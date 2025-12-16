@@ -11,5 +11,11 @@ cmds = [
   "cp -r apps/web/public apps/web/.next/standalone/apps/web/public"
 ]
 
+# These are only needed at runtime, not build time
+# Setting dummy values prevents build failures
+[variables]
+INNGEST_EVENT_KEY = "build-placeholder"
+INNGEST_SIGNING_KEY = "build-placeholder"
+
 [start]
 cmd = "node apps/web/.next/standalone/apps/web/server.js"
