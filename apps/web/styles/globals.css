@@ -11,6 +11,7 @@
 @import './theme.css';
 @import './theme.utilities.css';
 @import './shadcn-ui.css';
+@import './sparlo-tokens.css';
 @import './markdoc.css';
 @import './makerkit.css';
 @import './sparlo-animations.css';

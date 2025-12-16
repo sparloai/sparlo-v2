@@ -1,104 +1,129 @@
 /*
-* shadcn-ui.css
-*
-* Update the below to customize your Shadcn UI CSS Colors.
-* Refer to https://ui.shadcn.com/themes for applying new colors.
-* NB: apply the hsl function to the colors copied from the theme.
+ * shadcn-ui.css
+ *
+ * Sparlo brand-themed Shadcn UI CSS Colors.
+ * Uses violet (#7C3AED) as primary accent.
+ * Design: Typography-first, minimal decoration.
  */
 
 @layer base {
   :root {
-    --font-sans: -apple-system, BlinkMacSystemFont, var(--font-sans-fallback);
+    /* Typography - Söhne with Inter fallback */
+    --font-sans: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont,
+      sans-serif;
     --font-heading: var(--font-sans);
 
-    --background: var(--color-white);
-    --foreground: var(--color-neutral-950);
+    /* Backgrounds */
+    --background: #fafafa; /* sparlo-off-white */
+    --foreground: #0a0a0b; /* sparlo-black */
 
-    --card: var(--color-white);
-    --card-foreground: var(--color-neutral-950);
+    /* Cards */
+    --card: #ffffff;
+    --card-foreground: #0a0a0b;
 
-    --popover: var(--color-white);
-    --popover-foreground: var(--color-neutral-950);
+    /* Popovers */
+    --popover: #ffffff;
+    --popover-foreground: #0a0a0b;
 
-    --primary: var(--color-neutral-950);
-    --primary-foreground: var(--color-white);
+    /* Primary - Violet (brand accent) */
+    --primary: #7c3aed;
+    --primary-foreground: #ffffff;
 
-    --secondary: oklch(96.76% 0.0013 286.38);
-    --secondary-foreground: oklch(21.03% 0.0318 264.65);
+    /* Secondary - Subtle gray */
+    --secondary: #f3f4f6;
+    --secondary-foreground: #374151;
 
-    --muted: oklch(96.71% 0.0029 264.54);
-    --muted-foreground: oklch(55.13% 0.0233 264.36);
+    /* Muted - Background variations */
+    --muted: #f3f4f6;
+    --muted-foreground: #6b7280;
 
-    --accent: oklch(96.76% 0.0013 286.38);
-    --accent-foreground: oklch(21.03% 0.0318 264.65);
+    /* Accent - Violet subtle */
+    --accent: rgba(124, 58, 237, 0.08);
+    --accent-foreground: #7c3aed;
 
-    --destructive: var(--color-red-500);
-    --destructive-foreground: var(--color-white);
+    /* Destructive */
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
 
-    --border: var(--color-gray-100);
-    --input: var(--color-gray-200);
-    --ring: var(--color-neutral-800);
+    /* Borders & Inputs */
+    --border: #e5e7eb;
+    --input: #e5e7eb;
+    --ring: #7c3aed;
 
+    /* Border radius */
     --radius: 0.5rem;
 
-    --chart-1: var(--color-orange-400);
-    --chart-2: var(--color-teal-600);
-    --chart-3: var(--color-green-800);
-    --chart-4: var(--color-yellow-200);
-    --chart-5: var(--color-orange-200);
+    /* Charts - Violet-based palette */
+    --chart-1: #7c3aed;
+    --chart-2: #8b5cf6;
+    --chart-3: #a78bfa;
+    --chart-4: #c4b5fd;
+    --chart-5: #ddd6fe;
 
-    --sidebar-background: var(--color-neutral-50);
-    --sidebar-foreground: oklch(37.05% 0.012 285.8);
-    --sidebar-primary: var(--color-neutral-950);
-    --sidebar-primary-foreground: var(--color-white);
-    --sidebar-accent: var(--color-neutral-100);
-    --sidebar-accent-foreground: var(--color-neutral-950);
-    --sidebar-border: var(--border);
-    --sidebar-ring: var(--color-blue-500);
+    /* Sidebar */
+    --sidebar-background: #fafafa;
+    --sidebar-foreground: #374151;
+    --sidebar-primary: #7c3aed;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: rgba(124, 58, 237, 0.08);
+    --sidebar-accent-foreground: #0a0a0b;
+    --sidebar-border: #e5e7eb;
+    --sidebar-ring: #7c3aed;
   }
 
   .dark {
-    --background: var(--color-neutral-900);
-    --foreground: var(--color-white);
+    /* Backgrounds */
+    --background: #0a0a0b;
+    --foreground: #fafafa;
 
-    --card: var(--color-neutral-900);
-    --card-foreground: var(--color-white);
+    /* Cards */
+    --card: #111827;
+    --card-foreground: #fafafa;
 
-    --popover: var(--color-neutral-900);
-    --popover-foreground: var(--color-white);
+    /* Popovers */
+    --popover: #111827;
+    --popover-foreground: #fafafa;
 
-    --primary: var(--color-white);
-    --primary-foreground: var(--color-neutral-900);
+    /* Primary - Violet (slightly lighter in dark) */
+    --primary: #8b5cf6;
+    --primary-foreground: #ffffff;
 
-    --secondary: var(--color-neutral-800);
-    --secondary-foreground: oklch(98.43% 0.0017 247.84);
+    /* Secondary */
+    --secondary: #1f2937;
+    --secondary-foreground: #f3f4f6;
 
-    --muted: var(--color-neutral-800);
-    --muted-foreground: oklch(71.19% 0.0129 286.07);
+    /* Muted */
+    --muted: #1f2937;
+    --muted-foreground: #9ca3af;
 
-    --accent: var(--color-neutral-800);
-    --accent-foreground: oklch(98.48% 0 0);
+    /* Accent */
+    --accent: rgba(139, 92, 246, 0.15);
+    --accent-foreground: #a78bfa;
 
-    --destructive: var(--color-red-700);
-    --destructive-foreground: var(--color-white);
+    /* Destructive */
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
 
-    --border: var(--color-neutral-800);
-    --input: var(--color-neutral-700);
-    --ring: oklch(87.09% 0.0055 286.29);
+    /* Borders & Inputs */
+    --border: #374151;
+    --input: #374151;
+    --ring: #8b5cf6;
 
-    --chart-1: var(--color-blue-600);
-    --chart-2: var(--color-emerald-400);
-    --chart-3: var(--color-orange-400);
-    --chart-4: var(--color-purple-500);
-    --chart-5: var(--color-pink-500);
+    /* Charts */
+    --chart-1: #8b5cf6;
+    --chart-2: #a78bfa;
+    --chart-3: #c4b5fd;
+    --chart-4: #7c3aed;
+    --chart-5: #6d28d9;
 
-    --sidebar-background: var(--color-neutral-900);
-    --sidebar-foreground: var(--color-white);
-    --sidebar-primary: var(--color-blue-500);
-    --sidebar-primary-foreground: var(--color-white);
-    --sidebar-accent: var(--color-neutral-800);
-    --sidebar-accent-foreground: var(--color-white);
-    --sidebar-border: var(--border);
-    --sidebar-ring: var(--color-blue-500);
+    /* Sidebar */
+    --sidebar-background: #0a0a0b;
+    --sidebar-foreground: #f3f4f6;
+    --sidebar-primary: #8b5cf6;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: rgba(139, 92, 246, 0.15);
+    --sidebar-accent-foreground: #fafafa;
+    --sidebar-border: #374151;
+    --sidebar-ring: #8b5cf6;
   }
 }
