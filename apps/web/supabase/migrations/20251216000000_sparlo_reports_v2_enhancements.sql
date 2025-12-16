@@ -76,8 +76,10 @@ CREATE POLICY "Team members can delete reports"
     )
   );
 
--- Update count function to support team accounts
-CREATE OR REPLACE FUNCTION public.count_completed_reports(target_account_id uuid)
+-- Drop and recreate count function to support team accounts
+DROP FUNCTION IF EXISTS public.count_completed_reports(uuid);
+
+CREATE FUNCTION public.count_completed_reports(target_account_id uuid)
 RETURNS integer AS $$
   SELECT count(*)::integer
   FROM public.sparlo_reports
