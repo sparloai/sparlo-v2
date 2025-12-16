@@ -7,6 +7,8 @@ import { z } from 'zod';
 import { enhanceAction } from '@kit/next/actions';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
+import { inngest } from '~/lib/inngest/client';
+
 import type { ConversationStatus, Message, ReportResponse } from '../types';
 
 // Schema for creating a report
@@ -219,6 +221,153 @@ export const archiveReport = enhanceAction(
   },
   {
     schema: ArchiveReportSchema,
+    auth: true,
+  },
+);
+
+// Schema for starting a new report with Inngest
+const StartReportSchema = z.object({
+  designChallenge: z.string().min(50, 'Please provide at least 50 characters'),
+});
+
+/**
+ * Start a new report generation using Inngest durable workflow
+ */
+export const startReportGeneration = enhanceAction(
+  async (data, user) => {
+    const client = getSupabaseServerClient();
+    const conversationId = crypto.randomUUID();
+
+    // Create the report record
+    const { data: report, error: dbError } = await client
+      .from('sparlo_reports')
+      .insert({
+        account_id: user.id,
+        conversation_id: conversationId,
+        title: data.designChallenge.slice(0, 100),
+        status: 'processing',
+        current_step: 'an0',
+        messages: [
+          {
+            id: crypto.randomUUID(),
+            role: 'user',
+            content: data.designChallenge,
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      })
+      .select()
+      .single();
+
+    if (dbError) {
+      console.error('Failed to create report:', dbError);
+      throw new Error(`Failed to create report: ${dbError.message}`);
+    }
+
+    // Trigger Inngest function
+    try {
+      await inngest.send({
+        name: 'report/generate',
+        data: {
+          reportId: report.id,
+          accountId: user.id,
+          userId: user.id,
+          designChallenge: data.designChallenge,
+          conversationId,
+        },
+      });
+    } catch (inngestError) {
+      console.error('Failed to trigger Inngest:', inngestError);
+      // Update report status to error
+      await client
+        .from('sparlo_reports')
+        .update({
+          status: 'error',
+          last_message: 'Failed to start report generation',
+        })
+        .eq('id', report.id);
+      throw new Error('Failed to start report generation');
+    }
+
+    revalidatePath('/home');
+    return { success: true, reportId: report.id, conversationId };
+  },
+  {
+    schema: StartReportSchema,
+    auth: true,
+  },
+);
+
+// Schema for answering clarification
+const AnswerClarificationSchema = z.object({
+  reportId: z.string().uuid(),
+  answer: z.string().min(1, 'Please provide an answer'),
+});
+
+/**
+ * Answer a clarification question and resume the Inngest workflow
+ */
+export const answerClarification = enhanceAction(
+  async (data) => {
+    const client = getSupabaseServerClient();
+
+    // Get the report to verify status
+    const { data: report, error: fetchError } = await client
+      .from('sparlo_reports')
+      .select('id, status, clarifications')
+      .eq('id', data.reportId)
+      .single();
+
+    if (fetchError || !report) {
+      throw new Error('Report not found');
+    }
+
+    if (report.status !== 'clarifying') {
+      throw new Error('Report is not awaiting clarification');
+    }
+
+    // Update clarifications with answer
+    const clarifications = (report.clarifications as Record<string, unknown>[]) ?? [];
+    if (clarifications.length > 0) {
+      const lastClarification = clarifications[clarifications.length - 1];
+      if (lastClarification) {
+        lastClarification.answer = data.answer;
+        lastClarification.answeredAt = new Date().toISOString();
+      }
+    }
+
+    // Update report status
+    const { error: updateError } = await client
+      .from('sparlo_reports')
+      .update({
+        status: 'processing',
+        clarifications: JSON.parse(JSON.stringify(clarifications)),
+      })
+      .eq('id', data.reportId);
+
+    if (updateError) {
+      throw new Error(`Failed to update report: ${updateError.message}`);
+    }
+
+    // Resume Inngest workflow
+    try {
+      await inngest.send({
+        name: 'report/clarification-answered',
+        data: {
+          reportId: data.reportId,
+          answer: data.answer,
+        },
+      });
+    } catch (inngestError) {
+      console.error('Failed to resume workflow:', inngestError);
+      throw new Error('Failed to continue report generation');
+    }
+
+    revalidatePath('/home');
+    return { success: true };
+  },
+  {
+    schema: AnswerClarificationSchema,
     auth: true,
   },
 );
