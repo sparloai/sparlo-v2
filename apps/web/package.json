@@ -31,6 +31,7 @@
     "supabase:db:dump:local": "supabase db dump --local --data-only"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@edge-csrf/nextjs": "2.5.3-cloudflare-rc1",
     "@hookform/resolvers": "^5.2.2",
     "@kit/accounts": "workspace:*",
@@ -61,6 +62,7 @@
     "@tanstack/react-table": "^8.21.3",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.26",
+    "inngest": "^3.48.0",
     "lucide-react": "^0.556.0",
     "next": "catalog:",
     "next-sitemap": "^4.2.3",
