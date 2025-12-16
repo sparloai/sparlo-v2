@@ -40,7 +40,8 @@ async function AccountsPage(props: AdminAccountsPageProps) {
       <PageBody>
         <ServerDataLoader
           table={'accounts'}
-          client={client}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          client={client as any}
           page={page}
           where={(queryBuilder) => {
             const { account_type: type, query } = searchParams;
