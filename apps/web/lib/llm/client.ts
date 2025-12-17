@@ -61,7 +61,17 @@ export async function callClaude(params: {
         }
       }
 
-      return chunks.join('');
+      const result = chunks.join('');
+      if (!result) {
+        const finalMessage = await stream.finalMessage();
+        throw new Error(
+          `No text content from Claude stream. ` +
+            `stop_reason: ${finalMessage.stop_reason}, ` +
+            `model: ${finalMessage.model}`,
+        );
+      }
+
+      return result;
     }
 
     // Non-streaming for smaller requests
@@ -72,10 +82,16 @@ export async function callClaude(params: {
       messages: [{ role: 'user', content: params.userMessage }],
     });
 
-    // Extract text from response
+    // Extract text from response with detailed error context
     const textBlock = response.content.find((block) => block.type === 'text');
     if (!textBlock || textBlock.type !== 'text') {
-      throw new Error('No text content in Claude response');
+      const contentTypes = response.content.map((b) => b.type).join(', ');
+      throw new Error(
+        `No text content in Claude response. ` +
+          `stop_reason: ${response.stop_reason}, ` +
+          `content_types: [${contentTypes || 'empty'}], ` +
+          `model: ${response.model}`,
+      );
     }
 
     return textBlock.text;
