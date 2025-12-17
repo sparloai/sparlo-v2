@@ -52,19 +52,22 @@ function StatusBadge({ status }: { status: ConversationStatus }) {
     processing: {
       icon: Loader2,
       label: 'Processing',
-      className: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+      className:
+        'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
       iconClassName: 'animate-spin',
     },
     clarifying: {
       icon: Clock,
       label: 'Needs Input',
-      className: 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
+      className:
+        'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
       iconClassName: '',
     },
     complete: {
       icon: CheckCircle2,
       label: 'Complete',
-      className: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+      className:
+        'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
       iconClassName: '',
     },
     error: {
@@ -76,15 +79,26 @@ function StatusBadge({ status }: { status: ConversationStatus }) {
     confirm_rerun: {
       icon: Clock,
       label: 'Pending',
-      className: 'bg-gray-50 text-gray-600 dark:bg-gray-900/20 dark:text-gray-400',
+      className:
+        'bg-gray-50 text-gray-600 dark:bg-gray-900/20 dark:text-gray-400',
       iconClassName: '',
     },
   };
 
-  const { icon: Icon, label, className, iconClassName } = config[status] ?? config.processing;
+  const {
+    icon: Icon,
+    label,
+    className,
+    iconClassName,
+  } = config[status] ?? config.processing;
 
   return (
-    <span className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium', className)}>
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
+        className,
+      )}
+    >
       <Icon className={cn('h-3.5 w-3.5', iconClassName)} />
       {label}
     </span>
@@ -142,7 +156,8 @@ function EmptyState() {
         No reports yet
       </h3>
       <p className="mt-1 text-center text-sm text-gray-500 dark:text-gray-400">
-        Create your first report to get innovative solutions to your engineering challenges.
+        Create your first report to get innovative solutions to your engineering
+        challenges.
       </p>
       <Link href="/home/reports/new" className="mt-6">
         <Button className="bg-[#7C3AED] hover:bg-[#6D28D9]">

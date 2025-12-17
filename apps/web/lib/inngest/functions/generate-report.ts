@@ -497,11 +497,15 @@ export const generateReport = inngest.createFunction(
     // Complete Report
     // =========================================
     await step.run('complete-report', async () => {
+      // Convert AN5 JSON report to markdown for frontend display
+      const markdown = generateReportMarkdown(an5Result.report);
+
       await updateProgress({
         status: 'complete',
         current_step: 'complete',
         phase_progress: 100,
         report_data: {
+          markdown, // For frontend display
           report: an5Result.report,
           metadata: an5Result.metadata,
           chainState: state,
@@ -509,6 +513,7 @@ export const generateReport = inngest.createFunction(
           validation_results: an4Result.validation_results,
           recommendation: an4Result.recommendation,
           innovation_patterns: an2Result.innovation_patterns,
+          recommendedConcept: an5Result.report.recommendation?.primary?.title,
           // Corpus data
           retrieval_summary: state.an1_retrieval_summary,
           corpus_gaps: state.an1_5_corpus_gaps,
@@ -993,4 +998,218 @@ ${an4Result.validation_plan.pivot_triggers.join('\n')}
 ---
 
 Please synthesize this into an EXECUTIVE INNOVATION REPORT following the specified structure.`;
+}
+
+
+// =========================================
+// Helper: Convert AN5 JSON Report to Markdown
+// =========================================
+function generateReportMarkdown(report: AN5Output["report"]): string {
+  const sections: string[] = [];
+
+  // Title
+  sections.push(`# ${report.title}`);
+  sections.push(`*${report.subtitle}*`);
+  sections.push("");
+
+  // Executive Summary
+  sections.push("## Executive Summary");
+  sections.push(`**Problem:** ${report.executive_summary.problem_essence}`);
+  sections.push("");
+  sections.push(`**Key Insight:** ${report.executive_summary.key_insight}`);
+  sections.push("");
+  sections.push(`**Recommendation:** ${report.executive_summary.primary_recommendation}`);
+  sections.push("");
+  sections.push(`**Confidence:** ${report.executive_summary.confidence_level} — ${report.executive_summary.confidence_rationale}`);
+  sections.push("");
+
+  // Problem Analysis
+  sections.push("## Problem Analysis");
+  sections.push(`**Original Challenge:** ${report.problem_analysis.original_challenge}`);
+  sections.push("");
+  sections.push(`**Reframed Challenge:** ${report.problem_analysis.reframed_challenge}`);
+  sections.push("");
+  sections.push("### Core Contradiction");
+  sections.push(`${report.problem_analysis.core_contradiction.plain_english}`);
+  sections.push(`- **Improve:** ${report.problem_analysis.core_contradiction.improve}`);
+  sections.push(`- **Worsen:** ${report.problem_analysis.core_contradiction.worsen}`);
+  sections.push("");
+  sections.push(`**Physics Summary:** ${report.problem_analysis.physics_summary}`);
+  sections.push("");
+  sections.push(`**First Principles Insight:** ${report.problem_analysis.first_principles_insight}`);
+  sections.push("");
+
+  // Innovation Approach
+  sections.push("## Innovation Approach");
+  sections.push(`**Methodology:** ${report.innovation_approach.methodology_used}`);
+  sections.push("");
+  sections.push("### Paradigms Explored");
+  sections.push(`- **Direct:** ${report.innovation_approach.paradigms_explored.direct}`);
+  sections.push(`- **Indirect:** ${report.innovation_approach.paradigms_explored.indirect}`);
+  sections.push("");
+  if (report.innovation_approach.cross_domain_sources.length > 0) {
+    sections.push("### Cross-Domain Sources");
+    report.innovation_approach.cross_domain_sources.forEach(source => {
+      sections.push(`- ${source}`);
+    });
+    sections.push("");
+  }
+  if (report.innovation_approach.triz_principles_applied.length > 0) {
+    sections.push("### TRIZ Principles Applied");
+    report.innovation_approach.triz_principles_applied.forEach(principle => {
+      sections.push(`- ${principle}`);
+    });
+    sections.push("");
+  }
+
+  // Concepts Generated
+  sections.push("## Concepts Generated");
+  sections.push(`**Total:** ${report.concepts_generated.total_count} concepts across 3 tracks`);
+  sections.push("");
+
+  // By track
+  const tracks = [
+    { key: "simpler_path", name: "Simpler Path", data: report.concepts_generated.by_track.simpler_path },
+    { key: "best_fit", name: "Best Fit", data: report.concepts_generated.by_track.best_fit },
+    { key: "spark", name: "Spark", data: report.concepts_generated.by_track.spark },
+  ];
+
+  tracks.forEach(track => {
+    if (track.data.concepts.length > 0) {
+      sections.push(`### ${track.name} Track`);
+      sections.push(`*${track.data.philosophy}*`);
+      sections.push("");
+      track.data.concepts.forEach(concept => {
+        sections.push(`**${concept.id}: ${concept.title}**`);
+        sections.push(`${concept.one_liner}`);
+        sections.push(`- **Mechanism:** ${concept.mechanism}`);
+        sections.push(`- **Source:** ${concept.innovation_source}`);
+        sections.push(`- **Feasibility:** ${concept.feasibility}`);
+        sections.push("");
+      });
+    }
+  });
+
+  // First Principles Highlight
+  if (report.concepts_generated.first_principles_highlight) {
+    sections.push("### First Principles Highlight");
+    sections.push(`**${report.concepts_generated.first_principles_highlight.concept_id}:** ${report.concepts_generated.first_principles_highlight.what_makes_it_first_principles}`);
+    sections.push("");
+  }
+
+  // Validation Results
+  sections.push("## Validation Results");
+  sections.push(`**Passed:** ${report.validation_results.gate_outcomes.passed} | **Conditional:** ${report.validation_results.gate_outcomes.conditional} | **Failed:** ${report.validation_results.gate_outcomes.failed}`);
+  sections.push("");
+  sections.push(`**Key Finding:** ${report.validation_results.key_validation_finding}`);
+  sections.push("");
+  if (report.validation_results.concepts_flagged.length > 0) {
+    sections.push("### Concepts Flagged");
+    report.validation_results.concepts_flagged.forEach(flagged => {
+      sections.push(`- **${flagged.id}:** ${flagged.issue}`);
+    });
+    sections.push("");
+  }
+
+  // Recommendation
+  sections.push("## Recommendation");
+  sections.push("### Primary Recommendation");
+  sections.push(`**${report.recommendation.primary.concept_id}: ${report.recommendation.primary.title}** (${report.recommendation.primary.track})`);
+  sections.push("");
+  sections.push(report.recommendation.primary.why_recommended);
+  sections.push("");
+  sections.push(`**Expected Impact:** ${report.recommendation.primary.expected_impact}`);
+  sections.push(`**Key Risk:** ${report.recommendation.primary.key_risk}`);
+  sections.push("");
+  sections.push("**Next Steps:**");
+  report.recommendation.primary.next_steps.forEach(step => {
+    sections.push(`1. **${step.step}** — ${step.purpose}`);
+  });
+  sections.push("");
+
+  // Parallel Exploration
+  sections.push("### Parallel Exploration");
+  sections.push(`**${report.recommendation.parallel_exploration.concept_id}: ${report.recommendation.parallel_exploration.title}**`);
+  sections.push(report.recommendation.parallel_exploration.why_explore);
+  sections.push(`**Investment Level:** ${report.recommendation.parallel_exploration.investment_level}`);
+  sections.push("");
+
+  // Fallback
+  sections.push("### Fallback Option");
+  sections.push(`**${report.recommendation.fallback_option.concept_id}: ${report.recommendation.fallback_option.title}**`);
+  sections.push(`**When to Pivot:** ${report.recommendation.fallback_option.when_to_pivot}`);
+  sections.push("");
+
+  // Validation Roadmap
+  sections.push("## Validation Roadmap");
+  sections.push("### Phase 1: Quick Validation");
+  sections.push(`**Objective:** ${report.validation_roadmap.phase_1.objective}`);
+  sections.push("");
+  if (report.validation_roadmap.phase_1.experiments.length > 0) {
+    sections.push("| Experiment | Tests | Method | Success Criteria | Effort |");
+    sections.push("|------------|-------|--------|------------------|--------|");
+    report.validation_roadmap.phase_1.experiments.forEach(exp => {
+      sections.push(`| ${exp.name} | ${exp.tests} | ${exp.method} | ${exp.success_criteria} | ${exp.effort} |`);
+    });
+    sections.push("");
+  }
+  sections.push(`**Go/No-Go Criteria:** ${report.validation_roadmap.phase_1.go_no_go_criteria}`);
+  sections.push("");
+
+  sections.push("### Phase 2: Detailed Development");
+  sections.push(`**Objective:** ${report.validation_roadmap.phase_2.objective}`);
+  sections.push("");
+  if (report.validation_roadmap.phase_2.key_milestones.length > 0) {
+    sections.push("**Key Milestones:**");
+    report.validation_roadmap.phase_2.key_milestones.forEach(milestone => {
+      sections.push(`- ${milestone}`);
+    });
+    sections.push("");
+  }
+
+  if (report.validation_roadmap.kill_conditions.length > 0) {
+    sections.push("### Kill Conditions");
+    report.validation_roadmap.kill_conditions.forEach(condition => {
+      sections.push(`- ${condition}`);
+    });
+    sections.push("");
+  }
+
+  if (report.validation_roadmap.pivot_triggers.length > 0) {
+    sections.push("### Pivot Triggers");
+    report.validation_roadmap.pivot_triggers.forEach(trigger => {
+      sections.push(`- ${trigger}`);
+    });
+    sections.push("");
+  }
+
+  // Appendix
+  sections.push("## Appendix");
+  sections.push("### All Concepts Summary");
+  sections.push("| ID | Title | Track | Status | Score |");
+  sections.push("|----|-------|-------|--------|-------|");
+  report.appendix.all_concepts_summary.forEach(concept => {
+    sections.push(`| ${concept.id} | ${concept.title} | ${concept.track} | ${concept.gate_status} | ${concept.overall_score} |`);
+  });
+  sections.push("");
+
+  if (report.appendix.constraints_respected.length > 0) {
+    sections.push("### Constraints Respected");
+    report.appendix.constraints_respected.forEach(constraint => {
+      sections.push(`- ${constraint}`);
+    });
+    sections.push("");
+  }
+
+  if (report.appendix.assumptions_made.length > 0) {
+    sections.push("### Assumptions Made");
+    report.appendix.assumptions_made.forEach(assumption => {
+      sections.push(`- ${assumption}`);
+    });
+    sections.push("");
+  }
+
+  sections.push(`**Methodology Notes:** ${report.appendix.methodology_notes}`);
+
+  return sections.join("\n");
 }

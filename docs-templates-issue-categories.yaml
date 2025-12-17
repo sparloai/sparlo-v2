@@ -1,0 +1,363 @@
+# Compound Docs: Sparlo V2 Code Review Issue Category Templates
+# These templates map the 7-agent review findings to documentation structure
+
+---
+# TEMPLATE 1: Race Condition Issues (Performance & Races Category)
+# Used for: Issue 001, 005, 010, 029, 030, 021
+---
+
+category: "Performance & Race Conditions"
+agent: "Julik - Frontend Race Conditions Reviewer"
+frontmatter_template:
+  title: "Race Condition: {issue_name}"
+  date: "2024-12-16"
+  categories:
+    - performance
+    - race-condition
+    - frontend
+  tags:
+    - race-condition
+    - async
+    - react-hooks
+    - memory-leak
+    - polling
+  severity: "high"
+  component: "Frontend - React Hook"
+  symptoms:
+    - "Multiple async operations executing for wrong conversation context"
+    - "Duplicate API calls during rapid user interactions"
+    - "Memory leaks from orphaned async operations"
+    - "State thrashing and UI inconsistency"
+    - "React warnings about unmounted component updates"
+  root_cause: "Insufficient lifecycle management; async operations don't validate execution context after completing"
+  resolution_time_saved: "8-12 hours (prevents production race condition bugs)"
+  solutions:
+    - name: "Session ID Pattern"
+      effort: "small"
+      risk: "low"
+      recommended: true
+    - name: "AbortController Pattern"
+      effort: "medium"
+      risk: "low"
+      recommended: false
+  acceptance_criteria:
+    - "Only one polling interval active at any time"
+    - "No stale state updates from previous context"
+    - "Rapid interactions don't cause duplicate work"
+    - "No React warnings about unmounted components"
+
+---
+# TEMPLATE 2: Security Issues (Security & Data Integrity Category)
+# Used for: Issue 009, 014, 015, 016
+---
+
+category: "Security & Data Integrity"
+agent: "Security Reviewer"
+frontmatter_template:
+  title: "Security: {vulnerability_type}"
+  date: "2024-12-16"
+  categories:
+    - security
+    - authentication
+    - authorization
+    - data-protection
+  tags:
+    - security
+    - vulnerability
+    - authentication
+    - authorization
+    - xss
+    - data-leakage
+  severity: "critical"  # or "high"
+  component: "Backend API / Frontend Security"
+  symptoms:
+    - "Direct API access bypasses authentication"
+    - "Sensitive data exposed in error messages"
+    - "XSS injection possible via data sources"
+    - "User context unavailable for audit logging"
+  root_cause: "Security boundary missing or improperly implemented"
+  resolution_time_saved: "4-8 hours (prevents security incident)"
+  attack_scenario: "{describe how vulnerability could be exploited}"
+  solutions:
+    - name: "JWT Token Forwarding"
+      effort: "medium"
+      risk: "low"
+      recommended: true
+    - name: "API Key Pattern"
+      effort: "small"
+      risk: "low"
+      recommended: false
+  acceptance_criteria:
+    - "All endpoints require valid authentication"
+    - "Invalid tokens return 401 Unauthorized"
+    - "User context available for audit logging"
+    - "No sensitive data in error messages"
+
+---
+# TEMPLATE 3: Type Safety Issues (TypeScript Category)
+# Used for: Issue 011, 019, 032
+---
+
+category: "Type Safety"
+agent: "TypeScript Type Safety Reviewer"
+frontmatter_template:
+  title: "Type Safety: {issue_name}"
+  date: "2024-12-16"
+  categories:
+    - type-safety
+    - typescript
+    - validation
+  tags:
+    - typescript
+    - type-coercion
+    - validation
+    - runtime-safety
+    - zod
+  severity: "high"
+  component: "Frontend - API Integration"
+  symptoms:
+    - "TypeScript type checking bypassed"
+    - "Silent failures when API shape changes"
+    - "No runtime validation of external data"
+    - "Brittle to refactoring"
+  root_cause: "Type system bypassed with unsafe casting or overly broad types"
+  resolution_time_saved: "6-10 hours (prevents silent type-related bugs)"
+  affected_patterns:
+    - "as unknown as T"
+    - "Record<string, unknown>"
+    - "any" type usage
+  solutions:
+    - name: "Zod Runtime Validation"
+      effort: "medium"
+      risk: "low"
+      recommended: true
+    - name: "Type Guard Functions"
+      effort: "small"
+      risk: "low"
+      recommended: false
+  acceptance_criteria:
+    - "No unsafe type coercions"
+    - "Runtime validation at all API boundaries"
+    - "Clear error messages on validation failure"
+    - "Types derived from validation schemas"
+
+---
+# TEMPLATE 4: Architecture & Code Quality Issues (Simplicity Category)
+# Used for: Issue 002, 003, 006, 012, 013, 017, 018
+---
+
+category: "Architecture & Code Quality"
+agent: "Code Simplicity Reviewer"
+frontmatter_template:
+  title: "Refactor: {issue_name}"
+  date: "2024-12-16"
+  categories:
+    - architecture
+    - code-quality
+    - maintainability
+    - refactoring
+  tags:
+    - refactoring
+    - complexity
+    - duplication
+    - god-function
+    - state-management
+    - hooks
+  severity: "medium"
+  component: "Frontend - React Components/Hooks"
+  symptoms:
+    - "Function is too complex (250+ lines)"
+    - "Logic duplicated in multiple places"
+    - "Excessive number of useState hooks"
+    - "Excessive prop drilling"
+    - "Low maintainability"
+  root_cause: "Insufficient decomposition; mixed concerns"
+  resolution_time_saved: "10-15 hours (improves future maintenance)"
+  metrics:
+    lines_of_code: "XXX"
+    cyclomatic_complexity: "XXX"
+    state_variables: "XXX"
+    prop_drilling_depth: "XXX"
+  solutions:
+    - name: "Extract Custom Hook"
+      effort: "medium"
+      risk: "medium"
+      recommended: true
+    - name: "Consolidate State"
+      effort: "small"
+      risk: "low"
+      recommended: false
+  acceptance_criteria:
+    - "Each function has single responsibility"
+    - "No logic duplication"
+    - "Cognitive complexity reduced by 50%+"
+    - "All tests pass"
+
+---
+# TEMPLATE 5: Data Integrity Issues
+# Used for: Issue 004, 020, 024, 033, 034, 037
+---
+
+category: "Data Integrity"
+agent: "Data Integrity & Architecture Reviewer"
+frontmatter_template:
+  title: "Data Integrity: {issue_name}"
+  date: "2024-12-16"
+  categories:
+    - data-integrity
+    - validation
+    - database-constraints
+  tags:
+    - validation
+    - input-sanitization
+    - database-constraints
+    - data-consistency
+  severity: "high"  # or "medium"
+  component: "Frontend Input / Backend Processing / Database"
+  symptoms:
+    - "Invalid data accepted and stored"
+    - "Database constraints not enforced at application level"
+    - "User input not validated before API calls"
+    - "Missing composite indexes causing performance issues"
+  root_cause: "Missing input validation or database constraints"
+  resolution_time_saved: "5-8 hours (prevents data corruption)"
+  affected_operations:
+    - "{operation_name}"
+  solutions:
+    - name: "Add Zod Schema Validation"
+      effort: "small"
+      risk: "low"
+      recommended: true
+    - name: "Database Constraint"
+      effort: "small"
+      risk: "low"
+      recommended: false
+  acceptance_criteria:
+    - "All user input validated"
+    - "Database constraints enforced"
+    - "Invalid data rejected with clear errors"
+    - "No orphaned records possible"
+
+---
+# TEMPLATE 6: Backend/Python Issues
+# Used for: Issue 031, 035, 036
+---
+
+category: "Backend Architecture"
+agent: "Python Backend Reviewer"
+frontmatter_template:
+  title: "Backend: {issue_name}"
+  date: "2024-12-16"
+  categories:
+    - backend
+    - python
+    - fastapi
+  tags:
+    - python
+    - fastapi
+    - backend
+    - optimization
+    - streaming
+  severity: "medium"  # or "high"
+  component: "Backend - FastAPI Service"
+  symptoms:
+    - "Function performs too many responsibilities"
+    - "Memory inefficiency in streaming"
+    - "Missing optimization opportunities"
+  root_cause: "{technical explanation}"
+  resolution_time_saved: "6-12 hours (improves backend reliability)"
+  solutions:
+    - name: "{solution_name}"
+      effort: "medium"
+      risk: "low"
+      recommended: true
+  acceptance_criteria:
+    - "Function has single responsibility"
+    - "Performance metrics improved by X%"
+    - "All tests pass"
+
+---
+# TEMPLATE 7: Agent-Native Architecture Issues
+# Used for: Issue 018, and any agent-native patterns
+---
+
+category: "Agent-Native Architecture"
+agent: "Agent-Native Architecture Reviewer"
+frontmatter_template:
+  title: "Agent-Native: {pattern_name}"
+  date: "2024-12-16"
+  categories:
+    - agent-native
+    - architecture
+    - patterns
+  tags:
+    - agent-native
+    - state-machine
+    - autonomous-agents
+    - llm-patterns
+  severity: "medium"
+  component: "Application Architecture"
+  symptoms:
+    - "Implicit state machines instead of explicit ones"
+    - "Hard to reason about agent behavior"
+    - "Missing structured patterns for AI interactions"
+  root_cause: "Not using agent-native architectural patterns"
+  resolution_time_saved: "8-15 hours (improves agent reasoning)"
+  solutions:
+    - name: "Implement State Machine Pattern"
+      effort: "medium"
+      risk: "low"
+      recommended: true
+  acceptance_criteria:
+    - "State transitions explicit and documented"
+    - "Agent behavior predictable and testable"
+    - "Clearer code that's easier to modify"
+
+---
+
+# AGGREGATED ISSUE STATISTICS FOR DOCUMENTATION
+
+issue_count_by_category:
+  "Race Conditions & Performance": 8
+  "Security & Data Integrity": 6
+  "Type Safety & Validation": 5
+  "Architecture & Code Quality": 10
+  "Backend Issues": 4
+  "Agent-Native Patterns": 3
+  "Database & Constraints": 4
+
+issue_count_by_severity:
+  critical: 6
+  high: 12
+  medium: 14
+  low: 8
+
+issue_count_by_status:
+  completed: 8
+  pending: 20
+  ready: 12
+
+temporal_metrics:
+  total_resolution_effort_hours: "120-180"
+  total_time_saved_hours: "100-150"
+  critical_issues_timeline_days: 3
+  high_priority_timeline_days: 7
+  medium_priority_timeline_days: 14
+
+file_locations:
+  issue_tracker: "/Users/alijangbar/sparlo-v2/todos/"
+  main_app_frontend: "/Users/alijangbar/sparlo-v2/apps/web/"
+  backend_service: "/Users/alijangbar/sparlo-v2/sparlo-backend/"
+  database_schema: "/Users/alijangbar/sparlo-v2/apps/web/supabase/"
+
+search_tags_for_compound_docs:
+  - "sparlo-v2"
+  - "code-review"
+  - "7-agent-analysis"
+  - "race-condition"
+  - "security"
+  - "typescript"
+  - "react"
+  - "fastapi"
+  - "next.js"
+  - "supabase"

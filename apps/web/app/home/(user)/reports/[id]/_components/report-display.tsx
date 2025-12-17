@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -82,6 +83,7 @@ interface TocItem {
 }
 
 export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
+  const router = useRouter();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showToc, setShowToc] = useState(true);
   const [activeSection, setActiveSection] = useState('executive-summary');
@@ -92,6 +94,11 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
 
   // Track progress for processing reports
   const { progress } = useReportProgress(isProcessing ? report.id : null);
+
+  // Handle completion - refresh to get updated server data
+  const handleComplete = useCallback(() => {
+    router.refresh();
+  }, [router]);
 
   // Extract markdown from report data
   const reportMarkdown = report.report_data?.markdown ?? '';
@@ -229,7 +236,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
 
   // Show processing screen if still in progress
   if (isProcessing && progress) {
-    return <ProcessingScreen progress={progress} />;
+    return <ProcessingScreen progress={progress} onComplete={handleComplete} />;
   }
 
   // No report content yet

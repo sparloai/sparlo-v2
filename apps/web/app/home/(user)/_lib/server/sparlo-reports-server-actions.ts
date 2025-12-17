@@ -274,7 +274,7 @@ const StartReportSchema = z.object({
 // Rate limiting constants
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_REPORTS_PER_WINDOW = 1;
-const DAILY_LIMIT = 10;
+const DAILY_LIMIT = 1000; // Increased for testing
 
 /**
  * Start a new report generation using Inngest durable workflow

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Check, Loader2, MessageSquare, Send } from 'lucide-react';
@@ -13,7 +13,6 @@ import { PHASES } from '~/lib/constants/phases';
 
 import { answerClarification } from '../_lib/server/sparlo-reports-server-actions';
 import {
-  type ClarificationQuestion,
   type ReportProgress,
   calculateOverallProgress,
   getPhaseLabel,
@@ -32,9 +31,36 @@ export function ProcessingScreen({
 }: ProcessingScreenProps) {
   const [clarificationAnswer, setClarificationAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const hasNavigatedRef = useRef(false);
+  const startTimeRef = useRef(Date.now());
 
   const overallProgress = calculateOverallProgress(progress.currentStep);
   const currentPhaseLabel = getPhaseLabel(progress.currentStep);
+
+  // Auto-navigate when status changes to complete
+  useEffect(() => {
+    if (progress.status === 'complete' && onComplete && !hasNavigatedRef.current) {
+      hasNavigatedRef.current = true;
+      onComplete();
+    }
+  }, [progress.status, onComplete]);
+
+  // Elapsed time counter
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Format elapsed time as MM:SS
+  const formatElapsed = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Get the current clarification question (if any)
   const pendingClarification = progress.clarifications?.find((c) => !c.answer);
@@ -331,6 +357,11 @@ export function ProcessingScreen({
             );
           })}
         </div>
+
+        {/* Elapsed time */}
+        <p className="text-center text-sm tabular-nums text-[#8A8A8A]">
+          {formatElapsed(elapsedSeconds)} elapsed
+        </p>
 
         {/* Safe to leave notice */}
         <motion.p

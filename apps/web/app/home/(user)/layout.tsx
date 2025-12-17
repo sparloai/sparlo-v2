@@ -105,7 +105,7 @@ function MobileNavLink({
   return (
     <Link
       href={href}
-      className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 dark:bg-neutral-800 dark:text-gray-300"
+      className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm font-medium whitespace-nowrap text-gray-700 dark:bg-neutral-800 dark:text-gray-300"
     >
       <Icon className="h-3.5 w-3.5" />
       {children}
