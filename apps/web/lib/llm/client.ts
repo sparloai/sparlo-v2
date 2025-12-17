@@ -28,6 +28,7 @@ export const MODELS = {
 
 /**
  * Call Claude with proper error handling
+ * Uses streaming for large token requests to avoid timeout issues
  * (Kieran's fix: every LLM call wrapped with error handling)
  */
 export async function callClaude(params: {
@@ -37,11 +38,36 @@ export async function callClaude(params: {
   maxTokens?: number;
 }): Promise<string> {
   const anthropic = getAnthropicClient();
+  const maxTokens = params.maxTokens ?? 8192;
 
   try {
+    // Use streaming for large token requests (>10000) to avoid timeout
+    if (maxTokens > 10000) {
+      const chunks: string[] = [];
+
+      const stream = anthropic.messages.stream({
+        model: params.model,
+        max_tokens: maxTokens,
+        system: params.system,
+        messages: [{ role: 'user', content: params.userMessage }],
+      });
+
+      for await (const event of stream) {
+        if (
+          event.type === 'content_block_delta' &&
+          event.delta.type === 'text_delta'
+        ) {
+          chunks.push(event.delta.text);
+        }
+      }
+
+      return chunks.join('');
+    }
+
+    // Non-streaming for smaller requests
     const response = await anthropic.messages.create({
       model: params.model,
-      max_tokens: params.maxTokens ?? 8192,
+      max_tokens: maxTokens,
       system: params.system,
       messages: [{ role: 'user', content: params.userMessage }],
     });
