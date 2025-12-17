@@ -1,317 +1,216 @@
-'use client';
+import { Suspense } from 'react';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 
-import { Loader2 } from 'lucide-react';
-
-import { AnalyzingPhase } from './_components/analyzing-phase';
-import { ClarifyingPhase } from './_components/clarifying-phase';
-import { CompletePhase } from './_components/complete-phase';
-import { SparloErrorBoundary } from './_components/error-boundary';
-import { ErrorPhase } from './_components/error-phase';
-import { InputPhase } from './_components/input-phase';
 import {
-  generateSectionId,
-  markdownComponents,
-} from './_components/markdown-components';
-import { OfflineBanner } from './_components/offline-banner';
-import { ProcessingPhase } from './_components/processing-phase';
-import { useSparloContext } from './_lib/sparlo-context';
-import { PROGRESS_PHASES } from './_lib/types';
-import { useChat } from './_lib/use-chat';
+  AlertCircle,
+  Archive,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Loader2,
+  Plus,
+  Sparkles,
+} from 'lucide-react';
 
-interface TocItem {
+import { getSupabaseServerClient } from '@kit/supabase/server-client';
+import { Button } from '@kit/ui/button';
+import { cn } from '@kit/ui/utils';
+
+import type { ConversationStatus } from './_lib/types';
+
+interface Report {
   id: string;
   title: string;
-  level: number;
+  status: ConversationStatus;
+  current_step: string | null;
+  created_at: string;
+  updated_at: string;
+  archived: boolean;
 }
 
-function HomePageContent() {
-  const [input, setInput] = useState('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const clarificationInputRef = useRef<HTMLTextAreaElement>(null);
+async function getReports(): Promise<Report[]> {
+  const client = getSupabaseServerClient();
 
-  // Report navigation state
-  const [activeSection, setActiveSection] =
-    useState<string>('executive-summary');
-  const [showToc, setShowToc] = useState(true);
-  const reportRef = useRef<HTMLDivElement>(null);
-
-  // Clarification response
-  const [clarificationResponse, setClarificationResponse] = useState('');
-
-  // Elapsed time for processing phase
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-
-  const {
-    appState,
-    currentPhase, // Explicit phase from state machine - no derivation needed
-    activeConversation,
-    activeReportId,
-    reportData,
-    pendingMessage,
-    clarificationQuestion,
-    error,
-    isLoading,
-    currentStep,
-    sendMessage,
-    skipClarification,
-    startNewConversation,
-    getActiveReportChatHistory,
-    updateReportCache,
-  } = useSparloContext();
-
-  // Get chat history and convert timestamps from ISO strings to Date objects
-  const initialChatMessages = useMemo(() => {
-    const chatHistory = getActiveReportChatHistory();
-    return chatHistory.map((m) => ({
-      ...m,
-      timestamp: new Date(m.timestamp),
-    }));
-  }, [getActiveReportChatHistory]);
-
-  // Chat functionality - extracted to custom hook for cleaner code
-  const chat = useChat({
-    reportId: activeReportId,
-    reportMarkdown: reportData?.report_markdown ?? null,
-    conversationTitle: activeConversation?.title ?? 'Technical Analysis Report',
-    initialMessages: initialChatMessages,
-    onCacheUpdate: updateReportCache,
-  });
-
-  // Generate TOC from report markdown
-  const tocItems = useMemo((): TocItem[] => {
-    if (!reportData?.report_markdown) return [];
-
-    const headingRegex = /^##\s+(.+)$/gm;
-    const items: TocItem[] = [];
-    let match;
-
-    while ((match = headingRegex.exec(reportData.report_markdown)) !== null) {
-      const title = match[1]!.replace(/\*\*/g, '').trim();
-      const id = generateSectionId(title);
-      items.push({ id, title, level: 1 });
-    }
-
-    return items;
-  }, [reportData?.report_markdown]);
-
-  // Focus textarea on mount and when returning to input state
-  useEffect(() => {
-    if (textareaRef.current && appState === 'input' && !clarificationQuestion) {
-      textareaRef.current.focus();
-    }
-  }, [appState, clarificationQuestion]);
-
-  // Focus clarification input when question appears
-  useEffect(() => {
-    if (clarificationInputRef.current && clarificationQuestion) {
-      clarificationInputRef.current.focus();
-    }
-  }, [clarificationQuestion]);
-
-  // Scroll chat to bottom on new messages
-  useEffect(() => {
-    chat.endRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chat.messages, chat.endRef]);
-
-  // Track active section on scroll
-  useEffect(() => {
-    if (appState !== 'complete' || !reportData) return;
-
-    const handleScroll = () => {
-      const sections = tocItems.map((item) => ({
-        id: item.id,
-        element: document.getElementById(item.id),
-      }));
-
-      const scrollPosition = window.scrollY + 150;
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section?.element && section.element.offsetTop <= scrollPosition) {
-          setActiveSection(section.id);
-          break;
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [appState, reportData, tocItems]);
-
-  // Handle initial submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
-    const message = input.trim();
-    setInput('');
-    await sendMessage(message);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit(e);
-    }
-  };
-
-  // Handle clarification response
-  const handleClarificationSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!clarificationResponse.trim() || isLoading) return;
-    const response = clarificationResponse.trim();
-    setClarificationResponse('');
-    await sendMessage(response);
-  };
-
-  const handleClarificationKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleClarificationSubmit(e);
-    }
-  };
-
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offset = 100;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-      setActiveSection(sectionId);
-    }
-  };
-
-  // Note: currentPhase is now explicit from the state machine (use-sparlo.ts)
-  // No longer derived from multiple variables - cleaner and more predictable
-
-  // Track elapsed time during processing
-  useEffect(() => {
-    if (currentPhase !== 'processing') {
-      setElapsedSeconds(0);
-      return;
-    }
-    const timeInterval = setInterval(() => {
-      setElapsedSeconds((s) => s + 1);
-    }, 1000);
-    return () => clearInterval(timeInterval);
-  }, [currentPhase]);
-
-  // Progress percentage for generating phase
-  const progressPercent = useMemo(() => {
-    const stepOrder = [
-      'AN0',
-      'AN1',
-      'AN1.5',
-      'AN1.7',
-      'AN2',
-      'AN2-DIRECT',
-      'AN3',
-      'AN4',
-      'AN4.5',
-      'AN5',
-    ];
-    const idx = stepOrder.indexOf(currentStep);
-    if (idx === -1) return 10;
-    return Math.min(95, Math.round(((idx + 1) / stepOrder.length) * 100));
-  }, [currentStep]);
-
-  // Current progress phase based on percentage
-  const currentProgressPhase = useMemo(() => {
-    const found = PROGRESS_PHASES.find(
-      (p) =>
-        progressPercent >= p.duration[0] && progressPercent < p.duration[1],
-    );
-    return found || PROGRESS_PHASES[PROGRESS_PHASES.length - 1]!;
-  }, [progressPercent]);
-
-  // Render appropriate phase
-  if (currentPhase === 'input') {
-    return (
-      <InputPhase
-        input={input}
-        setInput={setInput}
-        isLoading={isLoading}
-        textareaRef={textareaRef}
-        onSubmit={handleSubmit}
-        onKeyDown={handleKeyDown}
-      />
-    );
-  }
-
-  if (currentPhase === 'analyzing') {
-    return <AnalyzingPhase pendingMessage={pendingMessage ?? undefined} />;
-  }
-
-  if (currentPhase === 'clarifying' && clarificationQuestion) {
-    return (
-      <ClarifyingPhase
-        clarificationQuestion={clarificationQuestion}
-        clarificationResponse={clarificationResponse}
-        setClarificationResponse={setClarificationResponse}
-        isLoading={isLoading}
-        clarificationInputRef={clarificationInputRef}
-        onSubmit={handleClarificationSubmit}
-        onKeyDown={handleClarificationKeyDown}
-        onSkip={skipClarification}
-      />
-    );
-  }
-
-  if (currentPhase === 'processing') {
-    return (
-      <ProcessingPhase
-        progressPercent={progressPercent}
-        currentProgressPhase={currentProgressPhase}
-        elapsedSeconds={elapsedSeconds}
-      />
-    );
-  }
-
-  if (currentPhase === 'complete' && reportData) {
-    return (
-      <CompletePhase
-        reportData={reportData}
-        activeConversation={activeConversation}
-        tocItems={tocItems}
-        activeSection={activeSection}
-        showToc={showToc}
-        setShowToc={setShowToc}
-        isChatOpen={chat.isOpen}
-        setIsChatOpen={chat.setIsOpen}
-        chatMessages={chat.messages}
-        chatInput={chat.input}
-        setChatInput={chat.setInput}
-        isChatLoading={chat.isLoading}
-        reportRef={reportRef}
-        chatEndRef={chat.endRef}
-        scrollToSection={scrollToSection}
-        markdownComponents={markdownComponents}
-        onStartNew={startNewConversation}
-        onChatSubmit={chat.handleSubmit}
-        onChatKeyDown={chat.handleKeyDown}
-      />
-    );
-  }
+  const { data, error } = await client
+    .from('sparlo_reports')
+    .select('id, title, status, current_step, created_at, updated_at, archived')
+    .eq('archived', false)
+    .order('created_at', { ascending: false })
+    .limit(50);
 
   if (error) {
-    return <ErrorPhase error={error} onStartNew={startNewConversation} />;
+    console.error('Failed to fetch reports:', error);
+    return [];
   }
 
-  // Fallback - shouldn't reach here, but just in case
+  return (data as Report[]) ?? [];
+}
+
+function StatusBadge({ status }: { status: ConversationStatus }) {
+  const config = {
+    processing: {
+      icon: Loader2,
+      label: 'Processing',
+      className: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+      iconClassName: 'animate-spin',
+    },
+    clarifying: {
+      icon: Clock,
+      label: 'Needs Input',
+      className: 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
+      iconClassName: '',
+    },
+    complete: {
+      icon: CheckCircle2,
+      label: 'Complete',
+      className: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+      iconClassName: '',
+    },
+    error: {
+      icon: AlertCircle,
+      label: 'Error',
+      className: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+      iconClassName: '',
+    },
+    confirm_rerun: {
+      icon: Clock,
+      label: 'Pending',
+      className: 'bg-gray-50 text-gray-600 dark:bg-gray-900/20 dark:text-gray-400',
+      iconClassName: '',
+    },
+  };
+
+  const { icon: Icon, label, className, iconClassName } = config[status] ?? config.processing;
+
   return (
-    <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[#FAFAFA] p-6 dark:bg-neutral-950">
+    <span className={cn('inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium', className)}>
+      <Icon className={cn('h-3.5 w-3.5', iconClassName)} />
+      {label}
+    </span>
+  );
+}
+
+function ReportCard({ report }: { report: Report }) {
+  const timeAgo = formatTimeAgo(new Date(report.created_at));
+
+  return (
+    <Link
+      href={`/home/reports/${report.id}`}
+      className="group block rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-[#7C3AED]/30 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-[#7C3AED]/30"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-base font-medium text-gray-900 group-hover:text-[#7C3AED] dark:text-white">
+            {report.title || 'Untitled Report'}
+          </h3>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            {timeAgo}
+          </p>
+        </div>
+        <StatusBadge status={report.status} />
+      </div>
+    </Link>
+  );
+}
+
+function formatTimeAgo(date: Date): string {
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 px-6 py-16 dark:border-neutral-800 dark:bg-neutral-900/50">
+      <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#7C3AED]/10">
+        <FileText className="h-7 w-7 text-[#7C3AED]" />
+      </div>
+      <h3 className="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+        No reports yet
+      </h3>
+      <p className="mt-1 text-center text-sm text-gray-500 dark:text-gray-400">
+        Create your first report to get innovative solutions to your engineering challenges.
+      </p>
+      <Link href="/home/reports/new" className="mt-6">
+        <Button className="bg-[#7C3AED] hover:bg-[#6D28D9]">
+          <Plus className="mr-2 h-4 w-4" />
+          New Report
+        </Button>
+      </Link>
+    </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16">
       <Loader2 className="h-8 w-8 animate-spin text-[#7C3AED]" />
+      <p className="mt-4 text-sm text-gray-500">Loading reports...</p>
+    </div>
+  );
+}
+
+async function ReportsList() {
+  const reports = await getReports();
+
+  if (reports.length === 0) {
+    return <EmptyState />;
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {reports.map((report) => (
+        <ReportCard key={report.id} report={report} />
+      ))}
     </div>
   );
 }
 
 export default function HomePage() {
   return (
-    <SparloErrorBoundary>
-      <OfflineBanner />
-      <HomePageContent />
-    </SparloErrorBoundary>
+    <div className="min-h-[calc(100vh-120px)] bg-[#FAFAFA] dark:bg-neutral-950">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight text-gray-900 dark:text-white">
+              <Sparkles className="h-6 w-6 text-[#7C3AED]" />
+              Your Reports
+            </h1>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              Innovation reports for your engineering challenges
+            </p>
+          </div>
+          <Link href="/home/reports/new">
+            <Button
+              size="lg"
+              className="bg-[#7C3AED] hover:bg-[#6D28D9]"
+              style={{ boxShadow: '0 4px 14px -2px rgba(124, 58, 237, 0.4)' }}
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              New Report
+            </Button>
+          </Link>
+        </div>
+
+        {/* Reports List */}
+        <Suspense fallback={<LoadingState />}>
+          <ReportsList />
+        </Suspense>
+      </div>
+    </div>
   );
 }
