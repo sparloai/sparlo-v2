@@ -178,6 +178,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
         content: chatInput.trim(),
       };
 
+      const savedInput = chatInput.trim();
       setChatMessages((prev) => [...prev, userMessage]);
       setChatInput('');
       setIsChatLoading(true);
@@ -194,24 +195,71 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             reportId: report.id,
-            message: chatInput.trim(),
-            reportContext: reportMarkdown,
+            message: savedInput,
           }),
         });
 
         if (!response.ok) {
-          throw new Error('Failed to get response');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.error || `Failed to get response (${response.status})`,
+          );
         }
 
-        const data = await response.json();
-        const content = data.response ?? 'I could not generate a response.';
+        // Handle streaming response
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let assistantContent = '';
 
-        // P1 Fix: Display content immediately instead of fake streaming
+        if (!reader) {
+          throw new Error('No response body');
+        }
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') break;
+
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.text) {
+                  assistantContent += parsed.text;
+                  setChatMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === assistantId
+                        ? { ...msg, content: assistantContent }
+                        : msg,
+                    ),
+                  );
+                }
+                if (parsed.error) {
+                  throw new Error(parsed.error);
+                }
+              } catch (parseError) {
+                // Skip invalid JSON lines (may be partial chunks)
+                if (
+                  parseError instanceof Error &&
+                  parseError.message !== 'AI service error'
+                ) {
+                  continue;
+                }
+                throw parseError;
+              }
+            }
+          }
+        }
+
+        // Mark streaming as complete
         setChatMessages((prev) =>
           prev.map((msg) =>
-            msg.id === assistantId
-              ? { ...msg, content, isStreaming: false }
-              : msg,
+            msg.id === assistantId ? { ...msg, isStreaming: false } : msg,
           ),
         );
       } catch (error) {
@@ -221,7 +269,10 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
             msg.id === assistantId
               ? {
                   ...msg,
-                  content: 'Sorry, I encountered an error. Please try again.',
+                  content:
+                    error instanceof Error
+                      ? error.message
+                      : 'Sorry, I encountered an error. Please try again.',
                   isStreaming: false,
                 }
               : msg,
@@ -231,7 +282,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
         setIsChatLoading(false);
       }
     },
-    [chatInput, isChatLoading, report.id, reportMarkdown],
+    [chatInput, isChatLoading, report.id],
   );
 
   // Show processing screen if still in progress
