@@ -473,7 +473,7 @@ export const generateReport = inngest.createFunction(
         model: MODELS.OPUS,
         system: AN4_PROMPT,
         userMessage: contextMessage,
-        maxTokens: 4096,
+        maxTokens: 12000, // Needs more tokens to evaluate 8-12 concepts
       });
 
       const parsed = parseJsonResponse<AN4Output>(response, 'AN4');
