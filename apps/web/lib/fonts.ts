@@ -1,5 +1,5 @@
-import localFont from 'next/font/local';
 import { Inter as InterFont } from 'next/font/google';
+import localFont from 'next/font/local';
 
 import { cn } from '@kit/ui/utils';
 
@@ -8,8 +8,8 @@ import { cn } from '@kit/ui/utils';
  * @description Söhne font with Inter fallback.
  * Söhne license required. Place font files in /public/fonts/:
  * - Soehne-Buch.woff2 (400)
- * - Soehne-Kraftig.woff2 (500)
- * - Soehne-Halbfett.woff2 (600)
+ * - Soehne-Kraeftig.woff2 (500)
+ * - Soehne-halbFett.woff2 (600)
  */
 const soehne = localFont({
   src: [
@@ -19,12 +19,12 @@ const soehne = localFont({
       style: 'normal',
     },
     {
-      path: '../public/fonts/Soehne-Kraftig.woff2',
+      path: '../public/fonts/Soehne-Kraeftig.woff2',
       weight: '500',
       style: 'normal',
     },
     {
-      path: '../public/fonts/Soehne-Halbfett.woff2',
+      path: '../public/fonts/Soehne-halbFett.woff2',
       weight: '600',
       style: 'normal',
     },
