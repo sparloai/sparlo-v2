@@ -309,7 +309,7 @@ export const generateReport = inngest.createFunction(
       const contextMessage = buildAN4Context(state, an3Result);
 
       const response = await callClaude({
-        model: MODELS.SONNET, // Use Sonnet for evaluation (faster)
+        model: MODELS.OPUS,
         system: AN4_PROMPT,
         userMessage: contextMessage,
         maxTokens: 4096,
