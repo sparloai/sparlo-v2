@@ -23,7 +23,7 @@ export function getAnthropicClient(): Anthropic {
  */
 export const MODELS = {
   // Use Opus for complex reasoning (AN0, AN2, AN3)
-  OPUS: 'claude-opus-4-5-20250514',
+  OPUS: 'claude-opus-4-5-20251101',
   // Use Sonnet for faster tasks (AN4, AN5, chat)
   SONNET: 'claude-sonnet-4-5-20250514',
 } as const;
