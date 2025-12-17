@@ -67,10 +67,7 @@ export async function callClaude(params: {
 /**
  * Parse JSON from Claude response with proper error handling
  */
-export function parseJsonResponse<T>(
-  response: string,
-  context: string
-): T {
+export function parseJsonResponse<T>(response: string, context: string): T {
   // Try to extract JSON from markdown code blocks
   const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)```/);
   const jsonStr = jsonMatch?.[1]?.trim() ?? response.trim();
@@ -79,7 +76,7 @@ export function parseJsonResponse<T>(
     return JSON.parse(jsonStr) as T;
   } catch {
     throw new Error(
-      `Failed to parse JSON from ${context}: ${jsonStr.slice(0, 200)}...`
+      `Failed to parse JSON from ${context}: ${jsonStr.slice(0, 200)}...`,
     );
   }
 }

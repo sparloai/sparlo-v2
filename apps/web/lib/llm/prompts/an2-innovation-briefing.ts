@@ -67,7 +67,7 @@ export const AN2OutputSchema = z.object({
       sourceDomains: z.array(z.string()),
       precedent: z.string(),
       applicability: z.string(),
-    })
+    }),
   ),
   synthesisInsight: z.string(),
 });

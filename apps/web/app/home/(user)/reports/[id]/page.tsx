@@ -29,7 +29,9 @@ async function loadReport(reportId: string): Promise<Report | null> {
 
   const { data, error } = await client
     .from('sparlo_reports')
-    .select('id, title, status, current_step, phase_progress, report_data, clarifications, last_message, created_at')
+    .select(
+      'id, title, status, current_step, phase_progress, report_data, clarifications, last_message, created_at',
+    )
     .eq('id', reportId)
     .single();
 

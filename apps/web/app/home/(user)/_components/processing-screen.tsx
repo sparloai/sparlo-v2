@@ -9,12 +9,14 @@ import { Button } from '@kit/ui/button';
 import { Textarea } from '@kit/ui/textarea';
 import { cn } from '@kit/ui/utils';
 
+import { PHASES } from '~/lib/constants/phases';
+
 import { answerClarification } from '../_lib/server/sparlo-reports-server-actions';
 import {
-  calculateOverallProgress,
-  getPhaseLabel,
   type ClarificationQuestion,
   type ReportProgress,
+  calculateOverallProgress,
+  getPhaseLabel,
 } from '../_lib/use-report-progress';
 
 interface ProcessingScreenProps {
@@ -22,15 +24,12 @@ interface ProcessingScreenProps {
   onComplete?: () => void;
 }
 
-const PHASES = [
-  { id: 'an0', label: 'Problem Framing', description: 'Understanding your challenge' },
-  { id: 'an2', label: 'Pattern Synthesis', description: 'Finding innovation patterns' },
-  { id: 'an3', label: 'Concept Generation', description: 'Creating solution concepts' },
-  { id: 'an4', label: 'Evaluation', description: 'Scoring and ranking' },
-  { id: 'an5', label: 'Report Writing', description: 'Compiling your report' },
-];
+// P2: PHASES constant now imported from ~/lib/constants/phases
 
-export function ProcessingScreen({ progress, onComplete }: ProcessingScreenProps) {
+export function ProcessingScreen({
+  progress,
+  onComplete,
+}: ProcessingScreenProps) {
   const [clarificationAnswer, setClarificationAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,9 +37,7 @@ export function ProcessingScreen({ progress, onComplete }: ProcessingScreenProps
   const currentPhaseLabel = getPhaseLabel(progress.currentStep);
 
   // Get the current clarification question (if any)
-  const pendingClarification = progress.clarifications?.find(
-    (c) => !c.answer
-  );
+  const pendingClarification = progress.clarifications?.find((c) => !c.answer);
 
   const handleSubmitClarification = useCallback(async () => {
     if (!clarificationAnswer.trim() || isSubmitting) return;
@@ -134,7 +131,8 @@ export function ProcessingScreen({ progress, onComplete }: ProcessingScreenProps
         </h2>
 
         <p className="mt-2 max-w-md text-center text-[#6A6A6A]">
-          {progress.errorMessage || 'An error occurred while generating your report. Please try again.'}
+          {progress.errorMessage ||
+            'An error occurred while generating your report. Please try again.'}
         </p>
       </motion.div>
     );
@@ -280,7 +278,7 @@ export function ProcessingScreen({ progress, onComplete }: ProcessingScreenProps
         <div className="space-y-2">
           {PHASES.map((phase, index) => {
             const currentIndex = PHASES.findIndex(
-              (p) => p.id === progress.currentStep
+              (p) => p.id === progress.currentStep,
             );
             const isCompleted = index < currentIndex;
             const isCurrent = phase.id === progress.currentStep;
@@ -291,7 +289,7 @@ export function ProcessingScreen({ progress, onComplete }: ProcessingScreenProps
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-4 py-2 transition-colors',
                   isCurrent && 'bg-[#7C3AED]/10',
-                  isCompleted && 'opacity-60'
+                  isCompleted && 'opacity-60',
                 )}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -302,26 +300,28 @@ export function ProcessingScreen({ progress, onComplete }: ProcessingScreenProps
                     'flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold',
                     isCompleted && 'bg-[#7C3AED] text-white',
                     isCurrent && 'border-2 border-[#7C3AED] text-[#7C3AED]',
-                    !isCompleted && !isCurrent && 'bg-[#E5E5E5] text-[#8A8A8A] dark:bg-neutral-800'
+                    !isCompleted &&
+                      !isCurrent &&
+                      'bg-[#E5E5E5] text-[#8A8A8A] dark:bg-neutral-800',
                   )}
                 >
-                  {isCompleted ? (
-                    <Check className="h-3 w-3" />
-                  ) : (
-                    index + 1
-                  )}
+                  {isCompleted ? <Check className="h-3 w-3" /> : index + 1}
                 </div>
                 <div className="flex-1">
                   <p
                     className={cn(
                       'text-sm font-medium',
-                      isCurrent ? 'text-[#7C3AED]' : 'text-[#4A4A4A] dark:text-neutral-300'
+                      isCurrent
+                        ? 'text-[#7C3AED]'
+                        : 'text-[#4A4A4A] dark:text-neutral-300',
                     )}
                   >
                     {phase.label}
                   </p>
                   {isCurrent && (
-                    <p className="text-xs text-[#8A8A8A]">{phase.description}</p>
+                    <p className="text-xs text-[#8A8A8A]">
+                      {phase.description}
+                    </p>
                   )}
                 </div>
                 {isCurrent && (

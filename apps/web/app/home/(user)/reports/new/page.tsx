@@ -2,9 +2,10 @@
 
 import { useCallback, useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 import { Button } from '@kit/ui/button';
 import { Textarea } from '@kit/ui/textarea';
@@ -50,7 +51,9 @@ export default function NewReportPage() {
     } catch (err) {
       console.error('Failed to start report:', err);
       setError(
-        err instanceof Error ? err.message : 'Failed to start report generation'
+        err instanceof Error
+          ? err.message
+          : 'Failed to start report generation',
       );
     } finally {
       setIsSubmitting(false);
@@ -103,7 +106,8 @@ export default function NewReportPage() {
             Describe your engineering challenge
           </h1>
           <p className="mt-2 text-[#6A6A6A]">
-            Sparlo will analyze your problem and generate innovative solution concepts
+            Sparlo will analyze your problem and generate innovative solution
+            concepts
           </p>
         </motion.div>
 
@@ -123,21 +127,25 @@ export default function NewReportPage() {
           />
 
           {/* Error message */}
-          {error && (
-            <p className="text-sm text-red-500">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-500">{error}</p>}
 
           {/* Quality feedback and submit */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <span className="text-sm tabular-nums text-[#8A8A8A]">
+              <span className="text-sm text-[#8A8A8A] tabular-nums">
                 {wordCount} words
               </span>
               {challengeText.length >= 30 && (
                 <div className="flex items-center gap-3">
                   {[
-                    { check: inputQuality.checks.hasChallenge, label: 'Problem' },
-                    { check: inputQuality.checks.hasConstraints, label: 'Constraints' },
+                    {
+                      check: inputQuality.checks.hasChallenge,
+                      label: 'Problem',
+                    },
+                    {
+                      check: inputQuality.checks.hasConstraints,
+                      label: 'Constraints',
+                    },
                     { check: inputQuality.checks.hasGoals, label: 'Goals' },
                     { check: inputQuality.checks.hasContext, label: 'Context' },
                   ].map(({ check, label }) => (
@@ -145,13 +153,13 @@ export default function NewReportPage() {
                       key={label}
                       className={cn(
                         'flex items-center gap-1 text-xs transition-colors',
-                        check ? 'text-[#7C3AED]' : 'text-[#8A8A8A]/50'
+                        check ? 'text-[#7C3AED]' : 'text-[#8A8A8A]/50',
                       )}
                     >
                       <div
                         className={cn(
                           'h-1.5 w-1.5 rounded-full transition-colors',
-                          check ? 'bg-[#7C3AED]' : 'bg-[#E5E5E5]'
+                          check ? 'bg-[#7C3AED]' : 'bg-[#E5E5E5]',
                         )}
                       />
                       <span className="hidden sm:inline">{label}</span>
@@ -180,7 +188,8 @@ export default function NewReportPage() {
           {/* Character requirement hint */}
           {challengeText.length > 0 && challengeText.length < 50 && (
             <p className="text-center text-sm text-[#8A8A8A]">
-              Please provide at least 50 characters ({50 - challengeText.length} more needed)
+              Please provide at least 50 characters ({50 - challengeText.length}{' '}
+              more needed)
             </p>
           )}
 

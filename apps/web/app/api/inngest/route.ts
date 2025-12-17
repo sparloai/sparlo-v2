@@ -11,8 +11,14 @@ import { functions } from '~/lib/inngest/functions';
  * - report/clarification-answered: Resume workflow after user answers clarification
  *
  * Inngest Cloud calls this endpoint to execute functions.
+ *
+ * SECURITY: Signature verification is automatically enabled when INNGEST_SIGNING_KEY
+ * environment variable is set. Unsigned requests will be rejected with 401.
  */
 export const { GET, POST, PUT } = serve({
   client: inngest,
   functions,
+  // Explicitly reference signing key to ensure signature verification is enabled
+  // The SDK will reject unsigned requests when this is set
+  signingKey: process.env.INNGEST_SIGNING_KEY,
 });

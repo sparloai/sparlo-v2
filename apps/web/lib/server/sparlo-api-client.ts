@@ -32,7 +32,9 @@ export async function callSparloApi<T>(
   const url = `${baseUrl}${endpoint}`;
 
   console.log(`[Sparlo API] Calling: ${url}`);
-  console.log(`[Sparlo API] SPARLO_BACKEND_HOST: ${process.env.SPARLO_BACKEND_HOST}`);
+  console.log(
+    `[Sparlo API] SPARLO_BACKEND_HOST: ${process.env.SPARLO_BACKEND_HOST}`,
+  );
 
   try {
     const response = await fetch(url, {

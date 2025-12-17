@@ -41,7 +41,8 @@ export const PHASES = [
   {
     id: 'an0',
     name: 'Problem Framing',
-    description: 'Understanding your challenge and extracting core contradictions',
+    description:
+      'Understanding your challenge and extracting core contradictions',
     estimatedMinutes: 1.5,
   },
   {

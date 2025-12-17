@@ -4,7 +4,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useSupabase } from '@kit/supabase/hooks/use-supabase';
 
+import {
+  PHASE_LABELS,
+  calculateOverallProgress,
+  getPhaseLabel,
+} from '~/lib/constants/phases';
+
 import type { ConversationStatus } from './types';
+
+// Re-export for backwards compatibility
+export { PHASE_LABELS, getPhaseLabel, calculateOverallProgress };
 
 /**
  * Report progress data from Supabase
@@ -172,33 +181,4 @@ export function useReportProgress(
   };
 }
 
-/**
- * Phase labels for display
- */
-export const PHASE_LABELS: Record<string, string> = {
-  an0: 'Understanding your challenge',
-  an2: 'Finding innovation patterns',
-  an3: 'Generating solution concepts',
-  an4: 'Evaluating and ranking',
-  an5: 'Writing your report',
-  complete: 'Report complete',
-};
-
-/**
- * Get human-readable label for a phase
- */
-export function getPhaseLabel(step: string | null): string {
-  if (!step) return 'Starting analysis...';
-  return PHASE_LABELS[step] ?? `Processing: ${step}`;
-}
-
-/**
- * Calculate overall progress percentage based on current step
- */
-export function calculateOverallProgress(step: string | null): number {
-  const steps = ['an0', 'an2', 'an3', 'an4', 'an5', 'complete'];
-  if (!step) return 0;
-  const index = steps.indexOf(step);
-  if (index === -1) return 0;
-  return Math.round((index / (steps.length - 1)) * 100);
-}
+// P2: Phase utilities now imported from ~/lib/constants/phases

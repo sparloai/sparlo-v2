@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import Link from 'next/link';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -17,7 +19,6 @@ import {
   Sparkles,
   X,
 } from 'lucide-react';
-import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 
 import { Button } from '@kit/ui/button';
@@ -95,16 +96,19 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
   // Extract markdown from report data
   const reportMarkdown = report.report_data?.markdown ?? '';
 
-  // Generate TOC from markdown headers
-  const tocItems: TocItem[] = [];
-  const headerRegex = /^(#{2,3})\s+(.+)$/gm;
-  let match;
-  while ((match = headerRegex.exec(reportMarkdown)) !== null) {
-    const level = match[1]?.length ?? 2;
-    const title = match[2]?.replace(/\*\*/g, '') ?? '';
-    const id = generateSectionId(title);
-    tocItems.push({ id, title, level });
-  }
+  // P1 Performance: Memoize TOC generation to prevent recalculation on every render
+  const tocItems = useMemo(() => {
+    const items: TocItem[] = [];
+    const headerRegex = /^(#{2,3})\s+(.+)$/gm;
+    let match;
+    while ((match = headerRegex.exec(reportMarkdown)) !== null) {
+      const level = match[1]?.length ?? 2;
+      const title = match[2]?.replace(/\*\*/g, '') ?? '';
+      const id = generateSectionId(title);
+      items.push({ id, title, level });
+    }
+    return items;
+  }, [reportMarkdown]);
 
   // Scroll chat to bottom
   useEffect(() => {
@@ -195,25 +199,13 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
         const data = await response.json();
         const content = data.response ?? 'I could not generate a response.';
 
-        // Simulate streaming
-        let displayedContent = '';
-        const words = content.split(' ');
-        for (let i = 0; i < words.length; i++) {
-          await new Promise((resolve) => setTimeout(resolve, 20));
-          displayedContent += (i > 0 ? ' ' : '') + words[i];
-          setChatMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === assistantId
-                ? { ...msg, content: displayedContent }
-                : msg
-            )
-          );
-        }
-
+        // P1 Fix: Display content immediately instead of fake streaming
         setChatMessages((prev) =>
           prev.map((msg) =>
-            msg.id === assistantId ? { ...msg, isStreaming: false } : msg
-          )
+            msg.id === assistantId
+              ? { ...msg, content, isStreaming: false }
+              : msg,
+          ),
         );
       } catch (error) {
         console.error('Chat error:', error);
@@ -225,14 +217,14 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                   content: 'Sorry, I encountered an error. Please try again.',
                   isStreaming: false,
                 }
-              : msg
-          )
+              : msg,
+          ),
         );
       } finally {
         setIsChatLoading(false);
       }
     },
-    [chatInput, isChatLoading, report.id, reportMarkdown]
+    [chatInput, isChatLoading, report.id, reportMarkdown],
   );
 
   // Show processing screen if still in progress
@@ -268,7 +260,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
               <div className="sticky top-20 h-[calc(100vh-80px)] overflow-y-auto border-r border-[#E5E5E5] bg-white dark:border-neutral-800 dark:bg-neutral-900">
                 <div className="p-5">
                   <div className="mb-5 flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase tracking-[0.1em] text-[#8A8A8A]">
+                    <span className="text-xs font-semibold tracking-[0.1em] text-[#8A8A8A] uppercase">
                       Contents
                     </span>
                     <Button
@@ -290,7 +282,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                           item.level === 3 && 'pl-6',
                           activeSection === item.id
                             ? 'bg-[#7C3AED]/10 font-medium text-[#7C3AED]'
-                            : 'text-[#6A6A6A] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]'
+                            : 'text-[#6A6A6A] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]',
                         )}
                       >
                         <span className="truncate">{item.title}</span>
@@ -306,7 +298,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
         {/* TOC Toggle */}
         {!showToc && (
           <motion.button
-            className="fixed left-4 top-24 z-40 hidden items-center gap-2 rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 shadow-md lg:flex"
+            className="fixed top-24 left-4 z-40 hidden items-center gap-2 rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 shadow-md lg:flex"
             onClick={() => setShowToc(true)}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
@@ -320,7 +312,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
         <div
           className={cn(
             'min-w-0 flex-1 px-6 py-10 transition-all',
-            isChatOpen && 'lg:mr-[420px]'
+            isChatOpen && 'lg:mr-[420px]',
           )}
         >
           <div className="mx-auto max-w-3xl">
@@ -337,15 +329,15 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
             <header className="mb-10">
               <div className="mb-6 flex items-start justify-between gap-6">
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.1em] text-[#8A8A8A]">
+                  <div className="flex items-center gap-2 text-xs font-medium tracking-[0.1em] text-[#8A8A8A] uppercase">
                     <Sparkles className="h-3.5 w-3.5" />
                     Sparlo Analysis Report
                   </div>
-                  <h1 className="text-[32px] font-semibold leading-tight tracking-tight text-[#1A1A1A] dark:text-white">
+                  <h1 className="text-[32px] leading-tight font-semibold tracking-tight text-[#1A1A1A] dark:text-white">
                     {report.title}
                   </h1>
                 </div>
-                <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase text-emerald-600">
+                <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600 uppercase">
                   <Check className="h-3 w-3" />
                   Complete
                 </div>
@@ -393,7 +385,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                         <h2 className="text-base font-semibold text-[#1A1A1A] dark:text-white">
                           Lead Recommendation
                         </h2>
-                        <span className="rounded bg-[#7C3AED]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#7C3AED]">
+                        <span className="rounded bg-[#7C3AED]/10 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-[#7C3AED] uppercase">
                           Key Finding
                         </span>
                       </div>
@@ -431,7 +423,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
       {/* Chat Toggle Button */}
       {!isChatOpen && (
         <motion.button
-          className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-full bg-[#7C3AED] px-5 py-3.5 text-white shadow-lg hover:shadow-xl"
+          className="fixed right-6 bottom-6 z-50 flex items-center gap-2.5 rounded-full bg-[#7C3AED] px-5 py-3.5 text-white shadow-lg hover:shadow-xl"
           style={{ boxShadow: '0 4px 14px -2px rgba(124, 58, 237, 0.4)' }}
           onClick={() => setIsChatOpen(true)}
           initial={{ scale: 0 }}
@@ -450,7 +442,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
       <AnimatePresence>
         {isChatOpen && (
           <motion.div
-            className="fixed bottom-0 right-0 top-0 z-50 flex h-full w-[420px] flex-col border-l border-[#E5E5E5] bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900"
+            className="fixed top-0 right-0 bottom-0 z-50 flex h-full w-[420px] flex-col border-l border-[#E5E5E5] bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900"
             initial={{ x: 420 }}
             animate={{ x: 0 }}
             exit={{ x: 420 }}
@@ -502,7 +494,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                     key={msg.id}
                     className={cn(
                       'flex',
-                      msg.role === 'user' ? 'justify-end' : 'justify-start'
+                      msg.role === 'user' ? 'justify-end' : 'justify-start',
                     )}
                   >
                     <div
@@ -510,10 +502,12 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                         'max-w-[85%] rounded-2xl px-4 py-3',
                         msg.role === 'user'
                           ? 'rounded-br-md bg-[#7C3AED] text-white'
-                          : 'rounded-bl-md bg-[#F5F5F5] text-[#1A1A1A] dark:bg-neutral-800 dark:text-white'
+                          : 'rounded-bl-md bg-[#F5F5F5] text-[#1A1A1A] dark:bg-neutral-800 dark:text-white',
                       )}
                     >
-                      <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
+                      <p className="text-sm whitespace-pre-wrap">
+                        {msg.content}
+                      </p>
                       {msg.isStreaming && (
                         <span className="inline-block animate-pulse text-[#7C3AED]">
                           @
@@ -587,7 +581,7 @@ const markdownComponents = {
     return (
       <h2
         id={id}
-        className="mb-5 mt-12 scroll-mt-28 border-b border-[#E5E5E5] pb-3 text-[22px] font-semibold tracking-tight text-[#1A1A1A] first:mt-0 dark:border-neutral-800 dark:text-white"
+        className="mt-12 mb-5 scroll-mt-28 border-b border-[#E5E5E5] pb-3 text-[22px] font-semibold tracking-tight text-[#1A1A1A] first:mt-0 dark:border-neutral-800 dark:text-white"
         {...props}
       >
         {children}
@@ -600,7 +594,7 @@ const markdownComponents = {
     return (
       <h3
         id={id}
-        className="mb-3 mt-8 scroll-mt-28 text-lg font-semibold text-[#1A1A1A] dark:text-white"
+        className="mt-8 mb-3 scroll-mt-28 text-lg font-semibold text-[#1A1A1A] dark:text-white"
         {...props}
       >
         {children}
@@ -652,7 +646,7 @@ const markdownComponents = {
   ),
   th: ({ children, ...props }: React.HTMLProps<HTMLTableCellElement>) => (
     <th
-      className="border-b border-[#E5E5E5] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[#1A1A1A] dark:border-neutral-800 dark:text-white"
+      className="border-b border-[#E5E5E5] px-4 py-3 text-left text-xs font-semibold tracking-wider text-[#1A1A1A] uppercase dark:border-neutral-800 dark:text-white"
       {...props}
     >
       {children}
@@ -686,10 +680,10 @@ const markdownComponents = {
   },
   blockquote: ({ children, ...props }: React.HTMLProps<HTMLQuoteElement>) => (
     <blockquote
-      className="my-5 rounded-r-lg border-l-[3px] border-[#7C3AED] bg-[#FAFAFA] py-4 pl-5 pr-4 dark:bg-neutral-900/50"
+      className="my-5 rounded-r-lg border-l-[3px] border-[#7C3AED] bg-[#FAFAFA] py-4 pr-4 pl-5 dark:bg-neutral-900/50"
       {...props}
     >
-      <div className="leading-[1.7] italic text-[#4A4A4A] dark:text-neutral-300">
+      <div className="leading-[1.7] text-[#4A4A4A] italic dark:text-neutral-300">
         {children}
       </div>
     </blockquote>

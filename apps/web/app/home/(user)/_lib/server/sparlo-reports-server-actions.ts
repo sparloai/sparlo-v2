@@ -56,7 +56,7 @@ const DeleteReportSchema = z.object({
 // Schema for renaming a report
 const RenameReportSchema = z.object({
   id: z.string().uuid(),
-  title: z.string().min(1),
+  title: z.string().min(1).max(200, 'Title must be under 200 characters'),
 });
 
 // Schema for archiving a report
@@ -64,6 +64,32 @@ const ArchiveReportSchema = z.object({
   id: z.string().uuid(),
   archived: z.boolean(),
 });
+
+/**
+ * Verify that the current user owns the specified report.
+ * This provides defense-in-depth alongside RLS.
+ * Inlined in each action to avoid TypeScript generic complexity.
+ */
+async function verifyReportOwnership(
+  reportId: string,
+  userId: string,
+): Promise<{ id: string; account_id: string }> {
+  const client = getSupabaseServerClient();
+  const { data: report, error } = await client
+    .from('sparlo_reports')
+    .select('id, account_id')
+    .eq('id', reportId)
+    .eq('account_id', userId) // User's personal account ID matches their user ID
+    .single();
+
+  if (error || !report) {
+    throw new Error(
+      'Report not found or you do not have permission to modify it',
+    );
+  }
+
+  return report;
+}
 
 // Chat message type for post-report Q&A
 export interface ChatHistoryMessage {
@@ -120,8 +146,11 @@ export const createReport = enhanceAction(
 );
 
 export const updateReport = enhanceAction(
-  async (data) => {
+  async (data, user) => {
     const client = getSupabaseServerClient();
+
+    // P0 Security: Verify ownership before update
+    await verifyReportOwnership(data.id, user.id);
 
     const updateData: Record<string, unknown> = {};
     if (data.title !== undefined) updateData.title = data.title;
@@ -156,8 +185,11 @@ export const updateReport = enhanceAction(
 );
 
 export const deleteReport = enhanceAction(
-  async (data) => {
+  async (data, user) => {
     const client = getSupabaseServerClient();
+
+    // P0 Security: Verify ownership before delete
+    await verifyReportOwnership(data.id, user.id);
 
     const { error } = await client
       .from('sparlo_reports')
@@ -178,8 +210,11 @@ export const deleteReport = enhanceAction(
 );
 
 export const renameReport = enhanceAction(
-  async (data) => {
+  async (data, user) => {
     const client = getSupabaseServerClient();
+
+    // P0 Security: Verify ownership before rename
+    await verifyReportOwnership(data.id, user.id);
 
     const { data: report, error } = await client
       .from('sparlo_reports')
@@ -202,8 +237,11 @@ export const renameReport = enhanceAction(
 );
 
 export const archiveReport = enhanceAction(
-  async (data) => {
+  async (data, user) => {
     const client = getSupabaseServerClient();
+
+    // P0 Security: Verify ownership before archive
+    await verifyReportOwnership(data.id, user.id);
 
     const { data: report, error } = await client
       .from('sparlo_reports')
@@ -227,8 +265,16 @@ export const archiveReport = enhanceAction(
 
 // Schema for starting a new report with Inngest
 const StartReportSchema = z.object({
-  designChallenge: z.string().min(50, 'Please provide at least 50 characters'),
+  designChallenge: z
+    .string()
+    .min(50, 'Please provide at least 50 characters')
+    .max(10000, 'Design challenge must be under 10,000 characters'),
 });
+
+// Rate limiting constants
+const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+const MAX_REPORTS_PER_WINDOW = 1;
+const DAILY_LIMIT = 10;
 
 /**
  * Start a new report generation using Inngest durable workflow
@@ -236,6 +282,38 @@ const StartReportSchema = z.object({
 export const startReportGeneration = enhanceAction(
   async (data, user) => {
     const client = getSupabaseServerClient();
+
+    // P1 Security: Rate limiting - check recent reports
+    const windowStart = new Date(
+      Date.now() - RATE_LIMIT_WINDOW_MS,
+    ).toISOString();
+    const dayStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const [recentResult, dailyResult] = await Promise.all([
+      client
+        .from('sparlo_reports')
+        .select('id', { count: 'exact', head: true })
+        .eq('account_id', user.id)
+        .gte('created_at', windowStart),
+      client
+        .from('sparlo_reports')
+        .select('id', { count: 'exact', head: true })
+        .eq('account_id', user.id)
+        .gte('created_at', dayStart),
+    ]);
+
+    if (recentResult.count && recentResult.count >= MAX_REPORTS_PER_WINDOW) {
+      throw new Error(
+        'Rate limit exceeded. Please wait 5 minutes between reports.',
+      );
+    }
+
+    if (dailyResult.count && dailyResult.count >= DAILY_LIMIT) {
+      throw new Error(
+        `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.`,
+      );
+    }
+
     const conversationId = crypto.randomUUID();
 
     // Create the report record
@@ -301,15 +379,21 @@ export const startReportGeneration = enhanceAction(
 // Schema for answering clarification
 const AnswerClarificationSchema = z.object({
   reportId: z.string().uuid(),
-  answer: z.string().min(1, 'Please provide an answer'),
+  answer: z
+    .string()
+    .min(1, 'Please provide an answer')
+    .max(5000, 'Answer must be under 5,000 characters'),
 });
 
 /**
  * Answer a clarification question and resume the Inngest workflow
  */
 export const answerClarification = enhanceAction(
-  async (data) => {
+  async (data, user) => {
     const client = getSupabaseServerClient();
+
+    // P0 Security: Verify ownership before answering
+    await verifyReportOwnership(data.reportId, user.id);
 
     // Get the report to verify status
     const { data: report, error: fetchError } = await client
@@ -327,7 +411,8 @@ export const answerClarification = enhanceAction(
     }
 
     // Update clarifications with answer
-    const clarifications = (report.clarifications as Record<string, unknown>[]) ?? [];
+    const clarifications =
+      (report.clarifications as Record<string, unknown>[]) ?? [];
     if (clarifications.length > 0) {
       const lastClarification = clarifications[clarifications.length - 1];
       if (lastClarification) {

@@ -129,6 +129,7 @@ export type AN0Output = z.infer<typeof AN0OutputSchema>;
 export const AN0_METADATA = {
   id: 'an0',
   name: 'Problem Framing',
-  description: 'Understanding your challenge and extracting core contradictions',
+  description:
+    'Understanding your challenge and extracting core contradictions',
   estimatedMinutes: 1.5,
 };

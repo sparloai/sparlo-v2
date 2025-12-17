@@ -2,26 +2,26 @@ import 'server-only';
 
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 
-import { inngest } from '../client';
-import { callClaude, MODELS, parseJsonResponse } from '../../llm/client';
+import { MODELS, callClaude, parseJsonResponse } from '../../llm/client';
 import {
-  AN0_PROMPT,
-  AN0OutputSchema,
-  AN2_PROMPT,
-  AN2OutputSchema,
-  AN3_PROMPT,
-  AN3OutputSchema,
-  AN4_PROMPT,
-  AN4OutputSchema,
   type AN0Output,
+  AN0OutputSchema,
+  AN0_PROMPT,
   type AN2Output,
+  AN2OutputSchema,
+  AN2_PROMPT,
   type AN3Output,
+  AN3OutputSchema,
+  AN3_PROMPT,
   type AN4Output,
+  AN4OutputSchema,
+  AN4_PROMPT,
 } from '../../llm/prompts';
 import {
-  createInitialChainState,
   type ChainState,
+  createInitialChainState,
 } from '../../llm/schemas/chain-state';
+import { inngest } from '../client';
 
 // AN5 Report Writing Prompt - Generates the final markdown report
 const AN5_REPORT_PROMPT = `You are an expert engineering consultant writing a technical report. Generate a comprehensive report following the structure and voice guidelines below.
@@ -193,7 +193,7 @@ export const generateReport = inngest.createFunction(
           event: 'report/clarification-answered',
           match: 'data.reportId',
           timeout: '24h',
-        }
+        },
       );
 
       if (clarificationEvent) {
@@ -355,7 +355,12 @@ export const generateReport = inngest.createFunction(
         phase_progress: 0,
       });
 
-      const contextMessage = buildAN5Context(state, an2Result, an3Result, an4Result);
+      const contextMessage = buildAN5Context(
+        state,
+        an2Result,
+        an3Result,
+        an4Result,
+      );
 
       const response = await callClaude({
         model: MODELS.OPUS,
@@ -399,7 +404,7 @@ export const generateReport = inngest.createFunction(
     });
 
     return { success: true, reportId };
-  }
+  },
 );
 
 // =========================================
@@ -448,7 +453,7 @@ ${an2Result.patterns
 ${p.description}
 - Mechanism: ${p.mechanism}
 - Precedent: ${p.precedent}
-- Application: ${p.applicability}`
+- Application: ${p.applicability}`,
   )
   .join('\n\n')}
 
@@ -482,7 +487,7 @@ ID: ${c.id}
 ${c.description}
 - Mechanism: ${c.mechanism}
 - Confidence: ${c.confidence}
-- Key Risks: ${c.keyRisks.join(', ')}`
+- Key Risks: ${c.keyRisks.join(', ')}`,
   )
   .join('\n\n')}
 
@@ -503,15 +508,19 @@ function buildAN5Context(
   state: ChainState,
   an2Result: AN2Output,
   an3Result: AN3Output,
-  an4Result: AN4Output
+  an4Result: AN4Output,
 ): string {
   // Sort concepts by ranking
   const rankedConcepts = an3Result.concepts
     .map((c) => {
-      const evaluation = an4Result.evaluations.find((e) => e.conceptId === c.id);
+      const evaluation = an4Result.evaluations.find(
+        (e) => e.conceptId === c.id,
+      );
       return { ...c, evaluation };
     })
-    .sort((a, b) => (a.evaluation?.ranking ?? 99) - (b.evaluation?.ranking ?? 99));
+    .sort(
+      (a, b) => (a.evaluation?.ranking ?? 99) - (b.evaluation?.ranking ?? 99),
+    );
 
   return `## Full Analysis Data
 
@@ -554,7 +563,7 @@ ${c.description}
 - Confidence: ${c.confidence}
 - Score: ${c.evaluation?.overallScore ?? 'N/A'}/100
 - Risks: ${c.keyRisks.join(', ')}
-- Validation: ${c.validationGates.map((g) => g.test).join('; ')}`
+- Validation: ${c.validationGates.map((g) => g.test).join('; ')}`,
   )
   .join('\n\n')}
 
