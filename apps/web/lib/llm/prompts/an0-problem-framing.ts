@@ -262,14 +262,32 @@ REMEMBER: Output ONLY the JSON object. No markdown, no preamble.`;
 /**
  * Zod schema for AN0 output validation (v10)
  */
+
+// Helper to extract enum value from LLM output that may include explanatory text
+const createLenientEnum = <T extends readonly [string, ...string[]]>(
+  values: T,
+) =>
+  z
+    .string()
+    .transform((val) => {
+      const lower = val.toLowerCase().trim();
+      for (const v of values) {
+        if (lower.startsWith(v.toLowerCase())) return v;
+      }
+      return val;
+    })
+    .pipe(z.enum(values));
+
+const ambiguityTypes = [
+  'scale',
+  'property',
+  'symptom_vs_cause',
+  'metric',
+  'constraint',
+] as const;
+
 const AmbiguitySchema = z.object({
-  type: z.enum([
-    'scale',
-    'property',
-    'symptom_vs_cause',
-    'metric',
-    'constraint',
-  ]),
+  type: createLenientEnum(ambiguityTypes),
   description: z.string(),
   resolution: z.string(),
 });
@@ -281,10 +299,12 @@ const KpiSchema = z.object({
   unit: z.string().optional(),
 });
 
+const flexibilityValues = ['none', 'minimal', 'some'] as const;
+
 const ConstraintSchema = z.object({
   name: z.string(),
   reason: z.string(),
-  flexibility: z.enum(['none', 'minimal', 'some']),
+  flexibility: createLenientEnum(flexibilityValues),
 });
 
 const PhysicsSchema = z.object({
@@ -293,9 +313,11 @@ const PhysicsSchema = z.object({
   rate_limiting_factors: z.array(z.string()),
 });
 
+const constraintTypeValues = ['physics', 'convention'] as const;
+
 const AssumedConstraintSchema = z.object({
   constraint: z.string(),
-  type: z.enum(['physics', 'convention']),
+  type: createLenientEnum(constraintTypeValues),
   challenge: z.string(),
 });
 
