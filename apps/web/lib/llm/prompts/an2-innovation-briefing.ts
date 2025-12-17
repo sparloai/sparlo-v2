@@ -151,9 +151,39 @@ REMEMBER: You're teaching HOW TO THINK, not WHAT TO THINK. The concept generator
 /**
  * Zod schema for AN2 output validation (v10)
  */
+
+// Helper to extract enum value from LLM output that may use different terms
+const createLenientEnum = <T extends readonly [string, ...string[]]>(
+  values: T,
+) =>
+  z
+    .string()
+    .transform((val) => {
+      const lower = val.toLowerCase().trim();
+      // Direct match first
+      for (const v of values) {
+        if (lower === v.toLowerCase()) return v;
+      }
+      // Map common synonyms
+      const synonyms: Record<string, string> = {
+        physics: 'real',
+        physical: 'real',
+        fundamental: 'real',
+        arbitrary: 'convention',
+        assumed: 'questionable',
+        uncertain: 'questionable',
+      };
+      if (synonyms[lower]) return synonyms[lower];
+      // Fallback to first value
+      return values[0];
+    })
+    .pipe(z.enum(values));
+
+const verdictValues = ['real', 'questionable', 'convention'] as const;
+
 const ConstraintChallengedSchema = z.object({
   constraint: z.string(),
-  verdict: z.enum(['real', 'questionable', 'convention']),
+  verdict: createLenientEnum(verdictValues),
   implication: z.string(),
 });
 
