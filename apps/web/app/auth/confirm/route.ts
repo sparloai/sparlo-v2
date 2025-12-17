@@ -6,6 +6,9 @@ import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import pathsConfig from '~/config/paths.config';
 
+// Default redirect after email verification - send users to reports page
+const EMAIL_VERIFICATION_REDIRECT = '/home/reports';
+
 export async function GET(request: NextRequest) {
   const service = createAuthCallbackService(getSupabaseServerClient());
   const requestUrl = new URL(request.url);
@@ -15,11 +18,15 @@ export async function GET(request: NextRequest) {
   const authCode = searchParams.get('code');
   const tokenHash = searchParams.get('token_hash');
 
+  // Check for custom redirect from callback parameter
+  const callbackRedirect = searchParams.get('callback');
+  const redirectPath = callbackRedirect || EMAIL_VERIFICATION_REDIRECT;
+
   if (authCode) {
     // PKCE flow - use exchangeCodeForSession
     const { nextPath } = await service.exchangeCodeForSession(request, {
       joinTeamPath: pathsConfig.app.joinTeam,
-      redirectPath: pathsConfig.app.home,
+      redirectPath,
     });
 
     return redirect(nextPath);
@@ -27,7 +34,7 @@ export async function GET(request: NextRequest) {
     // Token hash flow - use verifyTokenHash
     const url = await service.verifyTokenHash(request, {
       joinTeamPath: pathsConfig.app.joinTeam,
-      redirectPath: pathsConfig.app.home,
+      redirectPath,
     });
 
     return NextResponse.redirect(url);
