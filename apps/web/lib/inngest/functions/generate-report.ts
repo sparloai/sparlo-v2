@@ -223,10 +223,10 @@ export const generateReport = inngest.createFunction(
 
       // Retrieve from 4 namespaces with targeted queries
       const results = await retrieveTargeted(queries, {
-        failuresK: 20,
-        boundsK: 20,
-        transfersK: 30,
-        trizK: 30,
+        failuresK: 10,
+        boundsK: 10,
+        transfersK: 15,
+        trizK: 15,
       });
 
       const summary = formatRetrievalSummary(results);
@@ -563,6 +563,28 @@ function updateStateWithAN0Analysis(
 // =========================================
 
 function buildAN1_5ContextV10(state: ChainState): string {
+  // Helper to truncate and simplify corpus items for context
+  const simplifyCorpusItems = (
+    items: Array<{
+      id: string;
+      title: string;
+      text_preview: string;
+      relevance_score: number;
+    }> | null | undefined,
+    maxItems: number,
+    maxPreviewLength: number = 500,
+  ) => {
+    if (!items) return [];
+    return items.slice(0, maxItems).map((item) => ({
+      id: item.id,
+      title: item.title,
+      text_preview:
+        item.text_preview?.slice(0, maxPreviewLength) +
+        (item.text_preview?.length > maxPreviewLength ? '...' : ''),
+      score: Math.round(item.relevance_score * 100) / 100,
+    }));
+  };
+
   return `## Problem Context (from AN0)
 
 **Challenge:** ${state.an0_original_ask ?? state.userInput}
@@ -586,16 +608,16 @@ ${state.an0_triz_principles?.map((p) => `- #${p.id} ${p.name}: ${p.why_relevant}
 ## RAW RETRIEVAL RESULTS (4 namespaces)
 
 ### FAILURES (${state.an1_failures?.length ?? 0} results)
-${JSON.stringify(state.an1_failures?.slice(0, 20) ?? [], null, 2)}
+${JSON.stringify(simplifyCorpusItems(state.an1_failures, 10), null, 2)}
 
 ### BOUNDS (${state.an1_bounds?.length ?? 0} results)
-${JSON.stringify(state.an1_bounds?.slice(0, 20) ?? [], null, 2)}
+${JSON.stringify(simplifyCorpusItems(state.an1_bounds, 10), null, 2)}
 
 ### TRANSFERS (${state.an1_transfers?.length ?? 0} results)
-${JSON.stringify(state.an1_transfers?.slice(0, 30) ?? [], null, 2)}
+${JSON.stringify(simplifyCorpusItems(state.an1_transfers, 15), null, 2)}
 
 ### TRIZ EXAMPLES (${state.an1_triz?.length ?? 0} results)
-${JSON.stringify(state.an1_triz?.slice(0, 30) ?? [], null, 2)}
+${JSON.stringify(simplifyCorpusItems(state.an1_triz, 15), null, 2)}
 
 ---
 
