@@ -66,9 +66,19 @@ export async function callClaude(params: {
  * Parse JSON from Claude response with proper error handling
  */
 export function parseJsonResponse<T>(response: string, context: string): T {
-  // Try to extract JSON from markdown code blocks
-  const jsonMatch = response.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const jsonStr = jsonMatch?.[1]?.trim() ?? response.trim();
+  let jsonStr = response.trim();
+
+  // Try to extract JSON from complete markdown code blocks
+  const completeMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (completeMatch?.[1]) {
+    jsonStr = completeMatch[1].trim();
+  } else {
+    // Handle incomplete code fence (truncated response - no closing ```)
+    const incompleteMatch = jsonStr.match(/^```(?:json)?\s*([\s\S]*)/);
+    if (incompleteMatch?.[1]) {
+      jsonStr = incompleteMatch[1].trim();
+    }
+  }
 
   try {
     return JSON.parse(jsonStr) as T;

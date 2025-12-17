@@ -394,7 +394,7 @@ export const generateReport = inngest.createFunction(
         model: MODELS.OPUS,
         system: AN3_PROMPT,
         userMessage: contextMessage,
-        maxTokens: 12000,
+        maxTokens: 16000,
       });
 
       const parsed = parseJsonResponse<AN3Output>(response, 'AN3');
