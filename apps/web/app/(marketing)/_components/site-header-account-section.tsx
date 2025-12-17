@@ -77,7 +77,7 @@ function AuthButtons() {
 
       <div className={'flex items-center gap-x-2'}>
         <Button
-          className={'hidden md:flex md:text-sm'}
+          className="text-xs md:text-sm"
           asChild
           variant={'outline'}
           size={'sm'}
