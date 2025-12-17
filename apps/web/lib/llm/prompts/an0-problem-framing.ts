@@ -88,7 +88,7 @@ IMPORTANT: Output ONLY valid JSON. No markdown headers, no explanations, no code
  */
 export const AN0OutputSchema = z.object({
   needsClarification: z.boolean(),
-  clarificationQuestion: z.string().nullable(),
+  clarificationQuestion: z.string().nullish(), // Can be string, null, or undefined
   analysis: z.object({
     originalAsk: z.string(),
     userSector: z.string(),
