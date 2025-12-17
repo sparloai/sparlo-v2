@@ -3,6 +3,16 @@ import 'server-only';
 import Anthropic from '@anthropic-ai/sdk';
 
 /**
+ * Custom error for Claude refusals (safety filter triggers)
+ */
+export class ClaudeRefusalError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'ClaudeRefusalError';
+  }
+}
+
+/**
  * Anthropic client singleton
  */
 let client: Anthropic | null = null;
@@ -62,8 +72,18 @@ export async function callClaude(params: {
       }
 
       const result = chunks.join('');
+      const finalMessage = await stream.finalMessage();
+
+      // Check for refusal (safety filter triggered)
+      if (finalMessage.stop_reason === 'refusal') {
+        throw new ClaudeRefusalError(
+          'Your design challenge could not be processed. Please rephrase your ' +
+            'question to focus on standard engineering or product design problems. ' +
+            'Avoid topics that could be interpreted as harmful or dangerous.',
+        );
+      }
+
       if (!result) {
-        const finalMessage = await stream.finalMessage();
         throw new Error(
           `No text content from Claude stream. ` +
             `stop_reason: ${finalMessage.stop_reason}, ` +
@@ -82,6 +102,15 @@ export async function callClaude(params: {
       messages: [{ role: 'user', content: params.userMessage }],
     });
 
+    // Check for refusal (safety filter triggered)
+    if (response.stop_reason === 'refusal') {
+      throw new ClaudeRefusalError(
+        'Your design challenge could not be processed. Please rephrase your ' +
+          'question to focus on standard engineering or product design problems. ' +
+          'Avoid topics that could be interpreted as harmful or dangerous.',
+      );
+    }
+
     // Extract text from response with detailed error context
     const textBlock = response.content.find((block) => block.type === 'text');
     if (!textBlock || textBlock.type !== 'text') {
@@ -96,7 +125,11 @@ export async function callClaude(params: {
 
     return textBlock.text;
   } catch (error) {
-    // Re-throw with context
+    // Re-throw ClaudeRefusalError as-is (user-friendly message)
+    if (error instanceof ClaudeRefusalError) {
+      throw error;
+    }
+    // Re-throw with context for API errors
     if (error instanceof Anthropic.APIError) {
       throw new Error(`Claude API error: ${error.message} (${error.status})`);
     }

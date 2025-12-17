@@ -8,7 +8,12 @@ import {
   isVectorSearchAvailable,
   retrieveTargeted,
 } from '../../corpus';
-import { MODELS, callClaude, parseJsonResponse } from '../../llm/client';
+import {
+  ClaudeRefusalError,
+  MODELS,
+  callClaude,
+  parseJsonResponse,
+} from '../../llm/client';
 import {
   type AN0Output,
   AN0OutputSchema,
@@ -61,16 +66,37 @@ export const generateReport = inngest.createFunction(
     const { reportId, accountId, userId, designChallenge, conversationId } =
       event.data;
 
-    // Initialize chain state
-    let state = createInitialChainState({
-      reportId,
-      accountId,
-      userId,
-      designChallenge,
-      conversationId,
-    });
-
     const supabase = getSupabaseServerAdminClient();
+
+    // Handle ClaudeRefusalError at the top level
+    try {
+      return await runReportGeneration();
+    } catch (error) {
+      if (error instanceof ClaudeRefusalError) {
+        // Update report with user-friendly error
+        await supabase
+          .from('sparlo_reports')
+          .update({
+            status: 'failed',
+            error_message: error.message,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', reportId);
+
+        return { success: false, reportId, error: error.message };
+      }
+      throw error; // Re-throw other errors for Inngest retry
+    }
+
+    async function runReportGeneration() {
+      // Initialize chain state
+      let state = createInitialChainState({
+        reportId,
+        accountId,
+        userId,
+        designChallenge,
+        conversationId,
+      });
 
     /**
      * Helper: Update report progress in Supabase
@@ -528,6 +554,7 @@ export const generateReport = inngest.createFunction(
     });
 
     return { success: true, reportId };
+    } // End of runReportGeneration()
   },
 );
 
