@@ -33,7 +33,38 @@ const CorpusQueriesSchema = z.object({
   transferQueries: z.array(z.string()).default([]),
 });
 
-// AN1.5 - Teaching Selection outputs
+// AN1 - Corpus Retrieval outputs
+const CorpusItemSchema = z.object({
+  id: z.string(),
+  relevance_score: z.number(),
+  title: z.string(),
+  text_preview: z.string(),
+  matched_query: z.string(),
+  corpus: z.string(),
+});
+
+// AN1.5 - Re-ranking outputs
+const RerankedItemSchema = z.object({
+  id: z.string(),
+  original_rank: z.number(),
+  new_rank: z.number(),
+  relevance_score: z.number(),
+  relevance_reason: z.string(),
+  transfer_note: z.string().optional(),
+});
+
+// AN1.7 - Literature outputs
+const ValidatedApproachSchema = z.object({
+  approach_name: z.string(),
+  source: z.string(),
+  source_quality: z.enum(['HIGH', 'MEDIUM', 'LOW']),
+  commercial_status: z.string(),
+  reported_outcomes: z.string(),
+  limitations: z.string(),
+  in_corpus: z.boolean(),
+});
+
+// Teaching case schema (legacy compatibility)
 const TeachingCaseSchema = z.object({
   title: z.string(),
   domain: z.string(),
@@ -100,11 +131,39 @@ export const ChainStateSchema = z.object({
   clarificationAnswer: z.string().optional(),
   clarificationCount: z.number().int().default(0),
 
-  // AN1.5 - Teaching Selection outputs
-  teachingCases: z.array(TeachingCaseSchema).default([]),
-  selectedPatterns: z.array(z.string()).default([]),
+  // AN1 - Corpus Retrieval outputs
+  retrievalMechanisms: z.array(CorpusItemSchema).default([]),
+  retrievalSeeds: z.array(CorpusItemSchema).default([]),
+  retrievalPatents: z.array(CorpusItemSchema).default([]),
+  retrievalSummary: z.string().optional(),
+
+  // AN1.5 - Re-ranking outputs
+  rerankedMechanisms: z.array(RerankedItemSchema).default([]),
+  rerankedSeeds: z.array(RerankedItemSchema).default([]),
+  rerankedPatents: z.array(RerankedItemSchema).default([]),
+  corpusGaps: z.array(z.string()).default([]),
+  rerankingSummary: z.string().optional(),
 
   // AN1.7 - Literature Augmentation outputs
+  validatedApproaches: z.array(ValidatedApproachSchema).default([]),
+  literatureCoverage: z
+    .enum(['adequate', 'weak', 'gaps_identified'])
+    .optional(),
+  parameterReferences: z
+    .array(
+      z.object({
+        parameter: z.string(),
+        value_range: z.string(),
+        source: z.string(),
+        confidence: z.enum(['HIGH', 'MEDIUM', 'LOW']),
+      }),
+    )
+    .default([]),
+  augmentationSummary: z.string().optional(),
+
+  // Legacy fields (for compatibility)
+  teachingCases: z.array(TeachingCaseSchema).default([]),
+  selectedPatterns: z.array(z.string()).default([]),
   literatureFindings: z.array(z.string()).default([]),
   patentReferences: z.array(z.string()).default([]),
 

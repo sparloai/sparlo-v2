@@ -2,11 +2,22 @@ import 'server-only';
 
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 
+import {
+  buildRetrievalQueries,
+  isVectorSearchAvailable,
+  retrieveFromCorpus,
+} from '../../corpus';
 import { MODELS, callClaude, parseJsonResponse } from '../../llm/client';
 import {
   type AN0Output,
   AN0OutputSchema,
   AN0_PROMPT,
+  type AN1_5_Output,
+  AN1_5_OutputSchema,
+  AN1_5_PROMPT,
+  type AN1_7_Output,
+  AN1_7_OutputSchema,
+  AN1_7_PROMPT,
   type AN2Output,
   AN2OutputSchema,
   AN2_PROMPT,
@@ -23,7 +34,7 @@ import {
 } from '../../llm/schemas/chain-state';
 import { inngest } from '../client';
 
-// AN5 Report Writing Prompt - Generates the final markdown report
+// AN5 Report Writing Prompt
 const AN5_REPORT_PROMPT = `You are an expert engineering consultant writing a technical report. Generate a comprehensive report following the structure and voice guidelines below.
 
 ## Report Structure
@@ -86,9 +97,14 @@ Output the report in markdown format.`;
  * Generate Report - Inngest Durable Function
  *
  * Orchestrates the full AN0-AN5 chain with:
- * - Durable execution (survives failures)
- * - Progress updates to Supabase
- * - Clarification handling via waitForEvent
+ * - AN0: Problem Framing (+ clarification if needed)
+ * - AN1: Corpus Retrieval (Pinecone + Voyage AI)
+ * - AN1.5: Re-ranking with paradigm diversity
+ * - AN1.7: Literature Augmentation
+ * - AN2: Innovation Briefing (Pattern Synthesis)
+ * - AN3: Concept Generation
+ * - AN4: Evaluation & Ranking
+ * - AN5: Report Generation
  */
 export const generateReport = inngest.createFunction(
   {
@@ -216,6 +232,151 @@ export const generateReport = inngest.createFunction(
     }
 
     // =========================================
+    // AN1: Corpus Retrieval (Vector Search)
+    // =========================================
+    const an1Result = await step.run('an1-corpus-retrieval', async () => {
+      await updateProgress({
+        current_step: 'an1',
+        phase_progress: 0,
+      });
+
+      // Build queries from AN0 output
+      const queries = buildRetrievalQueries({
+        originalAsk: state.originalAsk,
+        corpusQueries: state.corpusQueries,
+        crossDomainSeeds: state.crossDomainSeeds,
+        contradiction: state.contradiction,
+      });
+
+      // Check if vector search is available
+      if (!isVectorSearchAvailable()) {
+        console.warn('Vector search not available - skipping AN1');
+        await updateProgress({ phase_progress: 100 });
+        return {
+          mechanisms: [],
+          seeds: [],
+          patents: [],
+          summary: 'Corpus retrieval skipped - API keys not configured',
+        };
+      }
+
+      // Retrieve from corpus
+      const results = await retrieveFromCorpus(queries, {
+        mechanismsK: 30,
+        seedsK: 40,
+        patentsK: 20,
+      });
+
+      const summary = `Retrieved ${results.mechanisms.length} mechanisms, ${results.seeds.length} seeds, ${results.patents.length} patents`;
+      console.log(`AN1 Complete: ${summary}`);
+
+      await updateProgress({ phase_progress: 100 });
+
+      return {
+        mechanisms: results.mechanisms,
+        seeds: results.seeds,
+        patents: results.patents,
+        summary,
+      };
+    });
+
+    // Update state with AN1 results
+    state = {
+      ...state,
+      retrievalMechanisms: an1Result.mechanisms,
+      retrievalSeeds: an1Result.seeds,
+      retrievalPatents: an1Result.patents,
+      retrievalSummary: an1Result.summary,
+      completedSteps: [...state.completedSteps, 'an1'],
+    };
+
+    // =========================================
+    // AN1.5: Re-ranking with Paradigm Diversity
+    // =========================================
+    let an1_5Result: AN1_5_Output | null = null;
+
+    if (
+      an1Result.mechanisms.length > 0 ||
+      an1Result.seeds.length > 0 ||
+      an1Result.patents.length > 0
+    ) {
+      an1_5Result = await step.run('an1.5-reranking', async () => {
+        await updateProgress({
+          current_step: 'an1.5',
+          phase_progress: 0,
+        });
+
+        const contextMessage = buildAN1_5Context(state);
+
+        const response = await callClaude({
+          model: MODELS.OPUS,
+          system: AN1_5_PROMPT,
+          userMessage: contextMessage,
+          maxTokens: 8000,
+        });
+
+        const parsed = parseJsonResponse<AN1_5_Output>(response, 'AN1.5');
+        const validated = AN1_5_OutputSchema.parse(parsed);
+
+        await updateProgress({ phase_progress: 100 });
+
+        return validated;
+      });
+
+      // Update state with AN1.5 results
+      state = {
+        ...state,
+        rerankedMechanisms: an1_5Result.reranked_mechanisms,
+        rerankedSeeds: an1_5Result.reranked_seeds,
+        rerankedPatents: an1_5Result.reranked_patents,
+        corpusGaps: an1_5Result.corpus_gaps,
+        rerankingSummary: an1_5Result.reranking_summary,
+        completedSteps: [...state.completedSteps, 'an1.5'],
+      };
+    } else {
+      state.completedSteps = [...state.completedSteps, 'an1.5'];
+    }
+
+    // =========================================
+    // AN1.7: Literature Augmentation
+    // =========================================
+    let an1_7Result: AN1_7_Output | null = null;
+
+    // Run AN1.7 to assess coverage and augment with literature
+    an1_7Result = await step.run('an1.7-literature', async () => {
+      await updateProgress({
+        current_step: 'an1.7',
+        phase_progress: 0,
+      });
+
+      const contextMessage = buildAN1_7Context(state, an1_5Result);
+
+      const response = await callClaude({
+        model: MODELS.OPUS,
+        system: AN1_7_PROMPT,
+        userMessage: contextMessage,
+        maxTokens: 8000,
+      });
+
+      const parsed = parseJsonResponse<AN1_7_Output>(response, 'AN1.7');
+      const validated = AN1_7_OutputSchema.parse(parsed);
+
+      await updateProgress({ phase_progress: 100 });
+
+      return validated;
+    });
+
+    // Update state with AN1.7 results
+    state = {
+      ...state,
+      validatedApproaches: an1_7Result.validated_approaches,
+      literatureCoverage: an1_7Result.coverage_assessment.corpus_coverage,
+      parameterReferences: an1_7Result.parameter_reference,
+      augmentationSummary: an1_7Result.augmentation_summary,
+      completedSteps: [...state.completedSteps, 'an1.7'],
+    };
+
+    // =========================================
     // AN2: Innovation Briefing (Pattern Synthesis)
     // =========================================
     const an2Result = await step.run('an2-innovation-briefing', async () => {
@@ -224,7 +385,7 @@ export const generateReport = inngest.createFunction(
         phase_progress: 0,
       });
 
-      const contextMessage = buildAN2Context(state);
+      const contextMessage = buildAN2Context(state, an1_5Result, an1_7Result);
 
       const response = await callClaude({
         model: MODELS.OPUS,
@@ -360,6 +521,7 @@ export const generateReport = inngest.createFunction(
         an2Result,
         an3Result,
         an4Result,
+        an1_7Result,
       );
 
       const response = await callClaude({
@@ -399,6 +561,11 @@ export const generateReport = inngest.createFunction(
           recommendedConcept: an4Result.recommendedConcept,
           alternativePath: an4Result.alternativePath,
           sparkHighlight: an4Result.sparkHighlight,
+          // Include corpus data
+          retrievalSummary: state.retrievalSummary,
+          corpusGaps: state.corpusGaps,
+          validatedApproaches: state.validatedApproaches,
+          literatureCoverage: state.literatureCoverage,
         },
       });
     });
@@ -411,7 +578,71 @@ export const generateReport = inngest.createFunction(
 // Context Building Functions
 // =========================================
 
-function buildAN2Context(state: ChainState): string {
+function buildAN1_5Context(state: ChainState): string {
+  return `## Problem Context
+
+**Challenge:** ${state.originalAsk ?? state.userInput}
+**Sector:** ${state.userSector ?? 'Not specified'}
+
+**Core Contradiction:**
+${state.contradiction?.description ?? 'Not identified'}
+- Improving: ${state.contradiction?.improvingParameter ?? 'N/A'}
+- Worsening: ${state.contradiction?.worseningParameter ?? 'N/A'}
+
+**Goal Direction:** User wants to ${state.contradiction?.improvingParameter ?? 'solve the problem'}
+
+---
+
+## RAW RETRIEVAL RESULTS
+
+### MECHANISMS (${state.retrievalMechanisms?.length ?? 0} results)
+${JSON.stringify(state.retrievalMechanisms?.slice(0, 30) ?? [], null, 2)}
+
+### SEEDS (${state.retrievalSeeds?.length ?? 0} results)
+${JSON.stringify(state.retrievalSeeds?.slice(0, 40) ?? [], null, 2)}
+
+### PATENTS (${state.retrievalPatents?.length ?? 0} results)
+${JSON.stringify(state.retrievalPatents?.slice(0, 20) ?? [], null, 2)}
+
+Please re-rank these results for actual relevance to the user's contradiction, applying negative filtering and preserving paradigm diversity.`;
+}
+
+function buildAN1_7Context(
+  state: ChainState,
+  an1_5Result: AN1_5_Output | null,
+): string {
+  return `## Problem Analysis Summary
+
+**Challenge:** ${state.originalAsk ?? state.userInput}
+**Sector:** ${state.userSector ?? 'Not specified'}
+
+**Core Contradiction:**
+${state.contradiction?.description ?? 'Not identified'}
+
+**Corpus Gaps Identified:** ${JSON.stringify(state.corpusGaps ?? [], null, 2)}
+
+---
+
+## TOP RERANKED MECHANISMS (from AN1.5)
+${JSON.stringify(an1_5Result?.reranked_mechanisms?.slice(0, 10) ?? [], null, 2)}
+
+## TOP RERANKED SEEDS
+${JSON.stringify(an1_5Result?.reranked_seeds?.slice(0, 10) ?? [], null, 2)}
+
+## TOP RERANKED PATENTS
+${JSON.stringify(an1_5Result?.reranked_patents?.slice(0, 5) ?? [], null, 2)}
+
+## RERANKING SUMMARY
+${an1_5Result?.reranking_summary ?? 'No reranking performed'}
+
+Please assess corpus coverage and augment with literature search to fill gaps.`;
+}
+
+function buildAN2Context(
+  state: ChainState,
+  an1_5Result: AN1_5_Output | null,
+  an1_7Result: AN1_7_Output | null,
+): string {
   return `## Problem Analysis Summary
 
 **Original Challenge:** ${state.originalAsk ?? state.userInput}
@@ -437,7 +668,43 @@ ${state.physicsOfProblem?.governingEquations?.map((e) => `- ${e}`).join('\n') ??
 
 ${state.clarificationAnswer ? `**User Clarification:** ${state.clarificationAnswer}` : ''}
 
-Please create an innovation briefing with 4-6 cross-domain patterns that could address this challenge.`;
+---
+
+## CORPUS INSIGHTS (from AN1.5)
+
+**Reranking Summary:** ${an1_5Result?.reranking_summary ?? 'No corpus results'}
+
+**Top Mechanisms:**
+${
+  an1_5Result?.reranked_mechanisms
+    ?.slice(0, 5)
+    .map((m) => `- ${m.id}: ${m.relevance_reason}`)
+    .join('\n') ?? 'None'
+}
+
+**Corpus Gaps:** ${state.corpusGaps?.join(', ') ?? 'None identified'}
+
+---
+
+## LITERATURE VALIDATION (from AN1.7)
+
+**Coverage:** ${an1_7Result?.coverage_assessment?.corpus_coverage ?? 'Not assessed'}
+
+**Validated Approaches:**
+${
+  an1_7Result?.validated_approaches
+    ?.map(
+      (a) =>
+        `- ${a.approach_name} (${a.source_quality}): ${a.commercial_status}`,
+    )
+    .join('\n') ?? 'None'
+}
+
+**Augmentation Summary:** ${an1_7Result?.augmentation_summary ?? 'No augmentation'}
+
+---
+
+Please create an innovation briefing with 4-6 cross-domain patterns that could address this challenge, incorporating insights from both corpus retrieval and literature.`;
 }
 
 function buildAN3Context(state: ChainState, an2Result: AN2Output): string {
@@ -474,6 +741,19 @@ ${state.hardConstraints?.map((c) => `- ${c}`).join('\n') ?? 'None'}
 
 **Core Contradiction:** ${state.contradiction?.description ?? 'Not specified'}
 
+---
+
+## Literature-Validated Parameters (use these in concept design)
+
+${
+  state.parameterReferences
+    ?.map(
+      (p) =>
+        `- ${p.parameter}: ${p.value_range} (${p.confidence}, ${p.source})`,
+    )
+    .join('\n') ?? 'No parameters available'
+}
+
 Please generate 8-12 solution concepts using these patterns.`;
 }
 
@@ -509,6 +789,7 @@ function buildAN5Context(
   an2Result: AN2Output,
   an3Result: AN3Output,
   an4Result: AN4Output,
+  an1_7Result: AN1_7_Output | null,
 ): string {
   // Sort concepts by ranking
   const rankedConcepts = an3Result.concepts
@@ -550,6 +831,18 @@ ${state.firstPrinciples?.tradeoffs?.join('\n') ?? 'Not specified'}
 ${an2Result.patterns
   .map((p) => `**${p.name}**: ${p.description}\nPrecedent: ${p.precedent}`)
   .join('\n\n')}
+
+---
+
+### Literature Validation
+${
+  an1_7Result?.validated_approaches
+    ?.map(
+      (a) =>
+        `**${a.approach_name}** (${a.source_quality})\n- Source: ${a.source}\n- Commercial: ${a.commercial_status}\n- Limitations: ${a.limitations}`,
+    )
+    .join('\n\n') ?? 'No literature validation'
+}
 
 ---
 

@@ -12,6 +12,20 @@ export {
 } from './an0-problem-framing';
 
 export {
+  AN1_5_PROMPT,
+  AN1_5_METADATA,
+  AN1_5_OutputSchema,
+  type AN1_5_Output,
+} from './an1.5-reranker';
+
+export {
+  AN1_7_PROMPT,
+  AN1_7_METADATA,
+  AN1_7_OutputSchema,
+  type AN1_7_Output,
+} from './an1.7-literature';
+
+export {
   AN2_PROMPT,
   AN2_METADATA,
   AN2OutputSchema,
@@ -44,6 +58,24 @@ export const PHASES = [
     description:
       'Understanding your challenge and extracting core contradictions',
     estimatedMinutes: 1.5,
+  },
+  {
+    id: 'an1',
+    name: 'Corpus Retrieval',
+    description: 'Searching knowledge base for relevant mechanisms and patents',
+    estimatedMinutes: 0.5,
+  },
+  {
+    id: 'an1.5',
+    name: 'Result Re-ranking',
+    description: 'Re-ranking retrieval results for actual relevance',
+    estimatedMinutes: 1.5,
+  },
+  {
+    id: 'an1.7',
+    name: 'Literature Augmentation',
+    description: 'Filling corpus gaps with verified literature',
+    estimatedMinutes: 2,
   },
   {
     id: 'an2',
