@@ -8,7 +8,6 @@ import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { JWTUserData } from '@kit/supabase/types';
 import { Button } from '@kit/ui/button';
 import { If } from '@kit/ui/if';
-import { Trans } from '@kit/ui/trans';
 
 import featuresFlagConfig from '~/config/feature-flags.config';
 import pathsConfig from '~/config/paths.config';
@@ -83,9 +82,7 @@ function AuthButtons() {
           variant={'outline'}
           size={'sm'}
         >
-          <Link href={pathsConfig.auth.signIn}>
-            <Trans i18nKey={'auth:signIn'} />
-          </Link>
+          <Link href={pathsConfig.auth.signIn}>Sign In</Link>
         </Button>
 
         <Button
@@ -94,9 +91,7 @@ function AuthButtons() {
           variant={'default'}
           size={'sm'}
         >
-          <Link href={pathsConfig.auth.signUp}>
-            <Trans i18nKey={'auth:signUp'} />
-          </Link>
+          <Link href={pathsConfig.auth.signUp}>Try It</Link>
         </Button>
       </div>
     </div>
