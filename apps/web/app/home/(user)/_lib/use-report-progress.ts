@@ -27,6 +27,7 @@ export interface ReportProgress {
   clarifications: ClarificationQuestion[];
   reportData: Record<string, unknown> | null;
   errorMessage: string | null;
+  createdAt: string | null;
 }
 
 export interface ClarificationQuestion {
@@ -74,7 +75,7 @@ export function useReportProgress(
       const { data, error: fetchError } = await supabase
         .from('sparlo_reports')
         .select(
-          'id, status, current_step, phase_progress, title, clarifications, report_data, last_message',
+          'id, status, current_step, phase_progress, title, clarifications, report_data, last_message, created_at',
         )
         .eq('id', reportId)
         .single();
@@ -95,6 +96,7 @@ export function useReportProgress(
           (data.clarifications as unknown as ClarificationQuestion[]) ?? [],
         reportData: data.report_data as Record<string, unknown> | null,
         errorMessage: data.last_message,
+        createdAt: data.created_at,
       });
       setError(null);
     } catch (err) {
@@ -151,6 +153,7 @@ export function useReportProgress(
                 (data.clarifications as ClarificationQuestion[]) ?? [],
               reportData: data.report_data as Record<string, unknown> | null,
               errorMessage: data.last_message as string | null,
+              createdAt: data.created_at as string | null,
             });
           },
         )

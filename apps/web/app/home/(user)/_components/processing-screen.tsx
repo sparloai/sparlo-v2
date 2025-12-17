@@ -2,28 +2,63 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowRight, Check, Loader2, MessageSquare, Send } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
 import { Textarea } from '@kit/ui/textarea';
-import { cn } from '@kit/ui/utils';
-
-import { PHASES } from '~/lib/constants/phases';
 
 import { answerClarification } from '../_lib/server/sparlo-reports-server-actions';
-import {
-  type ReportProgress,
-  calculateOverallProgress,
-  getPhaseLabel,
-} from '../_lib/use-report-progress';
+import { type ReportProgress } from '../_lib/use-report-progress';
 
 interface ProcessingScreenProps {
   progress: ReportProgress;
   onComplete?: () => void;
 }
 
-// P2: PHASES constant now imported from ~/lib/constants/phases
+/**
+ * Hook to calculate elapsed time from a timestamp.
+ * Persists correctly across page refresh by using database timestamp.
+ */
+function useElapsedTime(createdAt: string | null): number {
+  const calculateElapsed = (timestamp: string | null) => {
+    if (!timestamp) return 0;
+    return Math.max(0, Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000));
+  };
+
+  const [prevCreatedAt, setPrevCreatedAt] = useState(createdAt);
+  const [elapsed, setElapsed] = useState(() => calculateElapsed(createdAt));
+
+  // Handle createdAt changes during render (React-recommended pattern)
+  if (createdAt !== prevCreatedAt) {
+    setPrevCreatedAt(createdAt);
+    setElapsed(calculateElapsed(createdAt));
+  }
+
+  useEffect(() => {
+    if (!createdAt) return;
+
+    const startTime = new Date(createdAt).getTime();
+
+    // Update every second
+    const interval = setInterval(() => {
+      setElapsed(Math.max(0, Math.floor((Date.now() - startTime) / 1000)));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [createdAt]);
+
+  return elapsed;
+}
+
+/**
+ * Format elapsed seconds as M:SS
+ */
+function formatElapsed(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
 
 export function ProcessingScreen({
   progress,
@@ -31,12 +66,10 @@ export function ProcessingScreen({
 }: ProcessingScreenProps) {
   const [clarificationAnswer, setClarificationAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const hasNavigatedRef = useRef(false);
-  const startTimeRef = useRef(Date.now());
 
-  const overallProgress = calculateOverallProgress(progress.currentStep);
-  const currentPhaseLabel = getPhaseLabel(progress.currentStep);
+  // Use database timestamp for elapsed time (persists across refresh)
+  const elapsedSeconds = useElapsedTime(progress.createdAt);
 
   // Auto-navigate when status changes to complete
   useEffect(() => {
@@ -45,22 +78,6 @@ export function ProcessingScreen({
       onComplete();
     }
   }, [progress.status, onComplete]);
-
-  // Elapsed time counter
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Format elapsed time as MM:SS
-  const formatElapsed = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   // Get the current clarification question (if any)
   const pendingClarification = progress.clarifications?.find((c) => !c.answer);
@@ -238,140 +255,66 @@ export function ProcessingScreen({
     );
   }
 
-  // Default: Processing status
+  // Default: Processing status - simplified to show only elapsed time
   return (
     <motion.div
       className="flex min-h-[60vh] flex-col items-center justify-center p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      <div className="w-full max-w-md space-y-8">
-        {/* Animated brand mark */}
-        <div className="flex justify-center">
-          <motion.div
-            className="text-[#7C3AED]"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-          >
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2L22 12L12 22L2 12L12 2Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-              />
-              <motion.path
-                d="M12 6L18 12L12 18L6 12L12 6Z"
-                fill="currentColor"
-                animate={{ scale: [0.8, 1, 0.8] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </svg>
-          </motion.div>
-        </div>
-
-        {/* Current phase label */}
-        <div className="text-center">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={progress.currentStep}
-              className="text-lg font-medium text-[#1A1A1A] dark:text-white"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              {currentPhaseLabel}
-            </motion.p>
-          </AnimatePresence>
-        </div>
-
-        {/* Progress bar */}
-        <div className="space-y-3">
-          <div className="h-1 overflow-hidden rounded-full bg-[#E5E5E5] dark:bg-neutral-800">
-            <motion.div
-              className="h-full bg-[#7C3AED]"
-              initial={{ width: 0 }}
-              animate={{ width: `${overallProgress}%` }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
+      <div className="flex flex-col items-center gap-6">
+        {/* Rotating diamond animation */}
+        <motion.div
+          className="text-[#7C3AED]"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+        >
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 2L22 12L12 22L2 12L12 2Z"
+              stroke="currentColor"
+              strokeWidth="2"
+              fill="none"
             />
-          </div>
-          <p className="text-center text-sm text-[#8A8A8A]">
-            {overallProgress}% complete
-          </p>
-        </div>
+            <motion.path
+              d="M12 6L18 12L12 18L6 12L12 6Z"
+              fill="currentColor"
+              animate={{ scale: [0.8, 1, 0.8] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            />
+          </svg>
+        </motion.div>
 
-        {/* Phase indicators */}
-        <div className="space-y-2">
-          {PHASES.map((phase, index) => {
-            const currentIndex = PHASES.findIndex(
-              (p) => p.id === progress.currentStep,
-            );
-            const isCompleted = index < currentIndex;
-            const isCurrent = phase.id === progress.currentStep;
-
-            return (
-              <motion.div
-                key={phase.id}
-                className={cn(
-                  'flex items-center gap-3 rounded-lg px-4 py-2 transition-colors',
-                  isCurrent && 'bg-[#7C3AED]/10',
-                  isCompleted && 'opacity-60',
-                )}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <div
-                  className={cn(
-                    'flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold',
-                    isCompleted && 'bg-[#7C3AED] text-white',
-                    isCurrent && 'border-2 border-[#7C3AED] text-[#7C3AED]',
-                    !isCompleted &&
-                      !isCurrent &&
-                      'bg-[#E5E5E5] text-[#8A8A8A] dark:bg-neutral-800',
-                  )}
-                >
-                  {isCompleted ? <Check className="h-3 w-3" /> : index + 1}
-                </div>
-                <div className="flex-1">
-                  <p
-                    className={cn(
-                      'text-sm font-medium',
-                      isCurrent
-                        ? 'text-[#7C3AED]'
-                        : 'text-[#4A4A4A] dark:text-neutral-300',
-                    )}
-                  >
-                    {phase.label}
-                  </p>
-                  {isCurrent && (
-                    <p className="text-xs text-[#8A8A8A]">
-                      {phase.description}
-                    </p>
-                  )}
-                </div>
-                {isCurrent && (
-                  <Loader2 className="h-4 w-4 animate-spin text-[#7C3AED]" />
-                )}
-              </motion.div>
-            );
-          })}
-        </div>
+        {/* Status text */}
+        <p className="text-lg font-light text-[#1A1A1A] dark:text-white">
+          Analyzing your question...
+        </p>
 
         {/* Elapsed time */}
-        <p className="text-center text-sm tabular-nums text-[#8A8A8A]">
+        <p className="text-sm tabular-nums text-[#8A8A8A]">
           {formatElapsed(elapsedSeconds)} elapsed
         </p>
 
+        {/* Duration estimate */}
+        <p className="text-sm text-[#8A8A8A]">
+          Analyses typically take ~15 minutes
+        </p>
+
         {/* Safe to leave notice */}
-        <motion.p
-          className="text-center text-sm text-[#8A8A8A]"
+        <motion.div
+          className="mt-4 text-center text-sm text-[#8A8A8A]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
         >
-          Safe to leave — you can check back anytime.
-        </motion.p>
+          <p className="flex items-center justify-center gap-1">
+            <Check className="h-4 w-4 text-emerald-500" />
+            Safe to close this page
+          </p>
+          <p className="mt-1">
+            We&apos;ll email you when complete.
+          </p>
+        </motion.div>
       </div>
     </motion.div>
   );
