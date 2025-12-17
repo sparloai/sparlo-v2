@@ -23,6 +23,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 
 import { Button } from '@kit/ui/button';
+import { toast } from '@kit/ui/sonner';
 import { Textarea } from '@kit/ui/textarea';
 import { cn } from '@kit/ui/utils';
 
@@ -201,6 +202,14 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
+          // P1-044: Handle rate limit with specific message
+          if (response.status === 429) {
+            const retryAfter = response.headers.get('Retry-After');
+            const waitTime = retryAfter
+              ? `Please wait ${Math.ceil(parseInt(retryAfter) / 60)} minutes.`
+              : 'Please wait a few minutes.';
+            throw new Error(`Rate limit exceeded. ${waitTime}`);
+          }
           throw new Error(
             errorData.error || `Failed to get response (${response.status})`,
           );
@@ -215,7 +224,8 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
           throw new Error('No response body');
         }
 
-        while (true) {
+        let streamDone = false;
+        while (!streamDone) {
           const { done, value } = await reader.read();
           if (done) break;
 
@@ -225,10 +235,11 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
           for (const line of lines) {
             if (line.startsWith('data: ')) {
               const data = line.slice(6);
-              if (data === '[DONE]') break;
 
               try {
                 const parsed = JSON.parse(data);
+
+                // Handle text chunks
                 if (parsed.text) {
                   assistantContent += parsed.text;
                   setChatMessages((prev) =>
@@ -239,6 +250,20 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                     ),
                   );
                 }
+
+                // Handle completion signal with save status
+                if (parsed.done) {
+                  streamDone = true;
+                  if (parsed.saved === false) {
+                    // P0-043: Notify user of save failure
+                    toast.warning('Message may not be saved', {
+                      description:
+                        'Your conversation might not persist. Please copy important responses.',
+                      duration: 8000,
+                    });
+                  }
+                }
+
                 if (parsed.error) {
                   throw new Error(parsed.error);
                 }
