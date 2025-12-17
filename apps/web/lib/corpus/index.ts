@@ -1,5 +1,6 @@
 export {
   retrieveFromCorpus,
+  retrieveTargeted,
   buildRetrievalQueries,
   formatRetrievalSummary,
   isVectorSearchAvailable,

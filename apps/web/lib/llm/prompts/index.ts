@@ -45,60 +45,75 @@ export {
   AN4_METADATA,
   AN4OutputSchema,
   type AN4Output,
-  type Evaluation,
+  type ValidationResult,
 } from './an4-evaluation';
 
+export {
+  AN5_PROMPT,
+  AN5_METADATA,
+  AN5OutputSchema,
+  type AN5Output,
+  type Report,
+} from './an5-report';
+
 /**
- * Phase metadata for progress tracking
+ * Phase metadata for progress tracking (v10)
+ *
+ * Updated for v10 architecture:
+ * - AN1: 4-namespace corpus retrieval (failures, bounds, transfers, triz)
+ * - AN1.5: Teaching Example Selection (not re-ranking)
+ * - AN2: Innovation Methodology Briefing (teaches HOW TO THINK)
+ * - AN3: First principles emphasis, three tracks
+ * - AN4: Hard validation gates
  */
 export const PHASES = [
   {
     id: 'an0',
     name: 'Problem Framing',
     description:
-      'Understanding your challenge and extracting core contradictions',
+      'Understanding your challenge, physics, and first principles decomposition',
     estimatedMinutes: 1.5,
   },
   {
     id: 'an1',
     name: 'Corpus Retrieval',
-    description: 'Searching knowledge base for relevant mechanisms and patents',
+    description: 'Searching 4 namespaces: failures, bounds, transfers, TRIZ examples',
     estimatedMinutes: 0.5,
   },
   {
     id: 'an1.5',
-    name: 'Result Re-ranking',
-    description: 'Re-ranking retrieval results for actual relevance',
+    name: 'Teaching Selection',
+    description: 'Selecting exemplars to guide innovative thinking',
     estimatedMinutes: 1.5,
   },
   {
     id: 'an1.7',
     name: 'Literature Augmentation',
-    description: 'Filling corpus gaps with verified literature',
+    description: 'Validating with commercial precedent and parameters',
     estimatedMinutes: 2,
   },
   {
     id: 'an2',
-    name: 'Pattern Synthesis',
-    description: 'Identifying cross-domain mechanisms and innovation patterns',
+    name: 'Innovation Briefing',
+    description: 'Preparing methodology guidance for concept generation',
     estimatedMinutes: 2,
   },
   {
     id: 'an3',
     name: 'Concept Generation',
-    description: 'Creating 8-12 solution concepts from multiple paradigms',
+    description: 'Creating novel solutions from first principles',
     estimatedMinutes: 3,
   },
   {
     id: 'an4',
-    name: 'Evaluation & Ranking',
-    description: 'Scoring concepts against your constraints and KPIs',
+    name: 'Evaluation & Validation',
+    description: 'Validating concepts against hard constraints and ranking',
     estimatedMinutes: 2,
   },
   {
     id: 'an5',
-    name: 'Report Writing',
-    description: 'Compiling findings into a comprehensive analysis report',
+    name: 'Executive Report',
+    description: 'Synthesizing findings into a comprehensive analysis report',
     estimatedMinutes: 2,
   },
 ] as const;

@@ -1,125 +1,399 @@
 import { z } from 'zod';
 
 /**
- * AN0 - Problem Framing Prompt
+ * AN0 - Problem Framing (v10)
  *
- * First step in the Sparlo chain. Analyzes the user's design challenge,
- * extracts core constraints, identifies contradictions, and determines
- * if clarification is needed before proceeding.
- *
- * Key responsibility: Detect when clarification is needed and ask
- * ONE high-value question if so.
+ * TRIZ-trained design strategist that:
+ * 1. Extracts core problem and success metrics
+ * 2. Identifies hard constraints
+ * 3. Frames problem as TRIZ contradiction
+ * 4. Identifies physics of the problem
+ * 5. Suggests search queries for teaching examples and validation
  */
 
-export const AN0_PROMPT = `You are an expert engineering consultant performing the initial analysis of a design challenge. Your role is to deeply understand the problem before any solution work begins.
+export const AN0_PROMPT = `You are a TRIZ-trained design strategist who helps engineers reframe their design challenges.
 
-## Your Task
+CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or after. Start with { and end with }.
 
-Analyze the user's design challenge and:
-1. Extract the core problem statement
-2. Identify hard constraints and KPIs
-3. Understand the physics/first principles at play
-4. Identify the core contradiction or tradeoff
-5. Determine TRIZ principles that may apply
-6. Generate search queries for relevant prior art
-7. **Most importantly**: Decide if you need clarification
+Your job is to:
+1. Extract the core problem and success metrics
+2. Identify what CANNOT change (hard constraints)
+3. Frame the problem as a TRIZ contradiction
+4. Identify the PHYSICS of the problem - what physical principles are at play?
+5. Suggest search queries for teaching examples and validation data
 
-## Clarification Rules
+If the user's description is too vague to proceed, ask ONE clarifying question.
 
-You may ask for clarification ONLY if:
-- The problem domain is ambiguous (could be 2+ very different fields)
-- Critical constraints are missing that would change the approach entirely
-- The scale/scope is unclear (prototype vs production, lab vs industrial)
+## PROBLEM DISAMBIGUATION
 
-You should NOT ask for clarification if:
-- You can make reasonable assumptions
-- The missing info would only slightly adjust recommendations
-- You're just curious but could proceed without it
+Before proceeding, identify and resolve ambiguities:
 
-If you need clarification, ask exactly ONE question that would most change your analysis.
+1. **SCALE AMBIGUITY** - Micro vs macro, local vs global
+2. **PROPERTY AMBIGUITY** - Intrinsic vs extrinsic, bulk vs surface
+3. **SYMPTOM VS ROOT CAUSE** - Is the stated problem downstream of real problem?
+4. **PERFORMANCE METRIC AMBIGUITY** - What specific metric defines success?
+5. **CONSTRAINT AMBIGUITY** - What's actually fixed vs assumed fixed?
+
+If ambiguity significantly affects solutions: ASK ONE clarifying question.
+
+## TRIZ Contradiction Framing
+
+Use TRIZ's 39 parameters to frame the contradiction:
+1. Weight of moving object
+2. Weight of stationary object
+3. Length of moving object
+4. Length of stationary object
+5. Area of moving object
+6. Area of stationary object
+7. Volume of moving object
+8. Volume of stationary object
+9. Speed
+10. Force
+11. Stress or pressure
+12. Shape
+13. Stability of object's composition
+14. Strength
+15. Duration of action of moving object
+16. Duration of action of stationary object
+17. Temperature
+18. Illumination intensity
+19. Use of energy by moving object
+20. Use of energy by stationary object
+21. Power
+22. Loss of energy
+23. Loss of substance
+24. Loss of information
+25. Loss of time
+26. Quantity of substance
+27. Reliability
+28. Measurement accuracy
+29. Manufacturing precision
+30. Object-affected harmful factors
+31. Object-generated harmful factors
+32. Ease of manufacture
+33. Ease of operation
+34. Ease of repair
+35. Adaptability or versatility
+36. Device complexity
+37. Difficulty of detecting and measuring
+38. Extent of automation
+39. Productivity
+
+## Solution Paradigm Exploration
+
+Identify at least TWO fundamentally different approaches:
+- **Paradigm A (Direct)**: Fight the physics directly
+- **Paradigm B (Indirect)**: Work with physics differently—redirect, transform, eliminate
+
+## TRIZ Principles to Consider
+
+Based on the contradiction, identify 3-5 TRIZ principles that might help:
+1. Segmentation
+2. Taking out
+3. Local quality
+4. Asymmetry
+5. Merging
+6. Universality
+7. Nested doll
+8. Anti-weight
+9. Preliminary anti-action
+10. Preliminary action
+11. Beforehand cushioning
+12. Equipotentiality
+13. The other way round
+14. Spheroidality
+15. Dynamics
+16. Partial or excessive action
+17. Another dimension
+18. Mechanical vibration
+19. Periodic action
+20. Continuity of useful action
+21. Skipping
+22. Blessing in disguise
+23. Feedback
+24. Intermediary
+25. Self-service
+26. Copying
+27. Cheap short-living
+28. Mechanics substitution
+29. Pneumatics and hydraulics
+30. Flexible shells and thin films
+31. Porous materials
+32. Color changes
+33. Homogeneity
+34. Discarding and recovering
+35. Parameter changes
+36. Phase transitions
+37. Thermal expansion
+38. Strong oxidants
+39. Inert atmosphere
+40. Composite materials
+
+## FIRST PRINCIPLES DECOMPOSITION
+
+Before looking at how others solved similar problems, decompose to fundamentals:
+
+### 1. FUNDAMENTAL TRUTHS
+What physical/chemical/engineering laws MUST govern any solution?
+- Not "how the industry does it" but "what physics requires"
+- What equations or principles are inviolable?
+- Example: "Heat transfer requires ΔT" not "use a heat exchanger"
+
+### 2. ACTUAL GOAL (stripped to essence)
+What physical outcome does the user ACTUALLY need?
+- Strip away implementation details to find the core need
+- What would success look like measured only in physical terms?
+- Example: Not "better catalyst" but "more moles of product per unit time per unit cost"
+
+### 3. ASSUMED VS REAL CONSTRAINTS
+Which constraints are physics vs. industry convention?
+- What would you do if solving this fresh with no legacy systems?
+- What's "that's how it's done" vs. "that's what physics demands"?
+- Challenge each constraint: Is this truly immutable or just familiar?
+
+### 4. FROM-SCRATCH SOLUTION SPACE
+If you knew only the physics and the goal (no industry knowledge):
+- What approaches would a brilliant physicist consider?
+- What's the most direct path from inputs to desired outputs?
+- What would seem obvious if you'd never seen existing solutions?
+
+This decomposition prevents anchoring on existing approaches.
+
+## CROSS-DOMAIN THINKING SEEDS
+
+Identify 2-3 domains that face SIMILAR PHYSICS challenges:
+- What other industries deal with this contradiction?
+- Where has nature solved this?
+- What adjacent fields might have relevant mechanisms?
+
+This seeds cross-pollination thinking in later steps.
+
+## Query Generation
+
+Generate queries for:
+1. **Teaching examples** - Find exemplars of good cross-domain thinking and TRIZ application
+2. **Validation data** - Find failure patterns and parameter bounds to check solutions against
 
 ## Output Format
 
-IMPORTANT: Output ONLY valid JSON. No markdown headers, no explanations, no code fences. Just the raw JSON object.
-
 {
-  "needsClarification": true or false,
-  "clarificationQuestion": string | null,
-  "analysis": {
-    "originalAsk": "Restated problem in your own words",
-    "userSector": "Industry/domain (e.g., 'chemical processing', 'aerospace')",
-    "primaryKpis": ["KPI 1", "KPI 2"],
-    "hardConstraints": ["Constraint 1", "Constraint 2"],
-    "physicsOfProblem": {
-      "governingEquations": ["Equation or relationship"],
-      "keyVariables": ["Variable 1", "Variable 2"],
-      "boundaryConditions": ["Condition 1"]
+  "need_question": false,
+  "original_ask": "User's problem in their words",
+  "problem_interpretation": "One sentence core problem statement",
+  "ambiguities_detected": [
+    {"type": "scale|property|symptom_vs_cause|metric|constraint",
+     "description": "What was ambiguous",
+     "resolution": "How interpreted OR 'flagged for user'"}
+  ],
+  "user_sector": "Primary industry",
+  "primary_kpis": [
+    {"name": "KPI name", "current": "value if known", "target": "target value", "unit": "unit"}
+  ],
+  "hard_constraints": [
+    {"name": "Constraint", "reason": "Why fixed", "flexibility": "none|minimal|some"}
+  ],
+  "key_interfaces": ["Physical interfaces solution must work with"],
+
+  "physics_of_problem": {
+    "governing_principles": ["What physics dominates this problem"],
+    "key_tradeoffs": ["Fundamental physical tradeoffs"],
+    "rate_limiting_factors": ["What controls success/failure"]
+  },
+
+  "first_principles": {
+    "fundamental_truths": ["Inviolable physical/chemical laws that govern any solution"],
+    "actual_goal": "The core physical outcome needed, stripped of implementation",
+    "assumed_constraints": [
+      {"constraint": "...", "type": "physics|convention", "challenge": "Why this might not be fixed"}
+    ],
+    "from_scratch_approaches": ["What a brilliant physicist would try knowing only physics and goal"]
+  },
+
+  "contradiction": {
+    "improve_parameter": {"id": 1, "name": "parameter name"},
+    "worsen_parameter": {"id": 2, "name": "parameter name"},
+    "plain_english": "If we improve X, we worsen Y because..."
+  },
+  "secondary_contradictions": [
+    {"improve": "param", "worsen": "param", "description": "..."}
+  ],
+
+  "triz_principles": [
+    {"id": 1, "name": "Principle name", "why_relevant": "How this might help"}
+  ],
+
+  "paradigms": {
+    "direct": {"approach": "Fight physics directly by...", "examples": ["approach 1", "approach 2"]},
+    "indirect": {"approach": "Work with physics by...", "examples": ["approach 1", "approach 2"]}
+  },
+
+  "cross_domain_seeds": [
+    {"domain": "Domain name", "similar_challenge": "What similar problem they face", "why_relevant": "Why their solutions might transfer"}
+  ],
+
+  "corpus_queries": {
+    "teaching_examples": {
+      "triz": ["query for TRIZ application examples relevant to this contradiction"],
+      "transfers": ["query for cross-domain transfer cases with similar physics"]
     },
-    "firstPrinciples": {
-      "fundamentalConstraints": ["Physics limit 1"],
-      "physicalLimits": ["Hard limit from physics"],
-      "tradeoffs": ["Tradeoff 1 vs Tradeoff 2"]
-    },
-    "contradiction": {
-      "improvingParameter": "What they want to improve",
-      "worseningParameter": "What gets worse when they improve it",
-      "description": "Plain language description of the contradiction"
-    },
-    "trizPrinciples": [1, 13, 35],
-    "crossDomainSeeds": ["Domain 1 where similar problem is solved", "Domain 2"],
-    "corpusQueries": {
-      "failureQueries": ["Search query for failures in this space"],
-      "feasibilityQueries": ["Search query for feasibility bounds"],
-      "transferQueries": ["Search query for cross-domain solutions"]
+    "validation": {
+      "failures": ["query for failure patterns in relevant mechanisms"],
+      "bounds": ["query for parameter bounds on materials/mechanisms mentioned"]
     }
-  }
+  },
+
+  "web_search_queries": ["literature queries for commercial validation"],
+
+  "materials_mentioned": ["material1", "material2"],
+  "mechanisms_mentioned": ["mechanism1", "mechanism2"],
+
+  "reframed_problem": "Core challenge reframed as physics/engineering problem"
 }
 
-## Important Notes
+If you need clarification:
+{
+  "need_question": true,
+  "question": "Your single clarifying question",
+  "what_you_understood": "Summary of what you know so far"
+}
 
-- If needsClarification is true, clarificationQuestion MUST be a single, specific question
-- If needsClarification is false, clarificationQuestion should be null
-- TRIZ principles should be numbers 1-40
-- Be specific about physics - use real equations where relevant
-- Cross-domain seeds should be specific industries/applications, not generic`;
+REMEMBER: Output ONLY the JSON object. No markdown, no preamble.`;
 
 /**
- * Zod schema for AN0 output validation
+ * Zod schema for AN0 output validation (v10)
  */
-export const AN0OutputSchema = z.object({
-  needsClarification: z.boolean(),
-  clarificationQuestion: z.string().nullish(), // Can be string, null, or undefined
-  analysis: z.object({
-    originalAsk: z.string(),
-    userSector: z.string(),
-    primaryKpis: z.array(z.string()),
-    hardConstraints: z.array(z.string()),
-    physicsOfProblem: z.object({
-      governingEquations: z.array(z.string()),
-      keyVariables: z.array(z.string()),
-      boundaryConditions: z.array(z.string()),
-    }),
-    firstPrinciples: z.object({
-      fundamentalConstraints: z.array(z.string()),
-      physicalLimits: z.array(z.string()),
-      tradeoffs: z.array(z.string()),
-    }),
-    contradiction: z.object({
-      improvingParameter: z.string(),
-      worseningParameter: z.string(),
-      description: z.string(),
-    }),
-    trizPrinciples: z.array(z.number().int().min(1).max(40)),
-    crossDomainSeeds: z.array(z.string()),
-    corpusQueries: z.object({
-      failureQueries: z.array(z.string()),
-      feasibilityQueries: z.array(z.string()),
-      transferQueries: z.array(z.string()),
-    }),
+const AmbiguitySchema = z.object({
+  type: z.enum([
+    'scale',
+    'property',
+    'symptom_vs_cause',
+    'metric',
+    'constraint',
+  ]),
+  description: z.string(),
+  resolution: z.string(),
+});
+
+const KpiSchema = z.object({
+  name: z.string(),
+  current: z.string().optional(),
+  target: z.string().optional(),
+  unit: z.string().optional(),
+});
+
+const ConstraintSchema = z.object({
+  name: z.string(),
+  reason: z.string(),
+  flexibility: z.enum(['none', 'minimal', 'some']),
+});
+
+const PhysicsSchema = z.object({
+  governing_principles: z.array(z.string()),
+  key_tradeoffs: z.array(z.string()),
+  rate_limiting_factors: z.array(z.string()),
+});
+
+const AssumedConstraintSchema = z.object({
+  constraint: z.string(),
+  type: z.enum(['physics', 'convention']),
+  challenge: z.string(),
+});
+
+const FirstPrinciplesSchema = z.object({
+  fundamental_truths: z.array(z.string()),
+  actual_goal: z.string(),
+  assumed_constraints: z.array(AssumedConstraintSchema),
+  from_scratch_approaches: z.array(z.string()),
+});
+
+const TrizParameterSchema = z.object({
+  id: z.number().int().min(1).max(39),
+  name: z.string(),
+});
+
+const ContradictionSchema = z.object({
+  improve_parameter: TrizParameterSchema,
+  worsen_parameter: TrizParameterSchema,
+  plain_english: z.string(),
+});
+
+const SecondaryContradictionSchema = z.object({
+  improve: z.string(),
+  worsen: z.string(),
+  description: z.string(),
+});
+
+const TrizPrincipleSchema = z.object({
+  id: z.number().int().min(1).max(40),
+  name: z.string(),
+  why_relevant: z.string(),
+});
+
+const ParadigmSchema = z.object({
+  approach: z.string(),
+  examples: z.array(z.string()),
+});
+
+const CrossDomainSeedSchema = z.object({
+  domain: z.string(),
+  similar_challenge: z.string(),
+  why_relevant: z.string(),
+});
+
+const CorpusQueriesSchema = z.object({
+  teaching_examples: z.object({
+    triz: z.array(z.string()),
+    transfers: z.array(z.string()),
+  }),
+  validation: z.object({
+    failures: z.array(z.string()),
+    bounds: z.array(z.string()),
   }),
 });
 
+// Full analysis output schema
+const AN0AnalysisSchema = z.object({
+  need_question: z.literal(false),
+  original_ask: z.string(),
+  problem_interpretation: z.string(),
+  ambiguities_detected: z.array(AmbiguitySchema).default([]),
+  user_sector: z.string(),
+  primary_kpis: z.array(KpiSchema),
+  hard_constraints: z.array(ConstraintSchema),
+  key_interfaces: z.array(z.string()).default([]),
+  physics_of_problem: PhysicsSchema,
+  first_principles: FirstPrinciplesSchema,
+  contradiction: ContradictionSchema,
+  secondary_contradictions: z.array(SecondaryContradictionSchema).default([]),
+  triz_principles: z.array(TrizPrincipleSchema),
+  paradigms: z.object({
+    direct: ParadigmSchema,
+    indirect: ParadigmSchema,
+  }),
+  cross_domain_seeds: z.array(CrossDomainSeedSchema),
+  corpus_queries: CorpusQueriesSchema,
+  web_search_queries: z.array(z.string()).default([]),
+  materials_mentioned: z.array(z.string()).default([]),
+  mechanisms_mentioned: z.array(z.string()).default([]),
+  reframed_problem: z.string(),
+});
+
+// Clarification question output schema
+const AN0ClarificationSchema = z.object({
+  need_question: z.literal(true),
+  question: z.string(),
+  what_you_understood: z.string(),
+});
+
+// Combined schema using discriminated union
+export const AN0OutputSchema = z.discriminatedUnion('need_question', [
+  AN0AnalysisSchema,
+  AN0ClarificationSchema,
+]);
+
 export type AN0Output = z.infer<typeof AN0OutputSchema>;
+export type AN0Analysis = z.infer<typeof AN0AnalysisSchema>;
+export type AN0Clarification = z.infer<typeof AN0ClarificationSchema>;
 
 /**
  * AN0 metadata for progress tracking

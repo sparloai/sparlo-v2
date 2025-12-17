@@ -4,8 +4,9 @@ import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client'
 
 import {
   buildRetrievalQueries,
+  formatRetrievalSummary,
   isVectorSearchAvailable,
-  retrieveFromCorpus,
+  retrieveTargeted,
 } from '../../corpus';
 import { MODELS, callClaude, parseJsonResponse } from '../../llm/client';
 import {
@@ -27,6 +28,9 @@ import {
   type AN4Output,
   AN4OutputSchema,
   AN4_PROMPT,
+  type AN5Output,
+  AN5OutputSchema,
+  AN5_PROMPT,
 } from '../../llm/prompts';
 import {
   type ChainState,
@@ -34,77 +38,18 @@ import {
 } from '../../llm/schemas/chain-state';
 import { inngest } from '../client';
 
-// AN5 Report Writing Prompt
-const AN5_REPORT_PROMPT = `You are an expert engineering consultant writing a technical report. Generate a comprehensive report following the structure and voice guidelines below.
-
-## Report Structure
-
-### Executive Summary
-Lead with the insight. One sentence on the root cause, one sentence on the core insight, 1-2 sentences on the primary recommendation with confidence level, and a viability assessment (GREEN/YELLOW/RED).
-
-### Constraints Understood
-- Hard constraints from user input
-- Assumptions made (flag if incorrect)
-
-### Problem Analysis
-- What's actually going wrong (physical/engineering terms)
-- Why it's hard (apparent contradiction or tradeoff)
-- First principles insight (the reframe that makes the solution obvious)
-- Root causes (2-4 hypotheses with confidence levels)
-- Success metrics (quantified where possible)
-
-### Key Patterns
-3-5 cross-domain patterns with:
-- Pattern name
-- Where it comes from (industries, applications)
-- Why it matters here
-- Precedent (patents, companies, literature)
-
-### Solution Concepts
-Present the concepts ranked by the evaluation step:
-- Lead concepts (2-3) with full treatment: what, why, confidence, risks, validation gates
-- Other concepts (2-3) with lighter treatment
-- One "Spark" concept (frame-breaking, low confidence but interesting)
-
-### Concept Comparison
-Markdown table comparing concepts across key dimensions.
-
-### Decision Architecture
-Decision tree based on user's constraints, with primary path, fallback, and parallel exploration.
-
-### Personal Recommendation
-"If this were my project..." - chronological sequence with specific actions.
-
-### Challenge the Frame
-2-4 questions challenging whether the stated problem is the right problem.
-
-### Risks & Watchouts
-3-5 risks with likelihood, mitigation, and triggers.
-
-### Next Steps
-4-6 numbered items: Today, This Week, Week 2-3, Week 4, etc.
-
-## Voice Guidelines
-- Confident but calibrated
-- Senior engineer, not salesperson
-- Specific over vague
-- Physics over authority
-- Preserve optionality
-
-Output the report in markdown format.`;
-
 /**
- * Generate Report - Inngest Durable Function
+ * Generate Report - Inngest Durable Function (v10)
  *
  * Orchestrates the full AN0-AN5 chain with:
- * - AN0: Problem Framing (+ clarification if needed)
- * - AN1: Corpus Retrieval (Pinecone + Voyage AI)
- * - AN1.5: Re-ranking with paradigm diversity
+ * - AN0: Problem Framing with first principles + TRIZ contradiction
+ * - AN1: 4-namespace Corpus Retrieval (failures, bounds, transfers, triz)
+ * - AN1.5: Teaching Example Selection
  * - AN1.7: Literature Augmentation
- * - AN2: Innovation Briefing (Pattern Synthesis)
- * - AN3: Concept Generation
- * - AN4: Evaluation & Ranking
- * - AN5: Report Generation
+ * - AN2: Innovation Methodology Briefing
+ * - AN3: Concept Generation (first principles, three tracks)
+ * - AN4: Evaluation with Hard Validation Gates
+ * - AN5: Executive Report Generation
  */
 export const generateReport = inngest.createFunction(
   {
@@ -145,7 +90,7 @@ export const generateReport = inngest.createFunction(
     }
 
     // =========================================
-    // AN0: Problem Framing
+    // AN0: Problem Framing (v10)
     // =========================================
     const an0Result = await step.run('an0-problem-framing', async () => {
       await updateProgress({
@@ -157,7 +102,7 @@ export const generateReport = inngest.createFunction(
         model: MODELS.OPUS,
         system: AN0_PROMPT,
         userMessage: designChallenge,
-        maxTokens: 4096,
+        maxTokens: 8000,
       });
 
       const parsed = parseJsonResponse<AN0Output>(response, 'AN0');
@@ -168,34 +113,22 @@ export const generateReport = inngest.createFunction(
       return validated;
     });
 
-    // Update state with AN0 results
-    state = {
-      ...state,
-      originalAsk: an0Result.analysis.originalAsk,
-      userSector: an0Result.analysis.userSector,
-      primaryKpis: an0Result.analysis.primaryKpis,
-      hardConstraints: an0Result.analysis.hardConstraints,
-      physicsOfProblem: an0Result.analysis.physicsOfProblem,
-      firstPrinciples: an0Result.analysis.firstPrinciples,
-      contradiction: an0Result.analysis.contradiction,
-      trizPrinciples: an0Result.analysis.trizPrinciples,
-      crossDomainSeeds: an0Result.analysis.crossDomainSeeds,
-      corpusQueries: an0Result.analysis.corpusQueries,
-      needsClarification: an0Result.needsClarification,
-      clarificationQuestion: an0Result.clarificationQuestion ?? undefined,
-      completedSteps: ['an0'],
-    };
+    // Handle v10 AN0 output - check if clarification needed
+    if (an0Result.need_question === true) {
+      // Need clarification - store and wait
+      state = {
+        ...state,
+        needsClarification: true,
+        clarificationQuestion: an0Result.question,
+        completedSteps: ['an0'],
+      };
 
-    // =========================================
-    // Handle Clarification (if needed)
-    // =========================================
-    if (an0Result.needsClarification && an0Result.clarificationQuestion) {
       await step.run('store-clarification', async () => {
         await updateProgress({
           status: 'clarifying',
           clarifications: [
             {
-              question: an0Result.clarificationQuestion,
+              question: an0Result.question,
               askedAt: new Date().toISOString(),
             },
           ],
@@ -221,18 +154,45 @@ export const generateReport = inngest.createFunction(
             status: 'processing',
             clarifications: [
               {
-                question: an0Result.clarificationQuestion,
+                question: an0Result.question,
                 answer: clarificationEvent.data.answer,
                 answeredAt: new Date().toISOString(),
               },
             ],
           });
         });
+
+        // Re-run AN0 with clarification answer
+        const an0RetryResult = await step.run(
+          'an0-with-clarification',
+          async () => {
+            const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+
+            const response = await callClaude({
+              model: MODELS.OPUS,
+              system: AN0_PROMPT,
+              userMessage: clarifiedChallenge,
+              maxTokens: 8000,
+            });
+
+            const parsed = parseJsonResponse<AN0Output>(response, 'AN0');
+            return AN0OutputSchema.parse(parsed);
+          },
+        );
+
+        // Use the retry result if it's a full analysis
+        if (an0RetryResult.need_question === false) {
+          // Update state with v10 AN0 analysis outputs
+          state = updateStateWithAN0Analysis(state, an0RetryResult);
+        }
       }
+    } else {
+      // Full analysis - update state with v10 AN0 outputs
+      state = updateStateWithAN0Analysis(state, an0Result);
     }
 
     // =========================================
-    // AN1: Corpus Retrieval (Vector Search)
+    // AN1: Corpus Retrieval (v10 - 4 namespaces)
     // =========================================
     const an1Result = await step.run('an1-corpus-retrieval', async () => {
       await updateProgress({
@@ -240,73 +200,76 @@ export const generateReport = inngest.createFunction(
         phase_progress: 0,
       });
 
-      // Build queries from AN0 output
-      const queries = buildRetrievalQueries({
-        originalAsk: state.originalAsk,
-        corpusQueries: state.corpusQueries,
-        crossDomainSeeds: state.crossDomainSeeds,
-        contradiction: state.contradiction,
-      });
-
       // Check if vector search is available
       if (!isVectorSearchAvailable()) {
         console.warn('Vector search not available - skipping AN1');
         await updateProgress({ phase_progress: 100 });
         return {
-          mechanisms: [],
-          seeds: [],
-          patents: [],
+          failures: [],
+          bounds: [],
+          transfers: [],
+          triz: [],
           summary: 'Corpus retrieval skipped - API keys not configured',
         };
       }
 
-      // Retrieve from corpus
-      const results = await retrieveFromCorpus(queries, {
-        mechanismsK: 30,
-        seedsK: 40,
-        patentsK: 20,
+      // Build namespace-specific queries from AN0 v10 output
+      const queries = buildRetrievalQueries({
+        original_ask: state.an0_original_ask,
+        corpus_queries: state.an0_corpus_queries,
+        cross_domain_seeds: state.an0_cross_domain_seeds,
+        contradiction: state.an0_contradiction,
       });
 
-      const summary = `Retrieved ${results.mechanisms.length} mechanisms, ${results.seeds.length} seeds, ${results.patents.length} patents`;
+      // Retrieve from 4 namespaces with targeted queries
+      const results = await retrieveTargeted(queries, {
+        failuresK: 20,
+        boundsK: 20,
+        transfersK: 30,
+        trizK: 30,
+      });
+
+      const summary = formatRetrievalSummary(results);
       console.log(`AN1 Complete: ${summary}`);
 
       await updateProgress({ phase_progress: 100 });
 
       return {
-        mechanisms: results.mechanisms,
-        seeds: results.seeds,
-        patents: results.patents,
+        ...results,
         summary,
       };
     });
 
-    // Update state with AN1 results
+    // Update state with AN1 results (v10 - 4 namespaces)
     state = {
       ...state,
-      retrievalMechanisms: an1Result.mechanisms,
-      retrievalSeeds: an1Result.seeds,
-      retrievalPatents: an1Result.patents,
-      retrievalSummary: an1Result.summary,
+      an1_failures: an1Result.failures,
+      an1_bounds: an1Result.bounds,
+      an1_transfers: an1Result.transfers,
+      an1_triz: an1Result.triz,
+      an1_retrieval_summary: an1Result.summary,
       completedSteps: [...state.completedSteps, 'an1'],
     };
 
     // =========================================
-    // AN1.5: Re-ranking with Paradigm Diversity
+    // AN1.5: Teaching Example Selection (v10)
     // =========================================
     let an1_5Result: AN1_5_Output | null = null;
 
-    if (
-      an1Result.mechanisms.length > 0 ||
-      an1Result.seeds.length > 0 ||
-      an1Result.patents.length > 0
-    ) {
-      an1_5Result = await step.run('an1.5-reranking', async () => {
+    const hasCorpusResults =
+      an1Result.failures.length > 0 ||
+      an1Result.bounds.length > 0 ||
+      an1Result.transfers.length > 0 ||
+      an1Result.triz.length > 0;
+
+    if (hasCorpusResults) {
+      an1_5Result = await step.run('an1.5-teaching-selection', async () => {
         await updateProgress({
           current_step: 'an1.5',
           phase_progress: 0,
         });
 
-        const contextMessage = buildAN1_5Context(state);
+        const contextMessage = buildAN1_5ContextV10(state);
 
         const response = await callClaude({
           model: MODELS.OPUS,
@@ -323,14 +286,17 @@ export const generateReport = inngest.createFunction(
         return validated;
       });
 
-      // Update state with AN1.5 results
+      // Update state with AN1.5 results (v10)
       state = {
         ...state,
-        rerankedMechanisms: an1_5Result.reranked_mechanisms,
-        rerankedSeeds: an1_5Result.reranked_seeds,
-        rerankedPatents: an1_5Result.reranked_patents,
-        corpusGaps: an1_5Result.corpus_gaps,
-        rerankingSummary: an1_5Result.reranking_summary,
+        an1_5_triz_exemplars: an1_5Result.teaching_examples.triz_exemplars,
+        an1_5_transfer_exemplars:
+          an1_5Result.teaching_examples.transfer_exemplars,
+        an1_5_innovation_guidance:
+          an1_5Result.teaching_examples.innovation_guidance,
+        an1_5_failure_patterns: an1_5Result.validation_data.failure_patterns,
+        an1_5_parameter_bounds: an1_5Result.validation_data.parameter_bounds,
+        an1_5_corpus_gaps: an1_5Result.corpus_gaps,
         completedSteps: [...state.completedSteps, 'an1.5'],
       };
     } else {
@@ -338,18 +304,15 @@ export const generateReport = inngest.createFunction(
     }
 
     // =========================================
-    // AN1.7: Literature Augmentation
+    // AN1.7: Literature Augmentation (v10)
     // =========================================
-    let an1_7Result: AN1_7_Output | null = null;
-
-    // Run AN1.7 to assess coverage and augment with literature
-    an1_7Result = await step.run('an1.7-literature', async () => {
+    const an1_7Result = await step.run('an1.7-literature', async () => {
       await updateProgress({
         current_step: 'an1.7',
         phase_progress: 0,
       });
 
-      const contextMessage = buildAN1_7Context(state, an1_5Result);
+      const contextMessage = buildAN1_7ContextV10(state, an1_5Result);
 
       const response = await callClaude({
         model: MODELS.OPUS,
@@ -366,18 +329,19 @@ export const generateReport = inngest.createFunction(
       return validated;
     });
 
-    // Update state with AN1.7 results
+    // Update state with AN1.7 results (v10)
     state = {
       ...state,
-      validatedApproaches: an1_7Result.validated_approaches,
-      literatureCoverage: an1_7Result.coverage_assessment.corpus_coverage,
-      parameterReferences: an1_7Result.parameter_reference,
-      augmentationSummary: an1_7Result.augmentation_summary,
+      an1_7_searches_performed: an1_7Result.searches_performed,
+      an1_7_commercial_precedent: an1_7Result.commercial_precedent,
+      an1_7_process_parameters: an1_7Result.process_parameters,
+      an1_7_competitive_landscape: an1_7Result.competitive_landscape,
+      an1_7_literature_gaps: an1_7Result.literature_gaps,
       completedSteps: [...state.completedSteps, 'an1.7'],
     };
 
     // =========================================
-    // AN2: Innovation Briefing (Pattern Synthesis)
+    // AN2: Innovation Methodology Briefing (v10)
     // =========================================
     const an2Result = await step.run('an2-innovation-briefing', async () => {
       await updateProgress({
@@ -385,13 +349,13 @@ export const generateReport = inngest.createFunction(
         phase_progress: 0,
       });
 
-      const contextMessage = buildAN2Context(state, an1_5Result, an1_7Result);
+      const contextMessage = buildAN2ContextV10(state, an1_5Result, an1_7Result);
 
       const response = await callClaude({
         model: MODELS.OPUS,
         system: AN2_PROMPT,
         userMessage: contextMessage,
-        maxTokens: 4096,
+        maxTokens: 8000,
       });
 
       const parsed = parseJsonResponse<AN2Output>(response, 'AN2');
@@ -402,21 +366,21 @@ export const generateReport = inngest.createFunction(
       return validated;
     });
 
-    // Update state with AN2 results
+    // Update state with AN2 results (v10)
     state = {
       ...state,
-      patterns: an2Result.patterns.map((p) => ({
-        name: p.name,
-        description: p.description,
-        precedent: p.precedent,
-        applicability: p.applicability,
-      })),
-      briefingSummary: an2Result.briefingSummary,
+      an2_first_principles_foundation: an2Result.first_principles_foundation,
+      an2_problem_physics: an2Result.problem_physics,
+      an2_innovation_patterns: an2Result.innovation_patterns,
+      an2_cross_domain_map: an2Result.cross_domain_map,
+      an2_triz_guidance: an2Result.triz_guidance,
+      an2_design_constraints: an2Result.design_constraints,
+      an2_innovation_brief: an2Result.innovation_brief,
       completedSteps: [...state.completedSteps, 'an2'],
     };
 
     // =========================================
-    // AN3: Concept Generation
+    // AN3: Concept Generation (v10)
     // =========================================
     const an3Result = await step.run('an3-concept-generation', async () => {
       await updateProgress({
@@ -424,13 +388,13 @@ export const generateReport = inngest.createFunction(
         phase_progress: 0,
       });
 
-      const contextMessage = buildAN3Context(state, an2Result);
+      const contextMessage = buildAN3ContextV10(state, an2Result);
 
       const response = await callClaude({
         model: MODELS.OPUS,
         system: AN3_PROMPT,
         userMessage: contextMessage,
-        maxTokens: 8192,
+        maxTokens: 12000,
       });
 
       const parsed = parseJsonResponse<AN3Output>(response, 'AN3');
@@ -441,25 +405,19 @@ export const generateReport = inngest.createFunction(
       return validated;
     });
 
-    // Update state with AN3 results
+    // Update state with AN3 results (v10)
     state = {
       ...state,
-      concepts: an3Result.concepts.map((c) => ({
-        id: c.id,
-        name: c.name,
-        track: c.track,
-        description: c.description,
-        mechanism: c.mechanism,
-        confidence: c.confidence,
-        keyRisks: c.keyRisks,
-        validationGates: c.validationGates.map((g) => g.test),
-      })),
-      rawConceptCount: an3Result.concepts.length,
+      an3_concepts: an3Result.concepts,
+      an3_track_distribution: an3Result.track_distribution,
+      an3_innovation_notes: an3Result.innovation_notes,
+      an3_concepts_considered_but_rejected:
+        an3Result.concepts_considered_but_rejected,
       completedSteps: [...state.completedSteps, 'an3'],
     };
 
     // =========================================
-    // AN4: Evaluation & Ranking
+    // AN4: Evaluation & Validation (v10)
     // =========================================
     const an4Result = await step.run('an4-evaluation', async () => {
       await updateProgress({
@@ -467,13 +425,13 @@ export const generateReport = inngest.createFunction(
         phase_progress: 0,
       });
 
-      const contextMessage = buildAN4Context(state, an3Result);
+      const contextMessage = buildAN4ContextV10(state, an3Result, an2Result);
 
       const response = await callClaude({
         model: MODELS.OPUS,
         system: AN4_PROMPT,
         userMessage: contextMessage,
-        maxTokens: 12000, // Needs more tokens to evaluate 8-12 concepts
+        maxTokens: 16000, // Large output for validation gates
       });
 
       const parsed = parseJsonResponse<AN4Output>(response, 'AN4');
@@ -484,39 +442,27 @@ export const generateReport = inngest.createFunction(
       return validated;
     });
 
-    // Update state with AN4 results
+    // Update state with AN4 results (v10)
     state = {
       ...state,
-      evaluatedConcepts: an4Result.evaluations.map((e) => {
-        const concept = an3Result.concepts.find((c) => c.id === e.conceptId);
-        return {
-          id: e.conceptId,
-          name: concept?.name ?? e.conceptId,
-          track: concept?.track ?? 'best_fit',
-          description: concept?.description ?? '',
-          mechanism: concept?.mechanism ?? '',
-          confidence: concept?.confidence ?? 'MEDIUM',
-          keyRisks: e.weaknesses,
-          validationGates: [],
-          score: e.overallScore,
-          ranking: e.ranking,
-          evaluationNotes: e.evaluationNotes,
-        };
-      }),
-      recommendedConcept: an4Result.recommendedConcept,
+      an4_validation_results: an4Result.validation_results,
+      an4_gate_summary: an4Result.gate_summary,
+      an4_rankings: an4Result.rankings,
+      an4_recommendation: an4Result.recommendation,
+      an4_validation_plan: an4Result.validation_plan,
       completedSteps: [...state.completedSteps, 'an4'],
     };
 
     // =========================================
-    // AN5: Report Generation
+    // AN5: Executive Report Generation (v10)
     // =========================================
-    const reportMarkdown = await step.run('an5-report-generation', async () => {
+    const an5Result = await step.run('an5-report-generation', async () => {
       await updateProgress({
         current_step: 'an5',
         phase_progress: 0,
       });
 
-      const contextMessage = buildAN5Context(
+      const contextMessage = buildAN5ContextV10(
         state,
         an2Result,
         an3Result,
@@ -526,20 +472,23 @@ export const generateReport = inngest.createFunction(
 
       const response = await callClaude({
         model: MODELS.OPUS,
-        system: AN5_REPORT_PROMPT,
+        system: AN5_PROMPT,
         userMessage: contextMessage,
         maxTokens: 16384,
       });
 
+      const parsed = parseJsonResponse<AN5Output>(response, 'AN5');
+      const validated = AN5OutputSchema.parse(parsed);
+
       await updateProgress({ phase_progress: 100 });
 
-      return response;
+      return validated;
     });
 
     // Update state with final report
     state = {
       ...state,
-      reportMarkdown,
+      an5_report: an5Result.report,
       completedSteps: [...state.completedSteps, 'an5'],
       completedAt: new Date().toISOString(),
     };
@@ -553,19 +502,17 @@ export const generateReport = inngest.createFunction(
         current_step: 'complete',
         phase_progress: 100,
         report_data: {
-          markdown: reportMarkdown,
+          report: an5Result.report,
+          metadata: an5Result.metadata,
           chainState: state,
           concepts: an3Result.concepts,
-          evaluations: an4Result.evaluations,
-          patterns: an2Result.patterns,
-          recommendedConcept: an4Result.recommendedConcept,
-          alternativePath: an4Result.alternativePath,
-          sparkHighlight: an4Result.sparkHighlight,
-          // Include corpus data
-          retrievalSummary: state.retrievalSummary,
-          corpusGaps: state.corpusGaps,
-          validatedApproaches: state.validatedApproaches,
-          literatureCoverage: state.literatureCoverage,
+          validation_results: an4Result.validation_results,
+          recommendation: an4Result.recommendation,
+          innovation_patterns: an2Result.innovation_patterns,
+          // Corpus data
+          retrieval_summary: state.an1_retrieval_summary,
+          corpus_gaps: state.an1_5_corpus_gaps,
+          commercial_precedent: state.an1_7_commercial_precedent,
         },
       });
     });
@@ -575,299 +522,453 @@ export const generateReport = inngest.createFunction(
 );
 
 // =========================================
-// Context Building Functions
+// Helper: Update state with AN0 analysis
+// =========================================
+function updateStateWithAN0Analysis(
+  state: ChainState,
+  result: AN0Output,
+): ChainState {
+  if (result.need_question === true) {
+    return state; // Can't update with analysis from a question response
+  }
+
+  return {
+    ...state,
+    an0_original_ask: result.original_ask,
+    an0_problem_interpretation: result.problem_interpretation,
+    an0_ambiguities_detected: result.ambiguities_detected,
+    an0_user_sector: result.user_sector,
+    an0_primary_kpis: result.primary_kpis,
+    an0_hard_constraints: result.hard_constraints,
+    an0_key_interfaces: result.key_interfaces,
+    an0_physics_of_problem: result.physics_of_problem,
+    an0_first_principles: result.first_principles,
+    an0_contradiction: result.contradiction,
+    an0_secondary_contradictions: result.secondary_contradictions,
+    an0_triz_principles: result.triz_principles,
+    an0_paradigms: result.paradigms,
+    an0_cross_domain_seeds: result.cross_domain_seeds,
+    an0_corpus_queries: result.corpus_queries,
+    an0_web_search_queries: result.web_search_queries,
+    an0_materials_mentioned: result.materials_mentioned,
+    an0_mechanisms_mentioned: result.mechanisms_mentioned,
+    an0_reframed_problem: result.reframed_problem,
+    needsClarification: false,
+    completedSteps: ['an0'],
+  };
+}
+
+// =========================================
+// Context Building Functions (v10)
 // =========================================
 
-function buildAN1_5Context(state: ChainState): string {
+function buildAN1_5ContextV10(state: ChainState): string {
+  return `## Problem Context (from AN0)
+
+**Challenge:** ${state.an0_original_ask ?? state.userInput}
+**Reframed:** ${state.an0_reframed_problem ?? 'Not specified'}
+**Sector:** ${state.an0_user_sector ?? 'Not specified'}
+
+**Core Contradiction:**
+${state.an0_contradiction?.plain_english ?? 'Not identified'}
+- Improving: ${state.an0_contradiction?.improve_parameter?.name ?? 'N/A'} (TRIZ #${state.an0_contradiction?.improve_parameter?.id ?? 'N/A'})
+- Worsening: ${state.an0_contradiction?.worsen_parameter?.name ?? 'N/A'} (TRIZ #${state.an0_contradiction?.worsen_parameter?.id ?? 'N/A'})
+
+**TRIZ Principles Suggested:**
+${state.an0_triz_principles?.map((p) => `- #${p.id} ${p.name}: ${p.why_relevant}`).join('\n') ?? 'None'}
+
+**First Principles:**
+- Goal: ${state.an0_first_principles?.actual_goal ?? 'Not specified'}
+- Fundamental truths: ${state.an0_first_principles?.fundamental_truths?.join('; ') ?? 'None'}
+
+---
+
+## RAW RETRIEVAL RESULTS (4 namespaces)
+
+### FAILURES (${state.an1_failures?.length ?? 0} results)
+${JSON.stringify(state.an1_failures?.slice(0, 20) ?? [], null, 2)}
+
+### BOUNDS (${state.an1_bounds?.length ?? 0} results)
+${JSON.stringify(state.an1_bounds?.slice(0, 20) ?? [], null, 2)}
+
+### TRANSFERS (${state.an1_transfers?.length ?? 0} results)
+${JSON.stringify(state.an1_transfers?.slice(0, 30) ?? [], null, 2)}
+
+### TRIZ EXAMPLES (${state.an1_triz?.length ?? 0} results)
+${JSON.stringify(state.an1_triz?.slice(0, 30) ?? [], null, 2)}
+
+---
+
+Please select TEACHING EXAMPLES (triz_exemplars, transfer_exemplars) and VALIDATION DATA (failure_patterns, parameter_bounds) from these results.`;
+}
+
+function buildAN1_7ContextV10(
+  state: ChainState,
+  an1_5Result: AN1_5_Output | null,
+): string {
   return `## Problem Context
 
-**Challenge:** ${state.originalAsk ?? state.userInput}
-**Sector:** ${state.userSector ?? 'Not specified'}
+**Challenge:** ${state.an0_original_ask ?? state.userInput}
+**Sector:** ${state.an0_user_sector ?? 'Not specified'}
+**Reframed Problem:** ${state.an0_reframed_problem ?? 'Not specified'}
 
-**Core Contradiction:**
-${state.contradiction?.description ?? 'Not identified'}
-- Improving: ${state.contradiction?.improvingParameter ?? 'N/A'}
-- Worsening: ${state.contradiction?.worseningParameter ?? 'N/A'}
-
-**Goal Direction:** User wants to ${state.contradiction?.improvingParameter ?? 'solve the problem'}
+**Core Contradiction:** ${state.an0_contradiction?.plain_english ?? 'Not identified'}
 
 ---
 
-## RAW RETRIEVAL RESULTS
+## Corpus Gaps Identified
+${JSON.stringify(an1_5Result?.corpus_gaps ?? state.an1_5_corpus_gaps ?? [], null, 2)}
 
-### MECHANISMS (${state.retrievalMechanisms?.length ?? 0} results)
-${JSON.stringify(state.retrievalMechanisms?.slice(0, 30) ?? [], null, 2)}
+## Materials/Mechanisms to Research
+- Materials: ${state.an0_materials_mentioned?.join(', ') ?? 'None mentioned'}
+- Mechanisms: ${state.an0_mechanisms_mentioned?.join(', ') ?? 'None mentioned'}
 
-### SEEDS (${state.retrievalSeeds?.length ?? 0} results)
-${JSON.stringify(state.retrievalSeeds?.slice(0, 40) ?? [], null, 2)}
+## Web Search Queries Suggested by AN0
+${state.an0_web_search_queries?.map((q) => `- ${q}`).join('\n') ?? 'None'}
 
-### PATENTS (${state.retrievalPatents?.length ?? 0} results)
-${JSON.stringify(state.retrievalPatents?.slice(0, 20) ?? [], null, 2)}
+---
 
-Please re-rank these results for actual relevance to the user's contradiction, applying negative filtering and preserving paradigm diversity.`;
+Please search literature to find commercial precedent, process parameters, and competitive intelligence.`;
 }
 
-function buildAN1_7Context(
+function buildAN2ContextV10(
   state: ChainState,
   an1_5Result: AN1_5_Output | null,
+  an1_7Result: AN1_7_Output,
 ): string {
-  return `## Problem Analysis Summary
+  return `## Problem Framing (from AN0)
 
-**Challenge:** ${state.originalAsk ?? state.userInput}
-**Sector:** ${state.userSector ?? 'Not specified'}
+**Original Challenge:** ${state.an0_original_ask ?? state.userInput}
+**Reframed Problem:** ${state.an0_reframed_problem ?? 'Not specified'}
+**Sector:** ${state.an0_user_sector ?? 'Not specified'}
 
-**Core Contradiction:**
-${state.contradiction?.description ?? 'Not identified'}
+### First Principles Decomposition
+- **Fundamental Truths:** ${state.an0_first_principles?.fundamental_truths?.join('; ') ?? 'Not specified'}
+- **Actual Goal:** ${state.an0_first_principles?.actual_goal ?? 'Not specified'}
+- **From-Scratch Approaches:** ${state.an0_first_principles?.from_scratch_approaches?.join('; ') ?? 'Not specified'}
+- **Assumed Constraints:** ${JSON.stringify(state.an0_first_principles?.assumed_constraints ?? [], null, 2)}
 
-**Corpus Gaps Identified:** ${JSON.stringify(state.corpusGaps ?? [], null, 2)}
+### Physics of Problem
+- Governing Principles: ${state.an0_physics_of_problem?.governing_principles?.join('; ') ?? 'Not specified'}
+- Key Tradeoffs: ${state.an0_physics_of_problem?.key_tradeoffs?.join('; ') ?? 'Not specified'}
+- Rate Limiting Factors: ${state.an0_physics_of_problem?.rate_limiting_factors?.join('; ') ?? 'Not specified'}
 
----
+### Core Contradiction
+${state.an0_contradiction?.plain_english ?? 'Not identified'}
+- Improve: ${state.an0_contradiction?.improve_parameter?.name ?? 'N/A'}
+- Worsen: ${state.an0_contradiction?.worsen_parameter?.name ?? 'N/A'}
 
-## TOP RERANKED MECHANISMS (from AN1.5)
-${JSON.stringify(an1_5Result?.reranked_mechanisms?.slice(0, 10) ?? [], null, 2)}
+### TRIZ Principles Suggested
+${state.an0_triz_principles?.map((p) => `- #${p.id} ${p.name}: ${p.why_relevant}`).join('\n') ?? 'None'}
 
-## TOP RERANKED SEEDS
-${JSON.stringify(an1_5Result?.reranked_seeds?.slice(0, 10) ?? [], null, 2)}
+### Paradigms to Explore
+- **Direct:** ${state.an0_paradigms?.direct?.approach ?? 'Not specified'}
+- **Indirect:** ${state.an0_paradigms?.indirect?.approach ?? 'Not specified'}
 
-## TOP RERANKED PATENTS
-${JSON.stringify(an1_5Result?.reranked_patents?.slice(0, 5) ?? [], null, 2)}
-
-## RERANKING SUMMARY
-${an1_5Result?.reranking_summary ?? 'No reranking performed'}
-
-Please assess corpus coverage and augment with literature search to fill gaps.`;
-}
-
-function buildAN2Context(
-  state: ChainState,
-  an1_5Result: AN1_5_Output | null,
-  an1_7Result: AN1_7_Output | null,
-): string {
-  return `## Problem Analysis Summary
-
-**Original Challenge:** ${state.originalAsk ?? state.userInput}
-
-**Sector:** ${state.userSector ?? 'Not specified'}
-
-**Primary KPIs:**
-${state.primaryKpis?.map((k) => `- ${k}`).join('\n') ?? 'None specified'}
-
-**Hard Constraints:**
-${state.hardConstraints?.map((c) => `- ${c}`).join('\n') ?? 'None specified'}
-
-**Core Contradiction:**
-${state.contradiction?.description ?? 'Not identified'}
-- Improving: ${state.contradiction?.improvingParameter ?? 'N/A'}
-- Worsening: ${state.contradiction?.worseningParameter ?? 'N/A'}
-
-**Cross-Domain Seeds to Explore:**
-${state.crossDomainSeeds?.map((s) => `- ${s}`).join('\n') ?? 'None identified'}
-
-**Physics of the Problem:**
-${state.physicsOfProblem?.governingEquations?.map((e) => `- ${e}`).join('\n') ?? 'Not specified'}
-
-${state.clarificationAnswer ? `**User Clarification:** ${state.clarificationAnswer}` : ''}
+### Cross-Domain Seeds
+${state.an0_cross_domain_seeds?.map((s) => `- ${s.domain}: ${s.similar_challenge} (${s.why_relevant})`).join('\n') ?? 'None'}
 
 ---
 
-## CORPUS INSIGHTS (from AN1.5)
+## Teaching Examples (from AN1.5)
 
-**Reranking Summary:** ${an1_5Result?.reranking_summary ?? 'No corpus results'}
+### TRIZ Exemplars
+${JSON.stringify(an1_5Result?.teaching_examples?.triz_exemplars ?? state.an1_5_triz_exemplars ?? [], null, 2)}
 
-**Top Mechanisms:**
-${
-  an1_5Result?.reranked_mechanisms
-    ?.slice(0, 5)
-    .map((m) => `- ${m.id}: ${m.relevance_reason}`)
-    .join('\n') ?? 'None'
-}
+### Transfer Exemplars
+${JSON.stringify(an1_5Result?.teaching_examples?.transfer_exemplars ?? state.an1_5_transfer_exemplars ?? [], null, 2)}
 
-**Corpus Gaps:** ${state.corpusGaps?.join(', ') ?? 'None identified'}
+### Innovation Guidance
+${an1_5Result?.teaching_examples?.innovation_guidance ?? state.an1_5_innovation_guidance ?? 'Not provided'}
 
 ---
 
-## LITERATURE VALIDATION (from AN1.7)
+## Validation Data (from AN1.5)
 
-**Coverage:** ${an1_7Result?.coverage_assessment?.corpus_coverage ?? 'Not assessed'}
+### Failure Patterns
+${JSON.stringify(an1_5Result?.validation_data?.failure_patterns ?? state.an1_5_failure_patterns ?? [], null, 2)}
 
-**Validated Approaches:**
-${
-  an1_7Result?.validated_approaches
-    ?.map(
-      (a) =>
-        `- ${a.approach_name} (${a.source_quality}): ${a.commercial_status}`,
-    )
-    .join('\n') ?? 'None'
-}
-
-**Augmentation Summary:** ${an1_7Result?.augmentation_summary ?? 'No augmentation'}
+### Parameter Bounds
+${JSON.stringify(an1_5Result?.validation_data?.parameter_bounds ?? state.an1_5_parameter_bounds ?? [], null, 2)}
 
 ---
 
-Please create an innovation briefing with 4-6 cross-domain patterns that could address this challenge, incorporating insights from both corpus retrieval and literature.`;
+## Literature Validation (from AN1.7)
+
+### Commercial Precedent
+${JSON.stringify(an1_7Result.commercial_precedent, null, 2)}
+
+### Process Parameters
+${JSON.stringify(an1_7Result.process_parameters, null, 2)}
+
+### Competitive Landscape
+${an1_7Result.competitive_landscape}
+
+---
+
+Please create an INNOVATION METHODOLOGY BRIEFING that teaches HOW TO THINK about this problem.`;
 }
 
-function buildAN3Context(state: ChainState, an2Result: AN2Output): string {
-  return `## Innovation Briefing
+function buildAN3ContextV10(state: ChainState, an2Result: AN2Output): string {
+  return `## Innovation Methodology Briefing (from AN2)
 
-${an2Result.briefingSummary}
+### First Principles Foundation
+- **Fundamental Truths:** ${an2Result.first_principles_foundation.fundamental_truths.join('; ')}
+- **Actual Goal:** ${an2Result.first_principles_foundation.actual_goal_restated}
+- **From-Scratch Insight:** ${an2Result.first_principles_foundation.from_scratch_insight}
+- **Constraints Challenged:** ${JSON.stringify(an2Result.first_principles_foundation.constraints_challenged, null, 2)}
 
-### Patterns Identified
+### Problem Physics
+- **Core Challenge:** ${an2Result.problem_physics.core_challenge}
+- **Governing Equations:** ${an2Result.problem_physics.governing_equations}
+- **Key Tradeoff:** ${an2Result.problem_physics.key_tradeoff}
+- **Success Metric:** ${an2Result.problem_physics.success_metric}
 
-${an2Result.patterns
-  .map(
-    (p) => `**${p.name}**
-${p.description}
+### Innovation Patterns
+${an2Result.innovation_patterns.map((p) => `**${p.pattern_name}**
 - Mechanism: ${p.mechanism}
-- Precedent: ${p.precedent}
-- Application: ${p.applicability}`,
-  )
-  .join('\n\n')}
+- When to use: ${p.when_to_use}
+- Source: ${p.exemplar_source}
+- Application hint: ${p.application_hint}`).join('\n\n')}
 
-### Synthesis Insight
-${an2Result.synthesisInsight}
+### Cross-Domain Inspiration Map
+${an2Result.cross_domain_map.domains_to_mine.map((d) => `**${d.domain}**
+- Similar physics: ${d.similar_physics}
+- Mechanisms: ${d.mechanisms_to_explore.join(', ')}
+- Abstraction: ${d.abstraction}`).join('\n\n')}
+
+**Transfer Thinking Prompt:** ${an2Result.cross_domain_map.transfer_thinking_prompt}
+
+### TRIZ Application Guidance
+${an2Result.triz_guidance.primary_principles.map((p) => `**#${p.principle.id} ${p.principle.name}**
+- Obvious (AVOID): ${p.obvious_application}
+- Brilliant (AIM FOR): ${p.brilliant_application}
+- Pattern: ${p.pattern}`).join('\n\n')}
+
+**Combination Hint:** ${an2Result.triz_guidance.principle_combination_hint}
+
+### Design Constraints
+
+**Failure Modes to Prevent:**
+${an2Result.design_constraints.failure_modes_to_prevent.map((f) => `- ${f.failure}: ${f.design_rule}`).join('\n')}
+
+**Parameter Limits:**
+${an2Result.design_constraints.parameter_limits.map((p) => `- ${p.parameter}: ${p.limit} (${p.implication})`).join('\n')}
 
 ---
 
-## Problem Context
+## Innovation Brief
+${an2Result.innovation_brief}
 
-**Challenge:** ${state.originalAsk ?? state.userInput}
+---
 
+## Original Challenge
+${state.an0_original_ask ?? state.userInput}
+
+## KPIs and Constraints
 **Primary KPIs:**
-${state.primaryKpis?.map((k) => `- ${k}`).join('\n') ?? 'None'}
+${state.an0_primary_kpis?.map((k) => `- ${k.name}: ${k.target ?? 'improve'} ${k.unit ?? ''}`).join('\n') ?? 'None specified'}
 
 **Hard Constraints:**
-${state.hardConstraints?.map((c) => `- ${c}`).join('\n') ?? 'None'}
-
-**Core Contradiction:** ${state.contradiction?.description ?? 'Not specified'}
+${state.an0_hard_constraints?.map((c) => `- ${c.name}: ${c.reason} (flexibility: ${c.flexibility})`).join('\n') ?? 'None specified'}
 
 ---
 
-## Literature-Validated Parameters (use these in concept design)
-
-${
-  state.parameterReferences
-    ?.map(
-      (p) =>
-        `- ${p.parameter}: ${p.value_range} (${p.confidence}, ${p.source})`,
-    )
-    .join('\n') ?? 'No parameters available'
+Please generate 5-8 NOVEL SOLUTION CONCEPTS using the methodology above. Remember:
+- At least one concept from FIRST PRINCIPLES
+- Include all three tracks: Simpler Path, Best Fit, Spark
+- Be SKETCHABLE, MECHANISTICALLY GROUNDED, TESTABLE
+- Question assumed constraints`;
 }
 
-Please generate 8-12 solution concepts using these patterns.`;
-}
+function buildAN4ContextV10(
+  state: ChainState,
+  an3Result: AN3Output,
+  an2Result: AN2Output,
+): string {
+  return `## Concepts to Validate and Evaluate
 
-function buildAN4Context(state: ChainState, an3Result: AN3Output): string {
-  return `## Concepts to Evaluate
+${an3Result.concepts.map((c) => `### ${c.concept_id}: ${c.title} (${c.track.replace('_', ' ')})
 
-${an3Result.concepts
-  .map(
-    (c) => `### ${c.name} (${c.track.replace('_', ' ')})
-ID: ${c.id}
-${c.description}
-- Mechanism: ${c.mechanism}
-- Confidence: ${c.confidence}
-- Key Risks: ${c.keyRisks.join(', ')}`,
-  )
-  .join('\n\n')}
+**Mechanism:** ${c.mechanism_description}
+
+**Working Principle:** ${c.mechanistic_depth.working_principle}
+**Rate Limiting Step:** ${c.mechanistic_depth.rate_limiting_step}
+**Key Parameters:** ${c.mechanistic_depth.key_parameters.join('; ')}
+**Potential Failures:** ${c.mechanistic_depth.failure_modes.join('; ')}
+
+**Innovation Source:**
+- Pattern: ${c.innovation_source.pattern_used}
+- First Principles: ${c.innovation_source.first_principles_reasoning ?? 'N/A'}
+- Cross-Domain: ${c.innovation_source.cross_domain_inspiration ?? 'N/A'}
+- Novelty: ${c.innovation_source.novelty_claim}
+
+**Self-Assessed Feasibility:** ${c.feasibility_check.overall_feasibility}
+- Manufacturing: ${c.feasibility_check.manufacturing}
+- Materials: ${c.feasibility_check.materials}
+
+**Tradeoffs:** ${c.tradeoffs.join('; ')}
+
+**Expected Impact:** ${c.expected_impact.primary_kpi_improvement} (${c.expected_impact.confidence})
+`).join('\n---\n')}
 
 ---
 
-## Evaluation Criteria
+## Design Constraints (from AN2)
+
+### Failure Modes to Prevent
+${an2Result.design_constraints.failure_modes_to_prevent.map((f) => `- **${f.failure}**: ${f.mechanism} → Design rule: ${f.design_rule}`).join('\n')}
+
+### Parameter Limits
+${an2Result.design_constraints.parameter_limits.map((p) => `- **${p.parameter}**: ${p.limit} (${p.implication})`).join('\n')}
+
+---
+
+## Problem Physics (from AN2)
+- Core Challenge: ${an2Result.problem_physics.core_challenge}
+- Key Tradeoff: ${an2Result.problem_physics.key_tradeoff}
+- Success Metric: ${an2Result.problem_physics.success_metric}
+
+---
+
+## User's KPIs and Constraints (from AN0)
 
 **Primary KPIs:**
-${state.primaryKpis?.map((k) => `- ${k}`).join('\n') ?? 'None specified'}
+${state.an0_primary_kpis?.map((k) => `- ${k.name}: ${k.target ?? 'improve'} ${k.unit ?? ''}`).join('\n') ?? 'None specified'}
 
 **Hard Constraints:**
-${state.hardConstraints?.map((c) => `- ${c}`).join('\n') ?? 'None specified'}
+${state.an0_hard_constraints?.map((c) => `- ${c.name}: ${c.reason}`).join('\n') ?? 'None specified'}
 
-Please evaluate and rank all ${an3Result.concepts.length} concepts.`;
+---
+
+Please validate each concept against the HARD GATES (bounds, failure modes, physics) and evaluate those that pass.`;
 }
 
-function buildAN5Context(
+function buildAN5ContextV10(
   state: ChainState,
   an2Result: AN2Output,
   an3Result: AN3Output,
   an4Result: AN4Output,
-  an1_7Result: AN1_7_Output | null,
+  an1_7Result: AN1_7_Output,
 ): string {
-  // Sort concepts by ranking
-  const rankedConcepts = an3Result.concepts
-    .map((c) => {
-      const evaluation = an4Result.evaluations.find(
-        (e) => e.conceptId === c.id,
-      );
-      return { ...c, evaluation };
-    })
-    .sort(
-      (a, b) => (a.evaluation?.ranking ?? 99) - (b.evaluation?.ranking ?? 99),
-    );
+  return `## Complete Analysis Data for Report Synthesis
 
-  return `## Full Analysis Data
+### Problem Framing (AN0)
 
-### Problem Summary
-**Challenge:** ${state.originalAsk ?? state.userInput}
-**Sector:** ${state.userSector ?? 'Not specified'}
+**Original Challenge:** ${state.an0_original_ask ?? state.userInput}
+**Reframed:** ${state.an0_reframed_problem ?? 'Not specified'}
+**Sector:** ${state.an0_user_sector ?? 'Not specified'}
 
-### Constraints
-**Primary KPIs:**
-${state.primaryKpis?.map((k) => `- ${k}`).join('\n') ?? 'None'}
+**Core Contradiction:**
+${state.an0_contradiction?.plain_english ?? 'Not identified'}
+- Improve: ${state.an0_contradiction?.improve_parameter?.name ?? 'N/A'}
+- Worsen: ${state.an0_contradiction?.worsen_parameter?.name ?? 'N/A'}
 
-**Hard Constraints:**
-${state.hardConstraints?.map((c) => `- ${c}`).join('\n') ?? 'None'}
+**Physics Summary:**
+${state.an0_physics_of_problem?.governing_principles?.join('; ') ?? 'Not specified'}
 
-### Core Contradiction
-${state.contradiction?.description ?? 'Not identified'}
+**First Principles Insight:**
+- Actual Goal: ${state.an0_first_principles?.actual_goal ?? 'Not specified'}
+- From-Scratch: ${state.an0_first_principles?.from_scratch_approaches?.join('; ') ?? 'Not specified'}
 
-### Physics of the Problem
-${state.physicsOfProblem?.governingEquations?.map((e) => `- ${e}`).join('\n') ?? 'Not specified'}
+**KPIs:**
+${state.an0_primary_kpis?.map((k) => `- ${k.name}: ${k.target ?? 'improve'} ${k.unit ?? ''}`).join('\n') ?? 'None'}
 
-### First Principles Insight
-${state.firstPrinciples?.tradeoffs?.join('\n') ?? 'Not specified'}
+**Constraints:**
+${state.an0_hard_constraints?.map((c) => `- ${c.name}: ${c.reason}`).join('\n') ?? 'None'}
 
 ---
 
-### Key Patterns
-${an2Result.patterns
-  .map((p) => `**${p.name}**: ${p.description}\nPrecedent: ${p.precedent}`)
-  .join('\n\n')}
+### Innovation Briefing Summary (AN2)
+
+${an2Result.innovation_brief}
+
+**Key Patterns:**
+${an2Result.innovation_patterns.map((p) => `- ${p.pattern_name}: ${p.mechanism}`).join('\n')}
+
+**TRIZ Guidance:**
+${an2Result.triz_guidance.primary_principles.map((p) => `- #${p.principle.id} ${p.principle.name}`).join('\n')}
 
 ---
 
-### Literature Validation
-${
-  an1_7Result?.validated_approaches
-    ?.map(
-      (a) =>
-        `**${a.approach_name}** (${a.source_quality})\n- Source: ${a.source}\n- Commercial: ${a.commercial_status}\n- Limitations: ${a.limitations}`,
-    )
-    .join('\n\n') ?? 'No literature validation'
-}
+### Literature Validation (AN1.7)
+
+**Commercial Precedent:**
+${an1_7Result.commercial_precedent.map((p) => `- ${p.approach}: ${p.who_uses_it.join(', ')} (${p.confidence})`).join('\n') || 'None found'}
+
+**Competitive Landscape:**
+${an1_7Result.competitive_landscape}
 
 ---
 
-### Solution Concepts (Ranked)
+### Concepts Generated (AN3)
 
-${rankedConcepts
-  .map(
-    (c, i) => `**#${i + 1}: ${c.name}** — Track: ${c.track.replace('_', ' ')}
-${c.description}
-- Mechanism: ${c.mechanism}
-- Confidence: ${c.confidence}
-- Score: ${c.evaluation?.overallScore ?? 'N/A'}/100
-- Risks: ${c.keyRisks.join(', ')}
-- Validation: ${c.validationGates.map((g) => g.test).join('; ')}`,
-  )
-  .join('\n\n')}
+**Track Distribution:**
+- Simpler Path: ${an3Result.track_distribution.simpler_path.join(', ')}
+- Best Fit: ${an3Result.track_distribution.best_fit.join(', ')}
+- Spark: ${an3Result.track_distribution.spark.join(', ')}
+
+**Innovation Notes:**
+- Most Promising: ${an3Result.innovation_notes.most_promising}
+- Highest Novelty: ${an3Result.innovation_notes.highest_novelty}
+- Best Risk/Reward: ${an3Result.innovation_notes.best_risk_reward}
+- First Principles Winner: ${an3Result.innovation_notes.first_principles_winner}
+
+**All Concepts:**
+${an3Result.concepts.map((c) => `**${c.concept_id}: ${c.title}** (${c.track})
+${c.mechanism_description}
+- Innovation: ${c.innovation_source.novelty_claim}
+- Expected Impact: ${c.expected_impact.primary_kpi_improvement}
+- Feasibility: ${c.feasibility_check.overall_feasibility}`).join('\n\n')}
 
 ---
 
-### Recommendations
-**Primary:** ${an4Result.recommendedConcept} — ${an4Result.recommendationRationale}
-**Alternative:** ${an4Result.alternativePath} — ${an4Result.alternativeRationale}
-**Spark to Explore:** ${an4Result.sparkHighlight} — ${an4Result.sparkRationale}
+### Validation Results (AN4)
+
+**Gate Summary:**
+- Passed: ${an4Result.gate_summary.passed.join(', ')}
+- Conditional: ${an4Result.gate_summary.conditional.join(', ')}
+- Failed: ${an4Result.gate_summary.failed.join(', ')}
+
+**Failure Reasons:**
+${an4Result.gate_summary.failure_reasons.map((f) => `- ${f.concept_id}: ${f.reason}`).join('\n') || 'None'}
+
+**Overall Rankings:**
+${an4Result.rankings.overall.map((r) => `${r.rank}. ${r.concept_id} (${r.score}/100): ${r.one_liner}`).join('\n')}
 
 ---
 
-Please write the full report following the exact structure in your instructions.`;
+### Recommendation (AN4)
+
+**Primary:**
+- ${an4Result.recommendation.primary.concept_id}: ${an4Result.recommendation.primary.title}
+- Why: ${an4Result.recommendation.primary.why_this_one}
+- Next Steps: ${an4Result.recommendation.primary.next_steps.join('; ')}
+- Key Risk: ${an4Result.recommendation.primary.key_risk}
+- De-risk: ${an4Result.recommendation.primary.de_risk_plan}
+
+**Parallel Spark:**
+- ${an4Result.recommendation.parallel_spark.concept_id}: ${an4Result.recommendation.parallel_spark.title}
+- Why: ${an4Result.recommendation.parallel_spark.why_explore}
+
+**Fallback:**
+- ${an4Result.recommendation.fallback.concept_id}: ${an4Result.recommendation.fallback.title}
+- When: ${an4Result.recommendation.fallback.when_to_use}
+
+---
+
+### Validation Plan (AN4)
+
+**Critical Experiments:**
+${an4Result.validation_plan.critical_experiments.map((e) => `- ${e.name}: ${e.tests_assumption} (${e.estimated_effort})`).join('\n')}
+
+**Kill Conditions:**
+${an4Result.validation_plan.kill_conditions.join('\n')}
+
+**Pivot Triggers:**
+${an4Result.validation_plan.pivot_triggers.join('\n')}
+
+---
+
+Please synthesize this into an EXECUTIVE INNOVATION REPORT following the specified structure.`;
 }
