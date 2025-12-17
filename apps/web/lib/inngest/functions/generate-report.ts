@@ -394,7 +394,7 @@ export const generateReport = inngest.createFunction(
         model: MODELS.OPUS,
         system: AN3_PROMPT,
         userMessage: contextMessage,
-        maxTokens: 16000,
+        maxTokens: 24000,
       });
 
       const parsed = parseJsonResponse<AN3Output>(response, 'AN3');
@@ -474,7 +474,7 @@ export const generateReport = inngest.createFunction(
         model: MODELS.OPUS,
         system: AN5_PROMPT,
         userMessage: contextMessage,
-        maxTokens: 16384,
+        maxTokens: 24000, // Large output for executive report
       });
 
       const parsed = parseJsonResponse<AN5Output>(response, 'AN5');
