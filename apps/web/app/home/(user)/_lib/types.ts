@@ -11,6 +11,7 @@ export const ConversationStatusSchema = z.enum([
   'processing',
   'complete',
   'error',
+  'failed',
   'confirm_rerun',
 ]);
 

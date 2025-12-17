@@ -76,6 +76,13 @@ function StatusBadge({ status }: { status: ConversationStatus }) {
       className: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
       iconClassName: '',
     },
+    failed: {
+      icon: AlertCircle,
+      label: 'Failed',
+      className:
+        'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
+      iconClassName: '',
+    },
     confirm_rerun: {
       icon: Clock,
       label: 'Pending',

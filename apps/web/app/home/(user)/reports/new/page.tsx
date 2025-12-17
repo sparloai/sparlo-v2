@@ -1,12 +1,13 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
 
+import { Alert, AlertDescription } from '@kit/ui/alert';
 import { Button } from '@kit/ui/button';
 import { Textarea } from '@kit/ui/textarea';
 import { cn } from '@kit/ui/utils';
@@ -20,11 +21,31 @@ type PagePhase = 'input' | 'processing';
 
 export default function NewReportPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [phase, setPhase] = useState<PagePhase>('input');
   const [challengeText, setChallengeText] = useState('');
   const [reportId, setReportId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showRefusalWarning, setShowRefusalWarning] = useState(false);
+
+  // Handle URL params for prefill and error state
+  useEffect(() => {
+    const prefill = searchParams.get('prefill');
+    const errorType = searchParams.get('error');
+
+    if (prefill) {
+      setChallengeText(prefill);
+    }
+    if (errorType === 'refusal') {
+      setShowRefusalWarning(true);
+    }
+
+    // Clear params from URL without navigation
+    if (prefill || errorType) {
+      window.history.replaceState({}, '', '/home/reports/new');
+    }
+  }, [searchParams]);
 
   // Track progress once we have a report ID
   const { progress } = useReportProgress(reportId);
@@ -70,7 +91,11 @@ export default function NewReportPage() {
   if (phase === 'processing' && progress) {
     return (
       <div className="min-h-[calc(100vh-120px)]">
-        <ProcessingScreen progress={progress} onComplete={handleViewReport} />
+        <ProcessingScreen
+          progress={progress}
+          onComplete={handleViewReport}
+          designChallenge={challengeText}
+        />
       </div>
     );
   }
@@ -111,6 +136,24 @@ export default function NewReportPage() {
           </p>
         </motion.div>
 
+        {/* Refusal warning */}
+        {showRefusalWarning && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Alert variant="destructive" className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-100">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Your previous query was flagged by our AI safety filters.</strong>
+                {' '}This is often a false positive for legitimate engineering problems.
+                Please rephrase your challenge, focusing on the engineering aspects
+                and avoiding terminology that could be misinterpreted.
+              </AlertDescription>
+            </Alert>
+          </motion.div>
+        )}
+
         {/* Input area */}
         <motion.div
           className="space-y-4"
@@ -120,7 +163,13 @@ export default function NewReportPage() {
         >
           <Textarea
             value={challengeText}
-            onChange={(e) => setChallengeText(e.target.value)}
+            onChange={(e) => {
+              setChallengeText(e.target.value);
+              // Clear refusal warning when user starts editing
+              if (showRefusalWarning) {
+                setShowRefusalWarning(false);
+              }
+            }}
             placeholder="What engineering problem are you trying to solve? Include constraints, goals, and any relevant context for better results..."
             className="min-h-[200px] resize-none text-base leading-relaxed"
             disabled={isSubmitting}

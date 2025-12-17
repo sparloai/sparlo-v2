@@ -2,8 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { motion } from 'framer-motion';
-import { ArrowRight, Check, Loader2, MessageSquare, Send } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Check,
+  Loader2,
+  MessageSquare,
+  Send,
+} from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
 import { Textarea } from '@kit/ui/textarea';
@@ -14,6 +23,7 @@ import { type ReportProgress } from '../_lib/use-report-progress';
 interface ProcessingScreenProps {
   progress: ReportProgress;
   onComplete?: () => void;
+  designChallenge?: string;
 }
 
 /**
@@ -63,7 +73,9 @@ function formatElapsed(seconds: number): string {
 export function ProcessingScreen({
   progress,
   onComplete,
+  designChallenge,
 }: ProcessingScreenProps) {
+  const router = useRouter();
   const [clarificationAnswer, setClarificationAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const hasNavigatedRef = useRef(false);
@@ -157,26 +169,57 @@ export function ProcessingScreen({
     );
   }
 
-  // Handle error status
-  if (progress.status === 'error') {
+  // Handle error or failed status
+  if (progress.status === 'error' || progress.status === 'failed') {
+    const isRefusalError = progress.errorMessage?.includes('could not be processed');
+
+    const handleTryAgain = () => {
+      // Redirect to new report page with prefilled text and error flag
+      const params = new URLSearchParams();
+      if (designChallenge) {
+        params.set('prefill', designChallenge);
+      }
+      if (isRefusalError) {
+        params.set('error', 'refusal');
+      }
+      router.push(`/home/reports/new?${params.toString()}`);
+    };
+
     return (
       <motion.div
         className="flex min-h-[60vh] flex-col items-center justify-center p-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 dark:bg-red-900/20">
-          <span className="text-2xl">!</span>
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-900/20">
+          <AlertTriangle className="h-8 w-8 text-amber-500" />
         </div>
 
         <h2 className="mt-6 text-2xl font-semibold text-[#1A1A1A] dark:text-white">
-          Something went wrong
+          {isRefusalError ? 'Query Not Accepted' : 'Something went wrong'}
         </h2>
 
         <p className="mt-2 max-w-md text-center text-[#6A6A6A]">
-          {progress.errorMessage ||
-            'An error occurred while generating your report. Please try again.'}
+          {isRefusalError
+            ? 'Our AI has flagged your query as potentially problematic. This is usually a false positive for legitimate engineering problems.'
+            : progress.errorMessage ||
+              'An error occurred while generating your report. Please try again.'}
         </p>
+
+        {isRefusalError && (
+          <p className="mt-4 max-w-md text-center text-sm text-[#8A8A8A]">
+            Try rephrasing your challenge to focus on the engineering problem.
+            Avoid terminology that could be misinterpreted as harmful.
+          </p>
+        )}
+
+        <Button
+          onClick={handleTryAgain}
+          className="mt-6 bg-[#7C3AED] hover:bg-[#6D28D9]"
+        >
+          <ArrowRight className="mr-2 h-4 w-4" />
+          {isRefusalError ? 'Rewrite Challenge' : 'Try Again'}
+        </Button>
       </motion.div>
     );
   }
