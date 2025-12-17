@@ -255,7 +255,10 @@ export function ProcessingScreen({
     );
   }
 
-  // Default: Processing status - simplified to show only elapsed time
+  // Determine if we're in the initial review phase (AN0) or main analysis
+  const isInitialReview = !progress.currentStep || progress.currentStep === 'an0';
+
+  // Default: Processing status - two states based on current phase
   return (
     <motion.div
       className="flex min-h-[60vh] flex-col items-center justify-center p-6"
@@ -285,36 +288,49 @@ export function ProcessingScreen({
           </svg>
         </motion.div>
 
-        {/* Status text */}
-        <p className="text-lg font-light text-[#1A1A1A] dark:text-white">
-          Analyzing your question...
-        </p>
+        {isInitialReview ? (
+          <>
+            {/* Initial review phase - may ask follow-up */}
+            <p className="text-lg font-light text-[#1A1A1A] dark:text-white">
+              Reviewing your question...
+            </p>
 
-        {/* Elapsed time */}
-        <p className="text-sm tabular-nums text-[#8A8A8A]">
-          {formatElapsed(elapsedSeconds)} elapsed
-        </p>
+            <p className="max-w-sm text-center text-sm text-[#8A8A8A]">
+              We may ask a follow-up question to better understand your challenge
+            </p>
 
-        {/* Duration estimate */}
-        <p className="text-sm text-[#8A8A8A]">
-          Analyses typically take ~15 minutes
-        </p>
+            {/* Elapsed time */}
+            <p className="text-sm tabular-nums text-[#8A8A8A]">
+              {formatElapsed(elapsedSeconds)} elapsed
+            </p>
+          </>
+        ) : (
+          <>
+            {/* Main analysis phase - no clarification needed */}
+            <p className="text-lg font-light text-[#1A1A1A] dark:text-white">
+              Analyzing your question...
+            </p>
 
-        {/* Safe to leave notice */}
-        <motion.div
-          className="mt-4 text-center text-sm text-[#8A8A8A]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-        >
-          <p className="flex items-center justify-center gap-1">
-            <Check className="h-4 w-4 text-emerald-500" />
-            Safe to close this page
-          </p>
-          <p className="mt-1">
-            We&apos;ll email you when complete.
-          </p>
-        </motion.div>
+            {/* Elapsed time */}
+            <p className="text-sm tabular-nums text-[#8A8A8A]">
+              {formatElapsed(elapsedSeconds)} elapsed
+            </p>
+
+            {/* Duration estimate */}
+            <p className="text-sm text-[#8A8A8A]">
+              Analyses typically take ~15 minutes
+            </p>
+
+            {/* Safe to leave notice */}
+            <div className="mt-4 text-center text-sm text-[#8A8A8A]">
+              <p className="flex items-center justify-center gap-1">
+                <Check className="h-4 w-4 text-emerald-500" />
+                Safe to close this page
+              </p>
+              <p className="mt-1">We&apos;ll email you when complete.</p>
+            </div>
+          </>
+        )}
       </div>
     </motion.div>
   );
