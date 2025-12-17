@@ -168,8 +168,10 @@ REMEMBER:
  */
 
 // Helper to extract enum value from LLM output that may use different terms
+// Falls back to first value if no match found (most conservative option)
 const createLenientEnum = <T extends readonly [string, ...string[]]>(
   values: T,
+  defaultValue?: T[number],
 ) =>
   z
     .string()
@@ -190,10 +192,14 @@ const createLenientEnum = <T extends readonly [string, ...string[]]>(
         exotic: 'Exotic',
         offtheshelf: 'Off-shelf',
         'off the shelf': 'Off-shelf',
+        unknown: 'MEDIUM', // Conservative default for risk
+        uncertain: 'MEDIUM',
+        tbd: 'MEDIUM',
       };
       const normalized = lower.replace(/[-_\s]/g, '');
       if (synonyms[normalized]) return synonyms[normalized];
-      return val;
+      // Fallback to default or first value if nothing matches
+      return defaultValue ?? values[0];
     })
     .pipe(z.enum(values));
 
