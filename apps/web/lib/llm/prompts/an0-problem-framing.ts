@@ -40,11 +40,10 @@ If you need clarification, ask exactly ONE question that would most change your 
 
 ## Output Format
 
-Return a JSON object with this exact structure:
+IMPORTANT: Output ONLY valid JSON. No markdown headers, no explanations, no code fences. Just the raw JSON object.
 
-\`\`\`json
 {
-  "needsClarification": boolean,
+  "needsClarification": true or false,
   "clarificationQuestion": string | null,
   "analysis": {
     "originalAsk": "Restated problem in your own words",
@@ -75,7 +74,6 @@ Return a JSON object with this exact structure:
     }
   }
 }
-\`\`\`
 
 ## Important Notes
 

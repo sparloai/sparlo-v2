@@ -38,9 +38,8 @@ Each concept must:
 
 ## Output Format
 
-Return a JSON object with this exact structure:
+IMPORTANT: Output ONLY valid JSON. No markdown headers, no explanations, no code fences. Just the raw JSON object.
 
-\`\`\`json
 {
   "concepts": [
     {
@@ -66,7 +65,6 @@ Return a JSON object with this exact structure:
   ],
   "conceptSummary": "Brief overview of the concept landscape and recommended starting point"
 }
-\`\`\`
 
 ## Important Notes
 

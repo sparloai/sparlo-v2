@@ -27,9 +27,8 @@ Good patterns should:
 
 ## Output Format
 
-Return a JSON object with this exact structure:
+IMPORTANT: Output ONLY valid JSON. No markdown headers, no explanations, no code fences. Just the raw JSON object.
 
-\`\`\`json
 {
   "briefingSummary": "2-3 sentence overview of the innovation opportunity",
   "patterns": [
@@ -44,7 +43,6 @@ Return a JSON object with this exact structure:
   ],
   "synthesisInsight": "The key insight that connects these patterns to the problem"
 }
-\`\`\`
 
 ## Important Notes
 

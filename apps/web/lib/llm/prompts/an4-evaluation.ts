@@ -39,9 +39,8 @@ Use a 0-100 scale where:
 
 ## Output Format
 
-Return a JSON object with this exact structure:
+IMPORTANT: Output ONLY valid JSON. No markdown headers, no explanations, no code fences. Just the raw JSON object.
 
-\`\`\`json
 {
   "evaluations": [
     {
@@ -67,7 +66,6 @@ Return a JSON object with this exact structure:
   "sparkHighlight": "concept-8",
   "sparkRationale": "Why this Spark concept is worth exploring in parallel"
 }
-\`\`\`
 
 ## Important Notes
 
