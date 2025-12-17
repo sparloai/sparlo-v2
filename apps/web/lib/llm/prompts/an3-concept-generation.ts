@@ -166,6 +166,37 @@ REMEMBER:
 /**
  * Zod schema for AN3 output validation (v10)
  */
+
+// Helper to extract enum value from LLM output that may use different terms
+const createLenientEnum = <T extends readonly [string, ...string[]]>(
+  values: T,
+) =>
+  z
+    .string()
+    .transform((val) => {
+      const lower = val.toLowerCase().trim();
+      // Direct match first
+      for (const v of values) {
+        if (lower === v.toLowerCase()) return v;
+      }
+      // Prefix match
+      for (const v of values) {
+        if (lower.startsWith(v.toLowerCase())) return v;
+      }
+      // Map common synonyms
+      const synonyms: Record<string, string> = {
+        standard: 'Off-shelf',
+        specialized: 'Custom',
+        exotic: 'Exotic',
+        offtheshelf: 'Off-shelf',
+        'off the shelf': 'Off-shelf',
+      };
+      const normalized = lower.replace(/[-_\s]/g, '');
+      if (synonyms[normalized]) return synonyms[normalized];
+      return val;
+    })
+    .pipe(z.enum(values));
+
 const MechanisticDepthSchema = z.object({
   working_principle: z.string(),
   rate_limiting_step: z.string(),
@@ -190,25 +221,32 @@ const InnovationSourceSchema = z.object({
   novelty_claim: z.string(),
 });
 
+const statusValues = ['OK', 'CONCERN', 'VIOLATION'] as const;
+const riskLevelValues = ['LOW', 'MEDIUM', 'HIGH'] as const;
+
 const BoundsComplianceSchema = z.object({
   parameter: z.string(),
   proposed_value: z.string(),
   limit: z.string(),
-  status: z.enum(['OK', 'CONCERN', 'VIOLATION']),
+  status: createLenientEnum(statusValues),
 });
 
 const FailureModeRiskSchema = z.object({
   failure: z.string(),
-  risk_level: z.enum(['LOW', 'MEDIUM', 'HIGH']),
+  risk_level: createLenientEnum(riskLevelValues),
   mitigation: z.string(),
 });
+
+const materialsValues = ['Off-shelf', 'Custom', 'Exotic'] as const;
+const manufacturingValues = ['Standard', 'Specialized', 'Custom'] as const;
+const feasibilityValues = ['HIGH', 'MEDIUM', 'LOW'] as const;
 
 const FeasibilityCheckSchema = z.object({
   bounds_compliance: z.array(BoundsComplianceSchema),
   failure_mode_risks: z.array(FailureModeRiskSchema),
-  manufacturing: z.enum(['Standard', 'Specialized', 'Custom']),
-  materials: z.enum(['Off-shelf', 'Custom', 'Exotic']),
-  overall_feasibility: z.enum(['HIGH', 'MEDIUM', 'LOW']),
+  manufacturing: createLenientEnum(manufacturingValues),
+  materials: createLenientEnum(materialsValues),
+  overall_feasibility: createLenientEnum(feasibilityValues),
 });
 
 const FirstTestSchema = z.object({
@@ -224,16 +262,19 @@ const ValidationPathSchema = z.object({
   kill_conditions: z.array(z.string()),
 });
 
+const confidenceValues = ['HIGH', 'MEDIUM', 'LOW'] as const;
+const trackValues = ['simpler_path', 'best_fit', 'spark'] as const;
+
 const ExpectedImpactSchema = z.object({
   primary_kpi_improvement: z.string(),
-  confidence: z.enum(['HIGH', 'MEDIUM', 'LOW']),
+  confidence: createLenientEnum(confidenceValues),
   basis: z.string(),
 });
 
 const ConceptSchema = z.object({
   concept_id: z.string(),
   title: z.string(),
-  track: z.enum(['simpler_path', 'best_fit', 'spark']),
+  track: createLenientEnum(trackValues),
   mechanism_description: z.string(),
   mechanistic_depth: MechanisticDepthSchema,
   innovation_source: InnovationSourceSchema,
