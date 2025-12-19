@@ -20,6 +20,10 @@ interface UserWorkspace {
   };
 
   user: JWTUserData;
+
+  // Usage tracking (set by app loader)
+  reportsUsed: number;
+  reportLimit: number;
 }
 
 export const UserWorkspaceContext = createContext<UserWorkspace>(
