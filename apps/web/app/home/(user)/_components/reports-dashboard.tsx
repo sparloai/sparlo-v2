@@ -104,7 +104,9 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
   // Check if report is in a processing state (not complete)
   const isProcessing = (status: ConversationStatus) =>
-    status === 'processing' || status === 'clarifying' || status === 'confirm_rerun';
+    status === 'processing' ||
+    status === 'clarifying' ||
+    status === 'confirm_rerun';
 
   return (
     <div
@@ -114,7 +116,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
       {/* Header Actions */}
       <div className="mb-6 flex items-end justify-between">
         <h1
-          className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-[--text-muted]"
+          className="font-mono text-xs font-medium tracking-[0.2em] text-[--text-muted] uppercase"
           style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
         >
           REPORTS
@@ -144,7 +146,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search reports..."
-          className="w-full rounded-lg border border-[--border-subtle] bg-[--surface-elevated] py-3.5 pr-4 pl-11 text-sm text-[--text-primary] shadow-sm transition-all placeholder:text-[--text-muted] focus:border-[--border-default] focus:outline-none focus:ring-1 focus:ring-[--border-default]"
+          className="w-full rounded-lg border border-[--border-subtle] bg-[--surface-elevated] py-3.5 pr-4 pl-11 text-sm text-[--text-primary] shadow-sm transition-all placeholder:text-[--text-muted] focus:border-[--border-default] focus:ring-1 focus:ring-[--border-default] focus:outline-none"
           data-test="search-reports-input"
           style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
         />
@@ -165,7 +167,8 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
               const isClickable = isComplete;
 
               // Use headline if available, otherwise truncate title
-              const displayTitle = report.headline || truncate(report.title, 80);
+              const displayTitle =
+                report.headline || truncate(report.title, 80);
 
               if (processing) {
                 // Processing state - purple theme, not clickable
@@ -195,8 +198,11 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                         </h3>
                         <div className="mt-2 flex items-center gap-3">
                           <span
-                            className="font-mono text-xs uppercase tracking-wider text-violet-600 dark:text-violet-400"
-                            style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+                            className="font-mono text-xs tracking-wider text-violet-600 uppercase dark:text-violet-400"
+                            style={{
+                              fontFamily:
+                                'Soehne Mono, JetBrains Mono, monospace',
+                            }}
                           >
                             Processing
                           </span>
@@ -205,7 +211,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                       </div>
 
                       {/* Loader Icon */}
-                      <div className="absolute right-5 top-1/2 -translate-y-1/2">
+                      <div className="absolute top-1/2 right-5 -translate-y-1/2">
                         <Loader2 className="h-4 w-4 animate-spin text-violet-500/50" />
                       </div>
                     </div>
@@ -217,12 +223,15 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
               return (
                 <button
                   key={report.id}
-                  onClick={() => isClickable && router.push(`/home/reports/${report.id}`)}
+                  onClick={() =>
+                    isClickable && router.push(`/home/reports/${report.id}`)
+                  }
                   disabled={!isClickable}
                   data-test={`report-card-${report.id}`}
                   className={cn(
                     'group relative block w-full p-5 text-left transition-all',
-                    isClickable && 'cursor-pointer hover:bg-[--surface-overlay]',
+                    isClickable &&
+                      'cursor-pointer hover:bg-[--surface-overlay]',
                     !isLast && 'border-b border-[--border-subtle]',
                   )}
                 >
@@ -250,7 +259,10 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                       <div className="mt-2 flex items-center gap-4">
                         <span
                           className="font-mono text-xs text-[--text-primary]"
-                          style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+                          style={{
+                            fontFamily:
+                              'Soehne Mono, JetBrains Mono, monospace',
+                          }}
                         >
                           {formatDate(report.created_at)}
                         </span>
@@ -259,10 +271,16 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                             <span className="h-3 w-px bg-[--border-default]" />
                             <span
                               className="flex items-center gap-1.5 font-mono text-xs text-[--text-muted]"
-                              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+                              style={{
+                                fontFamily:
+                                  'Soehne Mono, JetBrains Mono, monospace',
+                              }}
                             >
                               <FileText className="h-3 w-3" />
-                              {report.concept_count} {report.concept_count === 1 ? 'CONCEPT' : 'CONCEPTS'}
+                              {report.concept_count}{' '}
+                              {report.concept_count === 1
+                                ? 'CONCEPT'
+                                : 'CONCEPTS'}
                             </span>
                           </>
                         )}
@@ -271,7 +289,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
                     {/* Arrow (visible on hover) */}
                     {isClickable && (
-                      <div className="absolute right-5 top-1/2 -translate-x-2 -translate-y-1/2 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
+                      <div className="absolute top-1/2 right-5 -translate-x-2 -translate-y-1/2 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
                         <ChevronRight className="h-4 w-4 text-[--text-muted]" />
                       </div>
                     )}
@@ -284,7 +302,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
           {/* Pagination Footer */}
           <div className="mt-4 flex items-center justify-between px-1">
             <span
-              className="font-mono text-[10px] uppercase tracking-wider text-[--text-secondary]"
+              className="font-mono text-[10px] tracking-wider text-[--text-secondary] uppercase"
               style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
             >
               Showing {filteredReports.length} of {reports.length} REPORTS

@@ -51,9 +51,9 @@ export function NavHeader() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50',
+        'fixed top-0 right-0 left-0 z-50',
         'border-b border-[--nav-border]',
-        'bg-[--nav-bg] backdrop-blur-[12px]',
+        'bg-[--nav-bg] backdrop-blur-[var(--nav-blur)]',
         'shadow-[--nav-shadow]',
         'transition-colors duration-200',
         'supports-[not(backdrop-filter)]:bg-[--nav-bg-solid]',

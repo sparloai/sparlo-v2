@@ -15,6 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 
 import { Button } from '@kit/ui/button';
 import { Textarea } from '@kit/ui/textarea';
@@ -30,11 +31,9 @@ type ViabilityLevel = 'GREEN' | 'YELLOW' | 'RED';
 
 function ViabilityBadge({ viability }: { viability: ViabilityLevel }) {
   const styles = {
-    GREEN:
-      'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
-    YELLOW:
-      'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
-    RED: 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400',
+    GREEN: 'bg-[--status-success-subtle] text-[--status-success]',
+    YELLOW: 'bg-[--status-warning-subtle] text-[--status-warning]',
+    RED: 'bg-[--status-error-subtle] text-[--status-error]',
   };
 
   return (
@@ -634,11 +633,16 @@ export default function BetaPage() {
       </strong>
     ),
     em: ({ children, ...props }: React.HTMLProps<HTMLElement>) => (
-      <em className="text-[--text-secondary] italic dark:text-neutral-300" {...props}>
+      <em
+        className="text-[--text-secondary] italic dark:text-neutral-300"
+        {...props}
+      >
         {children}
       </em>
     ),
-    hr: () => <hr className="my-10 border-[--border-subtle] dark:border-neutral-800" />,
+    hr: () => (
+      <hr className="my-10 border-[--border-subtle] dark:border-neutral-800" />
+    ),
     table: ({ children, ...props }: React.HTMLProps<HTMLTableElement>) => (
       <div className="mb-6 overflow-x-auto rounded-lg border border-[--border-subtle] dark:border-neutral-800">
         <table className="min-w-full text-sm" {...props}>
@@ -1030,7 +1034,9 @@ USER QUESTION: ${chatInput.trim()}`;
 
           {pendingMessage && (
             <div className="rounded-xl border border-[--border-subtle] bg-[--surface-elevated] p-4 text-left dark:border-neutral-800 dark:bg-neutral-900">
-              <p className="mb-2 text-sm text-[--text-muted]">Your challenge:</p>
+              <p className="mb-2 text-sm text-[--text-muted]">
+                Your challenge:
+              </p>
               <p className="line-clamp-3 text-sm text-[--text-secondary] dark:text-neutral-300">
                 {pendingMessage}
               </p>
@@ -1354,7 +1360,10 @@ USER QUESTION: ${chatInput.trim()}`;
 
           {/* Full Report Markdown */}
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <ReactMarkdown components={markdownComponents}>
+            <ReactMarkdown
+              components={markdownComponents}
+              rehypePlugins={[rehypeSanitize]}
+            >
               {reportData.report_markdown}
             </ReactMarkdown>
           </div>
@@ -1449,7 +1458,9 @@ USER QUESTION: ${chatInput.trim()}`;
                       >
                         {msg.role === 'assistant' ? (
                           <div className="prose prose-sm dark:prose-invert max-w-none">
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                            <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
+                              {msg.content}
+                            </ReactMarkdown>
                             {msg.isStreaming && (
                               <span className="inline-block animate-pulse">
                                 ▋

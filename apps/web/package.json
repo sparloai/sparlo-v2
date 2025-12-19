@@ -74,6 +74,7 @@
     "react-i18next": "^16.4.0",
     "react-markdown": "^10.1.0",
     "recharts": "2.15.3",
+    "rehype-sanitize": "^6.0.0",
     "tailwind-merge": "^3.4.0",
     "tw-animate-css": "catalog:",
     "urlpattern-polyfill": "^10.1.0",

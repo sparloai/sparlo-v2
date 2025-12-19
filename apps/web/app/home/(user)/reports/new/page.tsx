@@ -229,7 +229,7 @@ export default function NewReportPage() {
           <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
             {/* Toolbar / Context Hinting */}
             <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
-              <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[--text-muted]">
+              <div className="flex items-center gap-2 font-mono text-xs tracking-wider text-[--text-muted] uppercase">
                 <Terminal className="h-4 w-4 text-[--text-muted]" />
                 <span>new analysis</span>
               </div>
@@ -261,15 +261,15 @@ export default function NewReportPage() {
                 data-test="challenge-input"
                 placeholder="Describe the engineering challenge..."
                 spellCheck={false}
-                className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg font-light leading-relaxed text-[--text-primary] placeholder-[--text-muted] focus:outline-none focus:ring-0 disabled:opacity-40 md:text-xl"
+                className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] focus:ring-0 focus:outline-none disabled:opacity-40 md:text-xl"
                 style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
               />
             </div>
 
             {/* Context Awareness / Intelligence Layer */}
             <div className="px-6 pb-6 md:px-8 md:pb-8">
-              <div className="flex select-none flex-wrap items-center gap-3">
-                <span className="mr-1 font-mono text-xs font-medium uppercase tracking-widest text-[--text-muted]">
+              <div className="flex flex-wrap items-center gap-3 select-none">
+                <span className="mr-1 font-mono text-xs font-medium tracking-widest text-[--text-muted] uppercase">
                   Context Detection
                 </span>
 
@@ -296,7 +296,9 @@ export default function NewReportPage() {
                       <span
                         className={cn(
                           'text-xs font-medium',
-                          isDetected ? 'text-emerald-700 dark:text-emerald-200/90' : 'text-[--text-muted]',
+                          isDetected
+                            ? 'text-emerald-700 dark:text-emerald-200/90'
+                            : 'text-[--text-muted]',
                         )}
                         style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                       >
@@ -321,14 +323,16 @@ export default function NewReportPage() {
                   </div>
                   <div className="flex flex-col">
                     <span
-                      className="text-[10px] font-semibold uppercase tracking-wider text-[--text-muted]"
+                      className="text-[10px] font-semibold tracking-wider text-[--text-muted] uppercase"
                       style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                     >
                       ANALYSIS
                     </span>
                     <span
                       className="font-mono text-xs text-[--text-secondary]"
-                      style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+                      style={{
+                        fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
+                      }}
                     >
                       ~15 MINUTES
                     </span>

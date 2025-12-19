@@ -328,7 +328,7 @@ export function ProcessingScreen({
             <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
               {/* Toolbar */}
               <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
-                <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[--text-muted]">
+                <div className="flex items-center gap-2 font-mono text-xs tracking-wider text-[--text-muted] uppercase">
                   <MessageSquare className="h-4 w-4 text-[--text-muted]" />
                   <span>quick question</span>
                 </div>
@@ -337,7 +337,7 @@ export function ProcessingScreen({
               {/* Question Display */}
               <div className="border-b border-[--border-subtle] px-6 py-6 md:px-8">
                 <motion.p
-                  className="text-lg font-medium leading-relaxed text-[--text-primary] md:text-xl"
+                  className="text-lg leading-relaxed font-medium text-[--text-primary] md:text-xl"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
@@ -362,7 +362,7 @@ export function ProcessingScreen({
                   onChange={(e) => setClarificationAnswer(e.target.value)}
                   placeholder="Type your answer..."
                   data-test="clarification-input"
-                  className="min-h-[140px] flex-1 resize-none border-0 bg-transparent text-lg font-light leading-relaxed text-[--text-primary] placeholder-[--text-muted] focus:outline-none focus:ring-0 disabled:opacity-40"
+                  className="min-h-[140px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] focus:ring-0 focus:outline-none disabled:opacity-40"
                   style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                   disabled={isSubmitting}
                   onKeyDown={(e) => {

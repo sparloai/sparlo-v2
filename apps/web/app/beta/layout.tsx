@@ -14,7 +14,7 @@ export default function BetaLayout({
   return (
     <div className="min-h-screen bg-[--surface-base]">
       {/* Simple header with glassmorphic effect */}
-      <header className="sticky top-0 z-50 border-b border-[--nav-border] bg-[--nav-bg] backdrop-blur-[12px]">
+      <header className="sticky top-0 z-50 border-b border-[--nav-border] bg-[--nav-bg] backdrop-blur-[var(--nav-blur)]">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[--accent]">
