@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 
 import {
