@@ -4,20 +4,22 @@ import Link from 'next/link';
 
 import { ChevronDown } from 'lucide-react';
 
-import { useUserWorkspace } from '@kit/accounts/hooks/use-user-workspace';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@kit/ui/dropdown-menu';
+import { Trans } from '@kit/ui/trans';
 import { cn } from '@kit/ui/utils';
+
+import { useAppWorkspace } from '../../_lib/app-workspace-context';
 
 const WARNING_THRESHOLD = 0.8; // 80%
 const CRITICAL_THRESHOLD = 1.0; // 100%
 
 export function UsageIndicator() {
-  const { reportsUsed, reportLimit } = useUserWorkspace();
+  const { reportsUsed, reportLimit } = useAppWorkspace();
   const percentage = reportLimit > 0 ? reportsUsed / reportLimit : 0;
 
   const status =
@@ -43,10 +45,16 @@ export function UsageIndicator() {
           )}
         >
           <span className="hidden lg:inline">
-            {reportsUsed} / {reportLimit} reports
+            <Trans
+              i18nKey="common:nav.reportsLong"
+              values={{ used: reportsUsed, limit: reportLimit }}
+            />
           </span>
           <span className="lg:hidden">
-            {reportsUsed}/{reportLimit}
+            <Trans
+              i18nKey="common:nav.reportsShort"
+              values={{ used: reportsUsed, limit: reportLimit }}
+            />
           </span>
           <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
         </button>
@@ -54,7 +62,9 @@ export function UsageIndicator() {
 
       <DropdownMenuContent align="end" className="w-56">
         <div className="p-3">
-          <div className="mb-2 text-sm font-medium">Usage This Month</div>
+          <div className="mb-2 text-sm font-medium">
+            <Trans i18nKey="common:nav.usageThisMonth" />
+          </div>
 
           {/* Progress bar */}
           <div className="mb-2 h-2 overflow-hidden rounded-full bg-[--surface-overlay]">
@@ -72,14 +82,20 @@ export function UsageIndicator() {
           </div>
 
           <div className="text-xs text-[--text-muted]">
-            {reportsUsed} of {reportLimit} reports used (
-            {Math.round(percentage * 100)}%)
+            <Trans
+              i18nKey="common:nav.reportsUsed"
+              values={{
+                used: reportsUsed,
+                limit: reportLimit,
+                percent: Math.round(percentage * 100),
+              }}
+            />
           </div>
         </div>
 
         <DropdownMenuItem asChild>
           <Link href="/home/settings/billing" className="cursor-pointer">
-            Upgrade Plan
+            <Trans i18nKey="common:nav.upgradePlan" />
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -3,35 +3,52 @@
 import { useState } from 'react';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { motion } from 'framer-motion';
-import { FileText, Home, Settings, X } from 'lucide-react';
+import { Settings, X } from 'lucide-react';
 
-import { useUserWorkspace } from '@kit/accounts/hooks/use-user-workspace';
+import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { Avatar, AvatarFallback, AvatarImage } from '@kit/ui/avatar';
+import { SubMenuModeToggle } from '@kit/ui/mode-toggle';
 import { Sheet, SheetContent, SheetTrigger } from '@kit/ui/sheet';
+import { Trans } from '@kit/ui/trans';
 import { cn } from '@kit/ui/utils';
 
 import { AppLogo } from '~/components/app-logo';
 
-const NAV_LINKS = [
-  { href: '/home', label: 'Dashboard', icon: Home },
-  { href: '/home/reports/new', label: 'New Report', icon: FileText },
-  { href: '/home/settings', label: 'Settings', icon: Settings },
-] as const;
+import { useAppWorkspace } from '../../_lib/app-workspace-context';
+import { NAV_LINKS } from './nav-links';
+import { usePrefersReducedMotion } from './use-prefers-reduced-motion';
 
 export function MobileNav({ className }: { className?: string }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { user, workspace, reportsUsed, reportLimit } = useUserWorkspace();
+  const router = useRouter();
+  const { user, workspace, reportsUsed, reportLimit } = useAppWorkspace();
+  const signOutMutation = useSignOut();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   const handleNavClick = () => setOpen(false);
+
+  const handleSignOut = async () => {
+    await signOutMutation.mutateAsync();
+    router.push('/');
+  };
 
   const initials =
     workspace?.name?.[0]?.toUpperCase() ??
     user?.email?.[0]?.toUpperCase() ??
     '?';
+
+  // Animation variants - disabled when user prefers reduced motion
+  const motionProps = prefersReducedMotion
+    ? {}
+    : {
+        initial: { opacity: 0, x: -20 },
+        animate: { opacity: 1, x: 0 },
+        transition: { duration: 0.2 },
+      };
 
   return (
     <div
@@ -45,17 +62,15 @@ export function MobileNav({ className }: { className?: string }) {
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
           >
-            <HamburgerIcon open={open} />
+            <HamburgerIcon
+              open={open}
+              prefersReducedMotion={prefersReducedMotion}
+            />
           </button>
         </SheetTrigger>
 
         <SheetContent side="left" className="w-[280px] p-0">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2 }}
-            className="flex h-full flex-col"
-          >
+          <motion.div {...motionProps} className="flex h-full flex-col">
             {/* Drawer Header */}
             <div className="flex items-center justify-between border-b border-[--border-subtle] p-4">
               <AppLogo />
@@ -71,7 +86,7 @@ export function MobileNav({ className }: { className?: string }) {
             {/* Nav Links */}
             <nav className="flex-1 p-4">
               <ul className="space-y-2">
-                {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+                {NAV_LINKS.map(({ href, labelKey, icon: Icon }) => {
                   const isActive =
                     href === '/home'
                       ? pathname === '/home'
@@ -90,18 +105,37 @@ export function MobileNav({ className }: { className?: string }) {
                         aria-current={isActive ? 'page' : undefined}
                       >
                         <Icon className="h-5 w-5" aria-hidden="true" />
-                        {label}
+                        <Trans i18nKey={labelKey} />
                       </Link>
                     </li>
                   );
                 })}
+                {/* Settings link in mobile nav */}
+                <li>
+                  <Link
+                    href="/home/settings"
+                    onClick={handleNavClick}
+                    className={cn(
+                      'flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-3 transition-colors',
+                      pathname.startsWith('/home/settings')
+                        ? 'bg-[--accent-muted] font-medium text-[--accent]'
+                        : 'text-[--text-secondary] hover:bg-[--surface-overlay]',
+                    )}
+                    aria-current={
+                      pathname.startsWith('/home/settings') ? 'page' : undefined
+                    }
+                  >
+                    <Settings className="h-5 w-5" aria-hidden="true" />
+                    <Trans i18nKey="common:routes.settings" />
+                  </Link>
+                </li>
               </ul>
             </nav>
 
             {/* Usage Section */}
             <div className="border-t border-[--border-subtle] p-4">
               <div className="mb-1 text-sm text-[--text-muted]">
-                Reports Used
+                <Trans i18nKey="common:nav.usageThisMonth" />
               </div>
               <div className="text-lg font-medium">
                 {reportsUsed} / {reportLimit}
@@ -111,7 +145,7 @@ export function MobileNav({ className }: { className?: string }) {
                 onClick={handleNavClick}
                 className="mt-2 inline-block text-sm text-[--accent] hover:underline"
               >
-                Upgrade Plan
+                <Trans i18nKey="common:nav.upgradePlan" />
               </Link>
             </div>
 
@@ -131,14 +165,20 @@ export function MobileNav({ className }: { className?: string }) {
                   </div>
                 </div>
               </div>
-              <form action="/auth/sign-out" method="POST">
-                <button
-                  type="submit"
-                  className="w-full rounded-lg px-3 py-2 text-left text-[--status-error] transition-colors hover:bg-[--surface-overlay]"
-                >
-                  Sign Out
-                </button>
-              </form>
+
+              {/* Theme Toggle for Mobile */}
+              <div className="mb-4">
+                <SubMenuModeToggle />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={signOutMutation.isPending}
+                className="w-full rounded-lg px-3 py-2 text-left text-[--status-error] transition-colors hover:bg-[--surface-overlay] disabled:opacity-50"
+              >
+                <Trans i18nKey="common:nav.signOut" />
+              </button>
             </div>
           </motion.div>
         </SheetContent>
@@ -160,7 +200,30 @@ export function MobileNav({ className }: { className?: string }) {
   );
 }
 
-function HamburgerIcon({ open }: { open: boolean }) {
+function HamburgerIcon({
+  open,
+  prefersReducedMotion,
+}: {
+  open: boolean;
+  prefersReducedMotion: boolean;
+}) {
+  if (prefersReducedMotion) {
+    // Simple non-animated version
+    return (
+      <div className="relative flex h-4 w-5 flex-col justify-between">
+        {open ? (
+          <X className="h-5 w-5" />
+        ) : (
+          <>
+            <span className="block h-0.5 w-5 rounded-full bg-current" />
+            <span className="block h-0.5 w-5 rounded-full bg-current" />
+            <span className="block h-0.5 w-5 rounded-full bg-current" />
+          </>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex h-4 w-5 flex-col justify-between">
       <motion.span

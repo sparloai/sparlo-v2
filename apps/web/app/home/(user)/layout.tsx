@@ -5,6 +5,7 @@ import { UserWorkspaceContextProvider } from '@kit/accounts/components';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
 import { NavHeader } from './_components/navigation/nav-header';
+import { AppWorkspaceProvider } from './_lib/app-workspace-context';
 import { loadUserWorkspace } from './_lib/server/load-user-workspace';
 
 function UserHomeLayout({ children }: React.PropsWithChildren) {
@@ -12,10 +13,12 @@ function UserHomeLayout({ children }: React.PropsWithChildren) {
 
   return (
     <UserWorkspaceContextProvider value={workspace}>
-      <div className="flex min-h-screen flex-col bg-[--surface-base]">
-        <NavHeader />
-        <main className="flex-1">{children}</main>
-      </div>
+      <AppWorkspaceProvider value={workspace}>
+        <div className="flex min-h-screen flex-col bg-[--surface-base]">
+          <NavHeader />
+          <main className="flex-1">{children}</main>
+        </div>
+      </AppWorkspaceProvider>
     </UserWorkspaceContextProvider>
   );
 }
