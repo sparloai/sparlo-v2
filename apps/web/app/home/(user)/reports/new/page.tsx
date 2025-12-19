@@ -222,10 +222,7 @@ export default function NewReportPage() {
         )}
 
         {/* Main Input Card */}
-        <div className="group relative rounded-2xl bg-[--surface-overlay] p-[1px] transition-all duration-500 dark:bg-neutral-900/40">
-          {/* Glowing border effect */}
-          <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-b from-black/5 via-black/[0.02] to-transparent opacity-50 transition-opacity duration-500 group-hover:opacity-100 dark:from-white/10 dark:via-white/5" />
-
+        <div className="group relative">
           <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
             {/* Toolbar / Context Hinting */}
             <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
