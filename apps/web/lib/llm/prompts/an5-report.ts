@@ -428,12 +428,26 @@ const SolutionConceptsSchema = z.object({
   spark_concept: SparkConceptSchema.optional(),
 });
 
+// Helper to normalize enum values that may have parenthetical annotations
+const normalizeEnumValue = (validValues: string[]) =>
+  z.string().transform((val) => {
+    // Strip parenthetical content: "High (development)" -> "High"
+    const normalized = val.replace(/\s*\([^)]*\)\s*$/, '').trim();
+    // Find case-insensitive match
+    const match = validValues.find(
+      (v) => v.toLowerCase() === normalized.toLowerCase(),
+    );
+    return match ?? normalized;
+  });
+
 const ComparisonRowSchema = z.object({
   id: z.string(),
   title: z.string(),
   key_metric_achievable: z.string(),
   confidence: z.enum(['HIGH', 'MEDIUM', 'LOW']),
-  capital_required: z.enum(['None', 'Low', 'Medium', 'High']),
+  capital_required: normalizeEnumValue(['None', 'Low', 'Medium', 'High']).pipe(
+    z.enum(['None', 'Low', 'Medium', 'High']),
+  ),
   timeline: z.string(),
   key_risk: z.string(),
 });
