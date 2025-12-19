@@ -6,8 +6,27 @@ import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import pathsConfig from '~/config/paths.config';
 
-// Default redirect after email verification - send users to reports page
-const EMAIL_VERIFICATION_REDIRECT = '/home/reports';
+/**
+ * Validate redirect path to prevent open redirect vulnerabilities.
+ * Only allows relative paths within the app (starting with /home or /join).
+ */
+function isValidRedirectPath(path: string): boolean {
+  // Must be a string
+  if (typeof path !== 'string') return false;
+
+  // Must start with / (relative path)
+  if (!path.startsWith('/')) return false;
+
+  // Reject protocol-relative URLs (//example.com)
+  if (path.startsWith('//')) return false;
+
+  // Reject any URL with protocol (javascript:, data:, http:, etc.)
+  if (/^[a-z][a-z0-9+.-]*:/i.test(path)) return false;
+
+  // Only allow paths within the app (home or join routes)
+  const allowedPrefixes = ['/home', '/join'];
+  return allowedPrefixes.some((prefix) => path.startsWith(prefix));
+}
 
 export async function GET(request: NextRequest) {
   const service = createAuthCallbackService(getSupabaseServerClient());
@@ -18,9 +37,12 @@ export async function GET(request: NextRequest) {
   const authCode = searchParams.get('code');
   const tokenHash = searchParams.get('token_hash');
 
-  // Check for custom redirect from callback parameter
+  // Validate callback parameter to prevent open redirect
   const callbackRedirect = searchParams.get('callback');
-  const redirectPath = callbackRedirect || EMAIL_VERIFICATION_REDIRECT;
+  const redirectPath =
+    callbackRedirect && isValidRedirectPath(callbackRedirect)
+      ? callbackRedirect
+      : pathsConfig.app.home;
 
   if (authCode) {
     // PKCE flow - use exchangeCodeForSession
