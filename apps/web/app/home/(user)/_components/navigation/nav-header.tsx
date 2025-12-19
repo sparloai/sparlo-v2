@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
-import { LogOut, Settings } from 'lucide-react';
+import { CreditCard, LogOut, Settings } from 'lucide-react';
 
 import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import {
@@ -14,34 +14,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@kit/ui/dropdown-menu';
+import { SubMenuModeToggle } from '@kit/ui/mode-toggle';
 import { Trans } from '@kit/ui/trans';
+import { cn } from '@kit/ui/utils';
 
 import { useAppWorkspace } from '../../_lib/app-workspace-context';
 
-const PAGE_NAMES: Record<string, string> = {
-  '/home': 'Dashboard',
-  '/home/reports/new': 'New Analysis',
-  '/home/reports': 'Report',
-  '/home/settings': 'Settings',
-};
-
-function getPageName(pathname: string): string {
-  // Check exact matches first
-  if (PAGE_NAMES[pathname]) return PAGE_NAMES[pathname];
-
-  // Check prefix matches (e.g., /home/reports/123)
-  if (pathname.startsWith('/home/reports/')) return 'Report';
-  if (pathname.startsWith('/home/settings')) return 'Settings';
-
-  return '';
-}
+const NAV_ITEMS = [
+  { href: '/home', label: 'Dashboard' },
+  { href: '/home/reports/new', label: 'New Analysis' },
+];
 
 export function NavHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, workspace } = useAppWorkspace();
   const signOutMutation = useSignOut();
-  const pageName = getPageName(pathname);
 
   const handleSignOut = async () => {
     await signOutMutation.mutateAsync();
@@ -56,37 +44,47 @@ export function NavHeader() {
   return (
     <header className="border-b border-[#1E1E21] bg-[#111113]">
       <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
-        {/* Left: Wordmark + Breadcrumb */}
-        <div className="flex items-center gap-3">
-          <Link
-            href="/home"
-            className="transition-opacity hover:opacity-70"
-          >
-            {/* White logo for dark mode, black logo for light mode */}
+        {/* Left: Logo + Nav Links */}
+        <div className="flex items-center gap-6">
+          <Link href="/home" className="transition-opacity hover:opacity-70">
             <Image
               src="/images/sparlo-logo-white.png"
               alt="Sparlo"
               width={80}
               height={20}
-              className="h-5 w-auto dark:block"
+              className="h-5 w-auto"
               priority
             />
           </Link>
 
-          {pageName && pathname !== '/home' && (
-            <>
-              <span className="text-[14px] text-[#333]">/</span>
-              <span
-                className="text-[14px] text-[#666]"
-                style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-              >
-                {pageName}
-              </span>
-            </>
-          )}
+          {/* Nav Links */}
+          <div className="flex items-center gap-5">
+            {NAV_ITEMS.map(({ href, label }) => {
+              const isActive =
+                href === '/home'
+                  ? pathname === '/home'
+                  : pathname.startsWith(href);
+
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={cn(
+                    'text-[14px] transition-colors',
+                    isActive
+                      ? 'text-[#FAFAFA]'
+                      : 'text-[#A1A1AA] hover:text-[#FAFAFA]',
+                  )}
+                  style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Right: Avatar only */}
+        {/* Right: Avatar with dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -94,7 +92,7 @@ export function NavHeader() {
               aria-label="Account menu"
             >
               <span
-                className="text-[12px] font-medium text-[#666]"
+                className="text-[12px] font-medium text-[#A1A1AA]"
                 style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
               >
                 {initials}
@@ -115,6 +113,21 @@ export function NavHeader() {
                 <Trans i18nKey="common:routes.settings" />
               </Link>
             </DropdownMenuItem>
+
+            <DropdownMenuItem asChild>
+              <Link
+                href="/home/settings/billing"
+                className="cursor-pointer text-[#FAFAFA] focus:bg-[#2A2A2E] focus:text-[#FAFAFA]"
+              >
+                <CreditCard className="mr-2 h-4 w-4" />
+                <Trans i18nKey="common:routes.billing" />
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator className="bg-[#2A2A2E]" />
+
+            {/* Theme Toggle */}
+            <SubMenuModeToggle />
 
             <DropdownMenuSeparator className="bg-[#2A2A2E]" />
 
