@@ -310,34 +310,34 @@ export function ProcessingScreen({
   if (progress.status === 'clarifying' && pendingClarification) {
     return (
       <motion.div
-        className="relative flex min-h-screen flex-col items-center justify-center bg-[#050505] px-4 py-12 text-neutral-300"
+        className="relative flex min-h-screen flex-col items-center justify-center bg-[--surface-base] px-4 py-12 text-[--text-secondary]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
       >
-        {/* Ambient Background Glows */}
-        <div className="pointer-events-none absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 opacity-50 blur-[120px]" />
-        <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-emerald-900/5 opacity-50 blur-[100px]" />
+        {/* Ambient Background Glows - only visible in dark mode */}
+        <div className="pointer-events-none absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 opacity-0 blur-[120px] dark:opacity-50" />
+        <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-emerald-900/5 opacity-0 blur-[100px] dark:opacity-50" />
 
         <div className="relative z-10 w-full max-w-4xl">
           {/* Main Input Card */}
-          <div className="group relative rounded-2xl bg-neutral-900/40 p-[1px] transition-all duration-500">
+          <div className="group relative rounded-2xl bg-[--surface-overlay] p-[1px] transition-all duration-500 dark:bg-neutral-900/40">
             {/* Glowing border effect */}
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-b from-white/10 via-white/5 to-transparent opacity-50 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-b from-black/5 via-black/[0.02] to-transparent opacity-50 transition-opacity duration-500 group-hover:opacity-100 dark:from-white/10 dark:via-white/5" />
 
-            <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[#0A0A0A] shadow-2xl shadow-black/50">
+            <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
               {/* Toolbar */}
-              <div className="flex items-center justify-between border-b border-white/5 bg-neutral-900/20 px-6 py-3">
-                <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
-                  <MessageSquare className="h-4 w-4 text-neutral-400" />
+              <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
+                <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[--text-muted]">
+                  <MessageSquare className="h-4 w-4 text-[--text-muted]" />
                   <span>quick question</span>
                 </div>
               </div>
 
               {/* Question Display */}
-              <div className="border-b border-white/5 px-6 py-6 md:px-8">
+              <div className="border-b border-[--border-subtle] px-6 py-6 md:px-8">
                 <motion.p
-                  className="text-lg font-medium leading-relaxed text-neutral-100 md:text-xl"
+                  className="text-lg font-medium leading-relaxed text-[--text-primary] md:text-xl"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.1 }}
@@ -345,7 +345,7 @@ export function ProcessingScreen({
                 >
                   {pendingClarification.question}
                 </motion.p>
-                <p className="mt-2 text-sm text-neutral-500">
+                <p className="mt-2 text-sm text-[--text-muted]">
                   Help us understand your challenge better
                 </p>
               </div>
@@ -362,7 +362,7 @@ export function ProcessingScreen({
                   onChange={(e) => setClarificationAnswer(e.target.value)}
                   placeholder="Type your answer..."
                   data-test="clarification-input"
-                  className="min-h-[140px] flex-1 resize-none border-0 bg-transparent text-lg font-light leading-relaxed text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-0 disabled:opacity-40"
+                  className="min-h-[140px] flex-1 resize-none border-0 bg-transparent text-lg font-light leading-relaxed text-[--text-primary] placeholder-[--text-muted] focus:outline-none focus:ring-0 disabled:opacity-40"
                   style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                   disabled={isSubmitting}
                   onKeyDown={(e) => {
@@ -375,7 +375,7 @@ export function ProcessingScreen({
               </motion.div>
 
               {/* Footer / Action Area */}
-              <div className="border-t border-white/5 bg-neutral-900/30 p-2">
+              <div className="border-t border-[--border-subtle] bg-[--surface-overlay] p-2 dark:bg-neutral-900/30">
                 <div className="flex flex-col items-center justify-between gap-4 px-4 py-2 md:flex-row">
                   {/* Skip option */}
                   <Button
@@ -385,7 +385,7 @@ export function ProcessingScreen({
                       handleSubmitClarification();
                     }}
                     disabled={isSubmitting}
-                    className="text-neutral-500 hover:bg-white/5 hover:text-neutral-300"
+                    className="text-[--text-muted] hover:bg-[--surface-overlay] hover:text-[--text-secondary]"
                   >
                     Skip this question
                   </Button>
@@ -394,10 +394,10 @@ export function ProcessingScreen({
                   <div className="flex items-center gap-3">
                     {/* Keyboard shortcut hint */}
                     <div className="hidden items-center gap-1.5 md:flex">
-                      <kbd className="flex h-5 items-center justify-center rounded border border-neutral-700 bg-neutral-800 px-1.5 font-mono text-[10px] text-neutral-400">
+                      <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
                         ⌘
                       </kbd>
-                      <kbd className="flex h-5 items-center justify-center rounded border border-neutral-700 bg-neutral-800 px-1.5 font-mono text-[10px] text-neutral-400">
+                      <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
                         ↵
                       </kbd>
                     </div>
@@ -407,8 +407,8 @@ export function ProcessingScreen({
                       data-test="clarification-submit"
                       className={`group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg px-6 py-3 transition-all duration-300 md:w-auto ${
                         clarificationAnswer.trim() && !isSubmitting
-                          ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:bg-neutral-200 hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]'
-                          : 'cursor-not-allowed bg-neutral-800 text-neutral-500'
+                          ? 'bg-[--text-primary] text-[--surface-base] shadow-lg hover:opacity-90 dark:bg-white dark:text-black dark:shadow-[0_0_20px_rgba(255,255,255,0.05)] dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]'
+                          : 'cursor-not-allowed bg-[--surface-overlay] text-[--text-muted] dark:bg-neutral-800 dark:text-neutral-500'
                       }`}
                     >
                       {isSubmitting ? (

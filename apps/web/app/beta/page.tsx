@@ -573,7 +573,7 @@ export default function BetaPage() {
       return (
         <h2
           id={id}
-          className="mt-12 mb-5 scroll-mt-28 border-b border-[#E5E5E5] pb-3 text-[22px] font-semibold tracking-tight text-[#1A1A1A] first:mt-0 dark:border-neutral-800 dark:text-white"
+          className="mt-12 mb-5 scroll-mt-28 border-b border-[--border-subtle] pb-3 text-[22px] font-semibold tracking-tight text-[--text-primary] first:mt-0 dark:border-neutral-800 dark:text-white"
           {...props}
         >
           {children}
@@ -586,7 +586,7 @@ export default function BetaPage() {
       return (
         <h3
           id={id}
-          className="mt-8 mb-3 scroll-mt-28 text-lg font-semibold text-[#1A1A1A] dark:text-white"
+          className="mt-8 mb-3 scroll-mt-28 text-lg font-semibold text-[--text-primary] dark:text-white"
           {...props}
         >
           {children}
@@ -595,7 +595,7 @@ export default function BetaPage() {
     },
     h4: ({ children, ...props }: React.HTMLProps<HTMLHeadingElement>) => (
       <h4
-        className="mt-6 mb-2 text-base font-semibold text-[#1A1A1A] dark:text-white"
+        className="mt-6 mb-2 text-base font-semibold text-[--text-primary] dark:text-white"
         {...props}
       >
         {children}
@@ -603,7 +603,7 @@ export default function BetaPage() {
     ),
     p: ({ children, ...props }: React.HTMLProps<HTMLParagraphElement>) => (
       <p
-        className="mb-4 leading-[1.7] text-[#4A4A4A] dark:text-neutral-300"
+        className="mb-4 leading-[1.7] text-[--text-secondary] dark:text-neutral-300"
         {...props}
       >
         {children}
@@ -619,7 +619,7 @@ export default function BetaPage() {
     ),
     li: ({ children, ...props }: React.HTMLProps<HTMLLIElement>) => (
       <li
-        className="relative pl-5 leading-[1.7] text-[#4A4A4A] before:absolute before:top-[0.6em] before:left-0 before:h-1.5 before:w-1.5 before:rounded-full before:bg-[#7C3AED] dark:text-neutral-300"
+        className="relative pl-5 leading-[1.7] text-[--text-secondary] before:absolute before:top-[0.6em] before:left-0 before:h-1.5 before:w-1.5 before:rounded-full before:bg-[--accent] dark:text-neutral-300"
         {...props}
       >
         {children}
@@ -627,20 +627,20 @@ export default function BetaPage() {
     ),
     strong: ({ children, ...props }: React.HTMLProps<HTMLElement>) => (
       <strong
-        className="font-semibold text-[#1A1A1A] dark:text-white"
+        className="font-semibold text-[--text-primary] dark:text-white"
         {...props}
       >
         {children}
       </strong>
     ),
     em: ({ children, ...props }: React.HTMLProps<HTMLElement>) => (
-      <em className="text-[#4A4A4A] italic dark:text-neutral-300" {...props}>
+      <em className="text-[--text-secondary] italic dark:text-neutral-300" {...props}>
         {children}
       </em>
     ),
-    hr: () => <hr className="my-10 border-[#E5E5E5] dark:border-neutral-800" />,
+    hr: () => <hr className="my-10 border-[--border-subtle] dark:border-neutral-800" />,
     table: ({ children, ...props }: React.HTMLProps<HTMLTableElement>) => (
-      <div className="mb-6 overflow-x-auto rounded-lg border border-[#E5E5E5] dark:border-neutral-800">
+      <div className="mb-6 overflow-x-auto rounded-lg border border-[--border-subtle] dark:border-neutral-800">
         <table className="min-w-full text-sm" {...props}>
           {children}
         </table>
@@ -650,13 +650,13 @@ export default function BetaPage() {
       children,
       ...props
     }: React.HTMLProps<HTMLTableSectionElement>) => (
-      <thead className="bg-[#FAFAFA] dark:bg-neutral-900" {...props}>
+      <thead className="bg-[--surface-base] dark:bg-neutral-900" {...props}>
         {children}
       </thead>
     ),
     th: ({ children, ...props }: React.HTMLProps<HTMLTableCellElement>) => (
       <th
-        className="border-b border-[#E5E5E5] px-4 py-3 text-left text-xs font-semibold tracking-wider text-[#6B6B6B] uppercase dark:border-neutral-800 dark:text-neutral-400"
+        className="border-b border-[--border-subtle] px-4 py-3 text-left text-xs font-semibold tracking-wider text-[--text-muted] uppercase dark:border-neutral-800 dark:text-neutral-400"
         {...props}
       >
         {children}
@@ -664,7 +664,7 @@ export default function BetaPage() {
     ),
     td: ({ children, ...props }: React.HTMLProps<HTMLTableCellElement>) => (
       <td
-        className="border-b border-[#E5E5E5] px-4 py-3 text-[#4A4A4A] dark:border-neutral-800 dark:text-neutral-300"
+        className="border-b border-[--border-subtle] px-4 py-3 text-[--text-secondary] dark:border-neutral-800 dark:text-neutral-300"
         {...props}
       >
         {children}
@@ -681,7 +681,7 @@ export default function BetaPage() {
       }
       return (
         <code
-          className="rounded bg-[#F5F5F5] px-1.5 py-0.5 font-mono text-sm text-[#7C3AED] dark:bg-neutral-800 dark:text-purple-400"
+          className="rounded bg-[--surface-overlay] px-1.5 py-0.5 font-mono text-sm text-[--accent] dark:bg-neutral-800 dark:text-purple-400"
           {...props}
         >
           {children}
@@ -698,7 +698,7 @@ export default function BetaPage() {
     ),
     blockquote: ({ children, ...props }: React.HTMLProps<HTMLQuoteElement>) => (
       <blockquote
-        className="my-6 border-l-4 border-[#7C3AED] bg-[#FAFAFA] py-4 pr-4 pl-6 text-[#4A4A4A] dark:bg-neutral-900/50 dark:text-neutral-300"
+        className="my-6 border-l-4 border-[#7C3AED] bg-[--surface-base] py-4 pr-4 pl-6 text-[--text-secondary] dark:bg-neutral-900/50 dark:text-neutral-300"
         {...props}
       >
         {children}
@@ -837,12 +837,12 @@ USER QUESTION: ${chatInput.trim()}`;
   // ═══════════════════════════════════════════════════════════════════════════
   if (phase === 'input') {
     return (
-      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[#FAFAFA] p-6 dark:bg-neutral-950">
+      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[--surface-base] p-6 dark:bg-neutral-950">
         <div className="w-full max-w-2xl space-y-8">
           {/* Header */}
           <div className="space-y-4 text-center">
             <motion.div
-              className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[#7C3AED]"
+              className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[--accent]"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1 }}
@@ -869,7 +869,7 @@ USER QUESTION: ${chatInput.trim()}`;
               Beta Access
             </motion.div>
             <motion.h1
-              className="text-[32px] font-semibold tracking-tight text-[#1A1A1A] dark:text-white"
+              className="text-[32px] font-semibold tracking-tight text-[--text-primary] dark:text-white"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -877,7 +877,7 @@ USER QUESTION: ${chatInput.trim()}`;
               Describe your engineering challenge
             </motion.h1>
             <motion.p
-              className="text-lg text-[#6B6B6B] dark:text-neutral-400"
+              className="text-lg text-[--text-muted] dark:text-neutral-400"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -900,12 +900,12 @@ USER QUESTION: ${chatInput.trim()}`;
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="What are you trying to solve? Include constraints, goals, and context for better results."
-              className="min-h-[180px] resize-none rounded-xl border-[#E5E5E5] bg-white text-base leading-relaxed focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-800 dark:bg-neutral-900"
+              className="min-h-[180px] resize-none rounded-xl border-[--border-subtle] bg-[--surface-elevated] text-base leading-relaxed focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-800 dark:bg-neutral-900"
               disabled={isLoading}
             />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-sm text-[#8A8A8A] tabular-nums">
+                <span className="text-sm text-[--text-muted] tabular-nums">
                   {wordCount} words
                 </span>
                 {input.trim().length >= 30 && (
@@ -920,7 +920,7 @@ USER QUESTION: ${chatInput.trim()}`;
                         key={i}
                         className={cn(
                           'h-1.5 w-1.5 rounded-full transition-colors',
-                          check ? 'bg-[#7C3AED]' : 'bg-[#E5E5E5]',
+                          check ? 'bg-[--accent]' : 'bg-[#E5E5E5]',
                         )}
                         title={
                           ['Challenge', 'Constraints', 'Goals', 'Context'][i]
@@ -937,7 +937,7 @@ USER QUESTION: ${chatInput.trim()}`;
                 disabled={
                   !input.trim() || isLoading || input.trim().length < 30
                 }
-                className="rounded-lg bg-[#7C3AED] px-6 hover:bg-[#6D28D9]"
+                className="rounded-lg bg-[--accent] px-6 hover:bg-[--accent-hover]"
               >
                 {isLoading ? (
                   <>
@@ -954,7 +954,7 @@ USER QUESTION: ${chatInput.trim()}`;
             </div>
 
             {input.trim().length >= 30 && (
-              <p className="text-center text-sm text-[#8A8A8A]">
+              <p className="text-center text-sm text-[--text-muted]">
                 {inputQuality.quality === 'minimal' &&
                   'Add constraints or goals to improve your report'}
                 {inputQuality.quality === 'good' &&
@@ -972,7 +972,7 @@ USER QUESTION: ${chatInput.trim()}`;
               </p>
             )}
 
-            <p className="text-center text-sm text-[#8A8A8A]">
+            <p className="text-center text-sm text-[--text-muted]">
               Analysis takes 5-10 minutes. Safe to leave this page.
             </p>
           </motion.form>
@@ -986,7 +986,7 @@ USER QUESTION: ${chatInput.trim()}`;
   // ═══════════════════════════════════════════════════════════════════════════
   if (phase === 'analyzing') {
     return (
-      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[#FAFAFA] p-6 dark:bg-neutral-950">
+      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[--surface-base] p-6 dark:bg-neutral-950">
         <motion.div
           className="w-full max-w-md space-y-8 text-center"
           initial={{ opacity: 0, scale: 0.95 }}
@@ -994,7 +994,7 @@ USER QUESTION: ${chatInput.trim()}`;
           transition={{ duration: 0.3 }}
         >
           <motion.div
-            className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-[#7C3AED]/10"
+            className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-[--accent]/10"
             animate={{ scale: [1, 1.05, 1], opacity: [1, 0.8, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           >
@@ -1007,7 +1007,7 @@ USER QUESTION: ${chatInput.trim()}`;
                 height="40"
                 viewBox="0 0 40 40"
                 fill="none"
-                className="text-[#7C3AED]"
+                className="text-[--accent]"
               >
                 <path
                   d="M20 5L35 20L20 35L5 20L20 5Z"
@@ -1020,25 +1020,25 @@ USER QUESTION: ${chatInput.trim()}`;
           </motion.div>
 
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold tracking-tight text-[#1A1A1A] dark:text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-[--text-primary] dark:text-white">
               Analyzing your challenge
             </h2>
-            <p className="text-[#6B6B6B] dark:text-neutral-400">
+            <p className="text-[--text-muted] dark:text-neutral-400">
               Our AI is reviewing your input to understand your needs...
             </p>
           </div>
 
           {pendingMessage && (
-            <div className="rounded-xl border border-[#E5E5E5] bg-white p-4 text-left dark:border-neutral-800 dark:bg-neutral-900">
-              <p className="mb-2 text-sm text-[#8A8A8A]">Your challenge:</p>
-              <p className="line-clamp-3 text-sm text-[#4A4A4A] dark:text-neutral-300">
+            <div className="rounded-xl border border-[--border-subtle] bg-[--surface-elevated] p-4 text-left dark:border-neutral-800 dark:bg-neutral-900">
+              <p className="mb-2 text-sm text-[--text-muted]">Your challenge:</p>
+              <p className="line-clamp-3 text-sm text-[--text-secondary] dark:text-neutral-300">
                 {pendingMessage}
               </p>
             </div>
           )}
 
           <div className="flex items-center justify-center gap-2">
-            <div className="h-2 w-2 animate-pulse rounded-full bg-[#7C3AED]" />
+            <div className="h-2 w-2 animate-pulse rounded-full bg-[--accent]" />
             <div className="h-2 w-2 rounded-full bg-[#E5E5E5] dark:bg-neutral-700" />
             <div className="h-2 w-2 rounded-full bg-[#E5E5E5] dark:bg-neutral-700" />
           </div>
@@ -1052,7 +1052,7 @@ USER QUESTION: ${chatInput.trim()}`;
   // ═══════════════════════════════════════════════════════════════════════════
   if (phase === 'clarifying') {
     return (
-      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[#FAFAFA] p-6 dark:bg-neutral-950">
+      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[--surface-base] p-6 dark:bg-neutral-950">
         <motion.div
           className="w-full max-w-2xl space-y-8"
           initial={{ opacity: 0, y: 20 }}
@@ -1061,15 +1061,15 @@ USER QUESTION: ${chatInput.trim()}`;
         >
           <div className="text-center">
             <motion.div
-              className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#7C3AED]/10"
+              className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[--accent]/10"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
-              <MessageSquare className="h-6 w-6 text-[#7C3AED]" />
+              <MessageSquare className="h-6 w-6 text-[--accent]" />
             </motion.div>
             <motion.h1
-              className="text-2xl font-semibold tracking-tight text-[#1A1A1A] dark:text-white"
+              className="text-2xl font-semibold tracking-tight text-[--text-primary] dark:text-white"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
@@ -1087,12 +1087,12 @@ USER QUESTION: ${chatInput.trim()}`;
           </div>
 
           <motion.div
-            className="rounded-xl border border-[#E5E5E5] bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900"
+            className="rounded-xl border border-[--border-subtle] bg-[--surface-elevated] p-6 dark:border-neutral-800 dark:bg-neutral-900"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <p className="mb-4 font-medium text-[#1A1A1A] dark:text-white">
+            <p className="mb-4 font-medium text-[--text-primary] dark:text-white">
               {clarificationQuestion}
             </p>
             <form onSubmit={handleClarificationSubmit}>
@@ -1102,7 +1102,7 @@ USER QUESTION: ${chatInput.trim()}`;
                 onChange={(e) => setClarificationResponse(e.target.value)}
                 onKeyDown={handleClarificationKeyDown}
                 placeholder="Type your answer..."
-                className="min-h-[100px] resize-none rounded-lg border-[#E5E5E5] focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-700"
+                className="min-h-[100px] resize-none rounded-lg border-[--border-subtle] focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-700"
                 disabled={isLoading}
               />
               <div className="mt-4 flex items-center justify-between">
@@ -1111,7 +1111,7 @@ USER QUESTION: ${chatInput.trim()}`;
                   variant="ghost"
                   onClick={skipClarification}
                   disabled={isLoading}
-                  className="text-[#6B6B6B] hover:text-[#1A1A1A] dark:text-neutral-400 dark:hover:text-white"
+                  className="text-[--text-muted] hover:text-[--text-primary] dark:text-neutral-400 dark:hover:text-white"
                 >
                   Skip and proceed
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -1119,7 +1119,7 @@ USER QUESTION: ${chatInput.trim()}`;
                 <Button
                   type="submit"
                   disabled={!clarificationResponse.trim() || isLoading}
-                  className="bg-[#7C3AED] hover:bg-[#6D28D9]"
+                  className="bg-[--accent] hover:bg-[--accent-hover]"
                 >
                   {isLoading ? (
                     <>
@@ -1138,14 +1138,14 @@ USER QUESTION: ${chatInput.trim()}`;
           </motion.div>
 
           {/* Skip hint */}
-          <p className="text-center text-sm text-[#8A8A8A]">
+          <p className="text-center text-sm text-[--text-muted]">
             You can skip this question if you prefer to proceed with the
             information already provided.
           </p>
 
           <div className="flex items-center justify-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#7C3AED]" />
-            <div className="h-2 w-2 animate-pulse rounded-full bg-[#7C3AED]" />
+            <div className="h-2 w-2 rounded-full bg-[--accent]" />
+            <div className="h-2 w-2 animate-pulse rounded-full bg-[--accent]" />
             <div className="h-2 w-2 rounded-full bg-[#E5E5E5] dark:bg-neutral-700" />
           </div>
         </motion.div>
@@ -1240,19 +1240,19 @@ USER QUESTION: ${chatInput.trim()}`;
   // ═══════════════════════════════════════════════════════════════════════════
   if (phase === 'complete' && reportData) {
     return (
-      <div className="relative min-h-screen bg-[#FAFAFA] dark:bg-neutral-950">
+      <div className="relative min-h-screen bg-[--surface-base] dark:bg-neutral-950">
         {/* Fixed TOC Sidebar */}
         <AnimatePresence>
           {showToc && tocItems.length > 0 && (
             <motion.aside
-              className="fixed top-20 left-0 z-40 hidden h-[calc(100vh-80px)] w-64 overflow-y-auto border-r border-[#E5E5E5] bg-white p-4 lg:block dark:border-neutral-800 dark:bg-neutral-900"
+              className="fixed top-20 left-0 z-40 hidden h-[calc(100vh-80px)] w-64 overflow-y-auto border-r border-[--border-subtle] bg-[--surface-elevated] p-4 lg:block dark:border-neutral-800 dark:bg-neutral-900"
               initial={{ x: -264 }}
               animate={{ x: 0 }}
               exit={{ x: -264 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
               <div className="mb-4 flex items-center justify-between">
-                <span className="text-xs font-semibold tracking-wider text-[#8A8A8A] uppercase">
+                <span className="text-xs font-semibold tracking-wider text-[--text-muted] uppercase">
                   Contents
                 </span>
                 <Button
@@ -1272,8 +1272,8 @@ USER QUESTION: ${chatInput.trim()}`;
                     className={cn(
                       'block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors',
                       activeSection === item.id
-                        ? 'bg-[#7C3AED]/10 font-medium text-[#7C3AED]'
-                        : 'text-[#6B6B6B] hover:bg-[#F5F5F5] hover:text-[#1A1A1A] dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white',
+                        ? 'bg-[--accent]/10 font-medium text-[--accent]'
+                        : 'text-[--text-muted] hover:bg-[--surface-overlay] hover:text-[--text-primary] dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white',
                     )}
                   >
                     {item.title}
@@ -1286,7 +1286,7 @@ USER QUESTION: ${chatInput.trim()}`;
 
         {!showToc && tocItems.length > 0 && (
           <motion.button
-            className="fixed top-24 left-4 z-40 hidden rounded-lg border border-[#E5E5E5] bg-white p-2 shadow-sm lg:block dark:border-neutral-800 dark:bg-neutral-900"
+            className="fixed top-24 left-4 z-40 hidden rounded-lg border border-[--border-subtle] bg-[--surface-elevated] p-2 shadow-sm lg:block dark:border-neutral-800 dark:bg-neutral-900"
             onClick={() => setShowToc(true)}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -1312,7 +1312,7 @@ USER QUESTION: ${chatInput.trim()}`;
                 <div className="inline-flex items-center gap-2 rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
                   Beta Report
                 </div>
-                <h1 className="text-[32px] font-bold tracking-tight text-[#1A1A1A] dark:text-white">
+                <h1 className="text-[32px] font-bold tracking-tight text-[--text-primary] dark:text-white">
                   {reportTitle || 'Technical Analysis Report'}
                 </h1>
               </div>
@@ -1327,7 +1327,7 @@ USER QUESTION: ${chatInput.trim()}`;
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-lg border-[#E5E5E5] dark:border-neutral-700"
+                className="rounded-lg border-[--border-subtle] dark:border-neutral-700"
               >
                 <Download className="mr-2 h-4 w-4" />
                 Export PDF
@@ -1335,7 +1335,7 @@ USER QUESTION: ${chatInput.trim()}`;
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-lg border-[#E5E5E5] dark:border-neutral-700"
+                className="rounded-lg border-[--border-subtle] dark:border-neutral-700"
               >
                 <Share2 className="mr-2 h-4 w-4" />
                 Share
@@ -1344,7 +1344,7 @@ USER QUESTION: ${chatInput.trim()}`;
                 variant="outline"
                 size="sm"
                 onClick={resetFlow}
-                className="rounded-lg border-[#E5E5E5] dark:border-neutral-700"
+                className="rounded-lg border-[--border-subtle] dark:border-neutral-700"
               >
                 <RotateCcw className="mr-2 h-4 w-4" />
                 New Analysis
@@ -1365,7 +1365,7 @@ USER QUESTION: ${chatInput.trim()}`;
         {/* Chat Toggle Button */}
         {!isChatOpen && (
           <motion.button
-            className="fixed right-6 bottom-6 z-50 flex items-center gap-2 rounded-full bg-[#7C3AED] px-4 py-3 text-white shadow-lg"
+            className="fixed right-6 bottom-6 z-50 flex items-center gap-2 rounded-full bg-[--accent] px-4 py-3 text-white shadow-lg"
             onClick={() => setIsChatOpen(true)}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -1381,16 +1381,16 @@ USER QUESTION: ${chatInput.trim()}`;
         <AnimatePresence>
           {isChatOpen && (
             <motion.div
-              className="fixed top-0 right-0 z-50 flex h-full w-[400px] flex-col border-l border-[#E5E5E5] bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
+              className="fixed top-0 right-0 z-50 flex h-full w-[400px] flex-col border-l border-[--border-subtle] bg-[--surface-elevated] shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
               initial={{ x: 400 }}
               animate={{ x: 0 }}
               exit={{ x: 400 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
-              <div className="flex items-center justify-between border-b border-[#E5E5E5] px-4 py-3 dark:border-neutral-800">
+              <div className="flex items-center justify-between border-b border-[--border-subtle] px-4 py-3 dark:border-neutral-800">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-[#7C3AED]" />
-                  <span className="font-semibold text-[#1A1A1A] dark:text-white">
+                  <MessageSquare className="h-5 w-5 text-[--accent]" />
+                  <span className="font-semibold text-[--text-primary] dark:text-white">
                     Chat with Report
                   </span>
                 </div>
@@ -1405,9 +1405,9 @@ USER QUESTION: ${chatInput.trim()}`;
 
               <div className="flex-1 space-y-4 overflow-y-auto p-4">
                 {chatMessages.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center text-center text-[#8A8A8A]">
+                  <div className="flex h-full flex-col items-center justify-center text-center text-[--text-muted]">
                     <MessageSquare className="mb-4 h-12 w-12 opacity-20" />
-                    <p className="font-medium text-[#4A4A4A] dark:text-neutral-300">
+                    <p className="font-medium text-[--text-secondary] dark:text-neutral-300">
                       Ask anything about this report
                     </p>
                     <p className="mt-1 text-sm">
@@ -1422,7 +1422,7 @@ USER QUESTION: ${chatInput.trim()}`;
                       ].map((suggestion) => (
                         <button
                           key={suggestion}
-                          className="w-full rounded-lg border border-[#E5E5E5] px-3 py-2 text-left text-sm text-[#6B6B6B] transition-colors hover:bg-[#F5F5F5] hover:text-[#1A1A1A] dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+                          className="w-full rounded-lg border border-[--border-subtle] px-3 py-2 text-left text-sm text-[--text-muted] transition-colors hover:bg-[--surface-overlay] hover:text-[--text-primary] dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
                           onClick={() => setChatInput(suggestion)}
                         >
                           {suggestion}
@@ -1443,8 +1443,8 @@ USER QUESTION: ${chatInput.trim()}`;
                         className={cn(
                           'max-w-[85%] rounded-2xl px-4 py-2',
                           msg.role === 'user'
-                            ? 'rounded-tr-sm bg-[#7C3AED] text-white'
-                            : 'rounded-tl-sm bg-[#F5F5F5] dark:bg-neutral-800',
+                            ? 'rounded-tr-sm bg-[--accent] text-white'
+                            : 'rounded-tl-sm bg-[--surface-overlay] dark:bg-neutral-800',
                         )}
                       >
                         {msg.role === 'assistant' ? (
@@ -1470,7 +1470,7 @@ USER QUESTION: ${chatInput.trim()}`;
 
               <form
                 onSubmit={handleChatSubmit}
-                className="border-t border-[#E5E5E5] bg-[#FAFAFA] p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
+                className="border-t border-[--border-subtle] bg-[--surface-base] p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
               >
                 <div className="flex gap-2">
                   <Textarea
@@ -1478,13 +1478,13 @@ USER QUESTION: ${chatInput.trim()}`;
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={handleChatKeyDown}
                     placeholder="Ask a question about the report..."
-                    className="max-h-[100px] min-h-[44px] resize-none rounded-lg border-[#E5E5E5] bg-white text-sm focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-700 dark:bg-neutral-800"
+                    className="max-h-[100px] min-h-[44px] resize-none rounded-lg border-[--border-subtle] bg-[--surface-elevated] text-sm focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-700 dark:bg-neutral-800"
                     disabled={isChatLoading}
                   />
                   <Button
                     type="submit"
                     size="icon"
-                    className="h-[44px] w-[44px] flex-shrink-0 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9]"
+                    className="h-[44px] w-[44px] flex-shrink-0 rounded-lg bg-[--accent] hover:bg-[--accent-hover]"
                     disabled={!chatInput.trim() || isChatLoading}
                   >
                     {isChatLoading ? (
@@ -1494,7 +1494,7 @@ USER QUESTION: ${chatInput.trim()}`;
                     )}
                   </Button>
                 </div>
-                <p className="mt-3 text-center text-[10px] text-[#8A8A8A]">
+                <p className="mt-3 text-center text-[10px] text-[--text-muted]">
                   Powered by Claude Opus 4.5
                 </p>
               </form>
@@ -1510,20 +1510,20 @@ USER QUESTION: ${chatInput.trim()}`;
   // ═══════════════════════════════════════════════════════════════════════════
   if (error) {
     return (
-      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[#FAFAFA] p-6 dark:bg-neutral-950">
+      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[--surface-base] p-6 dark:bg-neutral-950">
         <div className="w-full max-w-md space-y-6 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-100 dark:bg-red-900/20">
             <X className="h-8 w-8 text-red-600 dark:text-red-400" />
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-semibold tracking-tight text-[#1A1A1A] dark:text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-[--text-primary] dark:text-white">
               Something went wrong
             </h2>
-            <p className="text-[#6B6B6B] dark:text-neutral-400">{error}</p>
+            <p className="text-[--text-muted] dark:text-neutral-400">{error}</p>
           </div>
           <Button
             onClick={resetFlow}
-            className="bg-[#7C3AED] hover:bg-[#6D28D9]"
+            className="bg-[--accent] hover:bg-[--accent-hover]"
           >
             <RotateCcw className="mr-2 h-4 w-4" />
             Start Over
@@ -1535,8 +1535,8 @@ USER QUESTION: ${chatInput.trim()}`;
 
   // Fallback
   return (
-    <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[#FAFAFA] p-6 dark:bg-neutral-950">
-      <Loader2 className="h-8 w-8 animate-spin text-[#7C3AED]" />
+    <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[--surface-base] p-6 dark:bg-neutral-950">
+      <Loader2 className="h-8 w-8 animate-spin text-[--accent]" />
     </div>
   );
 }

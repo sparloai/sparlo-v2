@@ -51,21 +51,21 @@ function EmptyState() {
 
   return (
     <div
-      className="rounded-lg border border-neutral-900 bg-[#0A0A0A] px-6 py-16 text-center"
+      className="rounded-lg border border-[--border-subtle] bg-[--surface-elevated] px-6 py-16 text-center"
       data-test="reports-empty-state"
     >
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-900">
-        <FileText className="h-7 w-7 text-neutral-400" />
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-[--surface-overlay]">
+        <FileText className="h-7 w-7 text-[--text-muted]" />
       </div>
       <p
-        className="mt-4 text-sm text-neutral-500"
+        className="mt-4 text-sm text-[--text-muted]"
         style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
       >
         No reports yet
       </p>
       <button
         onClick={() => router.push('/home/reports/new')}
-        className="mt-4 rounded-sm bg-white px-4 py-2 font-mono text-xs font-medium tracking-wider text-black uppercase transition-colors hover:bg-neutral-200"
+        className="mt-4 rounded-sm bg-[--text-primary] px-4 py-2 font-mono text-xs font-medium tracking-wider text-[--surface-base] uppercase transition-colors hover:opacity-90"
         style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
       >
         Create Your First Report
@@ -76,9 +76,9 @@ function EmptyState() {
 
 function NoResultsState({ query }: { query: string }) {
   return (
-    <div className="rounded-lg border border-neutral-900 bg-[#0A0A0A] px-6 py-12 text-center">
+    <div className="rounded-lg border border-[--border-subtle] bg-[--surface-elevated] px-6 py-12 text-center">
       <p
-        className="text-sm text-neutral-500"
+        className="text-sm text-[--text-muted]"
         style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
       >
         No reports match &ldquo;{query}&rdquo;
@@ -114,7 +114,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
       {/* Header Actions */}
       <div className="mb-6 flex items-end justify-between">
         <h1
-          className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-neutral-500"
+          className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-[--text-muted]"
           style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
         >
           REPORTS
@@ -123,11 +123,11 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
         <Link href="/home/reports/new" className="group">
           <button
             data-test="new-report-button"
-            className="flex items-center gap-2 font-mono text-xs font-medium text-white transition-colors hover:text-neutral-300"
+            className="flex items-center gap-2 font-mono text-xs font-medium text-[--text-primary] transition-colors hover:text-[--text-secondary]"
             style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
           >
             NEW ANALYSIS
-            <span className="flex h-4 w-4 items-center justify-center rounded-sm border border-neutral-700 text-neutral-500 transition-all group-hover:border-neutral-500 group-hover:text-white">
+            <span className="flex h-4 w-4 items-center justify-center rounded-sm border border-[--border-default] text-[--text-muted] transition-all group-hover:border-[--text-muted] group-hover:text-[--text-primary]">
               <Plus className="h-3 w-3" />
             </span>
           </button>
@@ -137,14 +137,14 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
       {/* Search Bar */}
       <div className="group relative mb-8">
         <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-          <Search className="h-4 w-4 text-neutral-600 transition-colors group-focus-within:text-neutral-400" />
+          <Search className="h-4 w-4 text-[--text-muted] transition-colors group-focus-within:text-[--text-secondary]" />
         </div>
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search reports..."
-          className="w-full rounded-lg border border-neutral-900 bg-[#0A0A0A] py-3.5 pr-4 pl-11 text-sm text-white shadow-sm transition-all placeholder:text-neutral-600 focus:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-700"
+          className="w-full rounded-lg border border-[--border-subtle] bg-[--surface-elevated] py-3.5 pr-4 pl-11 text-sm text-[--text-primary] shadow-sm transition-all placeholder:text-[--text-muted] focus:border-[--border-default] focus:outline-none focus:ring-1 focus:ring-[--border-default]"
           data-test="search-reports-input"
           style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
         />
@@ -157,7 +157,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
         <NoResultsState query={search} />
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-neutral-900 bg-[#0A0A0A] shadow-sm">
+          <div className="overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface-elevated] shadow-sm">
             {filteredReports.map((report, index) => {
               const isLast = index === filteredReports.length - 1;
               const processing = isProcessing(report.status);
@@ -174,8 +174,8 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                     key={report.id}
                     data-test={`report-card-${report.id}`}
                     className={cn(
-                      'relative block cursor-default bg-neutral-900/20 p-5',
-                      !isLast && 'border-b border-neutral-900',
+                      'relative block cursor-default bg-violet-500/5 p-5 dark:bg-neutral-900/20',
+                      !isLast && 'border-b border-[--border-subtle]',
                     )}
                   >
                     <div className="flex items-start gap-4">
@@ -188,19 +188,19 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                       {/* Content */}
                       <div className="min-w-0 flex-1">
                         <h3
-                          className="truncate pr-8 text-sm font-medium text-neutral-300 opacity-90"
+                          className="truncate pr-8 text-sm font-medium text-[--text-secondary] opacity-90"
                           style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                         >
                           {displayTitle}
                         </h3>
                         <div className="mt-2 flex items-center gap-3">
                           <span
-                            className="font-mono text-xs uppercase tracking-wider text-violet-400"
+                            className="font-mono text-xs uppercase tracking-wider text-violet-600 dark:text-violet-400"
                             style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
                           >
                             Processing
                           </span>
-                          <span className="h-3 w-px bg-neutral-800" />
+                          <span className="h-3 w-px bg-[--border-default]" />
                         </div>
                       </div>
 
@@ -222,8 +222,8 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                   data-test={`report-card-${report.id}`}
                   className={cn(
                     'group relative block w-full p-5 text-left transition-all',
-                    isClickable && 'cursor-pointer hover:bg-neutral-900/40',
-                    !isLast && 'border-b border-neutral-900',
+                    isClickable && 'cursor-pointer hover:bg-[--surface-overlay]',
+                    !isLast && 'border-b border-[--border-subtle]',
                   )}
                 >
                   <div className="flex items-start gap-4">
@@ -234,7 +234,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                           'h-2 w-2 rounded-full',
                           isComplete
                             ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
-                            : 'bg-neutral-600',
+                            : 'bg-[--text-muted]',
                         )}
                       />
                     </div>
@@ -242,23 +242,23 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                     {/* Content */}
                     <div className="min-w-0 flex-1">
                       <h3
-                        className="truncate pr-8 text-sm font-medium text-neutral-200 transition-colors group-hover:text-white"
+                        className="truncate pr-8 text-sm font-medium text-[--text-secondary] transition-colors group-hover:text-[--text-primary]"
                         style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                       >
                         {displayTitle}
                       </h3>
                       <div className="mt-2 flex items-center gap-4">
                         <span
-                          className="font-mono text-xs text-white"
+                          className="font-mono text-xs text-[--text-primary]"
                           style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
                         >
                           {formatDate(report.created_at)}
                         </span>
                         {isComplete && report.concept_count > 0 && (
                           <>
-                            <span className="h-3 w-px bg-neutral-700" />
+                            <span className="h-3 w-px bg-[--border-default]" />
                             <span
-                              className="flex items-center gap-1.5 font-mono text-xs text-neutral-400"
+                              className="flex items-center gap-1.5 font-mono text-xs text-[--text-muted]"
                               style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
                             >
                               <FileText className="h-3 w-3" />
@@ -272,7 +272,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                     {/* Arrow (visible on hover) */}
                     {isClickable && (
                       <div className="absolute right-5 top-1/2 -translate-x-2 -translate-y-1/2 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
-                        <ChevronRight className="h-4 w-4 text-neutral-500" />
+                        <ChevronRight className="h-4 w-4 text-[--text-muted]" />
                       </div>
                     )}
                   </div>
@@ -284,7 +284,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
           {/* Pagination Footer */}
           <div className="mt-4 flex items-center justify-between px-1">
             <span
-              className="font-mono text-[10px] uppercase tracking-wider text-neutral-200"
+              className="font-mono text-[10px] uppercase tracking-wider text-[--text-secondary]"
               style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
             >
               Showing {filteredReports.length} of {reports.length} REPORTS

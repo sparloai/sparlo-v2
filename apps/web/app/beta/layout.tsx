@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 
-import { AppLogo } from '~/components/app-logo';
-
 export const metadata: Metadata = {
   title: 'Sparlo Beta - Innovation AI',
   description:
@@ -14,12 +12,12 @@ export default function BetaLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950">
-      {/* Simple header */}
-      <header className="sticky top-0 z-50 border-b border-[#E5E5E5] bg-white/80 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/80">
+    <div className="min-h-screen bg-[--surface-base]">
+      {/* Simple header with glassmorphic effect */}
+      <header className="sticky top-0 z-50 border-b border-[--nav-border] bg-[--nav-bg] backdrop-blur-[12px]">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#7C3AED]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[--accent]">
               <svg
                 width="16"
                 height="16"
@@ -33,16 +31,16 @@ export default function BetaLayout({
                 />
               </svg>
             </div>
-            <span className="text-lg font-semibold text-[#1A1A1A] dark:text-white">
+            <span className="text-lg font-semibold text-[--text-primary]">
               Sparlo
             </span>
-            <span className="rounded-full bg-[#7C3AED]/10 px-2 py-0.5 text-xs font-medium text-[#7C3AED]">
+            <span className="rounded-full bg-[--accent-muted] px-2 py-0.5 text-xs font-medium text-[--accent]">
               Beta
             </span>
           </div>
           <a
             href="/"
-            className="text-sm text-[#6B6B6B] transition-colors hover:text-[#1A1A1A] dark:text-neutral-400 dark:hover:text-white"
+            className="text-sm text-[--text-muted] transition-colors hover:text-[--text-primary]"
           >
             Learn more →
           </a>

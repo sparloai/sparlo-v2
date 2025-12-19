@@ -16,7 +16,8 @@ function UserHomeLayout({ children }: React.PropsWithChildren) {
       <AppWorkspaceProvider value={workspace}>
         <div className="flex min-h-screen flex-col bg-[--surface-base]">
           <NavHeader />
-          <main className="flex-1">{children}</main>
+          {/* pt-14 accounts for fixed nav height (56px = 3.5rem) */}
+          <main className="flex-1 pt-14">{children}</main>
         </div>
       </AppWorkspaceProvider>
     </UserWorkspaceContextProvider>
