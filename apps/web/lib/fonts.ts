@@ -31,7 +31,7 @@ const soehne = localFont({
   ],
   variable: '--font-sans',
   display: 'swap',
-  fallback: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+  fallback: ['Söhne', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
 });
 
 /**
