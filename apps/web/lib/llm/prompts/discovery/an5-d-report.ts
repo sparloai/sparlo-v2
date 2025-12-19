@@ -66,7 +66,7 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
       {
         "id": "D-01",
         "name": "Concept name",
-        "category": "biological_transfer|geological|abandoned_tech|frontier_material|combination",
+        "category": "biological_transfer|biological|geological|geological_physical|abandoned_tech|abandoned_revival|frontier_material|industrial_process|combination",
         "source_domain": "Where the idea comes from",
 
         "the_insight": {
@@ -270,9 +270,13 @@ const DiscoveryConceptReportSchema = z.object({
   name: z.string(),
   category: z.enum([
     'biological_transfer',
+    'biological',
     'geological',
+    'geological_physical',
     'abandoned_tech',
+    'abandoned_revival',
     'frontier_material',
+    'industrial_process',
     'combination',
   ]),
   source_domain: z.string(),
