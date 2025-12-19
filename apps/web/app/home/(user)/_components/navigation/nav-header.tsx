@@ -45,8 +45,8 @@ export function NavHeader() {
 
   const logoSrc =
     resolvedTheme === 'dark'
-      ? '/images/sparlo-logo-white.png'
-      : '/images/sparlo-logo-black.png';
+      ? '/images/sparlo-grid-logo-white.png'
+      : '/images/sparlo-grid-logo-black.png';
 
   return (
     <header
