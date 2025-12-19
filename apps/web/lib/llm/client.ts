@@ -13,6 +13,47 @@ export class ClaudeRefusalError extends Error {
 }
 
 /**
+ * Token usage from Claude API response
+ */
+export interface TokenUsage {
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+}
+
+/**
+ * Result from callClaude with usage metrics
+ */
+export interface ClaudeResult {
+  content: string;
+  usage: TokenUsage;
+}
+
+/**
+ * Claude pricing per million tokens (as of Dec 2024)
+ * Opus 4.5: $15 input, $75 output
+ */
+export const CLAUDE_PRICING = {
+  'claude-opus-4-5-20251101': {
+    inputPerMillion: 15,
+    outputPerMillion: 75,
+  },
+} as const;
+
+/**
+ * Calculate cost from token usage
+ */
+export function calculateCost(
+  usage: TokenUsage,
+  model: keyof typeof CLAUDE_PRICING,
+): number {
+  const pricing = CLAUDE_PRICING[model];
+  const inputCost = (usage.inputTokens / 1_000_000) * pricing.inputPerMillion;
+  const outputCost = (usage.outputTokens / 1_000_000) * pricing.outputPerMillion;
+  return inputCost + outputCost;
+}
+
+/**
  * Anthropic client singleton
  */
 let client: Anthropic | null = null;
@@ -37,7 +78,7 @@ export const MODELS = {
 } as const;
 
 /**
- * Call Claude with proper error handling
+ * Call Claude with proper error handling and usage tracking
  * Uses streaming for large token requests to avoid timeout issues
  * (Kieran's fix: every LLM call wrapped with error handling)
  */
@@ -46,7 +87,7 @@ export async function callClaude(params: {
   system: string;
   userMessage: string;
   maxTokens?: number;
-}): Promise<string> {
+}): Promise<ClaudeResult> {
   const anthropic = getAnthropicClient();
   const maxTokens = params.maxTokens ?? 8192;
 
@@ -91,7 +132,15 @@ export async function callClaude(params: {
         );
       }
 
-      return result;
+      // Extract usage from final message
+      const usage: TokenUsage = {
+        inputTokens: finalMessage.usage.input_tokens,
+        outputTokens: finalMessage.usage.output_tokens,
+        totalTokens:
+          finalMessage.usage.input_tokens + finalMessage.usage.output_tokens,
+      };
+
+      return { content: result, usage };
     }
 
     // Non-streaming for smaller requests
@@ -123,7 +172,14 @@ export async function callClaude(params: {
       );
     }
 
-    return textBlock.text;
+    // Extract usage from response
+    const usage: TokenUsage = {
+      inputTokens: response.usage.input_tokens,
+      outputTokens: response.usage.output_tokens,
+      totalTokens: response.usage.input_tokens + response.usage.output_tokens,
+    };
+
+    return { content: textBlock.text, usage };
   } catch (error) {
     // Re-throw ClaudeRefusalError as-is (user-friendly message)
     if (error instanceof ClaudeRefusalError) {

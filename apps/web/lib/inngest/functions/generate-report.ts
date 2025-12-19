@@ -9,8 +9,11 @@ import {
   retrieveTargeted,
 } from '../../corpus';
 import {
+  CLAUDE_PRICING,
   ClaudeRefusalError,
   MODELS,
+  type TokenUsage,
+  calculateCost,
   callClaude,
   parseJsonResponse,
 } from '../../llm/client';
@@ -98,6 +101,28 @@ export const generateReport = inngest.createFunction(
         conversationId,
       });
 
+      // Track token usage per step
+      const usageByStep: Record<string, TokenUsage> = {};
+
+      function trackUsage(stepName: string, usage: TokenUsage) {
+        usageByStep[stepName] = usage;
+      }
+
+      function getTotalUsage(): TokenUsage & { costUsd: number } {
+        const totals = Object.values(usageByStep).reduce(
+          (acc, usage) => ({
+            inputTokens: acc.inputTokens + usage.inputTokens,
+            outputTokens: acc.outputTokens + usage.outputTokens,
+            totalTokens: acc.totalTokens + usage.totalTokens,
+          }),
+          { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+        );
+        return {
+          ...totals,
+          costUsd: calculateCost(totals, MODELS.OPUS as keyof typeof CLAUDE_PRICING),
+        };
+      }
+
     /**
      * Helper: Update report progress in Supabase
      */
@@ -124,14 +149,15 @@ export const generateReport = inngest.createFunction(
         phase_progress: 0,
       });
 
-      const response = await callClaude({
+      const { content, usage } = await callClaude({
         model: MODELS.OPUS,
         system: AN0_PROMPT,
         userMessage: designChallenge,
         maxTokens: 8000,
       });
+      trackUsage('an0', usage);
 
-      const parsed = parseJsonResponse<AN0Output>(response, 'AN0');
+      const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
       const validated = AN0OutputSchema.parse(parsed);
 
       await updateProgress({ phase_progress: 100 });
@@ -194,14 +220,15 @@ export const generateReport = inngest.createFunction(
           async () => {
             const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
 
-            const response = await callClaude({
+            const { content, usage } = await callClaude({
               model: MODELS.OPUS,
               system: AN0_PROMPT,
               userMessage: clarifiedChallenge,
               maxTokens: 8000,
             });
+            trackUsage('an0-retry', usage);
 
-            const parsed = parseJsonResponse<AN0Output>(response, 'AN0');
+            const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
             return AN0OutputSchema.parse(parsed);
           },
         );
@@ -297,14 +324,15 @@ export const generateReport = inngest.createFunction(
 
         const contextMessage = buildAN1_5ContextV10(state);
 
-        const response = await callClaude({
+        const { content, usage } = await callClaude({
           model: MODELS.OPUS,
           system: AN1_5_PROMPT,
           userMessage: contextMessage,
           maxTokens: 8000,
         });
+        trackUsage('an1.5', usage);
 
-        const parsed = parseJsonResponse<AN1_5_Output>(response, 'AN1.5');
+        const parsed = parseJsonResponse<AN1_5_Output>(content, 'AN1.5');
         const validated = AN1_5_OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
@@ -340,14 +368,15 @@ export const generateReport = inngest.createFunction(
 
       const contextMessage = buildAN1_7ContextV10(state, an1_5Result);
 
-      const response = await callClaude({
+      const { content, usage } = await callClaude({
         model: MODELS.OPUS,
         system: AN1_7_PROMPT,
         userMessage: contextMessage,
         maxTokens: 8000,
       });
+      trackUsage('an1.7', usage);
 
-      const parsed = parseJsonResponse<AN1_7_Output>(response, 'AN1.7');
+      const parsed = parseJsonResponse<AN1_7_Output>(content, 'AN1.7');
       const validated = AN1_7_OutputSchema.parse(parsed);
 
       await updateProgress({ phase_progress: 100 });
@@ -377,14 +406,15 @@ export const generateReport = inngest.createFunction(
 
       const contextMessage = buildAN2ContextV10(state, an1_5Result, an1_7Result);
 
-      const response = await callClaude({
+      const { content, usage } = await callClaude({
         model: MODELS.OPUS,
         system: AN2_PROMPT,
         userMessage: contextMessage,
         maxTokens: 8000,
       });
+      trackUsage('an2', usage);
 
-      const parsed = parseJsonResponse<AN2Output>(response, 'AN2');
+      const parsed = parseJsonResponse<AN2Output>(content, 'AN2');
       const validated = AN2OutputSchema.parse(parsed);
 
       await updateProgress({ phase_progress: 100 });
@@ -416,14 +446,15 @@ export const generateReport = inngest.createFunction(
 
       const contextMessage = buildAN3ContextV10(state, an2Result);
 
-      const response = await callClaude({
+      const { content, usage } = await callClaude({
         model: MODELS.OPUS,
         system: AN3_PROMPT,
         userMessage: contextMessage,
         maxTokens: 24000,
       });
+      trackUsage('an3', usage);
 
-      const parsed = parseJsonResponse<AN3Output>(response, 'AN3');
+      const parsed = parseJsonResponse<AN3Output>(content, 'AN3');
       const validated = AN3OutputSchema.parse(parsed);
 
       await updateProgress({ phase_progress: 100 });
@@ -453,14 +484,15 @@ export const generateReport = inngest.createFunction(
 
       const contextMessage = buildAN4ContextV10(state, an3Result, an2Result);
 
-      const response = await callClaude({
+      const { content, usage } = await callClaude({
         model: MODELS.OPUS,
         system: AN4_PROMPT,
         userMessage: contextMessage,
         maxTokens: 16000, // Large output for validation gates
       });
+      trackUsage('an4', usage);
 
-      const parsed = parseJsonResponse<AN4Output>(response, 'AN4');
+      const parsed = parseJsonResponse<AN4Output>(content, 'AN4');
       const validated = AN4OutputSchema.parse(parsed);
 
       await updateProgress({ phase_progress: 100 });
@@ -496,14 +528,15 @@ export const generateReport = inngest.createFunction(
         an1_7Result,
       );
 
-      const response = await callClaude({
+      const { content, usage } = await callClaude({
         model: MODELS.OPUS,
         system: AN5_PROMPT,
         userMessage: contextMessage,
         maxTokens: 24000, // Large output for executive report
       });
+      trackUsage('an5', usage);
 
-      const parsed = parseJsonResponse<AN5Output>(response, 'AN5');
+      const parsed = parseJsonResponse<AN5Output>(content, 'AN5');
       const validated = AN5OutputSchema.parse(parsed);
 
       await updateProgress({ phase_progress: 100 });
@@ -553,7 +586,21 @@ export const generateReport = inngest.createFunction(
       });
     });
 
-    return { success: true, reportId };
+    // Return success with token usage summary (visible in Inngest dashboard)
+    const totalUsage = getTotalUsage();
+    return {
+      success: true,
+      reportId,
+      usage: {
+        byStep: usageByStep,
+        total: {
+          inputTokens: totalUsage.inputTokens,
+          outputTokens: totalUsage.outputTokens,
+          totalTokens: totalUsage.totalTokens,
+        },
+        estimatedCostUsd: Math.round(totalUsage.costUsd * 100) / 100,
+      },
+    };
     } // End of runReportGeneration()
   },
 );

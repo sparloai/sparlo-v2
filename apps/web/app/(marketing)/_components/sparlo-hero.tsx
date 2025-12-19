@@ -11,8 +11,8 @@ export function SparloHero() {
 
         {/* Subhead */}
         <p className="animate-subhead-reveal dark:text-muted-foreground mx-auto mt-8 max-w-[600px] text-[17px] leading-[1.6] text-[#666666] opacity-0 md:text-[20px]">
-          An advanced reasoning model that uses a systematic methodology of
-          innovation to solve complex technical challenges.
+          Advanced reasoning AI utilizing a systematic innovation methodology
+          to solve technical challenges.
         </p>
 
         {/* CTA Button */}
