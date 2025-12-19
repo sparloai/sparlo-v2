@@ -229,14 +229,14 @@ export default function NewReportPage() {
           <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[#0A0A0A] shadow-2xl shadow-black/50">
             {/* Toolbar / Context Hinting */}
             <div className="flex items-center justify-between border-b border-white/5 bg-neutral-900/20 px-6 py-3">
-              <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-500">
-                <Terminal className="h-4 w-4 text-neutral-500" />
+              <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
+                <Terminal className="h-4 w-4 text-neutral-400" />
                 <span>new analysis</span>
               </div>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  className="group/btn flex items-center gap-1.5 rounded-md border border-white/5 bg-transparent px-3 py-1.5 text-xs text-neutral-400 transition-all hover:border-white/10 hover:bg-white/5 hover:text-white"
+                  className="group/btn flex items-center gap-1.5 rounded-md border border-white/5 bg-transparent px-3 py-1.5 text-xs text-neutral-300 transition-all hover:border-white/10 hover:bg-white/5 hover:text-white"
                 >
                   Attach
                   <Paperclip className="h-3 w-3 transition-colors group-hover/btn:text-emerald-400" />
@@ -244,8 +244,8 @@ export default function NewReportPage() {
               </div>
             </div>
 
-            {/* Text Area */}
-            <div className="min-h-[280px] p-6 md:p-8">
+            {/* Text Area - Full height */}
+            <div className="flex min-h-[320px] flex-col p-6 md:p-8">
               <textarea
                 value={challengeText}
                 onChange={(e) => {
@@ -261,7 +261,7 @@ export default function NewReportPage() {
                 data-test="challenge-input"
                 placeholder="Describe the engineering challenge..."
                 spellCheck={false}
-                className="h-full w-full resize-none border-0 bg-transparent text-lg font-light leading-relaxed text-neutral-200 placeholder-neutral-700 focus:outline-none focus:ring-0 disabled:opacity-40 md:text-xl"
+                className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg font-light leading-relaxed text-neutral-100 placeholder-neutral-500 focus:outline-none focus:ring-0 disabled:opacity-40 md:text-xl"
                 style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
               />
             </div>
@@ -269,7 +269,7 @@ export default function NewReportPage() {
             {/* Context Awareness / Intelligence Layer */}
             <div className="px-6 pb-6 md:px-8 md:pb-8">
               <div className="flex select-none flex-wrap items-center gap-3">
-                <span className="mr-1 font-mono text-xs font-medium uppercase tracking-widest text-neutral-600">
+                <span className="mr-1 font-mono text-xs font-medium uppercase tracking-widest text-neutral-400">
                   Context Detection
                 </span>
 
@@ -282,7 +282,7 @@ export default function NewReportPage() {
                         'flex items-center gap-2 rounded-full px-3 py-1.5 transition-all duration-500',
                         isDetected
                           ? 'border border-emerald-500/20 bg-emerald-500/10'
-                          : 'border border-dashed border-neutral-800 bg-transparent text-neutral-600',
+                          : 'border border-dashed border-neutral-700 bg-transparent text-neutral-500',
                       )}
                     >
                       <div
@@ -290,13 +290,13 @@ export default function NewReportPage() {
                           'h-1.5 w-1.5 rounded-full',
                           isDetected
                             ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
-                            : 'bg-neutral-700',
+                            : 'bg-neutral-600',
                         )}
                       />
                       <span
                         className={cn(
                           'text-xs font-medium',
-                          isDetected ? 'text-emerald-200/90' : 'text-neutral-600',
+                          isDetected ? 'text-emerald-200/90' : 'text-neutral-400',
                         )}
                         style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                       >
@@ -317,17 +317,17 @@ export default function NewReportPage() {
                 {/* Compute Estimate */}
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/5 bg-neutral-900">
-                    <Clock className="h-4 w-4 text-zinc-400" />
+                    <Clock className="h-4 w-4 text-neutral-400" />
                   </div>
                   <div className="flex flex-col">
                     <span
-                      className="text-[10px] font-semibold uppercase tracking-wider text-neutral-500"
+                      className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400"
                       style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                     >
                       ANALYSIS
                     </span>
                     <span
-                      className="font-mono text-xs text-neutral-300"
+                      className="font-mono text-xs text-neutral-200"
                       style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
                     >
                       ~15 MINUTES
@@ -335,28 +335,39 @@ export default function NewReportPage() {
                   </div>
                 </div>
 
-                {/* Primary Action */}
-                <button
-                  onClick={handleSubmit}
-                  disabled={!canSubmit || isSubmitting}
-                  data-test="challenge-submit"
-                  className={cn(
-                    'group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg px-6 py-3 transition-all duration-300 md:w-auto',
-                    canSubmit && !isSubmitting
-                      ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:bg-neutral-200 hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]'
-                      : 'cursor-not-allowed bg-neutral-800 text-neutral-500',
-                  )}
-                >
-                  <span
-                    className="relative z-10 text-sm font-semibold tracking-tight"
-                    style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                {/* Primary Action with keyboard shortcut */}
+                <div className="flex items-center gap-3">
+                  {/* Keyboard shortcut hint */}
+                  <div className="hidden items-center gap-1.5 md:flex">
+                    <kbd className="flex h-5 items-center justify-center rounded border border-neutral-700 bg-neutral-800 px-1.5 font-mono text-[10px] text-neutral-400">
+                      ⌘
+                    </kbd>
+                    <kbd className="flex h-5 items-center justify-center rounded border border-neutral-700 bg-neutral-800 px-1.5 font-mono text-[10px] text-neutral-400">
+                      ↵
+                    </kbd>
+                  </div>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!canSubmit || isSubmitting}
+                    data-test="challenge-submit"
+                    className={cn(
+                      'group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg px-6 py-3 transition-all duration-300 md:w-auto',
+                      canSubmit && !isSubmitting
+                        ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.05)] hover:bg-neutral-200 hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]'
+                        : 'cursor-not-allowed bg-neutral-800 text-neutral-500',
+                    )}
                   >
-                    {isSubmitting ? 'Running...' : 'Run Analysis'}
-                  </span>
-                  {!isSubmitting && (
-                    <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  )}
-                </button>
+                    <span
+                      className="relative z-10 text-sm font-semibold tracking-tight"
+                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                    >
+                      {isSubmitting ? 'Running...' : 'Run Analysis'}
+                    </span>
+                    {!isSubmitting && (
+                      <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -372,22 +383,22 @@ export default function NewReportPage() {
           </p>
         )}
 
-        {/* Trust / Capability Indicators */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-6 opacity-40 transition-opacity duration-500 hover:opacity-100 md:flex-row">
+        {/* Trust / Capability Indicators - Always visible */}
+        <div className="mt-8 flex flex-col items-center justify-center gap-6 opacity-60 md:flex-row">
           <div className="flex items-center gap-2">
             <Lock className="h-3 w-3 text-neutral-400" />
             <span
-              className="font-mono text-xs tracking-tight text-neutral-50"
+              className="font-mono text-xs tracking-tight text-neutral-300"
               style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
             >
               DATA NEVER TRAINS AI
             </span>
           </div>
-          <div className="hidden h-3 w-px bg-neutral-800 md:block" />
+          <div className="hidden h-3 w-px bg-neutral-700 md:block" />
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-3 w-3 text-emerald-500" />
             <span
-              className="font-mono text-xs tracking-tight text-neutral-100"
+              className="font-mono text-xs tracking-tight text-neutral-300"
               style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
             >
               BUILT ON SOC2 INFRASTRUCTURE
