@@ -2,10 +2,16 @@ import Link from 'next/link';
 
 export function SparloHero() {
   return (
-    <section className="flex min-h-[calc(100vh-72px)] items-center justify-center bg-[--surface-base]">
+    <section
+      className="flex min-h-[calc(100vh-72px)] items-center justify-center bg-[--surface-base]"
+      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+    >
       <div className="max-w-[720px] px-8 text-center">
         {/* Headline */}
-        <h1 className="animate-headline-reveal text-[40px] leading-[1.1] font-semibold tracking-[-0.03em] text-[--text-primary] opacity-0 sm:text-[56px] md:text-[72px] lg:text-[80px]">
+        <h1
+          className="animate-headline-reveal text-[40px] leading-[1.1] font-semibold tracking-[-0.03em] text-[--text-primary] opacity-0 sm:text-[56px] md:text-[72px] lg:text-[80px]"
+          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+        >
           Engineering Intelligence Model
         </h1>
 
@@ -19,7 +25,7 @@ export function SparloHero() {
         <div className="animate-cta-reveal mt-12 opacity-0">
           <Link
             href="/auth/sign-up"
-            className="inline-block cursor-pointer rounded-[10px] bg-[--accent] px-9 py-[18px] text-[16px] font-medium text-white shadow-[--shadow-accent] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[--accent-hover] hover:shadow-[0_8px_32px_rgba(124,58,237,0.45)] active:translate-y-0 active:shadow-[0_2px_16px_rgba(124,58,237,0.3)]"
+            className="inline-block cursor-pointer rounded-[10px] bg-[#7c3aed] px-9 py-[18px] text-[16px] font-medium text-white shadow-[0_4px_14px_-2px_rgba(124,58,237,0.4)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#6d28d9] hover:shadow-[0_8px_32px_rgba(124,58,237,0.45)] active:translate-y-0 active:shadow-[0_2px_16px_rgba(124,58,237,0.3)]"
           >
             Try It
           </Link>

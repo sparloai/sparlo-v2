@@ -1,7 +1,7 @@
 import { requireUser } from '@kit/supabase/require-user';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-import { SiteHeader } from '~/(marketing)/_components/site-header';
+import { LandingHeader } from '~/(marketing)/_components/landing-header';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
 async function SiteLayout(props: React.PropsWithChildren) {
@@ -9,10 +9,14 @@ async function SiteLayout(props: React.PropsWithChildren) {
   const user = await requireUser(client, { verifyMfa: false });
 
   return (
-    <div className={'flex min-h-[100vh] flex-col'}>
-      <SiteHeader user={user.data} />
+    <div
+      className={'flex min-h-[100vh] flex-col'}
+      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+    >
+      <LandingHeader user={user.data} />
 
-      {props.children}
+      {/* Add padding-top to account for fixed nav */}
+      <div className="pt-14">{props.children}</div>
     </div>
   );
 }
