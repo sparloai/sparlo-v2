@@ -1,5 +1,4 @@
 import type { ProblemAnalysis as ProblemAnalysisType } from '../../../_lib/schema/sparlo-report.schema';
-
 import { ConfidenceBadge } from '../shared/badges';
 import { SectionHeader } from '../shared/section-header';
 
@@ -12,17 +11,17 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
     <section id="problem-analysis" className="space-y-8">
       <SectionHeader id="problem-analysis-header" title="Problem Analysis" />
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="grid gap-8 md:grid-cols-2">
         {/* What&apos;s Wrong */}
         <div className="space-y-4">
-          <h3 className="uppercase text-sm font-semibold text-zinc-400 tracking-wider">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">
             What&apos;s Wrong
           </h3>
-          <p className="leading-relaxed text-base text-zinc-700">
+          <p className="text-base leading-relaxed text-zinc-700">
             {data.whats_wrong.prose}
           </p>
           {data.whats_wrong.technical_note && (
-            <div className="bg-zinc-50 border border-zinc-100 rounded-lg p-4 space-y-2">
+            <div className="space-y-2 rounded-lg border border-zinc-100 bg-zinc-50 p-4">
               {data.whats_wrong.technical_note.equation && (
                 <code className="block font-mono text-sm text-zinc-800">
                   {data.whats_wrong.technical_note.equation}
@@ -37,10 +36,10 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
 
         {/* Why It&apos;s Hard */}
         <div className="space-y-4">
-          <h3 className="uppercase text-sm font-semibold text-zinc-400 tracking-wider">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">
             Why It&apos;s Hard
           </h3>
-          <p className="leading-relaxed text-base text-zinc-700">
+          <p className="text-base leading-relaxed text-zinc-700">
             {data.why_its_hard.prose}
           </p>
           <ul className="space-y-2">
@@ -60,30 +59,30 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
       </div>
 
       {/* First Principles Insight */}
-      <div className="bg-gradient-to-br from-zinc-50 to-zinc-100/50 border border-zinc-200 rounded-xl p-6 space-y-3">
-        <h3 className="uppercase text-xs font-bold text-zinc-500 tracking-wider">
+      <div className="space-y-3 rounded-xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-zinc-100/50 p-6">
+        <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
           First Principles Insight
         </h3>
         <p className="text-lg font-semibold text-zinc-900">
           {data.first_principles_insight.headline}
         </p>
-        <p className="text-base text-zinc-600 leading-relaxed">
+        <p className="text-base leading-relaxed text-zinc-600">
           {data.first_principles_insight.explanation}
         </p>
       </div>
 
       {/* Root Cause Hypotheses */}
       <div className="space-y-4">
-        <h3 className="uppercase text-sm font-semibold text-zinc-400 tracking-wider">
+        <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">
           Root Cause Hypotheses
         </h3>
         <div className="grid gap-4">
           {data.root_cause_hypotheses.map((hypothesis) => (
             <div
               key={hypothesis.id}
-              className="flex gap-4 p-4 border border-zinc-100 rounded-lg hover:border-zinc-200 transition-colors"
+              className="flex gap-4 rounded-lg border border-zinc-100 p-4 transition-colors hover:border-zinc-200"
             >
-              <span className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-zinc-100 text-sm font-bold text-zinc-600">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-sm font-bold text-zinc-600">
                 {hypothesis.id}
               </span>
               <div className="flex-1 space-y-2">
@@ -93,7 +92,7 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
                   </span>
                   <ConfidenceBadge level={hypothesis.confidence} />
                 </div>
-                <p className="text-sm text-zinc-600 leading-relaxed">
+                <p className="text-sm leading-relaxed text-zinc-600">
                   {hypothesis.explanation}
                 </p>
               </div>
@@ -104,16 +103,16 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
 
       {/* Success Metrics */}
       <div className="space-y-4">
-        <h3 className="uppercase text-sm font-semibold text-zinc-400 tracking-wider">
+        <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">
           Success Metrics
         </h3>
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid gap-4 md:grid-cols-2">
           {data.success_metrics.map((metric, index) => (
             <div
               key={index}
-              className="flex items-start gap-3 p-3 bg-emerald-50/50 border border-emerald-100 rounded-lg"
+              className="flex items-start gap-3 rounded-lg border border-emerald-100 bg-emerald-50/50 p-3"
             >
-              <div className="shrink-0 w-2 h-2 mt-2 rounded-full bg-emerald-400" />
+              <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
               <div>
                 <p className="font-medium text-zinc-900">{metric.metric}</p>
                 <p className="text-sm text-emerald-700">{metric.target}</p>

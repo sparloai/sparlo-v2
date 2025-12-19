@@ -1,5 +1,4 @@
 import type { KeyPattern } from '../../../_lib/schema/sparlo-report.schema';
-
 import { SectionHeader } from '../shared/section-header';
 
 interface KeyPatternsProps {
@@ -17,28 +16,28 @@ export function KeyPatterns({ data }: KeyPatternsProps) {
         {data.map((pattern) => (
           <div
             key={pattern.id}
-            className="border border-zinc-100 rounded-xl p-6 hover:border-zinc-200 transition-colors space-y-4"
+            className="space-y-4 rounded-xl border border-zinc-100 p-6 transition-colors hover:border-zinc-200"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="text-xs font-mono text-zinc-400 uppercase tracking-wider">
+                <span className="font-mono text-xs tracking-wider text-zinc-400 uppercase">
                   {pattern.id}
                 </span>
-                <h3 className="text-lg font-semibold text-zinc-900 mt-1">
+                <h3 className="mt-1 text-lg font-semibold text-zinc-900">
                   {pattern.name}
                 </h3>
               </div>
-              <span className="shrink-0 text-xs font-medium text-zinc-500 bg-zinc-100 px-2 py-1 rounded">
+              <span className="shrink-0 rounded bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-500">
                 {pattern.source_industry}
               </span>
             </div>
 
-            <p className="text-base text-zinc-600 leading-relaxed">
+            <p className="text-base leading-relaxed text-zinc-600">
               {pattern.description}
             </p>
 
-            <div className="bg-zinc-50 rounded-lg p-4 space-y-2">
-              <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+            <div className="space-y-2 rounded-lg bg-zinc-50 p-4">
+              <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
                 Why It Matters
               </h4>
               <p className="text-sm text-zinc-700">{pattern.why_it_matters}</p>
@@ -49,7 +48,7 @@ export function KeyPatterns({ data }: KeyPatternsProps) {
                 {pattern.patent_refs.map((ref, i) => (
                   <span
                     key={i}
-                    className="text-xs font-mono text-zinc-500 bg-zinc-100 px-2 py-1 rounded"
+                    className="rounded bg-zinc-100 px-2 py-1 font-mono text-xs text-zinc-500"
                   >
                     {ref}
                   </span>

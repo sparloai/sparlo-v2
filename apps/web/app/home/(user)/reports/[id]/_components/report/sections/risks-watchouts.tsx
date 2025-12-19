@@ -1,5 +1,4 @@
 import type { RiskWatchout } from '../../../_lib/schema/sparlo-report.schema';
-
 import { LikelihoodBadge } from '../shared/badges';
 import { SectionHeader } from '../shared/section-header';
 
@@ -18,7 +17,7 @@ export function RisksWatchouts({ data }: RisksWatchoutsProps) {
         {data.map((risk, index) => (
           <div
             key={index}
-            className="border border-zinc-200 rounded-xl p-5 space-y-4 hover:border-zinc-300 transition-colors"
+            className="space-y-4 rounded-xl border border-zinc-200 p-5 transition-colors hover:border-zinc-300"
           >
             <div className="flex items-start justify-between gap-4">
               <h3 className="text-lg font-semibold text-zinc-900">
@@ -30,19 +29,19 @@ export function RisksWatchouts({ data }: RisksWatchoutsProps) {
               />
             </div>
 
-            <p className="text-base text-zinc-600 leading-relaxed">
+            <p className="text-base leading-relaxed text-zinc-600">
               {risk.description}
             </p>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-emerald-50/50 border border-emerald-100 rounded-lg p-3 space-y-1">
-                <h4 className="text-xs font-semibold text-emerald-700 uppercase tracking-wider">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-1 rounded-lg border border-emerald-100 bg-emerald-50/50 p-3">
+                <h4 className="text-xs font-semibold tracking-wider text-emerald-700 uppercase">
                   Mitigation
                 </h4>
                 <p className="text-sm text-zinc-600">{risk.mitigation}</p>
               </div>
-              <div className="bg-red-50/50 border border-red-100 rounded-lg p-3 space-y-1">
-                <h4 className="text-xs font-semibold text-red-700 uppercase tracking-wider">
+              <div className="space-y-1 rounded-lg border border-red-100 bg-red-50/50 p-3">
+                <h4 className="text-xs font-semibold tracking-wider text-red-700 uppercase">
                   Trigger
                 </h4>
                 <p className="text-sm text-zinc-600">{risk.trigger}</p>

@@ -1,8 +1,8 @@
 import { cn } from '@kit/ui/utils';
 
 import type {
-  ConfidenceLevelType,
   ConceptTrackType,
+  ConfidenceLevelType,
   LikelihoodColorType,
   ViabilityVerdictType,
 } from '../../../_lib/schema/sparlo-report.schema';
@@ -26,7 +26,7 @@ export function ConfidenceBadge({ level, className }: ConfidenceBadgeProps) {
   return (
     <span
       className={cn(
-        'text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide border',
+        'rounded border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase',
         confidenceStyles[level],
         className,
       )}
@@ -77,12 +77,12 @@ export function ViabilityBadge({
   return (
     <div
       className={cn(
-        'flex items-center gap-2 px-2.5 py-1 rounded-full border',
+        'flex items-center gap-2 rounded-full border px-2.5 py-1',
         style.container,
         className,
       )}
     >
-      <span className={cn('w-1.5 h-1.5 rounded-full', style.dot)} />
+      <span className={cn('h-1.5 w-1.5 rounded-full', style.dot)} />
       <span
         className={cn(
           'text-[10px] font-bold tracking-wide uppercase',
@@ -115,7 +115,7 @@ export function TrackBadge({ track, label, className }: TrackBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-semibold border uppercase tracking-wide',
+        'inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase',
         trackStyles[track],
         className,
       )}
@@ -149,7 +149,7 @@ export function LikelihoodBadge({
   return (
     <span
       className={cn(
-        'text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide border',
+        'rounded border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase',
         likelihoodStyles[color],
         className,
       )}

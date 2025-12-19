@@ -8,14 +8,14 @@ export function TestGate({ gate }: TestGateProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-mono font-bold text-zinc-500 bg-white border border-zinc-200 px-1.5 py-0.5 rounded">
+        <span className="rounded border border-zinc-200 bg-white px-1.5 py-0.5 font-mono text-[10px] font-bold text-zinc-500">
           {gate.gate_id}
         </span>
         <span className="text-xs font-semibold text-zinc-900">
           {gate.effort}: {gate.name}
         </span>
       </div>
-      <p className="text-xs text-zinc-600 pl-2 border-l-2 border-zinc-200 ml-1">
+      <p className="ml-1 border-l-2 border-zinc-200 pl-2 text-xs text-zinc-600">
         {gate.method}
       </p>
       <div className="flex flex-col gap-1 pl-3">

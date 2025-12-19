@@ -49,13 +49,17 @@ export const ExecutiveSummarySchema = z.object({
 export const ConstraintFromInputSchema = z.object({
   constraint: z.string().min(1).max(MAX_LONG_TEXT),
   highlighted_terms: z.array(z.string().min(1).max(MAX_SHORT_TEXT)).optional(),
-  technical_values: z.array(z.string().min(1).max(MAX_TECHNICAL_VALUE)).optional(),
+  technical_values: z
+    .array(z.string().min(1).max(MAX_TECHNICAL_VALUE))
+    .optional(),
   note: z.string().min(1).max(MAX_LONG_TEXT).optional(),
 });
 
 export const AssumptionSchema = z.object({
   assumption: z.string().min(1).max(MAX_LONG_TEXT),
-  technical_values: z.array(z.string().min(1).max(MAX_TECHNICAL_VALUE)).optional(),
+  technical_values: z
+    .array(z.string().min(1).max(MAX_TECHNICAL_VALUE))
+    .optional(),
 });
 
 export const ConstraintsSchema = z.object({

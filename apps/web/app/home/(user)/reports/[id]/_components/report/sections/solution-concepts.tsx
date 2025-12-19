@@ -4,7 +4,6 @@ import type {
   OtherConcept,
   SolutionConcepts as SolutionConceptsType,
 } from '../../../_lib/schema/sparlo-report.schema';
-
 import { ConfidenceBadge, TrackBadge } from '../shared/badges';
 import { SectionHeader } from '../shared/section-header';
 import { TestGate } from '../shared/test-gate';
@@ -15,7 +14,7 @@ interface SolutionConceptsProps {
 
 function LeadConceptCard({ concept }: { concept: LeadConcept }) {
   return (
-    <div className="border-2 border-emerald-100 bg-emerald-50/30 rounded-xl p-6 space-y-6">
+    <div className="space-y-6 rounded-xl border-2 border-emerald-100 bg-emerald-50/30 p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -26,34 +25,34 @@ function LeadConceptCard({ concept }: { concept: LeadConcept }) {
             {concept.title}
           </h3>
         </div>
-        <span className="text-xs font-mono text-zinc-400">{concept.id}</span>
+        <span className="font-mono text-xs text-zinc-400">{concept.id}</span>
       </div>
 
-      <p className="text-base font-medium text-zinc-800 bg-white/50 rounded-lg p-4 border border-emerald-100">
+      <p className="rounded-lg border border-emerald-100 bg-white/50 p-4 text-base font-medium text-zinc-800">
         {concept.bottom_line}
       </p>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
             What It Is
           </h4>
-          <p className="text-sm text-zinc-600 leading-relaxed">
+          <p className="text-sm leading-relaxed text-zinc-600">
             {concept.what_it_is}
           </p>
         </div>
         <div className="space-y-2">
-          <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
             Why It Works
           </h4>
-          <p className="text-sm text-zinc-600 leading-relaxed">
+          <p className="text-sm leading-relaxed text-zinc-600">
             {concept.why_it_works}
           </p>
         </div>
       </div>
 
       <div className="space-y-2">
-        <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+        <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
           Confidence Rationale
         </h4>
         <p className="text-sm text-zinc-600">{concept.confidence_rationale}</p>
@@ -65,19 +64,19 @@ function LeadConceptCard({ concept }: { concept: LeadConcept }) {
 
       {concept.key_risks.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
             Key Risks
           </h4>
           <div className="grid gap-2">
             {concept.key_risks.map((risk, i) => (
               <div
                 key={i}
-                className="flex gap-3 p-3 bg-white rounded-lg border border-zinc-100"
+                className="flex gap-3 rounded-lg border border-zinc-100 bg-white p-3"
               >
-                <span className="shrink-0 w-1.5 h-1.5 mt-2 rounded-full bg-red-400" />
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" />
                 <div className="flex-1">
                   <p className="text-sm text-zinc-700">{risk.risk}</p>
-                  <p className="text-xs text-zinc-500 mt-1">
+                  <p className="mt-1 text-xs text-zinc-500">
                     Mitigation: {risk.mitigation}
                   </p>
                 </div>
@@ -88,7 +87,7 @@ function LeadConceptCard({ concept }: { concept: LeadConcept }) {
       )}
 
       <div className="space-y-4">
-        <h4 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+        <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
           How to Test
         </h4>
         <div className="grid gap-4">
@@ -103,7 +102,7 @@ function LeadConceptCard({ concept }: { concept: LeadConcept }) {
 
 function OtherConceptCard({ concept }: { concept: OtherConcept }) {
   return (
-    <div className="border border-zinc-200 rounded-xl p-5 space-y-4 hover:border-zinc-300 transition-colors">
+    <div className="space-y-4 rounded-xl border border-zinc-200 p-5 transition-colors hover:border-zinc-300">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -114,13 +113,13 @@ function OtherConceptCard({ concept }: { concept: OtherConcept }) {
             {concept.title}
           </h3>
         </div>
-        <span className="text-xs font-mono text-zinc-400">{concept.id}</span>
+        <span className="font-mono text-xs text-zinc-400">{concept.id}</span>
       </div>
 
       <p className="text-sm font-medium text-zinc-700">{concept.bottom_line}</p>
       <p className="text-sm text-zinc-600">{concept.what_it_is}</p>
 
-      <div className="bg-zinc-50 rounded-lg p-3 space-y-1">
+      <div className="space-y-1 rounded-lg bg-zinc-50 p-3">
         <p className="text-xs text-zinc-500">{concept.confidence_rationale}</p>
         <p className="text-xs font-medium text-amber-700">
           Critical validation: {concept.critical_validation}
@@ -132,9 +131,9 @@ function OtherConceptCard({ concept }: { concept: OtherConcept }) {
 
 function InnovationConceptCard({ concept }: { concept: InnovationConcept }) {
   return (
-    <div className="border-2 border-purple-100 bg-purple-50/30 rounded-xl p-5 space-y-4">
+    <div className="space-y-4 rounded-xl border-2 border-purple-100 bg-purple-50/30 p-5">
       <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-purple-700 bg-purple-100 px-2 py-1 rounded uppercase tracking-wider">
+        <span className="rounded bg-purple-100 px-2 py-1 text-xs font-bold tracking-wider text-purple-700 uppercase">
           Innovation Spark
         </span>
         <ConfidenceBadge level={concept.confidence} />
@@ -142,7 +141,7 @@ function InnovationConceptCard({ concept }: { concept: InnovationConcept }) {
 
       <h3 className="text-lg font-semibold text-zinc-900">{concept.title}</h3>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-1">
           <h4 className="text-xs font-semibold text-purple-600 uppercase">
             Why Interesting
@@ -157,7 +156,7 @@ function InnovationConceptCard({ concept }: { concept: InnovationConcept }) {
         </div>
       </div>
 
-      <div className="space-y-2 bg-white/50 rounded-lg p-3">
+      <div className="space-y-2 rounded-lg bg-white/50 p-3">
         <p className="text-xs text-zinc-500">
           <span className="font-medium">When to pursue:</span>{' '}
           {concept.when_to_pursue}
@@ -177,7 +176,7 @@ export function SolutionConcepts({ data }: SolutionConceptsProps) {
 
       {/* Lead Concepts */}
       <div className="space-y-6">
-        <h3 className="uppercase text-sm font-semibold text-emerald-600 tracking-wider">
+        <h3 className="text-sm font-semibold tracking-wider text-emerald-600 uppercase">
           Lead Concepts
         </h3>
         {data.lead_concepts.map((concept) => (
@@ -188,10 +187,10 @@ export function SolutionConcepts({ data }: SolutionConceptsProps) {
       {/* Other Concepts */}
       {data.other_concepts.length > 0 && (
         <div className="space-y-4">
-          <h3 className="uppercase text-sm font-semibold text-zinc-400 tracking-wider">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">
             Other Concepts
           </h3>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {data.other_concepts.map((concept) => (
               <OtherConceptCard key={concept.id} concept={concept} />
             ))}
@@ -208,29 +207,29 @@ export function SolutionConcepts({ data }: SolutionConceptsProps) {
 
       {/* Comparison Table */}
       <div className="space-y-4">
-        <h3 className="uppercase text-sm font-semibold text-zinc-400 tracking-wider">
+        <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">
           Concept Comparison
         </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-zinc-200">
-                <th className="text-left py-3 px-4 font-semibold text-zinc-500">
+                <th className="px-4 py-3 text-left font-semibold text-zinc-500">
                   Concept
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-zinc-500">
+                <th className="px-4 py-3 text-left font-semibold text-zinc-500">
                   Key Metric
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-zinc-500">
+                <th className="px-4 py-3 text-left font-semibold text-zinc-500">
                   Confidence
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-zinc-500">
+                <th className="px-4 py-3 text-left font-semibold text-zinc-500">
                   Capital
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-zinc-500">
+                <th className="px-4 py-3 text-left font-semibold text-zinc-500">
                   Timeline
                 </th>
-                <th className="text-left py-3 px-4 font-semibold text-zinc-500">
+                <th className="px-4 py-3 text-left font-semibold text-zinc-500">
                   Key Risk
                 </th>
               </tr>
@@ -241,20 +240,20 @@ export function SolutionConcepts({ data }: SolutionConceptsProps) {
                   key={row.id}
                   className="border-b border-zinc-100 hover:bg-zinc-50"
                 >
-                  <td className="py-3 px-4 font-medium text-zinc-900">
+                  <td className="px-4 py-3 font-medium text-zinc-900">
                     {row.title}
                   </td>
-                  <td className="py-3 px-4 text-zinc-600">
+                  <td className="px-4 py-3 text-zinc-600">
                     {row.key_metric_achievable}
                   </td>
-                  <td className="py-3 px-4">
+                  <td className="px-4 py-3">
                     <ConfidenceBadge level={row.confidence} />
                   </td>
-                  <td className="py-3 px-4 text-zinc-600">
+                  <td className="px-4 py-3 text-zinc-600">
                     {row.capital_required}
                   </td>
-                  <td className="py-3 px-4 text-zinc-600">{row.timeline}</td>
-                  <td className="py-3 px-4 text-zinc-500 text-xs">
+                  <td className="px-4 py-3 text-zinc-600">{row.timeline}</td>
+                  <td className="px-4 py-3 text-xs text-zinc-500">
                     {row.key_risk}
                   </td>
                 </tr>
@@ -262,7 +261,9 @@ export function SolutionConcepts({ data }: SolutionConceptsProps) {
             </tbody>
           </table>
         </div>
-        <p className="text-sm text-zinc-600 italic">{data.comparison_insight}</p>
+        <p className="text-sm text-zinc-600 italic">
+          {data.comparison_insight}
+        </p>
       </div>
     </section>
   );

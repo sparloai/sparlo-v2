@@ -2,7 +2,6 @@ import type {
   DecisionPoint,
   NextStep,
 } from '../../../_lib/schema/sparlo-report.schema';
-
 import { SectionHeader } from '../shared/section-header';
 
 interface NextStepsProps {
@@ -21,10 +20,10 @@ export function NextSteps({ data }: NextStepsProps) {
         {data.steps.map((step) => (
           <div
             key={step.step_number}
-            className="flex gap-4 p-4 border border-zinc-100 rounded-xl hover:border-zinc-200 transition-colors"
+            className="flex gap-4 rounded-xl border border-zinc-100 p-4 transition-colors hover:border-zinc-200"
           >
-            <div className="shrink-0 flex flex-col items-center gap-1">
-              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-zinc-900 text-white text-sm font-bold">
+            <div className="flex shrink-0 flex-col items-center gap-1">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white">
                 {step.step_number}
               </span>
               <span className="text-xs font-medium text-zinc-400">
@@ -35,7 +34,7 @@ export function NextSteps({ data }: NextStepsProps) {
               <h3 className="text-base font-semibold text-zinc-900">
                 {step.action}
               </h3>
-              <p className="text-sm text-zinc-600 leading-relaxed">
+              <p className="text-sm leading-relaxed text-zinc-600">
                 {step.details}
               </p>
             </div>
@@ -44,13 +43,13 @@ export function NextSteps({ data }: NextStepsProps) {
       </div>
 
       {data.decision_point && (
-        <div className="bg-gradient-to-br from-zinc-900 to-zinc-800 text-white rounded-xl p-6 space-y-4">
+        <div className="space-y-4 rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-800 p-6 text-white">
           <h3 className="text-lg font-semibold">{data.decision_point.title}</h3>
-          <p className="text-zinc-300 leading-relaxed">
+          <p className="leading-relaxed text-zinc-300">
             {data.decision_point.description}
           </p>
           {data.decision_point.cta_label && (
-            <button className="px-4 py-2 bg-white text-zinc-900 rounded-lg font-medium text-sm hover:bg-zinc-100 transition-colors">
+            <button className="rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-100">
               {data.decision_point.cta_label}
             </button>
           )}

@@ -1,7 +1,6 @@
 import type { ExecutiveSummary as ExecutiveSummaryType } from '../../../_lib/schema/sparlo-report.schema';
-
-import { SectionHeader } from '../shared/section-header';
 import { ViabilityBadge } from '../shared/badges';
+import { SectionHeader } from '../shared/section-header';
 
 interface ExecutiveSummaryProps {
   data: ExecutiveSummaryType;
@@ -11,14 +10,17 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
   return (
     <section id="executive-summary" className="space-y-8">
       <SectionHeader id="executive-summary-header" title="Executive Summary">
-        <ViabilityBadge viability={data.viability} label={data.viability_label} />
+        <ViabilityBadge
+          viability={data.viability}
+          label={data.viability_label}
+        />
       </SectionHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         {/* The Problem - Dark Box */}
-        <div className="col-span-1 md:col-span-2 flex gap-4 text-slate-950 bg-stone-950/95 border-red-100 border rounded-lg p-5 items-start">
+        <div className="col-span-1 flex items-start gap-4 rounded-lg border border-red-100 bg-stone-950/95 p-5 text-slate-950 md:col-span-2">
           <div className="space-y-1">
-            <p className="leading-relaxed text-base text-gray-50">
+            <p className="text-base leading-relaxed text-gray-50">
               {data.the_problem}
             </p>
           </div>
@@ -26,29 +28,29 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
 
         {/* Core Insight */}
         <div className="space-y-4">
-          <h3 className="uppercase text-sm font-semibold text-zinc-400 tracking-wider">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">
             The Core Insight
           </h3>
-          <p className="leading-relaxed text-base font-medium text-zinc-900">
+          <p className="text-base leading-relaxed font-medium text-zinc-900">
             {data.core_insight.headline}
           </p>
-          <p className="leading-relaxed text-base text-zinc-600">
+          <p className="text-base leading-relaxed text-zinc-600">
             {data.core_insight.explanation}
           </p>
         </div>
 
         {/* Recommended Path */}
         <div className="space-y-4">
-          <h3 className="uppercase text-sm font-semibold text-zinc-400 tracking-wider">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-400 uppercase">
             Recommended Path
           </h3>
           <div className="space-y-3">
             {data.recommended_path.map((step) => (
               <div key={step.step_number} className="flex gap-3">
-                <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-full bg-zinc-100 text-[10px] font-mono font-medium text-zinc-500 border border-zinc-200">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 font-mono text-[10px] font-medium text-zinc-500">
                   {step.step_number}
                 </span>
-                <p className="leading-relaxed text-sm text-zinc-600">
+                <p className="text-sm leading-relaxed text-zinc-600">
                   {step.content}
                 </p>
               </div>

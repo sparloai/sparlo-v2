@@ -11,7 +11,6 @@ export function ReportError({
   formattedErrors,
   reportId,
 }: ReportErrorProps) {
-
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
       <div className="space-y-6 rounded-2xl border border-red-200 bg-gradient-to-br from-red-50 to-orange-50 p-8">

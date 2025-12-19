@@ -8,7 +8,7 @@ export function Brief({ data }: BriefProps) {
   return (
     <section
       id="brief"
-      className="bg-zinc-50 rounded-lg border border-zinc-100 p-6 md:p-8"
+      className="rounded-lg border border-zinc-100 bg-zinc-50 p-6 md:p-8"
     >
       <div className="flex flex-col gap-6">
         <div className="flex items-start justify-between">
@@ -31,7 +31,7 @@ export function Brief({ data }: BriefProps) {
           </div>
         </div>
 
-        <p className="text-sm leading-7 text-zinc-700 font-medium">
+        <p className="text-sm leading-7 font-medium text-zinc-700">
           {data.original_problem}
         </p>
 
@@ -40,7 +40,7 @@ export function Brief({ data }: BriefProps) {
             {data.tags.map((tag) => (
               <span
                 key={tag}
-                className="bg-zinc-100 text-zinc-600 px-2 py-0.5 rounded text-xs font-medium border border-zinc-200"
+                className="rounded border border-zinc-200 bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600"
               >
                 {tag}
               </span>

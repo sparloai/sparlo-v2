@@ -7,7 +7,6 @@ import { notFound } from 'next/navigation';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { ReportDisplay } from './_components/report-display';
-import { ReportError } from './_components/report/report-error';
 import { ReportRenderer } from './_components/report/report-renderer';
 import { SparloReportSchema } from './_lib/schema/sparlo-report.schema';
 
@@ -81,25 +80,18 @@ export default async function ReportPage({ params }: ReportPageProps) {
   // Validate the report data with Zod schema
   const result = SparloReportSchema.safeParse(report.report_data);
 
-  // Handle validation errors with premium error UI
+  // Fall back to legacy display for reports that don't match the new schema
   if (!result.success) {
-    const formattedErrors = result.error.format();
-    console.error('Report validation failed:', {
+    console.warn('Report validation failed, using legacy display:', {
       reportId: id,
-      errors: formattedErrors,
+      errorCount: result.error.errors.length,
     });
-    return (
-      <ReportError
-        errorCount={result.error.errors.length}
-        formattedErrors={formattedErrors}
-        reportId={id}
-      />
-    );
+    return <ReportDisplay report={report} />;
   }
 
   // Render the validated report
   return (
-    <div className="max-w-7xl mx-auto py-12 px-6 md:px-8">
+    <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
       <ReportRenderer report={result.data} />
     </div>
   );
