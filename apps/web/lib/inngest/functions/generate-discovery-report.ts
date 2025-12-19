@@ -63,9 +63,16 @@ export const generateDiscoveryReport = inngest.createFunction(
   },
   { event: 'report/generate-discovery' },
   async ({ event, step }) => {
+    console.log('[Discovery Function] Starting with event:', {
+      name: event.name,
+      reportId: event.data.reportId,
+      hasDesignChallenge: !!event.data.designChallenge,
+    });
+
     const { reportId, designChallenge, conversationId } = event.data;
 
     const supabase = getSupabaseServerAdminClient();
+    console.log('[Discovery Function] Supabase client initialized');
 
     // Handle ClaudeRefusalError at the top level
     try {
