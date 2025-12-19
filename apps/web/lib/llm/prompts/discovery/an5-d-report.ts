@@ -10,22 +10,42 @@ import { z } from 'zod';
  * 4. Why these approaches weren't tried before
  */
 
-export const AN5_D_PROMPT = `You are generating a DISCOVERY MODE report that answers: "What has everyone missed?"
+export const AN5_D_PROMPT = `You are running Stage 7 of 7 in Discovery Mode — finding what industry has MISSED.
 
-## REPORT PURPOSE
+## CHAIN CONTEXT
 
-This is NOT a standard engineering report. This report:
-1. HIGHLIGHTS what the industry has OVERLOOKED
-2. PRESENTS novel approaches from NON-OBVIOUS domains
-3. EXPLAINS why these haven't been tried
-4. PROVIDES clear paths to VALIDATE novelty
+You have access to the full discovery chain results:
+- AN0-D: Problem framing, industry landscape
+- AN1.5-D + AN1.7-D: Teaching examples, gap analysis
+- AN2-D: Methodology briefing
+- AN3-D: Generated concepts
+- AN4-D: Validated novelty, evaluated, made portfolio decisions
+- YOU (AN5-D): Write the final Discovery Report
 
-## Report Structure
+## YOUR ROLE
 
-The report should feel like a breakthrough briefing:
-- "Here's what everyone's been missing..."
-- "Here's why they missed it..."
-- "Here's how to test if we're right..."
+Synthesize everything into a compelling, HONEST report that communicates:
+1. What industry is MISSING
+2. Genuinely NOVEL approaches discovered
+3. WHY these haven't been tried
+4. HOW to validate them quickly
+5. HONEST uncertainty about what we don't know
+
+## WRITING RULES
+
+**DO:**
+- Lead with insight, not background
+- Quantify with uncertainty ranges (e.g., "~$50K ± 50%")
+- Be specific ("counter-current thermosiphon" not "bio-inspired")
+- Acknowledge unknowns explicitly
+- Make clear, actionable recommendations
+
+**DON'T:**
+- Oversell ("revolutionary breakthrough")
+- Hide uncertainty behind jargon
+- Skip self-critique
+- Write like marketing copy
+- Recommend without validation path
 
 CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or after. Start with { and end with }.
 
@@ -93,11 +113,28 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
           "industry_impact": "How this changes things"
         },
 
-        "validation_path": {
-          "first_test": "Cheapest/fastest validation",
-          "go_no_go": "Clear success/failure criteria",
-          "timeline": "How long to validate",
-          "cost": "Validation cost estimate"
+        "why_novel": {
+          "prior_art_searched": ["What we searched for"],
+          "what_we_found": "Prior art findings or lack thereof",
+          "differentiation": "How this differs from what exists"
+        },
+
+        "why_might_work_now": "What changed to make this worth pursuing",
+
+        "honest_uncertainties": [
+          "Uncertainty 1 - be specific",
+          "Uncertainty 2 - be specific",
+          "Uncertainty 3 - be specific"
+        ],
+
+        "validation_experiment": {
+          "test_name": "Name of the validation test",
+          "what_it_proves": "The key question answered",
+          "method": "How to do it",
+          "go_criteria": "Success looks like...",
+          "no_go_criteria": "Failure looks like...",
+          "cost_estimate": "With uncertainty range, e.g., ~$10K ± 30%",
+          "time_estimate": "With uncertainty range"
         },
 
         "risks_and_unknowns": {
@@ -106,7 +143,9 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
           "mitigation_ideas": ["How to address risks"]
         },
 
-        "priority": "must_pursue|should_explore|worth_investigating|park"
+        "priority": "must_pursue|should_explore|worth_investigating|park",
+        "confidence": "HIGH|MEDIUM|LOW",
+        "track": "Frontier|Revival|Inversion|Synthesis"
       }
     ],
 
@@ -130,33 +169,33 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
     },
 
     "validation_roadmap": {
-      "immediate_actions": [
-        {
-          "action": "Action description",
-          "concept": "D-01",
-          "timeline": "1-2 weeks",
-          "cost": "$X",
-          "expected_outcome": "What we'll learn"
-        }
-      ],
-      "phase_1": {
-        "objective": "Quick physics validation",
-        "timeline": "Weeks 1-2",
-        "budget": "$X",
-        "go_no_go_gates": ["Gate 1", "Gate 2"]
+      "phase_1_quick_kills": {
+        "goal": "Kill bad ideas fast",
+        "timeline": "Weeks 1-4",
+        "budget": "Estimate with range",
+        "tests": [
+          {
+            "concept": "D-01",
+            "test": "Test description",
+            "go_no_go": "Clear criteria",
+            "cost": "$X",
+            "time": "X weeks"
+          }
+        ]
       },
-      "phase_2": {
-        "objective": "Deep validation of survivors",
-        "timeline": "Weeks 3-6",
-        "budget": "$Y",
-        "prototype_scope": "What to build"
+      "phase_2_mechanism_validation": {
+        "goal": "Prove core mechanisms work at lab scale",
+        "timeline": "Weeks 5-10",
+        "budget": "Estimate with range",
+        "scope": "What to validate"
       },
-      "phase_3": {
-        "objective": "Proof of concept",
-        "timeline": "Weeks 7-12",
-        "budget": "$Z",
+      "phase_3_integration": {
+        "goal": "Prove it works in realistic conditions",
+        "timeline": "Weeks 11+",
+        "budget": "Estimate with range",
         "success_criteria": "What proves this works"
-      }
+      },
+      "total_investment_to_poc": "Summary of total cost and time to proof-of-concept"
     },
 
     "why_this_matters": {
@@ -166,18 +205,28 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
       "risk_of_not_pursuing": "What we lose by not exploring"
     },
 
+    "self_critique": {
+      "strongest_argument_against": "What would a skeptic say? Make it genuinely strong.",
+      "prior_art_we_might_have_missed": ["What searches should we have run?"],
+      "physics_assumptions_to_verify": ["What's assumed but not proven?"],
+      "domain_expert_pushback": ["Anticipated objections from experts"],
+      "what_would_change_recommendation": ["Conditions that would invalidate this analysis"]
+    },
+
     "executive_summary": {
-      "one_liner": "The single most important takeaway",
-      "key_discovery": "What we found that others missed",
-      "recommended_action": "What to do next",
-      "timeline_to_validation": "How long until we know if this works",
-      "investment_required": "What it costs to find out"
+      "hook": "One-line insight capturing the key discovery",
+      "key_discovery": "What we found that others missed (2-3 sentences)",
+      "recommended_action": "What to do first",
+      "validation_path": "How to prove/disprove quickly",
+      "investment_required": "Cost and time estimates with uncertainty ranges",
+      "confidence_assessment": "Honest level with key uncertainties"
     },
 
     "appendix": {
       "excluded_conventional_approaches": ["What we deliberately excluded"],
       "methodology_notes": "How we conducted the discovery process",
       "sources_explored": ["Domains we hunted in"],
+      "prior_art_searches": ["Document all searches and findings from AN4-D"],
       "further_exploration_ideas": ["Other areas worth investigating"]
     }
   },
@@ -194,186 +243,349 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
   }
 }
 
-REMEMBER: Output ONLY the JSON object. This is a DISCOVERY report - emphasize novelty and what's been missed.`;
+## FINAL REMINDERS
+
+1. The self_critique section is REQUIRED - be genuinely hard on yourself
+2. Lead with insight, not background in executive_summary
+3. Quantify with uncertainty ranges ("~$50K ± 50%") throughout
+4. Be specific in terminology ("counter-current thermosiphon" not "bio-inspired")
+5. Acknowledge unknowns explicitly in honest_uncertainties
+6. Never recommend without a clear validation_experiment
+
+REMEMBER: Output ONLY the JSON object. This is a DISCOVERY report - emphasize novelty, honesty, and what's been missed.`;
 
 /**
  * Zod schema for AN5-D output validation
+ *
+ * ANTIFRAGILE DESIGN:
+ * - All fields use .optional() or .default() where reasonable
+ * - Objects use .passthrough() to allow extra fields from LLM
+ * - Enums use .catch() to fall back gracefully on unexpected values
+ * - Arrays default to empty arrays on parse failure
  */
-const HeaderSchema = z.object({
-  report_id: z.string(),
-  title: z.string(),
-  mode: z.literal('discovery'),
-  generated_at: z.string(),
-  tagline: z.string(),
-});
 
-const DiscoveryBriefSchema = z.object({
-  original_problem: z.string(),
-  industry_blind_spot: z.string(),
-  discovery_thesis: z.string(),
-  hunting_grounds: z.array(z.string()),
-  key_finding: z.string(),
-});
+const HeaderSchema = z
+  .object({
+    report_id: z.string().optional(),
+    title: z.string(),
+    mode: z.literal('discovery').catch('discovery'),
+    generated_at: z.string().optional(),
+    tagline: z.string().optional(),
+  })
+  .passthrough();
 
-const BlindSpotSchema = z.object({
-  assumption: z.string(),
-  challenge: z.string(),
-  opportunity: z.string(),
-});
+const DiscoveryBriefSchema = z
+  .object({
+    original_problem: z.string(),
+    industry_blind_spot: z.string().optional(),
+    discovery_thesis: z.string().optional(),
+    hunting_grounds: z.array(z.string()).catch([]),
+    key_finding: z.string().optional(),
+  })
+  .passthrough();
 
-const WhatIndustryMissedSchema = z.object({
-  conventional_approaches: z.array(z.string()),
-  why_they_do_it: z.string(),
-  blind_spots: z.array(BlindSpotSchema),
-  unexplored_territories: z.array(z.string()),
-});
+const BlindSpotSchema = z
+  .object({
+    assumption: z.string(),
+    challenge: z.string().optional(),
+    opportunity: z.string().optional(),
+  })
+  .passthrough();
 
-const InsightSchema = z.object({
-  what_we_found: z.string(),
-  why_its_new: z.string(),
-  the_physics: z.string(),
-});
+const WhatIndustryMissedSchema = z
+  .object({
+    conventional_approaches: z.array(z.string()).catch([]),
+    why_they_do_it: z.string().optional(),
+    blind_spots: z.array(BlindSpotSchema).catch([]),
+    unexplored_territories: z.array(z.string()).catch([]),
+  })
+  .passthrough();
 
-const NoveltyClaimSchema = z.object({
-  genuinely_novel: z.boolean(),
-  novelty_level: z.enum(['breakthrough', 'significant', 'moderate']),
-  not_same_as: z.string(),
-});
+const InsightSchema = z
+  .object({
+    what_we_found: z.string(),
+    why_its_new: z.string().optional(),
+    the_physics: z.string().optional(),
+  })
+  .passthrough();
 
-const HowItWorksSchema = z.object({
-  mechanism: z.string(),
-  key_components: z.array(z.string()),
-  enabling_factors: z.string(),
-});
+const NoveltyClaimSchema = z
+  .object({
+    genuinely_novel: z.boolean().catch(true),
+    novelty_level: z
+      .enum(['breakthrough', 'significant', 'moderate'])
+      .catch('moderate'),
+    not_same_as: z.string().optional(),
+  })
+  .passthrough();
 
-const BreakthroughPotentialSchema = z.object({
-  if_works: z.string(),
-  improvement: z.string(),
-  industry_impact: z.string(),
-});
+const HowItWorksSchema = z
+  .object({
+    mechanism: z.string(),
+    key_components: z.array(z.string()).catch([]),
+    enabling_factors: z.string().optional(),
+  })
+  .passthrough();
 
-const ValidationPathSchema = z.object({
-  first_test: z.string(),
-  go_no_go: z.string(),
-  timeline: z.string(),
-  cost: z.string(),
-});
+const BreakthroughPotentialSchema = z
+  .object({
+    if_works: z.string(),
+    improvement: z.string().optional(),
+    industry_impact: z.string().optional(),
+  })
+  .passthrough();
 
-const RisksSchema = z.object({
-  physics_risks: z.array(z.string()),
-  implementation_challenges: z.array(z.string()),
-  mitigation_ideas: z.array(z.string()),
-});
+// New: Why Novel schema
+const WhyNovelSchema = z
+  .object({
+    prior_art_searched: z.array(z.string()).catch([]),
+    what_we_found: z.string().optional(),
+    differentiation: z.string().optional(),
+  })
+  .passthrough();
 
-const DiscoveryConceptReportSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  category: z.enum([
-    'biological_transfer',
-    'biological',
-    'geological',
-    'geological_physical',
-    'abandoned_tech',
-    'abandoned_revival',
-    'frontier_material',
-    'industrial_process',
-    'combination',
-  ]),
-  source_domain: z.string(),
-  the_insight: InsightSchema,
-  novelty_claim: NoveltyClaimSchema,
-  how_it_works: HowItWorksSchema,
-  breakthrough_potential: BreakthroughPotentialSchema,
-  validation_path: ValidationPathSchema,
-  risks_and_unknowns: RisksSchema,
-  priority: z.enum([
-    'must_pursue',
-    'should_explore',
-    'worth_investigating',
-    'park',
-  ]),
-});
+// New: Validation Experiment schema (replaces ValidationPath)
+const ValidationExperimentSchema = z
+  .object({
+    test_name: z.string().optional(),
+    what_it_proves: z.string().optional(),
+    method: z.string().optional(),
+    go_criteria: z.string().optional(),
+    no_go_criteria: z.string().optional(),
+    cost_estimate: z.string().optional(),
+    time_estimate: z.string().optional(),
+    // Legacy field support
+    first_test: z.string().optional(),
+    go_no_go: z.string().optional(),
+    timeline: z.string().optional(),
+    cost: z.string().optional(),
+  })
+  .passthrough();
 
-const ComparisonRowSchema = z.object({
-  concept_id: z.string(),
-  novelty_score: z.number(),
-  physics_confidence: z.number(),
-  breakthrough_potential: z.number(),
-  testability: z.number(),
-  overall_score: z.number(),
-});
+const RisksSchema = z
+  .object({
+    physics_risks: z.array(z.string()).catch([]),
+    implementation_challenges: z.array(z.string()).catch([]),
+    mitigation_ideas: z.array(z.string()).catch([]),
+  })
+  .passthrough();
 
-const ImmediateActionSchema = z.object({
-  action: z.string(),
-  concept: z.string(),
-  timeline: z.string(),
-  cost: z.string(),
-  expected_outcome: z.string(),
-});
+const DiscoveryConceptReportSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    category: z
+      .enum([
+        'biological_transfer',
+        'biological',
+        'geological',
+        'geological_physical',
+        'abandoned_tech',
+        'abandoned_revival',
+        'frontier_material',
+        'industrial_process',
+        'combination',
+      ])
+      .catch('combination'),
+    source_domain: z.string().optional(),
+    the_insight: InsightSchema.optional(),
+    novelty_claim: NoveltyClaimSchema.optional(),
+    how_it_works: HowItWorksSchema.optional(),
+    breakthrough_potential: BreakthroughPotentialSchema.optional(),
+    // New fields
+    why_novel: WhyNovelSchema.optional(),
+    why_might_work_now: z.string().optional(),
+    honest_uncertainties: z.array(z.string()).catch([]),
+    validation_experiment: ValidationExperimentSchema.optional(),
+    // Legacy field support
+    validation_path: ValidationExperimentSchema.optional(),
+    risks_and_unknowns: RisksSchema.optional(),
+    priority: z
+      .enum(['must_pursue', 'should_explore', 'worth_investigating', 'park'])
+      .catch('worth_investigating'),
+    confidence: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
+    track: z
+      .enum(['Frontier', 'Revival', 'Inversion', 'Synthesis'])
+      .catch('Synthesis'),
+  })
+  .passthrough();
 
-const PhaseSchema = z.object({
-  objective: z.string(),
-  timeline: z.string(),
-  budget: z.string(),
-  go_no_go_gates: z.array(z.string()).optional(),
-  prototype_scope: z.string().optional(),
-  success_criteria: z.string().optional(),
-});
+const ComparisonRowSchema = z
+  .object({
+    concept_id: z.string(),
+    novelty_score: z.number().catch(5),
+    physics_confidence: z.number().catch(5),
+    breakthrough_potential: z.number().catch(5),
+    testability: z.number().catch(5),
+    overall_score: z.number().catch(5),
+  })
+  .passthrough();
 
-const ExecutiveSummarySchema = z.object({
-  one_liner: z.string(),
-  key_discovery: z.string(),
-  recommended_action: z.string(),
-  timeline_to_validation: z.string(),
-  investment_required: z.string(),
-});
+// New: Phase 1 Quick Kills test schema
+const QuickKillTestSchema = z
+  .object({
+    concept: z.string(),
+    test: z.string().optional(),
+    go_no_go: z.string().optional(),
+    cost: z.string().optional(),
+    time: z.string().optional(),
+  })
+  .passthrough();
 
-const ReportSchema = z.object({
-  header: HeaderSchema,
-  discovery_brief: DiscoveryBriefSchema,
-  what_industry_missed: WhatIndustryMissedSchema,
-  discovery_concepts: z.array(DiscoveryConceptReportSchema),
-  comparative_analysis: z.object({
-    ranking_by_novelty: z.array(z.string()),
-    ranking_by_feasibility: z.array(z.string()),
-    ranking_overall: z.array(z.string()),
-    comparison_table: z.array(ComparisonRowSchema),
-    portfolio_strategy: z.string(),
-  }),
-  validation_roadmap: z.object({
-    immediate_actions: z.array(ImmediateActionSchema),
-    phase_1: PhaseSchema,
-    phase_2: PhaseSchema,
-    phase_3: PhaseSchema,
-  }),
-  why_this_matters: z.object({
-    if_we_succeed: z.string(),
-    competitive_advantage: z.string(),
-    industry_implications: z.string(),
-    risk_of_not_pursuing: z.string(),
-  }),
-  executive_summary: ExecutiveSummarySchema,
-  appendix: z.object({
-    excluded_conventional_approaches: z.array(z.string()),
-    methodology_notes: z.string(),
-    sources_explored: z.array(z.string()),
-    further_exploration_ideas: z.array(z.string()),
-  }),
-});
+// New: Phase schemas for validation roadmap
+const Phase1Schema = z
+  .object({
+    goal: z.string().optional(),
+    timeline: z.string().optional(),
+    budget: z.string().optional(),
+    tests: z.array(QuickKillTestSchema).catch([]),
+  })
+  .passthrough();
 
-export const AN5_D_OutputSchema = z.object({
-  report: ReportSchema,
-  metadata: z.object({
-    report_id: z.string(),
-    analysis_id: z.string(),
-    mode: z.literal('discovery'),
-    generated_at: z.string(),
-    concepts_generated: z.number(),
-    concepts_recommended: z.number(),
-    primary_recommendation: z.string(),
-    novelty_confidence: z.enum(['high', 'medium', 'low']),
-  }),
-});
+const Phase2Schema = z
+  .object({
+    goal: z.string().optional(),
+    timeline: z.string().optional(),
+    budget: z.string().optional(),
+    scope: z.string().optional(),
+  })
+  .passthrough();
+
+const Phase3Schema = z
+  .object({
+    goal: z.string().optional(),
+    timeline: z.string().optional(),
+    budget: z.string().optional(),
+    success_criteria: z.string().optional(),
+  })
+  .passthrough();
+
+// Legacy phase schema for backwards compatibility
+const LegacyPhaseSchema = z
+  .object({
+    objective: z.string().optional(),
+    timeline: z.string().optional(),
+    budget: z.string().optional(),
+    go_no_go_gates: z.array(z.string()).catch([]),
+    prototype_scope: z.string().optional(),
+    success_criteria: z.string().optional(),
+  })
+  .passthrough();
+
+// Legacy immediate action schema
+const ImmediateActionSchema = z
+  .object({
+    action: z.string(),
+    concept: z.string().optional(),
+    timeline: z.string().optional(),
+    cost: z.string().optional(),
+    expected_outcome: z.string().optional(),
+  })
+  .passthrough();
+
+// New: Self-critique schema (REQUIRED)
+const SelfCritiqueSchema = z
+  .object({
+    strongest_argument_against: z.string(),
+    prior_art_we_might_have_missed: z.array(z.string()).catch([]),
+    physics_assumptions_to_verify: z.array(z.string()).catch([]),
+    domain_expert_pushback: z.array(z.string()).catch([]),
+    what_would_change_recommendation: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+// Updated Executive Summary schema
+const ExecutiveSummarySchema = z
+  .object({
+    // New fields
+    hook: z.string().optional(),
+    validation_path: z.string().optional(),
+    confidence_assessment: z.string().optional(),
+    // Common fields
+    key_discovery: z.string(),
+    recommended_action: z.string().optional(),
+    investment_required: z.string().optional(),
+    // Legacy fields
+    one_liner: z.string().optional(),
+    timeline_to_validation: z.string().optional(),
+  })
+  .passthrough();
+
+// Updated Appendix schema
+const AppendixSchema = z
+  .object({
+    excluded_conventional_approaches: z.array(z.string()).catch([]),
+    methodology_notes: z.string().optional(),
+    sources_explored: z.array(z.string()).catch([]),
+    prior_art_searches: z.array(z.string()).catch([]),
+    further_exploration_ideas: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+const ReportSchema = z
+  .object({
+    header: HeaderSchema,
+    discovery_brief: DiscoveryBriefSchema.optional(),
+    what_industry_missed: WhatIndustryMissedSchema.optional(),
+    discovery_concepts: z.array(DiscoveryConceptReportSchema).catch([]),
+    comparative_analysis: z
+      .object({
+        ranking_by_novelty: z.array(z.string()).catch([]),
+        ranking_by_feasibility: z.array(z.string()).catch([]),
+        ranking_overall: z.array(z.string()).catch([]),
+        comparison_table: z.array(ComparisonRowSchema).catch([]),
+        portfolio_strategy: z.string().optional(),
+      })
+      .passthrough()
+      .optional(),
+    validation_roadmap: z
+      .object({
+        // New structure
+        phase_1_quick_kills: Phase1Schema.optional(),
+        phase_2_mechanism_validation: Phase2Schema.optional(),
+        phase_3_integration: Phase3Schema.optional(),
+        total_investment_to_poc: z.string().optional(),
+        // Legacy structure
+        immediate_actions: z.array(ImmediateActionSchema).catch([]),
+        phase_1: LegacyPhaseSchema.optional(),
+        phase_2: LegacyPhaseSchema.optional(),
+        phase_3: LegacyPhaseSchema.optional(),
+      })
+      .passthrough()
+      .optional(),
+    why_this_matters: z
+      .object({
+        if_we_succeed: z.string().optional(),
+        competitive_advantage: z.string().optional(),
+        industry_implications: z.string().optional(),
+        risk_of_not_pursuing: z.string().optional(),
+      })
+      .passthrough()
+      .optional(),
+    // New: Self-critique (conceptually required but schema is forgiving)
+    self_critique: SelfCritiqueSchema.optional(),
+    executive_summary: ExecutiveSummarySchema,
+    appendix: AppendixSchema.optional(),
+  })
+  .passthrough();
+
+export const AN5_D_OutputSchema = z
+  .object({
+    report: ReportSchema,
+    metadata: z
+      .object({
+        report_id: z.string().optional(),
+        analysis_id: z.string().optional(),
+        mode: z.literal('discovery').catch('discovery'),
+        generated_at: z.string().optional(),
+        concepts_generated: z.number().catch(0),
+        concepts_recommended: z.number().catch(0),
+        primary_recommendation: z.string().optional(),
+        novelty_confidence: z.enum(['high', 'medium', 'low']).catch('medium'),
+      })
+      .passthrough(),
+  })
+  .passthrough();
 
 export type AN5_D_Output = z.infer<typeof AN5_D_OutputSchema>;
 export type DiscoveryReport = z.infer<typeof ReportSchema>;
