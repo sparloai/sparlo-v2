@@ -1,11 +1,10 @@
-import { Inter as InterFont } from 'next/font/google';
 import localFont from 'next/font/local';
 
 import { cn } from '@kit/ui/utils';
 
 /**
  * @sans
- * @description Söhne font with Inter fallback.
+ * @description Söhne font (primary brand typeface).
  * Söhne license required. Place font files in /public/fonts/:
  * - Soehne-Buch.woff2 (400)
  * - Soehne-Kraeftig.woff2 (500)
@@ -31,21 +30,10 @@ const soehne = localFont({
   ],
   variable: '--font-sans',
   display: 'swap',
-  fallback: ['Söhne', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+  fallback: ['-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
 });
 
-/**
- * @inter (fallback)
- * @description Inter font as system fallback when Söhne isn't available.
- */
-const inter = InterFont({
-  subsets: ['latin'],
-  variable: '--font-sans-fallback',
-  display: 'swap',
-  weight: ['400', '500', '600', '700'],
-});
-
-// Primary font (Söhne with Inter fallback)
+// Primary font (Söhne)
 const sans = soehne;
 
 /**
@@ -55,23 +43,23 @@ const sans = soehne;
 const heading = sans;
 
 // we export these fonts into the root layout
-export { sans, heading, inter };
+export { sans, heading };
 
 /**
  * @name getFontsClassName
  * @description Get the class name for the root layout.
- * Includes both Söhne (primary) and Inter (fallback) font variables.
  */
 export function getFontsClassName(theme?: string) {
   const dark = theme === 'dark';
   const light = !dark;
 
-  const font = [sans.variable, heading.variable, inter.variable].reduce<
-    string[]
-  >((acc, curr) => {
-    if (acc.includes(curr)) return acc;
-    return [...acc, curr];
-  }, []);
+  const font = [sans.variable, heading.variable].reduce<string[]>(
+    (acc, curr) => {
+      if (acc.includes(curr)) return acc;
+      return [...acc, curr];
+    },
+    [],
+  );
 
   return cn(...font, {
     dark,
