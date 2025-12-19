@@ -83,11 +83,18 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   // Handle validation errors with premium error UI
   if (!result.success) {
+    const formattedErrors = result.error.format();
     console.error('Report validation failed:', {
       reportId: id,
-      errors: result.error.format(),
+      errors: formattedErrors,
     });
-    return <ReportError error={result.error} reportId={id} />;
+    return (
+      <ReportError
+        errorCount={result.error.errors.length}
+        formattedErrors={formattedErrors}
+        reportId={id}
+      />
+    );
   }
 
   // Render the validated report

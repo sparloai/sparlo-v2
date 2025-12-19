@@ -1,17 +1,16 @@
 'use client';
 
-import type { ZodError } from 'zod';
-
-import type { SparloReport } from '../../_lib/schema/sparlo-report.schema';
-
 interface ReportErrorProps {
-  error: ZodError<SparloReport>;
+  errorCount: number;
+  formattedErrors: unknown;
   reportId: string;
 }
 
-export function ReportError({ error, reportId }: ReportErrorProps) {
-  const formattedErrors = error.format();
-  const errorCount = error.errors.length;
+export function ReportError({
+  errorCount,
+  formattedErrors,
+  reportId,
+}: ReportErrorProps) {
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-16">
