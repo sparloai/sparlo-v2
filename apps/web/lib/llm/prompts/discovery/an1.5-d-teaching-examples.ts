@@ -125,83 +125,88 @@ REMEMBER: Output ONLY the JSON object. Focus on NON-OBVIOUS exemplars that teach
 const BiologicalExemplarSchema = z.object({
   organism_or_system: z.string(),
   mechanism: z.string(),
-  physics_principle: z.string(),
-  why_instructive: z.string(),
-  transfer_insight: z.string(),
+  physics_principle: z.string().optional().default(''),
+  why_instructive: z.string().optional().default(''),
+  transfer_insight: z.string().optional().default(''),
 });
 
 const GeologicalExemplarSchema = z.object({
   phenomenon: z.string(),
   mechanism: z.string(),
-  physics_principle: z.string(),
-  why_instructive: z.string(),
-  transfer_insight: z.string(),
+  physics_principle: z.string().optional().default(''),
+  why_instructive: z.string().optional().default(''),
+  transfer_insight: z.string().optional().default(''),
 });
 
 const AbandonedTechExemplarSchema = z.object({
   technology: z.string(),
-  original_era: z.string(),
-  why_abandoned: z.string(),
-  mechanism: z.string(),
-  what_changed: z.string(),
-  revival_potential: z.string(),
+  original_era: z.string().optional().default(''),
+  why_abandoned: z.string().optional().default(''),
+  mechanism: z.string().optional().default(''),
+  what_changed: z.string().optional().default(''),
+  revival_potential: z.string().optional().default(''),
 });
 
 const FrontierMaterialExemplarSchema = z.object({
   material: z.string(),
-  enabling_property: z.string(),
-  current_status: z.string(),
-  application_concept: z.string(),
-  barriers_to_explore: z.string(),
+  enabling_property: z.string().optional().default(''),
+  current_status: z.string().optional().default(''),
+  application_concept: z.string().optional().default(''),
+  barriers_to_explore: z.string().optional().default(''),
 });
 
 const IndustrialProcessExemplarSchema = z.object({
   process: z.string(),
-  industry: z.string(),
-  mechanism: z.string(),
-  scale_difference: z.string(),
-  transfer_concept: z.string(),
+  industry: z.string().optional().default(''),
+  mechanism: z.string().optional().default(''),
+  scale_difference: z.string().optional().default(''),
+  transfer_concept: z.string().optional().default(''),
 });
 
 const CrossPollinationInsightSchema = z.object({
   from_domain: z.string(),
-  principle: z.string(),
-  application_sketch: z.string(),
-  novelty_level: z.enum(['high', 'medium', 'low']),
+  principle: z.string().optional().default(''),
+  application_sketch: z.string().optional().default(''),
+  novelty_level: z.enum(['high', 'medium', 'low']).optional().default('medium'),
 });
 
 const InnovationGuidanceSchema = z.object({
-  promising_directions: z.array(z.string()),
-  mechanisms_to_explore: z.array(z.string()),
-  combinations_to_try: z.array(z.string()),
-  what_industry_missed: z.string(),
+  promising_directions: z.array(z.string()).optional().default([]),
+  mechanisms_to_explore: z.array(z.string()).optional().default([]),
+  combinations_to_try: z.array(z.string()).optional().default([]),
+  what_industry_missed: z.string().optional().default(''),
 });
 
 const FailurePatternSchema = z.object({
   pattern: z.string(),
-  from_exemplar: z.string(),
-  how_to_avoid: z.string(),
+  from_exemplar: z.string().optional().default(''),
+  how_to_avoid: z.string().optional().default(''),
 });
 
 const ParameterBoundSchema = z.object({
   parameter: z.string(),
-  bound: z.string(),
-  source: z.string(),
-  implication: z.string(),
+  bound: z.string().optional().default(''),
+  source: z.string().optional().default(''),
+  implication: z.string().optional().default(''),
 });
 
 export const AN1_5_D_OutputSchema = z.object({
   exemplar_selection: z.object({
-    biological_exemplars: z.array(BiologicalExemplarSchema),
-    geological_exemplars: z.array(GeologicalExemplarSchema),
-    abandoned_tech_exemplars: z.array(AbandonedTechExemplarSchema),
-    frontier_material_exemplars: z.array(FrontierMaterialExemplarSchema),
-    industrial_process_exemplars: z.array(IndustrialProcessExemplarSchema),
+    biological_exemplars: z.array(BiologicalExemplarSchema).optional().default([]),
+    geological_exemplars: z.array(GeologicalExemplarSchema).optional().default([]),
+    abandoned_tech_exemplars: z.array(AbandonedTechExemplarSchema).optional().default([]),
+    frontier_material_exemplars: z.array(FrontierMaterialExemplarSchema).optional().default([]),
+    industrial_process_exemplars: z.array(IndustrialProcessExemplarSchema).optional().default([]),
   }),
-  cross_pollination_insights: z.array(CrossPollinationInsightSchema),
-  innovation_guidance: InnovationGuidanceSchema,
-  failure_patterns_to_avoid: z.array(FailurePatternSchema),
-  parameter_bounds_discovered: z.array(ParameterBoundSchema),
+  cross_pollination_insights: z.array(CrossPollinationInsightSchema).optional().default([]),
+  innovation_guidance: InnovationGuidanceSchema.optional().default({
+    promising_directions: [],
+    mechanisms_to_explore: [],
+    combinations_to_try: [],
+    what_industry_missed: '',
+  }),
+  failure_patterns_to_avoid: z.array(FailurePatternSchema).optional().default([]),
+  parameter_bounds_discovered: z.array(ParameterBoundSchema).optional().default([]),
 });
 
 export type AN1_5_D_Output = z.infer<typeof AN1_5_D_OutputSchema>;
