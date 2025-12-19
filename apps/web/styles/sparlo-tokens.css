@@ -147,6 +147,35 @@
     --transition-fast: 150ms ease;
     --transition-normal: 200ms ease;
     --transition-slow: 300ms ease;
+
+    /* ============================================
+       SEMANTIC TOKENS (Light Mode)
+       ============================================ */
+
+    /* Surface hierarchy */
+    --surface-base: var(--sparlo-off-white);
+    --surface-elevated: #ffffff;
+    --surface-overlay: var(--sparlo-gray-50);
+
+    /* Text hierarchy */
+    --text-primary: var(--sparlo-gray-900);
+    --text-secondary: var(--sparlo-gray-600);
+    --text-muted: var(--sparlo-gray-500);
+
+    /* Accent */
+    --accent: var(--sparlo-violet);
+    --accent-hover: var(--sparlo-violet-dark);
+    --accent-muted: var(--sparlo-violet-subtle);
+
+    /* Borders */
+    --border-subtle: var(--sparlo-gray-100);
+    --border-default: var(--sparlo-gray-200);
+    --border-strong: var(--sparlo-gray-300);
+
+    /* Semantic status */
+    --status-success: var(--sparlo-success);
+    --status-warning: var(--sparlo-warning);
+    --status-error: var(--sparlo-error);
   }
 
   .dark {
@@ -176,5 +205,47 @@
     --sparlo-track-simpler-text: var(--sparlo-gray-400);
     --sparlo-track-spark-bg: rgba(245, 158, 11, 0.2);
     --sparlo-track-spark-text: #fbbf24;
+
+    /* ============================================
+       SEMANTIC TOKENS (Dark Mode)
+       ============================================ */
+
+    /* Surface hierarchy - deep blacks */
+    --surface-base: #0a0a0b;
+    --surface-elevated: #121214;
+    --surface-overlay: #1a1a1e;
+
+    /* Text hierarchy - high contrast */
+    --text-primary: #f4f4f5;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+
+    /* Accent - vibrant violet */
+    --accent: #8b5cf6;
+    --accent-hover: #a78bfa;
+    --accent-muted: rgba(139, 92, 246, 0.15);
+
+    /* Borders - subtle whites */
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-default: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.15);
+
+    /* Semantic status - slightly brighter for dark mode */
+    --status-success: #22c55e;
+    --status-warning: #f59e0b;
+    --status-error: #ef4444;
   }
+}
+
+/* ============================================
+   GLOBAL FOCUS STATES
+   ============================================ */
+
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
 }

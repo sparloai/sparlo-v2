@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertTriangle,
   ArrowRight,
@@ -17,6 +18,7 @@ import {
 import { Button } from '@kit/ui/button';
 import { Textarea } from '@kit/ui/textarea';
 
+import { usePrefersReducedMotion } from '../_hooks/use-prefers-reduced-motion';
 import { answerClarification } from '../_lib/server/sparlo-reports-server-actions';
 import { type ReportProgress } from '../_lib/use-report-progress';
 
@@ -26,6 +28,53 @@ interface ProcessingScreenProps {
   designChallenge?: string;
 }
 
+// Custom easing tuples for TypeScript
+const easeInOut: [number, number, number, number] = [0.4, 0, 0.6, 1];
+const easeOut: [number, number, number, number] = [0, 0, 0.2, 1];
+const easeIn: [number, number, number, number] = [0.4, 0, 1, 1];
+
+// Animation variants - defined outside component for performance
+const pulseVariants: Variants = {
+  initial: { scale: 1, opacity: 0.8 },
+  animate: {
+    scale: [1, 1.05, 1],
+    opacity: [0.8, 1, 0.8],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: easeInOut,
+    },
+  },
+};
+
+const spinVariants: Variants = {
+  animate: {
+    rotate: 360,
+    transition: {
+      duration: 8,
+      repeat: Infinity,
+      ease: 'linear',
+    },
+  },
+};
+
+const textVariants: Variants = {
+  initial: { opacity: 0, y: 8 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: easeOut },
+  },
+  exit: { opacity: 0, y: -8, transition: { duration: 0.2, ease: easeIn } },
+};
+
+const STATUS_MESSAGES = [
+  'Analyzing your problem...',
+  'Researching patterns...',
+  'Generating insights...',
+  'Building recommendations...',
+];
+
 /**
  * Hook to calculate elapsed time from a timestamp.
  * Persists correctly across page refresh by using database timestamp.
@@ -33,7 +82,10 @@ interface ProcessingScreenProps {
 function useElapsedTime(createdAt: string | null): number {
   const calculateElapsed = (timestamp: string | null) => {
     if (!timestamp) return 0;
-    return Math.max(0, Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000));
+    return Math.max(
+      0,
+      Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000),
+    );
   };
 
   const [prevCreatedAt, setPrevCreatedAt] = useState(createdAt);
@@ -76,16 +128,38 @@ export function ProcessingScreen({
   designChallenge,
 }: ProcessingScreenProps) {
   const router = useRouter();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const [clarificationAnswer, setClarificationAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [messageIndex, setMessageIndex] = useState(0);
   const hasNavigatedRef = useRef(false);
 
   // Use database timestamp for elapsed time (persists across refresh)
   const elapsedSeconds = useElapsedTime(progress.createdAt);
 
+  // Cycle through status messages
+  useEffect(() => {
+    if (
+      progress.status !== 'processing' ||
+      progress.currentStep === 'an0' ||
+      prefersReducedMotion
+    )
+      return;
+
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % STATUS_MESSAGES.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [progress.status, progress.currentStep, prefersReducedMotion]);
+
   // Auto-navigate when status changes to complete
   useEffect(() => {
-    if (progress.status === 'complete' && onComplete && !hasNavigatedRef.current) {
+    if (
+      progress.status === 'complete' &&
+      onComplete &&
+      !hasNavigatedRef.current
+    ) {
       hasNavigatedRef.current = true;
       onComplete();
     }
@@ -115,21 +189,24 @@ export function ProcessingScreen({
   if (progress.status === 'complete') {
     return (
       <motion.div
-        className="flex min-h-[60vh] flex-col items-center justify-center p-6"
+        className="flex min-h-[60vh] flex-col items-center justify-center bg-[--surface-base] p-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
         <motion.div
-          className="flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-900/20"
+          className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[--status-success]/15"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 200 }}
         >
-          <Check className="h-8 w-8 text-emerald-500" strokeWidth={2.5} />
+          <Check
+            className="h-8 w-8 text-[--status-success]"
+            strokeWidth={2.5}
+          />
         </motion.div>
 
         <motion.h2
-          className="mt-6 text-2xl font-semibold text-[#1A1A1A] dark:text-white"
+          className="mt-6 text-2xl font-semibold text-[--text-primary]"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -138,7 +215,7 @@ export function ProcessingScreen({
         </motion.h2>
 
         <motion.p
-          className="mt-2 text-[#6A6A6A]"
+          className="mt-2 text-[--text-muted]"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
@@ -155,9 +232,9 @@ export function ProcessingScreen({
             <Button
               onClick={onComplete}
               size="lg"
-              className="mt-8 rounded-lg bg-[#7C3AED] px-8 text-white hover:bg-[#6D28D9]"
+              className="mt-8 rounded-lg bg-[--accent] px-8 text-white hover:bg-[--accent-hover]"
               style={{
-                boxShadow: '0 4px 14px -2px rgba(124, 58, 237, 0.4)',
+                boxShadow: '0 4px 14px -2px rgba(139, 92, 246, 0.4)',
               }}
             >
               View Full Report
@@ -171,7 +248,9 @@ export function ProcessingScreen({
 
   // Handle error or failed status
   if (progress.status === 'error' || progress.status === 'failed') {
-    const isRefusalError = progress.errorMessage?.includes('could not be processed');
+    const isRefusalError = progress.errorMessage?.includes(
+      'could not be processed',
+    );
 
     const handleTryAgain = () => {
       // Redirect to new report page with prefilled text and error flag
@@ -187,19 +266,19 @@ export function ProcessingScreen({
 
     return (
       <motion.div
-        className="flex min-h-[60vh] flex-col items-center justify-center p-6"
+        className="flex min-h-[60vh] flex-col items-center justify-center bg-[--surface-base] p-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-900/20">
-          <AlertTriangle className="h-8 w-8 text-amber-500" />
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[--status-warning]/15">
+          <AlertTriangle className="h-8 w-8 text-[--status-warning]" />
         </div>
 
-        <h2 className="mt-6 text-2xl font-semibold text-[#1A1A1A] dark:text-white">
+        <h2 className="mt-6 text-2xl font-semibold text-[--text-primary]">
           {isRefusalError ? 'Query Not Accepted' : 'Something went wrong'}
         </h2>
 
-        <p className="mt-2 max-w-md text-center text-[#6A6A6A]">
+        <p className="mt-2 max-w-md text-center text-[--text-muted]">
           {isRefusalError
             ? 'Our AI has flagged your query as potentially problematic. This is usually a false positive for legitimate engineering problems.'
             : progress.errorMessage ||
@@ -207,7 +286,7 @@ export function ProcessingScreen({
         </p>
 
         {isRefusalError && (
-          <p className="mt-4 max-w-md text-center text-sm text-[#8A8A8A]">
+          <p className="mt-4 max-w-md text-center text-sm text-[--text-muted]/70">
             Try rephrasing your challenge to focus on the engineering problem.
             Avoid terminology that could be misinterpreted as harmful.
           </p>
@@ -215,7 +294,7 @@ export function ProcessingScreen({
 
         <Button
           onClick={handleTryAgain}
-          className="mt-6 bg-[#7C3AED] hover:bg-[#6D28D9]"
+          className="mt-6 bg-[--accent] text-white hover:bg-[--accent-hover]"
         >
           <ArrowRight className="mr-2 h-4 w-4" />
           {isRefusalError ? 'Rewrite Challenge' : 'Try Again'}
@@ -228,42 +307,42 @@ export function ProcessingScreen({
   if (progress.status === 'clarifying' && pendingClarification) {
     return (
       <motion.div
-        className="flex min-h-[60vh] flex-col items-center justify-center p-6"
+        className="flex min-h-[60vh] flex-col items-center justify-center bg-[--surface-base] p-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
       >
         <div className="w-full max-w-xl space-y-6">
           <div className="text-center">
             <motion.div
-              className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#7C3AED]/10"
+              className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[--accent-muted]"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
-              <MessageSquare className="h-6 w-6 text-[#7C3AED]" />
+              <MessageSquare className="h-6 w-6 text-[--accent]" />
             </motion.div>
-            <h2 className="text-2xl font-semibold tracking-tight text-[#1A1A1A] dark:text-white">
+            <h2 className="text-2xl font-semibold tracking-tight text-[--text-primary]">
               Quick question
             </h2>
-            <p className="mt-2 text-[#6A6A6A]">
+            <p className="mt-2 text-[--text-muted]">
               Help us understand your challenge better
             </p>
           </div>
 
           <motion.div
-            className="rounded-xl border border-[#E5E5E5] bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900"
+            className="rounded-xl border border-[--border-default] bg-[--surface-elevated] p-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <p className="mb-4 text-base font-medium text-[#1A1A1A] dark:text-white">
+            <p className="mb-4 text-base font-medium text-[--text-primary]">
               {pendingClarification.question}
             </p>
             <Textarea
               value={clarificationAnswer}
               onChange={(e) => setClarificationAnswer(e.target.value)}
               placeholder="Type your answer..."
-              className="min-h-[100px] resize-none"
+              className="min-h-[100px] resize-none border-[--border-subtle] bg-[--surface-overlay] text-[--text-primary] placeholder:text-[--text-muted]"
               disabled={isSubmitting}
             />
           </motion.div>
@@ -276,14 +355,14 @@ export function ProcessingScreen({
                 handleSubmitClarification();
               }}
               disabled={isSubmitting}
-              className="text-[#6B6B6B]"
+              className="text-[--text-muted]"
             >
               Skip
             </Button>
             <Button
               onClick={handleSubmitClarification}
               disabled={!clarificationAnswer.trim() || isSubmitting}
-              className="bg-[#7C3AED] hover:bg-[#6D28D9]"
+              className="bg-[--accent] text-white hover:bg-[--accent-hover]"
             >
               {isSubmitting ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -299,79 +378,113 @@ export function ProcessingScreen({
   }
 
   // Determine if we're in the initial review phase (AN0) or main analysis
-  const isInitialReview = !progress.currentStep || progress.currentStep === 'an0';
+  const isInitialReview =
+    !progress.currentStep || progress.currentStep === 'an0';
 
   // Default: Processing status - two states based on current phase
   return (
     <motion.div
-      className="flex min-h-[60vh] flex-col items-center justify-center p-6"
+      className="flex min-h-[60vh] flex-col items-center justify-center bg-[--surface-base] p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
       <div className="flex flex-col items-center gap-6">
-        {/* Rotating diamond animation */}
+        {/* Animated logo with pulse and spin */}
         <motion.div
-          className="text-[#7C3AED]"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+          className="text-[--accent]"
+          variants={prefersReducedMotion ? undefined : pulseVariants}
+          initial="initial"
+          animate="animate"
         >
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M12 2L22 12L12 22L2 12L12 2Z"
-              stroke="currentColor"
-              strokeWidth="2"
-              fill="none"
-            />
-            <motion.path
-              d="M12 6L18 12L12 18L6 12L12 6Z"
-              fill="currentColor"
-              animate={{ scale: [0.8, 1, 0.8] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-          </svg>
+          <motion.div
+            variants={prefersReducedMotion ? undefined : spinVariants}
+            animate="animate"
+          >
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M12 2L22 12L12 22L2 12L12 2Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                fill="none"
+              />
+              <motion.path
+                d="M12 6L18 12L12 18L6 12L12 6Z"
+                fill="currentColor"
+                animate={
+                  prefersReducedMotion ? undefined : { scale: [0.8, 1, 0.8] }
+                }
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+            </svg>
+          </motion.div>
         </motion.div>
 
         {isInitialReview ? (
           <>
             {/* Initial review phase - may ask follow-up */}
-            <p className="text-lg font-light text-[#1A1A1A] dark:text-white">
+            <p className="text-lg font-light text-[--text-primary]">
               Reviewing your question...
             </p>
 
-            <p className="max-w-sm text-center text-sm text-[#8A8A8A]">
-              We may ask a follow-up question to better understand your challenge
+            <p className="max-w-sm text-center text-sm text-[--text-muted]">
+              We may ask a follow-up question to better understand your
+              challenge
             </p>
 
             {/* Elapsed time */}
-            <p className="text-sm tabular-nums text-[#8A8A8A]">
+            <p className="text-sm text-[--text-muted] tabular-nums">
               {formatElapsed(elapsedSeconds)} elapsed
             </p>
           </>
         ) : (
           <>
-            {/* Main analysis phase - no clarification needed */}
-            <p className="text-lg font-light text-[#1A1A1A] dark:text-white">
-              Analyzing your question...
-            </p>
+            {/* Main analysis phase - animated status messages */}
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={messageIndex}
+                variants={textVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="text-lg font-light text-[--text-primary]"
+              >
+                {STATUS_MESSAGES[messageIndex]}
+              </motion.p>
+            </AnimatePresence>
+
+            {/* Progress bar */}
+            <motion.div className="mt-2 h-1 w-64 overflow-hidden rounded-full bg-[--border-subtle]">
+              <motion.div
+                className="h-full bg-[--accent]"
+                initial={{ width: '0%' }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 900, ease: 'linear' }}
+              />
+            </motion.div>
 
             {/* Elapsed time */}
-            <p className="text-sm tabular-nums text-[#8A8A8A]">
+            <p className="text-sm text-[--text-muted] tabular-nums">
               {formatElapsed(elapsedSeconds)} elapsed
             </p>
 
             {/* Duration estimate */}
-            <p className="text-sm text-[#8A8A8A]">
+            <p className="text-sm text-[--text-muted]">
               Analyses typically take ~15 minutes
             </p>
 
             {/* Safe to leave notice */}
-            <div className="mt-4 text-center text-sm text-[#8A8A8A]">
+            <motion.div
+              className="mt-4 text-center text-sm text-[--text-muted]"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
               <p className="flex items-center justify-center gap-1">
-                <Check className="h-4 w-4 text-emerald-500" />
+                <Check className="h-4 w-4 text-[--status-success]" />
                 Safe to close this page
               </p>
               <p className="mt-1">We&apos;ll email you when complete.</p>
-            </div>
+            </motion.div>
           </>
         )}
       </div>

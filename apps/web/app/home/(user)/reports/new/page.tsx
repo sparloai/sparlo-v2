@@ -90,7 +90,7 @@ export default function NewReportPage() {
   // Show processing screen when we have a report in progress
   if (phase === 'processing' && progress) {
     return (
-      <div className="min-h-[calc(100vh-120px)]">
+      <div className="min-h-[calc(100vh-120px)] bg-[--surface-base]">
         <ProcessingScreen
           progress={progress}
           onComplete={handleViewReport}
@@ -103,7 +103,7 @@ export default function NewReportPage() {
   // Input phase
   return (
     <motion.div
-      className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center p-6"
+      className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[--surface-base] p-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
@@ -111,12 +111,12 @@ export default function NewReportPage() {
         {/* Brand mark */}
         <div className="flex justify-center">
           <motion.div
-            className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#7C3AED]/10"
+            className="flex h-12 w-12 items-center justify-center rounded-xl bg-[--accent-muted]"
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
           >
-            <Sparkles className="h-6 w-6 text-[#7C3AED]" />
+            <Sparkles className="h-6 w-6 text-[--accent]" />
           </motion.div>
         </div>
 
@@ -127,10 +127,10 @@ export default function NewReportPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h1 className="text-2xl font-semibold tracking-tight text-[#1A1A1A] dark:text-white">
+          <h1 className="text-2xl font-semibold tracking-tight text-[--text-primary]">
             Describe your engineering challenge
           </h1>
-          <p className="mt-2 text-[#6A6A6A]">
+          <p className="mt-2 text-[--text-muted]">
             Sparlo will analyze your problem and generate innovative solution
             concepts
           </p>
@@ -142,13 +142,19 @@ export default function NewReportPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Alert variant="destructive" className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-100">
+            <Alert
+              variant="destructive"
+              className="border-[--status-warning]/30 bg-[--status-warning]/10 text-[--status-warning]"
+            >
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Your previous query was flagged by our AI safety filters.</strong>
-                {' '}This is often a false positive for legitimate engineering problems.
-                Please rephrase your challenge, focusing on the engineering aspects
-                and avoiding terminology that could be misinterpreted.
+                <strong>
+                  Your previous query was flagged by our AI safety filters.
+                </strong>{' '}
+                This is often a false positive for legitimate engineering
+                problems. Please rephrase your challenge, focusing on the
+                engineering aspects and avoiding terminology that could be
+                misinterpreted.
               </AlertDescription>
             </Alert>
           </motion.div>
@@ -171,17 +177,17 @@ export default function NewReportPage() {
               }
             }}
             placeholder="What engineering problem are you trying to solve? Include constraints, goals, and any relevant context for better results..."
-            className="min-h-[200px] resize-none text-base leading-relaxed"
+            className="min-h-[200px] resize-none border-[--border-subtle] bg-[--surface-elevated] text-base leading-relaxed text-[--text-primary] placeholder:text-[--text-muted] focus:border-[--accent] focus:ring-1 focus:ring-[--accent]/20"
             disabled={isSubmitting}
           />
 
           {/* Error message */}
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm text-[--status-error]">{error}</p>}
 
           {/* Quality feedback and submit */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <span className="text-sm text-[#8A8A8A] tabular-nums">
+              <span className="text-sm text-[--text-muted] tabular-nums">
                 {wordCount} words
               </span>
               {challengeText.length >= 30 && (
@@ -202,13 +208,13 @@ export default function NewReportPage() {
                       key={label}
                       className={cn(
                         'flex items-center gap-1 text-xs transition-colors',
-                        check ? 'text-[#7C3AED]' : 'text-[#8A8A8A]/50',
+                        check ? 'text-[--accent]' : 'text-[--text-muted]/50',
                       )}
                     >
                       <div
                         className={cn(
                           'h-1.5 w-1.5 rounded-full transition-colors',
-                          check ? 'bg-[#7C3AED]' : 'bg-[#E5E5E5]',
+                          check ? 'bg-[--accent]' : 'bg-[--border-default]',
                         )}
                       />
                       <span className="hidden sm:inline">{label}</span>
@@ -221,7 +227,8 @@ export default function NewReportPage() {
             <Button
               onClick={handleSubmit}
               disabled={!canSubmit || isSubmitting}
-              className="bg-[#7C3AED] hover:bg-[#6D28D9]"
+              className="bg-[--accent] text-white hover:bg-[--accent-hover]"
+              style={{ boxShadow: '0 4px 14px -2px rgba(139, 92, 246, 0.4)' }}
             >
               {isSubmitting ? (
                 'Starting...'
@@ -236,14 +243,14 @@ export default function NewReportPage() {
 
           {/* Character requirement hint */}
           {challengeText.length > 0 && challengeText.length < 50 && (
-            <p className="text-center text-sm text-[#8A8A8A]">
+            <p className="text-center text-sm text-[--text-muted]">
               Please provide at least 50 characters ({50 - challengeText.length}{' '}
               more needed)
             </p>
           )}
 
           {/* Time notice */}
-          <p className="text-center text-sm text-[#8A8A8A]">
+          <p className="text-center text-sm text-[--text-muted]">
             Analysis takes 5-10 minutes. Safe to leave this page.
           </p>
         </motion.div>
