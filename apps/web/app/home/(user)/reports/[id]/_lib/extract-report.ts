@@ -10,14 +10,8 @@ export function extractStructuredReport(
   if (!reportData) return null;
 
   try {
-    // Navigate the nested structure
-    const chainState = reportData.chainState as
-      | Record<string, unknown>
-      | undefined;
-    const an5Result = chainState?.an5Result as
-      | Record<string, unknown>
-      | undefined;
-    const report = an5Result?.report;
+    // Report is stored directly at reportData.report (not nested in chainState)
+    const report = reportData.report;
 
     if (!report) return null;
 
