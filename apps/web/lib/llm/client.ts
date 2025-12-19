@@ -88,9 +88,11 @@ export async function callClaude(params: {
   system: string;
   userMessage: string;
   maxTokens?: number;
+  temperature?: number;
 }): Promise<ClaudeResult> {
   const anthropic = getAnthropicClient();
   const maxTokens = params.maxTokens ?? 8192;
+  const temperature = params.temperature ?? 1;
 
   try {
     // Use streaming for large token requests (>10000) to avoid timeout
@@ -100,6 +102,7 @@ export async function callClaude(params: {
       const stream = anthropic.messages.stream({
         model: params.model,
         max_tokens: maxTokens,
+        temperature,
         system: params.system,
         messages: [{ role: 'user', content: params.userMessage }],
       });
@@ -148,6 +151,7 @@ export async function callClaude(params: {
     const response = await anthropic.messages.create({
       model: params.model,
       max_tokens: maxTokens,
+      temperature,
       system: params.system,
       messages: [{ role: 'user', content: params.userMessage }],
     });

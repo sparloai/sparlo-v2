@@ -21,9 +21,29 @@ export const ClarificationAnsweredEventSchema = z.object({
   answer: z.string().min(1),
 });
 
+// Discovery Mode event schemas (same structure, different chain)
+export const DiscoveryReportGenerateEventSchema = z.object({
+  reportId: z.string().uuid(),
+  accountId: z.string().uuid(),
+  userId: z.string().uuid(),
+  designChallenge: z.string().min(50),
+  conversationId: z.string(),
+});
+
+export const DiscoveryClarificationAnsweredEventSchema = z.object({
+  reportId: z.string().uuid(),
+  answer: z.string().min(1),
+});
+
 export type ReportGenerateEvent = z.infer<typeof ReportGenerateEventSchema>;
 export type ClarificationAnsweredEvent = z.infer<
   typeof ClarificationAnsweredEventSchema
+>;
+export type DiscoveryReportGenerateEvent = z.infer<
+  typeof DiscoveryReportGenerateEventSchema
+>;
+export type DiscoveryClarificationAnsweredEvent = z.infer<
+  typeof DiscoveryClarificationAnsweredEventSchema
 >;
 
 /**
@@ -32,6 +52,11 @@ export type ClarificationAnsweredEvent = z.infer<
 type Events = {
   'report/generate': { data: ReportGenerateEvent };
   'report/clarification-answered': { data: ClarificationAnsweredEvent };
+  // Discovery Mode events
+  'report/generate-discovery': { data: DiscoveryReportGenerateEvent };
+  'report/discovery-clarification-answered': {
+    data: DiscoveryClarificationAnsweredEvent;
+  };
 };
 
 /**

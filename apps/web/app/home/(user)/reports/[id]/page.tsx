@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
+import { DiscoveryReportDisplay } from './_components/discovery-report-display';
 import { ReportDisplay } from './_components/report-display';
 import { ReportRenderer } from './_components/report/report-renderer';
 import { SparloReportSchema } from './_lib/schema/sparlo-report.schema';
@@ -77,7 +78,25 @@ export default async function ReportPage({ params }: ReportPageProps) {
     return <ReportDisplay report={report} />;
   }
 
-  // Validate the report data with Zod schema
+  // Check if this is a discovery mode report
+  const isDiscoveryReport = report.report_data.mode === 'discovery';
+
+  if (isDiscoveryReport) {
+    // Discovery reports have a different schema - render with dedicated component
+    return (
+      <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
+        <DiscoveryReportDisplay
+          reportData={
+            report.report_data as Parameters<
+              typeof DiscoveryReportDisplay
+            >[0]['reportData']
+          }
+        />
+      </div>
+    );
+  }
+
+  // Validate the report data with Zod schema for standard reports
   const result = SparloReportSchema.safeParse(report.report_data);
 
   // Fall back to legacy display for reports that don't match the new schema

@@ -1,6 +1,7 @@
+import { generateDiscoveryReport } from './generate-discovery-report';
 import { generateReport } from './generate-report';
 
 /**
  * Export all Inngest functions for the API route
  */
-export const functions = [generateReport];
+export const functions = [generateReport, generateDiscoveryReport];
