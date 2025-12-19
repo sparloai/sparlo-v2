@@ -32,7 +32,7 @@ import {
   extractStructuredReport,
   extractUserInput,
 } from '../_lib/extract-report';
-import { StructuredReport } from './report/structured-report';
+import { ReportRenderer } from './report/report-renderer';
 
 interface ReportData {
   markdown?: string;
@@ -508,10 +508,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                 transition={{ delay: 0.1 }}
               >
                 {structuredReport ? (
-                  <StructuredReport
-                    report={structuredReport}
-                    userInput={userInput}
-                  />
+                  <ReportRenderer report={structuredReport} />
                 ) : (
                   <ReactMarkdown components={markdownComponents}>
                     {reportMarkdown}

@@ -551,10 +551,10 @@ export const generateReport = inngest.createFunction(
         return validated;
       });
 
-      // Update state with final report
+      // Update state with final report (v12: report data is flat, not nested under .report)
       state = {
         ...state,
-        an5_report: an5Result.report,
+        an5_report: an5Result,
         completedSteps: [...state.completedSteps, 'an5'],
         completedAt: new Date().toISOString(),
       };
@@ -563,33 +563,63 @@ export const generateReport = inngest.createFunction(
       // Complete Report
       // =========================================
       await step.run('complete-report', async () => {
-        // Convert AN5 JSON report to markdown for frontend display
-        const markdown = generateReportMarkdown(an5Result.report);
+        // Get the user's original input for the brief section
+        const originalProblem = state.an0_original_ask ?? state.userInput ?? designChallenge;
 
-        // Get the recommended concept title from the lead concepts (v11 structure)
+        // Convert AN5 JSON report to markdown for fallback display
+        const markdown = generateReportMarkdown(an5Result);
+
+        // Get the recommended concept title from the lead concepts (v12 structure)
         const recommendedTitle =
-          an5Result.report.solution_concepts?.lead_concepts?.[0]?.title ??
+          an5Result.solution_concepts?.lead_concepts?.[0]?.title ??
           'See report for details';
 
-        // Extract headline for dashboard display (scannable 4-8 word summary)
-        const headline = an5Result.report.headline ?? null;
+        // Extract headline from header title for dashboard display
+        const headline = an5Result.header?.title ?? null;
+
+        // Build the complete SparloReport structure for rendering
+        // The brief is added here from AN0 user input - AN5 doesn't generate it
+        // Tags are derived from TRIZ principles names for categorization
+        const tags = state.an0_triz_principles?.slice(0, 3).map((p) => p.name) ?? [];
+
+        const sparloReport = {
+          // Core AN5 output (matches SparloReportSchema)
+          header: an5Result.header,
+          brief: {
+            original_problem: originalProblem,
+            tags,
+          },
+          executive_summary: an5Result.executive_summary,
+          constraints: an5Result.constraints,
+          problem_analysis: an5Result.problem_analysis,
+          key_patterns: an5Result.key_patterns,
+          solution_concepts: an5Result.solution_concepts,
+          validation_summary: an5Result.validation_summary,
+          challenge_the_frame: an5Result.challenge_the_frame,
+          risks_and_watchouts: an5Result.risks_and_watchouts,
+          next_steps: an5Result.next_steps,
+          appendix: an5Result.appendix,
+          metadata: an5Result.metadata,
+          // Optional additional content can be added here if needed
+          additional_content: undefined,
+        };
 
         await updateProgress({
           status: 'complete',
           current_step: 'complete',
           phase_progress: 100,
-          headline, // AI-generated scannable headline for dashboard
+          headline,
+          // Store the SparloReport directly in report_data for page.tsx validation
           report_data: {
-            markdown, // For frontend display
-            report: an5Result.report,
-            metadata: an5Result.metadata,
+            ...sparloReport,
+            // Also include auxiliary data for backwards compatibility and debugging
+            markdown,
             chainState: state,
             concepts: an3Result.concepts,
             validation_results: an4Result.validation_results,
             recommendation: an4Result.recommendation,
             innovation_patterns: an2Result.innovation_patterns,
             recommendedConcept: recommendedTitle,
-            // Corpus data
             retrieval_summary: state.an1_retrieval_summary,
             corpus_gaps: state.an1_5_corpus_gaps,
             commercial_precedent: state.an1_7_commercial_precedent,
@@ -987,7 +1017,19 @@ function buildAN5ContextV10(
   an4Result: AN4Output,
   an1_7Result: AN1_7_Output,
 ): string {
-  return `## Complete Analysis Data for Report Synthesis
+  // Generate ISO timestamp for the report
+  const generatedAt = new Date().toISOString();
+
+  return `## Report Metadata
+
+**IMPORTANT:** Include these exact values in your output:
+- report_id: "${state.reportId}"
+- analysis_id: "${state.conversationId ?? state.reportId}"
+- generated_at: "${generatedAt}"
+
+---
+
+## Complete Analysis Data for Report Synthesis
 
 ### Problem Framing (AN0)
 
@@ -1114,32 +1156,31 @@ Please synthesize this into an EXECUTIVE INNOVATION REPORT following the specifi
 }
 
 // =========================================
-// Helper: Convert AN5 JSON Report to Markdown (v11)
+// Helper: Convert AN5 JSON Report to Markdown (v12)
 // =========================================
-function generateReportMarkdown(report: AN5Output['report']): string {
+function generateReportMarkdown(report: AN5Output): string {
   const sections: string[] = [];
 
   // Title
-  sections.push(`# ${report.title}`);
-  sections.push(`*${report.subtitle}*`);
+  sections.push(`# ${report.header.title}`);
   sections.push('');
 
   // Executive Summary
   sections.push('## Executive Summary');
   sections.push('');
-  sections.push(report.executive_summary.problem_essence);
+  sections.push(`**Viability: ${report.executive_summary.viability}**${report.executive_summary.viability_label ? ` — ${report.executive_summary.viability_label}` : ''}`);
   sections.push('');
-  sections.push(`**Key Insight:** ${report.executive_summary.key_insight}`);
+  sections.push(report.executive_summary.the_problem);
   sections.push('');
-  sections.push(
-    `**Recommendation:** ${report.executive_summary.primary_recommendation}`,
-  );
+  sections.push(`**Core Insight:** ${report.executive_summary.core_insight.headline}`);
   sections.push('');
-  sections.push(`**Fallback:** ${report.executive_summary.fallback_summary}`);
+  sections.push(report.executive_summary.core_insight.explanation);
   sections.push('');
-  sections.push(
-    `**Viability: ${report.executive_summary.viability_verdict}.** ${report.executive_summary.viability_rationale}`,
-  );
+  sections.push('**Recommended Path:**');
+  sections.push('');
+  report.executive_summary.recommended_path.forEach((step) => {
+    sections.push(`${step.step_number}. ${step.content}`);
+  });
   sections.push('');
   sections.push('---');
   sections.push('');
@@ -1149,17 +1190,16 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   sections.push('');
   sections.push('**From your input:**');
   sections.push('');
-  report.constraints.from_user_input.forEach((c) => {
-    sections.push(`- ${c.constraint} — *${c.interpretation}*`);
+  report.constraints.from_input.forEach((c) => {
+    const note = c.note ? ` — *${c.note}*` : '';
+    sections.push(`- ${c.constraint}${note}`);
   });
   sections.push('');
   sections.push('**Assumptions made (flag if incorrect):**');
   sections.push('');
-  report.constraints.assumptions_made.forEach((a) => {
-    sections.push(`- ${a.assumption} — *${a.flag_if_incorrect}*`);
+  report.constraints.assumptions.forEach((a) => {
+    sections.push(`- ${a.assumption}`);
   });
-  sections.push('');
-  sections.push(report.constraints.constraint_summary);
   sections.push('');
   sections.push('---');
   sections.push('');
@@ -1167,23 +1207,40 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   // Problem Analysis
   sections.push('## Problem Analysis');
   sections.push('');
-  sections.push("**What's actually going wrong:**");
+  sections.push("**What's going wrong:**");
   sections.push('');
-  sections.push(report.problem_analysis.what_is_actually_going_wrong);
+  sections.push(report.problem_analysis.whats_wrong.prose);
+  if (report.problem_analysis.whats_wrong.technical_note) {
+    sections.push('');
+    if (report.problem_analysis.whats_wrong.technical_note.equation) {
+      sections.push(`> \`${report.problem_analysis.whats_wrong.technical_note.equation}\``);
+    }
+    sections.push(`> ${report.problem_analysis.whats_wrong.technical_note.explanation}`);
+  }
   sections.push('');
   sections.push("**Why it's hard:**");
   sections.push('');
-  sections.push(report.problem_analysis.why_its_hard);
+  sections.push(report.problem_analysis.why_its_hard.prose);
   sections.push('');
-  sections.push('**The from-scratch revelation:**');
+  report.problem_analysis.why_its_hard.factors.forEach((f) => {
+    sections.push(`- ${f}`);
+  });
+  if (report.problem_analysis.why_its_hard.additional_prose) {
+    sections.push('');
+    sections.push(report.problem_analysis.why_its_hard.additional_prose);
+  }
   sections.push('');
-  sections.push(report.problem_analysis.from_scratch_revelation);
+  sections.push('**First Principles Insight:**');
+  sections.push('');
+  sections.push(`**${report.problem_analysis.first_principles_insight.headline}**`);
+  sections.push('');
+  sections.push(report.problem_analysis.first_principles_insight.explanation);
   sections.push('');
   sections.push('**Root Causes:**');
   sections.push('');
-  report.problem_analysis.root_cause_hypotheses.forEach((h, i) => {
+  report.problem_analysis.root_cause_hypotheses.forEach((h) => {
     sections.push(
-      `> Hypothesis ${i + 1}: ${h.hypothesis} — ${h.explanation} Confidence: ${h.confidence}.`,
+      `> **${h.id}. ${h.name}** (${h.confidence}) — ${h.explanation}`,
     );
     sections.push('');
   });
@@ -1200,19 +1257,15 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   sections.push('## Key Patterns');
   sections.push('');
   report.key_patterns.forEach((p) => {
-    sections.push(`**${p.pattern_name}**`);
+    sections.push(`**${p.name}** *(${p.source_industry})*`);
     sections.push('');
-    sections.push(p.what_it_is);
+    sections.push(p.description);
     sections.push('');
-    sections.push(`*Where it comes from:* ${p.where_it_comes_from}`);
-    sections.push('');
-    sections.push(`*Why it matters here:* ${p.why_it_matters_here}`);
-    sections.push('');
-    sections.push(`*Precedent:* ${p.precedent}`);
-    sections.push('');
-    sections.push('---');
+    sections.push(`*Why it matters:* ${p.why_it_matters}`);
     sections.push('');
   });
+  sections.push('---');
+  sections.push('');
 
   // Solution Concepts
   sections.push('## Solution Concepts');
@@ -1222,13 +1275,7 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   sections.push('### Lead Concepts');
   sections.push('');
   report.solution_concepts.lead_concepts.forEach((c) => {
-    const trackLabel =
-      c.track === 'simpler_path'
-        ? 'Simpler Path'
-        : c.track === 'best_fit'
-          ? 'Best Fit'
-          : 'Spark';
-    sections.push(`**${c.title}** — *Track: ${trackLabel}*`);
+    sections.push(`**${c.title}** — *${c.track_label}*`);
     sections.push('');
     sections.push(`**Bottom line:** ${c.bottom_line}`);
     sections.push('');
@@ -1250,22 +1297,13 @@ function generateReportMarkdown(report: AN5Output['report']): string {
     sections.push('');
     sections.push('**How to test:**');
     sections.push('');
-    sections.push(
-      `> Gate 0 — ${c.how_to_test.gate_0.effort}, ${c.how_to_test.gate_0.name}`,
-    );
-    sections.push(`> ${c.how_to_test.gate_0.method}`);
-    sections.push(`> GO: ${c.how_to_test.gate_0.go_criteria}`);
-    sections.push(`> NO-GO: ${c.how_to_test.gate_0.no_go_criteria}`);
-    sections.push('');
-    if (c.how_to_test.gate_1) {
-      sections.push(
-        `> Gate 1 — ${c.how_to_test.gate_1.effort}, ${c.how_to_test.gate_1.name}`,
-      );
-      sections.push(`> ${c.how_to_test.gate_1.method}`);
-      sections.push(`> GO: ${c.how_to_test.gate_1.go_criteria}`);
-      sections.push(`> NO-GO: ${c.how_to_test.gate_1.no_go_criteria}`);
+    c.how_to_test.forEach((gate) => {
+      sections.push(`> **${gate.gate_id}: ${gate.name}** — ${gate.effort}`);
+      sections.push(`> ${gate.method}`);
+      sections.push(`> GO: ${gate.go_criteria}`);
+      sections.push(`> NO-GO: ${gate.no_go_criteria}`);
       sections.push('');
-    }
+    });
     sections.push('---');
     sections.push('');
   });
@@ -1275,13 +1313,7 @@ function generateReportMarkdown(report: AN5Output['report']): string {
     sections.push('### Other Concepts');
     sections.push('');
     report.solution_concepts.other_concepts.forEach((c) => {
-      const trackLabel =
-        c.track === 'simpler_path'
-          ? 'Simpler Path'
-          : c.track === 'best_fit'
-            ? 'Best Fit'
-            : 'Spark';
-      sections.push(`**${c.title}** — *Track: ${trackLabel}*`);
+      sections.push(`**${c.title}** — *${c.track_label}*`);
       sections.push('');
       sections.push(`**Bottom line:** ${c.bottom_line}`);
       sections.push('');
@@ -1298,10 +1330,10 @@ function generateReportMarkdown(report: AN5Output['report']): string {
     });
   }
 
-  // Spark Concept
-  if (report.solution_concepts.spark_concept) {
-    const s = report.solution_concepts.spark_concept;
-    sections.push('### The Spark Concept');
+  // Innovation Concept
+  if (report.solution_concepts.innovation_concept) {
+    const s = report.solution_concepts.innovation_concept;
+    sections.push('### Innovation Concept');
     sections.push('');
     sections.push(`**${s.title}**`);
     sections.push('');
@@ -1328,13 +1360,13 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   sections.push(
     '|---------|------------|------------|---------|----------|----------|',
   );
-  report.concept_comparison.comparison_table.forEach((row) => {
+  report.solution_concepts.comparison_table.forEach((row) => {
     sections.push(
       `| ${row.title} | ${row.key_metric_achievable} | ${row.confidence} | ${row.capital_required} | ${row.timeline} | ${row.key_risk} |`,
     );
   });
   sections.push('');
-  sections.push(`**Key insight:** ${report.concept_comparison.key_insight}`);
+  sections.push(`**Key insight:** ${report.solution_concepts.comparison_insight}`);
   sections.push('');
   sections.push('---');
   sections.push('');
@@ -1345,70 +1377,20 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   sections.push('**Failure Modes Checked:**');
   sections.push('');
   report.validation_summary.failure_modes_checked.forEach((m) => {
-    sections.push(`- ${m}`);
+    sections.push(`- ${m.mode} — ${m.how_addressed}`);
   });
   sections.push('');
   sections.push('**Parameter Bounds Validated:**');
   sections.push('');
   report.validation_summary.parameter_bounds_validated.forEach((b) => {
-    sections.push(`- ${b}`);
+    sections.push(`- ${b.bound}${b.value ? `: ${b.value}` : ''}`);
   });
   sections.push('');
   sections.push('**Literature Precedent:**');
   sections.push('');
   report.validation_summary.literature_precedent.forEach((p) => {
-    sections.push(`- ${p.approach}: ${p.precedent_level} (${p.source})`);
+    sections.push(`- ${p.approach}: ${p.precedent_level}${p.source ? ` (${p.source})` : ''}`);
   });
-  sections.push('');
-  sections.push('---');
-  sections.push('');
-
-  // Decision Architecture
-  sections.push('## Decision Architecture');
-  sections.push('');
-  sections.push(
-    `**Primary decision:** ${report.decision_architecture.primary_decision}`,
-  );
-  sections.push('');
-  sections.push('```');
-  report.decision_architecture.decision_tree.forEach((d) => {
-    sections.push(`${d.condition}`);
-    sections.push(`│`);
-    sections.push(`├── ${d.then}`);
-    sections.push(`│`);
-    sections.push(`└── ${d.otherwise}`);
-    sections.push('');
-  });
-  sections.push('```');
-  sections.push('');
-  sections.push(
-    `**Primary path:** ${report.decision_architecture.primary_path}`,
-  );
-  sections.push(
-    `**Fallback path:** ${report.decision_architecture.fallback_path}`,
-  );
-  sections.push(
-    `**Parallel bet:** ${report.decision_architecture.parallel_bet}`,
-  );
-  sections.push('');
-  sections.push('---');
-  sections.push('');
-
-  // What I'd Actually Do
-  sections.push("## What I'd Actually Do");
-  sections.push('');
-  sections.push(report.what_id_actually_do.intro);
-  sections.push('');
-  report.what_id_actually_do.week_by_week.forEach((w) => {
-    sections.push(`**${w.timeframe}:**`);
-    w.actions.forEach((a) => {
-      sections.push(`- ${a}`);
-    });
-    sections.push('');
-    sections.push(`*Decision point:* ${w.decision_point}`);
-    sections.push('');
-  });
-  sections.push(report.what_id_actually_do.investment_summary);
   sections.push('');
   sections.push('---');
   sections.push('');
@@ -1423,7 +1405,7 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   report.challenge_the_frame.forEach((c) => {
     sections.push(`**${c.question}**`);
     sections.push(c.implication);
-    sections.push(`*Test:* ${c.how_to_test}`);
+    sections.push(`*${c.action_or_test.label}:* ${c.action_or_test.content}`);
     sections.push('');
   });
   sections.push('---');
@@ -1433,7 +1415,7 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   sections.push('## Risks & Watchouts');
   sections.push('');
   report.risks_and_watchouts.forEach((r) => {
-    sections.push(`**${r.risk_name} — ${r.likelihood}**`);
+    sections.push(`**${r.name} — ${r.likelihood_label}**`);
     sections.push(r.description);
     sections.push(`*Mitigation:* ${r.mitigation}`);
     sections.push(`*Trigger:* ${r.trigger}`);
@@ -1445,9 +1427,9 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   // Next Steps
   sections.push('## Next Steps');
   sections.push('');
-  report.next_steps.forEach((s) => {
+  report.next_steps.steps.forEach((s) => {
     sections.push(
-      `${s.step_number}. **${s.action}** — ${s.purpose} *(${s.when})*`,
+      `${s.step_number}. **${s.action}** — ${s.details} *(${s.timeframe})*`,
     );
   });
   sections.push('');
@@ -1461,7 +1443,7 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   sections.push('');
   sections.push('| ID | Title | Track | Status | Score |');
   sections.push('|----|-------|-------|--------|-------|');
-  report.appendix.all_concepts_summary.forEach((c) => {
+  report.appendix.all_concepts.forEach((c) => {
     sections.push(
       `| ${c.id} | ${c.title} | ${c.track} | ${c.gate_status} | ${c.overall_score} |`,
     );

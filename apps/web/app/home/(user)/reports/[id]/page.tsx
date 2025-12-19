@@ -96,19 +96,31 @@ export default async function ReportPage({ params }: ReportPageProps) {
     );
   }
 
-  // Validate the report data with Zod schema for standard reports
+  // Validate the report data against SparloReportSchema
   const result = SparloReportSchema.safeParse(report.report_data);
 
-  // Fall back to legacy display for reports that don't match the new schema
   if (!result.success) {
-    console.warn('Report validation failed, using legacy display:', {
+    // Log detailed validation errors for debugging schema mismatches
+    const flatErrors = result.error.flatten();
+    console.warn('[Report Rendering] SparloReportSchema validation failed:', {
       reportId: id,
       errorCount: result.error.errors.length,
+      fieldErrors: flatErrors.fieldErrors,
+      formErrors: flatErrors.formErrors,
+      // Log which top-level fields exist vs expected to diagnose schema drift
+      presentFields: report.report_data ? Object.keys(report.report_data) : [],
+      expectedFields: [
+        'header', 'brief', 'executive_summary', 'constraints', 'problem_analysis',
+        'key_patterns', 'solution_concepts', 'validation_summary', 'challenge_the_frame',
+        'risks_and_watchouts', 'next_steps', 'appendix', 'metadata'
+      ],
     });
+
+    // Fall back to legacy display with markdown rendering
     return <ReportDisplay report={report} />;
   }
 
-  // Render the validated report
+  // Render the validated structured report
   return (
     <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
       <ReportRenderer report={result.data} />

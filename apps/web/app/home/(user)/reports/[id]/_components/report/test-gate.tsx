@@ -2,8 +2,8 @@ import { Check, X } from 'lucide-react';
 
 interface TestGateProps {
   gate: {
+    gate_id: string;
     name: string;
-    what_it_tests: string;
     method: string;
     go_criteria: string;
     no_go_criteria: string;
@@ -29,9 +29,6 @@ export function TestGate({ gate, gateNumber }: TestGateProps) {
 
       {/* Module Body */}
       <div className="module-body module-body--compact">
-        {/* What it tests */}
-        <p className="gate-tests">{gate.what_it_tests}</p>
-
         {/* Method */}
         <div className="gate-method">
           <p className="gate-method-label">Method</p>

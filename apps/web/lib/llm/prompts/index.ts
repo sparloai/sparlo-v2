@@ -53,7 +53,10 @@ export {
   AN5_METADATA,
   AN5OutputSchema,
   type AN5Output,
-  type Report,
+  type LeadConcept,
+  type OtherConcept,
+  type InnovationConcept,
+  type TestGate,
 } from './an5-report';
 
 /**

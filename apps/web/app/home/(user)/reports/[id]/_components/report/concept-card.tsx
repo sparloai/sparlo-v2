@@ -1,10 +1,10 @@
 import { cn } from '@kit/ui/utils';
 
 import type {
+  InnovationConcept,
   LeadConcept,
   OtherConcept,
-  SparkConcept,
-} from '~/lib/llm/prompts/an5-report';
+} from '../../_lib/schema/sparlo-report.schema';
 
 import { Badge, getConfidenceVariant, getTrackVariant } from './badge';
 import { TestGate } from './test-gate';
@@ -95,16 +95,17 @@ export function ConceptCard({ concept, isLead = false }: LeadConceptProps) {
           </div>
         )}
 
-        {/* Test gates */}
-        <div className="module-section">
-          <p className="module-section-label">How to Test</p>
-          <div className="concept-gates">
-            <TestGate gate={concept.how_to_test.gate_0} gateNumber={0} />
-            {concept.how_to_test.gate_1 && (
-              <TestGate gate={concept.how_to_test.gate_1} gateNumber={1} />
-            )}
+        {/* Test gates (v12: how_to_test is now an array) */}
+        {concept.how_to_test.length > 0 && (
+          <div className="module-section">
+            <p className="module-section-label">How to Test</p>
+            <div className="concept-gates">
+              {concept.how_to_test.map((gate, index) => (
+                <TestGate key={gate.gate_id} gate={gate} gateNumber={index} />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </article>
   );
@@ -147,7 +148,7 @@ export function OtherConceptCard({ concept }: OtherConceptCardProps) {
 }
 
 interface SparkConceptCardProps {
-  concept: SparkConcept;
+  concept: InnovationConcept;
 }
 
 export function SparkConceptCard({ concept }: SparkConceptCardProps) {

@@ -1,4 +1,7 @@
-import { AN5OutputSchema, type Report } from '~/lib/llm/prompts/an5-report';
+import {
+  SparloReportSchema,
+  type SparloReport,
+} from './schema/sparlo-report.schema';
 
 const MAX_INPUT_LENGTH = 10_000;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
@@ -13,19 +16,17 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 /**
  * Safely extract and validate structured report data.
  * Falls back to null if data is missing or invalid.
- * Accepts unknown type to avoid unsafe type assertions at call sites.
+ * In v12, SparloReport is stored directly in report_data (not nested under .report).
  */
-export function extractStructuredReport(reportData: unknown): Report | null {
+export function extractStructuredReport(
+  reportData: unknown,
+): SparloReport | null {
   if (!reportData || !isRecord(reportData)) return null;
 
   try {
-    // Report is stored directly at reportData.report (not nested in chainState)
-    const report = reportData.report;
-
-    if (!report) return null;
-
-    // Validate against the actual AN5 schema
-    const validated = AN5OutputSchema.shape.report.safeParse(report);
+    // v12: Report data is stored directly at the top level (matching SparloReportSchema)
+    // The report_data object IS the SparloReport structure
+    const validated = SparloReportSchema.safeParse(reportData);
 
     if (!validated.success) {
       if (!IS_PRODUCTION) {
