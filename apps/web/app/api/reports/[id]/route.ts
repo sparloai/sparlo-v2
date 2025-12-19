@@ -10,7 +10,7 @@ import { getSupabaseServerClient } from '@kit/supabase/server-client';
  * Requires authentication - RLS ensures user can only access their own reports.
  */
 export const GET = enhanceRouteHandler(
-  async function ({ user, params }) {
+  async function ({ params }) {
     const client = getSupabaseServerClient();
     const reportId = params.id;
 

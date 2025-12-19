@@ -7,11 +7,16 @@ import { getSupabaseServerClient } from '@kit/supabase/server-client';
  * GET /api/reports
  *
  * List all reports for the authenticated user.
- * Supports pagination via query params: ?limit=10&offset=0
- * RLS ensures user can only access their own reports.
+ * Agent-native endpoint supporting mode filtering and pagination.
+ *
+ * Query params:
+ * - mode: 'discovery' | 'standard' (optional)
+ * - status: 'processing' | 'complete' | 'error' | 'clarifying' (optional)
+ * - limit: number (default 20, max 100)
+ * - offset: number (default 0)
  */
 export const GET = enhanceRouteHandler(
-  async function ({ user, request }) {
+  async function ({ request }) {
     const client = getSupabaseServerClient();
     const url = new URL(request.url);
 
@@ -21,17 +26,28 @@ export const GET = enhanceRouteHandler(
     );
     const offset = parseInt(url.searchParams.get('offset') ?? '0');
     const status = url.searchParams.get('status');
+    const mode = url.searchParams.get('mode');
 
     let query = client
       .from('sparlo_reports')
-      .select('id, title, status, current_step, phase_progress, created_at', {
-        count: 'exact',
-      })
+      .select(
+        'id, title, status, current_step, phase_progress, report_data, created_at',
+        { count: 'exact' },
+      )
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (status) {
       query = query.eq('status', status);
+    }
+
+    // Filter by mode if specified
+    if (mode === 'discovery') {
+      query = query.eq('report_data->>mode', 'discovery');
+    } else if (mode === 'standard') {
+      query = query.or(
+        'report_data->>mode.is.null,report_data->>mode.neq.discovery',
+      );
     }
 
     const { data, error, count } = await query;
@@ -52,6 +68,8 @@ export const GET = enhanceRouteHandler(
         status: report.status,
         currentStep: report.current_step,
         phaseProgress: report.phase_progress,
+        mode:
+          (report.report_data as { mode?: string } | null)?.mode ?? 'standard',
         createdAt: report.created_at,
       })),
       pagination: {
