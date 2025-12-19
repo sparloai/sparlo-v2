@@ -1,5 +1,3 @@
-import 'server-only';
-
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 
 import {
@@ -58,7 +56,7 @@ import { inngest } from '../client';
  */
 export const generateDiscoveryReport = inngest.createFunction(
   {
-    id: 'generate-discovery-report',
+    id: 'discovery-report-generator',
     retries: 2,
   },
   { event: 'report/generate-discovery' },

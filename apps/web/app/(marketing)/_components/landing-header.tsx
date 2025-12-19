@@ -89,7 +89,7 @@ function AuthButtons() {
 
         <Button
           asChild
-          className="bg-[#7c3aed] text-white hover:bg-[#6d28d9] text-xs md:text-sm"
+          className="bg-[#7c3aed] text-xs text-white hover:bg-[#6d28d9] md:text-sm"
           size={'sm'}
         >
           <Link href={pathsConfig.auth.signUp}>Try It</Link>
