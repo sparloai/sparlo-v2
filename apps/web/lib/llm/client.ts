@@ -49,7 +49,8 @@ export function calculateCost(
 ): number {
   const pricing = CLAUDE_PRICING[model];
   const inputCost = (usage.inputTokens / 1_000_000) * pricing.inputPerMillion;
-  const outputCost = (usage.outputTokens / 1_000_000) * pricing.outputPerMillion;
+  const outputCost =
+    (usage.outputTokens / 1_000_000) * pricing.outputPerMillion;
   return inputCost + outputCost;
 }
 

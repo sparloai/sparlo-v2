@@ -4,41 +4,62 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Sparkles } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@kit/ui/alert';
-import { Button } from '@kit/ui/button';
-import { Textarea } from '@kit/ui/textarea';
 import { cn } from '@kit/ui/utils';
 
 import { ProcessingScreen } from '../../_components/processing-screen';
 import { startReportGeneration } from '../../_lib/server/sparlo-reports-server-actions';
-import { analyzeInputQuality } from '../../_lib/types';
 import { useReportProgress } from '../../_lib/use-report-progress';
 
+const EXAMPLE_PROBLEM = `Reduce backlash in a precision positioning stage to under 5 arc-seconds. Current design uses a standard worm gear. Cannot increase cost or assembly complexity. Volume: 10K units/year.`;
+
 type PagePhase = 'input' | 'processing';
+
+interface FormState {
+  phase: PagePhase;
+  challengeText: string;
+  reportId: string | null;
+  isSubmitting: boolean;
+  error: string | null;
+  showRefusalWarning: boolean;
+}
+
+const initialFormState: FormState = {
+  phase: 'input',
+  challengeText: '',
+  reportId: null,
+  isSubmitting: false,
+  error: null,
+  showRefusalWarning: false,
+};
 
 export default function NewReportPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [phase, setPhase] = useState<PagePhase>('input');
-  const [challengeText, setChallengeText] = useState('');
-  const [reportId, setReportId] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showRefusalWarning, setShowRefusalWarning] = useState(false);
+  const [formState, setFormState] = useState<FormState>(initialFormState);
+
+  const {
+    phase,
+    challengeText,
+    reportId,
+    isSubmitting,
+    error,
+    showRefusalWarning,
+  } = formState;
 
   // Handle URL params for prefill and error state
   useEffect(() => {
     const prefill = searchParams.get('prefill');
     const errorType = searchParams.get('error');
 
-    if (prefill) {
-      setChallengeText(prefill);
-    }
-    if (errorType === 'refusal') {
-      setShowRefusalWarning(true);
+    if (prefill || errorType === 'refusal') {
+      setFormState((prev) => ({
+        ...prev,
+        challengeText: prefill || prev.challengeText,
+        showRefusalWarning: errorType === 'refusal',
+      }));
     }
 
     // Clear params from URL without navigation
@@ -50,15 +71,13 @@ export default function NewReportPage() {
   // Track progress once we have a report ID
   const { progress } = useReportProgress(reportId);
 
-  const inputQuality = analyzeInputQuality(challengeText);
-  const wordCount = challengeText.trim().split(/\s+/).filter(Boolean).length;
+  const hasInput = challengeText.trim().length > 0;
   const canSubmit = challengeText.trim().length >= 50;
 
   const handleSubmit = useCallback(async () => {
     if (!canSubmit || isSubmitting) return;
 
-    setIsSubmitting(true);
-    setError(null);
+    setFormState((prev) => ({ ...prev, isSubmitting: true, error: null }));
 
     try {
       const result = await startReportGeneration({
@@ -66,18 +85,23 @@ export default function NewReportPage() {
       });
 
       if (result.reportId) {
-        setReportId(result.reportId);
-        setPhase('processing');
+        setFormState((prev) => ({
+          ...prev,
+          reportId: result.reportId,
+          phase: 'processing',
+          isSubmitting: false,
+        }));
       }
     } catch (err) {
       console.error('Failed to start report:', err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to start report generation',
-      );
-    } finally {
-      setIsSubmitting(false);
+      setFormState((prev) => ({
+        ...prev,
+        error:
+          err instanceof Error
+            ? err.message
+            : 'Failed to start report generation',
+        isSubmitting: false,
+      }));
     }
   }, [canSubmit, challengeText, isSubmitting]);
 
@@ -90,7 +114,7 @@ export default function NewReportPage() {
   // Show processing screen when we have a report in progress
   if (phase === 'processing' && progress) {
     return (
-      <div className="min-h-[calc(100vh-120px)] bg-[--surface-base]">
+      <div className="min-h-[calc(100vh-120px)] bg-[#08080A]">
         <ProcessingScreen
           progress={progress}
           onComplete={handleViewReport}
@@ -100,161 +124,131 @@ export default function NewReportPage() {
     );
   }
 
-  // Input phase
+  // Input phase - minimal industrial design
   return (
-    <motion.div
-      className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center bg-[--surface-base] p-6"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-    >
-      <div className="w-full max-w-2xl space-y-8">
-        {/* Brand mark */}
-        <div className="flex justify-center">
-          <motion.div
-            className="flex h-12 w-12 items-center justify-center rounded-xl bg-[--accent-muted]"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Sparkles className="h-6 w-6 text-[--accent]" />
-          </motion.div>
-        </div>
-
-        {/* Title */}
-        <motion.div
-          className="text-center"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <h1 className="text-2xl font-semibold tracking-tight text-[--text-primary]">
-            Describe your engineering challenge
-          </h1>
-          <p className="mt-2 text-[--text-muted]">
-            Sparlo will analyze your problem and generate innovative solution
-            concepts
-          </p>
-        </motion.div>
-
-        {/* Refusal warning */}
-        {showRefusalWarning && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <Alert
-              variant="destructive"
-              className="border-[--status-warning]/30 bg-[--status-warning]/10 text-[--status-warning]"
-            >
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>
-                  Your previous query was flagged by our AI safety filters.
-                </strong>{' '}
-                This is often a false positive for legitimate engineering
-                problems. Please rephrase your challenge, focusing on the
-                engineering aspects and avoiding terminology that could be
-                misinterpreted.
-              </AlertDescription>
-            </Alert>
-          </motion.div>
-        )}
-
-        {/* Input area */}
-        <motion.div
-          className="space-y-4"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <Textarea
-            value={challengeText}
-            onChange={(e) => {
-              setChallengeText(e.target.value);
-              // Clear refusal warning when user starts editing
-              if (showRefusalWarning) {
-                setShowRefusalWarning(false);
-              }
-            }}
-            placeholder="What engineering problem are you trying to solve? Include constraints, goals, and any relevant context for better results..."
-            className="min-h-[200px] resize-none border-[--border-subtle] bg-[--surface-elevated] text-base leading-relaxed text-[--text-primary] placeholder:text-[--text-muted] focus:border-[--accent] focus:ring-1 focus:ring-[--accent]/20"
-            disabled={isSubmitting}
-          />
-
-          {/* Error message */}
-          {error && <p className="text-sm text-[--status-error]">{error}</p>}
-
-          {/* Quality feedback and submit */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-[--text-muted] tabular-nums">
-                {wordCount} words
-              </span>
-              {challengeText.length >= 30 && (
-                <div className="flex items-center gap-3">
-                  {[
-                    {
-                      check: inputQuality.checks.hasChallenge,
-                      label: 'Problem',
-                    },
-                    {
-                      check: inputQuality.checks.hasConstraints,
-                      label: 'Constraints',
-                    },
-                    { check: inputQuality.checks.hasGoals, label: 'Goals' },
-                    { check: inputQuality.checks.hasContext, label: 'Context' },
-                  ].map(({ check, label }) => (
-                    <div
-                      key={label}
-                      className={cn(
-                        'flex items-center gap-1 text-xs transition-colors',
-                        check ? 'text-[--accent]' : 'text-[--text-muted]/50',
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          'h-1.5 w-1.5 rounded-full transition-colors',
-                          check ? 'bg-[--accent]' : 'bg-[--border-default]',
-                        )}
-                      />
-                      <span className="hidden sm:inline">{label}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <Button
-              onClick={handleSubmit}
-              disabled={!canSubmit || isSubmitting}
-              className="bg-[--accent] text-white hover:bg-[--accent-hover]"
-              style={{ boxShadow: '0 4px 14px -2px rgba(139, 92, 246, 0.4)' }}
-            >
-              {isSubmitting ? (
-                'Starting...'
-              ) : (
-                <>
-                  Generate Report
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </>
-              )}
-            </Button>
+    <div className="flex min-h-screen flex-col bg-[#08080A] text-[#FAFAFA]">
+      {/* Main content */}
+      <main className="flex flex-1 items-center justify-center px-6 pb-20">
+        <div className="w-full max-w-[640px]">
+          {/* Section Label */}
+          <div className="mb-8">
+            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-[#52525B]">
+              Problem
+            </span>
+            <div className="mt-2 h-px bg-[#27272A]" />
           </div>
 
-          {/* Character requirement hint */}
-          {challengeText.length > 0 && challengeText.length < 50 && (
-            <p className="text-center text-sm text-[--text-muted]">
-              Please provide at least 50 characters ({50 - challengeText.length}{' '}
-              more needed)
-            </p>
+          {/* Refusal warning */}
+          {showRefusalWarning && (
+            <div className="mb-6">
+              <Alert
+                variant="destructive"
+                className="border-[#7f1d1d] bg-[#7f1d1d]/10 text-[#fca5a5]"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>
+                    Your previous query was flagged by our AI safety filters.
+                  </strong>{' '}
+                  This is often a false positive for legitimate engineering
+                  problems. Please rephrase your challenge, focusing on the
+                  engineering aspects.
+                </AlertDescription>
+              </Alert>
+            </div>
           )}
 
-          {/* Time notice */}
-          <p className="text-center text-sm text-[--text-muted]">
-            Analysis takes 5-10 minutes. Safe to leave this page.
-          </p>
-        </motion.div>
-      </div>
-    </motion.div>
+          {/* Textarea with Ghost Example */}
+          <div className="relative">
+            {/* Ghost text (visible when input is empty) */}
+            {!hasInput && (
+              <div className="pointer-events-none absolute inset-0 p-5">
+                <p className="font-mono text-[14px] leading-[1.8] text-[#27272A]">
+                  {EXAMPLE_PROBLEM}
+                </p>
+              </div>
+            )}
+
+            {/* Actual textarea */}
+            <textarea
+              value={challengeText}
+              onChange={(e) => {
+                setFormState((prev) => ({
+                  ...prev,
+                  challengeText: e.target.value,
+                  showRefusalWarning: false,
+                }));
+              }}
+              disabled={isSubmitting}
+              data-test="challenge-input"
+              className={cn(
+                'relative w-full',
+                'min-h-[220px]',
+                'rounded-[3px] border border-[#1F1F23] bg-[#0A0A0C]',
+                'p-5',
+                'font-mono text-[14px] leading-[1.8] text-[#FAFAFA]',
+                'resize-none',
+                'transition-colors duration-100',
+                'placeholder:text-transparent',
+                'focus:border-[#3F3F46] focus:outline-none',
+                'disabled:opacity-40',
+              )}
+              placeholder=""
+            />
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <p className="mt-3 font-mono text-[12px] text-[#ef4444]">{error}</p>
+          )}
+
+          {/* Action Bar */}
+          <div
+            className={cn(
+              'mt-4 flex items-center justify-between',
+              'rounded-[3px] border border-[#1F1F23] bg-[#0A0A0C] p-4',
+              // Mobile: stack vertically
+              'max-[480px]:flex-col max-[480px]:gap-4',
+            )}
+          >
+            {/* Duration info */}
+            <div
+              className={cn(
+                'flex items-center gap-3',
+                // Mobile: reorder to bottom and center
+                'max-[480px]:order-2 max-[480px]:justify-center',
+              )}
+            >
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#3F3F46]">
+                ~8 min
+              </span>
+              <span className="text-[12px] text-[#27272A]">|</span>
+              <span className="font-mono text-[11px] text-[#27272A]">
+                Deep analysis
+              </span>
+            </div>
+
+            {/* Run Button */}
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit || isSubmitting}
+              data-test="challenge-submit"
+              className={cn(
+                'rounded-[2px] px-5 py-2',
+                'bg-[#FAFAFA] text-[#08080A]',
+                'font-mono text-[12px] font-semibold uppercase tracking-[0.05em]',
+                'transition-all duration-100',
+                'hover:bg-[#E4E4E7]',
+                'disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-[#FAFAFA]',
+                // Mobile: full width and first
+                'max-[480px]:order-1 max-[480px]:w-full',
+              )}
+            >
+              {isSubmitting ? 'Running...' : 'Run Analysis'}
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 }

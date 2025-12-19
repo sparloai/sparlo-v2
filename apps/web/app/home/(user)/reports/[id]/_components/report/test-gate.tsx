@@ -1,3 +1,5 @@
+import { Check, X } from 'lucide-react';
+
 interface TestGateProps {
   gate: {
     name: string;
@@ -12,52 +14,46 @@ interface TestGateProps {
 
 export function TestGate({ gate, gateNumber }: TestGateProps) {
   return (
-    <div className="rounded-xl border border-[--border-default] bg-[--surface-elevated] p-6">
-      {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[--accent-muted] text-sm font-semibold text-[--accent]">
-            {gateNumber}
-          </span>
-          <h4 className="text-base font-semibold text-[--text-primary]">
-            {gate.name}
-          </h4>
+    <div className="module">
+      {/* Module Header */}
+      <div className="module-header">
+        <div className="module-header-left">
+          <span className="module-type">Gate</span>
+          <span className="module-id">{gateNumber}</span>
+          <span className="gate-name">{gate.name}</span>
         </div>
-        <span className="rounded-full bg-[--surface-overlay] px-3 py-1 text-xs font-medium text-[--text-muted]">
-          {gate.effort}
-        </span>
+        <div className="module-header-right">
+          <span className="timeline-badge">{gate.effort}</span>
+        </div>
       </div>
 
-      {/* What it tests */}
-      <p className="mb-4 text-sm text-[--text-secondary]">
-        {gate.what_it_tests}
-      </p>
+      {/* Module Body */}
+      <div className="module-body module-body--compact">
+        {/* What it tests */}
+        <p className="gate-tests">{gate.what_it_tests}</p>
 
-      {/* Method */}
-      <div className="mb-4 rounded-lg bg-[--surface-overlay] p-3">
-        <p className="text-xs font-medium tracking-wider text-[--text-muted] uppercase">
-          Method
-        </p>
-        <p className="mt-1 text-sm text-[--text-secondary]">{gate.method}</p>
-      </div>
-
-      {/* GO / NO-GO columns */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="rounded-lg border-l-2 border-[--status-success] bg-[--status-success]/10 p-3">
-          <p className="text-xs font-semibold tracking-wider text-[--status-success] uppercase">
-            GO if
-          </p>
-          <p className="mt-1 text-sm text-[--status-success]/90">
-            {gate.go_criteria}
-          </p>
+        {/* Method */}
+        <div className="gate-method">
+          <p className="gate-method-label">Method</p>
+          <p className="gate-method-text">{gate.method}</p>
         </div>
-        <div className="rounded-lg border-l-2 border-[--status-error] bg-[--status-error]/10 p-3">
-          <p className="text-xs font-semibold tracking-wider text-[--status-error] uppercase">
-            NO-GO if
-          </p>
-          <p className="mt-1 text-sm text-[--status-error]/90">
-            {gate.no_go_criteria}
-          </p>
+
+        {/* GO / NO-GO validation framework */}
+        <div className="validation-framework">
+          <div className="validation-gate validation-gate--go">
+            <div className="validation-gate-header">
+              <Check className="validation-gate-icon" />
+              <span className="validation-gate-label">GO if</span>
+            </div>
+            <p className="validation-gate-condition">{gate.go_criteria}</p>
+          </div>
+          <div className="validation-gate validation-gate--nogo">
+            <div className="validation-gate-header">
+              <X className="validation-gate-icon" />
+              <span className="validation-gate-label">NO-GO if</span>
+            </div>
+            <p className="validation-gate-condition">{gate.no_go_criteria}</p>
+          </div>
         </div>
       </div>
     </div>

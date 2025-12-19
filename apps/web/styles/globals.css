@@ -17,6 +17,11 @@
 @import './sparlo-animations.css';
 @import 'tw-animate-css';
 
+/* Report Intelligence Briefing Theme
+ * CSS is now imported in apps/web/app/home/(user)/reports/layout.tsx
+ * for code-splitting optimization (only loaded on report pages)
+ */
+
 /* content sources - update the below if you add a new path */
 @source '../../../packages/*/src/**/*.{ts,tsx}';
 @source '../../../packages/features/*/src/**/*.{ts,tsx}';
@@ -56,5 +61,11 @@
   input::placeholder,
   textarea::placeholder {
     color: theme(--color-muted-foreground);
+  }
+}
+
+@layer utilities {
+  .shadow-accent {
+    box-shadow: var(--shadow-accent);
   }
 }

@@ -545,6 +545,10 @@ export const AN5OutputSchema = z.object({
 
 export type AN5Output = z.infer<typeof AN5OutputSchema>;
 export type Report = z.infer<typeof ReportSchema>;
+export type LeadConcept = z.infer<typeof LeadConceptSchema>;
+export type OtherConcept = z.infer<typeof OtherConceptSchema>;
+export type SparkConcept = z.infer<typeof SparkConceptSchema>;
+export type TestGate = z.infer<typeof TestGateSchema>;
 
 /**
  * AN5 metadata for progress tracking

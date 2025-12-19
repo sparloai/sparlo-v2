@@ -1,0 +1,311 @@
+/*
+ * report-modules.css
+ *
+ * Module system for Sparlo Report.
+ * Self-contained intelligence units with status bars and glows.
+ */
+
+/* ============================================
+   BASE MODULE
+   A self-contained intelligence unit
+   ============================================ */
+.module {
+  position: relative;
+  background: var(--void-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color var(--transition-base),
+    background var(--transition-base);
+}
+
+/* Top edge glow line */
+.module::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-strong) 50%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+/* Hover state */
+.module:hover {
+  border-color: var(--border-strong);
+  background: var(--void-surface);
+}
+
+/* Focus state */
+.module:focus-within {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 1px var(--accent-subtle);
+}
+
+/* ============================================
+   MODULE HEADER
+   ============================================ */
+.module-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-5);
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.module-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.module-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.module-type {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.module-id {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-tertiary);
+}
+
+/* ============================================
+   MODULE BODY
+   ============================================ */
+.module-body {
+  padding: var(--space-6);
+}
+
+.module-body--compact {
+  padding: var(--space-5);
+}
+
+.module-body--spacious {
+  padding: var(--space-8);
+}
+
+/* ============================================
+   MODULE FOOTER
+   ============================================ */
+.module-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  background: rgba(0, 0, 0, 0.15);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.module-meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ============================================
+   MODULE VARIANTS
+   ============================================ */
+
+/* Primary/Lead - Violet accent */
+.module--primary::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--track-lead) 20%,
+    var(--track-lead) 80%,
+    transparent 100%
+  );
+  height: 2px;
+}
+
+.module--primary {
+  border-color: var(--track-lead-border);
+  background: linear-gradient(
+    180deg,
+    rgba(124, 58, 237, 0.04) 0%,
+    var(--void-elevated) 100%
+  );
+}
+
+.module--primary:hover {
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+/* Spark - Amber accent */
+.module--spark::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--track-spark) 20%,
+    var(--track-spark) 80%,
+    transparent 100%
+  );
+  height: 2px;
+}
+
+.module--spark {
+  border-color: var(--track-spark-border);
+  background: linear-gradient(
+    180deg,
+    rgba(245, 158, 11, 0.03) 0%,
+    var(--void-elevated) 100%
+  );
+}
+
+.module--spark:hover {
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+/* Simpler - Neutral */
+.module--simpler {
+  border-color: var(--track-simpler-border);
+}
+
+/* Warning state */
+.module--warning::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--nogo-color) 20%,
+    var(--nogo-color) 80%,
+    transparent 100%
+  );
+  height: 2px;
+  animation: warning-pulse 2s ease-in-out infinite;
+}
+
+/* Success state */
+.module--success::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--go-color) 20%,
+    var(--go-color) 80%,
+    transparent 100%
+  );
+  height: 2px;
+}
+
+/* ============================================
+   MODULE CONTENT ELEMENTS
+   ============================================ */
+.module-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.module-title--lg {
+  font-size: var(--text-2xl);
+}
+
+.module-description {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Thesis/Summary callout within module */
+.module-thesis {
+  padding: var(--space-4) var(--space-5);
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 2px solid var(--border-strong);
+  margin: var(--space-5) 0;
+}
+
+.module-thesis-text {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-normal);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Section within module */
+.module-section {
+  margin-bottom: var(--space-6);
+}
+
+.module-section:last-child {
+  margin-bottom: 0;
+}
+
+.module-section-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.module-section-content {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   MODULE GRID LAYOUTS
+   ============================================ */
+.module-grid {
+  display: grid;
+  gap: var(--module-gap);
+}
+
+.module-grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.module-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .module-grid--2,
+  .module-grid--3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Stack for single-column */
+.module-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--module-gap);
+}
+
+.module-stack--tight {
+  gap: var(--space-4);
+}

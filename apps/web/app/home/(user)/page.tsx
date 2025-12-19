@@ -71,8 +71,8 @@ export default function HomePage() {
           <Link href="/home/reports/new">
             <Button
               size="lg"
-              className="bg-[--accent] text-white hover:bg-[--accent-hover]"
-              style={{ boxShadow: '0 4px 14px -2px rgba(139, 92, 246, 0.4)' }}
+              data-test="new-report-button"
+              className="shadow-accent bg-[--accent] text-white hover:bg-[--accent-hover]"
             >
               <Plus className="mr-2 h-4 w-4" />
               New Report

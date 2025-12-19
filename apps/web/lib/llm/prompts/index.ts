@@ -77,7 +77,8 @@ export const PHASES = [
   {
     id: 'an1',
     name: 'Corpus Retrieval',
-    description: 'Searching 4 namespaces: failures, bounds, transfers, TRIZ examples',
+    description:
+      'Searching 4 namespaces: failures, bounds, transfers, TRIZ examples',
     estimatedMinutes: 0.5,
   },
   {

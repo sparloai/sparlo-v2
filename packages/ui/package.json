@@ -96,6 +96,7 @@
     "./item": "./src/shadcn/item.tsx",
     "./field": "./src/shadcn/field.tsx",
     "./utils": "./src/lib/utils/index.ts",
+    "./hooks": "./src/hooks/index.ts",
     "./if": "./src/makerkit/if.tsx",
     "./trans": "./src/makerkit/trans.tsx",
     "./sidebar": "./src/makerkit/sidebar.tsx",

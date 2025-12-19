@@ -119,488 +119,495 @@ export const generateReport = inngest.createFunction(
         );
         return {
           ...totals,
-          costUsd: calculateCost(totals, MODELS.OPUS as keyof typeof CLAUDE_PRICING),
+          costUsd: calculateCost(
+            totals,
+            MODELS.OPUS as keyof typeof CLAUDE_PRICING,
+          ),
         };
       }
 
-    /**
-     * Helper: Update report progress in Supabase
-     */
-    async function updateProgress(updates: Record<string, unknown>) {
-      const { error } = await supabase
-        .from('sparlo_reports')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', reportId);
+      /**
+       * Helper: Update report progress in Supabase
+       */
+      async function updateProgress(updates: Record<string, unknown>) {
+        const { error } = await supabase
+          .from('sparlo_reports')
+          .update({
+            ...updates,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', reportId);
 
-      if (error) {
-        console.error('Failed to update progress:', error);
-      }
-    }
-
-    // =========================================
-    // AN0: Problem Framing (v10)
-    // =========================================
-    const an0Result = await step.run('an0-problem-framing', async () => {
-      await updateProgress({
-        current_step: 'an0',
-        phase_progress: 0,
-      });
-
-      const { content, usage } = await callClaude({
-        model: MODELS.OPUS,
-        system: AN0_PROMPT,
-        userMessage: designChallenge,
-        maxTokens: 8000,
-      });
-      trackUsage('an0', usage);
-
-      const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
-      const validated = AN0OutputSchema.parse(parsed);
-
-      await updateProgress({ phase_progress: 100 });
-
-      return validated;
-    });
-
-    // Handle v10 AN0 output - check if clarification needed
-    if (an0Result.need_question === true) {
-      // Need clarification - store and wait
-      state = {
-        ...state,
-        needsClarification: true,
-        clarificationQuestion: an0Result.question,
-        completedSteps: ['an0'],
-      };
-
-      await step.run('store-clarification', async () => {
-        await updateProgress({
-          status: 'clarifying',
-          clarifications: [
-            {
-              question: an0Result.question,
-              askedAt: new Date().toISOString(),
-            },
-          ],
-        });
-      });
-
-      // Wait for user to answer (up to 24 hours)
-      const clarificationEvent = await step.waitForEvent(
-        'wait-for-clarification',
-        {
-          event: 'report/clarification-answered',
-          match: 'data.reportId',
-          timeout: '24h',
-        },
-      );
-
-      if (clarificationEvent) {
-        state.clarificationAnswer = clarificationEvent.data.answer;
-        state.clarificationCount = (state.clarificationCount ?? 0) + 1;
-
-        await step.run('resume-after-clarification', async () => {
-          await updateProgress({
-            status: 'processing',
-            clarifications: [
-              {
-                question: an0Result.question,
-                answer: clarificationEvent.data.answer,
-                answeredAt: new Date().toISOString(),
-              },
-            ],
-          });
-        });
-
-        // Re-run AN0 with clarification answer
-        const an0RetryResult = await step.run(
-          'an0-with-clarification',
-          async () => {
-            const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
-
-            const { content, usage } = await callClaude({
-              model: MODELS.OPUS,
-              system: AN0_PROMPT,
-              userMessage: clarifiedChallenge,
-              maxTokens: 8000,
-            });
-            trackUsage('an0-retry', usage);
-
-            const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
-            return AN0OutputSchema.parse(parsed);
-          },
-        );
-
-        // Use the retry result if it's a full analysis
-        if (an0RetryResult.need_question === false) {
-          // Update state with v10 AN0 analysis outputs
-          state = updateStateWithAN0Analysis(state, an0RetryResult);
+        if (error) {
+          console.error('Failed to update progress:', error);
         }
       }
-    } else {
-      // Full analysis - update state with v10 AN0 outputs
-      state = updateStateWithAN0Analysis(state, an0Result);
-    }
 
-    // =========================================
-    // AN1: Corpus Retrieval (v10 - 4 namespaces)
-    // =========================================
-    const an1Result = await step.run('an1-corpus-retrieval', async () => {
-      await updateProgress({
-        current_step: 'an1',
-        phase_progress: 0,
-      });
-
-      // Check if vector search is available
-      if (!isVectorSearchAvailable()) {
-        console.warn('Vector search not available - skipping AN1');
-        await updateProgress({ phase_progress: 100 });
-        return {
-          failures: [],
-          bounds: [],
-          transfers: [],
-          triz: [],
-          summary: 'Corpus retrieval skipped - API keys not configured',
-        };
-      }
-
-      // Build namespace-specific queries from AN0 v10 output
-      const queries = buildRetrievalQueries({
-        original_ask: state.an0_original_ask,
-        corpus_queries: state.an0_corpus_queries,
-        cross_domain_seeds: state.an0_cross_domain_seeds,
-        contradiction: state.an0_contradiction,
-      });
-
-      // Retrieve from 4 namespaces with targeted queries
-      const results = await retrieveTargeted(queries, {
-        failuresK: 10,
-        boundsK: 10,
-        transfersK: 15,
-        trizK: 15,
-      });
-
-      const summary = formatRetrievalSummary(results);
-      console.log(`AN1 Complete: ${summary}`);
-
-      await updateProgress({ phase_progress: 100 });
-
-      return {
-        ...results,
-        summary,
-      };
-    });
-
-    // Update state with AN1 results (v10 - 4 namespaces)
-    state = {
-      ...state,
-      an1_failures: an1Result.failures,
-      an1_bounds: an1Result.bounds,
-      an1_transfers: an1Result.transfers,
-      an1_triz: an1Result.triz,
-      an1_retrieval_summary: an1Result.summary,
-      completedSteps: [...state.completedSteps, 'an1'],
-    };
-
-    // =========================================
-    // AN1.5: Teaching Example Selection (v10)
-    // =========================================
-    let an1_5Result: AN1_5_Output | null = null;
-
-    const hasCorpusResults =
-      an1Result.failures.length > 0 ||
-      an1Result.bounds.length > 0 ||
-      an1Result.transfers.length > 0 ||
-      an1Result.triz.length > 0;
-
-    if (hasCorpusResults) {
-      an1_5Result = await step.run('an1.5-teaching-selection', async () => {
+      // =========================================
+      // AN0: Problem Framing (v10)
+      // =========================================
+      const an0Result = await step.run('an0-problem-framing', async () => {
         await updateProgress({
-          current_step: 'an1.5',
+          current_step: 'an0',
           phase_progress: 0,
         });
 
-        const contextMessage = buildAN1_5ContextV10(state);
-
         const { content, usage } = await callClaude({
           model: MODELS.OPUS,
-          system: AN1_5_PROMPT,
-          userMessage: contextMessage,
+          system: AN0_PROMPT,
+          userMessage: designChallenge,
           maxTokens: 8000,
         });
-        trackUsage('an1.5', usage);
+        trackUsage('an0', usage);
 
-        const parsed = parseJsonResponse<AN1_5_Output>(content, 'AN1.5');
-        const validated = AN1_5_OutputSchema.parse(parsed);
+        const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
+        const validated = AN0OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
 
         return validated;
       });
 
-      // Update state with AN1.5 results (v10)
+      // Handle v10 AN0 output - check if clarification needed
+      if (an0Result.need_question === true) {
+        // Need clarification - store and wait
+        state = {
+          ...state,
+          needsClarification: true,
+          clarificationQuestion: an0Result.question,
+          completedSteps: ['an0'],
+        };
+
+        await step.run('store-clarification', async () => {
+          await updateProgress({
+            status: 'clarifying',
+            clarifications: [
+              {
+                question: an0Result.question,
+                askedAt: new Date().toISOString(),
+              },
+            ],
+          });
+        });
+
+        // Wait for user to answer (up to 24 hours)
+        const clarificationEvent = await step.waitForEvent(
+          'wait-for-clarification',
+          {
+            event: 'report/clarification-answered',
+            match: 'data.reportId',
+            timeout: '24h',
+          },
+        );
+
+        if (clarificationEvent) {
+          state.clarificationAnswer = clarificationEvent.data.answer;
+          state.clarificationCount = (state.clarificationCount ?? 0) + 1;
+
+          await step.run('resume-after-clarification', async () => {
+            await updateProgress({
+              status: 'processing',
+              clarifications: [
+                {
+                  question: an0Result.question,
+                  answer: clarificationEvent.data.answer,
+                  answeredAt: new Date().toISOString(),
+                },
+              ],
+            });
+          });
+
+          // Re-run AN0 with clarification answer
+          const an0RetryResult = await step.run(
+            'an0-with-clarification',
+            async () => {
+              const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+
+              const { content, usage } = await callClaude({
+                model: MODELS.OPUS,
+                system: AN0_PROMPT,
+                userMessage: clarifiedChallenge,
+                maxTokens: 8000,
+              });
+              trackUsage('an0-retry', usage);
+
+              const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
+              return AN0OutputSchema.parse(parsed);
+            },
+          );
+
+          // Use the retry result if it's a full analysis
+          if (an0RetryResult.need_question === false) {
+            // Update state with v10 AN0 analysis outputs
+            state = updateStateWithAN0Analysis(state, an0RetryResult);
+          }
+        }
+      } else {
+        // Full analysis - update state with v10 AN0 outputs
+        state = updateStateWithAN0Analysis(state, an0Result);
+      }
+
+      // =========================================
+      // AN1: Corpus Retrieval (v10 - 4 namespaces)
+      // =========================================
+      const an1Result = await step.run('an1-corpus-retrieval', async () => {
+        await updateProgress({
+          current_step: 'an1',
+          phase_progress: 0,
+        });
+
+        // Check if vector search is available
+        if (!isVectorSearchAvailable()) {
+          console.warn('Vector search not available - skipping AN1');
+          await updateProgress({ phase_progress: 100 });
+          return {
+            failures: [],
+            bounds: [],
+            transfers: [],
+            triz: [],
+            summary: 'Corpus retrieval skipped - API keys not configured',
+          };
+        }
+
+        // Build namespace-specific queries from AN0 v10 output
+        const queries = buildRetrievalQueries({
+          original_ask: state.an0_original_ask,
+          corpus_queries: state.an0_corpus_queries,
+          cross_domain_seeds: state.an0_cross_domain_seeds,
+          contradiction: state.an0_contradiction,
+        });
+
+        // Retrieve from 4 namespaces with targeted queries
+        const results = await retrieveTargeted(queries, {
+          failuresK: 10,
+          boundsK: 10,
+          transfersK: 15,
+          trizK: 15,
+        });
+
+        const summary = formatRetrievalSummary(results);
+        console.log(`AN1 Complete: ${summary}`);
+
+        await updateProgress({ phase_progress: 100 });
+
+        return {
+          ...results,
+          summary,
+        };
+      });
+
+      // Update state with AN1 results (v10 - 4 namespaces)
       state = {
         ...state,
-        an1_5_triz_exemplars: an1_5Result.teaching_examples.triz_exemplars,
-        an1_5_transfer_exemplars:
-          an1_5Result.teaching_examples.transfer_exemplars,
-        an1_5_innovation_guidance:
-          an1_5Result.teaching_examples.innovation_guidance,
-        an1_5_failure_patterns: an1_5Result.validation_data.failure_patterns,
-        an1_5_parameter_bounds: an1_5Result.validation_data.parameter_bounds,
-        an1_5_corpus_gaps: an1_5Result.corpus_gaps,
-        completedSteps: [...state.completedSteps, 'an1.5'],
+        an1_failures: an1Result.failures,
+        an1_bounds: an1Result.bounds,
+        an1_transfers: an1Result.transfers,
+        an1_triz: an1Result.triz,
+        an1_retrieval_summary: an1Result.summary,
+        completedSteps: [...state.completedSteps, 'an1'],
       };
-    } else {
-      state.completedSteps = [...state.completedSteps, 'an1.5'];
-    }
 
-    // =========================================
-    // AN1.7: Literature Augmentation (v10)
-    // =========================================
-    const an1_7Result = await step.run('an1.7-literature', async () => {
-      await updateProgress({
-        current_step: 'an1.7',
-        phase_progress: 0,
+      // =========================================
+      // AN1.5: Teaching Example Selection (v10)
+      // =========================================
+      let an1_5Result: AN1_5_Output | null = null;
+
+      const hasCorpusResults =
+        an1Result.failures.length > 0 ||
+        an1Result.bounds.length > 0 ||
+        an1Result.transfers.length > 0 ||
+        an1Result.triz.length > 0;
+
+      if (hasCorpusResults) {
+        an1_5Result = await step.run('an1.5-teaching-selection', async () => {
+          await updateProgress({
+            current_step: 'an1.5',
+            phase_progress: 0,
+          });
+
+          const contextMessage = buildAN1_5ContextV10(state);
+
+          const { content, usage } = await callClaude({
+            model: MODELS.OPUS,
+            system: AN1_5_PROMPT,
+            userMessage: contextMessage,
+            maxTokens: 8000,
+          });
+          trackUsage('an1.5', usage);
+
+          const parsed = parseJsonResponse<AN1_5_Output>(content, 'AN1.5');
+          const validated = AN1_5_OutputSchema.parse(parsed);
+
+          await updateProgress({ phase_progress: 100 });
+
+          return validated;
+        });
+
+        // Update state with AN1.5 results (v10)
+        state = {
+          ...state,
+          an1_5_triz_exemplars: an1_5Result.teaching_examples.triz_exemplars,
+          an1_5_transfer_exemplars:
+            an1_5Result.teaching_examples.transfer_exemplars,
+          an1_5_innovation_guidance:
+            an1_5Result.teaching_examples.innovation_guidance,
+          an1_5_failure_patterns: an1_5Result.validation_data.failure_patterns,
+          an1_5_parameter_bounds: an1_5Result.validation_data.parameter_bounds,
+          an1_5_corpus_gaps: an1_5Result.corpus_gaps,
+          completedSteps: [...state.completedSteps, 'an1.5'],
+        };
+      } else {
+        state.completedSteps = [...state.completedSteps, 'an1.5'];
+      }
+
+      // =========================================
+      // AN1.7: Literature Augmentation (v10)
+      // =========================================
+      const an1_7Result = await step.run('an1.7-literature', async () => {
+        await updateProgress({
+          current_step: 'an1.7',
+          phase_progress: 0,
+        });
+
+        const contextMessage = buildAN1_7ContextV10(state, an1_5Result);
+
+        const { content, usage } = await callClaude({
+          model: MODELS.OPUS,
+          system: AN1_7_PROMPT,
+          userMessage: contextMessage,
+          maxTokens: 8000,
+        });
+        trackUsage('an1.7', usage);
+
+        const parsed = parseJsonResponse<AN1_7_Output>(content, 'AN1.7');
+        const validated = AN1_7_OutputSchema.parse(parsed);
+
+        await updateProgress({ phase_progress: 100 });
+
+        return validated;
       });
 
-      const contextMessage = buildAN1_7ContextV10(state, an1_5Result);
+      // Update state with AN1.7 results (v10)
+      state = {
+        ...state,
+        an1_7_searches_performed: an1_7Result.searches_performed,
+        an1_7_commercial_precedent: an1_7Result.commercial_precedent,
+        an1_7_process_parameters: an1_7Result.process_parameters,
+        an1_7_competitive_landscape: an1_7Result.competitive_landscape,
+        an1_7_literature_gaps: an1_7Result.literature_gaps,
+        completedSteps: [...state.completedSteps, 'an1.7'],
+      };
 
-      const { content, usage } = await callClaude({
-        model: MODELS.OPUS,
-        system: AN1_7_PROMPT,
-        userMessage: contextMessage,
-        maxTokens: 8000,
-      });
-      trackUsage('an1.7', usage);
+      // =========================================
+      // AN2: Innovation Methodology Briefing (v10)
+      // =========================================
+      const an2Result = await step.run('an2-innovation-briefing', async () => {
+        await updateProgress({
+          current_step: 'an2',
+          phase_progress: 0,
+        });
 
-      const parsed = parseJsonResponse<AN1_7_Output>(content, 'AN1.7');
-      const validated = AN1_7_OutputSchema.parse(parsed);
+        const contextMessage = buildAN2ContextV10(
+          state,
+          an1_5Result,
+          an1_7Result,
+        );
 
-      await updateProgress({ phase_progress: 100 });
+        const { content, usage } = await callClaude({
+          model: MODELS.OPUS,
+          system: AN2_PROMPT,
+          userMessage: contextMessage,
+          maxTokens: 8000,
+        });
+        trackUsage('an2', usage);
 
-      return validated;
-    });
+        const parsed = parseJsonResponse<AN2Output>(content, 'AN2');
+        const validated = AN2OutputSchema.parse(parsed);
 
-    // Update state with AN1.7 results (v10)
-    state = {
-      ...state,
-      an1_7_searches_performed: an1_7Result.searches_performed,
-      an1_7_commercial_precedent: an1_7Result.commercial_precedent,
-      an1_7_process_parameters: an1_7Result.process_parameters,
-      an1_7_competitive_landscape: an1_7Result.competitive_landscape,
-      an1_7_literature_gaps: an1_7Result.literature_gaps,
-      completedSteps: [...state.completedSteps, 'an1.7'],
-    };
+        await updateProgress({ phase_progress: 100 });
 
-    // =========================================
-    // AN2: Innovation Methodology Briefing (v10)
-    // =========================================
-    const an2Result = await step.run('an2-innovation-briefing', async () => {
-      await updateProgress({
-        current_step: 'an2',
-        phase_progress: 0,
-      });
-
-      const contextMessage = buildAN2ContextV10(state, an1_5Result, an1_7Result);
-
-      const { content, usage } = await callClaude({
-        model: MODELS.OPUS,
-        system: AN2_PROMPT,
-        userMessage: contextMessage,
-        maxTokens: 8000,
-      });
-      trackUsage('an2', usage);
-
-      const parsed = parseJsonResponse<AN2Output>(content, 'AN2');
-      const validated = AN2OutputSchema.parse(parsed);
-
-      await updateProgress({ phase_progress: 100 });
-
-      return validated;
-    });
-
-    // Update state with AN2 results (v10)
-    state = {
-      ...state,
-      an2_first_principles_foundation: an2Result.first_principles_foundation,
-      an2_problem_physics: an2Result.problem_physics,
-      an2_innovation_patterns: an2Result.innovation_patterns,
-      an2_cross_domain_map: an2Result.cross_domain_map,
-      an2_triz_guidance: an2Result.triz_guidance,
-      an2_design_constraints: an2Result.design_constraints,
-      an2_innovation_brief: an2Result.innovation_brief,
-      completedSteps: [...state.completedSteps, 'an2'],
-    };
-
-    // =========================================
-    // AN3: Concept Generation (v10)
-    // =========================================
-    const an3Result = await step.run('an3-concept-generation', async () => {
-      await updateProgress({
-        current_step: 'an3',
-        phase_progress: 0,
+        return validated;
       });
 
-      const contextMessage = buildAN3ContextV10(state, an2Result);
+      // Update state with AN2 results (v10)
+      state = {
+        ...state,
+        an2_first_principles_foundation: an2Result.first_principles_foundation,
+        an2_problem_physics: an2Result.problem_physics,
+        an2_innovation_patterns: an2Result.innovation_patterns,
+        an2_cross_domain_map: an2Result.cross_domain_map,
+        an2_triz_guidance: an2Result.triz_guidance,
+        an2_design_constraints: an2Result.design_constraints,
+        an2_innovation_brief: an2Result.innovation_brief,
+        completedSteps: [...state.completedSteps, 'an2'],
+      };
 
-      const { content, usage } = await callClaude({
-        model: MODELS.OPUS,
-        system: AN3_PROMPT,
-        userMessage: contextMessage,
-        maxTokens: 24000,
-      });
-      trackUsage('an3', usage);
+      // =========================================
+      // AN3: Concept Generation (v10)
+      // =========================================
+      const an3Result = await step.run('an3-concept-generation', async () => {
+        await updateProgress({
+          current_step: 'an3',
+          phase_progress: 0,
+        });
 
-      const parsed = parseJsonResponse<AN3Output>(content, 'AN3');
-      const validated = AN3OutputSchema.parse(parsed);
+        const contextMessage = buildAN3ContextV10(state, an2Result);
 
-      await updateProgress({ phase_progress: 100 });
+        const { content, usage } = await callClaude({
+          model: MODELS.OPUS,
+          system: AN3_PROMPT,
+          userMessage: contextMessage,
+          maxTokens: 24000,
+        });
+        trackUsage('an3', usage);
 
-      return validated;
-    });
+        const parsed = parseJsonResponse<AN3Output>(content, 'AN3');
+        const validated = AN3OutputSchema.parse(parsed);
 
-    // Update state with AN3 results (v10)
-    state = {
-      ...state,
-      an3_concepts: an3Result.concepts,
-      an3_track_distribution: an3Result.track_distribution,
-      an3_innovation_notes: an3Result.innovation_notes,
-      an3_concepts_considered_but_rejected:
-        an3Result.concepts_considered_but_rejected,
-      completedSteps: [...state.completedSteps, 'an3'],
-    };
+        await updateProgress({ phase_progress: 100 });
 
-    // =========================================
-    // AN4: Evaluation & Validation (v10)
-    // =========================================
-    const an4Result = await step.run('an4-evaluation', async () => {
-      await updateProgress({
-        current_step: 'an4',
-        phase_progress: 0,
-      });
-
-      const contextMessage = buildAN4ContextV10(state, an3Result, an2Result);
-
-      const { content, usage } = await callClaude({
-        model: MODELS.OPUS,
-        system: AN4_PROMPT,
-        userMessage: contextMessage,
-        maxTokens: 16000, // Large output for validation gates
-      });
-      trackUsage('an4', usage);
-
-      const parsed = parseJsonResponse<AN4Output>(content, 'AN4');
-      const validated = AN4OutputSchema.parse(parsed);
-
-      await updateProgress({ phase_progress: 100 });
-
-      return validated;
-    });
-
-    // Update state with AN4 results (v10)
-    state = {
-      ...state,
-      an4_validation_results: an4Result.validation_results,
-      an4_gate_summary: an4Result.gate_summary,
-      an4_rankings: an4Result.rankings,
-      an4_recommendation: an4Result.recommendation,
-      an4_validation_plan: an4Result.validation_plan,
-      completedSteps: [...state.completedSteps, 'an4'],
-    };
-
-    // =========================================
-    // AN5: Executive Report Generation (v10)
-    // =========================================
-    const an5Result = await step.run('an5-report-generation', async () => {
-      await updateProgress({
-        current_step: 'an5',
-        phase_progress: 0,
+        return validated;
       });
 
-      const contextMessage = buildAN5ContextV10(
-        state,
-        an2Result,
-        an3Result,
-        an4Result,
-        an1_7Result,
-      );
+      // Update state with AN3 results (v10)
+      state = {
+        ...state,
+        an3_concepts: an3Result.concepts,
+        an3_track_distribution: an3Result.track_distribution,
+        an3_innovation_notes: an3Result.innovation_notes,
+        an3_concepts_considered_but_rejected:
+          an3Result.concepts_considered_but_rejected,
+        completedSteps: [...state.completedSteps, 'an3'],
+      };
 
-      const { content, usage } = await callClaude({
-        model: MODELS.OPUS,
-        system: AN5_PROMPT,
-        userMessage: contextMessage,
-        maxTokens: 24000, // Large output for executive report
+      // =========================================
+      // AN4: Evaluation & Validation (v10)
+      // =========================================
+      const an4Result = await step.run('an4-evaluation', async () => {
+        await updateProgress({
+          current_step: 'an4',
+          phase_progress: 0,
+        });
+
+        const contextMessage = buildAN4ContextV10(state, an3Result, an2Result);
+
+        const { content, usage } = await callClaude({
+          model: MODELS.OPUS,
+          system: AN4_PROMPT,
+          userMessage: contextMessage,
+          maxTokens: 16000, // Large output for validation gates
+        });
+        trackUsage('an4', usage);
+
+        const parsed = parseJsonResponse<AN4Output>(content, 'AN4');
+        const validated = AN4OutputSchema.parse(parsed);
+
+        await updateProgress({ phase_progress: 100 });
+
+        return validated;
       });
-      trackUsage('an5', usage);
 
-      const parsed = parseJsonResponse<AN5Output>(content, 'AN5');
-      const validated = AN5OutputSchema.parse(parsed);
+      // Update state with AN4 results (v10)
+      state = {
+        ...state,
+        an4_validation_results: an4Result.validation_results,
+        an4_gate_summary: an4Result.gate_summary,
+        an4_rankings: an4Result.rankings,
+        an4_recommendation: an4Result.recommendation,
+        an4_validation_plan: an4Result.validation_plan,
+        completedSteps: [...state.completedSteps, 'an4'],
+      };
 
-      await updateProgress({ phase_progress: 100 });
+      // =========================================
+      // AN5: Executive Report Generation (v10)
+      // =========================================
+      const an5Result = await step.run('an5-report-generation', async () => {
+        await updateProgress({
+          current_step: 'an5',
+          phase_progress: 0,
+        });
 
-      return validated;
-    });
+        const contextMessage = buildAN5ContextV10(
+          state,
+          an2Result,
+          an3Result,
+          an4Result,
+          an1_7Result,
+        );
 
-    // Update state with final report
-    state = {
-      ...state,
-      an5_report: an5Result.report,
-      completedSteps: [...state.completedSteps, 'an5'],
-      completedAt: new Date().toISOString(),
-    };
+        const { content, usage } = await callClaude({
+          model: MODELS.OPUS,
+          system: AN5_PROMPT,
+          userMessage: contextMessage,
+          maxTokens: 24000, // Large output for executive report
+        });
+        trackUsage('an5', usage);
 
-    // =========================================
-    // Complete Report
-    // =========================================
-    await step.run('complete-report', async () => {
-      // Convert AN5 JSON report to markdown for frontend display
-      const markdown = generateReportMarkdown(an5Result.report);
+        const parsed = parseJsonResponse<AN5Output>(content, 'AN5');
+        const validated = AN5OutputSchema.parse(parsed);
 
-      // Get the recommended concept title from the lead concepts (v11 structure)
-      const recommendedTitle =
-        an5Result.report.solution_concepts?.lead_concepts?.[0]?.title ??
-        'See report for details';
+        await updateProgress({ phase_progress: 100 });
 
-      await updateProgress({
-        status: 'complete',
-        current_step: 'complete',
-        phase_progress: 100,
-        report_data: {
-          markdown, // For frontend display
-          report: an5Result.report,
-          metadata: an5Result.metadata,
-          chainState: state,
-          concepts: an3Result.concepts,
-          validation_results: an4Result.validation_results,
-          recommendation: an4Result.recommendation,
-          innovation_patterns: an2Result.innovation_patterns,
-          recommendedConcept: recommendedTitle,
-          // Corpus data
-          retrieval_summary: state.an1_retrieval_summary,
-          corpus_gaps: state.an1_5_corpus_gaps,
-          commercial_precedent: state.an1_7_commercial_precedent,
+        return validated;
+      });
+
+      // Update state with final report
+      state = {
+        ...state,
+        an5_report: an5Result.report,
+        completedSteps: [...state.completedSteps, 'an5'],
+        completedAt: new Date().toISOString(),
+      };
+
+      // =========================================
+      // Complete Report
+      // =========================================
+      await step.run('complete-report', async () => {
+        // Convert AN5 JSON report to markdown for frontend display
+        const markdown = generateReportMarkdown(an5Result.report);
+
+        // Get the recommended concept title from the lead concepts (v11 structure)
+        const recommendedTitle =
+          an5Result.report.solution_concepts?.lead_concepts?.[0]?.title ??
+          'See report for details';
+
+        await updateProgress({
+          status: 'complete',
+          current_step: 'complete',
+          phase_progress: 100,
+          report_data: {
+            markdown, // For frontend display
+            report: an5Result.report,
+            metadata: an5Result.metadata,
+            chainState: state,
+            concepts: an3Result.concepts,
+            validation_results: an4Result.validation_results,
+            recommendation: an4Result.recommendation,
+            innovation_patterns: an2Result.innovation_patterns,
+            recommendedConcept: recommendedTitle,
+            // Corpus data
+            retrieval_summary: state.an1_retrieval_summary,
+            corpus_gaps: state.an1_5_corpus_gaps,
+            commercial_precedent: state.an1_7_commercial_precedent,
+          },
+        });
+      });
+
+      // Return success with token usage summary (visible in Inngest dashboard)
+      const totalUsage = getTotalUsage();
+      return {
+        success: true,
+        reportId,
+        usage: {
+          byStep: usageByStep,
+          total: {
+            inputTokens: totalUsage.inputTokens,
+            outputTokens: totalUsage.outputTokens,
+            totalTokens: totalUsage.totalTokens,
+          },
+          estimatedCostUsd: Math.round(totalUsage.costUsd * 100) / 100,
         },
-      });
-    });
-
-    // Return success with token usage summary (visible in Inngest dashboard)
-    const totalUsage = getTotalUsage();
-    return {
-      success: true,
-      reportId,
-      usage: {
-        byStep: usageByStep,
-        total: {
-          inputTokens: totalUsage.inputTokens,
-          outputTokens: totalUsage.outputTokens,
-          totalTokens: totalUsage.totalTokens,
-        },
-        estimatedCostUsd: Math.round(totalUsage.costUsd * 100) / 100,
-      },
-    };
+      };
     } // End of runReportGeneration()
   },
 );
@@ -649,12 +656,15 @@ function updateStateWithAN0Analysis(
 function buildAN1_5ContextV10(state: ChainState): string {
   // Helper to truncate and simplify corpus items for context
   const simplifyCorpusItems = (
-    items: Array<{
-      id: string;
-      title: string;
-      text_preview: string;
-      relevance_score: number;
-    }> | null | undefined,
+    items:
+      | Array<{
+          id: string;
+          title: string;
+          text_preview: string;
+          relevance_score: number;
+        }>
+      | null
+      | undefined,
     maxItems: number,
     maxPreviewLength: number = 500,
   ) => {
@@ -831,25 +841,37 @@ function buildAN3ContextV10(state: ChainState, an2Result: AN2Output): string {
 - **Success Metric:** ${an2Result.problem_physics.success_metric}
 
 ### Innovation Patterns
-${an2Result.innovation_patterns.map((p) => `**${p.pattern_name}**
+${an2Result.innovation_patterns
+  .map(
+    (p) => `**${p.pattern_name}**
 - Mechanism: ${p.mechanism}
 - When to use: ${p.when_to_use}
 - Source: ${p.exemplar_source}
-- Application hint: ${p.application_hint}`).join('\n\n')}
+- Application hint: ${p.application_hint}`,
+  )
+  .join('\n\n')}
 
 ### Cross-Domain Inspiration Map
-${an2Result.cross_domain_map.domains_to_mine.map((d) => `**${d.domain}**
+${an2Result.cross_domain_map.domains_to_mine
+  .map(
+    (d) => `**${d.domain}**
 - Similar physics: ${d.similar_physics}
 - Mechanisms: ${d.mechanisms_to_explore.join(', ')}
-- Abstraction: ${d.abstraction}`).join('\n\n')}
+- Abstraction: ${d.abstraction}`,
+  )
+  .join('\n\n')}
 
 **Transfer Thinking Prompt:** ${an2Result.cross_domain_map.transfer_thinking_prompt}
 
 ### TRIZ Application Guidance
-${an2Result.triz_guidance.primary_principles.map((p) => `**#${p.principle.id} ${p.principle.name}**
+${an2Result.triz_guidance.primary_principles
+  .map(
+    (p) => `**#${p.principle.id} ${p.principle.name}**
 - Obvious (AVOID): ${p.obvious_application}
 - Brilliant (AIM FOR): ${p.brilliant_application}
-- Pattern: ${p.pattern}`).join('\n\n')}
+- Pattern: ${p.pattern}`,
+  )
+  .join('\n\n')}
 
 **Combination Hint:** ${an2Result.triz_guidance.principle_combination_hint}
 
@@ -894,7 +916,9 @@ function buildAN4ContextV10(
 ): string {
   return `## Concepts to Validate and Evaluate
 
-${an3Result.concepts.map((c) => `### ${c.concept_id}: ${c.title} (${c.track.replace('_', ' ')})
+${an3Result.concepts
+  .map(
+    (c) => `### ${c.concept_id}: ${c.title} (${c.track.replace('_', ' ')})
 
 **Mechanism:** ${c.mechanism_description}
 
@@ -916,7 +940,9 @@ ${an3Result.concepts.map((c) => `### ${c.concept_id}: ${c.title} (${c.track.repl
 **Tradeoffs:** ${c.tradeoffs.join('; ')}
 
 **Expected Impact:** ${c.expected_impact.primary_kpi_improvement} (${c.expected_impact.confidence})
-`).join('\n---\n')}
+`,
+  )
+  .join('\n---\n')}
 
 ---
 
@@ -1021,11 +1047,15 @@ ${an1_7Result.competitive_landscape}
 - First Principles Winner: ${an3Result.innovation_notes.first_principles_winner}
 
 **All Concepts:**
-${an3Result.concepts.map((c) => `**${c.concept_id}: ${c.title}** (${c.track})
+${an3Result.concepts
+  .map(
+    (c) => `**${c.concept_id}: ${c.title}** (${c.track})
 ${c.mechanism_description}
 - Innovation: ${c.innovation_source.novelty_claim}
 - Expected Impact: ${c.expected_impact.primary_kpi_improvement}
-- Feasibility: ${c.feasibility_check.overall_feasibility}`).join('\n\n')}
+- Feasibility: ${c.feasibility_check.overall_feasibility}`,
+  )
+  .join('\n\n')}
 
 ---
 
@@ -1079,7 +1109,6 @@ ${an4Result.validation_plan.pivot_triggers.join('\n')}
 Please synthesize this into an EXECUTIVE INNOVATION REPORT following the specified structure.`;
 }
 
-
 // =========================================
 // Helper: Convert AN5 JSON Report to Markdown (v11)
 // =========================================
@@ -1102,9 +1131,7 @@ function generateReportMarkdown(report: AN5Output['report']): string {
     `**Recommendation:** ${report.executive_summary.primary_recommendation}`,
   );
   sections.push('');
-  sections.push(
-    `**Fallback:** ${report.executive_summary.fallback_summary}`,
-  );
+  sections.push(`**Fallback:** ${report.executive_summary.fallback_summary}`);
   sections.push('');
   sections.push(
     `**Viability: ${report.executive_summary.viability_verdict}.** ${report.executive_summary.viability_rationale}`,
@@ -1136,11 +1163,11 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   // Problem Analysis
   sections.push('## Problem Analysis');
   sections.push('');
-  sections.push('**What\'s actually going wrong:**');
+  sections.push("**What's actually going wrong:**");
   sections.push('');
   sections.push(report.problem_analysis.what_is_actually_going_wrong);
   sections.push('');
-  sections.push('**Why it\'s hard:**');
+  sections.push("**Why it's hard:**");
   sections.push('');
   sections.push(report.problem_analysis.why_its_hard);
   sections.push('');
@@ -1335,7 +1362,9 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   // Decision Architecture
   sections.push('## Decision Architecture');
   sections.push('');
-  sections.push(`**Primary decision:** ${report.decision_architecture.primary_decision}`);
+  sections.push(
+    `**Primary decision:** ${report.decision_architecture.primary_decision}`,
+  );
   sections.push('');
   sections.push('```');
   report.decision_architecture.decision_tree.forEach((d) => {
@@ -1362,7 +1391,7 @@ function generateReportMarkdown(report: AN5Output['report']): string {
   sections.push('');
 
   // What I'd Actually Do
-  sections.push('## What I\'d Actually Do');
+  sections.push("## What I'd Actually Do");
   sections.push('');
   sections.push(report.what_id_actually_do.intro);
   sections.push('');

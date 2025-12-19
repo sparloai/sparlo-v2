@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeft,
-  Check,
   ChevronRight,
   Download,
   Lightbulb,
@@ -110,17 +109,13 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
   const reportMarkdown = report.report_data?.markdown ?? '';
 
   // Extract structured report data for premium rendering
+  // Functions accept unknown type and handle validation internally
   const structuredReport = useMemo(() => {
-    return extractStructuredReport(
-      report.report_data as Record<string, unknown>,
-    );
+    return extractStructuredReport(report.report_data);
   }, [report.report_data]);
 
   const userInput = useMemo(() => {
-    return extractUserInput(
-      report.report_data as Record<string, unknown>,
-      report.title,
-    );
+    return extractUserInput(report.report_data, report.title);
   }, [report.report_data, report.title]);
 
   // P1 Performance: Memoize TOC generation to prevent recalculation on every render
@@ -142,22 +137,33 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages]);
 
-  // Track active section on scroll
+  // Track active section on scroll (throttled with rAF)
   useEffect(() => {
+    let rafId: number | null = null;
+
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 150;
-      for (let i = tocItems.length - 1; i >= 0; i--) {
-        const item = tocItems[i];
-        if (!item) continue;
-        const element = document.getElementById(item.id);
-        if (element && element.offsetTop <= scrollPosition) {
-          setActiveSection(item.id);
-          break;
+      if (rafId !== null) return;
+
+      rafId = requestAnimationFrame(() => {
+        const scrollPosition = window.scrollY + 150;
+        for (let i = tocItems.length - 1; i >= 0; i--) {
+          const item = tocItems[i];
+          if (!item) continue;
+          const element = document.getElementById(item.id);
+          if (element && element.offsetTop <= scrollPosition) {
+            setActiveSection(item.id);
+            break;
+          }
         }
-      }
+        rafId = null;
+      });
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) cancelAnimationFrame(rafId);
+    };
   }, [tocItems]);
 
   // Keyboard shortcuts
@@ -347,324 +353,314 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
   }
 
   return (
-    <div className="relative min-h-screen">
-      {/* Two-column layout */}
-      <div className="flex">
-        {/* Sticky TOC Sidebar */}
-        <AnimatePresence>
-          {showToc && (
-            <motion.aside
-              className="hidden w-64 flex-shrink-0 lg:block"
-              initial={{ opacity: 0, width: 0 }}
-              animate={{ opacity: 1, width: 256 }}
-              exit={{ opacity: 0, width: 0 }}
-            >
-              <div className="sticky top-20 h-[calc(100vh-80px)] overflow-y-auto border-r border-[#E5E5E5] bg-white dark:border-neutral-800 dark:bg-neutral-900">
-                <div className="p-5">
-                  <div className="mb-5 flex items-center justify-between">
-                    <span className="text-xs font-semibold tracking-[0.1em] text-[#8A8A8A] uppercase">
-                      Contents
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 text-[#8A8A8A] hover:text-[#1A1A1A]"
-                      onClick={() => setShowToc(false)}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                  <nav className="space-y-0.5">
-                    {tocItems.map((item, index) => (
-                      <button
-                        key={`${item.id}-${index}`}
-                        onClick={() => scrollToSection(item.id)}
-                        className={cn(
-                          'group flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-[13px] transition-all',
-                          item.level === 3 && 'pl-6',
-                          activeSection === item.id
-                            ? 'bg-[#7C3AED]/10 font-medium text-[#7C3AED]'
-                            : 'text-[#6A6A6A] hover:bg-[#F5F5F5] hover:text-[#1A1A1A]',
-                        )}
-                      >
-                        <span className="truncate">{item.title}</span>
-                      </button>
-                    ))}
-                  </nav>
-                </div>
-              </div>
-            </motion.aside>
-          )}
-        </AnimatePresence>
-
-        {/* TOC Toggle */}
-        {!showToc && (
-          <motion.button
-            className="fixed top-24 left-4 z-40 hidden items-center gap-2 rounded-lg border border-[#E5E5E5] bg-white px-3 py-2 shadow-md lg:flex"
-            onClick={() => setShowToc(true)}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <List className="h-4 w-4 text-[#6A6A6A]" />
-            <span className="text-xs text-[#6A6A6A]">Contents</span>
-          </motion.button>
-        )}
-
-        {/* Main Content */}
-        <div
-          className={cn(
-            'min-w-0 flex-1 px-6 py-10 transition-all',
-            isChatOpen && 'lg:mr-[420px]',
-          )}
-        >
-          <div className="mx-auto max-w-3xl">
-            {/* Back link */}
-            <Link
-              href="/home"
-              className="mb-6 inline-flex items-center gap-2 text-sm text-[#6A6A6A] hover:text-[#1A1A1A]"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Link>
-
-            {/* Report Header */}
-            <header className="mb-10">
-              <div className="mb-6 flex items-start justify-between gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-xs font-medium tracking-[0.1em] text-[#8A8A8A] uppercase">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Sparlo Analysis Report
-                  </div>
-                  <h1 className="text-[32px] leading-tight font-semibold tracking-tight text-[#1A1A1A] dark:text-white">
-                    {report.title}
-                  </h1>
-                </div>
-                <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-600 uppercase">
-                  <Check className="h-3 w-3" />
-                  Complete
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-[#8A8A8A]">
-                  Generated {new Date(report.created_at).toLocaleDateString()}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-lg border-[#E5E5E5]"
-                  >
-                    <Download className="mr-2 h-3.5 w-3.5" />
-                    Export
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-lg border-[#E5E5E5]"
-                  >
-                    <Share2 className="mr-2 h-3.5 w-3.5" />
-                    Share
-                  </Button>
-                </div>
-              </div>
-            </header>
-
-            {/* Core Insight Card */}
-            {report.report_data?.recommendedConcept && (
-              <motion.section
-                className="relative mb-12 overflow-hidden rounded-xl border-l-[3px] border-[#7C3AED] bg-white shadow-sm dark:bg-neutral-900"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+    <div className="report-page relative min-h-screen">
+      <div className="report-content">
+        {/* Two-column layout */}
+        <div className="flex">
+          {/* Sticky TOC Sidebar - uses transform for GPU-accelerated animation */}
+          <AnimatePresence>
+            {showToc && (
+              <motion.aside
+                className="hidden w-64 flex-shrink-0 lg:block"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.2 }}
               >
-                <div className="p-6">
+                <div className="sticky top-20 h-[calc(100vh-80px)] overflow-y-auto border-r border-[--border-subtle] bg-[--void-elevated]">
+                  <div className="p-5">
+                    <div className="mb-5 flex items-center justify-between">
+                      <span className="text-label">Contents</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-[--text-muted] hover:text-[--text-primary]"
+                        onClick={() => setShowToc(false)}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                    <nav className="space-y-0.5">
+                      {tocItems.map((item, index) => (
+                        <button
+                          key={`${item.id}-${index}`}
+                          onClick={() => scrollToSection(item.id)}
+                          className={cn(
+                            'group flex w-full items-center gap-2.5 rounded-[--radius-sm] px-2.5 py-2 text-left text-[13px] transition-all',
+                            item.level === 3 && 'pl-6',
+                            activeSection === item.id
+                              ? 'bg-[--accent-muted] font-medium text-[--violet-400]'
+                              : 'text-[--text-muted] hover:bg-[--void-surface] hover:text-[--text-primary]',
+                          )}
+                        >
+                          <span className="truncate">{item.title}</span>
+                        </button>
+                      ))}
+                    </nav>
+                  </div>
+                </div>
+              </motion.aside>
+            )}
+          </AnimatePresence>
+
+          {/* TOC Toggle */}
+          {!showToc && (
+            <motion.button
+              className="btn fixed top-24 left-4 z-40 hidden lg:flex"
+              onClick={() => setShowToc(true)}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              <List className="btn-icon" />
+              <span className="text-xs">Contents</span>
+            </motion.button>
+          )}
+
+          {/* Main Content */}
+          <div
+            className={cn(
+              'min-w-0 flex-1 px-6 py-10 transition-all',
+              isChatOpen && 'lg:mr-[420px]',
+            )}
+          >
+            <div className="mx-auto max-w-3xl">
+              {/* Back link */}
+              <Link
+                href="/home"
+                className="mb-6 inline-flex items-center gap-2 text-sm text-[--text-muted] transition-colors hover:text-[--text-primary]"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to Dashboard
+              </Link>
+
+              {/* Report Header */}
+              <header className="mb-10">
+                <div className="mb-6 flex items-start justify-between gap-6">
+                  <div className="space-y-3">
+                    <div className="text-label flex items-center gap-2">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Sparlo Intelligence Briefing
+                    </div>
+                    <h1 className="heading-display heading-display--lg">
+                      {report.title}
+                    </h1>
+                  </div>
+                  <div className="status status--high">
+                    <span className="status-dot" />
+                    Complete
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-[--text-muted]">
+                    Generated {new Date(report.created_at).toLocaleDateString()}
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="btn">
+                      <Download className="btn-icon" />
+                      Export
+                    </button>
+                    <button className="btn">
+                      <Share2 className="btn-icon" />
+                      Share
+                    </button>
+                  </div>
+                </div>
+              </header>
+
+              {/* Core Insight Card */}
+              {report.report_data?.recommendedConcept && (
+                <motion.section
+                  className="callout callout--insight mb-12"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
                   <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#7C3AED]/10">
-                      <Lightbulb className="h-5 w-5 text-[#7C3AED]" />
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[--radius-sm] bg-[--accent-muted]">
+                      <Lightbulb className="h-5 w-5 text-[--violet-400]" />
                     </div>
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-2">
-                        <h2 className="text-base font-semibold text-[#1A1A1A] dark:text-white">
+                        <h2 className="text-base font-semibold text-[--text-primary]">
                           Lead Recommendation
                         </h2>
-                        <span className="rounded bg-[#7C3AED]/10 px-2 py-0.5 text-[10px] font-semibold tracking-wider text-[#7C3AED] uppercase">
+                        <span className="confidence-badge confidence-badge--high">
                           Key Finding
                         </span>
                       </div>
-                      <div className="border-t border-[#E5E5E5] pt-3 dark:border-neutral-800">
+                      <div className="border-t border-[--border-subtle] pt-3">
                         <div className="flex items-start gap-2">
-                          <ChevronRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#7C3AED]" />
-                          <p className="text-sm font-medium text-[#1A1A1A] dark:text-white">
+                          <ChevronRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[--violet-400]" />
+                          <p className="text-sm font-medium text-[--text-primary]">
                             {report.report_data.recommendedConcept}
                           </p>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </motion.section>
-            )}
-
-            {/* Full Report - Structured or Markdown fallback */}
-            <motion.div
-              className="rounded-xl bg-white p-8 shadow-sm lg:p-10 dark:bg-neutral-900"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              {structuredReport ? (
-                <StructuredReport
-                  report={structuredReport}
-                  userInput={userInput}
-                />
-              ) : (
-                <ReactMarkdown components={markdownComponents}>
-                  {reportMarkdown}
-                </ReactMarkdown>
+                </motion.section>
               )}
-            </motion.div>
 
-            <div className="h-32" />
+              {/* Full Report - Structured or Markdown fallback */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+              >
+                {structuredReport ? (
+                  <StructuredReport
+                    report={structuredReport}
+                    userInput={userInput}
+                  />
+                ) : (
+                  <ReactMarkdown components={markdownComponents}>
+                    {reportMarkdown}
+                  </ReactMarkdown>
+                )}
+              </motion.div>
+
+              <div className="h-32" />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Chat Toggle Button */}
-      {!isChatOpen && (
-        <motion.button
-          className="fixed right-6 bottom-6 z-50 flex items-center gap-2.5 rounded-full bg-[#7C3AED] px-5 py-3.5 text-white shadow-lg hover:shadow-xl"
-          style={{ boxShadow: '0 4px 14px -2px rgba(124, 58, 237, 0.4)' }}
-          onClick={() => setIsChatOpen(true)}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          whileHover={{ scale: 1.02 }}
-        >
-          <MessageSquare className="h-5 w-5" />
-          <span className="text-sm font-medium">Ask about this report</span>
-          <span className="ml-1 rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-medium">
-            ^/
-          </span>
-        </motion.button>
-      )}
-
-      {/* Chat Drawer */}
-      <AnimatePresence>
-        {isChatOpen && (
-          <motion.div
-            className="fixed top-0 right-0 bottom-0 z-50 flex h-full w-[420px] flex-col border-l border-[#E5E5E5] bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900"
-            initial={{ x: 420 }}
-            animate={{ x: 0 }}
-            exit={{ x: 420 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        {/* Chat Toggle Button */}
+        {!isChatOpen && (
+          <motion.button
+            className="btn btn--primary fixed right-6 bottom-6 z-50 rounded-full shadow-lg"
+            style={{ boxShadow: 'var(--glow-violet)' }}
+            onClick={() => setIsChatOpen(true)}
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            whileHover={{ scale: 1.02 }}
           >
-            {/* Chat Header */}
-            <div className="flex items-center justify-between border-b border-[#E5E5E5] px-5 py-4 dark:border-neutral-800">
-              <div className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#7C3AED]/10">
-                  <MessageSquare className="h-4 w-4 text-[#7C3AED]" />
-                </div>
-                <div>
-                  <span className="text-sm font-semibold text-[#1A1A1A] dark:text-white">
-                    Chat with Report
-                  </span>
-                  <p className="text-[10px] text-[#8A8A8A]">
-                    Ask follow-up questions
-                  </p>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-[#8A8A8A]"
-                onClick={() => setIsChatOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <MessageSquare className="h-5 w-5" />
+            <span className="text-sm font-medium">Ask about this report</span>
+            <span className="ml-1 rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-medium">
+              ^/
+            </span>
+          </motion.button>
+        )}
 
-            {/* Chat Messages */}
-            <div className="flex-1 space-y-4 overflow-y-auto p-5">
-              {chatMessages.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F5F5F5] dark:bg-neutral-800">
-                    <MessageSquare className="h-7 w-7 text-[#8A8A8A]" />
-                  </div>
-                  <p className="text-base font-semibold text-[#1A1A1A] dark:text-white">
-                    Ask anything about this report
-                  </p>
-                  <p className="mt-2 max-w-[280px] text-sm text-[#8A8A8A]">
-                    Get clarification, explore alternatives, or dive deeper into
-                    specific concepts.
-                  </p>
-                </div>
-              ) : (
-                chatMessages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={cn(
-                      'flex',
-                      msg.role === 'user' ? 'justify-end' : 'justify-start',
-                    )}
-                  >
-                    <div
-                      className={cn(
-                        'max-w-[85%] rounded-2xl px-4 py-3',
-                        msg.role === 'user'
-                          ? 'rounded-br-md bg-[#7C3AED] text-white'
-                          : 'rounded-bl-md bg-[#F5F5F5] text-[#1A1A1A] dark:bg-neutral-800 dark:text-white',
-                      )}
-                    >
-                      <p className="text-sm whitespace-pre-wrap">
-                        {msg.content}
-                      </p>
-                      {msg.isStreaming && (
-                        <span className="inline-block animate-pulse text-[#7C3AED]">
-                          @
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            {/* Chat Input */}
-            <form
-              onSubmit={handleChatSubmit}
-              className="border-t border-[#E5E5E5] bg-[#FAFAFA] p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
+        {/* Chat Drawer */}
+        <AnimatePresence>
+          {isChatOpen && (
+            <motion.div
+              className="fixed top-0 right-0 bottom-0 z-50 flex h-full w-[420px] flex-col border-l border-[--border-subtle] bg-[--void-elevated] shadow-2xl"
+              initial={{ x: 420 }}
+              animate={{ x: 0 }}
+              exit={{ x: 420 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
-              <div className="flex gap-2">
-                <Textarea
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Ask a question..."
-                  className="max-h-[100px] min-h-[44px] resize-none text-sm"
-                  disabled={isChatLoading}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleChatSubmit(e);
-                    }
-                  }}
-                />
+              {/* Chat Header */}
+              <div className="flex items-center justify-between border-b border-[--border-subtle] px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-[--radius-sm] bg-[--accent-muted]">
+                    <MessageSquare className="h-4 w-4 text-[--violet-400]" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-[--text-primary]">
+                      Chat with Report
+                    </span>
+                    <p className="text-[10px] text-[--text-muted]">
+                      Ask follow-up questions
+                    </p>
+                  </div>
+                </div>
                 <Button
-                  type="submit"
+                  variant="ghost"
                   size="icon"
-                  className="h-[44px] w-[44px] flex-shrink-0 bg-[#7C3AED] hover:bg-[#6D28D9]"
-                  disabled={!chatInput.trim() || isChatLoading}
+                  className="h-8 w-8 text-[--text-muted] hover:text-[--text-primary]"
+                  onClick={() => setIsChatOpen(false)}
                 >
-                  {isChatLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
-                  )}
+                  <X className="h-4 w-4" />
                 </Button>
               </div>
-            </form>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+              {/* Chat Messages */}
+              <div className="flex-1 space-y-4 overflow-y-auto p-5">
+                {chatMessages.length === 0 ? (
+                  <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[--radius-md] bg-[--void-surface]">
+                      <MessageSquare className="h-7 w-7 text-[--text-muted]" />
+                    </div>
+                    <p className="text-base font-semibold text-[--text-primary]">
+                      Ask anything about this report
+                    </p>
+                    <p className="mt-2 max-w-[280px] text-sm text-[--text-muted]">
+                      Get clarification, explore alternatives, or dive deeper
+                      into specific concepts.
+                    </p>
+                  </div>
+                ) : (
+                  chatMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        'flex',
+                        msg.role === 'user' ? 'justify-end' : 'justify-start',
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'max-w-[85%] rounded-[--radius-sm] px-4 py-3',
+                          msg.role === 'user'
+                            ? 'bg-[--accent-primary] text-white'
+                            : 'bg-[--void-surface] text-[--text-primary]',
+                        )}
+                      >
+                        <p className="text-sm whitespace-pre-wrap">
+                          {msg.content}
+                        </p>
+                        {msg.isStreaming && (
+                          <span className="inline-block animate-pulse text-[--violet-400]">
+                            |
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Chat Input */}
+              <form
+                onSubmit={handleChatSubmit}
+                className="border-t border-[--border-subtle] bg-[--void-deep] p-4"
+              >
+                <div className="flex gap-2">
+                  <Textarea
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Ask a question..."
+                    className="max-h-[100px] min-h-[44px] resize-none border-[--border-default] bg-[--void-elevated] text-sm text-[--text-primary] placeholder:text-[--text-muted]"
+                    disabled={isChatLoading}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleChatSubmit(e);
+                      }
+                    }}
+                  />
+                  <Button
+                    type="submit"
+                    size="icon"
+                    className="h-[44px] w-[44px] flex-shrink-0 bg-[--accent-primary] hover:bg-[--violet-700]"
+                    disabled={!chatInput.trim() || isChatLoading}
+                  >
+                    {isChatLoading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

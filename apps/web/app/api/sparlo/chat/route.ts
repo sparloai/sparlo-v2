@@ -20,64 +20,80 @@ const ChatHistorySchema = z.array(ChatMessageSchema);
 
 type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
-// P1-044: Rate limiting (in-memory, per-user)
-const rateLimits = new Map<
-  string,
-  { hourCount: number; hourReset: number; dayCount: number; dayReset: number }
->();
+// P2-051: Distributed rate limiting via Supabase
+// Works across all server instances in serverless/load-balanced environments
 const RATE_LIMITS = {
   MESSAGES_PER_HOUR: 30,
   MESSAGES_PER_DAY: 150,
 };
 
-function checkRateLimit(userId: string): {
+interface RateLimitResult {
+  allowed: boolean;
+  hourCount: number;
+  dayCount: number;
+  hourlyLimit: number;
+  dailyLimit: number;
+  hourReset: number;
+  dayReset: number;
+  retryAfter: number | null;
+}
+
+async function checkRateLimit(
+  client: any,
+  userId: string,
+): Promise<{
   allowed: boolean;
   retryAfter?: number;
-} {
-  const now = Date.now();
-  const hourMs = 60 * 60 * 1000;
-  const dayMs = 24 * 60 * 60 * 1000;
+  headers: Record<string, string>;
+}> {
+  try {
+    // Type assertion needed until typegen runs with rate_limits migration
+    const { data, error } = await client.rpc(
+      'check_rate_limit' as 'count_completed_reports',
+      {
+        p_user_id: userId,
+        p_endpoint: 'chat',
+        p_hourly_limit: RATE_LIMITS.MESSAGES_PER_HOUR,
+        p_daily_limit: RATE_LIMITS.MESSAGES_PER_DAY,
+      } as unknown as { target_account_id: string },
+    );
 
-  let record = rateLimits.get(userId);
-  if (!record) {
-    record = {
-      hourCount: 0,
-      hourReset: now + hourMs,
-      dayCount: 0,
-      dayReset: now + dayMs,
+    if (error) {
+      console.error('[RateLimit] Supabase RPC error:', error);
+      // Fail open - allow request if rate limiting fails
+      return { allowed: true, headers: {} };
+    }
+
+    const result = data as RateLimitResult;
+
+    // Build rate limit headers for transparency
+    const headers: Record<string, string> = {
+      'X-RateLimit-Limit-Hour': String(result.hourlyLimit),
+      'X-RateLimit-Remaining-Hour': String(
+        Math.max(0, result.hourlyLimit - result.hourCount),
+      ),
+      'X-RateLimit-Reset-Hour': String(result.hourReset),
+      'X-RateLimit-Limit-Day': String(result.dailyLimit),
+      'X-RateLimit-Remaining-Day': String(
+        Math.max(0, result.dailyLimit - result.dayCount),
+      ),
+      'X-RateLimit-Reset-Day': String(result.dayReset),
     };
-  }
 
-  // Reset counters if windows expired
-  if (now > record.hourReset) {
-    record.hourCount = 0;
-    record.hourReset = now + hourMs;
-  }
-  if (now > record.dayReset) {
-    record.dayCount = 0;
-    record.dayReset = now + dayMs;
-  }
+    if (!result.allowed && result.retryAfter) {
+      return {
+        allowed: false,
+        retryAfter: result.retryAfter,
+        headers,
+      };
+    }
 
-  // Check limits
-  if (record.hourCount >= RATE_LIMITS.MESSAGES_PER_HOUR) {
-    return {
-      allowed: false,
-      retryAfter: Math.ceil((record.hourReset - now) / 1000),
-    };
+    return { allowed: true, headers };
+  } catch (err) {
+    console.error('[RateLimit] Unexpected error:', err);
+    // Fail open - allow request if rate limiting fails
+    return { allowed: true, headers: {} };
   }
-  if (record.dayCount >= RATE_LIMITS.MESSAGES_PER_DAY) {
-    return {
-      allowed: false,
-      retryAfter: Math.ceil((record.dayReset - now) / 1000),
-    };
-  }
-
-  // Increment and save
-  record.hourCount++;
-  record.dayCount++;
-  rateLimits.set(userId, record);
-
-  return { allowed: true };
 }
 
 // P1-045: Structured system prompt with clear boundaries
@@ -158,22 +174,25 @@ export const GET = enhanceRouteHandler(
 
 export const POST = enhanceRouteHandler(
   async function POST({ request, user }) {
-    // P1-044: Check rate limit
-    const rateCheck = checkRateLimit(user.id);
+    const client = getSupabaseServerClient();
+
+    // P2-051: Distributed rate limiting via Supabase
+    const rateCheck = await checkRateLimit(client, user.id);
     if (!rateCheck.allowed) {
       return Response.json(
         { error: 'Rate limit exceeded. Please slow down.' },
         {
           status: 429,
-          headers: { 'Retry-After': String(rateCheck.retryAfter) },
+          headers: {
+            'Retry-After': String(rateCheck.retryAfter),
+            ...rateCheck.headers,
+          },
         },
       );
     }
 
     const body = await request.json();
     const { reportId, message } = ChatRequestSchema.parse(body);
-
-    const client = getSupabaseServerClient();
 
     // Load report + history (RLS handles authorization)
     const { data: report, error } = await client
@@ -258,16 +277,22 @@ ${reportContext}
           if (rpcError) throw rpcError;
         });
 
-        return Response.json({
-          response: assistantContent,
-          saved: saveResult.success,
-          ...(saveResult.success
-            ? {}
-            : { saveError: 'Failed to persist chat history' }),
-        });
+        return Response.json(
+          {
+            response: assistantContent,
+            saved: saveResult.success,
+            ...(saveResult.success
+              ? {}
+              : { saveError: 'Failed to persist chat history' }),
+          },
+          { headers: rateCheck.headers },
+        );
       } catch (err) {
         console.error('[Chat] JSON response error:', err);
-        return Response.json({ error: 'AI service error' }, { status: 500 });
+        return Response.json(
+          { error: 'AI service error' },
+          { status: 500, headers: rateCheck.headers },
+        );
       }
     }
 
@@ -348,6 +373,7 @@ ${reportContext}
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache, no-transform',
         Connection: 'keep-alive',
+        ...rateCheck.headers,
       },
     });
   },

@@ -14,9 +14,10 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
+import { usePrefersReducedMotion } from '@kit/ui/hooks';
 import { cn } from '@kit/ui/utils';
 
-import { usePrefersReducedMotion } from '../_hooks/use-prefers-reduced-motion';
+import { DURATION, EASING, STAGGER } from '../_lib/animation-constants';
 import type { ConversationStatus } from '../_lib/types';
 
 interface Report {
@@ -29,16 +30,13 @@ interface Report {
   archived: boolean;
 }
 
-// Custom easing as tuple for TypeScript
-const easeOut: [number, number, number, number] = [0, 0, 0.2, 1];
-
 // Animation variants - defined outside component for performance
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.08,
+      staggerChildren: STAGGER.normal,
     },
   },
 };
@@ -49,8 +47,8 @@ const itemVariants: Variants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.3,
-      ease: easeOut,
+      duration: DURATION.normal,
+      ease: EASING.easeOut,
     },
   },
 };
@@ -60,14 +58,14 @@ const cardVariants: Variants = {
   hover: {
     y: -2,
     transition: {
-      duration: 0.2,
-      ease: easeOut,
+      duration: DURATION.fast + 0.05,
+      ease: EASING.easeOut,
     },
   },
   tap: {
     scale: 0.98,
     transition: {
-      duration: 0.1,
+      duration: DURATION.fast - 0.05,
     },
   },
 };
@@ -125,6 +123,9 @@ function StatusBadge({ status }: { status: ConversationStatus }) {
         'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
         className,
       )}
+      data-test={`report-status-${status}`}
+      role="status"
+      aria-label={`Report status: ${label}`}
     >
       <Icon className={cn('h-3.5 w-3.5', iconClassName)} />
       {label}
@@ -176,7 +177,11 @@ function ReportCard({
   if (shouldAnimate) {
     return (
       <motion.div variants={itemVariants}>
-        <Link href={`/home/reports/${report.id}`} className="group block">
+        <Link
+          href={`/home/reports/${report.id}`}
+          className="group block"
+          data-test={`report-card-${report.id}`}
+        >
           <motion.div
             variants={cardVariants}
             initial="initial"
@@ -194,6 +199,7 @@ function ReportCard({
   return (
     <Link
       href={`/home/reports/${report.id}`}
+      data-test={`report-card-${report.id}`}
       className="group block rounded-xl border border-[--border-subtle] bg-[--surface-elevated] p-5 transition-colors hover:border-[--border-default]"
     >
       {cardContent}
@@ -203,7 +209,10 @@ function ReportCard({
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[--border-default] bg-[--surface-overlay]/50 px-6 py-16">
+    <div
+      className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[--border-default] bg-[--surface-overlay]/50 px-6 py-16"
+      data-test="reports-empty-state"
+    >
       <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[--accent-muted]">
         <FileText className="h-7 w-7 text-[--accent]" />
       </div>

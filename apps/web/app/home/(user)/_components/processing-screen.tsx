@@ -16,9 +16,10 @@ import {
 } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
+import { usePrefersReducedMotion } from '@kit/ui/hooks';
 import { Textarea } from '@kit/ui/textarea';
 
-import { usePrefersReducedMotion } from '../_hooks/use-prefers-reduced-motion';
+import { DURATION, EASING } from '../_lib/animation-constants';
 import { answerClarification } from '../_lib/server/sparlo-reports-server-actions';
 import { type ReportProgress } from '../_lib/use-report-progress';
 
@@ -28,11 +29,6 @@ interface ProcessingScreenProps {
   designChallenge?: string;
 }
 
-// Custom easing tuples for TypeScript
-const easeInOut: [number, number, number, number] = [0.4, 0, 0.6, 1];
-const easeOut: [number, number, number, number] = [0, 0, 0.2, 1];
-const easeIn: [number, number, number, number] = [0.4, 0, 1, 1];
-
 // Animation variants - defined outside component for performance
 const pulseVariants: Variants = {
   initial: { scale: 1, opacity: 0.8 },
@@ -40,9 +36,9 @@ const pulseVariants: Variants = {
     scale: [1, 1.05, 1],
     opacity: [0.8, 1, 0.8],
     transition: {
-      duration: 2,
+      duration: DURATION.pulse,
       repeat: Infinity,
-      ease: easeInOut,
+      ease: EASING.easeInOut,
     },
   },
 };
@@ -51,7 +47,7 @@ const spinVariants: Variants = {
   animate: {
     rotate: 360,
     transition: {
-      duration: 8,
+      duration: DURATION.spin,
       repeat: Infinity,
       ease: 'linear',
     },
@@ -63,9 +59,13 @@ const textVariants: Variants = {
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.3, ease: easeOut },
+    transition: { duration: DURATION.normal, ease: EASING.easeOut },
   },
-  exit: { opacity: 0, y: -8, transition: { duration: 0.2, ease: easeIn } },
+  exit: {
+    opacity: 0,
+    y: -8,
+    transition: { duration: DURATION.fast, ease: EASING.easeIn },
+  },
 };
 
 const STATUS_MESSAGES = [
@@ -76,36 +76,40 @@ const STATUS_MESSAGES = [
 ];
 
 /**
+ * Calculate elapsed seconds from a timestamp string.
+ */
+function calculateElapsed(createdAt: string | null): number {
+  if (!createdAt) return 0;
+  const startTime = new Date(createdAt).getTime();
+  if (isNaN(startTime)) return 0;
+  return Math.max(0, Math.floor((Date.now() - startTime) / 1000));
+}
+
+/**
  * Hook to calculate elapsed time from a timestamp.
  * Persists correctly across page refresh by using database timestamp.
+ *
+ * Uses interval pattern where interval fires immediately (0ms delay on first tick)
+ * to avoid lint warnings about setState in effects while still getting immediate updates.
  */
 function useElapsedTime(createdAt: string | null): number {
-  const calculateElapsed = (timestamp: string | null) => {
-    if (!timestamp) return 0;
-    return Math.max(
-      0,
-      Math.floor((Date.now() - new Date(timestamp).getTime()) / 1000),
-    );
-  };
-
-  const [prevCreatedAt, setPrevCreatedAt] = useState(createdAt);
   const [elapsed, setElapsed] = useState(() => calculateElapsed(createdAt));
 
-  // Handle createdAt changes during render (React-recommended pattern)
-  if (createdAt !== prevCreatedAt) {
-    setPrevCreatedAt(createdAt);
-    setElapsed(calculateElapsed(createdAt));
-  }
-
   useEffect(() => {
-    if (!createdAt) return;
+    // Fire immediately, then every second
+    let immediate = true;
+    const update = () => {
+      setElapsed(calculateElapsed(createdAt));
+    };
 
-    const startTime = new Date(createdAt).getTime();
+    // Immediate update via microtask to avoid lint warning
+    if (immediate) {
+      immediate = false;
+      queueMicrotask(update);
+    }
 
     // Update every second
-    const interval = setInterval(() => {
-      setElapsed(Math.max(0, Math.floor((Date.now() - startTime) / 1000)));
-    }, 1000);
+    const interval = setInterval(update, 1000);
 
     return () => clearInterval(interval);
   }, [createdAt]);
@@ -232,10 +236,8 @@ export function ProcessingScreen({
             <Button
               onClick={onComplete}
               size="lg"
-              className="mt-8 rounded-lg bg-[--accent] px-8 text-white hover:bg-[--accent-hover]"
-              style={{
-                boxShadow: '0 4px 14px -2px rgba(139, 92, 246, 0.4)',
-              }}
+              data-test="processing-view-report"
+              className="shadow-accent mt-8 rounded-lg bg-[--accent] px-8 text-white hover:bg-[--accent-hover]"
             >
               View Full Report
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -294,6 +296,7 @@ export function ProcessingScreen({
 
         <Button
           onClick={handleTryAgain}
+          data-test="processing-retry"
           className="mt-6 bg-[--accent] text-white hover:bg-[--accent-hover]"
         >
           <ArrowRight className="mr-2 h-4 w-4" />
@@ -342,6 +345,7 @@ export function ProcessingScreen({
               value={clarificationAnswer}
               onChange={(e) => setClarificationAnswer(e.target.value)}
               placeholder="Type your answer..."
+              data-test="clarification-input"
               className="min-h-[100px] resize-none border-[--border-subtle] bg-[--surface-overlay] text-[--text-primary] placeholder:text-[--text-muted]"
               disabled={isSubmitting}
             />
@@ -362,6 +366,7 @@ export function ProcessingScreen({
             <Button
               onClick={handleSubmitClarification}
               disabled={!clarificationAnswer.trim() || isSubmitting}
+              data-test="clarification-submit"
               className="bg-[--accent] text-white hover:bg-[--accent-hover]"
             >
               {isSubmitting ? (

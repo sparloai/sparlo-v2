@@ -2,15 +2,11 @@ import Link from 'next/link';
 
 import { cn } from '@kit/ui/utils';
 
-function LogoImage({
-  className,
-}: {
-  className?: string;
-}) {
+function LogoImage({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        'text-xl font-bold tracking-tight text-black dark:text-white lg:text-2xl',
+        'text-xl font-bold tracking-tight text-black lg:text-2xl dark:text-white',
         className,
       )}
     >
