@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -59,10 +60,17 @@ export function NavHeader() {
         <div className="flex items-center gap-3">
           <Link
             href="/home"
-            className="text-[15px] font-semibold tracking-[-0.01em] text-[#FAFAFA] transition-colors hover:text-[#888]"
-            style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+            className="transition-opacity hover:opacity-70"
           >
-            Sparlo
+            {/* White logo for dark mode, black logo for light mode */}
+            <Image
+              src="/images/sparlo-logo-white.png"
+              alt="Sparlo"
+              width={80}
+              height={20}
+              className="h-5 w-auto dark:block"
+              priority
+            />
           </Link>
 
           {pageName && pathname !== '/home' && (
