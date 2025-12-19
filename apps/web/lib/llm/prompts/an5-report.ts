@@ -342,9 +342,12 @@ const normalizeEnumValue = (validValues: string[]) =>
     return match ?? normalized;
   });
 
-const CapitalRequirement = normalizeEnumValue(['None', 'Low', 'Medium', 'High']).pipe(
-  z.enum(['None', 'Low', 'Medium', 'High']),
-);
+const CapitalRequirement = normalizeEnumValue([
+  'None',
+  'Low',
+  'Medium',
+  'High',
+]).pipe(z.enum(['None', 'Low', 'Medium', 'High']));
 
 // Header
 const HeaderSchema = z.object({

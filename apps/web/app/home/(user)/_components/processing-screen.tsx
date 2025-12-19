@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertTriangle,
   ArrowRight,
+  Brain,
   Check,
   Loader2,
   MessageSquare,
@@ -22,6 +23,8 @@ import { Textarea } from '@kit/ui/textarea';
 import { DURATION, EASING } from '../_lib/animation-constants';
 import { answerClarification } from '../_lib/server/sparlo-reports-server-actions';
 import { type ReportProgress } from '../_lib/use-report-progress';
+import { formatElapsed, useElapsedTime } from '../_lib/utils/elapsed-time';
+import { ERROR_PATTERNS } from '../_lib/utils/error-constants';
 
 interface ProcessingScreenProps {
   progress: ReportProgress;
@@ -75,57 +78,6 @@ const STATUS_MESSAGES = [
   'Building recommendations...',
 ];
 
-/**
- * Calculate elapsed seconds from a timestamp string.
- */
-function calculateElapsed(createdAt: string | null): number {
-  if (!createdAt) return 0;
-  const startTime = new Date(createdAt).getTime();
-  if (isNaN(startTime)) return 0;
-  return Math.max(0, Math.floor((Date.now() - startTime) / 1000));
-}
-
-/**
- * Hook to calculate elapsed time from a timestamp.
- * Persists correctly across page refresh by using database timestamp.
- *
- * Uses interval pattern where interval fires immediately (0ms delay on first tick)
- * to avoid lint warnings about setState in effects while still getting immediate updates.
- */
-function useElapsedTime(createdAt: string | null): number {
-  const [elapsed, setElapsed] = useState(() => calculateElapsed(createdAt));
-
-  useEffect(() => {
-    // Fire immediately, then every second
-    let immediate = true;
-    const update = () => {
-      setElapsed(calculateElapsed(createdAt));
-    };
-
-    // Immediate update via microtask to avoid lint warning
-    if (immediate) {
-      immediate = false;
-      queueMicrotask(update);
-    }
-
-    // Update every second
-    const interval = setInterval(update, 1000);
-
-    return () => clearInterval(interval);
-  }, [createdAt]);
-
-  return elapsed;
-}
-
-/**
- * Format elapsed seconds as M:SS
- */
-function formatElapsed(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
 export function ProcessingScreen({
   progress,
   onComplete,
@@ -157,17 +109,36 @@ export function ProcessingScreen({
     return () => clearInterval(interval);
   }, [progress.status, progress.currentStep, prefersReducedMotion]);
 
-  // Auto-navigate when status changes to complete
+  // Consolidated navigation effect - prevents race condition between two effects
   useEffect(() => {
-    if (
-      progress.status === 'complete' &&
-      onComplete &&
-      !hasNavigatedRef.current
-    ) {
+    if (hasNavigatedRef.current) return;
+
+    // Priority 1: Report complete - navigate to report
+    if (progress.status === 'complete' && onComplete) {
       hasNavigatedRef.current = true;
       onComplete();
+      return;
     }
-  }, [progress.status, onComplete]);
+
+    // Priority 2: AN0 bypass - redirect to dashboard when no clarification needed
+    const movedPastAN0 =
+      progress.status === 'processing' &&
+      progress.currentStep !== 'an0' &&
+      progress.currentStep !== null;
+    const noClarificationNeeded =
+      movedPastAN0 && progress.clarifications?.length === 0;
+
+    if (noClarificationNeeded) {
+      hasNavigatedRef.current = true;
+      router.push('/home');
+    }
+  }, [
+    progress.status,
+    progress.currentStep,
+    progress.clarifications,
+    onComplete,
+    router,
+  ]);
 
   // Get the current clarification question (if any)
   const pendingClarification = progress.clarifications?.find((c) => !c.answer);
@@ -251,7 +222,7 @@ export function ProcessingScreen({
   // Handle error or failed status
   if (progress.status === 'error' || progress.status === 'failed') {
     const isRefusalError = progress.errorMessage?.includes(
-      'could not be processed',
+      ERROR_PATTERNS.REFUSAL,
     );
 
     const handleTryAgain = () => {
@@ -480,18 +451,35 @@ export function ProcessingScreen({
 
         {isInitialReview ? (
           <>
-            {/* Initial review phase - may ask follow-up */}
-            <p className="text-lg font-light text-[--text-primary]">
-              Reviewing your question...
+            {/* Initial review phase - analyzing for clarification */}
+            <div className="relative mx-auto mb-2 h-20 w-20">
+              <div className="absolute inset-0 rounded-full border-4 border-[--border-subtle]" />
+              <motion.div
+                className="absolute inset-0 rounded-full border-4 border-t-[--accent] border-r-transparent border-b-transparent border-l-transparent"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+              />
+              <Brain className="absolute inset-0 m-auto h-8 w-8 text-[--accent]" />
+            </div>
+            <p className="text-lg font-medium text-[--text-primary]">
+              Analyzing Your Problem
             </p>
 
             <p className="max-w-sm text-center text-sm text-[--text-muted]">
-              We may ask a follow-up question to better understand your
-              challenge
+              We&apos;re reviewing your challenge to see if we need any
+              clarification before proceeding with the full analysis.
             </p>
 
+            <div className="mt-2 space-y-1 text-center text-sm text-[--text-muted]">
+              <p>This usually takes about a minute.</p>
+              <p className="text-xs opacity-70">
+                We&apos;ll either ask a clarifying question or start the full
+                analysis.
+              </p>
+            </div>
+
             {/* Elapsed time */}
-            <p className="text-sm text-[--text-muted] tabular-nums">
+            <p className="mt-2 text-sm text-[--text-muted] tabular-nums">
               {formatElapsed(elapsedSeconds)} elapsed
             </p>
           </>

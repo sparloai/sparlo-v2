@@ -5,11 +5,20 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { ChevronRight, FileText, Loader2, Plus, Search } from 'lucide-react';
+import {
+  AlertCircle,
+  ChevronRight,
+  FileText,
+  Loader2,
+  Plus,
+  Search,
+} from 'lucide-react';
 
+import { Button } from '@kit/ui/button';
 import { cn } from '@kit/ui/utils';
 
 import type { ConversationStatus } from '../_lib/types';
+import { formatElapsed, useElapsedTime } from '../_lib/utils/elapsed-time';
 
 interface Report {
   id: string;
@@ -21,6 +30,23 @@ interface Report {
   updated_at: string;
   archived: boolean;
   concept_count: number;
+  error_message: string | null;
+}
+
+/**
+ * ElapsedTime component - shows live updating elapsed time since creation
+ */
+function ElapsedTime({ createdAt }: { createdAt: string }) {
+  const elapsed = useElapsedTime(createdAt);
+
+  return (
+    <span
+      className="font-mono text-xs text-violet-600 tabular-nums dark:text-violet-400"
+      style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+    >
+      {formatElapsed(elapsed)}
+    </span>
+  );
 }
 
 interface ReportsDashboardProps {
@@ -164,6 +190,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
               const isLast = index === filteredReports.length - 1;
               const processing = isProcessing(report.status);
               const isComplete = report.status === 'complete';
+              const isFailed = report.status === 'failed';
               const isClickable = isComplete;
 
               // Use headline if available, otherwise truncate title
@@ -207,12 +234,72 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                             Processing
                           </span>
                           <span className="h-3 w-px bg-[--border-default]" />
+                          <ElapsedTime createdAt={report.created_at} />
                         </div>
                       </div>
 
                       {/* Loader Icon */}
                       <div className="absolute top-1/2 right-5 -translate-y-1/2">
                         <Loader2 className="h-4 w-4 animate-spin text-violet-500/50" />
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (isFailed) {
+                // Failed state - red theme, shows error and retry button
+                return (
+                  <div
+                    key={report.id}
+                    data-test={`report-card-${report.id}`}
+                    className={cn(
+                      'relative block cursor-default bg-red-500/5 p-5 dark:bg-red-900/10',
+                      !isLast && 'border-b border-[--border-subtle]',
+                    )}
+                  >
+                    <div className="flex items-start gap-4">
+                      {/* Status Dot (Red) */}
+                      <div className="mt-1.5 flex-shrink-0">
+                        <div className="h-2 w-2 rounded-full bg-red-500" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="min-w-0 flex-1">
+                        <h3
+                          className="truncate pr-8 text-sm font-medium text-[--text-secondary] opacity-90"
+                          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                        >
+                          {displayTitle}
+                        </h3>
+                        <div className="mt-2 flex items-center gap-3">
+                          <span
+                            className="font-mono text-xs tracking-wider text-red-600 uppercase dark:text-red-400"
+                            style={{
+                              fontFamily:
+                                'Soehne Mono, JetBrains Mono, monospace',
+                            }}
+                          >
+                            Failed
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-[--text-muted]">
+                          {report.error_message ||
+                            'Your report failed. Please submit a new analysis request and contact support for help if it happens repeatedly.'}
+                        </p>
+                      </div>
+
+                      {/* Retry Button */}
+                      <div className="flex-shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => router.push('/home/reports/new')}
+                          className="gap-1.5"
+                        >
+                          <AlertCircle className="h-3.5 w-3.5" />
+                          New Analysis
+                        </Button>
                       </div>
                     </div>
                   </div>

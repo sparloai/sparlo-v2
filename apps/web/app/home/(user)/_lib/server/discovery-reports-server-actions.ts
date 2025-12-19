@@ -8,6 +8,9 @@ import { enhanceAction } from '@kit/next/actions';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { inngest } from '~/lib/inngest/client';
+import { USAGE_CONSTANTS } from '~/lib/usage/constants';
+
+import { checkUsageAllowed } from './usage.service';
 
 // Schema for starting a discovery report with Inngest
 const StartDiscoveryReportSchema = z.object({
@@ -34,6 +37,25 @@ const DAILY_LIMIT = 1000; // Increased for testing
 export const startDiscoveryReportGeneration = enhanceAction(
   async (data, user) => {
     const client = getSupabaseServerClient();
+
+    // Check usage limits FIRST (before any other checks)
+    const usage = await checkUsageAllowed(
+      user.id,
+      USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
+    );
+
+    if (!usage.allowed) {
+      throw new Error(
+        `Usage limit reached (${usage.percentage.toFixed(0)}% used). ` +
+          `Upgrade your plan or wait until ${new Date(usage.periodEnd).toLocaleDateString()}.`,
+      );
+    }
+
+    if (usage.isWarning) {
+      console.log(
+        `[Usage Warning] User ${user.id} at ${usage.percentage.toFixed(0)}% usage`,
+      );
+    }
 
     // P1 Security: Rate limiting - check recent reports
     const windowStart = new Date(

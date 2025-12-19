@@ -26,6 +26,7 @@ interface Report {
   updated_at: string;
   archived: boolean;
   concept_count: number;
+  error_message: string | null;
 }
 
 // Raw DB row type (types may be stale - headline added in migration 20251218100000)
@@ -39,6 +40,7 @@ interface RawReportRow {
   updated_at: string;
   archived: boolean;
   report_data: ReportData | null;
+  error_message: string | null;
 }
 
 function computeConceptCount(reportData: ReportData | null): number {
@@ -58,7 +60,7 @@ async function getReports(): Promise<Report[]> {
   const { data, error } = await client
     .from('sparlo_reports')
     .select(
-      'id, title, headline, status, current_step, created_at, updated_at, archived, report_data',
+      'id, title, headline, status, current_step, created_at, updated_at, archived, report_data, error_message',
     )
     .eq('archived', false)
     .order('created_at', { ascending: false })
@@ -85,6 +87,7 @@ async function getReports(): Promise<Report[]> {
         updated_at: row.updated_at,
         archived: row.archived,
         concept_count: computeConceptCount(reportData),
+        error_message: row.error_message,
       };
     }) ?? []
   );

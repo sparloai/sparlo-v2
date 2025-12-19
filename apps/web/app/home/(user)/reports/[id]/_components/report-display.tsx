@@ -17,9 +17,12 @@ import {
   Send,
   Share2,
   Sparkles,
+  Square,
   X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import { Button } from '@kit/ui/button';
 import { toast } from '@kit/ui/sonner';
@@ -32,6 +35,7 @@ import {
   extractStructuredReport,
   extractUserInput,
 } from '../_lib/extract-report';
+import type { ChatMessage } from '../_lib/schemas/chat.schema';
 import { ReportRenderer } from './report/report-renderer';
 
 interface ReportData {
@@ -71,13 +75,7 @@ interface Report {
 interface ReportDisplayProps {
   report: Report;
   isProcessing?: boolean;
-}
-
-interface ChatMessage {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  isStreaming?: boolean;
+  initialChatHistory?: ChatMessage[];
 }
 
 // Table of contents item
@@ -87,15 +85,38 @@ interface TocItem {
   level: number;
 }
 
-export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
+export function ReportDisplay({
+  report,
+  isProcessing,
+  initialChatHistory = [],
+}: ReportDisplayProps) {
   const router = useRouter();
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showToc, setShowToc] = useState(true);
   const [activeSection, setActiveSection] = useState('executive-summary');
   const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] =
+    useState<ChatMessage[]>(initialChatHistory);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const isUserScrolledUpRef = useRef(false);
+
+  // Cancel the current streaming response
+  const cancelStream = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    // Mark the current streaming message as cancelled
+    setChatMessages((prev) =>
+      prev.map((msg) =>
+        msg.isStreaming ? { ...msg, isStreaming: false, cancelled: true } : msg,
+      ),
+    );
+    setIsChatLoading(false);
+  }, []);
 
   // Track progress for processing reports
   const { progress } = useReportProgress(isProcessing ? report.id : null);
@@ -114,7 +135,7 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
     return extractStructuredReport(report.report_data);
   }, [report.report_data]);
 
-  const userInput = useMemo(() => {
+  const _userInput = useMemo(() => {
     return extractUserInput(report.report_data, report.title);
   }, [report.report_data, report.title]);
 
@@ -132,10 +153,28 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
     return items;
   }, [reportMarkdown]);
 
-  // Scroll chat to bottom
+  // Smart scroll: only auto-scroll if user is near bottom
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!isUserScrolledUpRef.current && chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   }, [chatMessages]);
+
+  // Track user scroll position in chat
+  useEffect(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      // Consider "near bottom" if within 100px of the bottom
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+      isUserScrolledUpRef.current = !isNearBottom;
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Track active section on scroll (throttled with rAF)
   useEffect(() => {
@@ -173,14 +212,20 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
         e.preventDefault();
         setIsChatOpen((prev) => !prev);
       }
-      if (e.key === 'Escape' && isChatOpen) {
+      if (e.key === 'Escape') {
         e.preventDefault();
-        setIsChatOpen(false);
+        // If streaming, stop the stream first
+        if (isChatLoading) {
+          cancelStream();
+        } else if (isChatOpen) {
+          // Otherwise close the chat
+          setIsChatOpen(false);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isChatOpen]);
+  }, [isChatOpen, isChatLoading, cancelStream]);
 
   const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -215,6 +260,9 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
         { id: assistantId, role: 'assistant', content: '', isStreaming: true },
       ]);
 
+      // Create AbortController for this request
+      abortControllerRef.current = new AbortController();
+
       try {
         const response = await fetch('/api/sparlo/chat', {
           method: 'POST',
@@ -223,11 +271,12 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
             reportId: report.id,
             message: savedInput,
           }),
+          signal: abortControllerRef.current.signal,
         });
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          // P1-044: Handle rate limit with specific message
+          // Handle rate limit with specific message
           if (response.status === 429) {
             const retryAfter = response.headers.get('Retry-After');
             const waitTime = retryAfter
@@ -280,7 +329,6 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                 if (parsed.done) {
                   streamDone = true;
                   if (parsed.saved === false) {
-                    // P0-043: Notify user of save failure
                     toast.warning('Message may not be saved', {
                       description:
                         'Your conversation might not persist. Please copy important responses.',
@@ -313,6 +361,11 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
           ),
         );
       } catch (error) {
+        // Handle abort separately - don't show error for user-initiated cancellation
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
+
         console.error('Chat error:', error);
         setChatMessages((prev) =>
           prev.map((msg) =>
@@ -320,15 +373,21 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
               ? {
                   ...msg,
                   content:
+                    msg.content ||
+                    (error instanceof Error
+                      ? error.message
+                      : 'Sorry, I encountered an error. Please try again.'),
+                  isStreaming: false,
+                  error:
                     error instanceof Error
                       ? error.message
-                      : 'Sorry, I encountered an error. Please try again.',
-                  isStreaming: false,
+                      : 'An error occurred',
                 }
               : msg,
           ),
         );
       } finally {
+        abortControllerRef.current = null;
         setIsChatLoading(false);
       }
     },
@@ -542,7 +601,9 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
         {/* Chat Drawer */}
         <AnimatePresence>
           {isChatOpen && (
-            <motion.div
+            <motion.aside
+              role="complementary"
+              aria-label="Chat with report"
               className="fixed top-0 right-0 bottom-0 z-50 flex h-full w-[420px] flex-col border-l border-[--border-subtle] bg-[--void-elevated] shadow-2xl"
               initial={{ x: 420 }}
               animate={{ x: 0 }}
@@ -569,13 +630,20 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                   size="icon"
                   className="h-8 w-8 text-[--text-muted] hover:text-[--text-primary]"
                   onClick={() => setIsChatOpen(false)}
+                  aria-label="Close chat"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </div>
 
               {/* Chat Messages */}
-              <div className="flex-1 space-y-4 overflow-y-auto p-5">
+              <div
+                ref={chatContainerRef}
+                className="flex-1 space-y-4 overflow-y-auto p-5"
+                role="log"
+                aria-live="polite"
+                aria-label="Chat messages"
+              >
                 {chatMessages.length === 0 ? (
                   <div className="flex h-full flex-col items-center justify-center px-4 text-center">
                     <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[--radius-md] bg-[--void-surface]">
@@ -604,14 +672,29 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                           msg.role === 'user'
                             ? 'bg-[--accent-primary] text-white'
                             : 'bg-[--void-surface] text-[--text-primary]',
+                          msg.cancelled && 'opacity-60',
+                          msg.error && 'border border-red-500/30',
                         )}
                       >
-                        <p className="text-sm whitespace-pre-wrap">
-                          {msg.content}
-                        </p>
+                        {msg.role === 'user' ? (
+                          <p className="text-sm whitespace-pre-wrap">
+                            {msg.content}
+                          </p>
+                        ) : (
+                          <div className="prose-chat">
+                            <ReactMarkdown components={chatMarkdownComponents}>
+                              {msg.content}
+                            </ReactMarkdown>
+                          </div>
+                        )}
                         {msg.isStreaming && (
                           <span className="inline-block animate-pulse text-[--violet-400]">
-                            |
+                            ▋
+                          </span>
+                        )}
+                        {msg.cancelled && (
+                          <span className="mt-1 block text-xs text-[--text-muted] italic">
+                            Generation stopped
                           </span>
                         )}
                       </div>
@@ -640,21 +723,31 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
                       }
                     }}
                   />
-                  <Button
-                    type="submit"
-                    size="icon"
-                    className="h-[44px] w-[44px] flex-shrink-0 bg-[--accent-primary] hover:bg-[--violet-700]"
-                    disabled={!chatInput.trim() || isChatLoading}
-                  >
-                    {isChatLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
+                  {isChatLoading ? (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="h-[44px] w-[44px] flex-shrink-0 border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                      onClick={cancelStream}
+                      aria-label="Stop generating"
+                    >
+                      <Square className="h-4 w-4 fill-current" />
+                    </Button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      size="icon"
+                      className="h-[44px] w-[44px] flex-shrink-0 bg-[--accent-primary] hover:bg-[--violet-700]"
+                      disabled={!chatInput.trim()}
+                      aria-label="Send message"
+                    >
                       <Send className="h-4 w-4" />
-                    )}
-                  </Button>
+                    </Button>
+                  )}
                 </div>
               </form>
-            </motion.div>
+            </motion.aside>
           )}
         </AnimatePresence>
       </div>
@@ -789,5 +882,72 @@ const markdownComponents = {
         {children}
       </div>
     </blockquote>
+  ),
+};
+
+// Chat-specific markdown components (compact styling for sidebar)
+const chatMarkdownComponents = {
+  p: ({ children }: React.HTMLProps<HTMLParagraphElement>) => (
+    <p className="mb-2 text-sm leading-relaxed last:mb-0">{children}</p>
+  ),
+  ul: ({ children }: React.HTMLProps<HTMLUListElement>) => (
+    <ul className="mb-2 ml-4 list-disc space-y-1 text-sm">{children}</ul>
+  ),
+  ol: ({ children }: React.HTMLProps<HTMLOListElement>) => (
+    <ol className="mb-2 ml-4 list-decimal space-y-1 text-sm">{children}</ol>
+  ),
+  li: ({ children }: React.HTMLProps<HTMLLIElement>) => (
+    <li className="text-sm">{children}</li>
+  ),
+  strong: ({ children }: React.HTMLProps<HTMLElement>) => (
+    <strong className="font-semibold">{children}</strong>
+  ),
+  code: ({
+    children,
+    className,
+  }: React.HTMLProps<HTMLElement> & { inline?: boolean }) => {
+    const match = /language-(\w+)/.exec(className ?? '');
+    const language = match ? match[1] : undefined;
+
+    if (language) {
+      return (
+        <div className="my-2 overflow-hidden rounded-md">
+          <SyntaxHighlighter
+            style={oneDark}
+            language={language}
+            PreTag="div"
+            customStyle={{
+              margin: 0,
+              padding: '0.75rem',
+              fontSize: '0.75rem',
+              borderRadius: '0.375rem',
+            }}
+          >
+            {String(children).replace(/\n$/, '')}
+          </SyntaxHighlighter>
+        </div>
+      );
+    }
+
+    return (
+      <code className="rounded bg-[--void-deep] px-1 py-0.5 font-mono text-xs text-[--violet-400]">
+        {children}
+      </code>
+    );
+  },
+  pre: ({ children }: React.HTMLProps<HTMLPreElement>) => <>{children}</>,
+  blockquote: ({ children }: React.HTMLProps<HTMLQuoteElement>) => (
+    <blockquote className="my-2 border-l-2 border-[--violet-400] pl-3 text-sm italic opacity-80">
+      {children}
+    </blockquote>
+  ),
+  h1: ({ children }: React.HTMLProps<HTMLHeadingElement>) => (
+    <h1 className="mb-2 text-base font-semibold">{children}</h1>
+  ),
+  h2: ({ children }: React.HTMLProps<HTMLHeadingElement>) => (
+    <h2 className="mb-2 text-sm font-semibold">{children}</h2>
+  ),
+  h3: ({ children }: React.HTMLProps<HTMLHeadingElement>) => (
+    <h3 className="mb-1 text-sm font-medium">{children}</h3>
   ),
 };

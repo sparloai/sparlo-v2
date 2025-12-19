@@ -5,7 +5,6 @@ import type {
   LeadConcept,
   OtherConcept,
 } from '../../_lib/schema/sparlo-report.schema';
-
 import { Badge, getConfidenceVariant, getTrackVariant } from './badge';
 import { TestGate } from './test-gate';
 

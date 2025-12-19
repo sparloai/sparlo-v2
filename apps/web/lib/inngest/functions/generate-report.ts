@@ -63,6 +63,32 @@ export const generateReport = inngest.createFunction(
   {
     id: 'generate-report',
     retries: 2,
+    onFailure: async ({ error, event, step }) => {
+      // Type assertion for failure event which wraps the original event
+      const failureEvent = event as unknown as {
+        event: { data: { reportId: string } };
+      };
+      const reportId = failureEvent.event.data.reportId;
+
+      console.error('Report generation failed:', {
+        reportId,
+        error: error.message,
+        ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
+      });
+
+      await step.run('update-failed-status', async () => {
+        const supabase = getSupabaseServerAdminClient();
+        await supabase
+          .from('sparlo_reports')
+          .update({
+            status: 'failed',
+            error_message:
+              'Your report failed. Please submit a new analysis request and contact support for help if it happens repeatedly.',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', reportId);
+      });
+    },
   },
   { event: 'report/generate' },
   async ({ event, step }) => {
@@ -564,7 +590,8 @@ export const generateReport = inngest.createFunction(
       // =========================================
       await step.run('complete-report', async () => {
         // Get the user's original input for the brief section
-        const originalProblem = state.an0_original_ask ?? state.userInput ?? designChallenge;
+        const originalProblem =
+          state.an0_original_ask ?? state.userInput ?? designChallenge;
 
         // Convert AN5 JSON report to markdown for fallback display
         const markdown = generateReportMarkdown(an5Result);
@@ -580,7 +607,8 @@ export const generateReport = inngest.createFunction(
         // Build the complete SparloReport structure for rendering
         // The brief is added here from AN0 user input - AN5 doesn't generate it
         // Tags are derived from TRIZ principles names for categorization
-        const tags = state.an0_triz_principles?.slice(0, 3).map((p) => p.name) ?? [];
+        const tags =
+          state.an0_triz_principles?.slice(0, 3).map((p) => p.name) ?? [];
 
         const sparloReport = {
           // Core AN5 output (matches SparloReportSchema)
@@ -1168,11 +1196,15 @@ function generateReportMarkdown(report: AN5Output): string {
   // Executive Summary
   sections.push('## Executive Summary');
   sections.push('');
-  sections.push(`**Viability: ${report.executive_summary.viability}**${report.executive_summary.viability_label ? ` — ${report.executive_summary.viability_label}` : ''}`);
+  sections.push(
+    `**Viability: ${report.executive_summary.viability}**${report.executive_summary.viability_label ? ` — ${report.executive_summary.viability_label}` : ''}`,
+  );
   sections.push('');
   sections.push(report.executive_summary.the_problem);
   sections.push('');
-  sections.push(`**Core Insight:** ${report.executive_summary.core_insight.headline}`);
+  sections.push(
+    `**Core Insight:** ${report.executive_summary.core_insight.headline}`,
+  );
   sections.push('');
   sections.push(report.executive_summary.core_insight.explanation);
   sections.push('');
@@ -1213,9 +1245,13 @@ function generateReportMarkdown(report: AN5Output): string {
   if (report.problem_analysis.whats_wrong.technical_note) {
     sections.push('');
     if (report.problem_analysis.whats_wrong.technical_note.equation) {
-      sections.push(`> \`${report.problem_analysis.whats_wrong.technical_note.equation}\``);
+      sections.push(
+        `> \`${report.problem_analysis.whats_wrong.technical_note.equation}\``,
+      );
     }
-    sections.push(`> ${report.problem_analysis.whats_wrong.technical_note.explanation}`);
+    sections.push(
+      `> ${report.problem_analysis.whats_wrong.technical_note.explanation}`,
+    );
   }
   sections.push('');
   sections.push("**Why it's hard:**");
@@ -1232,7 +1268,9 @@ function generateReportMarkdown(report: AN5Output): string {
   sections.push('');
   sections.push('**First Principles Insight:**');
   sections.push('');
-  sections.push(`**${report.problem_analysis.first_principles_insight.headline}**`);
+  sections.push(
+    `**${report.problem_analysis.first_principles_insight.headline}**`,
+  );
   sections.push('');
   sections.push(report.problem_analysis.first_principles_insight.explanation);
   sections.push('');
@@ -1366,7 +1404,9 @@ function generateReportMarkdown(report: AN5Output): string {
     );
   });
   sections.push('');
-  sections.push(`**Key insight:** ${report.solution_concepts.comparison_insight}`);
+  sections.push(
+    `**Key insight:** ${report.solution_concepts.comparison_insight}`,
+  );
   sections.push('');
   sections.push('---');
   sections.push('');
@@ -1389,7 +1429,9 @@ function generateReportMarkdown(report: AN5Output): string {
   sections.push('**Literature Precedent:**');
   sections.push('');
   report.validation_summary.literature_precedent.forEach((p) => {
-    sections.push(`- ${p.approach}: ${p.precedent_level}${p.source ? ` (${p.source})` : ''}`);
+    sections.push(
+      `- ${p.approach}: ${p.precedent_level}${p.source ? ` (${p.source})` : ''}`,
+    );
   });
   sections.push('');
   sections.push('---');

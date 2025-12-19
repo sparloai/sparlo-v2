@@ -7,15 +7,25 @@ import { withI18n } from '~/lib/i18n/with-i18n';
 import { NavHeader } from './_components/navigation/nav-header';
 import { AppWorkspaceProvider } from './_lib/app-workspace-context';
 import { loadUserWorkspace } from './_lib/server/load-user-workspace';
+import { loadRecentReports } from './_lib/server/recent-reports.loader';
+import { loadUserUsage } from './_lib/server/usage.loader';
 
 function UserHomeLayout({ children }: React.PropsWithChildren) {
   const workspace = use(loadUserWorkspace());
+  // User's personal account ID is the same as their user ID
+  const usage = use(loadUserUsage(workspace.user.id));
+  const recentReports = use(loadRecentReports(workspace.user.id));
 
   return (
     <UserWorkspaceContextProvider value={workspace}>
       <AppWorkspaceProvider value={workspace}>
         <div className="flex min-h-screen flex-col bg-[--surface-base]">
-          <NavHeader />
+          <NavHeader
+            usage={usage}
+            recentReports={recentReports}
+            user={workspace.user}
+            workspace={workspace.workspace}
+          />
           {/* pt-14 accounts for fixed nav height (56px = 3.5rem) */}
           <main className="flex-1 pt-14">{children}</main>
         </div>

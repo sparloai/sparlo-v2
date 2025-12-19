@@ -50,14 +50,18 @@ export const POST = enhanceRouteHandler(
 
     if (recentResult.count && recentResult.count >= MAX_REPORTS_PER_WINDOW) {
       return NextResponse.json(
-        { error: 'Rate limit exceeded. Please wait 5 minutes between reports.' },
+        {
+          error: 'Rate limit exceeded. Please wait 5 minutes between reports.',
+        },
         { status: 429 },
       );
     }
 
     if (dailyResult.count && dailyResult.count >= DAILY_LIMIT) {
       return NextResponse.json(
-        { error: `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.` },
+        {
+          error: `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.`,
+        },
         { status: 429 },
       );
     }

@@ -10,6 +10,7 @@ import { DiscoveryReportDisplay } from './_components/discovery-report-display';
 import { ReportDisplay } from './_components/report-display';
 import { ReportRenderer } from './_components/report/report-renderer';
 import { SparloReportSchema } from './_lib/schema/sparlo-report.schema';
+import { loadChatHistory } from './_lib/server/chat.loader';
 
 interface ReportPageProps {
   params: Promise<{ id: string }>;
@@ -62,7 +63,12 @@ const loadReport = cache(async (reportId: string): Promise<Report | null> => {
 
 export default async function ReportPage({ params }: ReportPageProps) {
   const { id } = await params;
-  const report = await loadReport(id);
+
+  // Load report and chat history in parallel for optimal performance
+  const [report, initialChatHistory] = await Promise.all([
+    loadReport(id),
+    loadChatHistory(id),
+  ]);
 
   if (!report) {
     notFound();
@@ -70,12 +76,20 @@ export default async function ReportPage({ params }: ReportPageProps) {
 
   // If report is still processing, show the processing screen
   if (report.status !== 'complete') {
-    return <ReportDisplay report={report} isProcessing />;
+    return (
+      <ReportDisplay
+        report={report}
+        initialChatHistory={initialChatHistory}
+        isProcessing
+      />
+    );
   }
 
   // If no report data, show the legacy display
   if (!report.report_data) {
-    return <ReportDisplay report={report} />;
+    return (
+      <ReportDisplay report={report} initialChatHistory={initialChatHistory} />
+    );
   }
 
   // Check if this is a discovery mode report
@@ -110,14 +124,26 @@ export default async function ReportPage({ params }: ReportPageProps) {
       // Log which top-level fields exist vs expected to diagnose schema drift
       presentFields: report.report_data ? Object.keys(report.report_data) : [],
       expectedFields: [
-        'header', 'brief', 'executive_summary', 'constraints', 'problem_analysis',
-        'key_patterns', 'solution_concepts', 'validation_summary', 'challenge_the_frame',
-        'risks_and_watchouts', 'next_steps', 'appendix', 'metadata'
+        'header',
+        'brief',
+        'executive_summary',
+        'constraints',
+        'problem_analysis',
+        'key_patterns',
+        'solution_concepts',
+        'validation_summary',
+        'challenge_the_frame',
+        'risks_and_watchouts',
+        'next_steps',
+        'appendix',
+        'metadata',
       ],
     });
 
     // Fall back to legacy display with markdown rendering
-    return <ReportDisplay report={report} />;
+    return (
+      <ReportDisplay report={report} initialChatHistory={initialChatHistory} />
+    );
   }
 
   // Render the validated structured report

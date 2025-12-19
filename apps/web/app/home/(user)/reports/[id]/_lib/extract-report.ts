@@ -1,6 +1,6 @@
 import {
-  SparloReportSchema,
   type SparloReport,
+  SparloReportSchema,
 } from './schema/sparlo-report.schema';
 
 const MAX_INPUT_LENGTH = 10_000;
