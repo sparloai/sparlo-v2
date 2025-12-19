@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { FileText, Search } from 'lucide-react';
+import { ChevronRight, FileText, Loader2, Plus, Search } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
 
@@ -25,39 +25,6 @@ interface Report {
 interface ReportsDashboardProps {
   reports: Report[];
 }
-
-const STATUS_CONFIG: Record<
-  ConversationStatus,
-  {
-    label: string | null;
-    dotClass: string;
-  }
-> = {
-  complete: {
-    label: null, // Don't show label for complete - green dot says it
-    dotClass: 'bg-[#4ADE80]',
-  },
-  processing: {
-    label: 'Processing',
-    dotClass: 'bg-[#A78BFA] animate-pulse',
-  },
-  clarifying: {
-    label: 'Needs Input',
-    dotClass: 'bg-[#FBBF24]',
-  },
-  error: {
-    label: 'Error',
-    dotClass: 'bg-[#EF4444]',
-  },
-  failed: {
-    label: 'Failed',
-    dotClass: 'bg-[#EF4444]',
-  },
-  confirm_rerun: {
-    label: 'Pending',
-    dotClass: 'bg-[#71717A]',
-  },
-};
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -83,16 +50,22 @@ function EmptyState() {
 
   return (
     <div
-      className="rounded-[3px] border border-[--border-subtle] bg-[--surface-elevated] px-6 py-16 text-center"
+      className="rounded-lg border border-neutral-900 bg-[#0A0A0A] px-6 py-16 text-center"
       data-test="reports-empty-state"
     >
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-[--accent-muted]">
-        <FileText className="h-7 w-7 text-[--accent]" />
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-neutral-900">
+        <FileText className="h-7 w-7 text-neutral-400" />
       </div>
-      <p className="mt-4 text-sm text-[--text-muted]">No reports yet</p>
+      <p
+        className="mt-4 text-sm text-neutral-500"
+        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      >
+        No reports yet
+      </p>
       <button
         onClick={() => router.push('/home/reports/new')}
-        className="mt-4 rounded-[2px] bg-[--text-primary] px-4 py-2 font-mono text-[11px] font-semibold tracking-[0.05em] text-[--surface-base] uppercase transition-colors hover:opacity-90"
+        className="mt-4 rounded-sm bg-white px-4 py-2 font-mono text-xs font-medium tracking-wider text-black uppercase transition-colors hover:bg-neutral-200"
+        style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
       >
         Create Your First Report
       </button>
@@ -102,8 +75,11 @@ function EmptyState() {
 
 function NoResultsState({ query }: { query: string }) {
   return (
-    <div className="rounded-[3px] border border-[--border-subtle] bg-[--surface-elevated] px-6 py-12 text-center">
-      <p className="text-sm text-[--text-muted]">
+    <div className="rounded-lg border border-neutral-900 bg-[#0A0A0A] px-6 py-12 text-center">
+      <p
+        className="text-sm text-neutral-500"
+        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      >
         No reports match &ldquo;{query}&rdquo;
       </p>
     </div>
@@ -125,36 +101,51 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
     );
   }, [search, reports]);
 
+  // Check if report is in a processing state (not complete)
+  const isProcessing = (status: ConversationStatus) =>
+    status === 'processing' || status === 'clarifying' || status === 'confirm_rerun';
+
   return (
-    <div className="mx-auto max-w-[800px] px-6 py-12">
-      {/* Header Row */}
-      <div className="mb-2 flex items-end justify-between">
-        <span className="font-mono text-[11px] font-medium tracking-[0.15em] text-[--text-muted] uppercase">
-          Reports
-        </span>
-        <Link href="/home/reports/new">
+    <div
+      className="mx-auto w-full max-w-4xl px-6 py-12 md:py-16"
+      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+    >
+      {/* Header Actions */}
+      <div className="mb-6 flex items-end justify-between">
+        <h1
+          className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-neutral-500"
+          style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+        >
+          REPORTS
+        </h1>
+
+        <Link href="/home/reports/new" className="group">
           <button
             data-test="new-report-button"
-            className="rounded-[2px] bg-[--text-primary] px-4 py-2 font-mono text-[11px] font-semibold tracking-[0.05em] text-[--surface-base] uppercase transition-colors hover:opacity-90"
+            className="flex items-center gap-2 font-mono text-xs font-medium text-white transition-colors hover:text-neutral-300"
+            style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
           >
-            + New Problem
+            NEW ANALYSIS
+            <span className="flex h-4 w-4 items-center justify-center rounded-sm border border-neutral-700 text-neutral-500 transition-all group-hover:border-neutral-500 group-hover:text-white">
+              <Plus className="h-3 w-3" />
+            </span>
           </button>
         </Link>
       </div>
 
-      {/* Divider */}
-      <div className="mb-5 h-px bg-[--border-default]" />
-
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[--text-ghost]" />
+      {/* Search Bar */}
+      <div className="group relative mb-8">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+          <Search className="h-4 w-4 text-neutral-600 transition-colors group-focus-within:text-neutral-400" />
+        </div>
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search reports..."
-          className="w-full rounded-[3px] border border-[--border-subtle] bg-[--surface-elevated] py-3 pr-4 pl-11 text-sm text-[--text-primary] transition-colors placeholder:text-[--text-ghost] focus:border-[--border-strong] focus:outline-none"
+          className="w-full rounded-lg border border-neutral-900 bg-[#0A0A0A] py-3.5 pr-4 pl-11 text-sm text-white shadow-sm transition-all placeholder:text-neutral-600 focus:border-neutral-700 focus:outline-none focus:ring-1 focus:ring-neutral-700"
           data-test="search-reports-input"
+          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
         />
       </div>
 
@@ -164,75 +155,129 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
       ) : filteredReports.length === 0 ? (
         <NoResultsState query={search} />
       ) : (
-        <div className="overflow-hidden rounded-[3px] border border-[--border-subtle]">
-          {filteredReports.map((report, index) => {
-            const config =
-              STATUS_CONFIG[report.status] ?? STATUS_CONFIG.processing;
-            const isLast = index === filteredReports.length - 1;
-            const isClickable = report.status === 'complete';
+        <>
+          <div className="overflow-hidden rounded-lg border border-neutral-900 bg-[#0A0A0A] shadow-sm">
+            {filteredReports.map((report, index) => {
+              const isLast = index === filteredReports.length - 1;
+              const processing = isProcessing(report.status);
+              const isComplete = report.status === 'complete';
+              const isClickable = isComplete;
 
-            // Use headline if available, otherwise truncate title
-            const displayTitle = report.headline || truncate(report.title, 60);
+              // Use headline if available, otherwise truncate title
+              const displayTitle = report.headline || truncate(report.title, 80);
 
-            return (
-              <button
-                key={report.id}
-                onClick={() =>
-                  isClickable && router.push(`/home/reports/${report.id}`)
-                }
-                disabled={!isClickable}
-                data-test={`report-card-${report.id}`}
-                className={cn(
-                  'w-full bg-[--surface-elevated] px-5 py-4 text-left transition-colors',
-                  isClickable
-                    ? 'cursor-pointer hover:bg-[--surface-overlay]'
-                    : 'cursor-default',
-                  !isLast && 'border-b border-[--border-subtle]',
-                )}
-              >
-                <div className="flex items-start gap-3">
-                  {/* Status Dot */}
+              if (processing) {
+                // Processing state - purple theme, not clickable
+                return (
                   <div
+                    key={report.id}
+                    data-test={`report-card-${report.id}`}
                     className={cn(
-                      'mt-[7px] h-2 w-2 flex-shrink-0 rounded-full',
-                      config.dotClass,
+                      'relative block cursor-default bg-neutral-900/20 p-5',
+                      !isLast && 'border-b border-neutral-900',
                     )}
-                    role="status"
-                    aria-label={`Status: ${config.label ?? 'Complete'}`}
-                  />
+                  >
+                    <div className="flex items-start gap-4">
+                      {/* Status Dot (Pulsing Purple) */}
+                      <div className="relative mt-1.5 flex-shrink-0">
+                        <div className="h-2 w-2 animate-pulse rounded-full bg-violet-500" />
+                        <div className="absolute inset-0 h-2 w-2 animate-ping rounded-full bg-violet-500 opacity-75" />
+                      </div>
 
-                  {/* Content */}
-                  <div className="min-w-0 flex-1">
-                    {/* Headline/Title */}
-                    <p
-                      className={cn(
-                        'text-sm leading-[1.4]',
-                        report.headline
-                          ? 'text-[--text-primary]'
-                          : 'text-[--text-muted]',
-                      )}
-                    >
-                      {displayTitle}
-                    </p>
+                      {/* Content */}
+                      <div className="min-w-0 flex-1">
+                        <h3
+                          className="truncate pr-8 text-sm font-medium text-neutral-300 opacity-90"
+                          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                        >
+                          {displayTitle}
+                        </h3>
+                        <div className="mt-2 flex items-center gap-3">
+                          <span
+                            className="font-mono text-xs uppercase tracking-wider text-violet-400"
+                            style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+                          >
+                            Processing
+                          </span>
+                          <span className="h-3 w-px bg-neutral-800" />
+                        </div>
+                      </div>
 
-                    {/* Metadata */}
-                    <div className="mt-1.5 flex items-center gap-2">
-                      {config.label ? (
-                        <span className="font-mono text-[10px] font-medium tracking-[0.08em] text-[#A78BFA] uppercase">
-                          {config.label}
-                        </span>
-                      ) : (
-                        <span className="font-mono text-[10px] tracking-[0.02em] text-[--text-ghost]">
-                          {formatDate(report.created_at)}
-                        </span>
-                      )}
+                      {/* Loader Icon */}
+                      <div className="absolute right-5 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-4 w-4 animate-spin text-violet-500/50" />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
+                );
+              }
+
+              // Complete or other states - clickable
+              return (
+                <button
+                  key={report.id}
+                  onClick={() => isClickable && router.push(`/home/reports/${report.id}`)}
+                  disabled={!isClickable}
+                  data-test={`report-card-${report.id}`}
+                  className={cn(
+                    'group relative block w-full p-5 text-left transition-all',
+                    isClickable && 'hover:bg-neutral-900/40',
+                    !isLast && 'border-b border-neutral-900',
+                  )}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Status Dot - Green for complete, Gray for other */}
+                    <div className="mt-1.5 flex-shrink-0">
+                      <div
+                        className={cn(
+                          'h-2 w-2 rounded-full',
+                          isComplete
+                            ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
+                            : 'bg-neutral-600',
+                        )}
+                      />
+                    </div>
+
+                    {/* Content */}
+                    <div className="min-w-0 flex-1">
+                      <h3
+                        className="truncate pr-8 text-sm font-medium text-neutral-200 transition-colors group-hover:text-white"
+                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                      >
+                        {displayTitle}
+                      </h3>
+                      <div className="mt-2 flex items-center gap-4">
+                        <span
+                          className="font-mono text-xs text-white"
+                          style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+                        >
+                          {formatDate(report.created_at)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Arrow (visible on hover) */}
+                    {isClickable && (
+                      <div className="absolute right-5 top-1/2 -translate-x-2 -translate-y-1/2 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
+                        <ChevronRight className="h-4 w-4 text-neutral-500" />
+                      </div>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Pagination Footer */}
+          <div className="mt-4 flex items-center justify-between px-1">
+            <span
+              className="font-mono text-[10px] uppercase tracking-wider text-neutral-200"
+              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+            >
+              Showing {filteredReports.length} of {reports.length} REPORTS
+            </span>
+          </div>
+        </>
       )}
     </div>
   );
