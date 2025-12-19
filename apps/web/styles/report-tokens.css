@@ -108,9 +108,9 @@
     --track-spark-border: rgba(245, 158, 11, 0.25);
 
     /* Typography */
-    --font-display: 'Sohne', 'Inter', -apple-system, BlinkMacSystemFont,
+    --font-display: 'Söhne', -apple-system, BlinkMacSystemFont,
       sans-serif;
-    --font-body: 'Sohne', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Söhne', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'Sohne Mono', 'JetBrains Mono', 'SF Mono', 'Fira Code',
       monospace;
 

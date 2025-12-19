@@ -65,7 +65,18 @@
     "dashboard": "Dashboard",
     "settings": "Settings",
     "profile": "Profile",
-    "application": "Application"
+    "application": "Application",
+    "newReport": "New Report"
+  },
+  "nav": {
+    "usageThisMonth": "Usage This Month",
+    "reportsUsed": "{{used}} of {{limit}} reports used ({{percent}}%)",
+    "reportsShort": "{{used}}/{{limit}}",
+    "reportsLong": "{{used}} / {{limit}} reports",
+    "upgradePlan": "Upgrade Plan",
+    "signOut": "Sign Out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "roles": {
     "owner": {

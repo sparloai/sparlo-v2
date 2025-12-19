@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-import { CreditCard, LogOut, User } from 'lucide-react';
+import { CreditCard, LogOut, Settings, User } from 'lucide-react';
 
-import { useUserWorkspace } from '@kit/accounts/hooks/use-user-workspace';
+import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { Avatar, AvatarFallback, AvatarImage } from '@kit/ui/avatar';
 import {
   DropdownMenu,
@@ -13,9 +14,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@kit/ui/dropdown-menu';
+import { SubMenuModeToggle } from '@kit/ui/mode-toggle';
+import { Trans } from '@kit/ui/trans';
+
+import { useAppWorkspace } from '../../_lib/app-workspace-context';
 
 export function UserMenu() {
-  const { user, workspace } = useUserWorkspace();
+  const { user, workspace } = useAppWorkspace();
+  const router = useRouter();
+  const signOutMutation = useSignOut();
+
+  const handleSignOut = async () => {
+    await signOutMutation.mutateAsync();
+    router.push('/');
+  };
 
   const initials =
     workspace?.name?.[0]?.toUpperCase() ??
@@ -44,29 +56,38 @@ export function UserMenu() {
         <DropdownMenuItem asChild>
           <Link href="/home/settings" className="cursor-pointer">
             <User className="mr-2 h-4 w-4" />
-            Profile
+            <Trans i18nKey="common:routes.profile" />
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link href="/home/settings" className="cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" />
+            <Trans i18nKey="common:routes.settings" />
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link href="/home/settings/billing" className="cursor-pointer">
             <CreditCard className="mr-2 h-4 w-4" />
-            Billing
+            <Trans i18nKey="common:routes.billing" />
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem asChild>
-          <form action="/auth/sign-out" method="POST" className="w-full">
-            <button
-              type="submit"
-              className="flex w-full items-center text-[--status-error]"
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </button>
-          </form>
+        {/* Theme Toggle */}
+        <SubMenuModeToggle />
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          onClick={handleSignOut}
+          disabled={signOutMutation.isPending}
+          className="cursor-pointer text-[--status-error] focus:text-[--status-error]"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <Trans i18nKey="common:nav.signOut" />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

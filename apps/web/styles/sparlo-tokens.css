@@ -15,7 +15,7 @@
     /* ============================================
        TYPOGRAPHY
        ============================================ */
-    --font-primary: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont,
+    --font-primary: var(--font-sans), 'Söhne', -apple-system, BlinkMacSystemFont,
       sans-serif;
     --font-mono: 'Söhne Mono', 'JetBrains Mono', 'SF Mono', ui-monospace,
       monospace;

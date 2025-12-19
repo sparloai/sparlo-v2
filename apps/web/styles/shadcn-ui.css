@@ -8,8 +8,8 @@
 
 @layer base {
   :root {
-    /* Typography - Söhne with Inter fallback */
-    --font-sans: var(--font-sans), 'Inter', -apple-system, BlinkMacSystemFont,
+    /* Typography - Söhne primary */
+    --font-sans: var(--font-sans), 'Söhne', -apple-system, BlinkMacSystemFont,
       sans-serif;
     --font-heading: var(--font-sans);
 

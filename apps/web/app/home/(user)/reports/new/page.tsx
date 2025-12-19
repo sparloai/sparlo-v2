@@ -35,10 +35,108 @@ const initialFormState: FormState = {
   showRefusalWarning: false,
 };
 
+// Corner brackets component for mission control aesthetic
+function CornerBrackets({
+  focused,
+  className,
+}: {
+  focused: boolean;
+  className?: string;
+}) {
+  const bracketColor = focused ? '#3F3F46' : '#27272A';
+
+  return (
+    <div className={cn('pointer-events-none absolute inset-0', className)}>
+      {/* Top-left */}
+      <svg
+        className="absolute left-0 top-0"
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+      >
+        <path
+          d="M0 12V0H12"
+          fill="none"
+          stroke={bracketColor}
+          strokeWidth="1"
+          className="transition-colors duration-150"
+        />
+      </svg>
+      {/* Top-right */}
+      <svg
+        className="absolute right-0 top-0"
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+      >
+        <path
+          d="M12 12V0H0"
+          fill="none"
+          stroke={bracketColor}
+          strokeWidth="1"
+          className="transition-colors duration-150"
+        />
+      </svg>
+      {/* Bottom-left */}
+      <svg
+        className="absolute bottom-0 left-0"
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+      >
+        <path
+          d="M0 0V12H12"
+          fill="none"
+          stroke={bracketColor}
+          strokeWidth="1"
+          className="transition-colors duration-150"
+        />
+      </svg>
+      {/* Bottom-right */}
+      <svg
+        className="absolute bottom-0 right-0"
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+      >
+        <path
+          d="M12 0V12H0"
+          fill="none"
+          stroke={bracketColor}
+          strokeWidth="1"
+          className="transition-colors duration-150"
+        />
+      </svg>
+    </div>
+  );
+}
+
+// Blinking cursor component
+function BlinkingCursor() {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible((v) => !v);
+    }, 530);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <span
+      className={cn(
+        'inline-block h-[1.1em] w-[2px] translate-y-[2px] bg-[#8B5CF6]',
+        visible ? 'opacity-100' : 'opacity-0',
+      )}
+    />
+  );
+}
+
 export default function NewReportPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formState, setFormState] = useState<FormState>(initialFormState);
+  const [isFocused, setIsFocused] = useState(false);
 
   const {
     phase,
@@ -124,15 +222,35 @@ export default function NewReportPage() {
     );
   }
 
-  // Input phase - minimal industrial design
+  // Input phase - mission control aesthetic
   return (
-    <div className="flex min-h-screen flex-col bg-[#08080A] text-[#FAFAFA]">
+    <div className="relative flex min-h-screen flex-col bg-[#08080A] text-[#FAFAFA]">
+      {/* Dot grid background */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: `radial-gradient(circle, #FAFAFA 1px, transparent 1px)`,
+          backgroundSize: '24px 24px',
+          opacity: 0.03,
+        }}
+      />
+
+      {/* System status indicator */}
+      <div className="relative flex items-center justify-center py-6">
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#4ADE80]" />
+          <span className="font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[#3F3F46]">
+            Ready
+          </span>
+        </div>
+      </div>
+
       {/* Main content */}
-      <main className="flex flex-1 items-center justify-center px-6 pb-20">
+      <main className="relative flex flex-1 items-center justify-center px-6 pb-20">
         <div className="w-full max-w-[640px]">
           {/* Section Label */}
           <div className="mb-8">
-            <span className="font-mono text-[11px] font-medium tracking-[0.15em] text-[#52525B] uppercase">
+            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-[#52525B]">
               Problem
             </span>
             <div className="mt-2 h-px bg-[#27272A]" />
@@ -158,13 +276,17 @@ export default function NewReportPage() {
             </div>
           )}
 
-          {/* Textarea with Ghost Example */}
+          {/* Textarea with Corner Brackets */}
           <div className="relative">
-            {/* Ghost text (visible when input is empty) */}
+            {/* Corner brackets */}
+            <CornerBrackets focused={isFocused} className="z-10" />
+
+            {/* Ghost text with blinking cursor (visible when input is empty) */}
             {!hasInput && (
-              <div className="pointer-events-none absolute inset-0 p-5">
+              <div className="pointer-events-none absolute inset-0 z-0 p-5">
                 <p className="font-mono text-[14px] leading-[1.8] text-[#27272A]">
                   {EXAMPLE_PROBLEM}
+                  <BlinkingCursor />
                 </p>
               </div>
             )}
@@ -179,20 +301,27 @@ export default function NewReportPage() {
                   showRefusalWarning: false,
                 }));
               }}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
               disabled={isSubmitting}
               data-test="challenge-input"
               className={cn(
-                'relative w-full',
+                'relative z-[1] w-full',
                 'min-h-[220px]',
-                'rounded-[3px] border border-[#1F1F23] bg-[#0A0A0C]',
+                'rounded-[3px] border border-[#1F1F23] bg-[#0A0A0C]/80',
                 'p-5',
                 'font-mono text-[14px] leading-[1.8] text-[#FAFAFA]',
                 'resize-none',
-                'transition-colors duration-100',
+                'transition-all duration-150',
                 'placeholder:text-transparent',
                 'focus:border-[#3F3F46] focus:outline-none',
                 'disabled:opacity-40',
+                // Focus glow
+                isFocused && 'shadow-[0_0_20px_rgba(139,92,246,0.15)]',
               )}
+              style={{
+                caretColor: '#8B5CF6',
+              }}
               placeholder=""
             />
           </div>
@@ -206,7 +335,7 @@ export default function NewReportPage() {
           <div
             className={cn(
               'mt-4 flex items-center justify-between',
-              'rounded-[3px] border border-[#1F1F23] bg-[#0A0A0C] p-4',
+              'rounded-[3px] border border-[#1F1F23] bg-[#0A0A0C]/80 p-4',
               // Mobile: stack vertically
               'max-[480px]:flex-col max-[480px]:gap-4',
             )}
@@ -219,7 +348,7 @@ export default function NewReportPage() {
                 'max-[480px]:order-2 max-[480px]:justify-center',
               )}
             >
-              <span className="font-mono text-[11px] font-semibold tracking-[0.1em] text-[#3F3F46] uppercase">
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#3F3F46]">
                 ~8 min
               </span>
               <span className="text-[12px] text-[#27272A]">|</span>
@@ -236,7 +365,7 @@ export default function NewReportPage() {
               className={cn(
                 'rounded-[2px] px-5 py-2',
                 'bg-[#FAFAFA] text-[#08080A]',
-                'font-mono text-[12px] font-semibold tracking-[0.05em] uppercase',
+                'font-mono text-[12px] font-semibold uppercase tracking-[0.05em]',
                 'transition-all duration-100',
                 'hover:bg-[#E4E4E7]',
                 'disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-[#FAFAFA]',
@@ -249,6 +378,15 @@ export default function NewReportPage() {
           </div>
         </div>
       </main>
+
+      {/* Status bar footer */}
+      <footer className="relative border-t border-[#1F1F23] bg-[#0A0A0C]/60 px-6 py-3">
+        <div className="mx-auto flex max-w-[640px] items-center justify-end">
+          <span className="font-mono text-[10px] tracking-[0.1em] text-[#27272A]">
+            v1.0.0
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }

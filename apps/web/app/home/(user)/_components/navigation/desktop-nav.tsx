@@ -3,20 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { FileText, Home, Settings } from 'lucide-react';
-
+import { Trans } from '@kit/ui/trans';
 import { cn } from '@kit/ui/utils';
 
 import { AppLogo } from '~/components/app-logo';
 
+import { NAV_LINKS } from './nav-links';
 import { UsageIndicator } from './usage-indicator';
 import { UserMenu } from './user-menu';
-
-const NAV_LINKS = [
-  { href: '/home', label: 'Dashboard', icon: Home },
-  { href: '/home/reports/new', label: 'New Report', icon: FileText },
-  { href: '/home/settings', label: 'Settings', icon: Settings },
-] as const;
 
 export function DesktopNav({ className }: { className?: string }) {
   const pathname = usePathname();
@@ -30,7 +24,7 @@ export function DesktopNav({ className }: { className?: string }) {
         </Link>
 
         <div className="flex items-center gap-4 lg:gap-6">
-          {NAV_LINKS.map(({ href, label, icon: Icon }) => {
+          {NAV_LINKS.map(({ href, labelKey, icon: Icon }) => {
             const isActive =
               href === '/home'
                 ? pathname === '/home'
@@ -49,9 +43,13 @@ export function DesktopNav({ className }: { className?: string }) {
               >
                 <Icon className="h-5 w-5" aria-hidden="true" />
                 {/* Hide label on tablet, show on desktop */}
-                <span className="hidden lg:inline">{label}</span>
+                <span className="hidden lg:inline">
+                  <Trans i18nKey={labelKey} />
+                </span>
                 {/* Screen reader text for tablet */}
-                <span className="sr-only lg:hidden">{label}</span>
+                <span className="sr-only lg:hidden">
+                  <Trans i18nKey={labelKey} />
+                </span>
               </Link>
             );
           })}

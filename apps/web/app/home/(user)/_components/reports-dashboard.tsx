@@ -92,7 +92,7 @@ function EmptyState() {
       <p className="mt-4 text-sm text-[--text-muted]">No reports yet</p>
       <button
         onClick={() => router.push('/home/reports/new')}
-        className="mt-4 rounded-[2px] bg-[--text-primary] px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.05em] text-[--surface-base] transition-colors hover:opacity-90"
+        className="mt-4 rounded-[2px] bg-[--text-primary] px-4 py-2 font-mono text-[11px] font-semibold tracking-[0.05em] text-[--surface-base] uppercase transition-colors hover:opacity-90"
       >
         Create Your First Report
       </button>
@@ -129,13 +129,13 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
     <div className="mx-auto max-w-[800px] px-6 py-12">
       {/* Header Row */}
       <div className="mb-2 flex items-end justify-between">
-        <span className="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-[--text-muted]">
+        <span className="font-mono text-[11px] font-medium tracking-[0.15em] text-[--text-muted] uppercase">
           Reports
         </span>
         <Link href="/home/reports/new">
           <button
             data-test="new-report-button"
-            className="rounded-[2px] bg-[--text-primary] px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.05em] text-[--surface-base] transition-colors hover:opacity-90"
+            className="rounded-[2px] bg-[--text-primary] px-4 py-2 font-mono text-[11px] font-semibold tracking-[0.05em] text-[--surface-base] uppercase transition-colors hover:opacity-90"
           >
             + New Problem
           </button>
@@ -147,13 +147,13 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
       {/* Search */}
       <div className="relative mb-4">
-        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[--text-ghost]" />
+        <Search className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[--text-ghost]" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search reports..."
-          className="w-full rounded-[3px] border border-[--border-subtle] bg-[--surface-elevated] py-3 pl-11 pr-4 text-sm text-[--text-primary] transition-colors placeholder:text-[--text-ghost] focus:border-[--border-strong] focus:outline-none"
+          className="w-full rounded-[3px] border border-[--border-subtle] bg-[--surface-elevated] py-3 pr-4 pl-11 text-sm text-[--text-primary] transition-colors placeholder:text-[--text-ghost] focus:border-[--border-strong] focus:outline-none"
           data-test="search-reports-input"
         />
       </div>
@@ -166,7 +166,8 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
       ) : (
         <div className="overflow-hidden rounded-[3px] border border-[--border-subtle]">
           {filteredReports.map((report, index) => {
-            const config = STATUS_CONFIG[report.status] ?? STATUS_CONFIG.processing;
+            const config =
+              STATUS_CONFIG[report.status] ?? STATUS_CONFIG.processing;
             const isLast = index === filteredReports.length - 1;
             const isClickable = report.status === 'complete';
 
@@ -217,7 +218,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                     {/* Metadata */}
                     <div className="mt-1.5 flex items-center gap-2">
                       {config.label ? (
-                        <span className="font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-[#A78BFA]">
+                        <span className="font-mono text-[10px] font-medium tracking-[0.08em] text-[#A78BFA] uppercase">
                           {config.label}
                         </span>
                       ) : (
