@@ -21,11 +21,11 @@ interface Report {
 async function getReports(): Promise<Report[]> {
   const client = getSupabaseServerClient();
 
+  // Note: headline column requires migration 20251218100000_add_report_headline.sql
+  // Query both with and without headline for backwards compatibility
   const { data, error } = await client
     .from('sparlo_reports')
-    .select(
-      'id, title, headline, status, current_step, created_at, updated_at, archived',
-    )
+    .select('id, title, status, current_step, created_at, updated_at, archived')
     .eq('archived', false)
     .order('created_at', { ascending: false })
     .limit(50);
@@ -35,8 +35,11 @@ async function getReports(): Promise<Report[]> {
     return [];
   }
 
-  // Type assertion needed until typegen runs with headline migration
-  return (data as unknown as Report[]) ?? [];
+  // Add null headline for compatibility until migration is applied
+  return (data ?? []).map((report) => ({
+    ...report,
+    headline: null,
+  })) as Report[];
 }
 
 function LoadingState() {
