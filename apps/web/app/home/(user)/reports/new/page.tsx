@@ -259,7 +259,7 @@ export default function NewReportPage() {
                 disabled={isSubmitting}
                 autoFocus
                 data-test="challenge-input"
-                placeholder="Describe the engineering challenge..."
+                placeholder="Describe the challenge."
                 spellCheck={false}
                 className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] focus:ring-0 focus:outline-none disabled:opacity-40 md:text-xl"
                 style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
@@ -279,25 +279,25 @@ export default function NewReportPage() {
                     <div
                       key={context.id}
                       className={cn(
-                        'flex items-center gap-2 rounded-full px-3 py-1.5 transition-all duration-500',
+                        'flex items-center gap-2 rounded-full px-3 py-1.5 transition-all duration-300',
                         isDetected
-                          ? 'border border-emerald-500/30 bg-emerald-500/10 dark:border-emerald-500/20'
+                          ? 'border border-violet-500/30 bg-violet-500/10 dark:border-violet-500/20'
                           : 'border border-dashed border-[--border-default] bg-transparent text-[--text-muted]',
                       )}
                     >
                       <div
                         className={cn(
-                          'h-1.5 w-1.5 rounded-full',
+                          'h-1.5 w-1.5 rounded-full transition-all duration-300',
                           isDetected
-                            ? 'bg-emerald-500 shadow-[0_0_8px_rgba(52,211,153,0.6)] dark:bg-emerald-400'
-                            : 'bg-[--text-muted]',
+                            ? 'bg-violet-500 shadow-[0_0_6px_rgba(139,92,246,0.8)]'
+                            : 'bg-[--border-default]',
                         )}
                       />
                       <span
                         className={cn(
                           'text-xs font-medium',
                           isDetected
-                            ? 'text-emerald-700 dark:text-emerald-200/90'
+                            ? 'text-violet-700 dark:text-violet-300'
                             : 'text-[--text-muted]',
                         )}
                         style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
@@ -305,7 +305,7 @@ export default function NewReportPage() {
                         {context.label}
                       </span>
                       {isDetected && (
-                        <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400/80" />
+                        <Check className="h-3 w-3 text-violet-600 dark:text-violet-400" />
                       )}
                     </div>
                   );
@@ -355,20 +355,20 @@ export default function NewReportPage() {
                     disabled={!canSubmit || isSubmitting}
                     data-test="challenge-submit"
                     className={cn(
-                      'group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg px-6 py-3 transition-all duration-300 md:w-auto',
+                      'group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-8 py-4 transition-all duration-300 md:w-auto',
                       canSubmit && !isSubmitting
-                        ? 'bg-[--text-primary] text-[--surface-base] shadow-lg hover:opacity-90 dark:bg-white dark:text-black dark:shadow-[0_0_20px_rgba(255,255,255,0.05)] dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]'
+                        ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/25 hover:bg-violet-500 hover:shadow-violet-500/40 dark:bg-violet-600 dark:shadow-violet-500/20 dark:hover:bg-violet-500'
                         : 'cursor-not-allowed bg-[--surface-overlay] text-[--text-muted] dark:bg-neutral-800 dark:text-neutral-500',
                     )}
                   >
                     <span
-                      className="relative z-10 text-sm font-semibold tracking-tight"
+                      className="relative z-10 text-base font-semibold tracking-tight"
                       style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                     >
                       {isSubmitting ? 'Running...' : 'Run Analysis'}
                     </span>
                     {!isSubmitting && (
-                      <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     )}
                   </button>
                 </div>
