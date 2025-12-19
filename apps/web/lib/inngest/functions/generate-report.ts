@@ -589,6 +589,20 @@ export const generateReport = inngest.createFunction(
       // Complete Report
       // =========================================
       await step.run('complete-report', async () => {
+        // Persist token usage to database (P0-081 fix)
+        const totalUsage = getTotalUsage();
+        const { error: usageError } = await supabase.rpc('increment_usage', {
+          p_account_id: accountId,
+          p_tokens: totalUsage.totalTokens,
+          p_is_report: true,
+          p_is_chat: false,
+        });
+        if (usageError) {
+          console.error('[Usage] Failed to persist usage:', usageError);
+        } else {
+          console.log('[Usage] Persisted:', { accountId, tokens: totalUsage.totalTokens });
+        }
+
         // Get the user's original input for the brief section
         const originalProblem =
           state.an0_original_ask ?? state.userInput ?? designChallenge;
@@ -1375,9 +1389,9 @@ function generateReportMarkdown(report: AN5Output): string {
     sections.push('');
     sections.push(`**${s.title}**`);
     sections.push('');
-    sections.push(`**Why it\'s interesting:** ${s.why_interesting}`);
+    sections.push(`**Why it's interesting:** ${s.why_interesting}`);
     sections.push('');
-    sections.push(`**Why it\'s uncertain:** ${s.why_uncertain}`);
+    sections.push(`**Why it's uncertain:** ${s.why_uncertain}`);
     sections.push('');
     sections.push(`**Confidence: ${s.confidence}.**`);
     sections.push('');

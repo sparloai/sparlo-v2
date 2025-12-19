@@ -203,6 +203,6 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION get_or_create_usage_period TO authenticated;
-GRANT EXECUTE ON FUNCTION increment_usage TO authenticated;
-GRANT EXECUTE ON FUNCTION check_usage_allowed TO authenticated;
+GRANT EXECUTE ON FUNCTION get_or_create_usage_period(UUID, BIGINT) TO authenticated;
+GRANT EXECUTE ON FUNCTION increment_usage(UUID, BIGINT, BOOLEAN, BOOLEAN) TO authenticated;
+GRANT EXECUTE ON FUNCTION check_usage_allowed(UUID, BIGINT) TO authenticated;

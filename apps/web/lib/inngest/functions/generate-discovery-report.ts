@@ -539,6 +539,19 @@ Focus on:
       await step.run('complete-discovery-report', async () => {
         const totalUsage = getTotalUsage();
 
+        // Persist token usage to database (P0-081 fix)
+        const { error: usageError } = await supabase.rpc('increment_usage', {
+          p_account_id: event.data.accountId,
+          p_tokens: totalUsage.totalTokens,
+          p_is_report: true,
+          p_is_chat: false,
+        });
+        if (usageError) {
+          console.error('[Usage] Failed to persist usage:', usageError);
+        } else {
+          console.log('[Usage] Persisted (Discovery):', { accountId: event.data.accountId, tokens: totalUsage.totalTokens });
+        }
+
         await updateProgress({
           status: 'complete',
           current_step: 'complete',

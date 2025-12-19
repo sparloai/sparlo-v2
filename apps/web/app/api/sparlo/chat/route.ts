@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
 import { enhanceRouteHandler } from '@kit/next/routes';
@@ -39,7 +40,7 @@ interface RateLimitResult {
 }
 
 async function checkRateLimit(
-  client: any,
+  client: SupabaseClient,
   userId: string,
 ): Promise<{
   allowed: boolean;

@@ -511,8 +511,8 @@ export default function BetaPage() {
     }
   };
 
-  // Step descriptions
-  const stepDescriptions: Record<string, string> = {
+  // Step descriptions (kept for future use - maps step codes to human-readable descriptions)
+  const _stepDescriptions: Record<string, string> = {
     AN0: 'Understanding your challenge...',
     AN1: 'Searching knowledge base...',
     'AN1.5': 'Re-ranking results...',
