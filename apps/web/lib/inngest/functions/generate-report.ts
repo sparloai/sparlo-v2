@@ -571,10 +571,14 @@ export const generateReport = inngest.createFunction(
           an5Result.report.solution_concepts?.lead_concepts?.[0]?.title ??
           'See report for details';
 
+        // Extract headline for dashboard display (scannable 4-8 word summary)
+        const headline = an5Result.report.headline ?? null;
+
         await updateProgress({
           status: 'complete',
           current_step: 'complete',
           phase_progress: 100,
+          headline, // AI-generated scannable headline for dashboard
           report_data: {
             markdown, // For frontend display
             report: an5Result.report,

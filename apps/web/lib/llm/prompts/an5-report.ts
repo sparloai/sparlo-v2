@@ -59,6 +59,7 @@ Your job is to synthesize this into a report that:
   "report": {
     "title": "Clear, specific title for this analysis",
     "subtitle": "One-line problem characterization",
+    "headline": "4-8 word scannable headline for dashboard display",
     "generated_at": "ISO timestamp",
 
     "executive_summary": {
@@ -263,6 +264,12 @@ Your job is to synthesize this into a report that:
 }
 
 ## Writing Guidelines
+
+**Headline:**
+- 4-8 words describing the core technical challenge
+- Use noun phrases, not sentences (e.g., "Copper-free triazole synthesis protocol")
+- Should be scannable in 2 seconds on a dashboard
+- Examples: "Sub-10nm nanoparticle positioning on silicon", "Worm gear backlash reduction to 5 arc-seconds"
 
 **Executive Summary:**
 - 30 seconds to understand problem, insight, recommendation
@@ -514,6 +521,7 @@ const AppendixSchema = z.object({
 const ReportSchema = z.object({
   title: z.string(),
   subtitle: z.string(),
+  headline: z.string().optional(),
   generated_at: z.string(),
   executive_summary: ExecutiveSummarySchema,
   constraints: ConstraintsSchema,
