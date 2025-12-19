@@ -132,7 +132,7 @@ export default function NewReportPage() {
         <div className="w-full max-w-[640px]">
           {/* Section Label */}
           <div className="mb-8">
-            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-[#52525B]">
+            <span className="font-mono text-[11px] font-medium tracking-[0.15em] text-[#52525B] uppercase">
               Problem
             </span>
             <div className="mt-2 h-px bg-[#27272A]" />
@@ -219,7 +219,7 @@ export default function NewReportPage() {
                 'max-[480px]:order-2 max-[480px]:justify-center',
               )}
             >
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#3F3F46]">
+              <span className="font-mono text-[11px] font-semibold tracking-[0.1em] text-[#3F3F46] uppercase">
                 ~8 min
               </span>
               <span className="text-[12px] text-[#27272A]">|</span>
@@ -236,7 +236,7 @@ export default function NewReportPage() {
               className={cn(
                 'rounded-[2px] px-5 py-2',
                 'bg-[#FAFAFA] text-[#08080A]',
-                'font-mono text-[12px] font-semibold uppercase tracking-[0.05em]',
+                'font-mono text-[12px] font-semibold tracking-[0.05em] uppercase',
                 'transition-all duration-100',
                 'hover:bg-[#E4E4E7]',
                 'disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-[#FAFAFA]',
