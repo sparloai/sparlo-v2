@@ -101,7 +101,9 @@ export const startDiscoveryReportGeneration = enhanceAction(
 
     // Trigger Discovery Inngest function
     try {
-      await inngest.send({
+      console.log('[Discovery] Sending Inngest event for report:', report.id);
+
+      const sendResult = await inngest.send({
         name: 'report/generate-discovery',
         data: {
           reportId: report.id,
@@ -111,8 +113,13 @@ export const startDiscoveryReportGeneration = enhanceAction(
           conversationId,
         },
       });
+
+      console.log('[Discovery] Inngest event sent successfully:', {
+        reportId: report.id,
+        eventIds: sendResult.ids,
+      });
     } catch (inngestError) {
-      console.error('Failed to trigger Discovery Inngest:', inngestError);
+      console.error('[Discovery] Failed to trigger Inngest:', inngestError);
       // Update report status to error
       await client
         .from('sparlo_reports')
