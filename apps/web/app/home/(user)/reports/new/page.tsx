@@ -35,103 +35,6 @@ const initialFormState: FormState = {
   showRefusalWarning: false,
 };
 
-// Corner brackets component for mission control aesthetic
-function CornerBrackets({
-  focused,
-  className,
-}: {
-  focused: boolean;
-  className?: string;
-}) {
-  const bracketColor = focused ? '#3F3F46' : '#27272A';
-
-  return (
-    <div className={cn('pointer-events-none absolute inset-0', className)}>
-      {/* Top-left */}
-      <svg
-        className="absolute left-0 top-0"
-        width="12"
-        height="12"
-        viewBox="0 0 12 12"
-      >
-        <path
-          d="M0 12V0H12"
-          fill="none"
-          stroke={bracketColor}
-          strokeWidth="1"
-          className="transition-colors duration-150"
-        />
-      </svg>
-      {/* Top-right */}
-      <svg
-        className="absolute right-0 top-0"
-        width="12"
-        height="12"
-        viewBox="0 0 12 12"
-      >
-        <path
-          d="M12 12V0H0"
-          fill="none"
-          stroke={bracketColor}
-          strokeWidth="1"
-          className="transition-colors duration-150"
-        />
-      </svg>
-      {/* Bottom-left */}
-      <svg
-        className="absolute bottom-0 left-0"
-        width="12"
-        height="12"
-        viewBox="0 0 12 12"
-      >
-        <path
-          d="M0 0V12H12"
-          fill="none"
-          stroke={bracketColor}
-          strokeWidth="1"
-          className="transition-colors duration-150"
-        />
-      </svg>
-      {/* Bottom-right */}
-      <svg
-        className="absolute bottom-0 right-0"
-        width="12"
-        height="12"
-        viewBox="0 0 12 12"
-      >
-        <path
-          d="M12 0V12H0"
-          fill="none"
-          stroke={bracketColor}
-          strokeWidth="1"
-          className="transition-colors duration-150"
-        />
-      </svg>
-    </div>
-  );
-}
-
-// Blinking cursor component
-function BlinkingCursor() {
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setVisible((v) => !v);
-    }, 530);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <span
-      className={cn(
-        'inline-block h-[1.1em] w-[2px] translate-y-[2px] bg-[#8B5CF6]',
-        visible ? 'opacity-100' : 'opacity-0',
-      )}
-    />
-  );
-}
-
 export default function NewReportPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -203,6 +106,16 @@ export default function NewReportPage() {
     }
   }, [canSubmit, challengeText, isSubmitting]);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleSubmit();
+      }
+    },
+    [handleSubmit],
+  );
+
   const handleViewReport = useCallback(() => {
     if (reportId) {
       router.push(`/home/reports/${reportId}`);
@@ -212,7 +125,7 @@ export default function NewReportPage() {
   // Show processing screen when we have a report in progress
   if (phase === 'processing' && progress) {
     return (
-      <div className="min-h-[calc(100vh-120px)] bg-[#08080A]">
+      <div className="min-h-[calc(100vh-120px)] bg-[#111113]">
         <ProcessingScreen
           progress={progress}
           onComplete={handleViewReport}
@@ -222,39 +135,19 @@ export default function NewReportPage() {
     );
   }
 
-  // Input phase - mission control aesthetic
+  // Input phase - beautiful technical design
   return (
-    <div className="relative flex min-h-screen flex-col bg-[#08080A] text-[#FAFAFA]">
-      {/* Dot grid background */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage: `radial-gradient(circle, #FAFAFA 1px, transparent 1px)`,
-          backgroundSize: '24px 24px',
-          opacity: 0.03,
-        }}
-      />
-
-      {/* System status indicator */}
-      <div className="relative flex items-center justify-center py-6">
-        <div className="flex items-center gap-2">
-          <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#4ADE80]" />
-          <span className="font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-[#3F3F46]">
-            Ready
-          </span>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <main className="relative flex flex-1 items-center justify-center px-6 pb-20">
+    <div className="flex min-h-screen flex-col bg-[#111113] text-[#FAFAFA]">
+      {/* Main */}
+      <main className="flex flex-1 items-center justify-center px-6 pb-16">
         <div className="w-full max-w-[640px]">
-          {/* Section Label */}
-          <div className="mb-8">
-            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.15em] text-[#52525B]">
-              Problem
-            </span>
-            <div className="mt-2 h-px bg-[#27272A]" />
-          </div>
+          {/* Page Title */}
+          <h1
+            className="mb-6 text-[22px] font-medium tracking-[-0.02em] text-[#FAFAFA]"
+            style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+          >
+            New Analysis
+          </h1>
 
           {/* Refusal warning */}
           {showRefusalWarning && (
@@ -276,117 +169,100 @@ export default function NewReportPage() {
             </div>
           )}
 
-          {/* Textarea with Corner Brackets */}
-          <div className="relative">
-            {/* Corner brackets */}
-            <CornerBrackets focused={isFocused} className="z-10" />
-
-            {/* Ghost text with blinking cursor (visible when input is empty) */}
-            {!hasInput && (
-              <div className="pointer-events-none absolute inset-0 z-0 p-5">
-                <p className="font-mono text-[14px] leading-[1.8] text-[#27272A]">
-                  {EXAMPLE_PROBLEM}
-                  <BlinkingCursor />
-                </p>
-              </div>
+          {/* Input Container - Unified box */}
+          <div
+            className={cn(
+              'border transition-colors duration-150',
+              isFocused ? 'border-[#3A3A3F]' : 'border-[#2A2A2E]',
             )}
-
-            {/* Actual textarea */}
-            <textarea
-              value={challengeText}
-              onChange={(e) => {
-                setFormState((prev) => ({
-                  ...prev,
-                  challengeText: e.target.value,
-                  showRefusalWarning: false,
-                }));
-              }}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-              disabled={isSubmitting}
-              data-test="challenge-input"
-              className={cn(
-                'relative z-[1] w-full',
-                'min-h-[220px]',
-                'rounded-[3px] border border-[#1F1F23] bg-[#0A0A0C]/80',
-                'p-5',
-                'font-mono text-[14px] leading-[1.8] text-[#FAFAFA]',
-                'resize-none',
-                'transition-all duration-150',
-                'placeholder:text-transparent',
-                'focus:border-[#3F3F46] focus:outline-none',
-                'disabled:opacity-40',
-                // Focus glow
-                isFocused && 'shadow-[0_0_20px_rgba(139,92,246,0.15)]',
+            style={{ borderRadius: '4px' }}
+          >
+            {/* Textarea Area */}
+            <div
+              className="relative bg-[#18181B]"
+              style={{ borderRadius: '4px 4px 0 0' }}
+            >
+              {/* Ghost text */}
+              {!hasInput && (
+                <div className="pointer-events-none absolute inset-0 select-none p-5">
+                  <p
+                    className="text-[15px] leading-[1.7] text-[#3A3A3F]"
+                    style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                  >
+                    {EXAMPLE_PROBLEM}
+                  </p>
+                </div>
               )}
-              style={{
-                caretColor: '#8B5CF6',
-              }}
-              placeholder=""
-            />
+
+              {/* Textarea */}
+              <textarea
+                value={challengeText}
+                onChange={(e) => {
+                  setFormState((prev) => ({
+                    ...prev,
+                    challengeText: e.target.value,
+                    showRefusalWarning: false,
+                  }));
+                }}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                disabled={isSubmitting}
+                autoFocus
+                data-test="challenge-input"
+                className="relative min-h-[200px] w-full resize-none bg-transparent p-5 text-[15px] leading-[1.7] text-[#FAFAFA] focus:outline-none disabled:opacity-40"
+                style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+              />
+            </div>
+
+            {/* Command Bar */}
+            <div
+              className="flex items-center justify-between border-t border-[#2A2A2E] bg-[#141416] px-5 py-3"
+              style={{ borderRadius: '0 0 4px 4px' }}
+            >
+              {/* Left: Duration */}
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[12px] text-[#58585C]">
+                  ~15 min
+                </span>
+                <span className="text-[12px] text-[#2A2A2E]">·</span>
+                <span className="font-mono text-[12px] text-[#3A3A3F]">
+                  Deep Analysis
+                </span>
+              </div>
+
+              {/* Right: Button */}
+              <button
+                onClick={handleSubmit}
+                disabled={!canSubmit || isSubmitting}
+                data-test="challenge-submit"
+                className={cn(
+                  'px-4 py-2 text-[13px] font-medium transition-all duration-150',
+                  canSubmit && !isSubmitting
+                    ? 'bg-[#FAFAFA] text-[#111113] hover:bg-[#E8E8EB]'
+                    : 'cursor-not-allowed bg-[#2A2A2E] text-[#58585C]',
+                )}
+                style={{
+                  borderRadius: '3px',
+                  fontFamily: 'Soehne, Inter, sans-serif',
+                }}
+              >
+                {isSubmitting ? 'Running...' : 'Run Analysis'}
+              </button>
+            </div>
           </div>
 
           {/* Error message */}
           {error && (
-            <p className="mt-3 font-mono text-[12px] text-[#ef4444]">{error}</p>
+            <p
+              className="mt-3 text-[12px] text-[#ef4444]"
+              style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+            >
+              {error}
+            </p>
           )}
-
-          {/* Action Bar */}
-          <div
-            className={cn(
-              'mt-4 flex items-center justify-between',
-              'rounded-[3px] border border-[#1F1F23] bg-[#0A0A0C]/80 p-4',
-              // Mobile: stack vertically
-              'max-[480px]:flex-col max-[480px]:gap-4',
-            )}
-          >
-            {/* Duration info */}
-            <div
-              className={cn(
-                'flex items-center gap-3',
-                // Mobile: reorder to bottom and center
-                'max-[480px]:order-2 max-[480px]:justify-center',
-              )}
-            >
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-[#3F3F46]">
-                ~8 min
-              </span>
-              <span className="text-[12px] text-[#27272A]">|</span>
-              <span className="font-mono text-[11px] text-[#27272A]">
-                Deep analysis
-              </span>
-            </div>
-
-            {/* Run Button */}
-            <button
-              onClick={handleSubmit}
-              disabled={!canSubmit || isSubmitting}
-              data-test="challenge-submit"
-              className={cn(
-                'rounded-[2px] px-5 py-2',
-                'bg-[#FAFAFA] text-[#08080A]',
-                'font-mono text-[12px] font-semibold uppercase tracking-[0.05em]',
-                'transition-all duration-100',
-                'hover:bg-[#E4E4E7]',
-                'disabled:cursor-not-allowed disabled:opacity-20 disabled:hover:bg-[#FAFAFA]',
-                // Mobile: full width and first
-                'max-[480px]:order-1 max-[480px]:w-full',
-              )}
-            >
-              {isSubmitting ? 'Running...' : 'Run Analysis'}
-            </button>
-          </div>
         </div>
       </main>
-
-      {/* Status bar footer */}
-      <footer className="relative border-t border-[#1F1F23] bg-[#0A0A0C]/60 px-6 py-3">
-        <div className="mx-auto flex max-w-[640px] items-center justify-end">
-          <span className="font-mono text-[10px] tracking-[0.1em] text-[#27272A]">
-            v1.0.0
-          </span>
-        </div>
-      </footer>
     </div>
   );
 }
