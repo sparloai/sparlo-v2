@@ -1,0 +1,160 @@
+import { cn } from '@kit/ui/utils';
+
+import type {
+  ConfidenceLevelType,
+  ConceptTrackType,
+  LikelihoodColorType,
+  ViabilityVerdictType,
+} from '../../../_lib/schema/sparlo-report.schema';
+
+// ============================================================================
+// CONFIDENCE BADGE
+// ============================================================================
+
+interface ConfidenceBadgeProps {
+  level: ConfidenceLevelType;
+  className?: string;
+}
+
+const confidenceStyles = {
+  HIGH: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  MEDIUM: 'bg-amber-50 text-amber-700 border-amber-100',
+  LOW: 'bg-red-50 text-red-700 border-red-100',
+} as const satisfies Record<ConfidenceLevelType, string>;
+
+export function ConfidenceBadge({ level, className }: ConfidenceBadgeProps) {
+  return (
+    <span
+      className={cn(
+        'text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide border',
+        confidenceStyles[level],
+        className,
+      )}
+    >
+      {level}
+    </span>
+  );
+}
+
+// ============================================================================
+// VIABILITY BADGE
+// ============================================================================
+
+interface ViabilityBadgeProps {
+  viability: ViabilityVerdictType;
+  label?: string;
+  className?: string;
+}
+
+const viabilityStyles = {
+  GREEN: {
+    container: 'bg-emerald-50 border-emerald-100',
+    dot: 'bg-emerald-500',
+    text: 'text-emerald-700',
+  },
+  YELLOW: {
+    container: 'bg-amber-50 border-amber-100',
+    dot: 'bg-amber-500',
+    text: 'text-amber-700',
+  },
+  RED: {
+    container: 'bg-red-50 border-red-100',
+    dot: 'bg-red-500',
+    text: 'text-red-700',
+  },
+} as const satisfies Record<
+  ViabilityVerdictType,
+  { container: string; dot: string; text: string }
+>;
+
+export function ViabilityBadge({
+  viability,
+  label,
+  className,
+}: ViabilityBadgeProps) {
+  const style = viabilityStyles[viability];
+
+  return (
+    <div
+      className={cn(
+        'flex items-center gap-2 px-2.5 py-1 rounded-full border',
+        style.container,
+        className,
+      )}
+    >
+      <span className={cn('w-1.5 h-1.5 rounded-full', style.dot)} />
+      <span
+        className={cn(
+          'text-[10px] font-bold tracking-wide uppercase',
+          style.text,
+        )}
+      >
+        {label || `Viability: ${viability.toLowerCase()}`}
+      </span>
+    </div>
+  );
+}
+
+// ============================================================================
+// TRACK BADGE
+// ============================================================================
+
+interface TrackBadgeProps {
+  track: ConceptTrackType;
+  label: string;
+  className?: string;
+}
+
+const trackStyles = {
+  best_fit: 'bg-emerald-50 text-emerald-700 border-emerald-100',
+  simpler_path: 'bg-white text-zinc-600 border-zinc-200',
+  spark: 'bg-purple-100 text-purple-700 border-purple-200',
+} as const satisfies Record<ConceptTrackType, string>;
+
+export function TrackBadge({ track, label, className }: TrackBadgeProps) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-semibold border uppercase tracking-wide',
+        trackStyles[track],
+        className,
+      )}
+    >
+      {label}
+    </span>
+  );
+}
+
+// ============================================================================
+// LIKELIHOOD BADGE (for risks)
+// ============================================================================
+
+interface LikelihoodBadgeProps {
+  color?: LikelihoodColorType;
+  label: string;
+  className?: string;
+}
+
+const likelihoodStyles = {
+  amber: 'bg-amber-50 text-amber-700 border-amber-100',
+  red: 'bg-red-50 text-red-700 border-red-100',
+  gray: 'bg-zinc-50 text-zinc-600 border-zinc-200',
+} as const satisfies Record<LikelihoodColorType, string>;
+
+export function LikelihoodBadge({
+  color = 'gray',
+  label,
+  className,
+}: LikelihoodBadgeProps) {
+  return (
+    <span
+      className={cn(
+        'text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wide border',
+        likelihoodStyles[color],
+        className,
+      )}
+    >
+      {label}
+    </span>
+  );
+}

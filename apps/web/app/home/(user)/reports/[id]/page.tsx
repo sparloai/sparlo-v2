@@ -1,8 +1,15 @@
+import 'server-only';
+
+import { cache } from 'react';
+
 import { notFound } from 'next/navigation';
 
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { ReportDisplay } from './_components/report-display';
+import { ReportError } from './_components/report/report-error';
+import { ReportRenderer } from './_components/report/report-renderer';
+import { SparloReportSchema } from './_lib/schema/sparlo-report.schema';
 
 interface ReportPageProps {
   params: Promise<{ id: string }>;
@@ -24,7 +31,7 @@ interface Report {
   created_at: string;
 }
 
-async function loadReport(reportId: string): Promise<Report | null> {
+const loadReport = cache(async (reportId: string): Promise<Report | null> => {
   const client = getSupabaseServerClient();
 
   const { data, error } = await client
@@ -51,7 +58,7 @@ async function loadReport(reportId: string): Promise<Report | null> {
     last_message: data.last_message,
     created_at: data.created_at,
   };
-}
+});
 
 export default async function ReportPage({ params }: ReportPageProps) {
   const { id } = await params;
@@ -66,7 +73,29 @@ export default async function ReportPage({ params }: ReportPageProps) {
     return <ReportDisplay report={report} isProcessing />;
   }
 
-  return <ReportDisplay report={report} />;
+  // If no report data, show the legacy display
+  if (!report.report_data) {
+    return <ReportDisplay report={report} />;
+  }
+
+  // Validate the report data with Zod schema
+  const result = SparloReportSchema.safeParse(report.report_data);
+
+  // Handle validation errors with premium error UI
+  if (!result.success) {
+    console.error('Report validation failed:', {
+      reportId: id,
+      errors: result.error.format(),
+    });
+    return <ReportError error={result.error} reportId={id} />;
+  }
+
+  // Render the validated report
+  return (
+    <div className="max-w-7xl mx-auto py-12 px-6 md:px-8">
+      <ReportRenderer report={result.data} />
+    </div>
+  );
 }
 
 export async function generateMetadata({ params }: ReportPageProps) {
