@@ -19,7 +19,7 @@ const StartDiscoveryReportSchema = z.object({
 
 // Rate limiting constants (same as standard reports)
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
-const MAX_REPORTS_PER_WINDOW = 1;
+const MAX_REPORTS_PER_WINDOW = 1000; // Disabled for testing (was 1)
 const DAILY_LIMIT = 1000; // Increased for testing
 
 /**
