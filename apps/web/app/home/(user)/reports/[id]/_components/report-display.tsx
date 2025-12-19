@@ -29,6 +29,11 @@ import { cn } from '@kit/ui/utils';
 
 import { ProcessingScreen } from '../../../_components/processing-screen';
 import { useReportProgress } from '../../../_lib/use-report-progress';
+import {
+  extractStructuredReport,
+  extractUserInput,
+} from '../_lib/extract-report';
+import { StructuredReport } from './report/structured-report';
 
 interface ReportData {
   markdown?: string;
@@ -103,6 +108,20 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
 
   // Extract markdown from report data
   const reportMarkdown = report.report_data?.markdown ?? '';
+
+  // Extract structured report data for premium rendering
+  const structuredReport = useMemo(() => {
+    return extractStructuredReport(
+      report.report_data as Record<string, unknown>,
+    );
+  }, [report.report_data]);
+
+  const userInput = useMemo(() => {
+    return extractUserInput(
+      report.report_data as Record<string, unknown>,
+      report.title,
+    );
+  }, [report.report_data, report.title]);
 
   // P1 Performance: Memoize TOC generation to prevent recalculation on every render
   const tocItems = useMemo(() => {
@@ -486,16 +505,23 @@ export function ReportDisplay({ report, isProcessing }: ReportDisplayProps) {
               </motion.section>
             )}
 
-            {/* Full Report Markdown */}
+            {/* Full Report - Structured or Markdown fallback */}
             <motion.div
               className="rounded-xl bg-white p-8 shadow-sm lg:p-10 dark:bg-neutral-900"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <ReactMarkdown components={markdownComponents}>
-                {reportMarkdown}
-              </ReactMarkdown>
+              {structuredReport ? (
+                <StructuredReport
+                  report={structuredReport}
+                  userInput={userInput}
+                />
+              ) : (
+                <ReactMarkdown components={markdownComponents}>
+                  {reportMarkdown}
+                </ReactMarkdown>
+              )}
             </motion.div>
 
             <div className="h-32" />
