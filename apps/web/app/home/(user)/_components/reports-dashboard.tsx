@@ -20,6 +20,7 @@ interface Report {
   created_at: string;
   updated_at: string;
   archived: boolean;
+  concept_count: number;
 }
 
 interface ReportsDashboardProps {
@@ -221,7 +222,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                   data-test={`report-card-${report.id}`}
                   className={cn(
                     'group relative block w-full p-5 text-left transition-all',
-                    isClickable && 'hover:bg-neutral-900/40',
+                    isClickable && 'cursor-pointer hover:bg-neutral-900/40',
                     !isLast && 'border-b border-neutral-900',
                   )}
                 >
@@ -253,6 +254,18 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                         >
                           {formatDate(report.created_at)}
                         </span>
+                        {isComplete && report.concept_count > 0 && (
+                          <>
+                            <span className="h-3 w-px bg-neutral-700" />
+                            <span
+                              className="flex items-center gap-1.5 font-mono text-xs text-neutral-400"
+                              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+                            >
+                              <FileText className="h-3 w-3" />
+                              {report.concept_count} {report.concept_count === 1 ? 'CONCEPT' : 'CONCEPTS'}
+                            </span>
+                          </>
+                        )}
                       </div>
                     </div>
 
