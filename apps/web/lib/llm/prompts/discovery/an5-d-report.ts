@@ -257,11 +257,18 @@ REMEMBER: Output ONLY the JSON object. This is a DISCOVERY report - emphasize no
 /**
  * Zod schema for AN5-D output validation
  *
+ * SCHEMA VERSION: 2.0
+ *
  * ANTIFRAGILE DESIGN:
  * - All fields use .optional() or .default() where reasonable
  * - Objects use .passthrough() to allow extra fields from LLM
  * - Enums use .catch() to fall back gracefully on unexpected values
  * - Arrays default to empty arrays on parse failure
+ *
+ * DEPRECATION TIMELINE:
+ * - v1.0 fields (marked @deprecated): Remove after 2025-03-01
+ * - Legacy fields include: validation_path, first_test, go_no_go, timeline, cost,
+ *   immediate_actions, phase_1/2/3 (old structure), one_liner, timeline_to_validation
  */
 
 const HeaderSchema = z
@@ -311,7 +318,8 @@ const InsightSchema = z
 
 const NoveltyClaimSchema = z
   .object({
-    genuinely_novel: z.boolean().catch(true),
+    // Default to false - be conservative about claiming novelty
+    genuinely_novel: z.boolean().catch(false),
     novelty_level: z
       .enum(['breakthrough', 'significant', 'moderate'])
       .catch('moderate'),
@@ -344,9 +352,10 @@ const WhyNovelSchema = z
   })
   .passthrough();
 
-// New: Validation Experiment schema (replaces ValidationPath)
+// Validation Experiment schema (v2.0 - replaces ValidationPath)
 const ValidationExperimentSchema = z
   .object({
+    // v2.0 fields
     test_name: z.string().optional(),
     what_it_proves: z.string().optional(),
     method: z.string().optional(),
@@ -354,7 +363,7 @@ const ValidationExperimentSchema = z
     no_go_criteria: z.string().optional(),
     cost_estimate: z.string().optional(),
     time_estimate: z.string().optional(),
-    // Legacy field support
+    // @deprecated v1.0 fields - remove after 2025-03-01
     first_test: z.string().optional(),
     go_no_go: z.string().optional(),
     timeline: z.string().optional(),
@@ -392,12 +401,12 @@ const DiscoveryConceptReportSchema = z
     novelty_claim: NoveltyClaimSchema.optional(),
     how_it_works: HowItWorksSchema.optional(),
     breakthrough_potential: BreakthroughPotentialSchema.optional(),
-    // New fields
+    // v2.0 fields
     why_novel: WhyNovelSchema.optional(),
     why_might_work_now: z.string().optional(),
     honest_uncertainties: z.array(z.string()).catch([]),
     validation_experiment: ValidationExperimentSchema.optional(),
-    // Legacy field support
+    // @deprecated v1.0 field - remove after 2025-03-01
     validation_path: ValidationExperimentSchema.optional(),
     risks_and_unknowns: RisksSchema.optional(),
     priority: z
@@ -460,7 +469,7 @@ const Phase3Schema = z
   })
   .passthrough();
 
-// Legacy phase schema for backwards compatibility
+// @deprecated v1.0 phase schema - remove after 2025-03-01
 const LegacyPhaseSchema = z
   .object({
     objective: z.string().optional(),
@@ -472,7 +481,7 @@ const LegacyPhaseSchema = z
   })
   .passthrough();
 
-// Legacy immediate action schema
+// @deprecated v1.0 immediate action schema - remove after 2025-03-01
 const ImmediateActionSchema = z
   .object({
     action: z.string(),
@@ -494,10 +503,10 @@ const SelfCritiqueSchema = z
   })
   .passthrough();
 
-// Updated Executive Summary schema
+// Executive Summary schema (v2.0)
 const ExecutiveSummarySchema = z
   .object({
-    // New fields
+    // v2.0 fields
     hook: z.string().optional(),
     validation_path: z.string().optional(),
     confidence_assessment: z.string().optional(),
@@ -505,7 +514,7 @@ const ExecutiveSummarySchema = z
     key_discovery: z.string(),
     recommended_action: z.string().optional(),
     investment_required: z.string().optional(),
-    // Legacy fields
+    // @deprecated v1.0 fields - remove after 2025-03-01
     one_liner: z.string().optional(),
     timeline_to_validation: z.string().optional(),
   })
@@ -540,12 +549,12 @@ const ReportSchema = z
       .optional(),
     validation_roadmap: z
       .object({
-        // New structure
+        // v2.0 structure
         phase_1_quick_kills: Phase1Schema.optional(),
         phase_2_mechanism_validation: Phase2Schema.optional(),
         phase_3_integration: Phase3Schema.optional(),
         total_investment_to_poc: z.string().optional(),
-        // Legacy structure
+        // @deprecated v1.0 structure - remove after 2025-03-01
         immediate_actions: z.array(ImmediateActionSchema).catch([]),
         phase_1: LegacyPhaseSchema.optional(),
         phase_2: LegacyPhaseSchema.optional(),
@@ -562,8 +571,8 @@ const ReportSchema = z
       })
       .passthrough()
       .optional(),
-    // New: Self-critique (conceptually required but schema is forgiving)
-    self_critique: SelfCritiqueSchema.optional(),
+    // Self-critique is REQUIRED - this section must not be skipped
+    self_critique: SelfCritiqueSchema,
     executive_summary: ExecutiveSummarySchema,
     appendix: AppendixSchema.optional(),
   })
