@@ -21,6 +21,23 @@ export const TrackSchema = z.enum([
   'frontier_transfer',
 ]);
 
+export const ConfidenceLevel = z.enum(['low', 'medium', 'high']);
+
+export const CapitalRequirement = z.enum([
+  'minimal',
+  'low',
+  'medium',
+  'high',
+  'very_high',
+]);
+
+export const ViabilityVerdict = z.enum([
+  'viable',
+  'conditionally_viable',
+  'not_viable',
+  'uncertain',
+]);
+
 export const RiskItemSchema = z
   .object({
     risk: z.string(),
@@ -182,7 +199,7 @@ const AbandonedApproachSchema = z
   })
   .passthrough();
 
-// NEW: Detailed abandoned technology analysis
+// Detailed abandoned technology analysis
 const EnablingChangeSchema = z.object({
   change: z.string(),
   relevance: z.string(),
@@ -273,14 +290,14 @@ export type AN2_M_Output = z.infer<typeof AN2_M_OutputSchema>;
 // AN3-M: Concept Generation
 // ============================================
 
-// NEW: Quantified parameters for mechanism depth
+// Quantified parameters for mechanism depth
 const QuantifiedParameterSchema = z.object({
   parameter: z.string(),
   value: z.string(),
   significance: z.string(),
 });
 
-// NEW: Mechanistic depth schema for paradigm/frontier concepts
+// Mechanistic depth schema for paradigm/frontier concepts
 const MechanisticDepthSchema = z
   .object({
     working_principle: z.string(),
@@ -345,6 +362,26 @@ const FeasibilityAssessmentSchema = z
   })
   .passthrough();
 
+// Paradigm significance enum
+const ParadigmSignificance = z.enum([
+  'TRANSFORMATIVE',
+  'SIGNIFICANT',
+  'INCREMENTAL',
+  'OPTIMIZATION',
+]);
+
+// Paradigm assessment for each concept
+const ParadigmAssessmentSchema = z
+  .object({
+    paradigm_significance: ParadigmSignificance.catch('INCREMENTAL'),
+    what_it_challenges: z.string().optional(),
+    why_industry_missed_it: z.string().optional(),
+    strategic_insight_flag: z.boolean().catch(false),
+    first_mover_opportunity: z.string().optional(),
+    strategic_rationale: z.string().optional(),
+  })
+  .passthrough();
+
 const ValidationResultSchema = z
   .object({
     concept_id: z.string(),
@@ -361,25 +398,7 @@ const ValidationResultSchema = z
       .enum(['pursue', 'investigate', 'defer', 'reject'])
       .catch('investigate'),
     key_uncertainties: z.array(z.string()).catch([]),
-    // NEW: Paradigm assessment for each concept
-    paradigm_assessment: z
-      .object({
-        paradigm_significance: z
-          .enum([
-            'TRANSFORMATIVE',
-            'SIGNIFICANT',
-            'INCREMENTAL',
-            'OPTIMIZATION',
-          ])
-          .catch('INCREMENTAL'),
-        what_it_challenges: z.string().optional(),
-        why_industry_missed_it: z.string().optional(),
-        strategic_insight_flag: z.boolean().catch(false),
-        first_mover_opportunity: z.string().optional(),
-        strategic_rationale: z.string().optional(),
-      })
-      .passthrough()
-      .optional(),
+    paradigm_assessment: ParadigmAssessmentSchema.optional(),
   })
   .passthrough();
 
@@ -399,22 +418,7 @@ const SelfCritiqueSchema = z
   })
   .passthrough();
 
-// NEW: Paradigm significance assessment for each concept
-// Note: Defined for documentation; fields are inlined in ValidationResultSchema
-const _ParadigmAssessmentSchema = z
-  .object({
-    paradigm_significance: z
-      .enum(['TRANSFORMATIVE', 'SIGNIFICANT', 'INCREMENTAL', 'OPTIMIZATION'])
-      .catch('INCREMENTAL'),
-    what_it_challenges: z.string().optional(),
-    why_industry_missed_it: z.string().optional(),
-    strategic_insight_flag: z.boolean().catch(false),
-    first_mover_opportunity: z.string().optional(),
-    strategic_rationale: z.string().optional(),
-  })
-  .passthrough();
-
-// NEW: Paradigm insights identified during evaluation
+// Paradigm insights identified during evaluation
 const ParadigmInsightIdentifiedSchema = z
   .object({
     concept_id: z.string(),
@@ -443,7 +447,6 @@ export const AN4_M_OutputSchema = z
       })
       .passthrough()
       .optional(),
-    // NEW: Paradigm insights identified during evaluation
     paradigm_insights_identified: z
       .array(ParadigmInsightIdentifiedSchema)
       .default([]),
@@ -454,25 +457,316 @@ export type AN4_M_Output = z.infer<typeof AN4_M_OutputSchema>;
 export type HybridValidationResult = z.infer<typeof ValidationResultSchema>;
 
 // ============================================
-// AN5-M: Executive Report
+// AN5-M: Executive Report (Major Restructure)
 // ============================================
 
+// --- Header ---
+const HeaderSchema = z
+  .object({
+    title: z.string(),
+    date: z.string().optional(),
+    version: z.string().optional(),
+  })
+  .passthrough();
+
+// --- Executive Summary (Enhanced) ---
+const RecommendedPathStepSchema = z
+  .object({
+    step: z.number(),
+    action: z.string(),
+    rationale: z.string().optional(),
+  })
+  .passthrough();
+
+const ExecutiveSummarySchema = z
+  .object({
+    narrative_lead: z.string(), // Opening paragraph with voice
+    viability: ViabilityVerdict.catch('uncertain'),
+    viability_label: z.string().optional(),
+    the_problem: z.string(),
+    core_insight: z
+      .object({
+        headline: z.string(),
+        explanation: z.string(),
+      })
+      .passthrough(),
+    primary_recommendation: z.string(), // One sentence with confidence
+    recommended_path: z.array(RecommendedPathStepSchema).catch([]),
+  })
+  .passthrough();
+
+// --- Constraints ---
+const ConstraintsSchema = z
+  .object({
+    hard_constraints: z.array(z.string()).catch([]),
+    soft_constraints: z.array(z.string()).catch([]),
+    assumptions: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+// --- Problem Analysis (Enhanced) ---
+const RootCauseHypothesisSchema = z
+  .object({
+    id: z.number().int().positive(),
+    name: z.string(),
+    confidence_percent: z.number().int().min(0).max(100).catch(50),
+    explanation: z.string(),
+  })
+  .passthrough();
+
+const SuccessMetricSchema = z
+  .object({
+    metric: z.string(),
+    minimum_viable: z.string(),
+    target: z.string(),
+    stretch: z.string(),
+    unit: z.string().optional(),
+  })
+  .passthrough();
+
+const ReportProblemAnalysisSchema = z
+  .object({
+    whats_wrong: z
+      .object({
+        prose: z.string(), // Can include inline equations
+        technical_note: z
+          .object({
+            equation: z.string().optional(),
+            explanation: z.string(),
+          })
+          .passthrough()
+          .optional(),
+      })
+      .passthrough(),
+    why_its_hard: z
+      .object({
+        prose: z.string(),
+        factors: z.array(z.string()).catch([]),
+      })
+      .passthrough(),
+    first_principles_insight: z
+      .object({
+        headline: z.string(),
+        explanation: z.string(),
+      })
+      .passthrough(),
+    root_cause_hypotheses: z.array(RootCauseHypothesisSchema).catch([]),
+    success_metrics: z.array(SuccessMetricSchema).catch([]),
+  })
+  .passthrough();
+
+// --- What Industry Missed (Enhanced) ---
+const BlindSpotSchema = z
+  .object({
+    assumption: z.string(),
+    challenge: z.string(),
+    opportunity: z.string(),
+  })
+  .passthrough();
+
+const WhatIndustryMissedSectionSchema = z
+  .object({
+    conventional_approaches: z
+      .array(
+        z
+          .object({
+            approach: z.string(),
+            limitation: z.string(),
+          })
+          .passthrough(),
+      )
+      .catch([]),
+    why_they_do_it: z.string(), // Paradigm history paragraph
+    blind_spots: z.array(BlindSpotSchema).catch([]),
+  })
+  .passthrough();
+
+// Legacy format for backward compatibility
+const LegacyWhatIndustryMissedSchema = z
+  .object({
+    the_assumption: z.string(),
+    how_long_held: z.string().optional(),
+    the_reality: z.string(),
+    evidence: z.string(),
+    opportunity_created: z.string(),
+    first_mover_advantage: z.string().optional(),
+  })
+  .passthrough();
+
+// --- Key Patterns (Enhanced) ---
+const KeyPatternSchema = z
+  .object({
+    id: z.string(),
+    name: z.string(),
+    origin: z.string(), // Where this pattern comes from
+    description: z.string(),
+    why_it_matters: z.string(),
+    precedent: z.string(), // Specific papers, patents, companies
+    application_hint: z.string().optional(), // How it applies here
+    patent_refs: z.array(z.string()).optional(),
+  })
+  .passthrough();
+
+// --- Solution Concepts (Major Restructure) ---
+
+// Tags for visual rendering
+const InnovationType = z.enum([
+  'Combination',
+  'Transfer',
+  'Optimization',
+  'Revival',
+  'Paradigm',
+]);
+const NoveltyLevel = z.enum([
+  'Significant Novelty',
+  'Moderate Novelty',
+  'Known Approach',
+]);
+const PursuitRecommendation = z.enum([
+  'Must Pursue',
+  'Strong Consider',
+  'Worth Exploring',
+  'Long-term Watch',
+]);
+
+const ConceptTagsSchema = z
+  .object({
+    innovation_type: InnovationType.catch('Combination'),
+    novelty_level: NoveltyLevel.catch('Moderate Novelty'),
+    pursuit_recommendation: PursuitRecommendation.catch('Worth Exploring'),
+  })
+  .passthrough();
+
+const InsightBlockSchema = z
+  .object({
+    what: z.string(),
+    why_new: z.string(), // Include search evidence
+    physics: z.string(), // Mechanism with specifics
+  })
+  .passthrough();
+
+const BreakthroughPotentialSchema = z
+  .object({
+    if_it_works: z.string(),
+    estimated_improvement: z.string(), // Quantified with uncertainty
+    industry_impact: z.string(),
+  })
+  .passthrough();
+
+const ConceptRisksSchema = z
+  .object({
+    physics_risks: z.array(z.string()).catch([]),
+    implementation_challenges: z.array(z.string()).catch([]),
+    mitigation_ideas: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+const ValidationApproachSchema = z
+  .object({
+    first_test: z.string(),
+    timeline: z.string(),
+    cost: z.string(),
+    go_no_go: z.string(),
+  })
+  .passthrough();
+
+// Enhanced validation gates with decision points
+const ValidationGateSchema = z
+  .object({
+    week: z.string(),
+    test: z.string(),
+    method: z.string(),
+    success_criteria: z.string(),
+    cost: z.string().optional(),
+    decision_point: z.string().optional(), // "If X, pivot to Y"
+  })
+  .passthrough();
+
+// Full parallel exploration block (replaces other_concepts)
+const ParallelExplorationSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    tags: ConceptTagsSchema,
+    source_domain: z.string(),
+
+    the_insight: InsightBlockSchema,
+    how_it_works: z.array(z.string()).catch([]), // Numbered steps
+    components: z.array(z.string()).catch([]),
+    enabling_factors: z.string(),
+
+    breakthrough_potential: BreakthroughPotentialSchema,
+    risks: ConceptRisksSchema,
+
+    why_parallel_not_primary: z.string(),
+    when_to_elevate: z.string(),
+
+    validation_approach: ValidationApproachSchema,
+  })
+  .passthrough();
+
+// Enhanced lead concept with validation gates
 const LeadConceptSchema = z
   .object({
     id: z.string(),
     title: z.string().max(500),
     track: TrackSchema,
-    executive_summary: z.string(),
-    why_it_wins: z.string(),
+    track_label: z.string().optional(),
+    score: z.number().int().min(0).max(100).catch(50),
+    confidence: ConfidenceLevel.catch('medium'),
+
+    bottom_line: z.string().optional(),
+    what_it_is: z.string().optional(),
+    why_it_works: z.string().optional(),
+    why_it_might_fail: z.array(z.string()).catch([]),
+
+    // Legacy fields for backward compatibility
+    executive_summary: z.string().optional(),
+    why_it_wins: z.string().optional(),
+
+    patterns_referenced: z.array(z.string()).optional(),
+    confidence_rationale: z.string().optional(),
+    what_would_change_this: z.string().optional(),
     key_risks: z.array(RiskItemSchema).catch([]),
+
+    validation_gates: z.array(ValidationGateSchema).catch([]),
+    // Legacy field
     how_to_test: z.array(TestGateSchema).catch([]),
+
     prior_art_summary: z.array(PriorArtSchema).catch([]),
     estimated_timeline: z.string().optional(),
     estimated_investment: z.string().optional(),
-    confidence_level: z.enum(['low', 'medium', 'high']).catch('medium'),
   })
   .passthrough();
 
+// Enhanced spark concept (renamed from innovation_concept)
+const SparkConceptSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    score: z.number().int().min(0).max(100).catch(50),
+    confidence: ConfidenceLevel.catch('medium'),
+    tags: ConceptTagsSchema.optional(),
+    source_domain: z.string(),
+
+    the_insight: InsightBlockSchema.optional(),
+    how_it_works: z.array(z.string()).catch([]),
+    components: z.array(z.string()).catch([]),
+    enabling_factors: z.string().optional(),
+
+    breakthrough_potential: BreakthroughPotentialSchema.optional(),
+    risks: ConceptRisksSchema.optional(),
+
+    recommended_parallel_action: z.string().optional(),
+    validation_approach: ValidationApproachSchema.optional(),
+
+    // Legacy fields
+    one_liner: z.string().optional(),
+    when_to_consider: z.string().optional(),
+  })
+  .passthrough();
+
+// Legacy OtherConceptSchema for backward compatibility
 const OtherConceptSchema = z
   .object({
     id: z.string(),
@@ -484,51 +778,117 @@ const OtherConceptSchema = z
   })
   .passthrough();
 
-const DecisionArchitectureSchema = z
+// Enhanced comparison table
+const ComparisonRowSchema = z
   .object({
-    primary: LeadConceptSchema,
-    fallback: LeadConceptSchema.optional(),
-    parallel_exploration: z.array(OtherConceptSchema).catch([]),
+    id: z.string(),
+    title: z.string(),
+    score: z.number().int().min(0).max(100).catch(50),
+    confidence: ConfidenceLevel.catch('medium'),
+    time_to_first_data: z.string().optional(),
+    expected_performance: z.string().optional(),
+    key_risk: z.string(),
+    capital_required: CapitalRequirement.catch('medium'),
+    timeline: z.string(),
   })
   .passthrough();
 
-const ReportSelfCritiqueSchema = z
+// Complete solution concepts structure
+const SolutionConceptsSchema = z
   .object({
-    what_we_might_be_wrong_about: z.array(z.string()).catch([]),
-    unexplored_directions: z.array(z.string()).catch([]),
-    confidence_level: z.enum(['low', 'medium', 'high']).catch('medium'),
-    confidence_rationale: z.string(),
+    lead_concepts: z.array(LeadConceptSchema).catch([]),
+
+    parallel_explorations_intro: z.string().optional(),
+    parallel_explorations: z.array(ParallelExplorationSchema).catch([]),
+
+    spark_concept: SparkConceptSchema.optional(),
+
+    comparison_table: z.array(ComparisonRowSchema).catch([]),
+    comparison_insight: z.string().optional(),
   })
   .passthrough();
 
-// NEW: Paradigm insight section for AN5-M
+// --- Paradigm Insight Section ---
 const ParadigmInsightSectionSchema = z
   .object({
-    insight_headline: z.string(),
-    the_conventional_wisdom: z.string(),
-    what_we_discovered: z.string(),
+    exists: z.boolean().catch(false),
+    insight_name: z.string().optional(),
+    the_assumption: z.string().optional(),
+    the_reality: z.string().optional(),
+    the_disconnect: z.string().optional(),
+    years_of_blind_spot: z.string().optional(),
+    why_missed: z.string().optional(),
+    evidence_base: z.string().optional(),
+    magnitude_of_opportunity: z.string().optional(),
+    first_mover_advantage: z.string().optional(),
+
+    // Legacy fields for backward compatibility
+    insight_headline: z.string().optional(),
+    the_conventional_wisdom: z.string().optional(),
+    what_we_discovered: z.string().optional(),
     evidence_sources: z.array(z.string()).catch([]),
-    why_it_matters: z.string(),
+    why_it_matters: z.string().optional(),
     who_should_care: z.array(z.string()).catch([]),
     related_concepts: z.array(z.string()).catch([]),
   })
   .passthrough();
 
-// NEW: What industry missed section
-const WhatIndustryMissedSchema = z
+// --- Decision Architecture Section (ASCII flowchart) ---
+const DecisionFlowchartSchema = z
   .object({
-    the_assumption: z.string(),
-    how_long_held: z.string().optional(),
-    the_reality: z.string(),
-    evidence: z.string(),
-    opportunity_created: z.string(),
-    first_mover_advantage: z.string().optional(),
+    flowchart: z.string(), // ASCII or Mermaid format
+    summary: z.string(),
   })
   .passthrough();
 
-// NEW: Strategic implications section
+// Legacy decision architecture for backward compatibility
+const LegacyDecisionArchitectureSchema = z
+  .object({
+    primary: LeadConceptSchema.optional(),
+    fallback: LeadConceptSchema.optional(),
+    parallel_exploration: z.array(OtherConceptSchema).catch([]),
+  })
+  .passthrough();
+
+// --- Personal Recommendation Section ---
+const ActionPlanStepSchema = z
+  .object({
+    timeframe: z.string(),
+    actions: z.array(z.string()).catch([]),
+    rationale: z.string().optional(),
+    decision_gate: z.string().optional(),
+  })
+  .passthrough();
+
+const PersonalRecommendationSchema = z
+  .object({
+    intro: z.string(), // "If this were my project..."
+    action_plan: z.array(ActionPlanStepSchema).catch([]),
+    key_insight: z.string(),
+  })
+  .passthrough();
+
+// --- Strategic Implications Section ---
+const StrategicTimeframeSchema = z
+  .object({
+    timeframe: z.string(),
+    action: z.string().optional(),
+    expected_outcome: z.string().optional(),
+    why_parallel: z.string().optional(),
+    paradigm_bet: z.string().optional(),
+    why_now: z.string().optional(),
+    competitive_implications: z.string().optional(),
+  })
+  .passthrough();
+
 const StrategicImplicationsSchema = z
   .object({
+    near_term: StrategicTimeframeSchema.optional(),
+    medium_term: StrategicTimeframeSchema.optional(),
+    long_term: StrategicTimeframeSchema.optional(),
+    portfolio_view: z.string().optional(),
+
+    // Legacy fields
     for_incumbents: z.array(z.string()).catch([]),
     for_startups: z.array(z.string()).catch([]),
     for_investors: z.array(z.string()).catch([]),
@@ -537,23 +897,128 @@ const StrategicImplicationsSchema = z
   })
   .passthrough();
 
+// --- Validation Summary ---
+const ValidationSummarySchema = z
+  .object({
+    overall_confidence: ConfidenceLevel.catch('medium'),
+    key_validations: z.array(z.string()).catch([]),
+    remaining_uncertainties: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+// --- Challenge the Frame ---
+const ChallengeFrameSchema = z
+  .object({
+    assumption: z.string(),
+    challenge: z.string(),
+    implication: z.string(),
+  })
+  .passthrough();
+
+// --- Risks and Watchouts ---
+const RiskWatchoutSchema = z
+  .object({
+    category: z.string(),
+    risk: z.string(),
+    severity: z.enum(['low', 'medium', 'high']).catch('medium'),
+    mitigation: z.string().optional(),
+  })
+  .passthrough();
+
+// --- Self-Critique (Enhanced) ---
+const ReportSelfCritiqueSchema = z
+  .object({
+    what_we_might_be_wrong_about: z.array(z.string()).catch([]),
+    unexplored_directions: z.array(z.string()).catch([]),
+    confidence_level: ConfidenceLevel.catch('medium'),
+    confidence_rationale: z.string(),
+  })
+  .passthrough();
+
+// --- Next Steps (Granular Timeline) ---
+const NextStepsGranularSchema = z
+  .object({
+    today: z.array(z.string()).catch([]),
+    this_week: z.array(z.string()).catch([]),
+    week_2_3: z.array(z.string()).catch([]),
+    week_4_plus: z.array(z.string()).catch([]),
+    decision_point: z
+      .object({
+        title: z.string(),
+        description: z.string(),
+        cta_label: z.string().optional(),
+      })
+      .passthrough()
+      .optional(),
+  })
+  .passthrough();
+
+// --- Appendix ---
+const AppendixSchema = z
+  .object({
+    additional_resources: z.array(z.string()).catch([]),
+    methodology_notes: z.string().optional(),
+    data_sources: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+// --- Metadata ---
+const MetadataSchema = z
+  .object({
+    generated_at: z.string().optional(),
+    model_version: z.string().optional(),
+    chain_version: z.string().optional(),
+    total_concepts_generated: z.number().optional(),
+    tracks_covered: z.array(TrackSchema).catch([]),
+  })
+  .passthrough();
+
+// ============================================
+// Complete AN5-M Output Schema
+// ============================================
+
 export const AN5_M_OutputSchema = z
   .object({
-    report_title: z.string().max(100),
-    decision_architecture: DecisionArchitectureSchema,
-    other_concepts: z.array(OtherConceptSchema).catch([]),
+    // New structured format
+    header: HeaderSchema.optional(),
+    executive_summary: z.union([ExecutiveSummarySchema, z.string()]),
+    constraints: ConstraintsSchema.optional(),
+    problem_analysis: ReportProblemAnalysisSchema.optional(),
+    what_industry_missed: z
+      .union([
+        WhatIndustryMissedSectionSchema,
+        z.array(LegacyWhatIndustryMissedSchema),
+      ])
+      .optional(),
+    key_patterns: z.array(KeyPatternSchema).catch([]),
+    solution_concepts: SolutionConceptsSchema.optional(),
+    paradigm_insight: ParadigmInsightSectionSchema.optional(),
+    decision_flowchart: DecisionFlowchartSchema.optional(),
+    personal_recommendation: PersonalRecommendationSchema.optional(),
+    validation_summary: ValidationSummarySchema.optional(),
+    challenge_the_frame: z.array(ChallengeFrameSchema).catch([]),
+    strategic_implications: StrategicImplicationsSchema.optional(),
+    risks_and_watchouts: z.array(RiskWatchoutSchema).catch([]),
     self_critique: ReportSelfCritiqueSchema,
-    executive_summary: z.string(),
-    next_steps: z.array(z.string()).catch([]),
+    next_steps: z
+      .union([NextStepsGranularSchema, z.array(z.string())])
+      .optional(),
+    appendix: AppendixSchema.optional(),
+    metadata: MetadataSchema.optional(),
+
+    // Legacy fields for backward compatibility
+    report_title: z.string().max(100).optional(),
+    decision_architecture: LegacyDecisionArchitectureSchema.optional(),
+    other_concepts: z.array(OtherConceptSchema).catch([]),
     problem_restatement: z.string().optional(),
     key_insights: z.array(z.string()).catch([]),
-    // NEW: Paradigm insight surfacing sections
-    paradigm_insight: ParadigmInsightSectionSchema.optional(),
-    what_industry_missed: z.array(WhatIndustryMissedSchema).default([]),
-    strategic_implications: StrategicImplicationsSchema.optional(),
   })
   .passthrough();
 
 export type AN5_M_Output = z.infer<typeof AN5_M_OutputSchema>;
 export type HybridLeadConcept = z.infer<typeof LeadConceptSchema>;
 export type HybridOtherConcept = z.infer<typeof OtherConceptSchema>;
+export type HybridParallelExploration = z.infer<
+  typeof ParallelExplorationSchema
+>;
+export type HybridSparkConcept = z.infer<typeof SparkConceptSchema>;

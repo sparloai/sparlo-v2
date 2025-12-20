@@ -9,6 +9,7 @@
  * - HUNTS in expanded territories (biology, geology, abandoned tech, etc.)
  * - DOCUMENTS prior art evidence
  * - INCLUDES honest self-critique
+ * - SURFACES paradigm insights prominently even when simpler paths win
  *
  * Philosophy: The best solution wins regardless of origin.
  *
@@ -39,6 +40,13 @@ export {
   type HybridValidationResult,
   type HybridLeadConcept,
   type HybridOtherConcept,
+  type HybridParallelExploration,
+  type HybridSparkConcept,
+  // Shared primitives
+  ConfidenceLevel,
+  CapitalRequirement,
+  ViabilityVerdict,
+  TrackSchema,
 } from './schemas';
 
 // Re-export all prompts
@@ -82,7 +90,7 @@ export const HYBRID_TEMPERATURES = {
  * - AN1.7-M: Literature search for precedent AND gaps
  * - AN2-M: Full-spectrum methodology briefing
  * - AN3-M: Concept generation across all 4 tracks
- * - AN4-M: Merit-based evaluation
+ * - AN4-M: Merit-based evaluation with paradigm significance
  * - AN5-M: Executive report with decision architecture
  */
 export const HYBRID_PHASES = [
@@ -108,7 +116,8 @@ export const HYBRID_PHASES = [
   {
     id: 'an1.7-m',
     name: 'Literature Search',
-    description: 'Finding both precedent and gaps in literature',
+    description:
+      'Finding precedent, gaps, and abandoned technologies in literature',
     estimatedMinutes: 3,
   },
   {
@@ -120,19 +129,22 @@ export const HYBRID_PHASES = [
   {
     id: 'an3-m',
     name: 'Concept Generation',
-    description: 'Generating solutions across the full spectrum',
+    description:
+      'Generating solutions across the full spectrum with mechanism depth',
     estimatedMinutes: 4,
   },
   {
     id: 'an4-m',
     name: 'Evaluation',
-    description: 'Merit-based validation with decision architecture',
+    description:
+      'Merit-based validation with paradigm significance assessment',
     estimatedMinutes: 3,
   },
   {
     id: 'an5-m',
     name: 'Executive Report',
-    description: 'Full-spectrum analysis report with decision architecture',
+    description:
+      'Full-spectrum report with parallel explorations and paradigm insights',
     estimatedMinutes: 4,
   },
 ] as const;
@@ -152,13 +164,28 @@ export const HYBRID_SOLUTION_TRACKS = [
 export type HybridSolutionTrack = (typeof HYBRID_SOLUTION_TRACKS)[number];
 
 /**
- * Hybrid chain metadata
+ * Hybrid chain metadata (v2.0.0)
  */
 export const HYBRID_CHAIN_METADATA = {
-  version: '1.0.0',
+  version: '2.0.0',
   name: 'Hybrid Innovation Chain',
-  description: 'Full-spectrum solution search from simple to paradigm-shifting',
-  philosophy: 'The best solution wins regardless of origin or novelty',
+  description: 'Full-spectrum solution search with paradigm insight surfacing',
+  philosophy:
+    'The best solution wins regardless of origin. Paradigm insights are surfaced prominently even when simpler paths win on merit.',
+
+  stages: [
+    { id: 'an0-m', name: 'Problem Framing' },
+    { id: 'an1-m', name: 'Corpus Retrieval' },
+    { id: 'an1.5-m', name: 'Teaching Selection' },
+    { id: 'an1.7-m', name: 'Literature Search' },
+    { id: 'an2-m', name: 'Methodology Briefing' },
+    { id: 'an3-m', name: 'Concept Generation' },
+    { id: 'an4-m', name: 'Evaluation' },
+    { id: 'an5-m', name: 'Executive Report' },
+  ],
+
+  estimatedTotalMinutes: 20,
+  estimatedCost: '$4-6',
 
   tracks: {
     simpler_path: 'Lower risk, faster to implement. NOT consolation prizes.',
@@ -175,9 +202,10 @@ export const HYBRID_CHAIN_METADATA = {
     'Self-critique section in every report',
     'Prior art documented for every concept',
     'Decision architecture with primary + fallback + parallel',
-    // NEW: Paradigm insight surfacing guarantees
-    'Paradigm insights surfaced even when simple solutions win',
-    'Abandoned technology revival opportunities identified',
-    'Mechanistic depth for paradigm/frontier concepts',
+    'Paradigm insights surfaced prominently when found',
+    'Abandoned technology revival scan in every report',
+    'Strategic implications with near/medium/long-term framing',
+    'Personal recommendation with day-by-day action plan',
+    'Parallel explorations with full detail (not footnotes)',
   ],
 };
