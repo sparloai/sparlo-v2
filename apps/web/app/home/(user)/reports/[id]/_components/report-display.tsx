@@ -495,45 +495,43 @@ export function ReportDisplay({
                 Back to Dashboard
               </Link>
 
-              {/* Report Header - Discovery reports have their own header in DiscoveryReportDisplay */}
-              {!isDiscovery && (
-                <header className="mb-10">
-                  <div className="mb-6 flex items-start justify-between gap-6">
-                    <div className="space-y-3">
-                      <div className="text-label flex items-center gap-2">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Sparlo Intelligence Briefing
-                      </div>
-                      <h1 className="heading-display heading-display--lg">
-                        {report.title}
-                      </h1>
+              {/* Report Header */}
+              <header className="mb-10">
+                <div className="mb-6 flex items-start justify-between gap-6">
+                  <div className="space-y-3">
+                    <div className="text-label flex items-center gap-2">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Sparlo Intelligence Briefing
                     </div>
-                    <div className="status status--high">
-                      <span className="status-dot" />
-                      Complete
-                    </div>
+                    <h1 className="heading-display heading-display--lg">
+                      {report.title}
+                    </h1>
                   </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-[--text-muted]">
-                      Generated {new Date(report.created_at).toLocaleDateString()}
-                    </div>
-                    <div className="flex gap-2">
-                      <button className="btn">
-                        <Download className="btn-icon" />
-                        Export
-                      </button>
-                      <button className="btn">
-                        <Share2 className="btn-icon" />
-                        Share
-                      </button>
-                    </div>
+                  <div className="status status--high">
+                    <span className="status-dot" />
+                    Complete
                   </div>
-                </header>
-              )}
+                </div>
 
-              {/* Core Insight Card - Only for standard reports */}
-              {!isDiscovery && report.report_data?.recommendedConcept && (
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-[--text-muted]">
+                    Generated {new Date(report.created_at).toLocaleDateString()}
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="btn">
+                      <Download className="btn-icon" />
+                      Export
+                    </button>
+                    <button className="btn">
+                      <Share2 className="btn-icon" />
+                      Share
+                    </button>
+                  </div>
+                </div>
+              </header>
+
+              {/* Core Insight Card */}
+              {report.report_data?.recommendedConcept && (
                 <motion.section
                   className="callout callout--insight mb-12"
                   initial={{ opacity: 0, y: 20 }}
