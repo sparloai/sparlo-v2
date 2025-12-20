@@ -728,6 +728,7 @@ The client might be asking the wrong question. If we discovered that the industr
 CRITICAL: Respond with ONLY valid JSON.
 
 {
+  "report_title": "Clear, specific title for this analysis (max 100 chars)",
   "decision_architecture": {
     "primary": {
       "id": "concept-id",

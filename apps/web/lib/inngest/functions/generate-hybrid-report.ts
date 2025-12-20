@@ -673,9 +673,7 @@ The BEST solution wins regardless of origin (simple vs complex, conventional vs 
           status: 'complete',
           current_step: 'complete',
           phase_progress: 100,
-          headline:
-            an5mResult.result.executive_summary?.slice(0, 200) ??
-            'Hybrid Analysis Complete',
+          headline: an5mResult.result.report_title ?? 'Hybrid Analysis Complete',
           report_data: {
             mode: 'hybrid',
             report: an5mResult.result,

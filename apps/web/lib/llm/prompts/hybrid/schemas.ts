@@ -539,6 +539,7 @@ const StrategicImplicationsSchema = z
 
 export const AN5_M_OutputSchema = z
   .object({
+    report_title: z.string().max(100),
     decision_architecture: DecisionArchitectureSchema,
     other_concepts: z.array(OtherConceptSchema).catch([]),
     self_critique: ReportSelfCritiqueSchema,
