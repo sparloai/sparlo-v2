@@ -36,6 +36,7 @@ import {
   extractUserInput,
 } from '../_lib/extract-report';
 import type { ChatMessage } from '../_lib/schemas/chat.schema';
+import { DiscoveryReportDisplay } from './discovery-report-display';
 import { ReportRenderer } from './report/report-renderer';
 
 interface ReportData {
@@ -76,6 +77,7 @@ interface ReportDisplayProps {
   report: Report;
   isProcessing?: boolean;
   initialChatHistory?: ChatMessage[];
+  isDiscovery?: boolean;
 }
 
 // Table of contents item
@@ -89,6 +91,7 @@ export function ReportDisplay({
   report,
   isProcessing,
   initialChatHistory = [],
+  isDiscovery = false,
 }: ReportDisplayProps) {
   const router = useRouter();
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -560,13 +563,21 @@ export function ReportDisplay({
                 </motion.section>
               )}
 
-              {/* Full Report - Structured or Markdown fallback */}
+              {/* Full Report - Discovery, Structured, or Markdown fallback */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
-                {structuredReport ? (
+                {isDiscovery ? (
+                  <DiscoveryReportDisplay
+                    reportData={
+                      report.report_data as Parameters<
+                        typeof DiscoveryReportDisplay
+                      >[0]['reportData']
+                    }
+                  />
+                ) : structuredReport ? (
                   <ReportRenderer report={structuredReport} />
                 ) : (
                   <ReactMarkdown components={markdownComponents}>

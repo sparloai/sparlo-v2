@@ -96,17 +96,13 @@ export default async function ReportPage({ params }: ReportPageProps) {
   const isDiscoveryReport = report.report_data.mode === 'discovery';
 
   if (isDiscoveryReport) {
-    // Discovery reports have a different schema - render with dedicated component
+    // Discovery reports use ReportDisplay for chat functionality, with discovery flag
     return (
-      <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
-        <DiscoveryReportDisplay
-          reportData={
-            report.report_data as Parameters<
-              typeof DiscoveryReportDisplay
-            >[0]['reportData']
-          }
-        />
-      </div>
+      <ReportDisplay
+        report={report}
+        initialChatHistory={initialChatHistory}
+        isDiscovery
+      />
     );
   }
 

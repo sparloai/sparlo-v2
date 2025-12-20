@@ -97,6 +97,79 @@ async function checkRateLimit(
   }
 }
 
+/**
+ * Extract text context from discovery report for chat
+ */
+function extractDiscoveryContext(
+  reportData: Record<string, unknown>,
+): string {
+  const report = reportData.report as Record<string, unknown> | undefined;
+  if (!report) return JSON.stringify(reportData, null, 2);
+
+  const sections: string[] = [];
+
+  // Header
+  const header = report.header as Record<string, unknown> | undefined;
+  if (header) {
+    sections.push(`# ${header.title || 'Discovery Report'}`);
+    if (header.tagline) sections.push(`*${header.tagline}*`);
+  }
+
+  // Executive Summary
+  const exec = report.executive_summary as Record<string, unknown> | undefined;
+  if (exec) {
+    sections.push('\n## Executive Summary');
+    if (exec.one_liner) sections.push(exec.one_liner as string);
+    if (exec.key_discovery)
+      sections.push(`**Key Discovery:** ${exec.key_discovery}`);
+    if (exec.recommended_action)
+      sections.push(`**Recommended Action:** ${exec.recommended_action}`);
+  }
+
+  // Discovery Brief
+  const brief = report.discovery_brief as Record<string, unknown> | undefined;
+  if (brief) {
+    sections.push('\n## Discovery Brief');
+    if (brief.original_problem)
+      sections.push(`**Problem:** ${brief.original_problem}`);
+    if (brief.industry_blind_spot)
+      sections.push(`**Industry Blind Spot:** ${brief.industry_blind_spot}`);
+    if (brief.discovery_thesis)
+      sections.push(`**Thesis:** ${brief.discovery_thesis}`);
+  }
+
+  // Discovery Concepts
+  const concepts = report.discovery_concepts as Array<
+    Record<string, unknown>
+  > | undefined;
+  if (concepts?.length) {
+    sections.push('\n## Discovery Concepts');
+    concepts.forEach((concept, i) => {
+      sections.push(`\n### ${i + 1}. ${concept.name || 'Concept'}`);
+      if (concept.category) sections.push(`Category: ${concept.category}`);
+      const insight = concept.the_insight as Record<string, unknown> | undefined;
+      if (insight?.what_we_found) sections.push(insight.what_we_found as string);
+      const potential = concept.breakthrough_potential as
+        | Record<string, unknown>
+        | undefined;
+      if (potential?.if_works)
+        sections.push(`**If it works:** ${potential.if_works}`);
+    });
+  }
+
+  // Why This Matters
+  const matters = report.why_this_matters as Record<string, unknown> | undefined;
+  if (matters) {
+    sections.push('\n## Why This Matters');
+    if (matters.if_we_succeed)
+      sections.push(`**If We Succeed:** ${matters.if_we_succeed}`);
+    if (matters.competitive_advantage)
+      sections.push(`**Competitive Advantage:** ${matters.competitive_advantage}`);
+  }
+
+  return sections.join('\n');
+}
+
 // P1-045: Structured system prompt with clear boundaries
 const SYSTEM_PROMPT = `You are an expert AI assistant helping users understand their Sparlo innovation report.
 
@@ -217,9 +290,20 @@ export const POST = enhanceRouteHandler(
     const history = ChatHistorySchema.safeParse(report.chat_history);
     const chatHistory: ChatMessage[] = history.success ? history.data : [];
 
-    // Use the markdown report as context (already contains synthesized AN0-AN5)
-    const reportData = report.report_data as { markdown?: string } | null;
-    const reportContext = reportData?.markdown || '';
+    // Extract report context - handle both standard (markdown) and discovery (structured) reports
+    const reportData = report.report_data as Record<string, unknown> | null;
+    let reportContext = '';
+
+    if (reportData?.markdown) {
+      // Standard report with markdown
+      reportContext = reportData.markdown as string;
+    } else if (reportData?.mode === 'discovery') {
+      // Discovery report - convert structured data to text context
+      reportContext = extractDiscoveryContext(reportData);
+    } else if (reportData) {
+      // Fallback: stringify the report data
+      reportContext = JSON.stringify(reportData, null, 2);
+    }
 
     // Build messages for Anthropic
     const anthropic = new Anthropic({
