@@ -302,9 +302,11 @@ export const startReportGeneration = enhanceAction(
     );
 
     if (!usage.allowed) {
+      const periodInfo = usage.periodEnd
+        ? ` Wait until ${new Date(usage.periodEnd).toLocaleDateString()}.`
+        : '';
       throw new Error(
-        `Usage limit reached (${usage.percentage.toFixed(0)}% used). ` +
-          `Upgrade your plan or wait until ${new Date(usage.periodEnd).toLocaleDateString()}.`,
+        `Usage limit reached (${usage.percentage.toFixed(0)}% used).${periodInfo}`,
       );
     }
 

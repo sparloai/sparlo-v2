@@ -23,6 +23,9 @@ export const USAGE_CONSTANTS = {
   /** Show warning indicator at this percentage */
   WARNING_THRESHOLD: 80,
 
+  /** Show critical indicator at this percentage */
+  CRITICAL_THRESHOLD: 95,
+
   /** Hard limit - block new reports at this percentage */
   HARD_LIMIT_THRESHOLD: 100,
 } as const;

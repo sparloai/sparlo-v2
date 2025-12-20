@@ -190,9 +190,18 @@ export function useReportProgress(
       cleanup = cleanupFn;
     });
 
+    // POLLING FALLBACK: Realtime can be unreliable, so poll every 3 seconds
+    // as a backup to ensure we catch step transitions
+    const pollInterval = setInterval(() => {
+      if (mountedRef.current) {
+        fetchProgress();
+      }
+    }, 3000);
+
     return () => {
       mountedRef.current = false;
       cleanup?.();
+      clearInterval(pollInterval);
     };
   }, [reportId, supabase, fetchProgress]);
 
