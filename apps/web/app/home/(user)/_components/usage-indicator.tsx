@@ -8,6 +8,8 @@ import {
   TooltipTrigger,
 } from '@kit/ui/tooltip';
 
+import { USAGE_CONSTANTS } from '~/lib/usage/constants';
+
 interface UsageIndicatorProps {
   tokensUsed: number;
   tokensLimit: number;
@@ -22,8 +24,9 @@ export function UsageIndicator({
   periodEnd,
 }: UsageIndicatorProps) {
   const percentage = Math.min((tokensUsed / tokensLimit) * 100, 100);
-  const isNearLimit = percentage >= 80;
-  const isAtLimit = percentage >= 100;
+  const isWarning = percentage >= USAGE_CONSTANTS.WARNING_THRESHOLD;
+  const isCritical = percentage >= USAGE_CONSTANTS.CRITICAL_THRESHOLD;
+  const isAtLimit = percentage >= USAGE_CONSTANTS.HARD_LIMIT_THRESHOLD;
 
   const formatTokens = (tokens: number) => {
     if (tokens >= 1_000_000) {
@@ -53,9 +56,11 @@ export function UsageIndicator({
                 className={
                   isAtLimit
                     ? 'text-destructive font-medium'
-                    : isNearLimit
-                      ? 'font-medium text-amber-500'
-                      : 'font-medium'
+                    : isCritical
+                      ? 'font-medium text-red-500'
+                      : isWarning
+                        ? 'font-medium text-amber-500'
+                        : 'font-medium'
                 }
               >
                 {percentage.toFixed(0)}%
@@ -66,9 +71,11 @@ export function UsageIndicator({
               className={
                 isAtLimit
                   ? '[&>div]:bg-destructive h-1.5'
-                  : isNearLimit
-                    ? 'h-1.5 [&>div]:bg-amber-500'
-                    : 'h-1.5'
+                  : isCritical
+                    ? 'h-1.5 [&>div]:bg-red-500'
+                    : isWarning
+                      ? 'h-1.5 [&>div]:bg-amber-500'
+                      : 'h-1.5'
               }
             />
           </div>
@@ -89,11 +96,13 @@ export function UsageIndicator({
               <span className="text-muted-foreground">Resets in:</span>
               <span className="font-medium">{daysRemaining} days</span>
             </div>
-            {isNearLimit && (
+            {isWarning && (
               <div className="text-muted-foreground border-t pt-2 text-xs">
                 {isAtLimit
                   ? 'Upgrade your plan to continue generating reports.'
-                  : 'Running low on tokens. Consider upgrading.'}
+                  : isCritical
+                    ? 'Almost at your limit. Upgrade soon.'
+                    : 'Running low on tokens. Consider upgrading.'}
               </div>
             )}
           </div>
