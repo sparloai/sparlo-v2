@@ -139,7 +139,7 @@ export const DISCOVERY_CHAIN_CONFIG = {
   maxTokensByPhase: {
     'an0-d': 8000,
     'an1.5-d': 16000, // Increased - complex multi-category output
-    'an1.7-d': 12000, // Increased for detailed literature analysis
+    'an1.7-d': 20000, // Increased - large output with 8 sections of detailed analysis
     'an2-d': 12000, // Increased for methodology briefing
     'an3-d': 24000,
     'an4-d': 16000,
