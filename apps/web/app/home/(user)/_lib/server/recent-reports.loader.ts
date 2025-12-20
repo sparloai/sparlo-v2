@@ -2,7 +2,8 @@ import 'server-only';
 
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-export type ReportMode = 'discovery' | 'standard';
+import type { DashboardReportData, ReportMode } from '../types';
+import { extractReportMode } from '../utils/report-utils';
 
 export interface RecentReport {
   id: string;
@@ -15,12 +16,14 @@ interface RawRecentReport {
   id: string;
   title: string;
   created_at: string;
-  report_data: { mode?: string } | null;
+  report_data: DashboardReportData | null;
 }
 
 /**
  * Load the 5 most recent non-archived reports for a user.
  * Returns empty array on error to gracefully degrade.
+ *
+ * Note: Uses idx_sparlo_reports_active partial index for performance.
  */
 export async function loadRecentReports(
   userId: string,
@@ -47,9 +50,7 @@ export async function loadRecentReports(
       id: row.id,
       title: row.title,
       created_at: row.created_at,
-      mode: (row.report_data?.mode === 'discovery'
-        ? 'discovery'
-        : 'standard') as ReportMode,
+      mode: extractReportMode(row.report_data),
     })) ?? []
   );
 }

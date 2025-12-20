@@ -157,6 +157,54 @@ export interface Pattern {
   description: string;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// REPORT LIST TYPES - Shared across dashboard components
+// ═══════════════════════════════════════════════════════════════════════════
+
+export type ReportMode = 'discovery' | 'standard';
+
+export const REPORT_MODE_LABELS: Record<ReportMode, string> = {
+  discovery: 'Discovery',
+  standard: 'Analysis',
+} as const;
+
+export interface DashboardReportData {
+  solution_concepts?: {
+    lead_concepts?: unknown[];
+    other_concepts?: unknown[];
+    spark_concept?: unknown;
+  };
+  headline?: string;
+  mode?: string;
+}
+
+export interface RawReportRow {
+  id: string;
+  title: string;
+  headline: string | null;
+  status: string;
+  current_step: string | null;
+  created_at: string;
+  updated_at: string;
+  archived: boolean;
+  report_data: DashboardReportData | null;
+  error_message: string | null;
+}
+
+export interface DashboardReport {
+  id: string;
+  title: string;
+  headline: string | null;
+  status: ConversationStatus;
+  current_step?: string | null;
+  created_at: string;
+  updated_at: string;
+  archived?: boolean;
+  concept_count: number;
+  error_message?: string | null;
+  mode: ReportMode;
+}
+
 // Frontend-specific types
 export type AppState = 'input' | 'processing' | 'complete';
 

@@ -95,9 +95,10 @@ export function ProcessingScreen({
 
   // Cycle through status messages
   useEffect(() => {
+    // Don't cycle messages during AN0 phase (any variant)
     if (
       progress.status !== 'processing' ||
-      progress.currentStep === 'an0' ||
+      progress.currentStep?.startsWith('an0') ||
       prefersReducedMotion
     )
       return;
@@ -428,8 +429,9 @@ export function ProcessingScreen({
   }
 
   // Determine if we're in the initial review phase (AN0) or main analysis
+  // Handle any AN0 variant (an0, an0-d for discovery, etc.)
   const isInitialReview =
-    !progress.currentStep || progress.currentStep === 'an0';
+    !progress.currentStep || progress.currentStep.startsWith('an0');
 
   // Default: Processing status - two states based on current phase
   return (

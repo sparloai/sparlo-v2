@@ -7,11 +7,12 @@ import { getSupabaseServerClient } from '@kit/supabase/server-client';
  * GET /api/reports
  *
  * List all reports for the authenticated user.
- * Agent-native endpoint supporting mode filtering and pagination.
+ * Agent-native endpoint supporting mode, archived, and status filtering with pagination.
  *
  * Query params:
  * - mode: 'discovery' | 'standard' (optional)
  * - status: 'processing' | 'complete' | 'error' | 'clarifying' (optional)
+ * - archived: 'true' | 'false' (optional, omit to return all)
  * - limit: number (default 20, max 100)
  * - offset: number (default 0)
  */
@@ -27,11 +28,12 @@ export const GET = enhanceRouteHandler(
     const offset = parseInt(url.searchParams.get('offset') ?? '0');
     const status = url.searchParams.get('status');
     const mode = url.searchParams.get('mode');
+    const archived = url.searchParams.get('archived');
 
     let query = client
       .from('sparlo_reports')
       .select(
-        'id, title, status, current_step, phase_progress, report_data, created_at',
+        'id, title, status, current_step, phase_progress, report_data, archived, created_at',
         { count: 'exact' },
       )
       .order('created_at', { ascending: false })
@@ -40,6 +42,14 @@ export const GET = enhanceRouteHandler(
     if (status) {
       query = query.eq('status', status);
     }
+
+    // Filter by archived status if specified
+    if (archived === 'true') {
+      query = query.eq('archived', true);
+    } else if (archived === 'false') {
+      query = query.eq('archived', false);
+    }
+    // If archived is not specified, return all reports
 
     // Filter by mode if specified
     if (mode === 'discovery') {
@@ -70,6 +80,7 @@ export const GET = enhanceRouteHandler(
         phaseProgress: report.phase_progress,
         mode:
           (report.report_data as { mode?: string } | null)?.mode ?? 'standard',
+        archived: report.archived,
         createdAt: report.created_at,
       })),
       pagination: {

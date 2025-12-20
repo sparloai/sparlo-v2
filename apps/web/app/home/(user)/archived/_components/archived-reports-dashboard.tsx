@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -10,49 +10,18 @@ import {
   ArrowLeft,
   ChevronRight,
   FileText,
-  RotateCcw,
   Search,
 } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
 
-import { archiveReport } from '../../_lib/server/sparlo-reports-server-actions';
-import type { ConversationStatus } from '../../_lib/types';
-
-export type ReportMode = 'discovery' | 'standard';
-
-interface Report {
-  id: string;
-  title: string;
-  headline: string | null;
-  status: ConversationStatus;
-  created_at: string;
-  updated_at: string;
-  concept_count: number;
-  mode: ReportMode;
-}
+import { ArchiveToggleButton } from '../../_components/shared/archive-toggle-button';
+import { ModeLabel } from '../../_components/shared/mode-label';
+import type { DashboardReport } from '../../_lib/types';
+import { formatReportDate, truncateText } from '../../_lib/utils/report-utils';
 
 interface ArchivedReportsDashboardProps {
-  reports: Report[];
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const isThisYear = date.getFullYear() === now.getFullYear();
-
-  return date
-    .toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      ...(isThisYear ? {} : { year: 'numeric' }),
-    })
-    .toUpperCase();
-}
-
-function truncate(str: string, length: number): string {
-  if (str.length <= length) return str;
-  return str.slice(0, length).trim() + '...';
+  reports: DashboardReport[];
 }
 
 function EmptyState() {
@@ -91,47 +60,6 @@ function NoResultsState({ query }: { query: string }) {
         No archived reports match &ldquo;{query}&rdquo;
       </p>
     </div>
-  );
-}
-
-function ModeLabel({ mode }: { mode: ReportMode }) {
-  return (
-    <span
-      className="font-mono text-[10px] tracking-wider text-[--text-muted] uppercase"
-      style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
-    >
-      [{mode === 'discovery' ? 'Discovery' : 'Analysis'}]
-    </span>
-  );
-}
-
-function RestoreButton({
-  reportId,
-  onRestored,
-}: {
-  reportId: string;
-  onRestored: () => void;
-}) {
-  const [isPending, startTransition] = useTransition();
-
-  const handleRestore = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    startTransition(async () => {
-      await archiveReport({ id: reportId, archived: false });
-      onRestored();
-    });
-  };
-
-  return (
-    <button
-      onClick={handleRestore}
-      disabled={isPending}
-      className="rounded p-1.5 text-[--text-muted] opacity-0 transition-all group-hover:opacity-100 hover:bg-[--surface-overlay] hover:text-[--text-secondary]"
-      title="Restore report"
-    >
-      <RotateCcw className="h-4 w-4" />
-    </button>
   );
 }
 
@@ -205,7 +133,7 @@ export function ArchivedReportsDashboard({
               const isClickable = isComplete;
 
               const displayTitle =
-                report.headline || truncate(report.title, 80);
+                report.headline || truncateText(report.title, 80);
 
               return (
                 <div
@@ -242,7 +170,7 @@ export function ArchivedReportsDashboard({
                           fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
                         }}
                       >
-                        {formatDate(report.created_at)}
+                        {formatReportDate(report.created_at)}
                       </span>
                       {isComplete && report.concept_count > 0 && (
                         <>
@@ -267,9 +195,9 @@ export function ArchivedReportsDashboard({
 
                   {/* Actions */}
                   <div className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-1">
-                    <RestoreButton
+                    <ArchiveToggleButton
                       reportId={report.id}
-                      onRestored={() => router.refresh()}
+                      isArchived={true}
                     />
                     {isClickable && (
                       <ChevronRight className="h-4 w-4 -translate-x-2 text-[--text-muted] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />

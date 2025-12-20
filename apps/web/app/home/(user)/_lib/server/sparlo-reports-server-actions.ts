@@ -256,7 +256,9 @@ export const archiveReport = enhanceAction(
       throw new Error(`Failed to archive report: ${error.message}`);
     }
 
+    // Revalidate both active and archived pages
     revalidatePath('/home');
+    revalidatePath('/home/archived');
     return { success: true, report: report as unknown as SparloReport };
   },
   {

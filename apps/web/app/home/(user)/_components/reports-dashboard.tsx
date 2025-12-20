@@ -1,13 +1,12 @@
 'use client';
 
-import { useMemo, useState, useTransition } from 'react';
+import { useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
   AlertCircle,
-  Archive,
   ChevronRight,
   FileText,
   Loader2,
@@ -18,25 +17,11 @@ import {
 import { Button } from '@kit/ui/button';
 import { cn } from '@kit/ui/utils';
 
-import { archiveReport } from '../_lib/server/sparlo-reports-server-actions';
-import type { ConversationStatus } from '../_lib/types';
+import type { ConversationStatus, DashboardReport } from '../_lib/types';
 import { formatElapsed, useElapsedTime } from '../_lib/utils/elapsed-time';
-
-export type ReportMode = 'discovery' | 'standard';
-
-interface Report {
-  id: string;
-  title: string;
-  headline: string | null;
-  status: ConversationStatus;
-  current_step: string | null;
-  created_at: string;
-  updated_at: string;
-  archived: boolean;
-  concept_count: number;
-  error_message: string | null;
-  mode: ReportMode;
-}
+import { formatReportDate, truncateText } from '../_lib/utils/report-utils';
+import { ArchiveToggleButton } from './shared/archive-toggle-button';
+import { ModeLabel } from './shared/mode-label';
 
 /**
  * ElapsedTime component - shows live updating elapsed time since creation
@@ -55,26 +40,7 @@ function ElapsedTime({ createdAt }: { createdAt: string }) {
 }
 
 interface ReportsDashboardProps {
-  reports: Report[];
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const isThisYear = date.getFullYear() === now.getFullYear();
-
-  return date
-    .toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      ...(isThisYear ? {} : { year: 'numeric' }),
-    })
-    .toUpperCase();
-}
-
-function truncate(str: string, length: number): string {
-  if (str.length <= length) return str;
-  return str.slice(0, length).trim() + '...';
+  reports: DashboardReport[];
 }
 
 function EmptyState() {
@@ -115,47 +81,6 @@ function NoResultsState({ query }: { query: string }) {
         No reports match &ldquo;{query}&rdquo;
       </p>
     </div>
-  );
-}
-
-function ModeLabel({ mode }: { mode: ReportMode }) {
-  return (
-    <span
-      className="font-mono text-[10px] tracking-wider text-[--text-muted] uppercase"
-      style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
-    >
-      [{mode === 'discovery' ? 'Discovery' : 'Analysis'}]
-    </span>
-  );
-}
-
-function ArchiveButton({
-  reportId,
-  onArchived,
-}: {
-  reportId: string;
-  onArchived: () => void;
-}) {
-  const [isPending, startTransition] = useTransition();
-
-  const handleArchive = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    startTransition(async () => {
-      await archiveReport({ id: reportId, archived: true });
-      onArchived();
-    });
-  };
-
-  return (
-    <button
-      onClick={handleArchive}
-      disabled={isPending}
-      className="cursor-pointer rounded p-1.5 text-[--text-muted] opacity-0 transition-all group-hover:opacity-100 hover:bg-[--surface-overlay] hover:text-[--text-secondary]"
-      title="Archive report"
-    >
-      <Archive className="h-4 w-4" />
-    </button>
   );
 }
 
@@ -241,7 +166,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
               // Use headline if available, otherwise truncate title
               const displayTitle =
-                report.headline || truncate(report.title, 80);
+                report.headline || truncateText(report.title, 80);
 
               if (processing) {
                 // Processing state - purple theme, not clickable
@@ -339,9 +264,10 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
                       {/* Actions */}
                       <div className="flex flex-shrink-0 items-center gap-2">
-                        <ArchiveButton
+                        <ArchiveToggleButton
                           reportId={report.id}
-                          onArchived={() => router.refresh()}
+                          isArchived={false}
+                          onComplete={() => router.refresh()}
                         />
                         <Button
                           variant="outline"
@@ -401,7 +327,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                           fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
                         }}
                       >
-                        {formatDate(report.created_at)}
+                        {formatReportDate(report.created_at)}
                       </span>
                       {isComplete && report.concept_count > 0 && (
                         <>
@@ -426,9 +352,10 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
                   {/* Actions */}
                   <div className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-1">
-                    <ArchiveButton
+                    <ArchiveToggleButton
                       reportId={report.id}
-                      onArchived={() => router.refresh()}
+                      isArchived={false}
+                      onComplete={() => router.refresh()}
                     />
                     {isClickable && (
                       <ChevronRight className="h-4 w-4 -translate-x-2 text-[--text-muted] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
