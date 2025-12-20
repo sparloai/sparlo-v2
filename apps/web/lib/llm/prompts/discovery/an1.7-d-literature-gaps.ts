@@ -200,44 +200,54 @@ const LiteratureSynthesisSchema = z.object({
   novelty_opportunity_summary: z.string(),
 });
 
-const SearchExecutedSchema = z.object({
-  query: z.string(),
-  results_count: z.number(),
-  key_findings: z.string(),
-  source_urls: z.array(z.string()),
-});
+const SearchExecutedSchema = z
+  .object({
+    query: z.string(),
+    results_count: z.number().catch(0),
+    key_findings: z.string().optional(),
+    source_urls: z.array(z.string()).catch([]),
+  })
+  .passthrough();
 
-const GapEvidenceSchema = z.object({
-  claimed_gap: z.string(),
-  search_query: z.string(),
-  results_summary: z.string(),
-  conclusion: z.string(),
-});
+const GapEvidenceSchema = z
+  .object({
+    claimed_gap: z.string(),
+    search_query: z.string().optional(),
+    results_summary: z.string().optional(),
+    conclusion: z.string().optional(),
+  })
+  .passthrough();
 
-const AbandonmentCitationSchema = z.object({
-  approach: z.string(),
-  original_source: z.string(),
-  abandonment_evidence: z.string(),
-  why_revisit: z.string(),
-});
+const AbandonmentCitationSchema = z
+  .object({
+    approach: z.string(),
+    original_source: z.string().optional(),
+    abandonment_evidence: z.string().optional(),
+    why_revisit: z.string().optional(),
+  })
+  .passthrough();
 
-const SearchEvidenceSchema = z.object({
-  searches_executed: z.array(SearchExecutedSchema),
-  gap_evidence: z.array(GapEvidenceSchema),
-  abandonment_citations: z.array(AbandonmentCitationSchema),
-});
+const SearchEvidenceSchema = z
+  .object({
+    searches_executed: z.array(SearchExecutedSchema).catch([]),
+    gap_evidence: z.array(GapEvidenceSchema).catch([]),
+    abandonment_citations: z.array(AbandonmentCitationSchema).catch([]),
+  })
+  .passthrough();
 
-export const AN1_7_D_OutputSchema = z.object({
-  abandoned_approaches_found: z.array(AbandonedApproachSchema),
-  research_gaps_identified: z.array(ResearchGapSchema),
-  uncommercial_patents: z.array(UncommercialPatentSchema),
-  academic_orphans: z.array(AcademicOrphanSchema),
-  cross_domain_untried: z.array(CrossDomainUntriedSchema),
-  historical_wisdom: z.array(HistoricalWisdomSchema),
-  competitive_blind_spots: CompetitiveBlindSpotsSchema,
-  literature_synthesis: LiteratureSynthesisSchema,
-  search_evidence: SearchEvidenceSchema,
-});
+export const AN1_7_D_OutputSchema = z
+  .object({
+    abandoned_approaches_found: z.array(AbandonedApproachSchema).catch([]),
+    research_gaps_identified: z.array(ResearchGapSchema).catch([]),
+    uncommercial_patents: z.array(UncommercialPatentSchema).catch([]),
+    academic_orphans: z.array(AcademicOrphanSchema).catch([]),
+    cross_domain_untried: z.array(CrossDomainUntriedSchema).catch([]),
+    historical_wisdom: z.array(HistoricalWisdomSchema).catch([]),
+    competitive_blind_spots: CompetitiveBlindSpotsSchema.optional(),
+    literature_synthesis: LiteratureSynthesisSchema.optional(),
+    search_evidence: SearchEvidenceSchema.optional(),
+  })
+  .passthrough();
 
 export type AN1_7_D_Output = z.infer<typeof AN1_7_D_OutputSchema>;
 

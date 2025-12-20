@@ -265,12 +265,20 @@ export const archiveReport = enhanceAction(
   },
 );
 
+// Attachment schema for vision support
+const ReportAttachmentSchema = z.object({
+  filename: z.string(),
+  media_type: z.enum(['image/jpeg', 'image/png', 'image/gif', 'image/webp']),
+  data: z.string(), // base64 encoded
+});
+
 // Schema for starting a new report with Inngest
 const StartReportSchema = z.object({
   designChallenge: z
     .string()
     .min(50, 'Please provide at least 50 characters')
     .max(10000, 'Design challenge must be under 10,000 characters'),
+  attachments: z.array(ReportAttachmentSchema).max(5).optional(),
 });
 
 // Rate limiting constants
@@ -373,6 +381,7 @@ export const startReportGeneration = enhanceAction(
           userId: user.id,
           designChallenge: data.designChallenge,
           conversationId,
+          attachments: data.attachments,
         },
       });
     } catch (inngestError) {

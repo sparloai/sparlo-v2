@@ -47,6 +47,10 @@ Synthesize everything into a compelling, HONEST report that communicates:
 - Write like marketing copy
 - Recommend without validation path
 
+## EVIDENCE REQUIREMENTS
+
+RULE: No source URL = no claim. Every factual assertion about industry state, prior art, or gaps must cite where you found it.
+
 CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or after. Start with { and end with }.
 
 ## Output Format
@@ -213,6 +217,26 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
       "what_would_change_recommendation": ["Conditions that would invalidate this analysis"]
     },
 
+    "prior_art_search_evidence": {
+      "industry_landscape_searches": [
+        {"search_query": "[problem] companies 2024", "top_finding": "Found X, Y, Z actively working", "implication": "Excluded from recommendations"}
+      ],
+      "gap_validation_searches": [
+        {"claimed_gap": "No one using metallic PCMs", "search_query": "gallium indium battery thermal", "results": "3 results, none on runaway protection", "conclusion": "Gap appears genuine"}
+      ],
+      "concept_prior_art_checks": [
+        {"concept": "D-05 Ga-In PCM", "key_search": "gallium phase change battery", "finding": "No direct prior art found", "novelty_status": "NOVEL (pending deeper search)"},
+        {"concept": "D-01 Directed Venting", "key_search": "battery thermal runaway vent directed", "finding": "Tesla patents on vent paths", "novelty_status": "PARTIALLY EXPLORED"}
+      ],
+      "searches_not_run": {
+        "acknowledged_gaps": [
+          "Did not search patent databases directly (Google Patents, USPTO)",
+          "Did not search academic databases (Google Scholar, IEEE)"
+        ],
+        "recommended_client_verification": ["specific searches client should run to verify our findings"]
+      }
+    },
+
     "executive_summary": {
       "hook": "One-line insight capturing the key discovery",
       "key_discovery": "What we found that others missed (2-3 sentences)",
@@ -246,11 +270,13 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
 ## FINAL REMINDERS
 
 1. The self_critique section is REQUIRED - be genuinely hard on yourself
-2. Lead with insight, not background in executive_summary
-3. Quantify with uncertainty ranges ("~$50K ± 50%") throughout
-4. Be specific in terminology ("counter-current thermosiphon" not "bio-inspired")
-5. Acknowledge unknowns explicitly in honest_uncertainties
-6. Never recommend without a clear validation_experiment
+2. The prior_art_search_evidence section is REQUIRED - document all searches and findings
+3. Lead with insight, not background in executive_summary
+4. Quantify with uncertainty ranges ("~$50K ± 50%") throughout
+5. Be specific in terminology ("counter-current thermosiphon" not "bio-inspired")
+6. Acknowledge unknowns explicitly in honest_uncertainties
+7. Never recommend without a clear validation_experiment
+8. RULE: No source URL = no claim. Every factual assertion must cite where you found it.
 
 REMEMBER: Output ONLY the JSON object. This is a DISCOVERY report - emphasize novelty, honesty, and what's been missed.`;
 
@@ -503,6 +529,49 @@ const SelfCritiqueSchema = z
   })
   .passthrough();
 
+// New: Prior Art Search Evidence schemas (REQUIRED but antifragile)
+const IndustryLandscapeSearchSchema = z
+  .object({
+    search_query: z.string(),
+    top_finding: z.string().optional(),
+    implication: z.string().optional(),
+  })
+  .passthrough();
+
+const GapValidationSearchSchema = z
+  .object({
+    claimed_gap: z.string(),
+    search_query: z.string().optional(),
+    results: z.string().optional(),
+    conclusion: z.string().optional(),
+  })
+  .passthrough();
+
+const ConceptPriorArtCheckSchema = z
+  .object({
+    concept: z.string(),
+    key_search: z.string().optional(),
+    finding: z.string().optional(),
+    novelty_status: z.string().optional(),
+  })
+  .passthrough();
+
+const SearchesNotRunSchema = z
+  .object({
+    acknowledged_gaps: z.array(z.string()).catch([]),
+    recommended_client_verification: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+const PriorArtSearchEvidenceSchema = z
+  .object({
+    industry_landscape_searches: z.array(IndustryLandscapeSearchSchema).catch([]),
+    gap_validation_searches: z.array(GapValidationSearchSchema).catch([]),
+    concept_prior_art_checks: z.array(ConceptPriorArtCheckSchema).catch([]),
+    searches_not_run: SearchesNotRunSchema.optional(),
+  })
+  .passthrough();
+
 // Executive Summary schema (v2.0)
 const ExecutiveSummarySchema = z
   .object({
@@ -573,6 +642,8 @@ const ReportSchema = z
       .optional(),
     // Self-critique is REQUIRED - this section must not be skipped
     self_critique: SelfCritiqueSchema,
+    // Prior Art Search Evidence is REQUIRED - document all searches (optional for antifragile rendering)
+    prior_art_search_evidence: PriorArtSearchEvidenceSchema.optional(),
     executive_summary: ExecutiveSummarySchema,
     appendix: AppendixSchema.optional(),
   })

@@ -45,6 +45,30 @@ Discovery mode accepts higher risk for higher novelty:
 - Low novelty + low physics risk = REJECT (not interesting enough)
 - High novelty + high physics risk = INVESTIGATE (worth checking)
 
+## PRIOR ART SEARCH DOCUMENTATION (MANDATORY)
+
+RULE: No source URL = no claim. Every factual assertion about industry state, prior art, or gaps must cite where you found it.
+
+For EACH concept, you must document:
+
+1. EXACT SEARCHES RUN (minimum 5 per concept)
+   - Query 1: "[mechanism] [application]"
+   - Query 2: "[mechanism] patent"
+   - Query 3: "[mechanism] [industry] company"
+   - Query 4: "[mechanism] research paper"
+   - Query 5: "[alternative terms] [application]"
+
+2. WHAT YOU FOUND
+   - If prior art exists: "Found [paper/patent/company] doing [specific thing]. Source: [URL]"
+   - If no prior art: "Searched [N] queries, found no direct application to [domain]. Closest result was [X] which differs because [Y]."
+
+3. NOVELTY VERDICT WITH EVIDENCE
+   - GENUINELY_NOVEL: "0 of 5 searches returned relevant prior art"
+   - PARTIALLY_EXPLORED: "Found [citation] but it differs in [specific way]"
+   - ALREADY_PURSUED: "Found [entity] actively working on this: [URL]"
+
+DO NOT claim novelty without documenting the searches that support that claim.
+
 CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or after. Start with { and end with }.
 
 ## Output Format
@@ -69,6 +93,17 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
         "novelty_rationale": "Why this is/isn't novel",
         "conventional_trap_check": "Is this conventional in disguise? No because...",
         "prior_art_check": "Has this been tried? If so, what's different?"
+      },
+
+      "prior_art_search_documentation": {
+        "searches_executed": [
+          {"query": "exact search query", "results_found": "what came up", "source_urls": ["URL1", "URL2"]},
+          {"query": "second search query", "results_found": "what came up", "source_urls": []}
+        ],
+        "prior_art_findings": "If prior art exists: Found [X] doing [Y]. Source: [URL]. If none: Searched 5 queries, no direct prior art.",
+        "closest_existing_work": {"description": "Closest thing found", "source": "URL", "how_this_differs": "Why our concept is different"},
+        "novelty_verdict": "GENUINELY_NOVEL | PARTIALLY_EXPLORED | ALREADY_PURSUED",
+        "verdict_evidence": "X of Y searches returned relevant prior art"
       },
 
       "physics_assessment": {
@@ -180,6 +215,34 @@ const NoveltyAssessmentSchema = z.object({
   prior_art_check: z.string(),
 });
 
+const PriorArtSearchSchema = z
+  .object({
+    query: z.string(),
+    results_found: z.string().optional(),
+    source_urls: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+const ClosestExistingWorkSchema = z
+  .object({
+    description: z.string().optional(),
+    source: z.string().optional(),
+    how_this_differs: z.string().optional(),
+  })
+  .passthrough();
+
+const PriorArtSearchDocumentationSchema = z
+  .object({
+    searches_executed: z.array(PriorArtSearchSchema).catch([]),
+    prior_art_findings: z.string().optional(),
+    closest_existing_work: ClosestExistingWorkSchema.optional(),
+    novelty_verdict: z
+      .enum(['GENUINELY_NOVEL', 'PARTIALLY_EXPLORED', 'ALREADY_PURSUED'])
+      .catch('PARTIALLY_EXPLORED'),
+    verdict_evidence: z.string().optional(),
+  })
+  .passthrough();
+
 const PhysicsAssessmentSchema = z.object({
   physics_valid: z.boolean(),
   physics_score: z.number().min(1).max(10),
@@ -220,15 +283,18 @@ const OverallEvaluationSchema = z.object({
   recommendation: z.string(),
 });
 
-const ConceptEvaluationSchema = z.object({
-  concept_id: z.string(),
-  concept_name: z.string(),
-  novelty_assessment: NoveltyAssessmentSchema,
-  physics_assessment: PhysicsAssessmentSchema,
-  breakthrough_assessment: BreakthroughAssessmentSchema,
-  testability_assessment: TestabilityAssessmentSchema,
-  overall_evaluation: OverallEvaluationSchema,
-});
+const ConceptEvaluationSchema = z
+  .object({
+    concept_id: z.string(),
+    concept_name: z.string(),
+    novelty_assessment: NoveltyAssessmentSchema.optional(),
+    prior_art_search_documentation: PriorArtSearchDocumentationSchema.optional(),
+    physics_assessment: PhysicsAssessmentSchema.optional(),
+    breakthrough_assessment: BreakthroughAssessmentSchema.optional(),
+    testability_assessment: TestabilityAssessmentSchema.optional(),
+    overall_evaluation: OverallEvaluationSchema.optional(),
+  })
+  .passthrough();
 
 const RejectedConceptSchema = z.object({
   concept_id: z.string(),

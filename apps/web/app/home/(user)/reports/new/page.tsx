@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -13,6 +13,7 @@ import {
   Paperclip,
   ShieldCheck,
   Terminal,
+  X,
 } from 'lucide-react';
 
 import { Alert, AlertDescription } from '@kit/ui/alert';
@@ -21,6 +22,23 @@ import { cn } from '@kit/ui/utils';
 import { ProcessingScreen } from '../../_components/processing-screen';
 import { startReportGeneration } from '../../_lib/server/sparlo-reports-server-actions';
 import { useReportProgress } from '../../_lib/use-report-progress';
+
+// Attachment types and constants
+interface Attachment {
+  id: string;
+  file: File;
+  preview: string;
+  base64?: string;
+}
+
+const MAX_ATTACHMENTS = 5;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+];
 
 type PagePhase = 'input' | 'processing';
 
@@ -82,6 +100,8 @@ export default function NewReportPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [formState, setFormState] = useState<FormState>(initialFormState);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     phase,
@@ -91,6 +111,71 @@ export default function NewReportPage() {
     error,
     showRefusalWarning,
   } = formState;
+
+  // File handling functions
+  const handleFileSelect = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files) return;
+
+      const newAttachments: Attachment[] = [];
+
+      for (const file of Array.from(files)) {
+        if (attachments.length + newAttachments.length >= MAX_ATTACHMENTS) {
+          setFormState((prev) => ({
+            ...prev,
+            error: `Maximum ${MAX_ATTACHMENTS} attachments allowed`,
+          }));
+          break;
+        }
+
+        if (!ALLOWED_TYPES.includes(file.type)) {
+          setFormState((prev) => ({
+            ...prev,
+            error: `File type ${file.type} not supported. Use JPEG, PNG, GIF, or WebP.`,
+          }));
+          continue;
+        }
+
+        if (file.size > MAX_FILE_SIZE) {
+          setFormState((prev) => ({
+            ...prev,
+            error: `File ${file.name} exceeds 10MB limit`,
+          }));
+          continue;
+        }
+
+        // Convert to base64
+        const base64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const result = reader.result as string;
+            resolve(result.split(',')[1] || '');
+          };
+          reader.readAsDataURL(file);
+        });
+
+        newAttachments.push({
+          id: crypto.randomUUID(),
+          file,
+          preview: URL.createObjectURL(file),
+          base64,
+        });
+      }
+
+      setAttachments((prev) => [...prev, ...newAttachments]);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    },
+    [attachments.length],
+  );
+
+  const removeAttachment = useCallback((id: string) => {
+    setAttachments((prev) => {
+      const attachment = prev.find((a) => a.id === id);
+      if (attachment) URL.revokeObjectURL(attachment.preview);
+      return prev.filter((a) => a.id !== id);
+    });
+  }, []);
 
   // Handle URL params for prefill and error state
   useEffect(() => {
@@ -136,11 +221,27 @@ export default function NewReportPage() {
     setFormState((prev) => ({ ...prev, isSubmitting: true, error: null }));
 
     try {
+      // Prepare attachments for API
+      const attachmentData = attachments.map((a) => ({
+        filename: a.file.name,
+        media_type: a.file.type as
+          | 'image/jpeg'
+          | 'image/png'
+          | 'image/gif'
+          | 'image/webp',
+        data: a.base64 || '',
+      }));
+
       const result = await startReportGeneration({
         designChallenge: challengeText.trim(),
+        attachments: attachmentData.length > 0 ? attachmentData : undefined,
       });
 
       if (result.reportId) {
+        // Clean up attachment previews
+        attachments.forEach((a) => URL.revokeObjectURL(a.preview));
+        setAttachments([]);
+
         setFormState((prev) => ({
           ...prev,
           reportId: result.reportId,
@@ -159,7 +260,7 @@ export default function NewReportPage() {
         isSubmitting: false,
       }));
     }
-  }, [canSubmit, challengeText, isSubmitting]);
+  }, [canSubmit, challengeText, isSubmitting, attachments]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -231,11 +332,26 @@ export default function NewReportPage() {
                 <span>new analysis</span>
               </div>
               <div className="flex items-center gap-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp"
+                  multiple
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
                 <button
                   type="button"
-                  className="group/btn flex items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-3 py-1.5 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary]"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={attachments.length >= MAX_ATTACHMENTS}
+                  className="group/btn flex items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-3 py-1.5 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Attach
+                  {attachments.length > 0 && (
+                    <span className="text-violet-500">
+                      ({attachments.length})
+                    </span>
+                  )}
                   <Paperclip className="h-3 w-3 transition-colors group-hover/btn:text-emerald-500" />
                 </button>
               </div>
@@ -265,6 +381,37 @@ export default function NewReportPage() {
                 }}
               />
             </div>
+
+            {/* Attachment Previews */}
+            {attachments.length > 0 && (
+              <div className="border-t border-[--border-subtle] px-6 py-4">
+                <div className="flex flex-wrap gap-3">
+                  {attachments.map((attachment) => (
+                    <div
+                      key={attachment.id}
+                      className="group relative h-16 w-16 overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface-overlay]"
+                    >
+                      <img
+                        src={attachment.preview}
+                        alt={attachment.file.name}
+                        className="h-full w-full object-cover"
+                      />
+                      <button
+                        onClick={() => removeAttachment(attachment.id)}
+                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-[--text-muted]">
+                  {attachments.length} attachment
+                  {attachments.length !== 1 ? 's' : ''} - Images will be
+                  analyzed by Claude Vision
+                </p>
+              </div>
+            )}
 
             {/* Context Awareness / Intelligence Layer */}
             <div className="px-6 pb-6 md:px-8 md:pb-8">

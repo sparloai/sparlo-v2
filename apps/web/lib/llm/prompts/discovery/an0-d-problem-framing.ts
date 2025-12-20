@@ -291,25 +291,31 @@ const DiscoveryQueriesSchema = z.object({
   gap_literature_search: z.array(z.string()),
 });
 
-const SearchExecutedSchema = z.object({
-  query: z.string(),
-  top_results: z.array(z.string()),
-  key_finding: z.string(),
-});
+const SearchExecutedSchema = z
+  .object({
+    query: z.string(),
+    top_results: z.array(z.string()).catch([]),
+    key_finding: z.string().optional(),
+  })
+  .passthrough();
 
-const ActivePlayerSchema = z.object({
-  entity: z.string(),
-  approach: z.string(),
-  source: z.string(),
-  why_excluded: z.string(),
-});
+const ActivePlayerSchema = z
+  .object({
+    entity: z.string(),
+    approach: z.string().optional(),
+    source: z.string(),
+    why_excluded: z.string().optional(),
+  })
+  .passthrough();
 
-const IndustryLandscapeSchema = z.object({
-  searches_executed: z.array(SearchExecutedSchema),
-  active_players: z.array(ActivePlayerSchema),
-  market_state: z.string(),
-  search_gaps: z.array(z.string()),
-});
+const IndustryLandscapeSchema = z
+  .object({
+    searches_executed: z.array(SearchExecutedSchema).catch([]),
+    active_players: z.array(ActivePlayerSchema).catch([]),
+    market_state: z.string().optional(),
+    search_gaps: z.array(z.string()).catch([]),
+  })
+  .passthrough();
 
 // Full analysis output schema
 const AN0DAnalysisSchema = z.object({
@@ -328,7 +334,7 @@ const AN0DAnalysisSchema = z.object({
   }),
   first_principles_reframe: FirstPrinciplesReframeSchema,
   discovery_queries: DiscoveryQueriesSchema,
-  industry_landscape: IndustryLandscapeSchema,
+  industry_landscape: IndustryLandscapeSchema.optional(),
   novelty_hypothesis: z.string(),
 });
 

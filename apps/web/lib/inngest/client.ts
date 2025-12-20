@@ -8,12 +8,25 @@ import { z } from 'zod';
  * (Kieran's fix: explicit types for all events)
  */
 
+// Attachment schema for vision support (standard reports)
+const StandardAttachmentSchema = z.object({
+  filename: z.string(),
+  media_type: z.enum([
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+  ]),
+  data: z.string(), // base64 encoded
+});
+
 export const ReportGenerateEventSchema = z.object({
   reportId: z.string().uuid(),
   accountId: z.string().uuid(),
   userId: z.string().uuid(),
   designChallenge: z.string().min(50),
   conversationId: z.string(),
+  attachments: z.array(StandardAttachmentSchema).optional(),
 });
 
 export const ClarificationAnsweredEventSchema = z.object({

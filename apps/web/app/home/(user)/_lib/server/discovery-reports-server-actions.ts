@@ -12,12 +12,20 @@ import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 
 import { checkUsageAllowed } from './usage.service';
 
+// Attachment schema for vision support
+const AttachmentSchema = z.object({
+  filename: z.string(),
+  media_type: z.enum(['image/jpeg', 'image/png', 'image/gif', 'image/webp']),
+  data: z.string(), // base64 encoded
+});
+
 // Schema for starting a discovery report with Inngest
 const StartDiscoveryReportSchema = z.object({
   designChallenge: z
     .string()
     .min(50, 'Please provide at least 50 characters')
     .max(10000, 'Design challenge must be under 10,000 characters'),
+  attachments: z.array(AttachmentSchema).max(5).optional(),
 });
 
 // Rate limiting constants (same as standard reports)
@@ -133,6 +141,7 @@ export const startDiscoveryReportGeneration = enhanceAction(
           userId: user.id,
           designChallenge: data.designChallenge,
           conversationId,
+          attachments: data.attachments,
         },
       });
 

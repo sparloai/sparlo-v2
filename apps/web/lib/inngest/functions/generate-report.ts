@@ -92,10 +92,22 @@ export const generateReport = inngest.createFunction(
   },
   { event: 'report/generate' },
   async ({ event, step }) => {
-    const { reportId, accountId, userId, designChallenge, conversationId } =
+    const { reportId, accountId, userId, designChallenge, conversationId, attachments } =
       event.data;
 
     const supabase = getSupabaseServerAdminClient();
+
+    // Convert attachments to ImageAttachment format for Claude vision
+    type ImageAttachment = {
+      media_type: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
+      data: string;
+    };
+    const imageAttachments: ImageAttachment[] = (attachments || [])
+      .filter((a: { media_type: string }) => a.media_type.startsWith('image/'))
+      .map((a: { media_type: string; data: string }) => ({
+        media_type: a.media_type as ImageAttachment['media_type'],
+        data: a.data,
+      }));
 
     // Handle ClaudeRefusalError at the top level
     try {
@@ -178,11 +190,17 @@ export const generateReport = inngest.createFunction(
           phase_progress: 0,
         });
 
+        // Add context about attached images if present
+        const userMessageWithContext = imageAttachments.length > 0
+          ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
+          : designChallenge;
+
         const { content, usage } = await callClaude({
           model: MODELS.OPUS,
           system: AN0_PROMPT,
-          userMessage: designChallenge,
+          userMessage: userMessageWithContext,
           maxTokens: 8000,
+          images: imageAttachments.length > 0 ? imageAttachments : undefined,
         });
         trackUsage('an0', usage);
 
