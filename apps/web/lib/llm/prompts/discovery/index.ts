@@ -137,13 +137,13 @@ export type DiscoveryPhaseId = (typeof DISCOVERY_PHASES)[number]['id'];
 export const DISCOVERY_CHAIN_CONFIG = {
   model: 'claude-opus-4-5-20251101',
   maxTokensByPhase: {
-    'an0-d': 8000,
-    'an1.5-d': 16000, // Increased - complex multi-category output
-    'an1.7-d': 20000, // Increased - large output with 8 sections of detailed analysis
-    'an2-d': 12000, // Increased for methodology briefing
-    'an3-d': 24000,
-    'an4-d': 16000,
-    'an5-d': 24000,
+    'an0-d': 20000,
+    'an1.5-d': 20000,
+    'an1.7-d': 20000,
+    'an2-d': 20000,
+    'an3-d': 20000,
+    'an4-d': 20000,
+    'an5-d': 20000,
   },
   temperatureByPhase: {
     'an0-d': 0.7,
