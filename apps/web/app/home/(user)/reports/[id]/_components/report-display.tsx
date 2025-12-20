@@ -402,8 +402,17 @@ export function ReportDisplay({
     return <ProcessingScreen progress={progress} onComplete={handleComplete} />;
   }
 
+  // Check if we have valid report content
+  // For discovery reports, data is in report.report_data.report
+  // For regular reports, data is in report.report_data.markdown
+  const hasDiscoveryContent =
+    isDiscovery &&
+    report.report_data &&
+    (report.report_data as { report?: unknown }).report;
+  const hasMarkdownContent = !!reportMarkdown;
+
   // No report content yet
-  if (!reportMarkdown) {
+  if (!hasDiscoveryContent && !hasMarkdownContent) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
