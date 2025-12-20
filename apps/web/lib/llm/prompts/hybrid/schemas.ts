@@ -3,16 +3,66 @@ import { z } from 'zod';
 /**
  * Hybrid Mode Zod Schemas
  *
- * All schemas use antifragile patterns:
- * - .catch([]) for array fallbacks
+ * Validation patterns:
+ * - .default([]) for optional arrays (field missing)
+ * - .catch([]) for error recovery (malformed LLM output)
  * - .optional() for optional fields
- * - .passthrough() to preserve extra LLM output
- * - .default() for sensible defaults
+ * - .passthrough() to preserve extra LLM output (required for forward compatibility)
+ *
+ * Security patterns:
+ * - SafeUrlSchema validates URL format and blocks dangerous protocols
+ * - Array length limits prevent DoS via oversized responses
  */
 
 // ============================================
 // Shared Primitives
 // ============================================
+
+/**
+ * Safe URL schema - validates URL format and blocks dangerous protocols
+ * Prevents XSS via javascript: URLs and SSRF via internal IPs
+ */
+export const SafeUrlSchema = z
+  .string()
+  .refine(
+    (url) => {
+      try {
+        const parsed = new URL(url);
+        // Only allow HTTP and HTTPS protocols
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          return false;
+        }
+        // Block localhost and private IPs (SSRF prevention)
+        const blockedPatterns = [
+          /^localhost$/i,
+          /^127\./,
+          /^192\.168\./,
+          /^10\./,
+          /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+        ];
+        if (
+          blockedPatterns.some((pattern) =>
+            typeof pattern === 'string'
+              ? parsed.hostname === pattern
+              : pattern.test(parsed.hostname),
+          )
+        ) {
+          return false;
+        }
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    { message: 'Invalid URL or blocked protocol/host' },
+  )
+  .optional();
+
+/**
+ * Severity/confidence level - standardized to lowercase
+ * Used for risk likelihood, impact, confidence, revival potential, evidence strength
+ */
+export const SeverityLevel = z.enum(['low', 'medium', 'high']);
 
 export const TrackSchema = z.enum([
   'simpler_path',
@@ -21,7 +71,7 @@ export const TrackSchema = z.enum([
   'frontier_transfer',
 ]);
 
-export const ConfidenceLevel = z.enum(['low', 'medium', 'high']);
+export const ConfidenceLevel = SeverityLevel;
 
 export const CapitalRequirement = z.enum([
   'minimal',
@@ -62,7 +112,7 @@ export const PriorArtSchema = z
     source: z.string(),
     relevance: z.string(),
     what_it_proves: z.string().optional(),
-    url: z.string().optional(),
+    url: SafeUrlSchema,
   })
   .passthrough();
 
@@ -211,21 +261,22 @@ const AbandonedTechnologyAnalysisSchema = z
     original_era: z.string(),
     original_application: z.string(),
     why_abandoned: z.string(),
-    enabling_changes_since: z.array(EnablingChangeSchema).catch([]),
-    revival_potential: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
+    enabling_changes_since: z.array(EnablingChangeSchema).max(20).default([]),
+    revival_potential: SeverityLevel.catch('medium'),
     revival_concept: z.string(),
     who_is_positioned: z.string().optional(),
-    source_urls: z.array(z.string()).default([]),
+    source_urls: z.array(SafeUrlSchema).max(10).default([]),
   })
   .passthrough();
 
 export const AN1_7_M_OutputSchema = z
   .object({
-    precedent_findings: z.array(PrecedentFindingSchema).catch([]),
-    gap_analysis: z.array(GapAnalysisSchema).catch([]),
-    abandoned_approaches: z.array(AbandonedApproachSchema).catch([]),
+    precedent_findings: z.array(PrecedentFindingSchema).max(50).default([]),
+    gap_analysis: z.array(GapAnalysisSchema).max(20).default([]),
+    abandoned_approaches: z.array(AbandonedApproachSchema).max(20).default([]),
     abandoned_technology_analysis: z
       .array(AbandonedTechnologyAnalysisSchema)
+      .max(10)
       .default([]),
     key_papers: z
       .array(
@@ -235,11 +286,12 @@ export const AN1_7_M_OutputSchema = z
             authors: z.string().optional(),
             year: z.string().optional(),
             key_insight: z.string(),
-            url: z.string().optional(),
+            url: SafeUrlSchema,
           })
           .passthrough(),
       )
-      .catch([]),
+      .max(30)
+      .default([]),
   })
   .passthrough();
 
@@ -332,7 +384,7 @@ const ConceptSchema = z
 
 export const AN3_M_OutputSchema = z
   .object({
-    concepts: z.array(ConceptSchema).catch([]),
+    concepts: z.array(ConceptSchema).max(50).default([]),
     track_coverage: z
       .object({
         simpler_path_count: z.number().catch(0),
@@ -341,9 +393,9 @@ export const AN3_M_OutputSchema = z
         frontier_transfer_count: z.number().catch(0),
       })
       .passthrough(),
-    first_principles_concepts: z.array(z.string()).catch([]),
-    industry_assumption_challenges: z.array(z.string()).catch([]),
-    cross_domain_transfers: z.array(z.string()).catch([]),
+    first_principles_concepts: z.array(z.string()).max(20).default([]),
+    industry_assumption_challenges: z.array(z.string()).max(20).default([]),
+    cross_domain_transfers: z.array(z.string()).max(20).default([]),
   })
   .passthrough();
 
@@ -428,15 +480,15 @@ const ParadigmInsightIdentifiedSchema = z
     years_missed: z.string().optional(),
     why_missed: z.string(),
     opportunity: z.string(),
-    evidence_strength: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
+    evidence_strength: SeverityLevel.catch('medium'),
     recommendation: z.string(),
   })
   .passthrough();
 
 export const AN4_M_OutputSchema = z
   .object({
-    validation_results: z.array(ValidationResultSchema).catch([]),
-    ranking: z.array(RankingItemSchema).catch([]),
+    validation_results: z.array(ValidationResultSchema).max(50).default([]),
+    ranking: z.array(RankingItemSchema).max(50).default([]),
     self_critique: SelfCritiqueSchema,
     track_analysis: z
       .object({
@@ -449,6 +501,7 @@ export const AN4_M_OutputSchema = z
       .optional(),
     paradigm_insights_identified: z
       .array(ParadigmInsightIdentifiedSchema)
+      .max(10)
       .default([]),
   })
   .passthrough();
@@ -796,14 +849,17 @@ const ComparisonRowSchema = z
 // Complete solution concepts structure
 const SolutionConceptsSchema = z
   .object({
-    lead_concepts: z.array(LeadConceptSchema).catch([]),
+    lead_concepts: z.array(LeadConceptSchema).max(10).default([]),
 
     parallel_explorations_intro: z.string().optional(),
-    parallel_explorations: z.array(ParallelExplorationSchema).catch([]),
+    parallel_explorations: z
+      .array(ParallelExplorationSchema)
+      .max(20)
+      .default([]),
 
     spark_concept: SparkConceptSchema.optional(),
 
-    comparison_table: z.array(ComparisonRowSchema).catch([]),
+    comparison_table: z.array(ComparisonRowSchema).max(20).default([]),
     comparison_insight: z.string().optional(),
   })
   .passthrough();
@@ -987,31 +1043,31 @@ export const AN5_M_OutputSchema = z
     what_industry_missed: z
       .union([
         WhatIndustryMissedSectionSchema,
-        z.array(LegacyWhatIndustryMissedSchema),
+        z.array(LegacyWhatIndustryMissedSchema).max(20),
       ])
       .optional(),
-    key_patterns: z.array(KeyPatternSchema).catch([]),
+    key_patterns: z.array(KeyPatternSchema).max(20).default([]),
     solution_concepts: SolutionConceptsSchema.optional(),
     paradigm_insight: ParadigmInsightSectionSchema.optional(),
     decision_flowchart: DecisionFlowchartSchema.optional(),
     personal_recommendation: PersonalRecommendationSchema.optional(),
     validation_summary: ValidationSummarySchema.optional(),
-    challenge_the_frame: z.array(ChallengeFrameSchema).catch([]),
+    challenge_the_frame: z.array(ChallengeFrameSchema).max(10).default([]),
     strategic_implications: StrategicImplicationsSchema.optional(),
-    risks_and_watchouts: z.array(RiskWatchoutSchema).catch([]),
+    risks_and_watchouts: z.array(RiskWatchoutSchema).max(20).default([]),
     self_critique: ReportSelfCritiqueSchema,
     next_steps: z
-      .union([NextStepsGranularSchema, z.array(z.string())])
+      .union([NextStepsGranularSchema, z.array(z.string()).max(20)])
       .optional(),
     appendix: AppendixSchema.optional(),
     metadata: MetadataSchema.optional(),
 
-    // Legacy fields for backward compatibility
+    // Legacy fields for backward compatibility (required for hybrid-report-display.tsx)
     report_title: z.string().max(100).optional(),
     decision_architecture: LegacyDecisionArchitectureSchema.optional(),
-    other_concepts: z.array(OtherConceptSchema).catch([]),
+    other_concepts: z.array(OtherConceptSchema).max(30).default([]),
     problem_restatement: z.string().optional(),
-    key_insights: z.array(z.string()).catch([]),
+    key_insights: z.array(z.string()).max(20).default([]),
   })
   .passthrough();
 
