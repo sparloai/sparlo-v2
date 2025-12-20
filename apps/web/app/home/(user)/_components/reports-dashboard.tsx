@@ -151,7 +151,7 @@ function ArchiveButton({
     <button
       onClick={handleArchive}
       disabled={isPending}
-      className="rounded p-1.5 text-[--text-muted] opacity-0 transition-all group-hover:opacity-100 hover:bg-[--surface-overlay] hover:text-[--text-secondary]"
+      className="cursor-pointer rounded p-1.5 text-[--text-muted] opacity-0 transition-all group-hover:opacity-100 hover:bg-[--surface-overlay] hover:text-[--text-secondary]"
       title="Archive report"
     >
       <Archive className="h-4 w-4" />

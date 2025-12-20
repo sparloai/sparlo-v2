@@ -1,14 +1,11 @@
 'use client';
 
-import { useState, useTransition } from 'react';
-
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { formatDistanceToNow } from 'date-fns';
 import {
-  Archive,
   CreditCard,
   FileText,
   FolderOpen,
@@ -29,10 +26,8 @@ import {
 import { SubMenuModeToggle } from '@kit/ui/mode-toggle';
 import { Sheet, SheetContent } from '@kit/ui/sheet';
 import { Trans } from '@kit/ui/trans';
-import { cn } from '@kit/ui/utils';
 
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
-import { archiveReport } from '../../_lib/server/sparlo-reports-server-actions';
 import type { UsageData } from '../../_lib/server/usage.loader';
 import { UsageIndicator } from '../usage-indicator';
 
@@ -48,7 +43,6 @@ interface NavSidebarProps {
 const NAV_ITEMS = [
   { href: '/home/reports/new', label: 'New Analysis', icon: PlusCircle },
   { href: '/home', label: 'All Reports', icon: FolderOpen },
-  { href: '/home/archived', label: 'Archived', icon: Archive },
 ];
 
 function RecentReportItem({
@@ -58,64 +52,29 @@ function RecentReportItem({
   report: RecentReport;
   onClose: () => void;
 }) {
-  const [isPending, startTransition] = useTransition();
-  const [isHovered, setIsHovered] = useState(false);
-  const router = useRouter();
-
-  const handleArchive = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    startTransition(async () => {
-      await archiveReport({ id: report.id, archived: true });
-      router.refresh();
-    });
-  };
-
   const modeLabel = report.mode === 'discovery' ? 'Discovery' : 'Analysis';
 
   return (
     <Link
       href={`/home/reports/${report.id}`}
       onClick={onClose}
-      className="group relative flex items-start gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-[--surface-overlay]"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className="flex items-start gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
     >
-      <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.3)]" />
+      <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-black/40 dark:bg-white/40" />
       <div className="min-w-0 flex-1">
-        <span
-          className="font-mono text-[10px] tracking-wider text-[--text-muted] uppercase"
-          style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
-        >
+        <span className="font-mono text-[10px] tracking-wider text-black/50 uppercase dark:text-white/50">
           [{modeLabel}]
         </span>
-        <p
-          className="truncate text-sm font-medium text-[--text-secondary]"
-          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-        >
+        <p className="truncate text-sm text-black/80 dark:text-white/80">
           {report.title || 'Untitled Report'}
         </p>
-        <p
-          className="text-xs text-[--text-muted]"
-          style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
-        >
+        <p className="font-mono text-xs text-black/40 dark:text-white/40">
           {formatDistanceToNow(new Date(report.created_at), {
             addSuffix: true,
           })}
         </p>
       </div>
-      {isHovered ? (
-        <button
-          onClick={handleArchive}
-          disabled={isPending}
-          className="flex-shrink-0 rounded p-1 text-[--text-muted] transition-colors hover:bg-[--surface-elevated] hover:text-[--text-secondary]"
-          title="Archive report"
-        >
-          <Archive className="h-3.5 w-3.5" />
-        </button>
-      ) : (
-        <FileText className="h-3.5 w-3.5 flex-shrink-0 text-[--text-muted]" />
-      )}
+      <FileText className="mt-1 h-3.5 w-3.5 flex-shrink-0 text-black/30 dark:text-white/30" />
     </Link>
   );
 }
@@ -153,15 +112,10 @@ export function NavSidebar({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="left"
-        className={cn(
-          'flex w-72 flex-col p-0',
-          'bg-[--nav-bg] backdrop-blur-[var(--nav-blur)]',
-          'border-[--nav-border]',
-          'supports-[not(backdrop-filter)]:bg-[--nav-bg-solid]',
-        )}
+        className="flex w-72 flex-col border-r border-black/10 bg-white p-0 dark:border-white/10 dark:bg-black"
       >
         {/* Header with logo */}
-        <div className="flex h-14 items-center border-b border-[--nav-border] px-4">
+        <div className="flex h-14 items-center border-b border-black/10 px-4 dark:border-white/10">
           <Link
             href="/home"
             onClick={close}
@@ -184,13 +138,10 @@ export function NavSidebar({
               key={href}
               href={href}
               onClick={close}
-              className="flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-[--surface-overlay]"
+              className="flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
             >
-              <Icon className="h-4 w-4 text-[--text-muted]" />
-              <span
-                className="text-sm font-medium text-[--text-secondary]"
-                style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-              >
+              <Icon className="h-4 w-4 text-black/50 dark:text-white/50" />
+              <span className="text-sm font-medium text-black/80 dark:text-white/80">
                 {label}
               </span>
             </Link>
@@ -198,25 +149,19 @@ export function NavSidebar({
         </nav>
 
         {/* Recent Reports */}
-        <div className="flex-1 overflow-y-auto border-t border-[--nav-border]">
+        <div className="flex-1 overflow-y-auto border-t border-black/10 dark:border-white/10">
           <div className="px-4 py-3">
-            <h3
-              className="text-xs font-medium tracking-wider text-[--text-muted] uppercase"
-              style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-            >
+            <h3 className="text-xs font-medium tracking-wider text-black/40 uppercase dark:text-white/40">
               Recent
             </h3>
           </div>
 
           {recentReports.length === 0 ? (
-            <p
-              className="px-4 text-sm text-[--text-muted]"
-              style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-            >
+            <p className="px-4 text-sm text-black/40 dark:text-white/40">
               No reports yet
             </p>
           ) : (
-            <div className="space-y-1 px-2">
+            <div className="space-y-0.5 px-2">
               {recentReports.map((report) => (
                 <RecentReportItem
                   key={report.id}
@@ -229,13 +174,13 @@ export function NavSidebar({
         </div>
 
         {/* Footer: Usage + User */}
-        <div className="border-t border-[--nav-border]">
+        <div className="border-t border-black/10 dark:border-white/10">
           {/* Usage indicator - only shows when >= 25% used */}
           {usage?.showUsageBar && (
             <Link
               href="/home/settings/billing"
               onClick={close}
-              className="block border-b border-[--nav-border] px-4 py-3 transition-colors hover:bg-[--surface-overlay]"
+              className="block border-b border-black/10 px-4 py-3 transition-colors hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5"
             >
               <UsageIndicator
                 tokensUsed={usage.tokensUsed}
@@ -250,22 +195,16 @@ export function NavSidebar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-[--surface-overlay]"
+                className="flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
                 aria-label="Account menu"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[--border-default] bg-[--surface-overlay]">
-                  <span
-                    className="text-[12px] font-medium text-[--text-muted]"
-                    style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                  >
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-black/5 dark:border-white/10 dark:bg-white/5">
+                  <span className="text-xs font-medium text-black/60 dark:text-white/60">
                     {initials}
                   </span>
                 </div>
                 <div className="flex-1 text-left">
-                  <p
-                    className="truncate text-sm font-medium text-[--text-primary]"
-                    style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                  >
+                  <p className="truncate text-sm font-medium text-black/80 dark:text-white/80">
                     {workspace?.name || user?.email || 'Account'}
                   </p>
                 </div>
@@ -275,13 +214,13 @@ export function NavSidebar({
             <DropdownMenuContent
               align="start"
               side="top"
-              className="w-48 border-[--border-default] bg-[--surface-elevated]"
+              className="w-48 border-black/10 bg-white dark:border-white/10 dark:bg-black"
             >
               <DropdownMenuItem asChild>
                 <Link
                   href="/home/settings"
                   onClick={close}
-                  className="cursor-pointer text-[--text-primary] focus:bg-[--surface-overlay] focus:text-[--text-primary]"
+                  className="cursor-pointer text-black/80 focus:bg-black/5 focus:text-black dark:text-white/80 dark:focus:bg-white/5 dark:focus:text-white"
                 >
                   <Settings className="mr-2 h-4 w-4" />
                   <Trans i18nKey="common:routes.settings" />
@@ -292,24 +231,24 @@ export function NavSidebar({
                 <Link
                   href="/home/settings/billing"
                   onClick={close}
-                  className="cursor-pointer text-[--text-primary] focus:bg-[--surface-overlay] focus:text-[--text-primary]"
+                  className="cursor-pointer text-black/80 focus:bg-black/5 focus:text-black dark:text-white/80 dark:focus:bg-white/5 dark:focus:text-white"
                 >
                   <CreditCard className="mr-2 h-4 w-4" />
                   <Trans i18nKey="common:routes.billing" />
                 </Link>
               </DropdownMenuItem>
 
-              <DropdownMenuSeparator className="bg-[--border-default]" />
+              <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10" />
 
               {/* Theme Toggle */}
               <SubMenuModeToggle />
 
-              <DropdownMenuSeparator className="bg-[--border-default]" />
+              <DropdownMenuSeparator className="bg-black/10 dark:bg-white/10" />
 
               <DropdownMenuItem
                 onClick={handleSignOut}
                 disabled={signOutMutation.isPending}
-                className="cursor-pointer text-[--status-error] focus:bg-[--surface-overlay] focus:text-[--status-error]"
+                className="cursor-pointer text-red-600 focus:bg-black/5 focus:text-red-600 dark:text-red-400 dark:focus:bg-white/5 dark:focus:text-red-400"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 <Trans i18nKey="common:nav.signOut" />
