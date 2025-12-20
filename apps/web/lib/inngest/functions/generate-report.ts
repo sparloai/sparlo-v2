@@ -145,20 +145,27 @@ export const generateReport = inngest.createFunction(
         conversationId,
       });
 
-      // Track token usage per step
-      const usageByStep: Record<string, TokenUsage> = {};
+      // Helper to calculate total usage from collected step usages
+      function calculateTotalUsage(
+        usages: (TokenUsage | null | undefined)[],
+        stepNames: string[],
+      ): TokenUsage & { costUsd: number; byStep: Record<string, TokenUsage> } {
+        const byStep: Record<string, TokenUsage> = {};
+        usages.forEach((u, i) => {
+          if (u && u.totalTokens > 0) {
+            byStep[stepNames[i] || `step-${i}`] = u;
+          }
+        });
 
-      function trackUsage(stepName: string, usage: TokenUsage) {
-        usageByStep[stepName] = usage;
-      }
-
-      function getTotalUsage(): TokenUsage & { costUsd: number } {
-        const totals = Object.values(usageByStep).reduce(
-          (acc, usage) => ({
-            inputTokens: acc.inputTokens + usage.inputTokens,
-            outputTokens: acc.outputTokens + usage.outputTokens,
-            totalTokens: acc.totalTokens + usage.totalTokens,
-          }),
+        const totals: TokenUsage = usages.reduce(
+          (acc: TokenUsage, usage) => {
+            if (!usage) return acc;
+            return {
+              inputTokens: acc.inputTokens + (usage.inputTokens || 0),
+              outputTokens: acc.outputTokens + (usage.outputTokens || 0),
+              totalTokens: acc.totalTokens + (usage.totalTokens || 0),
+            };
+          },
           { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
         );
         return {
@@ -167,6 +174,7 @@ export const generateReport = inngest.createFunction(
             totals,
             MODELS.OPUS as keyof typeof CLAUDE_PRICING,
           ),
+          byStep,
         };
       }
 
@@ -209,23 +217,25 @@ export const generateReport = inngest.createFunction(
           maxTokens: 8000,
           images: imageAttachments.length > 0 ? imageAttachments : undefined,
         });
-        trackUsage('an0', usage);
 
         const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
         const validated = AN0OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
 
-        return validated;
+        return { result: validated, usage };
       });
 
       // Handle v10 AN0 output - check if clarification needed
-      if (an0Result.need_question === true) {
+      if (an0Result.result.need_question === true) {
+        // Extract question with type narrowing
+        const clarificationQuestion = an0Result.result.question;
+
         // Need clarification - store and wait
         state = {
           ...state,
           needsClarification: true,
-          clarificationQuestion: an0Result.question,
+          clarificationQuestion,
           completedSteps: ['an0'],
         };
 
@@ -234,7 +244,7 @@ export const generateReport = inngest.createFunction(
             status: 'clarifying',
             clarifications: [
               {
-                question: an0Result.question,
+                question: clarificationQuestion,
                 askedAt: new Date().toISOString(),
               },
             ],
@@ -260,7 +270,7 @@ export const generateReport = inngest.createFunction(
               status: 'processing',
               clarifications: [
                 {
-                  question: an0Result.question,
+                  question: clarificationQuestion,
                   answer: clarificationEvent.data.answer,
                   answeredAt: new Date().toISOString(),
                 },
@@ -280,22 +290,31 @@ export const generateReport = inngest.createFunction(
                 userMessage: clarifiedChallenge,
                 maxTokens: 8000,
               });
-              trackUsage('an0-retry', usage);
 
               const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
-              return AN0OutputSchema.parse(parsed);
+              return { result: AN0OutputSchema.parse(parsed), usage };
             },
           );
 
           // Use the retry result if it's a full analysis
-          if (an0RetryResult.need_question === false) {
+          if (an0RetryResult.result.need_question === false) {
             // Update state with v10 AN0 analysis outputs
-            state = updateStateWithAN0Analysis(state, an0RetryResult);
+            state = updateStateWithAN0Analysis(state, an0RetryResult.result);
+            // Merge usage
+            an0Result.usage = {
+              inputTokens:
+                an0Result.usage.inputTokens + an0RetryResult.usage.inputTokens,
+              outputTokens:
+                an0Result.usage.outputTokens +
+                an0RetryResult.usage.outputTokens,
+              totalTokens:
+                an0Result.usage.totalTokens + an0RetryResult.usage.totalTokens,
+            };
           }
         }
       } else {
         // Full analysis - update state with v10 AN0 outputs
-        state = updateStateWithAN0Analysis(state, an0Result);
+        state = updateStateWithAN0Analysis(state, an0Result.result);
       }
 
       // =========================================
@@ -369,30 +388,38 @@ export const generateReport = inngest.createFunction(
         an1Result.transfers.length > 0 ||
         an1Result.triz.length > 0;
 
+      // Track AN1.5 usage separately since it's conditional
+      let an1_5Usage: TokenUsage | null = null;
+
       if (hasCorpusResults) {
-        an1_5Result = await step.run('an1.5-teaching-selection', async () => {
-          await updateProgress({
-            current_step: 'an1.5',
-            phase_progress: 0,
-          });
+        const an1_5StepResult = await step.run(
+          'an1.5-teaching-selection',
+          async () => {
+            await updateProgress({
+              current_step: 'an1.5',
+              phase_progress: 0,
+            });
 
-          const contextMessage = buildAN1_5ContextV10(state);
+            const contextMessage = buildAN1_5ContextV10(state);
 
-          const { content, usage } = await callClaude({
-            model: MODELS.OPUS,
-            system: AN1_5_PROMPT,
-            userMessage: contextMessage,
-            maxTokens: 8000,
-          });
-          trackUsage('an1.5', usage);
+            const { content, usage } = await callClaude({
+              model: MODELS.OPUS,
+              system: AN1_5_PROMPT,
+              userMessage: contextMessage,
+              maxTokens: 8000,
+            });
 
-          const parsed = parseJsonResponse<AN1_5_Output>(content, 'AN1.5');
-          const validated = AN1_5_OutputSchema.parse(parsed);
+            const parsed = parseJsonResponse<AN1_5_Output>(content, 'AN1.5');
+            const validated = AN1_5_OutputSchema.parse(parsed);
 
-          await updateProgress({ phase_progress: 100 });
+            await updateProgress({ phase_progress: 100 });
 
-          return validated;
-        });
+            return { result: validated, usage };
+          },
+        );
+
+        an1_5Result = an1_5StepResult.result;
+        an1_5Usage = an1_5StepResult.usage;
 
         // Update state with AN1.5 results (v10)
         state = {
@@ -428,24 +455,23 @@ export const generateReport = inngest.createFunction(
           userMessage: contextMessage,
           maxTokens: 8000,
         });
-        trackUsage('an1.7', usage);
 
         const parsed = parseJsonResponse<AN1_7_Output>(content, 'AN1.7');
         const validated = AN1_7_OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
 
-        return validated;
+        return { result: validated, usage };
       });
 
       // Update state with AN1.7 results (v10)
       state = {
         ...state,
-        an1_7_searches_performed: an1_7Result.searches_performed,
-        an1_7_commercial_precedent: an1_7Result.commercial_precedent,
-        an1_7_process_parameters: an1_7Result.process_parameters,
-        an1_7_competitive_landscape: an1_7Result.competitive_landscape,
-        an1_7_literature_gaps: an1_7Result.literature_gaps,
+        an1_7_searches_performed: an1_7Result.result.searches_performed,
+        an1_7_commercial_precedent: an1_7Result.result.commercial_precedent,
+        an1_7_process_parameters: an1_7Result.result.process_parameters,
+        an1_7_competitive_landscape: an1_7Result.result.competitive_landscape,
+        an1_7_literature_gaps: an1_7Result.result.literature_gaps,
         completedSteps: [...state.completedSteps, 'an1.7'],
       };
 
@@ -461,7 +487,7 @@ export const generateReport = inngest.createFunction(
         const contextMessage = buildAN2ContextV10(
           state,
           an1_5Result,
-          an1_7Result,
+          an1_7Result.result,
         );
 
         const { content, usage } = await callClaude({
@@ -470,26 +496,26 @@ export const generateReport = inngest.createFunction(
           userMessage: contextMessage,
           maxTokens: 8000,
         });
-        trackUsage('an2', usage);
 
         const parsed = parseJsonResponse<AN2Output>(content, 'AN2');
         const validated = AN2OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
 
-        return validated;
+        return { result: validated, usage };
       });
 
       // Update state with AN2 results (v10)
       state = {
         ...state,
-        an2_first_principles_foundation: an2Result.first_principles_foundation,
-        an2_problem_physics: an2Result.problem_physics,
-        an2_innovation_patterns: an2Result.innovation_patterns,
-        an2_cross_domain_map: an2Result.cross_domain_map,
-        an2_triz_guidance: an2Result.triz_guidance,
-        an2_design_constraints: an2Result.design_constraints,
-        an2_innovation_brief: an2Result.innovation_brief,
+        an2_first_principles_foundation:
+          an2Result.result.first_principles_foundation,
+        an2_problem_physics: an2Result.result.problem_physics,
+        an2_innovation_patterns: an2Result.result.innovation_patterns,
+        an2_cross_domain_map: an2Result.result.cross_domain_map,
+        an2_triz_guidance: an2Result.result.triz_guidance,
+        an2_design_constraints: an2Result.result.design_constraints,
+        an2_innovation_brief: an2Result.result.innovation_brief,
         completedSteps: [...state.completedSteps, 'an2'],
       };
 
@@ -502,7 +528,7 @@ export const generateReport = inngest.createFunction(
           phase_progress: 0,
         });
 
-        const contextMessage = buildAN3ContextV10(state, an2Result);
+        const contextMessage = buildAN3ContextV10(state, an2Result.result);
 
         const { content, usage } = await callClaude({
           model: MODELS.OPUS,
@@ -510,24 +536,23 @@ export const generateReport = inngest.createFunction(
           userMessage: contextMessage,
           maxTokens: 24000,
         });
-        trackUsage('an3', usage);
 
         const parsed = parseJsonResponse<AN3Output>(content, 'AN3');
         const validated = AN3OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
 
-        return validated;
+        return { result: validated, usage };
       });
 
       // Update state with AN3 results (v10)
       state = {
         ...state,
-        an3_concepts: an3Result.concepts,
-        an3_track_distribution: an3Result.track_distribution,
-        an3_innovation_notes: an3Result.innovation_notes,
+        an3_concepts: an3Result.result.concepts,
+        an3_track_distribution: an3Result.result.track_distribution,
+        an3_innovation_notes: an3Result.result.innovation_notes,
         an3_concepts_considered_but_rejected:
-          an3Result.concepts_considered_but_rejected,
+          an3Result.result.concepts_considered_but_rejected,
         completedSteps: [...state.completedSteps, 'an3'],
       };
 
@@ -540,7 +565,11 @@ export const generateReport = inngest.createFunction(
           phase_progress: 0,
         });
 
-        const contextMessage = buildAN4ContextV10(state, an3Result, an2Result);
+        const contextMessage = buildAN4ContextV10(
+          state,
+          an3Result.result,
+          an2Result.result,
+        );
 
         const { content, usage } = await callClaude({
           model: MODELS.OPUS,
@@ -548,24 +577,23 @@ export const generateReport = inngest.createFunction(
           userMessage: contextMessage,
           maxTokens: 16000, // Large output for validation gates
         });
-        trackUsage('an4', usage);
 
         const parsed = parseJsonResponse<AN4Output>(content, 'AN4');
         const validated = AN4OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
 
-        return validated;
+        return { result: validated, usage };
       });
 
       // Update state with AN4 results (v10)
       state = {
         ...state,
-        an4_validation_results: an4Result.validation_results,
-        an4_gate_summary: an4Result.gate_summary,
-        an4_rankings: an4Result.rankings,
-        an4_recommendation: an4Result.recommendation,
-        an4_validation_plan: an4Result.validation_plan,
+        an4_validation_results: an4Result.result.validation_results,
+        an4_gate_summary: an4Result.result.gate_summary,
+        an4_rankings: an4Result.result.rankings,
+        an4_recommendation: an4Result.result.recommendation,
+        an4_validation_plan: an4Result.result.validation_plan,
         completedSteps: [...state.completedSteps, 'an4'],
       };
 
@@ -580,10 +608,10 @@ export const generateReport = inngest.createFunction(
 
         const contextMessage = buildAN5ContextV10(
           state,
-          an2Result,
-          an3Result,
-          an4Result,
-          an1_7Result,
+          an2Result.result,
+          an3Result.result,
+          an4Result.result,
+          an1_7Result.result,
         );
 
         const { content, usage } = await callClaude({
@@ -592,20 +620,19 @@ export const generateReport = inngest.createFunction(
           userMessage: contextMessage,
           maxTokens: 24000, // Large output for executive report
         });
-        trackUsage('an5', usage);
 
         const parsed = parseJsonResponse<AN5Output>(content, 'AN5');
         const validated = AN5OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
 
-        return validated;
+        return { result: validated, usage };
       });
 
       // Update state with final report (v12: report data is flat, not nested under .report)
       state = {
         ...state,
-        an5_report: an5Result,
+        an5_report: an5Result.result,
         completedSteps: [...state.completedSteps, 'an5'],
         completedAt: new Date().toISOString(),
       };
@@ -613,9 +640,29 @@ export const generateReport = inngest.createFunction(
       // =========================================
       // Complete Report
       // =========================================
+      // Collect all usages from step results
+      const allUsages = [
+        an0Result.usage,
+        an1_5Usage, // may be null if corpus had no results
+        an1_7Result.usage,
+        an2Result.usage,
+        an3Result.usage,
+        an4Result.usage,
+        an5Result.usage,
+      ];
+      const stepNames = [
+        'an0',
+        'an1.5',
+        'an1.7',
+        'an2',
+        'an3',
+        'an4',
+        'an5',
+      ];
+      const totalUsage = calculateTotalUsage(allUsages, stepNames);
+
       await step.run('complete-report', async () => {
         // Persist token usage to database (P0-081 fix)
-        const totalUsage = getTotalUsage();
         const { error: usageError } = await supabase.rpc('increment_usage', {
           p_account_id: accountId,
           p_tokens: totalUsage.totalTokens,
@@ -628,6 +675,7 @@ export const generateReport = inngest.createFunction(
           console.log('[Usage] Persisted:', {
             accountId,
             tokens: totalUsage.totalTokens,
+            costUsd: totalUsage.costUsd,
           });
         }
 
@@ -636,15 +684,15 @@ export const generateReport = inngest.createFunction(
           state.an0_original_ask ?? state.userInput ?? designChallenge;
 
         // Convert AN5 JSON report to markdown for fallback display
-        const markdown = generateReportMarkdown(an5Result);
+        const markdown = generateReportMarkdown(an5Result.result);
 
         // Get the recommended concept title from the lead concepts (v12 structure)
         const recommendedTitle =
-          an5Result.solution_concepts?.lead_concepts?.[0]?.title ??
+          an5Result.result.solution_concepts?.lead_concepts?.[0]?.title ??
           'See report for details';
 
         // Extract headline from header title for dashboard display
-        const headline = an5Result.header?.title ?? null;
+        const headline = an5Result.result.header?.title ?? null;
 
         // Build the complete SparloReport structure for rendering
         // The brief is added here from AN0 user input - AN5 doesn't generate it
@@ -654,22 +702,22 @@ export const generateReport = inngest.createFunction(
 
         const sparloReport = {
           // Core AN5 output (matches SparloReportSchema)
-          header: an5Result.header,
+          header: an5Result.result.header,
           brief: {
             original_problem: originalProblem,
             tags,
           },
-          executive_summary: an5Result.executive_summary,
-          constraints: an5Result.constraints,
-          problem_analysis: an5Result.problem_analysis,
-          key_patterns: an5Result.key_patterns,
-          solution_concepts: an5Result.solution_concepts,
-          validation_summary: an5Result.validation_summary,
-          challenge_the_frame: an5Result.challenge_the_frame,
-          risks_and_watchouts: an5Result.risks_and_watchouts,
-          next_steps: an5Result.next_steps,
-          appendix: an5Result.appendix,
-          metadata: an5Result.metadata,
+          executive_summary: an5Result.result.executive_summary,
+          constraints: an5Result.result.constraints,
+          problem_analysis: an5Result.result.problem_analysis,
+          key_patterns: an5Result.result.key_patterns,
+          solution_concepts: an5Result.result.solution_concepts,
+          validation_summary: an5Result.result.validation_summary,
+          challenge_the_frame: an5Result.result.challenge_the_frame,
+          risks_and_watchouts: an5Result.result.risks_and_watchouts,
+          next_steps: an5Result.result.next_steps,
+          appendix: an5Result.result.appendix,
+          metadata: an5Result.result.metadata,
           // Optional additional content can be added here if needed
           additional_content: undefined,
         };
@@ -685,25 +733,25 @@ export const generateReport = inngest.createFunction(
             // Also include auxiliary data for backwards compatibility and debugging
             markdown,
             chainState: state,
-            concepts: an3Result.concepts,
-            validation_results: an4Result.validation_results,
-            recommendation: an4Result.recommendation,
-            innovation_patterns: an2Result.innovation_patterns,
+            concepts: an3Result.result.concepts,
+            validation_results: an4Result.result.validation_results,
+            recommendation: an4Result.result.recommendation,
+            innovation_patterns: an2Result.result.innovation_patterns,
             recommendedConcept: recommendedTitle,
             retrieval_summary: state.an1_retrieval_summary,
             corpus_gaps: state.an1_5_corpus_gaps,
             commercial_precedent: state.an1_7_commercial_precedent,
+            tokenUsage: totalUsage,
           },
         });
       });
 
       // Return success with token usage summary (visible in Inngest dashboard)
-      const totalUsage = getTotalUsage();
       return {
         success: true,
         reportId,
         usage: {
-          byStep: usageByStep,
+          byStep: totalUsage.byStep,
           total: {
             inputTokens: totalUsage.inputTokens,
             outputTokens: totalUsage.outputTokens,
