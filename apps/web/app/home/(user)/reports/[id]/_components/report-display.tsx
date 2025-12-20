@@ -411,6 +411,15 @@ export function ReportDisplay({
     (report.report_data as { report?: unknown }).report;
   const hasMarkdownContent = !!reportMarkdown;
 
+  // Debug logging
+  console.log('[ReportDisplay] Debug:', {
+    isDiscovery,
+    hasDiscoveryContent: !!hasDiscoveryContent,
+    hasMarkdownContent,
+    reportDataKeys: report.report_data ? Object.keys(report.report_data) : [],
+    reportStatus: report.status,
+  });
+
   // No report content yet
   if (!hasDiscoveryContent && !hasMarkdownContent) {
     return (

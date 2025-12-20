@@ -95,6 +95,16 @@ export default async function ReportPage({ params }: ReportPageProps) {
   // Check if this is a discovery mode report
   const isDiscoveryReport = report.report_data.mode === 'discovery';
 
+  // Debug logging
+  console.log('[ReportPage] Debug:', {
+    reportId: id,
+    status: report.status,
+    mode: report.report_data.mode,
+    isDiscoveryReport,
+    hasReportField: 'report' in report.report_data,
+    reportDataKeys: Object.keys(report.report_data),
+  });
+
   if (isDiscoveryReport) {
     // Discovery reports use ReportDisplay for chat functionality, with discovery flag
     return (
