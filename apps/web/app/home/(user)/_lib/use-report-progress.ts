@@ -86,6 +86,14 @@ export function useReportProgress(
 
       if (!mountedRef.current) return;
 
+      // DEBUG: Log fetched data to understand AN0 timing
+      console.log('[useReportProgress] Initial fetch result:', {
+        id: data.id,
+        status: data.status,
+        current_step: data.current_step,
+        clarifications: (data.clarifications as unknown as ClarificationQuestion[])?.length ?? 0,
+      });
+
       setProgress({
         id: data.id,
         status: data.status as ConversationStatus,
@@ -143,6 +151,15 @@ export function useReportProgress(
             if (!mountedRef.current) return;
 
             const data = payload.new as Record<string, unknown>;
+
+            // DEBUG: Log realtime update to understand AN0 timing
+            console.log('[useReportProgress] Realtime update:', {
+              id: data.id,
+              status: data.status,
+              current_step: data.current_step,
+              clarifications: (data.clarifications as ClarificationQuestion[])?.length ?? 0,
+            });
+
             setProgress({
               id: data.id as string,
               status: data.status as ConversationStatus,

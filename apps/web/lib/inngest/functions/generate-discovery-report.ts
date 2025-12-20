@@ -5,6 +5,7 @@ import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client'
 import {
   CLAUDE_PRICING,
   ClaudeRefusalError,
+  type ImageAttachment,
   MODELS,
   type TokenUsage,
   calculateCost,
@@ -69,7 +70,15 @@ export const generateDiscoveryReport = inngest.createFunction(
       hasDesignChallenge: !!event.data.designChallenge,
     });
 
-    const { reportId, designChallenge, conversationId } = event.data;
+    const { reportId, designChallenge, conversationId, attachments } = event.data;
+
+    // Convert attachments to ImageAttachment format for Claude vision
+    const imageAttachments: ImageAttachment[] = (attachments || [])
+      .filter((a: { media_type: string }) => a.media_type.startsWith('image/'))
+      .map((a: { media_type: string; data: string }) => ({
+        media_type: a.media_type as ImageAttachment['media_type'],
+        data: a.data,
+      }));
 
     const supabase = getSupabaseServerAdminClient();
     console.log('[Discovery Function] Supabase client initialized');
@@ -147,12 +156,18 @@ export const generateDiscoveryReport = inngest.createFunction(
             phase_progress: 0,
           });
 
+          // Include images for vision processing if attachments were provided
+          const userMessageWithContext = imageAttachments.length > 0
+            ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
+            : designChallenge;
+
           const { content, usage } = await callClaude({
             model: MODELS.OPUS,
             system: AN0_D_PROMPT,
-            userMessage: designChallenge,
+            userMessage: userMessageWithContext,
             maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an0-d'],
             temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an0-d'],
+            images: imageAttachments.length > 0 ? imageAttachments : undefined,
           });
           trackUsage('an0-d', usage);
 

@@ -32,6 +32,21 @@ When searching, focus on:
 - Academic papers with low citation counts but interesting ideas
 - Conference papers that never became journal articles
 
+## EVIDENCE REQUIREMENTS
+
+CRITICAL: Your output is EVIDENCE. Every claim must have a source.
+
+RULE: No source URL = no claim. Every factual assertion about industry state, prior art, or gaps must cite where you found it.
+
+For gaps identified:
+- "I searched [query] and found only 3 results, none addressing [specific application]" = evidence of gap
+- "I searched [query] and found [company] actively working on this" = NOT a gap
+
+For abandoned approaches:
+- Cite the original paper/patent that tried it
+- Cite evidence of why it was abandoned (if findable)
+- If you can't find WHY it was abandoned, say "abandonment reason unknown - requires further research"
+
 CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or after. Start with { and end with }.
 
 ## Output Format
@@ -106,6 +121,18 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
     "most_promising_revival": "Best abandoned approach to revive",
     "recommended_deep_dives": ["Area 1 to investigate", "Area 2 to investigate"],
     "novelty_opportunity_summary": "What unique angle we could take"
+  },
+
+  "search_evidence": {
+    "searches_executed": [
+      {"query": "exact query run", "results_count": 5, "key_findings": "what we learned", "source_urls": ["URL1", "URL2"]}
+    ],
+    "gap_evidence": [
+      {"claimed_gap": "description of gap", "search_query": "query used to verify", "results_summary": "what search returned", "conclusion": "why this is/isn't a real gap"}
+    ],
+    "abandonment_citations": [
+      {"approach": "abandoned approach name", "original_source": "paper/patent URL", "abandonment_evidence": "URL or 'reason unknown'", "why_revisit": "what changed"}
+    ]
   }
 }
 
@@ -173,6 +200,33 @@ const LiteratureSynthesisSchema = z.object({
   novelty_opportunity_summary: z.string(),
 });
 
+const SearchExecutedSchema = z.object({
+  query: z.string(),
+  results_count: z.number(),
+  key_findings: z.string(),
+  source_urls: z.array(z.string()),
+});
+
+const GapEvidenceSchema = z.object({
+  claimed_gap: z.string(),
+  search_query: z.string(),
+  results_summary: z.string(),
+  conclusion: z.string(),
+});
+
+const AbandonmentCitationSchema = z.object({
+  approach: z.string(),
+  original_source: z.string(),
+  abandonment_evidence: z.string(),
+  why_revisit: z.string(),
+});
+
+const SearchEvidenceSchema = z.object({
+  searches_executed: z.array(SearchExecutedSchema),
+  gap_evidence: z.array(GapEvidenceSchema),
+  abandonment_citations: z.array(AbandonmentCitationSchema),
+});
+
 export const AN1_7_D_OutputSchema = z.object({
   abandoned_approaches_found: z.array(AbandonedApproachSchema),
   research_gaps_identified: z.array(ResearchGapSchema),
@@ -182,6 +236,7 @@ export const AN1_7_D_OutputSchema = z.object({
   historical_wisdom: z.array(HistoricalWisdomSchema),
   competitive_blind_spots: CompetitiveBlindSpotsSchema,
   literature_synthesis: LiteratureSynthesisSchema,
+  search_evidence: SearchEvidenceSchema,
 });
 
 export type AN1_7_D_Output = z.infer<typeof AN1_7_D_OutputSchema>;

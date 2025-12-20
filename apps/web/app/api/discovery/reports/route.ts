@@ -7,11 +7,24 @@ import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { inngest } from '~/lib/inngest/client';
 
+const AttachmentSchema = z.object({
+  filename: z.string(),
+  media_type: z.enum([
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'application/pdf',
+  ]),
+  data: z.string(), // base64 encoded
+});
+
 const StartDiscoveryReportSchema = z.object({
   designChallenge: z
     .string()
     .min(50, 'Please provide at least 50 characters')
     .max(10000, 'Design challenge must be under 10,000 characters'),
+  attachments: z.array(AttachmentSchema).max(5).optional(),
 });
 
 // Rate limiting constants
@@ -111,6 +124,8 @@ export const POST = enhanceRouteHandler(
           userId: user.id,
           designChallenge: body.designChallenge,
           conversationId,
+          // Pass attachments for Claude vision processing
+          attachments: body.attachments || [],
         },
       });
     } catch (inngestError) {

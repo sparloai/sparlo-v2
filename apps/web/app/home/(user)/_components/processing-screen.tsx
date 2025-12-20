@@ -113,6 +113,14 @@ export function ProcessingScreen({
   useEffect(() => {
     if (hasNavigatedRef.current) return;
 
+    // DEBUG: Log progress state to understand AN0 redirect timing
+    console.log('[ProcessingScreen] Progress state:', {
+      status: progress.status,
+      currentStep: progress.currentStep,
+      clarifications: progress.clarifications?.length ?? 0,
+      id: progress.id,
+    });
+
     // Priority 1: Report complete - navigate to report
     if (progress.status === 'complete' && onComplete) {
       hasNavigatedRef.current = true;
@@ -127,6 +135,15 @@ export function ProcessingScreen({
       progress.currentStep !== null;
     const noClarificationNeeded =
       movedPastAN0 && progress.clarifications?.length === 0;
+
+    // DEBUG: Log redirect decision
+    if (movedPastAN0) {
+      console.log('[ProcessingScreen] Moved past AN0, checking clarifications:', {
+        movedPastAN0,
+        noClarificationNeeded,
+        willRedirect: noClarificationNeeded,
+      });
+    }
 
     if (noClarificationNeeded) {
       hasNavigatedRef.current = true;

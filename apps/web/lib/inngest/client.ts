@@ -21,6 +21,19 @@ export const ClarificationAnsweredEventSchema = z.object({
   answer: z.string().min(1),
 });
 
+// Attachment schema for vision support
+const AttachmentSchema = z.object({
+  filename: z.string(),
+  media_type: z.enum([
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'application/pdf',
+  ]),
+  data: z.string(), // base64 encoded
+});
+
 // Discovery Mode event schemas (same structure, different chain)
 export const DiscoveryReportGenerateEventSchema = z.object({
   reportId: z.string().uuid(),
@@ -28,6 +41,7 @@ export const DiscoveryReportGenerateEventSchema = z.object({
   userId: z.string().uuid(),
   designChallenge: z.string().min(50),
   conversationId: z.string(),
+  attachments: z.array(AttachmentSchema).optional(),
 });
 
 export const DiscoveryClarificationAnsweredEventSchema = z.object({

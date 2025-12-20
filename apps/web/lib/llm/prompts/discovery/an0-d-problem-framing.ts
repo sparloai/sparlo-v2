@@ -131,6 +131,15 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
 3. **HUNT FOR ANALOGUES** - Where else in nature/industry do similar physics challenges exist?
 4. **GENERATE DISCOVERY QUERIES** - What should we search for in non-obvious domains?
 
+## PRIOR ART SEARCH REQUIREMENT
+
+You have access to web search capabilities via SerpAPI. USE THEM.
+
+RULE: No source URL = no claim. Every factual assertion about industry state, prior art, or gaps must cite where you found it.
+
+CRITICAL: For every company/approach you list as "active," you must have a SOURCE URL.
+If you cannot cite where you learned this, do not include it.
+
 ## Output Format
 
 {
@@ -205,6 +214,17 @@ CRITICAL: You must respond with ONLY valid JSON. No markdown, no text before or 
     "gap_literature_search": ["Queries to find what's MISSING in literature"]
   },
 
+  "industry_landscape": {
+    "searches_executed": [
+      {"query": "exact search query you ran", "top_results": ["result 1 title + URL", "result 2 title + URL"], "key_finding": "what this told us"}
+    ],
+    "active_players": [
+      {"entity": "company or research group name", "approach": "what they're doing", "source": "URL where you found this", "why_excluded": "reason we're excluding this from our discovery"}
+    ],
+    "market_state": "Brief summary of current industry approaches based on search results",
+    "search_gaps": ["Areas where searches returned few/no relevant results - potential opportunities"]
+  },
+
   "novelty_hypothesis": "What specific non-obvious approach seems most promising and why"
 }
 
@@ -271,6 +291,26 @@ const DiscoveryQueriesSchema = z.object({
   gap_literature_search: z.array(z.string()),
 });
 
+const SearchExecutedSchema = z.object({
+  query: z.string(),
+  top_results: z.array(z.string()),
+  key_finding: z.string(),
+});
+
+const ActivePlayerSchema = z.object({
+  entity: z.string(),
+  approach: z.string(),
+  source: z.string(),
+  why_excluded: z.string(),
+});
+
+const IndustryLandscapeSchema = z.object({
+  searches_executed: z.array(SearchExecutedSchema),
+  active_players: z.array(ActivePlayerSchema),
+  market_state: z.string(),
+  search_gaps: z.array(z.string()),
+});
+
 // Full analysis output schema
 const AN0DAnalysisSchema = z.object({
   need_question: z.literal(false),
@@ -288,6 +328,7 @@ const AN0DAnalysisSchema = z.object({
   }),
   first_principles_reframe: FirstPrinciplesReframeSchema,
   discovery_queries: DiscoveryQueriesSchema,
+  industry_landscape: IndustryLandscapeSchema,
   novelty_hypothesis: z.string(),
 });
 

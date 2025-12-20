@@ -9,6 +9,7 @@ import {
   List,
   Loader2,
   MessageSquare,
+  Paperclip,
   RotateCcw,
   Send,
   Share2,
@@ -91,13 +92,29 @@ function generateSectionId(text: string): string {
 
 const POLLING_INTERVAL = 3000;
 
+interface Attachment {
+  id: string;
+  file: File;
+  preview: string;
+  base64?: string;
+}
+
+const MAX_ATTACHMENTS = 5;
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+
 export default function BetaPage() {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const clarificationInputRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Attachment state
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   // Flow state
   const [phase, setPhase] = useState<FlowPhase>('input');
+  const [reportId, setReportId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [reportTitle, setReportTitle] = useState<string>('');
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
@@ -224,41 +241,49 @@ export default function BetaPage() {
     return () => clearInterval(timeInterval);
   }, [phase]);
 
-  // Poll for status
+  // Poll for status using reports API
   const startPolling = useCallback(
-    (convId: string) => {
+    (reportId: string) => {
       if (pollingRef.current) {
         clearInterval(pollingRef.current);
       }
 
       const poll = async () => {
         try {
-          const response = await fetch(`/api/sparlo/status/${convId}`);
+          const response = await fetch(`/api/reports/${reportId}/progress`);
           if (!response.ok) throw new Error('Status check failed');
 
           const status = await response.json();
-          setCurrentStep(status.current_step || 'AN0');
+          setCurrentStep(status.current_step || 'an0-d');
 
-          if (status.status === 'complete' && status.report) {
+          if (status.status === 'complete') {
             if (pollingRef.current) {
               clearInterval(pollingRef.current);
               pollingRef.current = null;
             }
 
             // Fetch full report
-            const reportResponse = await fetch(`/api/sparlo/report/${convId}`);
+            const reportResponse = await fetch(`/api/reports/${reportId}`);
             if (!reportResponse.ok) throw new Error('Failed to fetch report');
 
             const report = await reportResponse.json();
-            setReportData(report);
+            // Extract markdown from report_data
+            const reportMarkdown = report.report_data?.report?.markdown ||
+              generateMarkdownFromReport(report.report_data);
+            setReportData({
+              report_markdown: reportMarkdown,
+              viability: report.report_data?.report?.viability,
+              title: report.title,
+            });
             setPendingMessage(null);
             setPhase('complete');
-          } else if (status.status === 'error') {
+          } else if (status.status === 'error' || status.status === 'failed') {
             if (pollingRef.current) {
               clearInterval(pollingRef.current);
               pollingRef.current = null;
             }
-            setError(status.message || 'An error occurred during processing');
+            setError(status.error_message || status.last_message || 'An error occurred during processing');
+            setPhase('input');
           } else if (status.status === 'clarifying') {
             if (pollingRef.current) {
               clearInterval(pollingRef.current);
@@ -266,27 +291,23 @@ export default function BetaPage() {
             }
             // Only show ONE clarifying question max
             if (hasAskedClarification) {
-              // Already asked one, skip to processing
-              const skipResponse = await fetch('/api/sparlo/chat', {
+              // Already asked one, skip by answering clarification
+              const skipResponse = await fetch(`/api/reports/${reportId}/clarify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  message:
-                    'Please proceed with the analysis based on the information provided.',
-                  conversation_id: convId,
+                  answer: 'Please proceed with the analysis based on the information provided.',
                 }),
               });
               if (skipResponse.ok) {
-                const skipData = await skipResponse.json();
-                if (skipData.status === 'processing') {
-                  setCurrentStep(skipData.current_step || 'AN1');
-                  setPhase('processing');
-                  startPolling(skipData.conversation_id);
-                }
+                setPhase('processing');
+                startPolling(reportId);
               }
             } else {
               setHasAskedClarification(true);
-              setClarificationQuestion(status.message || null);
+              const clarifications = status.clarifications || [];
+              const latestQuestion = clarifications[clarifications.length - 1]?.question;
+              setClarificationQuestion(latestQuestion || 'Do you have any additional details to share?');
               setPhase('clarifying');
             }
           }
@@ -301,21 +322,56 @@ export default function BetaPage() {
     [hasAskedClarification],
   );
 
-  // Send message to backend
+  // Helper to generate markdown from structured report data
+  function generateMarkdownFromReport(reportData: Record<string, unknown> | null): string {
+    if (!reportData) return '';
+
+    const report = reportData.report as Record<string, unknown> | undefined;
+    if (!report) return JSON.stringify(reportData, null, 2);
+
+    // If there's already markdown, use it
+    if (typeof report.markdown === 'string') return report.markdown;
+
+    // Otherwise, try to build from structured data
+    const sections: string[] = [];
+
+    const execSummary = report.executive_summary as Record<string, string> | undefined;
+    if (execSummary) {
+      sections.push('## Executive Summary\n');
+      if (execSummary.hook) sections.push(execSummary.hook + '\n');
+      if (execSummary.key_discovery) sections.push(`**Key Discovery:** ${execSummary.key_discovery}\n`);
+      if (execSummary.recommended_action) sections.push(`**Recommended Action:** ${execSummary.recommended_action}\n`);
+    }
+
+    // Add more sections as needed
+    return sections.join('\n') || JSON.stringify(reportData, null, 2);
+  }
+
+  // Send message to backend - uses discovery API with vision support
   const sendMessage = useCallback(
-    async (message: string) => {
+    async (message: string, imageAttachments?: Attachment[]) => {
       setIsLoading(true);
       setError(null);
       setPendingMessage(message);
       setPhase('analyzing');
 
       try {
-        const response = await fetch('/api/sparlo/chat', {
+        // Prepare attachments for API (filter to only images for Claude vision)
+        const attachmentData = imageAttachments
+          ?.filter(a => a.file.type.startsWith('image/'))
+          .map(a => ({
+            filename: a.file.name,
+            media_type: a.file.type,
+            data: a.base64,
+          })) || [];
+
+        // Use discovery API for initial submission (supports vision)
+        const response = await fetch('/api/discovery/reports', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message,
-            conversation_id: conversationId,
+            designChallenge: message,
+            attachments: attachmentData.length > 0 ? attachmentData : undefined,
           }),
         });
 
@@ -328,58 +384,19 @@ export default function BetaPage() {
 
         const data = await response.json();
 
-        if (!conversationId) {
-          setConversationId(data.conversation_id);
+        // Discovery API returns reportId and conversationId
+        if (data.success && data.reportId) {
+          setReportId(data.reportId);
+          setConversationId(data.conversationId);
           setReportTitle(
             message.slice(0, 50) + (message.length > 50 ? '...' : ''),
           );
-        }
-
-        if (data.status === 'clarifying') {
-          // Only show ONE clarifying question max
-          if (hasAskedClarification) {
-            // Already asked one, skip to processing
-            const skipResponse = await fetch('/api/sparlo/chat', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                message:
-                  'Please proceed with the analysis based on the information provided.',
-                conversation_id: data.conversation_id,
-              }),
-            });
-            if (skipResponse.ok) {
-              const skipData = await skipResponse.json();
-              if (skipData.status === 'processing') {
-                setClarificationQuestion(null);
-                setCurrentStep(skipData.current_step || 'AN1');
-                setPhase('processing');
-                startPolling(skipData.conversation_id);
-              } else {
-                // Fallback: start polling even if status is unexpected
-                setClarificationQuestion(null);
-                setCurrentStep(skipData.current_step || 'AN0');
-                setPhase('processing');
-                startPolling(skipData.conversation_id);
-              }
-            }
-          } else {
-            setHasAskedClarification(true);
-            setClarificationQuestion(data.message);
-            setPhase('clarifying');
-          }
-        } else if (data.status === 'processing') {
-          setClarificationQuestion(null);
-          setCurrentStep(data.current_step || 'AN1');
+          // Start polling for progress using report ID
+          setCurrentStep('an0-d');
           setPhase('processing');
-          startPolling(data.conversation_id);
+          startPolling(data.reportId);
         } else {
-          // Handle other statuses (analyzing, pending, etc.) - start polling
-          // The backend may have started processing asynchronously
-          setClarificationQuestion(null);
-          setCurrentStep(data.current_step || 'AN0');
-          setPhase('processing');
-          startPolling(data.conversation_id);
+          throw new Error(data.error || 'Failed to start analysis');
         }
       } catch (err) {
         console.error('Send message error:', err);
@@ -389,7 +406,7 @@ export default function BetaPage() {
         setIsLoading(false);
       }
     },
-    [conversationId, startPolling, hasAskedClarification],
+    [startPolling],
   );
 
   // Handle initial submission
@@ -397,8 +414,12 @@ export default function BetaPage() {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
     const message = input.trim();
+    const currentAttachments = [...attachments];
     setInput('');
-    await sendMessage(message);
+    // Clear attachments after capturing them
+    attachments.forEach(a => URL.revokeObjectURL(a.preview));
+    setAttachments([]);
+    await sendMessage(message, currentAttachments);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -432,6 +453,7 @@ export default function BetaPage() {
     }
     setPhase('input');
     setInput('');
+    setReportId(null);
     setConversationId(null);
     setReportTitle('');
     setPendingMessage(null);
@@ -439,10 +461,75 @@ export default function BetaPage() {
     setClarificationResponse('');
     setHasAskedClarification(false);
     setReportData(null);
-    setCurrentStep('AN0');
+    setCurrentStep('an0-d');
     setError(null);
     setChatMessages([]);
     setChatInput('');
+    // Clear attachments and revoke object URLs
+    attachments.forEach(a => URL.revokeObjectURL(a.preview));
+    setAttachments([]);
+  }, [attachments]);
+
+  // Attachment handlers
+  const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const remainingSlots = MAX_ATTACHMENTS - attachments.length;
+    const filesToAdd = files.slice(0, remainingSlots);
+
+    const newAttachments: Attachment[] = [];
+
+    for (const file of filesToAdd) {
+      // Validate file type
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setError(`File type not supported: ${file.type}. Supported: images and PDFs.`);
+        continue;
+      }
+
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        setError(`File too large: ${file.name}. Maximum size is 10MB.`);
+        continue;
+      }
+
+      // Create preview URL and read as base64
+      const preview = URL.createObjectURL(file);
+      const base64 = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          const result = reader.result as string;
+          // Remove the data URL prefix (e.g., "data:image/png;base64,")
+          resolve(result.split(',')[1] || '');
+        };
+        reader.readAsDataURL(file);
+      });
+
+      newAttachments.push({
+        id: crypto.randomUUID(),
+        file,
+        preview,
+        base64,
+      });
+    }
+
+    setAttachments(prev => [...prev, ...newAttachments]);
+    setError(null);
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [attachments.length]);
+
+  const removeAttachment = useCallback((id: string) => {
+    setAttachments(prev => {
+      const attachment = prev.find(a => a.id === id);
+      if (attachment) {
+        URL.revokeObjectURL(attachment.preview);
+      }
+      return prev.filter(a => a.id !== id);
+    });
   }, []);
 
   // Skip clarification and proceed directly
@@ -922,12 +1009,73 @@ USER QUESTION: ${chatInput.trim()}`;
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="What are you trying to solve? Include constraints, goals, and context for better results."
-              className="min-h-[180px] resize-none rounded-xl border-[--border-subtle] bg-[--surface-elevated] text-base leading-relaxed focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-800 dark:bg-neutral-900"
+              className="min-h-[180px] resize-none rounded-xl border-[--border-subtle] bg-[--surface-elevated] text-base leading-relaxed text-gray-900 placeholder:text-gray-400 focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500"
               disabled={isLoading}
             />
+
+            {/* Attachment Previews */}
+            {attachments.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {attachments.map((attachment) => (
+                  <div
+                    key={attachment.id}
+                    className="group relative h-16 w-16 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-neutral-700 dark:bg-neutral-800"
+                  >
+                    {attachment.file.type === 'application/pdf' ? (
+                      <div className="flex h-full w-full items-center justify-center text-xs font-medium text-gray-500 dark:text-neutral-400">
+                        PDF
+                      </div>
+                    ) : (
+                      <img
+                        src={attachment.preview}
+                        alt={attachment.file.name}
+                        className="h-full w-full object-cover"
+                      />
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeAttachment(attachment.id)}
+                      className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                    <div className="absolute inset-x-0 bottom-0 truncate bg-black/50 px-1 py-0.5 text-[10px] text-white">
+                      {attachment.file.name.slice(0, 10)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={ALLOWED_TYPES.join(',')}
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span className="text-sm text-[--text-muted] tabular-nums">
+                {/* Attach button */}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading || attachments.length >= MAX_ATTACHMENTS}
+                  className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 dark:text-neutral-400 dark:hover:text-neutral-200"
+                >
+                  <Paperclip className="h-4 w-4" />
+                  <span className="text-sm">
+                    {attachments.length > 0
+                      ? `${attachments.length}/${MAX_ATTACHMENTS}`
+                      : 'Attach'}
+                  </span>
+                </Button>
+                <span className="text-sm text-gray-500 tabular-nums dark:text-neutral-400">
                   {wordCount} words
                 </span>
                 {input.trim().length >= 30 && (

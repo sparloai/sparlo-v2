@@ -79,8 +79,17 @@ export const MODELS = {
 } as const;
 
 /**
+ * Image attachment for vision processing
+ */
+export interface ImageAttachment {
+  media_type: 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
+  data: string; // base64 encoded
+}
+
+/**
  * Call Claude with proper error handling and usage tracking
  * Uses streaming for large token requests to avoid timeout issues
+ * Supports vision with optional image attachments
  * (Kieran's fix: every LLM call wrapped with error handling)
  */
 export async function callClaude(params: {
@@ -89,10 +98,37 @@ export async function callClaude(params: {
   userMessage: string;
   maxTokens?: number;
   temperature?: number;
+  images?: ImageAttachment[];
 }): Promise<ClaudeResult> {
   const anthropic = getAnthropicClient();
   const maxTokens = params.maxTokens ?? 8192;
   const temperature = params.temperature ?? 1;
+
+  // Build message content - supports text and images for vision
+  // Use Anthropic SDK types for proper type compatibility
+  type ImageMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
+  type ContentBlock =
+    | { type: 'text'; text: string }
+    | { type: 'image'; source: { type: 'base64'; media_type: ImageMediaType; data: string } };
+
+  const messageContent: ContentBlock[] = [];
+
+  // Add images first if present (Claude processes them before text)
+  if (params.images && params.images.length > 0) {
+    for (const image of params.images) {
+      messageContent.push({
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: image.media_type,
+          data: image.data,
+        },
+      });
+    }
+  }
+
+  // Add text message
+  messageContent.push({ type: 'text', text: params.userMessage });
 
   try {
     // Use streaming for large token requests (>10000) to avoid timeout
@@ -104,7 +140,7 @@ export async function callClaude(params: {
         max_tokens: maxTokens,
         temperature,
         system: params.system,
-        messages: [{ role: 'user', content: params.userMessage }],
+        messages: [{ role: 'user', content: messageContent }],
       });
 
       for await (const event of stream) {
@@ -153,7 +189,7 @@ export async function callClaude(params: {
       max_tokens: maxTokens,
       temperature,
       system: params.system,
-      messages: [{ role: 'user', content: params.userMessage }],
+      messages: [{ role: 'user', content: messageContent }],
     });
 
     // Check for refusal (safety filter triggered)
