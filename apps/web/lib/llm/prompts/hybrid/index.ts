@@ -44,9 +44,11 @@ export {
   type HybridSparkConcept,
   // Shared primitives
   ConfidenceLevel,
+  SeverityLevel,
   CapitalRequirement,
   ViabilityVerdict,
   TrackSchema,
+  SafeUrlSchema,
 } from './schemas';
 
 // Re-export all prompts
@@ -136,8 +138,7 @@ export const HYBRID_PHASES = [
   {
     id: 'an4-m',
     name: 'Evaluation',
-    description:
-      'Merit-based validation with paradigm significance assessment',
+    description: 'Merit-based validation with paradigm significance assessment',
     estimatedMinutes: 3,
   },
   {
@@ -165,6 +166,8 @@ export type HybridSolutionTrack = (typeof HYBRID_SOLUTION_TRACKS)[number];
 
 /**
  * Hybrid chain metadata (v2.0.0)
+ *
+ * Note: `stages` is derived from HYBRID_PHASES to maintain single source of truth
  */
 export const HYBRID_CHAIN_METADATA = {
   version: '2.0.0',
@@ -173,18 +176,18 @@ export const HYBRID_CHAIN_METADATA = {
   philosophy:
     'The best solution wins regardless of origin. Paradigm insights are surfaced prominently even when simpler paths win on merit.',
 
-  stages: [
-    { id: 'an0-m', name: 'Problem Framing' },
-    { id: 'an1-m', name: 'Corpus Retrieval' },
-    { id: 'an1.5-m', name: 'Teaching Selection' },
-    { id: 'an1.7-m', name: 'Literature Search' },
-    { id: 'an2-m', name: 'Methodology Briefing' },
-    { id: 'an3-m', name: 'Concept Generation' },
-    { id: 'an4-m', name: 'Evaluation' },
-    { id: 'an5-m', name: 'Executive Report' },
-  ],
+  // Derived from HYBRID_PHASES - single source of truth
+  get stages() {
+    return HYBRID_PHASES.map(({ id, name }) => ({ id, name }));
+  },
 
-  estimatedTotalMinutes: 20,
+  get estimatedTotalMinutes() {
+    return HYBRID_PHASES.reduce(
+      (sum, phase) => sum + phase.estimatedMinutes,
+      0,
+    );
+  },
+
   estimatedCost: '$4-6',
 
   tracks: {
