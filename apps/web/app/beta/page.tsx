@@ -124,6 +124,8 @@ export default function BetaPage() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isChatLoading, setIsChatLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const userScrolledUpRef = useRef(false);
 
   // Polling ref
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
@@ -159,10 +161,22 @@ export default function BetaPage() {
     }
   }, [clarificationQuestion]);
 
-  // Scroll chat to bottom on new messages
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
+  // Scroll chat to bottom only when user sends a message (not during streaming)
+  // Uses ref to track if user manually scrolled up
+  const scrollChatToBottom = useCallback(() => {
+    if (!userScrolledUpRef.current) {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  // Handle scroll events to detect if user scrolled up
+  const handleChatScroll = useCallback(() => {
+    const container = chatContainerRef.current;
+    if (!container) return;
+
+    const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 50;
+    userScrolledUpRef.current = !isAtBottom;
+  }, []);
 
   // Track active section on scroll
   useEffect(() => {
@@ -727,6 +741,10 @@ export default function BetaPage() {
       setChatInput('');
       setIsChatLoading(true);
 
+      // Reset scroll tracking and scroll to bottom when user sends
+      userScrolledUpRef.current = false;
+      setTimeout(() => scrollChatToBottom(), 50);
+
       const assistantId = (Date.now() + 1).toString();
       const assistantMessage: ChatMessage = {
         id: assistantId,
@@ -826,7 +844,7 @@ USER QUESTION: ${chatInput.trim()}`;
 
       setIsChatLoading(false);
     },
-    [chatInput, isChatLoading, chatMessages, reportData, reportTitle],
+    [chatInput, isChatLoading, chatMessages, reportData, reportTitle, scrollChatToBottom],
   );
 
   const handleChatKeyDown = (e: React.KeyboardEvent) => {
@@ -1390,16 +1408,16 @@ USER QUESTION: ${chatInput.trim()}`;
         <AnimatePresence>
           {isChatOpen && (
             <motion.div
-              className="fixed top-0 right-0 z-50 flex h-full w-[400px] flex-col border-l border-[--border-subtle] bg-[--surface-elevated] shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
+              className="fixed top-16 right-0 z-50 flex h-[calc(100%-4rem)] w-[400px] flex-col border-l border-gray-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
               initial={{ x: 400 }}
               animate={{ x: 0 }}
               exit={{ x: 400 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             >
-              <div className="flex items-center justify-between border-b border-[--border-subtle] px-4 py-3 dark:border-neutral-800">
+              <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-neutral-800">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5 text-[--accent]" />
-                  <span className="font-semibold text-[--text-primary] dark:text-white">
+                  <span className="font-semibold text-gray-900 dark:text-white">
                     Chat with Report
                   </span>
                 </div>
@@ -1412,14 +1430,18 @@ USER QUESTION: ${chatInput.trim()}`;
                 </Button>
               </div>
 
-              <div className="flex-1 space-y-4 overflow-y-auto p-4">
+              <div
+                ref={chatContainerRef}
+                onScroll={handleChatScroll}
+                className="flex-1 space-y-4 overflow-y-auto p-4"
+              >
                 {chatMessages.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center text-center text-[--text-muted]">
+                  <div className="flex h-full flex-col items-center justify-center text-center text-gray-500 dark:text-neutral-400">
                     <MessageSquare className="mb-4 h-12 w-12 opacity-20" />
-                    <p className="font-medium text-[--text-secondary] dark:text-neutral-300">
+                    <p className="font-medium text-gray-700 dark:text-neutral-300">
                       Ask anything about this report
                     </p>
-                    <p className="mt-1 text-sm">
+                    <p className="mt-1 text-sm text-gray-500 dark:text-neutral-400">
                       Get clarification, explore alternatives, or dive deeper
                       into specific concepts.
                     </p>
@@ -1431,7 +1453,7 @@ USER QUESTION: ${chatInput.trim()}`;
                       ].map((suggestion) => (
                         <button
                           key={suggestion}
-                          className="w-full rounded-lg border border-[--border-subtle] px-3 py-2 text-left text-sm text-[--text-muted] transition-colors hover:bg-[--surface-overlay] hover:text-[--text-primary] dark:border-neutral-700 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+                          className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-left text-sm text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white"
                           onClick={() => setChatInput(suggestion)}
                         >
                           {suggestion}
@@ -1453,11 +1475,11 @@ USER QUESTION: ${chatInput.trim()}`;
                           'max-w-[85%] rounded-2xl px-4 py-2',
                           msg.role === 'user'
                             ? 'rounded-tr-sm bg-[--accent] text-white'
-                            : 'rounded-tl-sm bg-[--surface-overlay] dark:bg-neutral-800',
+                            : 'rounded-tl-sm bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-neutral-100',
                         )}
                       >
                         {msg.role === 'assistant' ? (
-                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                          <div className="prose prose-sm prose-gray max-w-none dark:prose-invert">
                             <ReactMarkdown rehypePlugins={[rehypeSanitize]}>
                               {msg.content}
                             </ReactMarkdown>
@@ -1481,7 +1503,7 @@ USER QUESTION: ${chatInput.trim()}`;
 
               <form
                 onSubmit={handleChatSubmit}
-                className="border-t border-[--border-subtle] bg-[--surface-base] p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
+                className="border-t border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
               >
                 <div className="flex gap-2">
                   <Textarea
@@ -1489,13 +1511,13 @@ USER QUESTION: ${chatInput.trim()}`;
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={handleChatKeyDown}
                     placeholder="Ask a question about the report..."
-                    className="max-h-[100px] min-h-[44px] resize-none rounded-lg border-[--border-subtle] bg-[--surface-elevated] text-sm focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-700 dark:bg-neutral-800"
+                    className="max-h-[100px] min-h-[44px] resize-none rounded-lg border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#7C3AED] focus:ring-[#7C3AED]/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500"
                     disabled={isChatLoading}
                   />
                   <Button
                     type="submit"
                     size="icon"
-                    className="h-[44px] w-[44px] flex-shrink-0 rounded-lg bg-[--accent] hover:bg-[--accent-hover]"
+                    className="h-[44px] w-[44px] flex-shrink-0 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:bg-gray-300 disabled:text-gray-500 dark:bg-purple-600 dark:hover:bg-purple-700 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-500"
                     disabled={!chatInput.trim() || isChatLoading}
                   >
                     {isChatLoading ? (
@@ -1505,7 +1527,7 @@ USER QUESTION: ${chatInput.trim()}`;
                     )}
                   </Button>
                 </div>
-                <p className="mt-3 text-center text-[10px] text-[--text-muted]">
+                <p className="mt-3 text-center text-[10px] text-gray-400 dark:text-neutral-500">
                   Powered by Claude Opus 4.5
                 </p>
               </form>
