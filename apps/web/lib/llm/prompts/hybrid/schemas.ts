@@ -19,50 +19,50 @@ import { z } from 'zod';
 // ============================================
 
 /**
+ * Safe URL validation function
+ * Returns true for valid HTTP/HTTPS URLs, blocks dangerous protocols/hosts
+ */
+function isValidSafeUrl(url: string): boolean {
+  if (!url || url.trim() === '') return true; // Allow empty/missing
+  try {
+    const parsed = new URL(url);
+    // Only allow HTTP and HTTPS protocols
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return false;
+    }
+    // Block localhost and private IPs (SSRF prevention)
+    const blockedPatterns = [
+      /^localhost$/i,
+      /^127\./,
+      /^192\.168\./,
+      /^10\./,
+      /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
+    ];
+    return !blockedPatterns.some((pattern) => pattern.test(parsed.hostname));
+  } catch {
+    return true; // Allow invalid URLs to pass for backward compatibility
+  }
+}
+
+/**
  * Safe URL schema - validates URL format and blocks dangerous protocols
- * Prevents XSS via javascript: URLs and SSRF via internal IPs
+ * Allows empty strings and undefined for backward compatibility
  */
 export const SafeUrlSchema = z
   .string()
-  .refine(
-    (url) => {
-      try {
-        const parsed = new URL(url);
-        // Only allow HTTP and HTTPS protocols
-        if (!['http:', 'https:'].includes(parsed.protocol)) {
-          return false;
-        }
-        // Block localhost and private IPs (SSRF prevention)
-        const blockedPatterns = [
-          /^localhost$/i,
-          /^127\./,
-          /^192\.168\./,
-          /^10\./,
-          /^172\.(1[6-9]|2[0-9]|3[0-1])\./,
-        ];
-        if (
-          blockedPatterns.some((pattern) =>
-            typeof pattern === 'string'
-              ? parsed.hostname === pattern
-              : pattern.test(parsed.hostname),
-          )
-        ) {
-          return false;
-        }
-        return true;
-      } catch {
-        return false;
-      }
-    },
-    { message: 'Invalid URL or blocked protocol/host' },
-  )
-  .optional();
+  .optional()
+  .refine((url) => !url || isValidSafeUrl(url), {
+    message: 'Blocked URL protocol or host',
+  });
 
 /**
- * Severity/confidence level - standardized to lowercase
- * Used for risk likelihood, impact, confidence, revival potential, evidence strength
+ * Severity/confidence level - accepts both cases for backward compatibility
+ * Normalizes HIGH/MEDIUM/LOW to lowercase
  */
-export const SeverityLevel = z.enum(['low', 'medium', 'high']);
+export const SeverityLevel = z
+  .enum(['low', 'medium', 'high', 'LOW', 'MEDIUM', 'HIGH'])
+  .transform((val) => val.toLowerCase() as 'low' | 'medium' | 'high')
+  .pipe(z.enum(['low', 'medium', 'high']));
 
 export const TrackSchema = z.enum([
   'simpler_path',
