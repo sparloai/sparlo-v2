@@ -251,7 +251,10 @@ export function DiscoveryReportDisplay({
 
       {/* Executive Summary */}
       {report.executive_summary && (
-        <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+        <section
+          id="executive-summary"
+          className="rounded-xl border border-emerald-200 bg-emerald-50 p-6"
+        >
           <SectionHeader icon={Sparkles} title="Executive Summary" />
           {report.executive_summary.one_liner && (
             <p className="mb-4 text-lg font-medium text-emerald-900">
@@ -305,7 +308,7 @@ export function DiscoveryReportDisplay({
 
       {/* Discovery Brief */}
       {report.discovery_brief && (
-        <section>
+        <section id="discovery-brief">
           <SectionHeader icon={BookOpen} title="Discovery Brief" />
           <div className="space-y-4">
             {report.discovery_brief.original_problem && (
@@ -369,7 +372,7 @@ export function DiscoveryReportDisplay({
 
       {/* What Industry Missed */}
       {report.what_industry_missed && (
-        <section>
+        <section id="what-industry-missed">
           <SectionHeader icon={Search} title="What Industry Missed" />
           <div className="space-y-6">
             {report.what_industry_missed.conventional_approaches &&
@@ -462,7 +465,7 @@ export function DiscoveryReportDisplay({
 
       {/* Discovery Concepts */}
       {report.discovery_concepts && report.discovery_concepts.length > 0 && (
-        <section>
+        <section id="discovery-concepts">
           <SectionHeader icon={Lightbulb} title="Discovery Concepts" />
           <div className="space-y-6">
             {report.discovery_concepts.map((concept, i) => (
@@ -670,7 +673,7 @@ export function DiscoveryReportDisplay({
 
       {/* Validation Roadmap */}
       {report.validation_roadmap && (
-        <section>
+        <section id="validation-roadmap">
           <SectionHeader icon={ClipboardList} title="Validation Roadmap" />
           <div className="space-y-6">
             {report.validation_roadmap.immediate_actions &&
@@ -775,7 +778,10 @@ export function DiscoveryReportDisplay({
 
       {/* Why This Matters */}
       {report.why_this_matters && (
-        <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+        <section
+          id="why-this-matters"
+          className="rounded-xl border border-emerald-200 bg-emerald-50 p-6"
+        >
           <SectionHeader icon={Beaker} title="Why This Matters" />
           <div className="grid gap-4 md:grid-cols-2">
             {report.why_this_matters.if_we_succeed && (

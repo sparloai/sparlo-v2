@@ -57,6 +57,21 @@ export const DiscoveryClarificationAnsweredEventSchema = z.object({
   answer: z.string().min(1),
 });
 
+// Hybrid Mode event schemas (same structure as discovery)
+export const HybridReportGenerateEventSchema = z.object({
+  reportId: z.string().uuid(),
+  accountId: z.string().uuid(),
+  userId: z.string().uuid(),
+  designChallenge: z.string().min(50),
+  conversationId: z.string(),
+  attachments: z.array(AttachmentSchema).optional(),
+});
+
+export const HybridClarificationAnsweredEventSchema = z.object({
+  reportId: z.string().uuid(),
+  answer: z.string().min(1),
+});
+
 export type ReportGenerateEvent = z.infer<typeof ReportGenerateEventSchema>;
 export type ClarificationAnsweredEvent = z.infer<
   typeof ClarificationAnsweredEventSchema
@@ -66,6 +81,12 @@ export type DiscoveryReportGenerateEvent = z.infer<
 >;
 export type DiscoveryClarificationAnsweredEvent = z.infer<
   typeof DiscoveryClarificationAnsweredEventSchema
+>;
+export type HybridReportGenerateEvent = z.infer<
+  typeof HybridReportGenerateEventSchema
+>;
+export type HybridClarificationAnsweredEvent = z.infer<
+  typeof HybridClarificationAnsweredEventSchema
 >;
 
 /**
@@ -78,6 +99,11 @@ type Events = {
   'report/generate-discovery': { data: DiscoveryReportGenerateEvent };
   'report/discovery-clarification-answered': {
     data: DiscoveryClarificationAnsweredEvent;
+  };
+  // Hybrid Mode events
+  'report/generate-hybrid': { data: HybridReportGenerateEvent };
+  'report/hybrid-clarification-answered': {
+    data: HybridClarificationAnsweredEvent;
   };
 };
 

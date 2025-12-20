@@ -78,6 +78,7 @@ interface ReportDisplayProps {
   isProcessing?: boolean;
   initialChatHistory?: ChatMessage[];
   isDiscovery?: boolean;
+  isHybrid?: boolean;
 }
 
 // Table of contents item
@@ -92,6 +93,7 @@ export function ReportDisplay({
   isProcessing,
   initialChatHistory = [],
   isDiscovery = false,
+  isHybrid = false,
 }: ReportDisplayProps) {
   const router = useRouter();
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -145,6 +147,107 @@ export function ReportDisplay({
   // P1 Performance: Memoize TOC generation to prevent recalculation on every render
   const tocItems = useMemo(() => {
     const items: TocItem[] = [];
+
+    // For discovery/hybrid reports, generate TOC from known sections
+    if (isDiscovery || isHybrid) {
+      const discoveryData = report.report_data as {
+        report?: {
+          executive_summary?: unknown;
+          discovery_brief?: unknown;
+          what_industry_missed?: unknown;
+          discovery_concepts?: unknown[];
+          validation_roadmap?: unknown;
+          why_this_matters?: unknown;
+        };
+      };
+      const r = discoveryData?.report;
+      if (r?.executive_summary)
+        items.push({
+          id: 'executive-summary',
+          title: 'Executive Summary',
+          level: 2,
+        });
+      if (r?.discovery_brief)
+        items.push({
+          id: 'discovery-brief',
+          title: 'Discovery Brief',
+          level: 2,
+        });
+      if (r?.what_industry_missed)
+        items.push({
+          id: 'what-industry-missed',
+          title: 'What Industry Missed',
+          level: 2,
+        });
+      if (r?.discovery_concepts && r.discovery_concepts.length > 0)
+        items.push({
+          id: 'discovery-concepts',
+          title: 'Discovery Concepts',
+          level: 2,
+        });
+      if (r?.validation_roadmap)
+        items.push({
+          id: 'validation-roadmap',
+          title: 'Validation Roadmap',
+          level: 2,
+        });
+      if (r?.why_this_matters)
+        items.push({
+          id: 'why-this-matters',
+          title: 'Why This Matters',
+          level: 2,
+        });
+      return items;
+    }
+
+    // For structured reports, generate TOC from known sections
+    if (structuredReport) {
+      items.push({ id: 'brief', title: 'Brief', level: 2 });
+      items.push({
+        id: 'executive-summary',
+        title: 'Executive Summary',
+        level: 2,
+      });
+      if (structuredReport.constraints)
+        items.push({ id: 'constraints', title: 'Constraints', level: 2 });
+      if (structuredReport.problem_analysis)
+        items.push({
+          id: 'problem-analysis',
+          title: 'Problem Analysis',
+          level: 2,
+        });
+      if (structuredReport.key_patterns)
+        items.push({ id: 'key-patterns', title: 'Key Patterns', level: 2 });
+      if (structuredReport.solution_concepts)
+        items.push({
+          id: 'solution-concepts',
+          title: 'Solution Concepts',
+          level: 2,
+        });
+      if (structuredReport.validation_summary)
+        items.push({
+          id: 'validation-summary',
+          title: 'Validation Summary',
+          level: 2,
+        });
+      if (structuredReport.challenge_the_frame)
+        items.push({
+          id: 'challenge-frame',
+          title: 'Challenge the Frame',
+          level: 2,
+        });
+      if (structuredReport.risks_and_watchouts)
+        items.push({
+          id: 'risks-watchouts',
+          title: 'Risks & Watchouts',
+          level: 2,
+        });
+      if (structuredReport.next_steps)
+        items.push({ id: 'next-steps', title: 'Next Steps', level: 2 });
+      return items;
+    }
+
+    // For markdown fallback, parse headers
     const headerRegex = /^(#{2,3})\s+(.+)$/gm;
     let match;
     while ((match = headerRegex.exec(reportMarkdown)) !== null) {
@@ -154,7 +257,13 @@ export function ReportDisplay({
       items.push({ id, title, level });
     }
     return items;
-  }, [reportMarkdown]);
+  }, [
+    reportMarkdown,
+    isDiscovery,
+    isHybrid,
+    structuredReport,
+    report.report_data,
+  ]);
 
   // Smart scroll: only auto-scroll if user is near bottom
   useEffect(() => {
@@ -403,10 +512,14 @@ export function ReportDisplay({
   }
 
   // Check if we have valid report content
-  // For discovery reports, data is in report.report_data.report
+  // For discovery/hybrid reports, data is in report.report_data.report
   // For regular reports, data is in report.report_data.markdown
   const hasDiscoveryContent =
     isDiscovery &&
+    report.report_data &&
+    (report.report_data as { report?: unknown }).report;
+  const hasHybridContent =
+    isHybrid &&
     report.report_data &&
     (report.report_data as { report?: unknown }).report;
   const hasMarkdownContent = !!reportMarkdown;
@@ -414,14 +527,16 @@ export function ReportDisplay({
   // Debug logging
   console.log('[ReportDisplay] Debug:', {
     isDiscovery,
+    isHybrid,
     hasDiscoveryContent: !!hasDiscoveryContent,
+    hasHybridContent: !!hasHybridContent,
     hasMarkdownContent,
     reportDataKeys: report.report_data ? Object.keys(report.report_data) : [],
     reportStatus: report.status,
   });
 
   // No report content yet
-  if (!hasDiscoveryContent && !hasMarkdownContent) {
+  if (!hasDiscoveryContent && !hasHybridContent && !hasMarkdownContent) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
@@ -581,13 +696,23 @@ export function ReportDisplay({
                 </motion.section>
               )}
 
-              {/* Full Report - Discovery, Structured, or Markdown fallback */}
+              {/* Full Report - Discovery, Hybrid, Structured, or Markdown fallback */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
               >
                 {isDiscovery ? (
+                  <DiscoveryReportDisplay
+                    reportData={
+                      report.report_data as Parameters<
+                        typeof DiscoveryReportDisplay
+                      >[0]['reportData']
+                    }
+                  />
+                ) : isHybrid ? (
+                  // Hybrid reports use the same display component as Discovery
+                  // since the structure is similar (report field with concepts)
                   <DiscoveryReportDisplay
                     reportData={
                       report.report_data as Parameters<

@@ -91,15 +91,18 @@ export default async function ReportPage({ params }: ReportPageProps) {
     );
   }
 
-  // Check if this is a discovery mode report
-  const isDiscoveryReport = report.report_data.mode === 'discovery';
+  // Check report mode (discovery, hybrid, or standard)
+  const reportMode = report.report_data.mode as string | undefined;
+  const isDiscoveryReport = reportMode === 'discovery';
+  const isHybridReport = reportMode === 'hybrid';
 
   // Debug logging
   console.log('[ReportPage] Debug:', {
     reportId: id,
     status: report.status,
-    mode: report.report_data.mode,
+    mode: reportMode,
     isDiscoveryReport,
+    isHybridReport,
     hasReportField: 'report' in report.report_data,
     reportDataKeys: Object.keys(report.report_data),
   });
@@ -111,6 +114,17 @@ export default async function ReportPage({ params }: ReportPageProps) {
         report={report}
         initialChatHistory={initialChatHistory}
         isDiscovery
+      />
+    );
+  }
+
+  if (isHybridReport) {
+    // Hybrid reports use ReportDisplay for chat functionality, with hybrid flag
+    return (
+      <ReportDisplay
+        report={report}
+        initialChatHistory={initialChatHistory}
+        isHybrid
       />
     );
   }
