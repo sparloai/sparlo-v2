@@ -72,9 +72,7 @@ function validateBase64Image(
     if (signature) {
       try {
         const decoded = Buffer.from(data, 'base64');
-        const matches = signature.every(
-          (byte, i) => decoded[i] === byte,
-        );
+        const matches = signature.every((byte, i) => decoded[i] === byte);
         if (!matches) {
           return {
             valid: false,
@@ -94,14 +92,17 @@ function validateBase64Image(
  * Sanitize user input to prevent prompt injection
  */
 function sanitizePromptInput(input: string): string {
-  return input
-    // Remove control characters
-    .replace(/[\x00-\x1f\x7f-\x9f]/g, '')
-    // Remove special tokens that might confuse the model
-    .replace(/<\|endoftext\|>/gi, '')
-    .replace(/<\|im_start\|>/gi, '')
-    .replace(/<\|im_end\|>/gi, '')
-    .trim();
+  return (
+    input
+      // Remove control characters
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1f\x7f-\x9f]/g, '')
+      // Remove special tokens that might confuse the model
+      .replace(/<\|endoftext\|>/gi, '')
+      .replace(/<\|im_start\|>/gi, '')
+      .replace(/<\|im_end\|>/gi, '')
+      .trim()
+  );
 }
 
 /**
