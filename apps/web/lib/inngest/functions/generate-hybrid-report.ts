@@ -65,7 +65,7 @@ const TOKEN_BUDGET_LIMIT = 200000; // 200K tokens max per report
 
 export const generateHybridReport = inngest.createFunction(
   {
-    id: 'hybrid-report-generator',
+    id: 'generate-hybrid-report-v2',
     retries: 2,
   },
   { event: 'report/generate-hybrid' },
