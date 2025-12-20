@@ -8,7 +8,11 @@ import { functions } from '~/lib/inngest/functions';
  *
  * This endpoint serves Inngest functions for:
  * - report/generate: Full AN0-AN5 report generation workflow
+ * - report/generate-discovery: Discovery mode report generation
+ * - report/generate-hybrid: Hybrid mode full-spectrum analysis
  * - report/clarification-answered: Resume workflow after user answers clarification
+ * - report/discovery-clarification-answered: Resume discovery workflow
+ * - report/hybrid-clarification-answered: Resume hybrid workflow
  *
  * Inngest Cloud calls this endpoint to execute functions.
  *
