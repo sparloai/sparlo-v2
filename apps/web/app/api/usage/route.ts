@@ -80,7 +80,8 @@ export const GET = enhanceRouteHandler(
         warningPercentage: USAGE_CONSTANTS.WARNING_THRESHOLD,
         hardLimitPercentage: USAGE_CONSTANTS.HARD_LIMIT_THRESHOLD,
         estimatedTokensPerReport: USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
-        estimatedTokensPerChat: USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_CHAT_MESSAGE,
+        estimatedTokensPerChat:
+          USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_CHAT_MESSAGE,
       },
     });
   },

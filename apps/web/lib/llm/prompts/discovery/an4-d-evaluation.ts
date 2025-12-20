@@ -288,7 +288,8 @@ const ConceptEvaluationSchema = z
     concept_id: z.string(),
     concept_name: z.string(),
     novelty_assessment: NoveltyAssessmentSchema.optional(),
-    prior_art_search_documentation: PriorArtSearchDocumentationSchema.optional(),
+    prior_art_search_documentation:
+      PriorArtSearchDocumentationSchema.optional(),
     physics_assessment: PhysicsAssessmentSchema.optional(),
     breakthrough_assessment: BreakthroughAssessmentSchema.optional(),
     testability_assessment: TestabilityAssessmentSchema.optional(),

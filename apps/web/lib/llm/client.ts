@@ -109,7 +109,10 @@ export async function callClaude(params: {
   type ImageMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
   type ContentBlock =
     | { type: 'text'; text: string }
-    | { type: 'image'; source: { type: 'base64'; media_type: ImageMediaType; data: string } };
+    | {
+        type: 'image';
+        source: { type: 'base64'; media_type: ImageMediaType; data: string };
+      };
 
   const messageContent: ContentBlock[] = [];
 

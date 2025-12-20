@@ -1,5 +1,6 @@
-import Anthropic from '@anthropic-ai/sdk';
 import type { SupabaseClient } from '@supabase/supabase-js';
+
+import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 
 import { enhanceRouteHandler } from '@kit/next/routes';
@@ -100,9 +101,7 @@ async function checkRateLimit(
 /**
  * Extract text context from discovery report for chat
  */
-function extractDiscoveryContext(
-  reportData: Record<string, unknown>,
-): string {
+function extractDiscoveryContext(reportData: Record<string, unknown>): string {
   const report = reportData.report as Record<string, unknown> | undefined;
   if (!report) return JSON.stringify(reportData, null, 2);
 
@@ -139,16 +138,19 @@ function extractDiscoveryContext(
   }
 
   // Discovery Concepts
-  const concepts = report.discovery_concepts as Array<
-    Record<string, unknown>
-  > | undefined;
+  const concepts = report.discovery_concepts as
+    | Array<Record<string, unknown>>
+    | undefined;
   if (concepts?.length) {
     sections.push('\n## Discovery Concepts');
     concepts.forEach((concept, i) => {
       sections.push(`\n### ${i + 1}. ${concept.name || 'Concept'}`);
       if (concept.category) sections.push(`Category: ${concept.category}`);
-      const insight = concept.the_insight as Record<string, unknown> | undefined;
-      if (insight?.what_we_found) sections.push(insight.what_we_found as string);
+      const insight = concept.the_insight as
+        | Record<string, unknown>
+        | undefined;
+      if (insight?.what_we_found)
+        sections.push(insight.what_we_found as string);
       const potential = concept.breakthrough_potential as
         | Record<string, unknown>
         | undefined;
@@ -158,13 +160,17 @@ function extractDiscoveryContext(
   }
 
   // Why This Matters
-  const matters = report.why_this_matters as Record<string, unknown> | undefined;
+  const matters = report.why_this_matters as
+    | Record<string, unknown>
+    | undefined;
   if (matters) {
     sections.push('\n## Why This Matters');
     if (matters.if_we_succeed)
       sections.push(`**If We Succeed:** ${matters.if_we_succeed}`);
     if (matters.competitive_advantage)
-      sections.push(`**Competitive Advantage:** ${matters.competitive_advantage}`);
+      sections.push(
+        `**Competitive Advantage:** ${matters.competitive_advantage}`,
+      );
   }
 
   return sections.join('\n');

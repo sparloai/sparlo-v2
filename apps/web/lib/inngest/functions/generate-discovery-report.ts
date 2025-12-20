@@ -70,7 +70,8 @@ export const generateDiscoveryReport = inngest.createFunction(
       hasDesignChallenge: !!event.data.designChallenge,
     });
 
-    const { reportId, designChallenge, conversationId, attachments } = event.data;
+    const { reportId, designChallenge, conversationId, attachments } =
+      event.data;
 
     // Convert attachments to ImageAttachment format for Claude vision
     const imageAttachments: ImageAttachment[] = (attachments || [])
@@ -157,9 +158,10 @@ export const generateDiscoveryReport = inngest.createFunction(
           });
 
           // Include images for vision processing if attachments were provided
-          const userMessageWithContext = imageAttachments.length > 0
-            ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
-            : designChallenge;
+          const userMessageWithContext =
+            imageAttachments.length > 0
+              ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
+              : designChallenge;
 
           const { content, usage } = await callClaude({
             model: MODELS.OPUS,
@@ -564,7 +566,10 @@ Focus on:
         if (usageError) {
           console.error('[Usage] Failed to persist usage:', usageError);
         } else {
-          console.log('[Usage] Persisted (Discovery):', { accountId: event.data.accountId, tokens: totalUsage.totalTokens });
+          console.log('[Usage] Persisted (Discovery):', {
+            accountId: event.data.accountId,
+            tokens: totalUsage.totalTokens,
+          });
         }
 
         await updateProgress({

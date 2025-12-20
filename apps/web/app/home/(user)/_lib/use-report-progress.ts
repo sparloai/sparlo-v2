@@ -91,7 +91,9 @@ export function useReportProgress(
         id: data.id,
         status: data.status,
         current_step: data.current_step,
-        clarifications: (data.clarifications as unknown as ClarificationQuestion[])?.length ?? 0,
+        clarifications:
+          (data.clarifications as unknown as ClarificationQuestion[])?.length ??
+          0,
       });
 
       setProgress({
@@ -157,7 +159,8 @@ export function useReportProgress(
               id: data.id,
               status: data.status,
               current_step: data.current_step,
-              clarifications: (data.clarifications as ClarificationQuestion[])?.length ?? 0,
+              clarifications:
+                (data.clarifications as ClarificationQuestion[])?.length ?? 0,
             });
 
             setProgress({

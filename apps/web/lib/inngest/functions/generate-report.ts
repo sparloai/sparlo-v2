@@ -92,8 +92,14 @@ export const generateReport = inngest.createFunction(
   },
   { event: 'report/generate' },
   async ({ event, step }) => {
-    const { reportId, accountId, userId, designChallenge, conversationId, attachments } =
-      event.data;
+    const {
+      reportId,
+      accountId,
+      userId,
+      designChallenge,
+      conversationId,
+      attachments,
+    } = event.data;
 
     const supabase = getSupabaseServerAdminClient();
 
@@ -191,9 +197,10 @@ export const generateReport = inngest.createFunction(
         });
 
         // Add context about attached images if present
-        const userMessageWithContext = imageAttachments.length > 0
-          ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
-          : designChallenge;
+        const userMessageWithContext =
+          imageAttachments.length > 0
+            ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
+            : designChallenge;
 
         const { content, usage } = await callClaude({
           model: MODELS.OPUS,
@@ -618,7 +625,10 @@ export const generateReport = inngest.createFunction(
         if (usageError) {
           console.error('[Usage] Failed to persist usage:', usageError);
         } else {
-          console.log('[Usage] Persisted:', { accountId, tokens: totalUsage.totalTokens });
+          console.log('[Usage] Persisted:', {
+            accountId,
+            tokens: totalUsage.totalTokens,
+          });
         }
 
         // Get the user's original input for the brief section

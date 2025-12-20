@@ -11,12 +11,7 @@ import { z } from 'zod';
 // Attachment schema for vision support (standard reports)
 const StandardAttachmentSchema = z.object({
   filename: z.string(),
-  media_type: z.enum([
-    'image/jpeg',
-    'image/png',
-    'image/gif',
-    'image/webp',
-  ]),
+  media_type: z.enum(['image/jpeg', 'image/png', 'image/gif', 'image/webp']),
   data: z.string(), // base64 encoded
 });
 

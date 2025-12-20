@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation';
 
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-import { DiscoveryReportDisplay } from './_components/discovery-report-display';
 import { ReportDisplay } from './_components/report-display';
 import { ReportRenderer } from './_components/report/report-renderer';
 import { SparloReportSchema } from './_lib/schema/sparlo-report.schema';

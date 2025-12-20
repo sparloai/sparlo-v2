@@ -131,20 +131,21 @@ export function ProcessingScreen({
     // Priority 2: AN0 bypass - redirect to dashboard when no clarification needed
     // Check for any AN0 variant (an0, an0-d for discovery, etc.)
     const isStillInAN0 =
-      progress.currentStep === null ||
-      progress.currentStep.startsWith('an0');
-    const movedPastAN0 =
-      progress.status === 'processing' && !isStillInAN0;
+      progress.currentStep === null || progress.currentStep.startsWith('an0');
+    const movedPastAN0 = progress.status === 'processing' && !isStillInAN0;
     const noClarificationNeeded =
       movedPastAN0 && progress.clarifications?.length === 0;
 
     // DEBUG: Log redirect decision
     if (movedPastAN0) {
-      console.log('[ProcessingScreen] Moved past AN0, checking clarifications:', {
-        movedPastAN0,
-        noClarificationNeeded,
-        willRedirect: noClarificationNeeded,
-      });
+      console.log(
+        '[ProcessingScreen] Moved past AN0, checking clarifications:',
+        {
+          movedPastAN0,
+          noClarificationNeeded,
+          willRedirect: noClarificationNeeded,
+        },
+      );
     }
 
     if (noClarificationNeeded) {

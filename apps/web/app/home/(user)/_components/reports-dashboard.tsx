@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
   AlertCircle,
+  Archive,
   ChevronRight,
   FileText,
   Loader2,
@@ -17,8 +18,11 @@ import {
 import { Button } from '@kit/ui/button';
 import { cn } from '@kit/ui/utils';
 
+import { archiveReport } from '../_lib/server/sparlo-reports-server-actions';
 import type { ConversationStatus } from '../_lib/types';
 import { formatElapsed, useElapsedTime } from '../_lib/utils/elapsed-time';
+
+export type ReportMode = 'discovery' | 'standard';
 
 interface Report {
   id: string;
@@ -31,6 +35,7 @@ interface Report {
   archived: boolean;
   concept_count: number;
   error_message: string | null;
+  mode: ReportMode;
 }
 
 /**
@@ -110,6 +115,47 @@ function NoResultsState({ query }: { query: string }) {
         No reports match &ldquo;{query}&rdquo;
       </p>
     </div>
+  );
+}
+
+function ModeLabel({ mode }: { mode: ReportMode }) {
+  return (
+    <span
+      className="font-mono text-[10px] tracking-wider text-[--text-muted] uppercase"
+      style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+    >
+      [{mode === 'discovery' ? 'Discovery' : 'Analysis'}]
+    </span>
+  );
+}
+
+function ArchiveButton({
+  reportId,
+  onArchived,
+}: {
+  reportId: string;
+  onArchived: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleArchive = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startTransition(async () => {
+      await archiveReport({ id: reportId, archived: true });
+      onArchived();
+    });
+  };
+
+  return (
+    <button
+      onClick={handleArchive}
+      disabled={isPending}
+      className="rounded p-1.5 text-[--text-muted] opacity-0 transition-all group-hover:opacity-100 hover:bg-[--surface-overlay] hover:text-[--text-secondary]"
+      title="Archive report"
+    >
+      <Archive className="h-4 w-4" />
+    </button>
   );
 }
 
@@ -204,7 +250,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                     key={report.id}
                     data-test={`report-card-${report.id}`}
                     className={cn(
-                      'relative block cursor-default bg-violet-500/5 p-5 dark:bg-neutral-900/20',
+                      'group relative block cursor-default bg-violet-500/5 p-5 dark:bg-neutral-900/20',
                       !isLast && 'border-b border-[--border-subtle]',
                     )}
                   >
@@ -217,6 +263,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
                       {/* Content */}
                       <div className="min-w-0 flex-1">
+                        <ModeLabel mode={report.mode} />
                         <h3
                           className="truncate pr-8 text-sm font-medium text-[--text-secondary] opacity-90"
                           style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
@@ -254,7 +301,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                     key={report.id}
                     data-test={`report-card-${report.id}`}
                     className={cn(
-                      'relative block cursor-default bg-red-500/5 p-5 dark:bg-red-900/10',
+                      'group relative block cursor-default bg-red-500/5 p-5 dark:bg-red-900/10',
                       !isLast && 'border-b border-[--border-subtle]',
                     )}
                   >
@@ -266,6 +313,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
                       {/* Content */}
                       <div className="min-w-0 flex-1">
+                        <ModeLabel mode={report.mode} />
                         <h3
                           className="truncate pr-8 text-sm font-medium text-[--text-secondary] opacity-90"
                           style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
@@ -289,8 +337,12 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                         </p>
                       </div>
 
-                      {/* Retry Button */}
-                      <div className="flex-shrink-0">
+                      {/* Actions */}
+                      <div className="flex flex-shrink-0 items-center gap-2">
+                        <ArchiveButton
+                          reportId={report.id}
+                          onArchived={() => router.refresh()}
+                        />
                         <Button
                           variant="outline"
                           size="sm"
@@ -308,80 +360,81 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
               // Complete or other states - clickable
               return (
-                <button
+                <div
                   key={report.id}
-                  onClick={() =>
-                    isClickable && router.push(`/home/reports/${report.id}`)
-                  }
-                  disabled={!isClickable}
                   data-test={`report-card-${report.id}`}
                   className={cn(
-                    'group relative block w-full p-5 text-left transition-all',
+                    'group relative flex items-start gap-4 p-5 transition-all',
                     isClickable &&
                       'cursor-pointer hover:bg-[--surface-overlay]',
                     !isLast && 'border-b border-[--border-subtle]',
                   )}
+                  onClick={() =>
+                    isClickable && router.push(`/home/reports/${report.id}`)
+                  }
                 >
-                  <div className="flex items-start gap-4">
-                    {/* Status Dot - Green for complete, Gray for other */}
-                    <div className="mt-1.5 flex-shrink-0">
-                      <div
-                        className={cn(
-                          'h-2 w-2 rounded-full',
-                          isComplete
-                            ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
-                            : 'bg-[--text-muted]',
-                        )}
-                      />
-                    </div>
+                  {/* Status Dot - Green for complete, Gray for other */}
+                  <div className="mt-1.5 flex-shrink-0">
+                    <div
+                      className={cn(
+                        'h-2 w-2 rounded-full',
+                        isComplete
+                          ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
+                          : 'bg-[--text-muted]',
+                      )}
+                    />
+                  </div>
 
-                    {/* Content */}
-                    <div className="min-w-0 flex-1">
-                      <h3
-                        className="truncate pr-8 text-sm font-medium text-[--text-secondary] transition-colors group-hover:text-[--text-primary]"
-                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                  {/* Content */}
+                  <div className="min-w-0 flex-1">
+                    <ModeLabel mode={report.mode} />
+                    <h3
+                      className="truncate pr-16 text-sm font-medium text-[--text-secondary] transition-colors group-hover:text-[--text-primary]"
+                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                    >
+                      {displayTitle}
+                    </h3>
+                    <div className="mt-2 flex items-center gap-4">
+                      <span
+                        className="font-mono text-xs text-[--text-primary]"
+                        style={{
+                          fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
+                        }}
                       >
-                        {displayTitle}
-                      </h3>
-                      <div className="mt-2 flex items-center gap-4">
-                        <span
-                          className="font-mono text-xs text-[--text-primary]"
-                          style={{
-                            fontFamily:
-                              'Soehne Mono, JetBrains Mono, monospace',
-                          }}
-                        >
-                          {formatDate(report.created_at)}
-                        </span>
-                        {isComplete && report.concept_count > 0 && (
-                          <>
-                            <span className="h-3 w-px bg-[--border-default]" />
-                            <span
-                              className="flex items-center gap-1.5 font-mono text-xs text-[--text-muted]"
-                              style={{
-                                fontFamily:
-                                  'Soehne Mono, JetBrains Mono, monospace',
-                              }}
-                            >
-                              <FileText className="h-3 w-3" />
-                              {report.concept_count}{' '}
-                              {report.concept_count === 1
-                                ? 'CONCEPT'
-                                : 'CONCEPTS'}
-                            </span>
-                          </>
-                        )}
-                      </div>
+                        {formatDate(report.created_at)}
+                      </span>
+                      {isComplete && report.concept_count > 0 && (
+                        <>
+                          <span className="h-3 w-px bg-[--border-default]" />
+                          <span
+                            className="flex items-center gap-1.5 font-mono text-xs text-[--text-muted]"
+                            style={{
+                              fontFamily:
+                                'Soehne Mono, JetBrains Mono, monospace',
+                            }}
+                          >
+                            <FileText className="h-3 w-3" />
+                            {report.concept_count}{' '}
+                            {report.concept_count === 1
+                              ? 'CONCEPT'
+                              : 'CONCEPTS'}
+                          </span>
+                        </>
+                      )}
                     </div>
+                  </div>
 
-                    {/* Arrow (visible on hover) */}
+                  {/* Actions */}
+                  <div className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-1">
+                    <ArchiveButton
+                      reportId={report.id}
+                      onArchived={() => router.refresh()}
+                    />
                     {isClickable && (
-                      <div className="absolute top-1/2 right-5 -translate-x-2 -translate-y-1/2 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
-                        <ChevronRight className="h-4 w-4 text-[--text-muted]" />
-                      </div>
+                      <ChevronRight className="h-4 w-4 -translate-x-2 text-[--text-muted] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
                     )}
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>

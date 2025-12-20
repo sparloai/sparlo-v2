@@ -1,11 +1,14 @@
 'use client';
 
+import { useState, useTransition } from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { formatDistanceToNow } from 'date-fns';
 import {
+  Archive,
   CreditCard,
   FileText,
   FolderOpen,
@@ -29,6 +32,7 @@ import { Trans } from '@kit/ui/trans';
 import { cn } from '@kit/ui/utils';
 
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
+import { archiveReport } from '../../_lib/server/sparlo-reports-server-actions';
 import type { UsageData } from '../../_lib/server/usage.loader';
 import { UsageIndicator } from '../usage-indicator';
 
@@ -44,7 +48,77 @@ interface NavSidebarProps {
 const NAV_ITEMS = [
   { href: '/home/reports/new', label: 'New Analysis', icon: PlusCircle },
   { href: '/home', label: 'All Reports', icon: FolderOpen },
+  { href: '/home/archived', label: 'Archived', icon: Archive },
 ];
+
+function RecentReportItem({
+  report,
+  onClose,
+}: {
+  report: RecentReport;
+  onClose: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+
+  const handleArchive = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startTransition(async () => {
+      await archiveReport({ id: report.id, archived: true });
+      router.refresh();
+    });
+  };
+
+  const modeLabel = report.mode === 'discovery' ? 'Discovery' : 'Analysis';
+
+  return (
+    <Link
+      href={`/home/reports/${report.id}`}
+      onClick={onClose}
+      className="group relative flex items-start gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-[--surface-overlay]"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.3)]" />
+      <div className="min-w-0 flex-1">
+        <span
+          className="font-mono text-[10px] tracking-wider text-[--text-muted] uppercase"
+          style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+        >
+          [{modeLabel}]
+        </span>
+        <p
+          className="truncate text-sm font-medium text-[--text-secondary]"
+          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+        >
+          {report.title || 'Untitled Report'}
+        </p>
+        <p
+          className="text-xs text-[--text-muted]"
+          style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+        >
+          {formatDistanceToNow(new Date(report.created_at), {
+            addSuffix: true,
+          })}
+        </p>
+      </div>
+      {isHovered ? (
+        <button
+          onClick={handleArchive}
+          disabled={isPending}
+          className="flex-shrink-0 rounded p-1 text-[--text-muted] transition-colors hover:bg-[--surface-elevated] hover:text-[--text-secondary]"
+          title="Archive report"
+        >
+          <Archive className="h-3.5 w-3.5" />
+        </button>
+      ) : (
+        <FileText className="h-3.5 w-3.5 flex-shrink-0 text-[--text-muted]" />
+      )}
+    </Link>
+  );
+}
 
 export function NavSidebar({
   open,
@@ -144,31 +218,11 @@ export function NavSidebar({
           ) : (
             <div className="space-y-1 px-2">
               {recentReports.map((report) => (
-                <Link
+                <RecentReportItem
                   key={report.id}
-                  href={`/home/reports/${report.id}`}
-                  onClick={close}
-                  className="flex items-center gap-3 rounded-md px-2 py-2 transition-colors hover:bg-[--surface-overlay]"
-                >
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.3)]" />
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className="truncate text-sm font-medium text-[--text-secondary]"
-                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                    >
-                      {report.title || 'Untitled Report'}
-                    </p>
-                    <p
-                      className="text-xs text-[--text-muted]"
-                      style={{ fontFamily: 'monospace' }}
-                    >
-                      {formatDistanceToNow(new Date(report.created_at), {
-                        addSuffix: true,
-                      })}
-                    </p>
-                  </div>
-                  <FileText className="h-3.5 w-3.5 flex-shrink-0 text-[--text-muted]" />
-                </Link>
+                  report={report}
+                  onClose={close}
+                />
               ))}
             </div>
           )}

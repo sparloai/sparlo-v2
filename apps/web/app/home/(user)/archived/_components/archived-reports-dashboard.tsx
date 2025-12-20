@@ -1,0 +1,297 @@
+'use client';
+
+import { useMemo, useState, useTransition } from 'react';
+
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
+import {
+  Archive,
+  ArrowLeft,
+  ChevronRight,
+  FileText,
+  RotateCcw,
+  Search,
+} from 'lucide-react';
+
+import { cn } from '@kit/ui/utils';
+
+import { archiveReport } from '../../_lib/server/sparlo-reports-server-actions';
+import type { ConversationStatus } from '../../_lib/types';
+
+export type ReportMode = 'discovery' | 'standard';
+
+interface Report {
+  id: string;
+  title: string;
+  headline: string | null;
+  status: ConversationStatus;
+  created_at: string;
+  updated_at: string;
+  concept_count: number;
+  mode: ReportMode;
+}
+
+interface ArchivedReportsDashboardProps {
+  reports: Report[];
+}
+
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const isThisYear = date.getFullYear() === now.getFullYear();
+
+  return date
+    .toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      ...(isThisYear ? {} : { year: 'numeric' }),
+    })
+    .toUpperCase();
+}
+
+function truncate(str: string, length: number): string {
+  if (str.length <= length) return str;
+  return str.slice(0, length).trim() + '...';
+}
+
+function EmptyState() {
+  return (
+    <div
+      className="rounded-lg border border-[--border-subtle] bg-[--surface-elevated] px-6 py-16 text-center"
+      data-test="archived-empty-state"
+    >
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-[--surface-overlay]">
+        <Archive className="h-7 w-7 text-[--text-muted]" />
+      </div>
+      <p
+        className="mt-4 text-sm text-[--text-muted]"
+        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      >
+        No archived reports
+      </p>
+      <Link
+        href="/home"
+        className="mt-4 inline-block rounded-sm bg-[--text-primary] px-4 py-2 font-mono text-xs font-medium tracking-wider text-[--surface-base] uppercase transition-colors hover:opacity-90"
+        style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+      >
+        View All Reports
+      </Link>
+    </div>
+  );
+}
+
+function NoResultsState({ query }: { query: string }) {
+  return (
+    <div className="rounded-lg border border-[--border-subtle] bg-[--surface-elevated] px-6 py-12 text-center">
+      <p
+        className="text-sm text-[--text-muted]"
+        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      >
+        No archived reports match &ldquo;{query}&rdquo;
+      </p>
+    </div>
+  );
+}
+
+function ModeLabel({ mode }: { mode: ReportMode }) {
+  return (
+    <span
+      className="font-mono text-[10px] tracking-wider text-[--text-muted] uppercase"
+      style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+    >
+      [{mode === 'discovery' ? 'Discovery' : 'Analysis'}]
+    </span>
+  );
+}
+
+function RestoreButton({
+  reportId,
+  onRestored,
+}: {
+  reportId: string;
+  onRestored: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleRestore = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    startTransition(async () => {
+      await archiveReport({ id: reportId, archived: false });
+      onRestored();
+    });
+  };
+
+  return (
+    <button
+      onClick={handleRestore}
+      disabled={isPending}
+      className="rounded p-1.5 text-[--text-muted] opacity-0 transition-all group-hover:opacity-100 hover:bg-[--surface-overlay] hover:text-[--text-secondary]"
+      title="Restore report"
+    >
+      <RotateCcw className="h-4 w-4" />
+    </button>
+  );
+}
+
+export function ArchivedReportsDashboard({
+  reports,
+}: ArchivedReportsDashboardProps) {
+  const router = useRouter();
+  const [search, setSearch] = useState('');
+
+  const filteredReports = useMemo(() => {
+    if (!search.trim()) return reports;
+
+    const query = search.toLowerCase();
+    return reports.filter(
+      (report) =>
+        report.headline?.toLowerCase().includes(query) ||
+        report.title.toLowerCase().includes(query),
+    );
+  }, [search, reports]);
+
+  return (
+    <div
+      className="mx-auto w-full max-w-4xl px-6 py-12 md:py-16"
+      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+    >
+      {/* Header Actions */}
+      <div className="mb-6 flex items-end justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/home"
+            className="flex items-center gap-1 text-[--text-muted] transition-colors hover:text-[--text-secondary]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+          <h1
+            className="font-mono text-xs font-medium tracking-[0.2em] text-[--text-muted] uppercase"
+            style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+          >
+            ARCHIVED
+          </h1>
+        </div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="group relative mb-8">
+        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+          <Search className="h-4 w-4 text-[--text-muted] transition-colors group-focus-within:text-[--text-secondary]" />
+        </div>
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search archived reports..."
+          className="w-full rounded-lg border border-[--border-subtle] bg-[--surface-elevated] py-3.5 pr-4 pl-11 text-sm text-[--text-primary] shadow-sm transition-all placeholder:text-[--text-muted] focus:border-[--border-default] focus:ring-1 focus:ring-[--border-default] focus:outline-none"
+          data-test="search-archived-input"
+          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+        />
+      </div>
+
+      {/* Report List */}
+      {reports.length === 0 ? (
+        <EmptyState />
+      ) : filteredReports.length === 0 ? (
+        <NoResultsState query={search} />
+      ) : (
+        <>
+          <div className="overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface-elevated] shadow-sm">
+            {filteredReports.map((report, index) => {
+              const isLast = index === filteredReports.length - 1;
+              const isComplete = report.status === 'complete';
+              const isClickable = isComplete;
+
+              const displayTitle =
+                report.headline || truncate(report.title, 80);
+
+              return (
+                <div
+                  key={report.id}
+                  data-test={`archived-card-${report.id}`}
+                  className={cn(
+                    'group relative flex items-start gap-4 p-5 transition-all',
+                    isClickable &&
+                      'cursor-pointer hover:bg-[--surface-overlay]',
+                    !isLast && 'border-b border-[--border-subtle]',
+                  )}
+                  onClick={() =>
+                    isClickable && router.push(`/home/reports/${report.id}`)
+                  }
+                >
+                  {/* Status Dot - Gray for archived */}
+                  <div className="mt-1.5 flex-shrink-0">
+                    <div className="h-2 w-2 rounded-full bg-zinc-400 dark:bg-zinc-600" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="min-w-0 flex-1">
+                    <ModeLabel mode={report.mode} />
+                    <h3
+                      className="truncate pr-16 text-sm font-medium text-[--text-muted] transition-colors group-hover:text-[--text-secondary]"
+                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                    >
+                      {displayTitle}
+                    </h3>
+                    <div className="mt-2 flex items-center gap-4">
+                      <span
+                        className="font-mono text-xs text-[--text-muted]"
+                        style={{
+                          fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
+                        }}
+                      >
+                        {formatDate(report.created_at)}
+                      </span>
+                      {isComplete && report.concept_count > 0 && (
+                        <>
+                          <span className="h-3 w-px bg-[--border-default]" />
+                          <span
+                            className="flex items-center gap-1.5 font-mono text-xs text-[--text-muted]"
+                            style={{
+                              fontFamily:
+                                'Soehne Mono, JetBrains Mono, monospace',
+                            }}
+                          >
+                            <FileText className="h-3 w-3" />
+                            {report.concept_count}{' '}
+                            {report.concept_count === 1
+                              ? 'CONCEPT'
+                              : 'CONCEPTS'}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-1">
+                    <RestoreButton
+                      reportId={report.id}
+                      onRestored={() => router.refresh()}
+                    />
+                    {isClickable && (
+                      <ChevronRight className="h-4 w-4 -translate-x-2 text-[--text-muted] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Pagination Footer */}
+          <div className="mt-4 flex items-center justify-between px-1">
+            <span
+              className="font-mono text-[10px] tracking-wider text-[--text-secondary] uppercase"
+              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+            >
+              {filteredReports.length} ARCHIVED{' '}
+              {filteredReports.length === 1 ? 'REPORT' : 'REPORTS'}
+            </span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

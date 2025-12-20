@@ -565,7 +565,9 @@ const SearchesNotRunSchema = z
 
 const PriorArtSearchEvidenceSchema = z
   .object({
-    industry_landscape_searches: z.array(IndustryLandscapeSearchSchema).catch([]),
+    industry_landscape_searches: z
+      .array(IndustryLandscapeSearchSchema)
+      .catch([]),
     gap_validation_searches: z.array(GapValidationSearchSchema).catch([]),
     concept_prior_art_checks: z.array(ConceptPriorArtCheckSchema).catch([]),
     searches_not_run: SearchesNotRunSchema.optional(),
