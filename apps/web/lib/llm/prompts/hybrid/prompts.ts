@@ -205,7 +205,8 @@ Search for:
 1. PRECEDENT - What has been done and documented
 2. GAPS - What has NOT been tried and why
 3. ABANDONED APPROACHES - What was tried and stopped
-4. KEY PAPERS - Foundational work in relevant areas
+4. ABANDONED TECHNOLOGY ANALYSIS - Deep dive into potentially revivable technologies
+5. KEY PAPERS - Foundational work in relevant areas
 
 ## SEARCH TERRITORIES
 
@@ -228,6 +229,24 @@ Search for:
 - Biomimicry databases
 - Materials science journals
 - Process engineering literature
+
+## ABANDONED TECHNOLOGY SEARCH
+
+This is CRITICAL for paradigm_shift and frontier_transfer concepts. Search specifically for:
+
+**Technologies abandoned due to:**
+- Economic conditions that have changed
+- Material limitations now overcome
+- Manufacturing costs now feasible
+- Enabling technologies now available
+- Market timing that was wrong
+
+**For each abandoned technology, analyze:**
+- Original era and application
+- Why it was abandoned
+- What has changed since (enabling changes)
+- Revival potential (HIGH/MEDIUM/LOW)
+- Who is best positioned to revive it
 
 ## OUTPUT FORMAT
 
@@ -262,6 +281,24 @@ CRITICAL: Respond with ONLY valid JSON.
       "revival_potential": "Worth revisiting? Why?"
     }
   ],
+  "abandoned_technology_analysis": [
+    {
+      "technology_name": "Name of abandoned technology",
+      "original_era": "When it was developed/used",
+      "original_application": "What it was used for",
+      "why_abandoned": "Why it fell out of use",
+      "enabling_changes_since": [
+        {
+          "change": "What has changed",
+          "relevance": "Why this enables revival"
+        }
+      ],
+      "revival_potential": "HIGH | MEDIUM | LOW",
+      "revival_concept": "How it could be applied to our problem",
+      "who_is_positioned": "Who could best execute this revival",
+      "source_urls": ["URLs supporting this analysis"]
+    }
+  ],
   "key_papers": [
     {
       "title": "Paper title",
@@ -273,7 +310,8 @@ CRITICAL: Respond with ONLY valid JSON.
   ]
 }
 
-IMPORTANT: Every factual claim must have a source. No source = no claim.`;
+IMPORTANT: Every factual claim must have a source. No source = no claim.
+GUARANTEE: Include at least 2 abandoned technologies with HIGH or MEDIUM revival potential.`;
 
 export const AN1_7_M_METADATA = {
   id: 'an1.7-m',
@@ -402,6 +440,24 @@ Each concept MUST include:
 5. Impact assessment (1-10)
 6. Validation speed (days/weeks/months/years)
 
+## MECHANISM DEPTH REQUIREMENT
+
+For PARADIGM_SHIFT and FRONTIER_TRANSFER concepts, you MUST provide deeper mechanistic explanation:
+
+**Required mechanistic_depth for paradigm_shift and frontier_transfer:**
+
+1. **working_principle**: The fundamental physics/chemistry/biology at work
+2. **molecular_mechanism** (if applicable): What happens at molecular level
+3. **quantified_parameters**: Specific numbers that matter
+   - Example: "Thermal conductivity: 400 W/mK at 25°C"
+   - Example: "Reaction rate: 10^6 molecules/second"
+4. **rate_limiting_step**: What fundamentally limits performance
+5. **key_parameters**: Variables that control success
+6. **thermodynamic_advantage** (if applicable): Energy considerations
+7. **failure_modes**: How this could fail and why
+
+This depth is required because paradigm shifts need to be grounded in real physics, not just conceptual handwaving. Evaluators need quantified parameters to assess feasibility.
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON.
@@ -414,6 +470,21 @@ CRITICAL: Respond with ONLY valid JSON.
       "track": "simpler_path | best_fit | paradigm_shift | frontier_transfer",
       "description": "What this solution does",
       "mechanism": "How it works technically",
+      "mechanistic_depth": {
+        "working_principle": "Fundamental principle at work",
+        "molecular_mechanism": "Molecular-level explanation (if applicable)",
+        "quantified_parameters": [
+          {
+            "parameter": "Parameter name",
+            "value": "Quantified value with units",
+            "significance": "Why this matters"
+          }
+        ],
+        "rate_limiting_step": "What limits performance",
+        "key_parameters": ["Key variables"],
+        "thermodynamic_advantage": "Energy considerations (if applicable)",
+        "failure_modes": ["How it could fail"]
+      },
       "source_domain": "Where the idea comes from",
       "prior_art": [
         {
@@ -445,7 +516,8 @@ MANDATORY GUARANTEES:
 - At least 2 per track
 - At least 1 from first principles
 - At least 1 challenging industry assumption
-- At least 1 from unexpected domain`;
+- At least 1 from unexpected domain
+- ALL paradigm_shift and frontier_transfer concepts MUST have mechanistic_depth`;
 
 export const AN3_M_METADATA = {
   id: 'an3-m',
@@ -466,7 +538,8 @@ Evaluate each concept on:
 1. PHYSICS FEASIBILITY - Does it violate known physics?
 2. ENGINEERING FEASIBILITY - Can it be built with current technology?
 3. ECONOMIC VIABILITY - Does the cost/benefit make sense?
-4. OVERALL MERIT - Combining all factors
+4. PARADIGM SIGNIFICANCE - How fundamentally does this change the game?
+5. OVERALL MERIT - Combining all factors
 
 ## EVALUATION PHILOSOPHY
 
@@ -497,6 +570,32 @@ Merit = Feasibility × Impact / (Risk × Cost)
 - 4-6: Uncertain ROI, significant investment
 - 1-3: Poor ROI or prohibitive costs
 
+## PARADIGM SIGNIFICANCE ASSESSMENT
+
+For EACH concept, assess its paradigm significance:
+
+**TRANSFORMATIVE** - Changes the entire industry
+- Challenges fundamental assumptions everyone takes for granted
+- If true, makes current approaches obsolete
+- Example: Electric vehicles vs. internal combustion
+
+**SIGNIFICANT** - Major improvement over status quo
+- Meaningfully better than current best practices
+- Could become new industry standard
+- Example: LED lighting vs. incandescent
+
+**INCREMENTAL** - Useful improvement
+- Better than current approach but same paradigm
+- Worth doing but not game-changing
+- Example: More efficient gas engine
+
+**OPTIMIZATION** - Fine-tuning existing approach
+- Marginal improvements within existing framework
+- Low risk, low reward
+- Example: Better materials for existing design
+
+**Strategic Insight Flag**: Set to true if this concept reveals something the industry has been wrong about. These insights have value even if the concept doesn't win on merit.
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON.
@@ -518,6 +617,14 @@ CRITICAL: Respond with ONLY valid JSON.
       "economic_viability": {
         "score": 6,
         "analysis": "Why this score"
+      },
+      "paradigm_assessment": {
+        "paradigm_significance": "TRANSFORMATIVE | SIGNIFICANT | INCREMENTAL | OPTIMIZATION",
+        "what_it_challenges": "What assumption or approach it challenges",
+        "why_industry_missed_it": "Why this wasn't obvious before",
+        "strategic_insight_flag": true,
+        "first_mover_opportunity": "Window for first mover advantage (if any)",
+        "strategic_rationale": "Why this insight matters beyond the specific solution"
       },
       "overall_merit_score": 7,
       "recommendation": "pursue | investigate | defer | reject",
@@ -541,10 +648,24 @@ CRITICAL: Respond with ONLY valid JSON.
     "best_best_fit": "concept-id of best conventional solution",
     "best_paradigm_shift": "concept-id of best radical solution",
     "best_frontier_transfer": "concept-id of best cross-domain solution"
-  }
+  },
+  "paradigm_insights_identified": [
+    {
+      "concept_id": "concept-id where insight was found",
+      "insight_name": "Short name for the insight",
+      "the_assumption": "What everyone assumes",
+      "the_reality": "What we discovered is actually true",
+      "years_missed": "How long industry missed this",
+      "why_missed": "Why it wasn't obvious",
+      "opportunity": "What this enables",
+      "evidence_strength": "HIGH | MEDIUM | LOW",
+      "recommendation": "What to do with this insight"
+    }
+  ]
 }
 
-IMPORTANT: Rank by MERIT, not by track. A simple solution that works beats a complex one that might work.`;
+IMPORTANT: Rank by MERIT, not by track. A simple solution that works beats a complex one that might work.
+GUARANTEE: Flag ALL concepts with strategic_insight_flag=true that reveal industry blind spots, even if they don't win on merit.`;
 
 export const AN4_M_METADATA = {
   id: 'an4-m',
@@ -565,7 +686,8 @@ Create a report that:
 1. RECOMMENDS a primary solution (highest merit)
 2. PROVIDES a fallback (if primary fails)
 3. IDENTIFIES parallel explorations (hedge bets)
-4. INCLUDES honest self-critique
+4. SURFACES paradigm insights (even if not the primary recommendation)
+5. INCLUDES honest self-critique
 
 ## DECISION ARCHITECTURE
 
@@ -583,6 +705,23 @@ Create a report that:
 - High potential but higher uncertainty
 - Could become primary if validated
 - Low-cost exploration options
+
+## PARADIGM INSIGHT SURFACING
+
+CRITICAL: Even if a simpler_path or best_fit solution wins on merit, the report MUST surface any significant paradigm insights discovered during analysis.
+
+**Why this matters:**
+The client might be asking the wrong question. If we discovered that the industry has been fundamentally wrong about something, that insight has value even if the "winning" solution is conventional.
+
+**For paradigm_insight section, include:**
+- The biggest insight from paradigm_shift/frontier_transfer concepts
+- What the industry has been missing
+- Strategic implications for different stakeholders
+
+**For what_industry_missed section, surface each blind spot:**
+- The assumption industry holds
+- The reality we discovered
+- The opportunity this creates
 
 ## OUTPUT FORMAT
 
@@ -648,6 +787,32 @@ CRITICAL: Respond with ONLY valid JSON.
       "merit_score": 5
     }
   ],
+  "paradigm_insight": {
+    "insight_headline": "The big insight in one sentence",
+    "the_conventional_wisdom": "What industry assumes to be true",
+    "what_we_discovered": "The reality that challenges this",
+    "evidence_sources": ["Sources supporting this insight"],
+    "why_it_matters": "Implications of this being true",
+    "who_should_care": ["Stakeholders affected by this insight"],
+    "related_concepts": ["concept-ids that informed this insight"]
+  },
+  "what_industry_missed": [
+    {
+      "the_assumption": "Industry-wide assumption",
+      "how_long_held": "How long this has been assumed",
+      "the_reality": "What we found to be actually true",
+      "evidence": "Supporting evidence",
+      "opportunity_created": "What this enables",
+      "first_mover_advantage": "Window for first movers"
+    }
+  ],
+  "strategic_implications": {
+    "for_incumbents": ["What established players should do"],
+    "for_startups": ["Opportunities for new entrants"],
+    "for_investors": ["Investment implications"],
+    "timing_considerations": "Why timing matters now",
+    "competitive_dynamics": "How this changes competition"
+  },
   "self_critique": {
     "what_we_might_be_wrong_about": [
       "Specific ways our analysis could be flawed"
@@ -671,7 +836,9 @@ CRITICAL: Respond with ONLY valid JSON.
 PHILOSOPHY: The best solution wins regardless of origin.
 Simple solutions that work beat complex ones that might work.
 Novel solutions that work beat conventional ones that don't.
-MERIT is the only criterion.`;
+MERIT is the only criterion.
+
+GUARANTEE: Even if primary recommendation is simpler_path or best_fit, the report MUST include paradigm_insight and what_industry_missed sections if ANY significant insights were discovered during analysis.`;
 
 export const AN5_M_METADATA = {
   id: 'an5-m',

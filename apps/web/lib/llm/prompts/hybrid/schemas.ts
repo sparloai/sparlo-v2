@@ -182,11 +182,34 @@ const AbandonedApproachSchema = z
   })
   .passthrough();
 
+// NEW: Detailed abandoned technology analysis
+const EnablingChangeSchema = z.object({
+  change: z.string(),
+  relevance: z.string(),
+});
+
+const AbandonedTechnologyAnalysisSchema = z
+  .object({
+    technology_name: z.string(),
+    original_era: z.string(),
+    original_application: z.string(),
+    why_abandoned: z.string(),
+    enabling_changes_since: z.array(EnablingChangeSchema).catch([]),
+    revival_potential: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
+    revival_concept: z.string(),
+    who_is_positioned: z.string().optional(),
+    source_urls: z.array(z.string()).default([]),
+  })
+  .passthrough();
+
 export const AN1_7_M_OutputSchema = z
   .object({
     precedent_findings: z.array(PrecedentFindingSchema).catch([]),
     gap_analysis: z.array(GapAnalysisSchema).catch([]),
     abandoned_approaches: z.array(AbandonedApproachSchema).catch([]),
+    abandoned_technology_analysis: z
+      .array(AbandonedTechnologyAnalysisSchema)
+      .default([]),
     key_papers: z
       .array(
         z
@@ -250,6 +273,26 @@ export type AN2_M_Output = z.infer<typeof AN2_M_OutputSchema>;
 // AN3-M: Concept Generation
 // ============================================
 
+// NEW: Quantified parameters for mechanism depth
+const QuantifiedParameterSchema = z.object({
+  parameter: z.string(),
+  value: z.string(),
+  significance: z.string(),
+});
+
+// NEW: Mechanistic depth schema for paradigm/frontier concepts
+const MechanisticDepthSchema = z
+  .object({
+    working_principle: z.string(),
+    molecular_mechanism: z.string().optional(),
+    quantified_parameters: z.array(QuantifiedParameterSchema).default([]),
+    rate_limiting_step: z.string(),
+    key_parameters: z.array(z.string()).catch([]),
+    thermodynamic_advantage: z.string().optional(),
+    failure_modes: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
 const ConceptSchema = z
   .object({
     id: z.string(),
@@ -257,6 +300,7 @@ const ConceptSchema = z
     track: TrackSchema,
     description: z.string(),
     mechanism: z.string(),
+    mechanistic_depth: MechanisticDepthSchema.optional(),
     source_domain: z.string().optional(),
     prior_art: z.array(PriorArtSchema).catch([]),
     feasibility_score: z.number().min(1).max(10).catch(5),
@@ -317,6 +361,25 @@ const ValidationResultSchema = z
       .enum(['pursue', 'investigate', 'defer', 'reject'])
       .catch('investigate'),
     key_uncertainties: z.array(z.string()).catch([]),
+    // NEW: Paradigm assessment for each concept
+    paradigm_assessment: z
+      .object({
+        paradigm_significance: z
+          .enum([
+            'TRANSFORMATIVE',
+            'SIGNIFICANT',
+            'INCREMENTAL',
+            'OPTIMIZATION',
+          ])
+          .catch('INCREMENTAL'),
+        what_it_challenges: z.string().optional(),
+        why_industry_missed_it: z.string().optional(),
+        strategic_insight_flag: z.boolean().catch(false),
+        first_mover_opportunity: z.string().optional(),
+        strategic_rationale: z.string().optional(),
+      })
+      .passthrough()
+      .optional(),
   })
   .passthrough();
 
@@ -336,6 +399,36 @@ const SelfCritiqueSchema = z
   })
   .passthrough();
 
+// NEW: Paradigm significance assessment for each concept
+// Note: Defined for documentation; fields are inlined in ValidationResultSchema
+const _ParadigmAssessmentSchema = z
+  .object({
+    paradigm_significance: z
+      .enum(['TRANSFORMATIVE', 'SIGNIFICANT', 'INCREMENTAL', 'OPTIMIZATION'])
+      .catch('INCREMENTAL'),
+    what_it_challenges: z.string().optional(),
+    why_industry_missed_it: z.string().optional(),
+    strategic_insight_flag: z.boolean().catch(false),
+    first_mover_opportunity: z.string().optional(),
+    strategic_rationale: z.string().optional(),
+  })
+  .passthrough();
+
+// NEW: Paradigm insights identified during evaluation
+const ParadigmInsightIdentifiedSchema = z
+  .object({
+    concept_id: z.string(),
+    insight_name: z.string(),
+    the_assumption: z.string(),
+    the_reality: z.string(),
+    years_missed: z.string().optional(),
+    why_missed: z.string(),
+    opportunity: z.string(),
+    evidence_strength: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
+    recommendation: z.string(),
+  })
+  .passthrough();
+
 export const AN4_M_OutputSchema = z
   .object({
     validation_results: z.array(ValidationResultSchema).catch([]),
@@ -350,6 +443,10 @@ export const AN4_M_OutputSchema = z
       })
       .passthrough()
       .optional(),
+    // NEW: Paradigm insights identified during evaluation
+    paradigm_insights_identified: z
+      .array(ParadigmInsightIdentifiedSchema)
+      .default([]),
   })
   .passthrough();
 
@@ -404,6 +501,42 @@ const ReportSelfCritiqueSchema = z
   })
   .passthrough();
 
+// NEW: Paradigm insight section for AN5-M
+const ParadigmInsightSectionSchema = z
+  .object({
+    insight_headline: z.string(),
+    the_conventional_wisdom: z.string(),
+    what_we_discovered: z.string(),
+    evidence_sources: z.array(z.string()).catch([]),
+    why_it_matters: z.string(),
+    who_should_care: z.array(z.string()).catch([]),
+    related_concepts: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
+// NEW: What industry missed section
+const WhatIndustryMissedSchema = z
+  .object({
+    the_assumption: z.string(),
+    how_long_held: z.string().optional(),
+    the_reality: z.string(),
+    evidence: z.string(),
+    opportunity_created: z.string(),
+    first_mover_advantage: z.string().optional(),
+  })
+  .passthrough();
+
+// NEW: Strategic implications section
+const StrategicImplicationsSchema = z
+  .object({
+    for_incumbents: z.array(z.string()).catch([]),
+    for_startups: z.array(z.string()).catch([]),
+    for_investors: z.array(z.string()).catch([]),
+    timing_considerations: z.string().optional(),
+    competitive_dynamics: z.string().optional(),
+  })
+  .passthrough();
+
 export const AN5_M_OutputSchema = z
   .object({
     decision_architecture: DecisionArchitectureSchema,
@@ -413,6 +546,10 @@ export const AN5_M_OutputSchema = z
     next_steps: z.array(z.string()).catch([]),
     problem_restatement: z.string().optional(),
     key_insights: z.array(z.string()).catch([]),
+    // NEW: Paradigm insight surfacing sections
+    paradigm_insight: ParadigmInsightSectionSchema.optional(),
+    what_industry_missed: z.array(WhatIndustryMissedSchema).default([]),
+    strategic_implications: StrategicImplicationsSchema.optional(),
   })
   .passthrough();
 

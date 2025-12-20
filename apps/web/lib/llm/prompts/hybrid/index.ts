@@ -175,5 +175,9 @@ export const HYBRID_CHAIN_METADATA = {
     'Self-critique section in every report',
     'Prior art documented for every concept',
     'Decision architecture with primary + fallback + parallel',
+    // NEW: Paradigm insight surfacing guarantees
+    'Paradigm insights surfaced even when simple solutions win',
+    'Abandoned technology revival opportunities identified',
+    'Mechanistic depth for paradigm/frontier concepts',
   ],
 };
