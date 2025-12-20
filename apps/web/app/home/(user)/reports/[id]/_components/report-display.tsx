@@ -37,6 +37,7 @@ import {
 } from '../_lib/extract-report';
 import type { ChatMessage } from '../_lib/schemas/chat.schema';
 import { DiscoveryReportDisplay } from './discovery-report-display';
+import { HybridReportDisplay } from './hybrid-report-display';
 import { ReportRenderer } from './report/report-renderer';
 
 interface ReportData {
@@ -148,8 +149,8 @@ export function ReportDisplay({
   const tocItems = useMemo(() => {
     const items: TocItem[] = [];
 
-    // For discovery/hybrid reports, generate TOC from known sections
-    if (isDiscovery || isHybrid) {
+    // For discovery reports, generate TOC from known sections
+    if (isDiscovery) {
       const discoveryData = report.report_data as {
         report?: {
           executive_summary?: unknown;
@@ -195,6 +196,65 @@ export function ReportDisplay({
         items.push({
           id: 'why-this-matters',
           title: 'Why This Matters',
+          level: 2,
+        });
+      return items;
+    }
+
+    // For hybrid reports, generate TOC from decision architecture sections
+    if (isHybrid) {
+      const hybridData = report.report_data as {
+        report?: {
+          executive_summary?: unknown;
+          problem_restatement?: unknown;
+          decision_architecture?: unknown;
+          key_insights?: unknown[];
+          next_steps?: unknown[];
+          other_concepts?: unknown[];
+          self_critique?: unknown;
+        };
+      };
+      const r = hybridData?.report;
+      if (r?.executive_summary)
+        items.push({
+          id: 'executive-summary',
+          title: 'Executive Summary',
+          level: 2,
+        });
+      if (r?.problem_restatement)
+        items.push({
+          id: 'problem-restatement',
+          title: 'Problem Restatement',
+          level: 2,
+        });
+      if (r?.decision_architecture)
+        items.push({
+          id: 'decision-architecture',
+          title: 'Decision Architecture',
+          level: 2,
+        });
+      if (r?.key_insights && r.key_insights.length > 0)
+        items.push({
+          id: 'key-insights',
+          title: 'Key Insights',
+          level: 2,
+        });
+      if (r?.next_steps && r.next_steps.length > 0)
+        items.push({
+          id: 'next-steps',
+          title: 'Next Steps',
+          level: 2,
+        });
+      if (r?.other_concepts && r.other_concepts.length > 0)
+        items.push({
+          id: 'other-concepts',
+          title: 'Other Concepts',
+          level: 2,
+        });
+      if (r?.self_critique)
+        items.push({
+          id: 'self-critique',
+          title: 'Self-Critique',
           level: 2,
         });
       return items;
@@ -711,12 +771,10 @@ export function ReportDisplay({
                     }
                   />
                 ) : isHybrid ? (
-                  // Hybrid reports use the same display component as Discovery
-                  // since the structure is similar (report field with concepts)
-                  <DiscoveryReportDisplay
+                  <HybridReportDisplay
                     reportData={
                       report.report_data as Parameters<
-                        typeof DiscoveryReportDisplay
+                        typeof HybridReportDisplay
                       >[0]['reportData']
                     }
                   />
