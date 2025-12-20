@@ -60,6 +60,9 @@ import { inngest } from '../client';
  * - paradigm_shift: Challenge fundamental assumptions
  * - frontier_transfer: Cross-domain innovation
  */
+// Token budget limit for safety (prevents runaway costs)
+const TOKEN_BUDGET_LIMIT = 200000; // 200K tokens max per report
+
 export const generateHybridReport = inngest.createFunction(
   {
     id: 'hybrid-report-generator',
@@ -76,6 +79,33 @@ export const generateHybridReport = inngest.createFunction(
     const { reportId, designChallenge, conversationId, attachments } =
       event.data;
 
+    const supabase = getSupabaseServerAdminClient();
+    console.log('[Hybrid Function] Supabase client initialized');
+
+    // Authorization check: Verify report belongs to this account
+    const { data: report, error: authError } = await supabase
+      .from('sparlo_reports')
+      .select('id, account_id')
+      .eq('id', reportId)
+      .single();
+
+    if (authError || !report) {
+      console.error('[Hybrid Function] Report not found:', authError);
+      return { success: false, reportId, error: 'Report not found' };
+    }
+
+    if (report.account_id !== event.data.accountId) {
+      console.error('[Hybrid Function] Authorization failed:', {
+        reportAccountId: report.account_id,
+        eventAccountId: event.data.accountId,
+      });
+      return {
+        success: false,
+        reportId,
+        error: 'Not authorized to access this report',
+      };
+    }
+
     // Convert attachments to ImageAttachment format for Claude vision
     const imageAttachments: ImageAttachment[] = (attachments || [])
       .filter((a: { media_type: string }) => a.media_type.startsWith('image/'))
@@ -83,9 +113,6 @@ export const generateHybridReport = inngest.createFunction(
         media_type: a.media_type as ImageAttachment['media_type'],
         data: a.data,
       }));
-
-    const supabase = getSupabaseServerAdminClient();
-    console.log('[Hybrid Function] Supabase client initialized');
 
     // Handle ClaudeRefusalError at the top level
     try {
@@ -107,6 +134,25 @@ export const generateHybridReport = inngest.createFunction(
     }
 
     async function runHybridGeneration() {
+      // Track cumulative tokens for budget monitoring
+      let cumulativeTokens = 0;
+
+      /**
+       * Check token budget and throw if exceeded
+       */
+      function checkTokenBudget(usage: TokenUsage, stepName: string) {
+        cumulativeTokens += usage.totalTokens;
+        console.log(
+          `[Hybrid] Token usage after ${stepName}: ${usage.totalTokens} (cumulative: ${cumulativeTokens}/${TOKEN_BUDGET_LIMIT})`,
+        );
+
+        if (cumulativeTokens > TOKEN_BUDGET_LIMIT) {
+          throw new Error(
+            `Token budget exceeded at ${stepName}: ${cumulativeTokens}/${TOKEN_BUDGET_LIMIT}. Report stopped to prevent excessive costs.`,
+          );
+        }
+      }
+
       // Helper to calculate total usage from collected step usages
       function calculateTotalUsage(
         usages: TokenUsage[],
@@ -186,6 +232,7 @@ export const generateHybridReport = inngest.createFunction(
           const validated = AN0_M_OutputSchema.parse(parsed);
 
           await updateProgress({ phase_progress: 100 });
+          checkTokenBudget(usage, 'AN0-M');
 
           return { result: validated, usage };
         },
@@ -317,6 +364,7 @@ Include at least:
           const validated = AN1_5_M_OutputSchema.parse(parsed);
 
           await updateProgress({ phase_progress: 100 });
+          checkTokenBudget(usage, 'AN1.5-M');
 
           return { result: validated, usage };
         },
@@ -363,6 +411,7 @@ Every claim must have a source.`;
           const validated = AN1_7_M_OutputSchema.parse(parsed);
 
           await updateProgress({ phase_progress: 100 });
+          checkTokenBudget(usage, 'AN1.7-M');
 
           return { result: validated, usage };
         },
@@ -411,6 +460,7 @@ Prepare full-spectrum concept generation guidance:
           const validated = AN2_M_OutputSchema.parse(parsed);
 
           await updateProgress({ phase_progress: 100 });
+          checkTokenBudget(usage, 'AN2-M');
 
           return { result: validated, usage };
         },
@@ -469,6 +519,7 @@ Each concept needs:
           const validated = AN3_M_OutputSchema.parse(parsed);
 
           await updateProgress({ phase_progress: 100 });
+          checkTokenBudget(usage, 'AN3-M');
 
           return { result: validated, usage };
         },
@@ -515,6 +566,7 @@ Include honest self-critique of the analysis.`;
         const validated = AN4_M_OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
+        checkTokenBudget(usage, 'AN4-M');
 
         return { result: validated, usage };
       });
@@ -570,6 +622,7 @@ The BEST solution wins regardless of origin (simple vs complex, conventional vs 
         const validated = AN5_M_OutputSchema.parse(parsed);
 
         await updateProgress({ phase_progress: 100 });
+        checkTokenBudget(usage, 'AN5-M');
 
         return { result: validated, usage };
       });

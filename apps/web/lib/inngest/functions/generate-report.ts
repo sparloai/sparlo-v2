@@ -650,15 +650,7 @@ export const generateReport = inngest.createFunction(
         an4Result.usage,
         an5Result.usage,
       ];
-      const stepNames = [
-        'an0',
-        'an1.5',
-        'an1.7',
-        'an2',
-        'an3',
-        'an4',
-        'an5',
-      ];
+      const stepNames = ['an0', 'an1.5', 'an1.7', 'an2', 'an3', 'an4', 'an5'];
       const totalUsage = calculateTotalUsage(allUsages, stepNames);
 
       await step.run('complete-report', async () => {

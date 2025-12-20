@@ -1,18 +1,12 @@
-'use server';
-
-import { revalidatePath } from 'next/cache';
+import { NextResponse } from 'next/server';
 
 import { z } from 'zod';
 
-import { enhanceAction } from '@kit/next/actions';
+import { enhanceRouteHandler } from '@kit/next/routes';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { inngest } from '~/lib/inngest/client';
-import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 
-import { checkUsageAllowed } from './usage.service';
-
-// Attachment schema for vision support (images and PDFs)
 const AttachmentSchema = z.object({
   filename: z.string(),
   media_type: z.enum([
@@ -25,7 +19,6 @@ const AttachmentSchema = z.object({
   data: z.string(), // base64 encoded
 });
 
-// Schema for starting a hybrid report with Inngest
 const StartHybridReportSchema = z.object({
   designChallenge: z
     .string()
@@ -72,9 +65,7 @@ function validateBase64Image(
     if (signature) {
       try {
         const decoded = Buffer.from(data, 'base64');
-        const matches = signature.every(
-          (byte, i) => decoded[i] === byte,
-        );
+        const matches = signature.every((byte, i) => decoded[i] === byte);
         if (!matches) {
           return {
             valid: false,
@@ -94,18 +85,24 @@ function validateBase64Image(
  * Sanitize user input to prevent prompt injection
  */
 function sanitizePromptInput(input: string): string {
-  return input
-    // Remove control characters
-    .replace(/[\x00-\x1f\x7f-\x9f]/g, '')
-    // Remove special tokens that might confuse the model
-    .replace(/<\|endoftext\|>/gi, '')
-    .replace(/<\|im_start\|>/gi, '')
-    .replace(/<\|im_end\|>/gi, '')
-    .trim();
+  return (
+    input
+      // Remove control characters
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1f\x7f-\x9f]/g, '')
+      // Remove special tokens that might confuse the model
+      .replace(/<\|endoftext\|>/gi, '')
+      .replace(/<\|im_start\|>/gi, '')
+      .replace(/<\|im_end\|>/gi, '')
+      .trim()
+  );
 }
 
 /**
- * Start a new hybrid report generation using Inngest durable workflow
+ * POST /api/hybrid/reports
+ *
+ * Start a new hybrid report generation.
+ * Agent-native endpoint for programmatic access to Hybrid Mode.
  *
  * Hybrid Mode (Full-Spectrum Analysis):
  * - SEARCHES the full solution spectrum (simple to paradigm-shifting)
@@ -113,49 +110,34 @@ function sanitizePromptInput(input: string): string {
  * - HUNTS in expanded territories (biology, geology, abandoned tech, etc.)
  * - DOCUMENTS prior art evidence
  * - INCLUDES honest self-critique
- *
- * Philosophy: The best solution wins regardless of origin.
  */
-export const startHybridReportGeneration = enhanceAction(
-  async (data, user) => {
+export const POST = enhanceRouteHandler(
+  async ({ body, user }) => {
     const client = getSupabaseServerClient();
 
     // Sanitize user input to prevent prompt injection
-    const sanitizedChallenge = sanitizePromptInput(data.designChallenge);
+    const sanitizedChallenge = sanitizePromptInput(body.designChallenge);
     if (sanitizedChallenge.length < 50) {
-      throw new Error('Design challenge too short after sanitization');
+      return NextResponse.json(
+        { error: 'Design challenge too short after sanitization' },
+        { status: 400 },
+      );
     }
 
     // Validate attachments if present
-    if (data.attachments && data.attachments.length > 0) {
-      for (const attachment of data.attachments) {
+    if (body.attachments && body.attachments.length > 0) {
+      for (const attachment of body.attachments) {
         const validation = validateBase64Image(
           attachment.data,
           attachment.media_type,
         );
         if (!validation.valid) {
-          throw new Error(`Invalid attachment: ${validation.error}`);
+          return NextResponse.json(
+            { error: `Invalid attachment: ${validation.error}` },
+            { status: 400 },
+          );
         }
       }
-    }
-
-    // Check usage limits FIRST
-    const usage = await checkUsageAllowed(
-      user.id,
-      USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
-    );
-
-    if (!usage.allowed) {
-      throw new Error(
-        `Usage limit reached (${usage.percentage.toFixed(0)}% used). ` +
-          `Upgrade your plan or wait until ${new Date(usage.periodEnd).toLocaleDateString()}.`,
-      );
-    }
-
-    if (usage.isWarning) {
-      console.log(
-        `[Usage Warning] User ${user.id} at ${usage.percentage.toFixed(0)}% usage`,
-      );
     }
 
     // Rate limiting - check recent reports
@@ -178,14 +160,20 @@ export const startHybridReportGeneration = enhanceAction(
     ]);
 
     if (recentResult.count && recentResult.count >= MAX_REPORTS_PER_WINDOW) {
-      throw new Error(
-        'Rate limit exceeded. Please wait 5 minutes between reports.',
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded. Please wait 5 minutes between reports.',
+        },
+        { status: 429 },
       );
     }
 
     if (dailyResult.count && dailyResult.count >= DAILY_LIMIT) {
-      throw new Error(
-        `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.`,
+      return NextResponse.json(
+        {
+          error: `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.`,
+        },
+        { status: 429 },
       );
     }
 
@@ -217,15 +205,18 @@ export const startHybridReportGeneration = enhanceAction(
       .single();
 
     if (dbError) {
-      console.error('[Hybrid] Failed to create report:', dbError);
-      throw new Error('Failed to create report. Please try again.');
+      console.error('[Hybrid API] Failed to create report:', dbError);
+      return NextResponse.json(
+        { error: 'Failed to create report. Please try again.' },
+        { status: 500 },
+      );
     }
 
     // Trigger Hybrid Inngest function
     try {
-      console.log('[Hybrid] Sending Inngest event for report:', report.id);
+      console.log('[Hybrid API] Sending Inngest event for report:', report.id);
 
-      const sendResult = await inngest.send({
+      await inngest.send({
         name: 'report/generate-hybrid',
         data: {
           reportId: report.id,
@@ -233,16 +224,11 @@ export const startHybridReportGeneration = enhanceAction(
           userId: user.id,
           designChallenge: sanitizedChallenge,
           conversationId,
-          attachments: data.attachments,
+          attachments: body.attachments,
         },
       });
-
-      console.log('[Hybrid] Inngest event sent successfully:', {
-        reportId: report.id,
-        eventIds: sendResult.ids,
-      });
     } catch (inngestError) {
-      console.error('[Hybrid] Failed to trigger Inngest:', inngestError);
+      console.error('[Hybrid API] Failed to trigger Inngest:', inngestError);
       await client
         .from('sparlo_reports')
         .update({
@@ -250,96 +236,20 @@ export const startHybridReportGeneration = enhanceAction(
           last_message: 'Failed to start hybrid report generation',
         })
         .eq('id', report.id);
-      throw new Error('Failed to start hybrid report generation');
-    }
-
-    revalidatePath('/home');
-    return { success: true, reportId: report.id, conversationId };
-  },
-  {
-    schema: StartHybridReportSchema,
-    auth: true,
-  },
-);
-
-// Schema for answering clarification in hybrid mode
-const AnswerHybridClarificationSchema = z.object({
-  reportId: z.string().uuid(),
-  answer: z
-    .string()
-    .min(1, 'Please provide an answer')
-    .max(5000, 'Answer must be under 5,000 characters'),
-});
-
-/**
- * Answer a clarification question in hybrid mode and resume the Inngest workflow
- */
-export const answerHybridClarification = enhanceAction(
-  async (data, user) => {
-    const client = getSupabaseServerClient();
-
-    // Verify ownership
-    const { data: report, error: fetchError } = await client
-      .from('sparlo_reports')
-      .select('id, status, clarifications, account_id')
-      .eq('id', data.reportId)
-      .eq('account_id', user.id)
-      .single();
-
-    if (fetchError || !report) {
-      throw new Error(
-        'Report not found or you do not have permission to modify it',
+      return NextResponse.json(
+        { error: 'Failed to start report generation. Please try again.' },
+        { status: 500 },
       );
     }
 
-    if (report.status !== 'clarifying') {
-      throw new Error('Report is not awaiting clarification');
-    }
-
-    // Update clarifications with answer
-    const clarifications =
-      (report.clarifications as Record<string, unknown>[]) ?? [];
-    if (clarifications.length > 0) {
-      const lastClarification = clarifications[clarifications.length - 1];
-      if (lastClarification) {
-        lastClarification.answer = data.answer;
-        lastClarification.answeredAt = new Date().toISOString();
-      }
-    }
-
-    // Update report status
-    const { error: updateError } = await client
-      .from('sparlo_reports')
-      .update({
-        status: 'processing',
-        clarifications: JSON.parse(JSON.stringify(clarifications)),
-      })
-      .eq('id', data.reportId);
-
-    if (updateError) {
-      console.error('[Hybrid] Failed to update report:', updateError);
-      throw new Error('Failed to update report. Please try again.');
-    }
-
-    // Resume Hybrid Inngest workflow
-    try {
-      await inngest.send({
-        name: 'report/hybrid-clarification-answered',
-        data: {
-          reportId: data.reportId,
-          answer: data.answer,
-        },
-      });
-    } catch (inngestError) {
-      console.error('Failed to resume hybrid workflow:', inngestError);
-      throw new Error('Failed to continue hybrid report generation');
-    }
-
-    revalidatePath('/home');
-    return { success: true };
+    return NextResponse.json({
+      success: true,
+      reportId: report.id,
+      conversationId,
+    });
   },
   {
-    schema: AnswerHybridClarificationSchema,
     auth: true,
+    schema: StartHybridReportSchema,
   },
 );

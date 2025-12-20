@@ -84,10 +84,18 @@ export const POST = enhanceRouteHandler(
 
     // Determine which event to send based on report mode
     const reportData = report.report_data as { mode?: string } | null;
-    const isDiscovery = reportData?.mode === 'discovery';
-    const eventName = isDiscovery
-      ? 'report/discovery-clarification-answered'
-      : 'report/clarification-answered';
+    const mode = reportData?.mode;
+
+    let eventName:
+      | 'report/clarification-answered'
+      | 'report/discovery-clarification-answered'
+      | 'report/hybrid-clarification-answered' =
+      'report/clarification-answered';
+    if (mode === 'discovery') {
+      eventName = 'report/discovery-clarification-answered';
+    } else if (mode === 'hybrid') {
+      eventName = 'report/hybrid-clarification-answered';
+    }
 
     // Resume Inngest workflow
     try {
