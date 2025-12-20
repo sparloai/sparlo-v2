@@ -90,6 +90,7 @@ export interface ImageAttachment {
  * Call Claude with proper error handling and usage tracking
  * Uses streaming for large token requests to avoid timeout issues
  * Supports vision with optional image attachments
+ * Supports prompt caching via cacheablePrefix for cost optimization
  * (Kieran's fix: every LLM call wrapped with error handling)
  */
 export async function callClaude(params: {
@@ -99,6 +100,7 @@ export async function callClaude(params: {
   maxTokens?: number;
   temperature?: number;
   images?: ImageAttachment[];
+  cacheablePrefix?: string;
 }): Promise<ClaudeResult> {
   const anthropic = getAnthropicClient();
   const maxTokens = params.maxTokens ?? 8192;
@@ -133,6 +135,29 @@ export async function callClaude(params: {
   // Add text message
   messageContent.push({ type: 'text', text: params.userMessage });
 
+  // Build system parameter - supports caching when prefix is provided
+  type SystemBlock =
+    | string
+    | Array<{
+        type: 'text';
+        text: string;
+        cache_control?: { type: 'ephemeral' };
+      }>;
+
+  const systemParam: SystemBlock = params.cacheablePrefix
+    ? [
+        {
+          type: 'text' as const,
+          text: params.cacheablePrefix,
+          cache_control: { type: 'ephemeral' as const },
+        },
+        {
+          type: 'text' as const,
+          text: params.system,
+        },
+      ]
+    : params.system;
+
   try {
     // Use streaming for large token requests (>10000) to avoid timeout
     if (maxTokens > 10000) {
@@ -142,7 +167,7 @@ export async function callClaude(params: {
         model: params.model,
         max_tokens: maxTokens,
         temperature,
-        system: params.system,
+        system: systemParam,
         messages: [{ role: 'user', content: messageContent }],
       });
 
@@ -191,7 +216,7 @@ export async function callClaude(params: {
       model: params.model,
       max_tokens: maxTokens,
       temperature,
-      system: params.system,
+      system: systemParam,
       messages: [{ role: 'user', content: messageContent }],
     });
 

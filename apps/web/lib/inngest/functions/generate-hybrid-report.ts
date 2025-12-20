@@ -37,6 +37,7 @@ import {
   HYBRID_MAX_TOKENS,
   HYBRID_TEMPERATURES,
 } from '../../llm/prompts/hybrid';
+import { HYBRID_CACHED_PREFIX } from '../../llm/prompts/hybrid/cached-prefix';
 import { inngest } from '../client';
 
 /**
@@ -226,6 +227,7 @@ export const generateHybridReport = inngest.createFunction(
             maxTokens: HYBRID_MAX_TOKENS,
             temperature: HYBRID_TEMPERATURES.default,
             images: imageAttachments.length > 0 ? imageAttachments : undefined,
+            cacheablePrefix: HYBRID_CACHED_PREFIX,
           });
 
           const parsed = parseJsonResponse<AN0_M_Output>(content, 'AN0-M');
@@ -285,6 +287,7 @@ export const generateHybridReport = inngest.createFunction(
               userMessage: clarifiedChallenge,
               maxTokens: HYBRID_MAX_TOKENS,
               temperature: HYBRID_TEMPERATURES.default,
+              cacheablePrefix: HYBRID_CACHED_PREFIX,
             });
 
             const parsed = parseJsonResponse<AN0_M_Output>(content, 'AN0-M');
@@ -358,6 +361,7 @@ Include at least:
             userMessage: contextMessage,
             maxTokens: HYBRID_MAX_TOKENS,
             temperature: HYBRID_TEMPERATURES.default,
+            cacheablePrefix: HYBRID_CACHED_PREFIX,
           });
 
           const parsed = parseJsonResponse<AN1_5_M_Output>(content, 'AN1.5-M');
@@ -405,6 +409,7 @@ Every claim must have a source.`;
             userMessage: contextMessage,
             maxTokens: HYBRID_MAX_TOKENS,
             temperature: HYBRID_TEMPERATURES.default,
+            cacheablePrefix: HYBRID_CACHED_PREFIX,
           });
 
           const parsed = parseJsonResponse<AN1_7_M_Output>(content, 'AN1.7-M');
@@ -454,6 +459,7 @@ Prepare full-spectrum concept generation guidance:
             userMessage: contextMessage,
             maxTokens: HYBRID_MAX_TOKENS,
             temperature: HYBRID_TEMPERATURES.analytical,
+            cacheablePrefix: HYBRID_CACHED_PREFIX,
           });
 
           const parsed = parseJsonResponse<AN2_M_Output>(content, 'AN2-M');
@@ -513,6 +519,7 @@ Each concept needs:
             userMessage: contextMessage,
             maxTokens: HYBRID_MAX_TOKENS,
             temperature: HYBRID_TEMPERATURES.creative,
+            cacheablePrefix: HYBRID_CACHED_PREFIX,
           });
 
           const parsed = parseJsonResponse<AN3_M_Output>(content, 'AN3-M');
@@ -560,6 +567,7 @@ Include honest self-critique of the analysis.`;
           userMessage: contextMessage,
           maxTokens: HYBRID_MAX_TOKENS,
           temperature: HYBRID_TEMPERATURES.analytical,
+          cacheablePrefix: HYBRID_CACHED_PREFIX,
         });
 
         const parsed = parseJsonResponse<AN4_M_Output>(content, 'AN4-M');
@@ -616,6 +624,7 @@ The BEST solution wins regardless of origin (simple vs complex, conventional vs 
           userMessage: contextMessage,
           maxTokens: HYBRID_MAX_TOKENS,
           temperature: HYBRID_TEMPERATURES.report,
+          cacheablePrefix: HYBRID_CACHED_PREFIX,
         });
 
         const parsed = parseJsonResponse<AN5_M_Output>(content, 'AN5-M');
