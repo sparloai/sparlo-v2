@@ -382,6 +382,22 @@ const ConceptSchema = z
   })
   .passthrough();
 
+/**
+ * Operational Alternative - behavior/process change instead of technology purchase
+ */
+export const OperationalAlternativeSchema = z
+  .object({
+    title: z.string(),
+    what_changes: z.string(), // Operations, not technology
+    capital_required: z.string(), // Usually "minimal" or specific low amount
+    expected_benefit: z.string(), // "Could capture X% of benefit"
+    why_not_already_doing: z.string(), // Why this isn't obvious
+    validation_approach: z.string(),
+    comparison_to_capital_solutions: z.string(), // "X% of benefit at Y% of cost"
+  })
+  .passthrough();
+export type OperationalAlternative = z.infer<typeof OperationalAlternativeSchema>;
+
 export const AN3_M_OutputSchema = z
   .object({
     concepts: z.array(ConceptSchema).max(50).default([]),
@@ -396,11 +412,136 @@ export const AN3_M_OutputSchema = z
     first_principles_concepts: z.array(z.string()).max(20).default([]),
     industry_assumption_challenges: z.array(z.string()).max(20).default([]),
     cross_domain_transfers: z.array(z.string()).max(20).default([]),
+    // NEW: Operational alternatives (behavior changes, not technology purchases)
+    operational_alternatives: z
+      .array(OperationalAlternativeSchema)
+      .max(10)
+      .default([]),
   })
   .passthrough();
 
 export type AN3_M_Output = z.infer<typeof AN3_M_OutputSchema>;
 export type HybridConcept = z.infer<typeof ConceptSchema>;
+
+// ============================================
+// POST-SEARCH CLASSIFICATION (AN4)
+// ============================================
+
+/**
+ * Solution classification type - classifies what we FOUND (not what we searched for)
+ */
+export const SolutionClassificationType = z.enum([
+  'CATALOG', // Supplier sells this in their product line
+  'EMERGING_PRACTICE', // Suppliers moving this direction, not yet standard
+  'CROSS_DOMAIN', // Found in another industry, transfer required
+  'PARADIGM', // Industry hasn't seen this approach
+  'OPTIMIZATION', // Known approach, parameter tuning
+]);
+export type SolutionClassificationType = z.infer<
+  typeof SolutionClassificationType
+>;
+
+/**
+ * Catalog solution - supplier sells this in their product line
+ */
+const CatalogSolutionSchema = z
+  .object({
+    concept_id: z.string(),
+    title: z.string(),
+    supplier: z.string(),
+    how_discoverable: z.string(), // "Phone call to X" or "Search for Y"
+  })
+  .passthrough();
+
+/**
+ * Emerging practice - suppliers moving this direction, not yet standard
+ */
+const EmergingPracticeSchema = z
+  .object({
+    concept_id: z.string(),
+    title: z.string(),
+    who_is_doing_it: z.string(),
+    how_far_from_standard: z.string(), // "2-3 years" or "Already common in segment X"
+  })
+  .passthrough();
+
+/**
+ * Cross-domain transfer - found in another industry
+ */
+const CrossDomainTransferItemSchema = z
+  .object({
+    concept_id: z.string(),
+    title: z.string(),
+    source_domain: z.string(),
+    transfer_difficulty: z.enum(['OBVIOUS', 'MODERATE', 'NON_OBVIOUS']),
+  })
+  .passthrough();
+
+/**
+ * Paradigm insight - industry hasn't seen this approach
+ */
+const ParadigmInsightItemSchema = z
+  .object({
+    concept_id: z.string(),
+    title: z.string(),
+    what_industry_believes: z.string(),
+    what_we_found: z.string(),
+    validation: z.string(), // Why this is genuinely paradigm-level
+  })
+  .passthrough();
+
+/**
+ * What we found - classifies all concepts by type
+ */
+const WhatWeFoundSchema = z
+  .object({
+    catalog_solutions: z.array(CatalogSolutionSchema).default([]),
+    emerging_practice: z.array(EmergingPracticeSchema).default([]),
+    cross_domain_transfers: z.array(CrossDomainTransferItemSchema).default([]),
+    paradigm_insights: z.array(ParadigmInsightItemSchema).default([]),
+  })
+  .passthrough();
+
+/**
+ * Recommended emphasis for AN5 calibration
+ */
+export const RecommendedEmphasis = z.enum([
+  'SUPPLIER_ARBITRAGE', // Help them have better supplier conversations
+  'DECISION_FRAMEWORK', // Structure and validation gates
+  'CROSS_DOMAIN_SYNTHESIS', // The transfer is our value
+  'PARADIGM_INSIGHT', // The reframe is our value
+  'INTEGRATION', // Combining known elements in novel way
+]);
+export type RecommendedEmphasis = z.infer<typeof RecommendedEmphasis>;
+
+/**
+ * Presentation calibration for AN5 - honest calibration
+ */
+const PresentationCalibrationSchema = z
+  .object({
+    phone_call_equivalent: z.string(), // What user would learn from 30-min supplier call
+    literature_equivalent: z.string(), // What user would learn from searching best practices
+    sparlo_adds_beyond_that: z.array(z.string()).default([]), // Our actual value-add
+    recommended_emphasis: RecommendedEmphasis,
+  })
+  .passthrough();
+export type PresentationCalibration = z.infer<
+  typeof PresentationCalibrationSchema
+>;
+
+/**
+ * Solution Classification Schema - classifies what we FOUND (not what we searched for)
+ */
+export const SolutionClassificationSchema = z
+  .object({
+    what_we_found: WhatWeFoundSchema,
+    primary_recommendation_classification: SolutionClassificationType,
+    presentation_calibration: PresentationCalibrationSchema,
+  })
+  .passthrough();
+export type SolutionClassification = z.infer<
+  typeof SolutionClassificationSchema
+>;
 
 // ============================================
 // AN4-M: Evaluation
@@ -503,11 +644,634 @@ export const AN4_M_OutputSchema = z
       .array(ParadigmInsightIdentifiedSchema)
       .max(10)
       .default([]),
+    // NEW: Post-search solution classification
+    solution_classification: SolutionClassificationSchema.optional(),
   })
   .passthrough();
 
 export type AN4_M_Output = z.infer<typeof AN4_M_OutputSchema>;
 export type HybridValidationResult = z.infer<typeof ValidationResultSchema>;
+
+// ============================================
+// NEW: Execution Track + Innovation Portfolio Framework
+// ============================================
+
+/**
+ * Source type for execution track concepts
+ */
+export const SourceType = z.enum([
+  'CATALOG',
+  'TRANSFER',
+  'OPTIMIZATION',
+  'FIRST_PRINCIPLES',
+]);
+export type SourceType = z.infer<typeof SourceType>;
+
+/**
+ * Innovation type for portfolio concepts (new framework)
+ */
+export const PortfolioInnovationType = z.enum([
+  'PARADIGM_SHIFT',
+  'CROSS_DOMAIN_TRANSFER',
+  'TECHNOLOGY_REVIVAL',
+  'FIRST_PRINCIPLES',
+]);
+export type PortfolioInnovationType = z.infer<typeof PortfolioInnovationType>;
+
+/**
+ * Where We Found It - the narrative power of cross-domain transfer
+ */
+export const WhereWeFoundItSchema = z
+  .object({
+    domain: z.string(),
+    how_they_use_it: z.string(),
+    why_it_transfers: z.string(),
+  })
+  .passthrough();
+export type WhereWeFoundIt = z.infer<typeof WhereWeFoundItSchema>;
+
+/**
+ * The Insight Block - reused across execution track and innovation portfolio (new framework)
+ */
+export const NewInsightBlockSchema = z
+  .object({
+    what: z.string(),
+    where_we_found_it: WhereWeFoundItSchema.optional(), // Optional for FIRST_PRINCIPLES
+    why_industry_missed_it: z.string(),
+    physics: z.string(),
+  })
+  .passthrough();
+export type NewInsightBlock = z.infer<typeof NewInsightBlockSchema>;
+
+/**
+ * Supplier Arbitrage - when source_type === CATALOG
+ * How to negotiate with vendors and avoid being overcharged
+ */
+export const SupplierArbitrageSchema = z
+  .object({
+    who_to_call: z.string(),
+    what_to_ask: z.array(z.string()).default([]),
+    what_to_push_back_on: z.array(z.string()).default([]),
+    what_they_wont_volunteer: z.array(z.string()).default([]),
+    how_to_verify: z.array(z.string()).default([]),
+    competitor_alternative: z.string().optional(),
+  })
+  .passthrough();
+export type SupplierArbitrage = z.infer<typeof SupplierArbitrageSchema>;
+
+/**
+ * Why Not Obvious - when source_type === TRANSFER or FIRST_PRINCIPLES
+ * Explains the knowledge barrier that prevented this insight
+ */
+export const WhyNotObviousSchema = z
+  .object({
+    industry_gap: z.string(),
+    knowledge_barrier: z.string(),
+    our_contribution: z.string(),
+  })
+  .passthrough();
+export type WhyNotObvious = z.infer<typeof WhyNotObviousSchema>;
+
+/**
+ * Why Safe - validation for execution track primary
+ */
+export const WhySafeSchema = z
+  .object({
+    track_record: z.string(),
+    precedent: z.array(z.string()).default([]),
+    failure_modes_understood: z.boolean().default(false),
+  })
+  .passthrough();
+export type WhySafe = z.infer<typeof WhySafeSchema>;
+
+/**
+ * Fallback Trigger - when to pivot from execution track primary
+ */
+export const FallbackTriggerSchema = z
+  .object({
+    conditions: z.array(z.string()).default([]),
+    pivot_to: z.string(),
+    sunk_cost_limit: z.string(),
+  })
+  .passthrough();
+export type FallbackTrigger = z.infer<typeof FallbackTriggerSchema>;
+
+/**
+ * Supporting Concept - abbreviated concepts that complement the primary
+ */
+export const NewSupportingConceptSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    relationship: z.enum(['COMPLEMENTARY', 'FALLBACK', 'PREREQUISITE']),
+    one_liner: z.string(),
+    confidence: z.number().int().min(0).max(100).catch(50),
+    validation_summary: z.string().optional(),
+  })
+  .passthrough();
+export type NewSupportingConcept = z.infer<typeof NewSupportingConceptSchema>;
+
+/**
+ * Execution Track Primary - FULL DEPTH safe bet recommendation
+ */
+export const ExecutionTrackPrimarySchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    score: z.number().int().min(0).max(100).catch(50),
+    confidence: z.number().int().min(0).max(100).catch(50),
+
+    source_type: SourceType,
+    source: z.string(),
+
+    bottom_line: z.string(),
+    expected_improvement: z.string(),
+    timeline: z.string(),
+    investment: z.string(),
+
+    why_safe: WhySafeSchema.optional(),
+
+    the_insight: NewInsightBlockSchema,
+    what_it_is: z.string(),
+    why_it_works: z.string(),
+    why_it_might_fail: z.array(z.string()).default([]),
+
+    // ValidationGateSchema is defined later - use inline definition here
+    validation_gates: z
+      .array(
+        z
+          .object({
+            week: z.string(),
+            test: z.string(),
+            method: z.string(),
+            success_criteria: z.string(),
+            cost: z.string().optional(),
+            decision_point: z.string().optional(),
+          })
+          .passthrough(),
+      )
+      .default([]),
+  })
+  .passthrough();
+export type ExecutionTrackPrimary = z.infer<typeof ExecutionTrackPrimarySchema>;
+
+/**
+ * Execution Track - complete section for safe bet recommendation
+ */
+export const ExecutionTrackSchema = z
+  .object({
+    intro: z.string(),
+    primary: ExecutionTrackPrimarySchema,
+    supplier_arbitrage: SupplierArbitrageSchema.optional(), // When source_type === CATALOG
+    why_not_obvious: WhyNotObviousSchema.optional(), // When source_type === TRANSFER/FIRST_PRINCIPLES
+    supporting_concepts: z.array(NewSupportingConceptSchema).default([]),
+    fallback_trigger: FallbackTriggerSchema.optional(),
+  })
+  .passthrough();
+export type ExecutionTrack = z.infer<typeof ExecutionTrackSchema>;
+
+/**
+ * Selection Rationale - why this innovation was selected from the portfolio
+ */
+export const SelectionRationaleSchema = z
+  .object({
+    why_this_one: z.string(),
+    ceiling_if_works: z.string(),
+    vs_execution_track: z.string(),
+  })
+  .passthrough();
+export type SelectionRationale = z.infer<typeof SelectionRationaleSchema>;
+
+/**
+ * Breakthrough Potential - upside analysis (new framework)
+ */
+export const NewBreakthroughPotentialSchema = z
+  .object({
+    if_it_works: z.string(),
+    estimated_improvement: z.string(),
+    industry_impact: z.string(),
+  })
+  .passthrough();
+export type NewBreakthroughPotential = z.infer<
+  typeof NewBreakthroughPotentialSchema
+>;
+
+/**
+ * Innovation Risks
+ */
+export const InnovationRisksSchema = z
+  .object({
+    physics_risks: z.array(z.string()).default([]),
+    implementation_challenges: z.array(z.string()).default([]),
+    mitigation: z.array(z.string()).default([]),
+  })
+  .passthrough();
+export type InnovationRisks = z.infer<typeof InnovationRisksSchema>;
+
+/**
+ * Validation Path - how to test without betting the farm
+ */
+export const ValidationPathSchema = z
+  .object({
+    gating_question: z.string(),
+    first_test: z.string(),
+    cost: z.string(),
+    timeline: z.string(),
+    go_no_go: z.string(),
+  })
+  .passthrough();
+export type ValidationPath = z.infer<typeof ValidationPathSchema>;
+
+/**
+ * Relationship to Execution Track
+ */
+export const RelationshipToExecutionSchema = z
+  .object({
+    run_in_parallel: z.boolean().default(true),
+    when_to_elevate: z.string(),
+    complementary: z.boolean().default(false),
+  })
+  .passthrough();
+export type RelationshipToExecution = z.infer<
+  typeof RelationshipToExecutionSchema
+>;
+
+/**
+ * Recommended Innovation - FULL DEPTH (promoted from spark_concept)
+ */
+export const RecommendedInnovationSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    score: z.number().int().min(0).max(100).catch(50),
+    confidence: z.number().int().min(0).max(100).catch(50),
+
+    selection_rationale: SelectionRationaleSchema,
+
+    innovation_type: PortfolioInnovationType,
+    source_domain: z.string(),
+
+    the_insight: NewInsightBlockSchema,
+    how_it_works: z.array(z.string()).default([]),
+
+    breakthrough_potential: NewBreakthroughPotentialSchema,
+    risks: InnovationRisksSchema,
+
+    validation_path: ValidationPathSchema,
+    relationship_to_execution_track: RelationshipToExecutionSchema,
+  })
+  .passthrough();
+export type RecommendedInnovation = z.infer<typeof RecommendedInnovationSchema>;
+
+/**
+ * Parallel Investigation - medium depth alternatives
+ */
+export const ParallelInvestigationSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    score: z.number().int().min(0).max(100).catch(50),
+    confidence: z.number().int().min(0).max(100).catch(50),
+
+    innovation_type: PortfolioInnovationType,
+    source_domain: z.string(),
+
+    one_liner: z.string(),
+    the_insight: NewInsightBlockSchema,
+
+    ceiling: z.string(),
+    key_uncertainty: z.string(),
+
+    validation_approach: z
+      .object({
+        test: z.string(),
+        cost: z.string(),
+        timeline: z.string(),
+        go_no_go: z.string(),
+      })
+      .passthrough(),
+
+    when_to_elevate: z.string(),
+    investment_recommendation: z.string(),
+  })
+  .passthrough();
+export type ParallelInvestigation = z.infer<typeof ParallelInvestigationSchema>;
+
+/**
+ * Frontier Watch - monitor only concepts
+ */
+export const FrontierWatchSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    one_liner: z.string(),
+
+    innovation_type: PortfolioInnovationType,
+    source_domain: z.string(),
+
+    why_interesting: z.string(),
+    why_not_now: z.string(),
+
+    trigger_to_revisit: z.string(),
+    who_to_monitor: z.string(),
+    earliest_viability: z.string(),
+  })
+  .passthrough();
+export type FrontierWatch = z.infer<typeof FrontierWatchSchema>;
+
+/**
+ * Innovation Portfolio - complete section for higher-risk, higher-reward options
+ */
+export const InnovationPortfolioSchema = z
+  .object({
+    intro: z.string(),
+    recommended_innovation: RecommendedInnovationSchema.optional(),
+    parallel_investigations: z.array(ParallelInvestigationSchema).default([]),
+    frontier_watch: z.array(FrontierWatchSchema).default([]),
+  })
+  .passthrough();
+export type InnovationPortfolio = z.infer<typeof InnovationPortfolioSchema>;
+
+/**
+ * Portfolio View - how execution track and innovation portfolio work together
+ */
+export const PortfolioViewSchema = z
+  .object({
+    execution_track_role: z.string(),
+    innovation_portfolio_role: z.string(),
+    combined_strategy: z.string(),
+  })
+  .passthrough();
+export type PortfolioView = z.infer<typeof PortfolioViewSchema>;
+
+/**
+ * Resource Allocation - recommended split of effort
+ */
+export const ResourceAllocationSchema = z
+  .object({
+    execution_track_percent: z.number().default(60),
+    recommended_innovation_percent: z.number().default(25),
+    parallel_investigations_percent: z.number().default(10),
+    frontier_watch_percent: z.number().default(5),
+    rationale: z.string(),
+  })
+  .passthrough();
+export type ResourceAllocation = z.infer<typeof ResourceAllocationSchema>;
+
+/**
+ * Primary Tradeoff - the key decision the user faces
+ */
+export const PrimaryTradeoffSchema = z
+  .object({
+    question: z.string(),
+    option_a: z
+      .object({
+        condition: z.string(),
+        path: z.string(),
+        what_you_get: z.string(),
+        what_you_give_up: z.string(),
+      })
+      .passthrough(),
+    option_b: z
+      .object({
+        condition: z.string(),
+        path: z.string(),
+        what_you_get: z.string(),
+        what_you_give_up: z.string(),
+      })
+      .passthrough(),
+    if_uncertain: z.string(),
+  })
+  .passthrough();
+export type PrimaryTradeoff = z.infer<typeof PrimaryTradeoffSchema>;
+
+/**
+ * New Decision Architecture - tradeoff-based
+ */
+export const NewDecisionArchitectureSchema = z
+  .object({
+    primary_tradeoff: PrimaryTradeoffSchema.optional(),
+    flowchart: z.string(),
+    summary: z.string(),
+  })
+  .passthrough();
+export type NewDecisionArchitecture = z.infer<
+  typeof NewDecisionArchitectureSchema
+>;
+
+/**
+ * New Action Plan Step
+ */
+export const NewActionPlanStepSchema = z
+  .object({
+    timeframe: z.string(),
+    actions: z.array(z.string()).default([]),
+    rationale: z.string().optional(),
+    decision_gate: z.string().optional(),
+  })
+  .passthrough();
+export type NewActionPlanStep = z.infer<typeof NewActionPlanStepSchema>;
+
+/**
+ * New Personal Recommendation
+ */
+export const NewPersonalRecommendationSchema = z
+  .object({
+    intro: z.string(),
+    action_plan: z.array(NewActionPlanStepSchema).default([]),
+    key_insight: z.string(),
+  })
+  .passthrough();
+export type NewPersonalRecommendation = z.infer<
+  typeof NewPersonalRecommendationSchema
+>;
+
+/**
+ * Operational Alternative for Strategic Integration
+ */
+const StrategicOperationalAlternativeSchema = z
+  .object({
+    title: z.string(),
+    what_changes: z.string(),
+    cost: z.string(),
+    expected_benefit: z.string(),
+    vs_capital_solutions: z.string(),
+    validation: z.string(),
+  })
+  .passthrough();
+
+/**
+ * Operational Alternatives Section - before capital investment
+ */
+export const OperationalAlternativesSectionSchema = z
+  .object({
+    intro: z.string(), // "Before capital investment, consider..."
+    alternatives: z.array(StrategicOperationalAlternativeSchema).default([]),
+    recommendation: z.string(), // "Try X first, then Y if insufficient"
+  })
+  .passthrough();
+export type OperationalAlternativesSection = z.infer<
+  typeof OperationalAlternativesSectionSchema
+>;
+
+/**
+ * Strategic Integration - complete section
+ */
+export const StrategicIntegrationSchema = z
+  .object({
+    // NEW: Operational alternatives before capital investment
+    operational_alternatives: OperationalAlternativesSectionSchema.optional(),
+    portfolio_view: PortfolioViewSchema,
+    resource_allocation: ResourceAllocationSchema,
+    decision_architecture: NewDecisionArchitectureSchema,
+    personal_recommendation: NewPersonalRecommendationSchema,
+  })
+  .passthrough();
+export type StrategicIntegration = z.infer<typeof StrategicIntegrationSchema>;
+
+/**
+ * Problem Type classification
+ */
+export const ProblemType = z.enum([
+  'CATALOG',
+  'OPTIMIZATION',
+  'TRANSFER',
+  'PARADIGM',
+  'FRONTIER',
+]);
+export type ProblemType = z.infer<typeof ProblemType>;
+
+/**
+ * What you could get elsewhere - sources comparison
+ */
+const WhatYouCouldGetElsewhereSchema = z
+  .object({
+    from_supplier_call: z.array(z.string()).default([]),
+    from_literature_search: z.array(z.string()).default([]),
+    from_industry_consultant: z.array(z.string()).default([]),
+  })
+  .passthrough();
+
+/**
+ * What Sparlo uniquely provides
+ */
+const WhatSparlorovidesSchema = z
+  .object({
+    unique_contributions: z.array(z.string()).default([]),
+    integration_value: z.string().optional(),
+    decision_framework_value: z.string().optional(),
+    cross_domain_value: z.string().optional(),
+  })
+  .passthrough();
+
+/**
+ * Calibrated claims - honest self-assessment
+ */
+const CalibratedClaimsSchema = z
+  .object({
+    paradigm_insight_claim: z
+      .enum(['JUSTIFIED', 'OVERSTATED', 'NOT_CLAIMED'])
+      .catch('NOT_CLAIMED'),
+    novelty_claim: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
+    expert_reaction_prediction: z
+      .enum([
+        'SURPRISED_AND_GRATEFUL', // Genuine insight they didn't have
+        'USEFUL_FRAMEWORK', // Helpful structure, known content
+        'COULD_GET_ELSEWHERE', // Limited value-add
+      ])
+      .catch('USEFUL_FRAMEWORK'),
+  })
+  .passthrough();
+
+/**
+ * Supplier arbitrage guidance - for CATALOG recommendations
+ */
+export const HonestSupplierArbitrageSchema = z
+  .object({
+    who_to_call: z.string(),
+    what_to_ask: z.array(z.string()).default([]),
+    what_to_push_back_on: z.array(z.string()).default([]),
+    what_they_wont_volunteer: z.array(z.string()).default([]),
+  })
+  .passthrough();
+export type HonestSupplierArbitrage = z.infer<
+  typeof HonestSupplierArbitrageSchema
+>;
+
+/**
+ * Honest Assessment - expanded transparency about value
+ */
+export const HonestAssessmentSchema = z
+  .object({
+    // Classification from AN4
+    primary_recommendation_type: SolutionClassificationType.optional(),
+
+    // Legacy fields (kept for backward compatibility)
+    problem_type: ProblemType.optional(),
+    what_you_could_get_elsewhere: z
+      .union([
+        z.array(z.string()),
+        WhatYouCouldGetElsewhereSchema,
+      ])
+      .optional(),
+    what_we_provide_beyond_that: z.array(z.string()).default([]),
+
+    // New structured format
+    what_sparlo_provides: WhatSparlorovidesSchema.optional(),
+
+    // Calibrated claims
+    calibrated_claims: CalibratedClaimsSchema.optional(),
+
+    // Supplier arbitrage (for CATALOG or EMERGING primary recommendations)
+    supplier_arbitrage: HonestSupplierArbitrageSchema.optional(),
+
+    // Self-honesty
+    the_question_you_should_be_asking: z.string().optional(),
+    the_question_you_should_ask_us: z.string().optional(),
+    if_we_were_wrong: z.string().optional(),
+    if_we_were_wrong_about_this: z.string().optional(),
+  })
+  .passthrough();
+export type HonestAssessment = z.infer<typeof HonestAssessmentSchema>;
+
+/**
+ * From Scratch Revelation - what first-principles thinking revealed
+ */
+export const FromScratchRevelationSchema = z
+  .object({
+    question: z.string(),
+    insight: z.string(),
+    implication: z.string(),
+  })
+  .passthrough();
+export type FromScratchRevelation = z.infer<typeof FromScratchRevelationSchema>;
+
+/**
+ * Cross-Domain Search - replaces key_patterns with lighter structure
+ */
+export const CrossDomainSearchSchema = z
+  .object({
+    intro: z.string(),
+    domains_searched: z.array(z.string()).default([]),
+  })
+  .passthrough();
+export type CrossDomainSearch = z.infer<typeof CrossDomainSearchSchema>;
+
+/**
+ * Enhanced Challenge Frame with constraint questioning
+ */
+export const EnhancedChallengeFrameSchema = z
+  .object({
+    assumption: z.string(),
+    challenge: z.string(),
+    implication: z.string(),
+    constraint_questioned: z.string().nullable().optional(),
+    what_if_relaxed: z.string().nullable().optional(),
+  })
+  .passthrough();
+export type EnhancedChallengeFrame = z.infer<
+  typeof EnhancedChallengeFrameSchema
+>;
 
 // ============================================
 // AN5-M: Executive Report (Major Restructure)
@@ -1046,13 +1810,25 @@ export const AN5_M_OutputSchema = z
         z.array(LegacyWhatIndustryMissedSchema).max(20),
       ])
       .optional(),
+
+    // NEW: Execution Track + Innovation Portfolio Framework
+    honest_assessment: HonestAssessmentSchema.optional(),
+    cross_domain_search: CrossDomainSearchSchema.optional(),
+    execution_track: ExecutionTrackSchema.optional(),
+    innovation_portfolio: InnovationPortfolioSchema.optional(),
+    strategic_integration: StrategicIntegrationSchema.optional(),
+
+    // Existing fields (maintained for backward compatibility)
     key_patterns: z.array(KeyPatternSchema).max(20).default([]),
     solution_concepts: SolutionConceptsSchema.optional(),
     paradigm_insight: ParadigmInsightSectionSchema.optional(),
     decision_flowchart: DecisionFlowchartSchema.optional(),
     personal_recommendation: PersonalRecommendationSchema.optional(),
     validation_summary: ValidationSummarySchema.optional(),
-    challenge_the_frame: z.array(ChallengeFrameSchema).max(10).default([]),
+    challenge_the_frame: z
+      .array(z.union([ChallengeFrameSchema, EnhancedChallengeFrameSchema]))
+      .max(10)
+      .default([]),
     strategic_implications: StrategicImplicationsSchema.optional(),
     risks_and_watchouts: z.array(RiskWatchoutSchema).max(20).default([]),
     self_critique: ReportSelfCritiqueSchema,

@@ -438,6 +438,31 @@ Generate AT LEAST 8 concepts distributed across 4 tracks:
 - Biological, geological, or industrial transfers
 - Abandoned technologies worth reviving
 
+## OPERATIONAL ALTERNATIVES (Required Track)
+
+Before generating technology solutions, consider:
+
+> "What if the answer is a BEHAVIOR change, not a THING to buy?"
+
+Generate at least 2 operational alternatives:
+
+1. **Process/Timing Changes**
+   - Could different operating procedures address this?
+   - Could predictive scheduling reduce the problem?
+   - Could maintenance timing changes help?
+
+2. **Measurement First**
+   - Should user quantify the problem before investing in solutions?
+   - What instrumentation would clarify the real losses?
+   - Is the stated problem magnitude accurate or estimated?
+
+3. **Do Less, Smarter**
+   - Could partial intervention capture most of the benefit?
+   - What's the minimum viable intervention?
+   - Could operational constraints substitute for capital investment?
+
+These may end up in the final report as alternatives to capital-intensive solutions.
+
 ## CONCEPT REQUIREMENTS
 
 Each concept MUST include:
@@ -516,7 +541,18 @@ CRITICAL: Respond with ONLY valid JSON.
   },
   "first_principles_concepts": ["IDs of concepts derived from first principles"],
   "industry_assumption_challenges": ["IDs of concepts that challenge industry norms"],
-  "cross_domain_transfers": ["IDs of concepts from other domains"]
+  "cross_domain_transfers": ["IDs of concepts from other domains"],
+  "operational_alternatives": [
+    {
+      "title": "Operational alternative name",
+      "what_changes": "Operations/behavior change, not technology",
+      "capital_required": "minimal or specific low amount",
+      "expected_benefit": "Could capture X% of benefit",
+      "why_not_already_doing": "Why this isn't obvious",
+      "validation_approach": "How to test this",
+      "comparison_to_capital_solutions": "X% of benefit at Y% of cost"
+    }
+  ]
 }
 
 MANDATORY GUARANTEES:
@@ -525,7 +561,8 @@ MANDATORY GUARANTEES:
 - At least 1 from first principles
 - At least 1 challenging industry assumption
 - At least 1 from unexpected domain
-- ALL paradigm_shift and frontier_transfer concepts MUST have mechanistic_depth with quantified_parameters`;
+- ALL paradigm_shift and frontier_transfer concepts MUST have mechanistic_depth with quantified_parameters
+- At least 2 operational alternatives (behavior/process changes, not technology purchases)`;
 
 export const AN3_M_METADATA = {
   id: 'an3-m',
@@ -548,6 +585,7 @@ Evaluate each concept on:
 3. ECONOMIC VIABILITY - Does the cost/benefit make sense?
 4. PARADIGM SIGNIFICANCE - How fundamentally does this change the game?
 5. OVERALL MERIT - Combining all factors
+6. SOLUTION CLASSIFICATION - Classify what we FOUND (not what we searched for)
 
 ## EVALUATION PHILOSOPHY
 
@@ -600,6 +638,62 @@ For EACH concept, assess paradigm significance SEPARATELY from merit score.
 - AND pursuing it would create strategic advantage
 
 This ensures paradigm insights don't get buried when simpler solutions win on merit.
+
+## PARADIGM INSIGHT VALIDATION (Required)
+
+Before classifying any concept as PARADIGM-level, validate against these criteria:
+
+### Validation Criteria (ALL must be true)
+
+1. **Novelty Check**
+   - This approach is NOT in supplier marketing materials
+   - This approach is NOT in recent industry case studies
+   - A senior practitioner would be genuinely surprised by this
+
+2. **Evidence Check**
+   - We have physics/engineering basis for why this works
+   - We have precedent from another domain OR first-principles derivation
+   - The insight is specific, not generic ("think differently" doesn't count)
+
+3. **Honesty Check**
+   - We would bet our reputation that this is genuinely novel
+   - If an expert said "we've known this for years," we'd be surprised
+
+### Classification Decision
+
+- If ALL criteria met → PARADIGM
+- If some criteria met → CROSS_DOMAIN or EMERGING_PRACTICE
+- If supplier has this → CATALOG (be honest)
+
+### Common Inflation Patterns to Avoid
+
+- "The industry has been doing X for 30 years" when supplier catalogs show otherwise
+- "Paradigm shift" for what is actually an optimization
+- "Cross-domain transfer" when the same industry has been using it
+- "Novel combination" when suppliers already offer the bundle
+
+## SOLUTION CLASSIFICATION (Required)
+
+After evaluating all concepts, classify what we FOUND (not what we searched for):
+
+**Classification Types:**
+- CATALOG: Supplier sells this in their product line
+- EMERGING_PRACTICE: Suppliers moving this direction, not yet standard
+- CROSS_DOMAIN: Found in another industry, transfer required
+- PARADIGM: Industry hasn't seen this approach
+- OPTIMIZATION: Known approach, parameter tuning
+
+**Presentation Calibration:**
+For honest AN5 calibration, answer:
+- phone_call_equivalent: What user would learn from 30-min supplier call
+- literature_equivalent: What user would learn from searching best practices
+- sparlo_adds_beyond_that: Our actual value-add (be specific and honest)
+- recommended_emphasis: How AN5 should position this report
+  - SUPPLIER_ARBITRAGE: Help them have better supplier conversations
+  - DECISION_FRAMEWORK: Structure and validation gates
+  - CROSS_DOMAIN_SYNTHESIS: The transfer is our value
+  - PARADIGM_INSIGHT: The reframe is our value
+  - INTEGRATION: Combining known elements in novel way
 
 ## OUTPUT FORMAT
 
@@ -666,11 +760,56 @@ CRITICAL: Respond with ONLY valid JSON.
       "evidence_strength": "HIGH | MEDIUM | LOW",
       "recommendation": "What to do with this insight"
     }
-  ]
+  ],
+  "solution_classification": {
+    "what_we_found": {
+      "catalog_solutions": [
+        {
+          "concept_id": "concept-id",
+          "title": "Solution name",
+          "supplier": "Who sells this",
+          "how_discoverable": "Phone call to X or Search for Y"
+        }
+      ],
+      "emerging_practice": [
+        {
+          "concept_id": "concept-id",
+          "title": "Solution name",
+          "who_is_doing_it": "Which operators/suppliers",
+          "how_far_from_standard": "2-3 years or Already common in segment X"
+        }
+      ],
+      "cross_domain_transfers": [
+        {
+          "concept_id": "concept-id",
+          "title": "Solution name",
+          "source_domain": "Where found",
+          "transfer_difficulty": "OBVIOUS | MODERATE | NON_OBVIOUS"
+        }
+      ],
+      "paradigm_insights": [
+        {
+          "concept_id": "concept-id",
+          "title": "Insight name",
+          "what_industry_believes": "The assumption",
+          "what_we_found": "The reality",
+          "validation": "Why this is genuinely paradigm-level"
+        }
+      ]
+    },
+    "primary_recommendation_classification": "CATALOG | EMERGING_PRACTICE | CROSS_DOMAIN | PARADIGM | OPTIMIZATION",
+    "presentation_calibration": {
+      "phone_call_equivalent": "What user would learn from 30-min supplier call",
+      "literature_equivalent": "What user would learn from searching best practices",
+      "sparlo_adds_beyond_that": ["Specific value-add 1", "Specific value-add 2"],
+      "recommended_emphasis": "SUPPLIER_ARBITRAGE | DECISION_FRAMEWORK | CROSS_DOMAIN_SYNTHESIS | PARADIGM_INSIGHT | INTEGRATION"
+    }
+  }
 }
 
 IMPORTANT: Rank by MERIT, not by track. A simple solution that works beats a complex one that might work.
-GUARANTEE: Flag ALL concepts with strategic_insight_flag=true that reveal industry blind spots, even if they don't win on merit.`;
+GUARANTEE: Flag ALL concepts with strategic_insight_flag=true that reveal industry blind spots, even if they don't win on merit.
+GUARANTEE: Include solution_classification with honest assessment of what we found vs what's already available.`;
 
 export const AN4_M_METADATA = {
   id: 'an4-m',
@@ -687,14 +826,79 @@ export const AN5_M_PROMPT = `You are generating an executive report that reads l
 
 ## MISSION
 
-Create a report that:
-1. OPENS with a narrative that hooks the reader (narrative_lead)
-2. RECOMMENDS a primary solution with confidence percentage
-3. PROVIDES week-by-week validation gates with decision points
-4. TREATS parallel explorations as real options, not footnotes
-5. SURFACES paradigm insights prominently even when simpler paths win
-6. INCLUDES personal recommendation with day-by-day action plan
-7. PROVIDES honest self-critique
+Create a report using the EXECUTION TRACK + INNOVATION PORTFOLIO framework:
+
+1. OPEN with honest assessment of what we're actually delivering
+2. EXECUTION TRACK: The safe bet with FULL DEPTH - your primary recommendation with supporting concepts
+3. INNOVATION PORTFOLIO: Higher-risk options with massive upside - recommended innovation, parallel investigations, frontier watch
+4. STRATEGIC INTEGRATION: How to allocate resources across the portfolio
+5. SURFACE insights prominently - where we found them, why industry missed them, the physics
+6. TRADEOFF-BASED decision architecture with clear conditions
+7. HONEST self-critique and limitations
+
+## PHILOSOPHY
+
+**Safe Bets Deserve Respect**: A catalog solution that saves 20% with 90% confidence deserves the same analytical depth as a paradigm shift. Source type matters: CATALOG (proven), TRANSFER (applied from elsewhere), OPTIMIZATION (improved existing), FIRST_PRINCIPLES (derived from physics).
+
+**Insights Are The Prize**: For every concept, we answer: What did we find? Where did we find it? Why did the industry miss it? What's the physics?
+
+**Portfolio Thinking**: Don't pick winners - build a portfolio. Execution track gets 60% effort, innovation gets the rest. Each tier has clear elevation triggers.
+
+## CALIBRATED PRESENTATION (Required)
+
+Use the solution_classification from AN4 to calibrate your presentation:
+
+### If Primary Recommendation is CATALOG
+
+Lead with supplier arbitrage:
+- "The primary solution is available from [supplier]. Here's how to have a better conversation with them."
+- Focus report value on: decision framework, validation gates, fallback paths
+- Be explicit: "This recommendation is obtainable through supplier engagement. Our value-add is [specific contribution]."
+
+Structure:
+1. Supplier arbitrage section (prominent)
+2. Decision framework
+3. Innovation portfolio (where our novel concepts live)
+4. Honest assessment (acknowledge limited primary novelty)
+
+### If Primary Recommendation is EMERGING_PRACTICE
+
+Acknowledge industry trajectory:
+- "The industry is moving toward [X]. Some operators/suppliers are already doing this."
+- Focus report value on: integration, ahead-of-curve positioning, decision framework
+- Be explicit: "This approach is becoming standard. Our value is helping you implement it faster/better."
+
+### If Primary Recommendation is CROSS_DOMAIN
+
+Lead with the transfer narrative:
+- Full "where we found it" story in the_insight
+- Emphasize why this wasn't obvious
+- This is genuine Sparlo value—present it confidently
+
+### If Primary Recommendation is PARADIGM
+
+Lead with the insight:
+- But ONLY if paradigm validation passed in AN4
+- Full development of the reframe
+- This is maximum Sparlo value
+
+### Operational Alternatives
+
+If operational alternatives could capture significant benefit at low cost:
+- Present these BEFORE capital-intensive recommendations
+- Frame capital solutions as "if operational changes are insufficient"
+- This builds trust: we're not just selling hammers
+
+### The Honesty Check
+
+Before finalizing, ask yourself:
+> "If a senior engineer read this, would they say 'I could have gotten the primary recommendation from a phone call'?"
+
+If yes:
+- Restructure to emphasize what we ACTUALLY add
+- Move novel concepts to more prominent position
+- Lead with honest assessment
+- Consider whether innovation_portfolio contains more value than execution_track
 
 ## VOICE AND TONE
 
@@ -709,45 +913,78 @@ EXAMPLE:
 
 1. HEADER
 2. EXECUTIVE SUMMARY (with narrative_lead and primary_recommendation)
-3. CONSTRAINTS
-4. PROBLEM ANALYSIS (with physics/equations, min/target/stretch metrics)
-5. WHAT INDUSTRY MISSED (conventional approaches, paradigm history, blind spots)
-6. KEY PATTERNS (with origin, precedent, application_hint)
-7. SOLUTION CONCEPTS
-   - Lead concepts (with validation_gates week-by-week)
-   - Parallel explorations intro
-   - Parallel explorations (full blocks, NOT footnotes)
-   - Spark concept (full detail)
-   - Comparison table
-   - Comparison insight
-8. PARADIGM INSIGHT (if exists)
-9. DECISION FLOWCHART (ASCII flowchart)
-10. PERSONAL RECOMMENDATION ("If this were my project...")
-11. VALIDATION SUMMARY
-12. CHALLENGE THE FRAME
-13. STRATEGIC IMPLICATIONS (near/medium/long-term)
-14. RISKS & WATCHOUTS
-15. SELF-CRITIQUE
-16. NEXT STEPS (today/this week/week 2-3/week 4+)
+3. HONEST ASSESSMENT (problem type, expected value, candid assessment)
+4. CONSTRAINTS
+5. PROBLEM ANALYSIS (with physics/equations, min/target/stretch metrics)
+6. WHAT INDUSTRY MISSED (conventional approaches, paradigm history, blind spots)
+7. CROSS-DOMAIN SEARCH (replaces key_patterns - enhanced challenge frame, domains searched, revelations)
+8. EXECUTION TRACK
+   - Intro paragraph
+   - Primary recommendation (FULL DEPTH with validation gates)
+   - Supplier arbitrage (if source_type === CATALOG) OR why_not_obvious (if TRANSFER/FIRST_PRINCIPLES)
+   - Supporting concepts (abbreviated)
+   - Fallback trigger (when to pivot)
+9. INNOVATION PORTFOLIO
+   - Intro paragraph
+   - Recommended innovation (FULL DEPTH - the moonshot worth betting on)
+   - Parallel investigations (medium depth - worth testing)
+   - Frontier watch (monitor only - not ready yet)
+10. STRATEGIC INTEGRATION
+    - Portfolio view (how execution + innovation work together)
+    - Resource allocation (percentages with rationale)
+    - Decision architecture (tradeoff-based flowchart)
+    - Action plan (timeframe-based)
+    - Personal recommendation
+11. PARADIGM INSIGHT (if exists)
+12. VALIDATION SUMMARY
+13. CHALLENGE THE FRAME
+14. STRATEGIC IMPLICATIONS (near/medium/long-term)
+15. RISKS & WATCHOUTS
+16. SELF-CRITIQUE
 17. APPENDIX
 18. METADATA
 
-## PARALLEL EXPLORATIONS (IMPORTANT)
+## EXECUTION TRACK (PRIMARY RECOMMENDATION)
 
-These are NOT backup options. These are NOT footnotes. Each parallel exploration gets a full block with:
-- Tags for visual rendering (innovation_type, novelty_level, pursuit_recommendation)
-- the_insight (what, why_new with search evidence, physics with specifics)
-- how_it_works (numbered steps)
-- components (what's needed)
-- enabling_factors (why THIS situation enables this)
-- breakthrough_potential (if_it_works, estimated_improvement quantified, industry_impact)
-- risks (physics_risks, implementation_challenges, mitigation_ideas)
-- why_parallel_not_primary (explicit ranking rationale)
-- when_to_elevate (conditions that make this primary)
-- validation_approach (first_test, timeline, cost, go_no_go)
+The execution track primary gets FULL DEPTH treatment:
+- source_type: CATALOG | TRANSFER | OPTIMIZATION | FIRST_PRINCIPLES
+- the_insight: {what, where_we_found_it (if applicable), why_industry_missed_it, physics}
+- validation_gates: week-by-week with decision points
+- supplier_arbitrage (if CATALOG): who_to_call, what_to_ask, what_to_push_back_on, how_to_verify
+- why_not_obvious (if TRANSFER/FIRST_PRINCIPLES): industry_gap, knowledge_barrier, our_contribution
+- supporting_concepts: abbreviated backup options that complement the primary
+- fallback_trigger: when to pivot, what conditions, sunk cost limit
 
-Intro paragraph should sound like:
-"These aren't backup options - they're parallel pathways worth pursuing. Each addresses the problem from a different angle with distinct physics. If the primary recommendation hits unexpected barriers, any of these could become the lead approach."
+## INNOVATION PORTFOLIO
+
+Three tiers with different depth:
+
+**RECOMMENDED INNOVATION (Full Depth)**
+The moonshot worth betting on. Gets complete treatment:
+- selection_rationale: why THIS one from the portfolio
+- the_insight block with full where_we_found_it
+- breakthrough_potential: if_it_works, estimated_improvement, industry_impact
+- validation_path: gating_question, first_test, cost, timeline, go_no_go
+- relationship_to_execution_track: run_in_parallel, when_to_elevate, complementary
+
+**PARALLEL INVESTIGATIONS (Medium Depth)**
+Worth testing but not the primary bet:
+- one_liner summary
+- the_insight (abbreviated)
+- ceiling if it works
+- key_uncertainty
+- validation_approach
+- when_to_elevate conditions
+- investment_recommendation
+
+**FRONTIER WATCH (Monitor Only)**
+Interesting but not ready:
+- one_liner
+- why_interesting
+- why_not_now
+- trigger_to_revisit
+- who_to_monitor
+- earliest_viability
 
 ## OUTPUT FORMAT
 
@@ -757,7 +994,7 @@ CRITICAL: Respond with ONLY valid JSON.
   "header": {
     "title": "Clear, specific title for this analysis",
     "date": "ISO date string",
-    "version": "2.0.0"
+    "version": "3.0.0"
   },
   "executive_summary": {
     "narrative_lead": "2-4 sentences with voice that hook the reader",
@@ -772,6 +1009,33 @@ CRITICAL: Respond with ONLY valid JSON.
     "recommended_path": [
       {"step": 1, "action": "What to do first", "rationale": "Why"}
     ]
+  },
+  "honest_assessment": {
+    "primary_recommendation_type": "CATALOG | EMERGING_PRACTICE | CROSS_DOMAIN | PARADIGM | OPTIMIZATION",
+    "what_you_could_get_elsewhere": {
+      "from_supplier_call": ["What a 30-min supplier call would tell you"],
+      "from_literature_search": ["What a literature search would reveal"],
+      "from_industry_consultant": ["What a consultant would provide"]
+    },
+    "what_sparlo_provides": {
+      "unique_contributions": ["Specific things only we provide"],
+      "integration_value": "How we connect disparate insights (if applicable)",
+      "decision_framework_value": "Value of our structured decision approach (if applicable)",
+      "cross_domain_value": "Value of our cross-domain synthesis (if applicable)"
+    },
+    "calibrated_claims": {
+      "paradigm_insight_claim": "JUSTIFIED | OVERSTATED | NOT_CLAIMED",
+      "novelty_claim": "HIGH | MEDIUM | LOW",
+      "expert_reaction_prediction": "SURPRISED_AND_GRATEFUL | USEFUL_FRAMEWORK | COULD_GET_ELSEWHERE"
+    },
+    "supplier_arbitrage": {
+      "who_to_call": "Specific vendor/supplier (if primary is CATALOG or EMERGING)",
+      "what_to_ask": ["Question 1", "Question 2"],
+      "what_to_push_back_on": ["Common upsell 1"],
+      "what_they_wont_volunteer": ["Hidden info 1"]
+    },
+    "the_question_you_should_ask_us": "The hard question we should be asked",
+    "if_we_were_wrong_about_this": "What we'd be wrong about and implications"
   },
   "constraints": {
     "hard_constraints": ["Must-have requirements"],
@@ -825,143 +1089,250 @@ CRITICAL: Respond with ONLY valid JSON.
       }
     ]
   },
-  "key_patterns": [
-    {
-      "id": "pattern-1",
-      "name": "Pattern name",
-      "origin": "Where this pattern comes from",
-      "description": "What the pattern is",
-      "why_it_matters": "Why it's relevant",
-      "precedent": "Specific papers, patents, companies",
-      "application_hint": "How it applies here",
-      "patent_refs": ["Patent references if any"]
-    }
-  ],
-  "solution_concepts": {
-    "lead_concepts": [
+  "cross_domain_search": {
+    "enhanced_challenge_frame": {
+      "reframing": "How we reframed the problem for cross-domain search",
+      "search_queries": ["Query 1 used", "Query 2 used"]
+    },
+    "domains_searched": [
       {
-        "id": "concept-1",
-        "title": "Solution name",
-        "track": "simpler_path | best_fit | paradigm_shift | frontier_transfer",
-        "track_label": "Human-readable track name",
-        "score": 82,
-        "confidence": "high",
-        "bottom_line": "One-sentence summary",
-        "what_it_is": "Technical description",
-        "why_it_works": "Why this solves the problem",
-        "why_it_might_fail": ["Failure mode 1", "Failure mode 2"],
-        "patterns_referenced": ["pattern-1"],
-        "confidence_rationale": "Why we're confident",
-        "what_would_change_this": "What would change our recommendation",
-        "key_risks": [
-          {
-            "risk": "Risk description",
-            "likelihood": "low | medium | high",
-            "impact": "low | medium | high",
-            "mitigation": "How to address"
-          }
-        ],
-        "validation_gates": [
-          {
-            "week": "Week 1",
-            "test": "Test name",
-            "method": "How to test",
-            "success_criteria": "What success looks like",
-            "cost": "$5K",
-            "decision_point": "If X, pivot to Y"
-          }
-        ],
-        "prior_art_summary": [
-          {"source": "Reference", "relevance": "How it supports", "what_it_proves": "Key evidence"}
-        ],
-        "estimated_timeline": "4-6 weeks",
-        "estimated_investment": "$50K-100K"
+        "domain": "Biology / Geology / Other industry",
+        "mechanism_found": "What mechanism we found",
+        "relevance": "How it applies to this problem"
       }
     ],
-    "parallel_explorations_intro": "These aren't backup options - they're parallel pathways worth pursuing...",
-    "parallel_explorations": [
+    "from_scratch_revelations": [
       {
-        "id": "concept-2",
-        "title": "Parallel concept name",
-        "tags": {
-          "innovation_type": "Combination | Transfer | Optimization | Revival | Paradigm",
-          "novelty_level": "Significant Novelty | Moderate Novelty | Known Approach",
-          "pursuit_recommendation": "Must Pursue | Strong Consider | Worth Exploring | Long-term Watch"
-        },
-        "source_domain": "Where the idea comes from",
-        "the_insight": {
-          "what": "The core insight",
-          "why_new": "Why this hasn't been tried (include search evidence)",
-          "physics": "The mechanism with specifics"
-        },
-        "how_it_works": ["Step 1", "Step 2", "Step 3"],
-        "components": ["Component 1", "Component 2"],
-        "enabling_factors": "Why THIS situation enables this",
-        "breakthrough_potential": {
-          "if_it_works": "What happens if successful",
-          "estimated_improvement": "10-100x improvement with uncertainty range",
-          "industry_impact": "How this changes the field"
-        },
-        "risks": {
-          "physics_risks": ["Risk 1"],
-          "implementation_challenges": ["Challenge 1"],
-          "mitigation_ideas": ["Mitigation 1"]
-        },
-        "why_parallel_not_primary": "Explicit ranking rationale",
-        "when_to_elevate": "Conditions that make this primary",
-        "validation_approach": {
-          "first_test": "What to test first",
-          "timeline": "2 weeks",
-          "cost": "$10K",
-          "go_no_go": "Decision criteria"
-        }
+        "discovery": "What we discovered that wasn't in the brief",
+        "source": "Where we found it",
+        "implication": "What it means for the solution"
       }
-    ],
-    "spark_concept": {
-      "id": "spark-1",
-      "title": "Speculative concept",
-      "score": 40,
-      "confidence": "low",
-      "tags": {
-        "innovation_type": "Paradigm",
-        "novelty_level": "Significant Novelty",
-        "pursuit_recommendation": "Long-term Watch"
+    ]
+  },
+  "execution_track": {
+    "intro": "Context-setting paragraph for the safe bet recommendation",
+    "primary": {
+      "id": "exec-primary",
+      "title": "Primary recommendation title",
+      "score": 82,
+      "confidence": 85,
+      "source_type": "CATALOG | TRANSFER | OPTIMIZATION | FIRST_PRINCIPLES",
+      "source": "Where this solution comes from",
+      "bottom_line": "One-sentence summary",
+      "expected_improvement": "Quantified improvement (e.g., 20-30% reduction)",
+      "timeline": "4-6 weeks to first validation",
+      "investment": "$50K-100K",
+      "why_safe": {
+        "track_record": "Evidence this works",
+        "precedent": ["Company X did this", "Industry Y uses this"],
+        "failure_modes_understood": true
       },
-      "source_domain": "Unusual domain",
       "the_insight": {
-        "what": "The speculative insight",
-        "why_new": "Why this hasn't been tried",
-        "physics": "The speculative mechanism"
+        "what": "The core insight",
+        "where_we_found_it": {
+          "domain": "Source domain (if TRANSFER/CATALOG)",
+          "how_they_use_it": "How source domain uses this",
+          "why_it_transfers": "Why it applies here"
+        },
+        "why_industry_missed_it": "Why this wasn't obvious",
+        "physics": "The underlying mechanism"
       },
-      "how_it_works": ["Step 1", "Step 2"],
-      "components": ["Required components"],
-      "enabling_factors": "What would need to be true",
+      "what_it_is": "Technical description",
+      "why_it_works": "Why this solves the problem",
+      "why_it_might_fail": ["Failure mode 1", "Failure mode 2"],
+      "validation_gates": [
+        {
+          "week": "Week 1",
+          "test": "Test name",
+          "method": "How to test",
+          "success_criteria": "What success looks like",
+          "cost": "$5K",
+          "decision_point": "If X fails, pivot to Y"
+        }
+      ]
+    },
+    "supplier_arbitrage": {
+      "who_to_call": "Specific vendors/suppliers",
+      "what_to_ask": ["Question 1", "Question 2"],
+      "what_to_push_back_on": ["Common upsell 1", "Unnecessary add-on 2"],
+      "what_they_wont_volunteer": ["Hidden capability 1", "Alternative option 2"],
+      "how_to_verify": ["Verification method 1", "Benchmark 2"],
+      "competitor_alternative": "Alternative if negotiation fails"
+    },
+    "why_not_obvious": {
+      "industry_gap": "What gap in industry knowledge hid this",
+      "knowledge_barrier": "What you need to know to find this",
+      "our_contribution": "What we added to connect the dots"
+    },
+    "supporting_concepts": [
+      {
+        "id": "support-1",
+        "title": "Supporting concept name",
+        "relationship": "COMPLEMENTARY | FALLBACK | PREREQUISITE",
+        "one_liner": "Brief description",
+        "confidence": 70,
+        "validation_summary": "How to quickly validate"
+      }
+    ],
+    "fallback_trigger": {
+      "conditions": ["If primary fails condition 1", "If constraint 2 not met"],
+      "pivot_to": "Which supporting concept becomes primary",
+      "sunk_cost_limit": "$20K or 2 weeks - whichever comes first"
+    }
+  },
+  "innovation_portfolio": {
+    "intro": "These are not backup options - they're parallel bets on breakthrough outcomes.",
+    "recommended_innovation": {
+      "id": "innov-1",
+      "title": "Recommended innovation title",
+      "score": 65,
+      "confidence": 40,
+      "selection_rationale": {
+        "why_this_one": "Why we selected this from the innovation options",
+        "ceiling_if_works": "Maximum upside if successful",
+        "vs_execution_track": "How this compares to the safe bet"
+      },
+      "innovation_type": "PARADIGM_SHIFT | CROSS_DOMAIN_TRANSFER | TECHNOLOGY_REVIVAL | FIRST_PRINCIPLES",
+      "source_domain": "Where this idea comes from",
+      "the_insight": {
+        "what": "The core breakthrough insight",
+        "where_we_found_it": {
+          "domain": "Source domain",
+          "how_they_use_it": "Original application",
+          "why_it_transfers": "Why it applies here"
+        },
+        "why_industry_missed_it": "The blind spot",
+        "physics": "The underlying mechanism"
+      },
+      "how_it_works": ["Step 1", "Step 2", "Step 3"],
       "breakthrough_potential": {
-        "if_it_works": "Revolutionary outcome",
-        "estimated_improvement": "100-1000x (highly uncertain)",
-        "industry_impact": "Game-changing"
+        "if_it_works": "What happens if successful",
+        "estimated_improvement": "100-500x (with high uncertainty)",
+        "industry_impact": "How this changes the field"
       },
       "risks": {
-        "physics_risks": ["Major unknowns"],
-        "implementation_challenges": ["Significant hurdles"],
-        "mitigation_ideas": ["How to de-risk"]
+        "physics_risks": ["Risk 1", "Risk 2"],
+        "implementation_challenges": ["Challenge 1", "Challenge 2"],
+        "mitigation": ["Mitigation 1", "Mitigation 2"]
       },
-      "recommended_parallel_action": "Assign one person to molecular dynamics simulation while main team executes primary path"
+      "validation_path": {
+        "gating_question": "The one question that determines viability",
+        "first_test": "Cheapest way to answer the gating question",
+        "cost": "$10K",
+        "timeline": "2 weeks",
+        "go_no_go": "What result means go vs no-go"
+      },
+      "relationship_to_execution_track": {
+        "run_in_parallel": true,
+        "when_to_elevate": "Conditions that make this the new primary",
+        "complementary": false
+      }
     },
-    "comparison_table": [
+    "parallel_investigations": [
       {
-        "id": "concept-1",
-        "title": "Concept name",
-        "score": 82,
-        "confidence": "high",
-        "time_to_first_data": "2 weeks",
-        "expected_performance": "2-3 mmol/g capacity",
-        "key_risk": "Main risk",
-        "capital_required": "low | medium | high",
-        "timeline": "4-6 weeks"
+        "id": "parallel-1",
+        "title": "Parallel investigation title",
+        "score": 55,
+        "confidence": 35,
+        "innovation_type": "CROSS_DOMAIN_TRANSFER",
+        "source_domain": "Source domain",
+        "one_liner": "Brief description of the approach",
+        "the_insight": {
+          "what": "The core insight",
+          "where_we_found_it": {
+            "domain": "Source",
+            "how_they_use_it": "Original use",
+            "why_it_transfers": "Why relevant"
+          },
+          "why_industry_missed_it": "The gap",
+          "physics": "The mechanism"
+        },
+        "ceiling": "Maximum upside if successful",
+        "key_uncertainty": "The main unknown",
+        "validation_approach": {
+          "test": "What to test",
+          "cost": "$5K",
+          "timeline": "1 week",
+          "go_no_go": "Decision criteria"
+        },
+        "when_to_elevate": "When this becomes recommended innovation",
+        "investment_recommendation": "Assign 1 person part-time"
       }
     ],
-    "comparison_insight": "Analysis of how concepts compare"
+    "frontier_watch": [
+      {
+        "id": "frontier-1",
+        "title": "Frontier concept title",
+        "one_liner": "Brief description",
+        "innovation_type": "PARADIGM_SHIFT",
+        "source_domain": "Cutting-edge research area",
+        "why_interesting": "Why this could be game-changing",
+        "why_not_now": "Why it's not ready for investment",
+        "trigger_to_revisit": "What development would change this",
+        "who_to_monitor": "Companies, labs, or researchers to watch",
+        "earliest_viability": "2-3 years"
+      }
+    ]
+  },
+  "strategic_integration": {
+    "operational_alternatives": {
+      "intro": "Before capital investment, consider these behavioral/process changes...",
+      "alternatives": [
+        {
+          "title": "Alternative name",
+          "what_changes": "Process/behavior change",
+          "cost": "Minimal or specific amount",
+          "expected_benefit": "X% of benefit",
+          "vs_capital_solutions": "X% of benefit at Y% of cost",
+          "validation": "How to test this"
+        }
+      ],
+      "recommendation": "Try X first, then Y if insufficient"
+    },
+    "portfolio_view": {
+      "execution_track_role": "Role of safe bet in overall strategy",
+      "innovation_portfolio_role": "Role of innovation bets",
+      "combined_strategy": "How they work together"
+    },
+    "resource_allocation": {
+      "execution_track_percent": 60,
+      "recommended_innovation_percent": 25,
+      "parallel_investigations_percent": 10,
+      "frontier_watch_percent": 5,
+      "rationale": "Why this split makes sense"
+    },
+    "decision_architecture": {
+      "primary_tradeoff": {
+        "question": "The key decision you face",
+        "option_a": {
+          "condition": "If you need certainty",
+          "path": "Execute safe bet",
+          "what_you_get": "Reliable 20% improvement",
+          "what_you_give_up": "Moonshot potential"
+        },
+        "option_b": {
+          "condition": "If you can afford risk",
+          "path": "Pursue innovation in parallel",
+          "what_you_get": "Shot at 100x improvement",
+          "what_you_give_up": "Faster time to first results"
+        },
+        "if_uncertain": "Default recommendation if you're unsure"
+      },
+      "flowchart": "ASCII decision tree",
+      "summary": "One-paragraph summary of decision logic"
+    },
+    "action_plan": [
+      {
+        "timeframe": "Days 1-3",
+        "actions": ["Action 1", "Action 2"],
+        "rationale": "Why these first",
+        "decision_gate": "What decision this enables"
+      }
+    ],
+    "personal_recommendation": {
+      "intro": "If this were my project, here's exactly what I'd do:",
+      "key_insight": "The one thing that matters most"
+    }
   },
   "paradigm_insight": {
     "exists": true,
@@ -974,26 +1345,6 @@ CRITICAL: Respond with ONLY valid JSON.
     "evidence_base": "What evidence supports this",
     "magnitude_of_opportunity": "100-1000x improvement demonstrated in adjacent field",
     "first_mover_advantage": "Strategic advantage description"
-  },
-  "decision_flowchart": {
-    "flowchart": "START: Do you need results in <1 week?\\n|\\n+-YES-> Execute Concept 3 as screening\\n|       +- If capacity <1 mmol/g -> substrate problem\\n|       +- If capacity >2 mmol/g -> proceed\\n|\\n+-NO-> Is COOH density confirmed?\\n       +-YES-> Execute Concept 1\\n       +-NO-> Run parallel tracks",
-    "summary": "Start with rapid screening if time-constrained. Otherwise, primary path is Concept 1 with Week 3 decision gate."
-  },
-  "personal_recommendation": {
-    "intro": "If this were my project, here's exactly what I'd do:",
-    "action_plan": [
-      {
-        "timeframe": "Days 1-3",
-        "actions": ["Order materials for Concepts 1, 2, and 3 simultaneously", "Start Concept 3 immediately"],
-        "rationale": "Parallel ordering saves 1-2 weeks if you need to pivot"
-      },
-      {
-        "timeframe": "Week 2",
-        "actions": ["Run the critical retention test"],
-        "decision_gate": "This is the go/no-go for primary path"
-      }
-    ],
-    "key_insight": "Don't optimize before validating. Get the retention answer fast, then invest."
   },
   "validation_summary": {
     "overall_confidence": "medium",
@@ -1039,17 +1390,6 @@ CRITICAL: Respond with ONLY valid JSON.
     "confidence_level": "low | medium | high",
     "confidence_rationale": "Why we have this confidence level"
   },
-  "next_steps": {
-    "today": ["Actions to take today"],
-    "this_week": ["Actions for this week"],
-    "week_2_3": ["Actions for weeks 2-3"],
-    "week_4_plus": ["Longer-term actions"],
-    "decision_point": {
-      "title": "Key decision point",
-      "description": "What decision needs to be made",
-      "cta_label": "Make Decision"
-    }
-  },
   "appendix": {
     "additional_resources": ["Resource links"],
     "methodology_notes": "How this analysis was conducted",
@@ -1058,18 +1398,25 @@ CRITICAL: Respond with ONLY valid JSON.
   "metadata": {
     "generated_at": "ISO timestamp",
     "model_version": "Model version",
-    "chain_version": "2.0.0",
+    "chain_version": "3.0.0",
     "total_concepts_generated": 8,
-    "tracks_covered": ["simpler_path", "best_fit", "paradigm_shift", "frontier_transfer"]
+    "framework": "execution_track_innovation_portfolio"
   }
 }
 
 PHILOSOPHY: The best solution wins regardless of origin.
-Simple solutions that work beat complex ones that might work.
-Novel solutions that work beat conventional ones that don't.
+Safe bets deserve full analytical depth - a 20% improvement with 90% confidence is valuable.
+Innovation bets get proper portfolio treatment - recommended, parallel, frontier watch.
+Insights are the prize - we always explain WHERE we found it and WHY industry missed it.
 MERIT is the only criterion.
 
-GUARANTEE: Even if primary recommendation is simpler_path or best_fit, the report MUST include paradigm_insight section if ANY significant insights were discovered during analysis.`;
+GUARANTEE: Every report includes honest_assessment with calibrated_claims.
+GUARANTEE: Every concept explains the_insight with where_we_found_it.
+GUARANTEE: Execution track gets the same analytical depth as innovation portfolio.
+GUARANTEE: Presentation is calibrated to primary_recommendation_type from AN4 solution_classification.
+GUARANTEE: If primary is CATALOG, supplier_arbitrage section is prominent.
+GUARANTEE: Operational alternatives are considered before capital-intensive solutions.
+GUARANTEE: The honesty check is applied - would a senior engineer say "I could have gotten this from a phone call"?`;
 
 export const AN5_M_METADATA = {
   id: 'an5-m',

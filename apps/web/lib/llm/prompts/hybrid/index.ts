@@ -49,6 +49,84 @@ export {
   ViabilityVerdict,
   TrackSchema,
   SafeUrlSchema,
+  // NEW: Execution Track + Innovation Portfolio Framework (schemas and types)
+  // Note: For Zod enums with same-name type exports, we export value only (type is inferred)
+  SourceType,
+  PortfolioInnovationType,
+  ProblemType,
+  // NEW: Solution Classification (AN4) - classifies what we FOUND
+  SolutionClassificationType,
+  RecommendedEmphasis,
+  SolutionClassificationSchema,
+  type SolutionClassification,
+  // NEW: Operational Alternatives (AN3)
+  OperationalAlternativeSchema,
+  type OperationalAlternative,
+  // NEW: Operational Alternatives Section (StrategicIntegration)
+  OperationalAlternativesSectionSchema,
+  type OperationalAlternativesSection,
+  // NEW: Honest Supplier Arbitrage
+  HonestSupplierArbitrageSchema,
+  type HonestSupplierArbitrage,
+  // Schema/Type pairs - schema is value, type is exported via 'type' keyword
+  WhereWeFoundItSchema,
+  type WhereWeFoundIt,
+  NewInsightBlockSchema,
+  type NewInsightBlock,
+  SupplierArbitrageSchema,
+  type SupplierArbitrage,
+  WhyNotObviousSchema,
+  type WhyNotObvious,
+  WhySafeSchema,
+  type WhySafe,
+  FallbackTriggerSchema,
+  type FallbackTrigger,
+  NewSupportingConceptSchema,
+  type NewSupportingConcept,
+  ExecutionTrackPrimarySchema,
+  type ExecutionTrackPrimary,
+  ExecutionTrackSchema,
+  type ExecutionTrack,
+  SelectionRationaleSchema,
+  type SelectionRationale,
+  NewBreakthroughPotentialSchema,
+  type NewBreakthroughPotential,
+  InnovationRisksSchema,
+  type InnovationRisks,
+  ValidationPathSchema,
+  type ValidationPath,
+  RelationshipToExecutionSchema,
+  type RelationshipToExecution,
+  RecommendedInnovationSchema,
+  type RecommendedInnovation,
+  ParallelInvestigationSchema,
+  type ParallelInvestigation,
+  FrontierWatchSchema,
+  type FrontierWatch,
+  InnovationPortfolioSchema,
+  type InnovationPortfolio,
+  PortfolioViewSchema,
+  type PortfolioView,
+  ResourceAllocationSchema,
+  type ResourceAllocation,
+  PrimaryTradeoffSchema,
+  type PrimaryTradeoff,
+  NewDecisionArchitectureSchema,
+  type NewDecisionArchitecture,
+  NewActionPlanStepSchema,
+  type NewActionPlanStep,
+  NewPersonalRecommendationSchema,
+  type NewPersonalRecommendation,
+  StrategicIntegrationSchema,
+  type StrategicIntegration,
+  HonestAssessmentSchema,
+  type HonestAssessment,
+  FromScratchRevelationSchema,
+  type FromScratchRevelation,
+  CrossDomainSearchSchema,
+  type CrossDomainSearch,
+  EnhancedChallengeFrameSchema,
+  type EnhancedChallengeFrame,
 } from './schemas';
 
 // Re-export all prompts
@@ -170,11 +248,12 @@ export type HybridSolutionTrack = (typeof HYBRID_SOLUTION_TRACKS)[number];
  * Note: `stages` is derived from HYBRID_PHASES to maintain single source of truth
  */
 export const HYBRID_CHAIN_METADATA = {
-  version: '2.0.0',
+  version: '3.1.0',
   name: 'Hybrid Innovation Chain',
-  description: 'Full-spectrum solution search with paradigm insight surfacing',
+  description:
+    'Full-spectrum solution search with calibrated presentation and paradigm insight surfacing',
   philosophy:
-    'The best solution wins regardless of origin. Paradigm insights are surfaced prominently even when simpler paths win on merit.',
+    'The best solution wins regardless of origin. Paradigm insights are surfaced prominently even when simpler paths win on merit. Presentation is calibrated to actual value delivered.',
 
   // Derived from HYBRID_PHASES - single source of truth
   get stages() {
@@ -210,5 +289,12 @@ export const HYBRID_CHAIN_METADATA = {
     'Strategic implications with near/medium/long-term framing',
     'Personal recommendation with day-by-day action plan',
     'Parallel explorations with full detail (not footnotes)',
+    // NEW v3.1.0 guarantees
+    'Solution classification with honest calibration (AN4)',
+    'Paradigm insight validation before claiming paradigm-level insight',
+    'Operational alternatives considered before capital-intensive solutions',
+    'Presentation calibrated to primary_recommendation_type',
+    'Supplier arbitrage guidance when primary is CATALOG',
+    'Calibrated claims with expert_reaction_prediction',
   ],
 };
