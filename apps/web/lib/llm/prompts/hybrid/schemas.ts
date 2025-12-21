@@ -1662,25 +1662,26 @@ const SolutionConceptsSchema = z
   .passthrough();
 
 // --- Paradigm Insight Section ---
+// LLM sometimes sends null instead of omitting fields
 const ParadigmInsightSectionSchema = z
   .object({
     exists: z.boolean().catch(false),
-    insight_name: z.string().optional(),
-    the_assumption: z.string().optional(),
-    the_reality: z.string().optional(),
-    the_disconnect: z.string().optional(),
-    years_of_blind_spot: z.string().optional(),
-    why_missed: z.string().optional(),
-    evidence_base: z.string().optional(),
-    magnitude_of_opportunity: z.string().optional(),
-    first_mover_advantage: z.string().optional(),
+    insight_name: z.string().nullable().optional(),
+    the_assumption: z.string().nullable().optional(),
+    the_reality: z.string().nullable().optional(),
+    the_disconnect: z.string().nullable().optional(),
+    years_of_blind_spot: z.string().nullable().optional(),
+    why_missed: z.string().nullable().optional(),
+    evidence_base: z.string().nullable().optional(),
+    magnitude_of_opportunity: z.string().nullable().optional(),
+    first_mover_advantage: z.string().nullable().optional(),
 
     // Legacy fields for backward compatibility
-    insight_headline: z.string().optional(),
-    the_conventional_wisdom: z.string().optional(),
-    what_we_discovered: z.string().optional(),
+    insight_headline: z.string().nullable().optional(),
+    the_conventional_wisdom: z.string().nullable().optional(),
+    what_we_discovered: z.string().nullable().optional(),
     evidence_sources: z.array(z.string()).catch([]),
-    why_it_matters: z.string().optional(),
+    why_it_matters: z.string().nullable().optional(),
     who_should_care: z.array(z.string()).catch([]),
     related_concepts: z.array(z.string()).catch([]),
   })
