@@ -86,6 +86,10 @@ export const POST = enhanceRouteHandler(
     const reportData = report.report_data as { mode?: string } | null;
     const mode = reportData?.mode;
 
+    console.log('[Clarify] Report ID:', reportId);
+    console.log('[Clarify] Report data:', JSON.stringify(reportData));
+    console.log('[Clarify] Mode detected:', mode);
+
     let eventName:
       | 'report/clarification-answered'
       | 'report/discovery-clarification-answered'
@@ -96,6 +100,8 @@ export const POST = enhanceRouteHandler(
     } else if (mode === 'hybrid') {
       eventName = 'report/hybrid-clarification-answered';
     }
+
+    console.log('[Clarify] Sending event:', eventName);
 
     // Resume Inngest workflow
     try {
