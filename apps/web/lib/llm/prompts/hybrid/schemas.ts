@@ -687,6 +687,7 @@ export const SourceType = z.enum([
   'TRANSFER',
   'OPTIMIZATION',
   'FIRST_PRINCIPLES',
+  'EMERGING_PRACTICE',
 ]);
 export type SourceType = z.infer<typeof SourceType>;
 
@@ -1272,11 +1273,19 @@ export type FromScratchRevelation = z.infer<typeof FromScratchRevelationSchema>;
 
 /**
  * Cross-Domain Search - replaces key_patterns with lighter structure
+ * LLM sometimes outputs objects for domains_searched, so we coerce to strings
  */
 export const CrossDomainSearchSchema = z
   .object({
-    intro: z.string(),
-    domains_searched: z.array(z.string()).default([]),
+    intro: z.string().optional(),
+    domains_searched: z
+      .array(
+        z.union([
+          z.string(),
+          z.object({}).passthrough().transform((obj) => JSON.stringify(obj)),
+        ]),
+      )
+      .default([]),
   })
   .passthrough();
 export type CrossDomainSearch = z.infer<typeof CrossDomainSearchSchema>;
