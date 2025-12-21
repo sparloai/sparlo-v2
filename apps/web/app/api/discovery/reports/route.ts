@@ -87,7 +87,7 @@ export const POST = enhanceRouteHandler(
       .insert({
         account_id: user.id,
         conversation_id: conversationId,
-        title: `[Discovery] ${body.designChallenge.slice(0, 90)}`,
+        title: `${body.designChallenge.slice(0, 90)}`,
         status: 'processing',
         current_step: 'an0-d',
         messages: [

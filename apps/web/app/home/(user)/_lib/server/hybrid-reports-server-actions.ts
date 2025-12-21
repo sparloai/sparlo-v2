@@ -208,7 +208,7 @@ export const startHybridReportGeneration = enhanceAction(
       .insert({
         account_id: user.id,
         conversation_id: conversationId,
-        title: `[Hybrid] ${sanitizedChallenge.slice(0, 90)}`,
+        title: `${sanitizedChallenge.slice(0, 90)}`,
         status: 'processing',
         current_step: 'an0-m',
         messages: [
@@ -228,13 +228,13 @@ export const startHybridReportGeneration = enhanceAction(
       .single();
 
     if (dbError) {
-      console.error('[Hybrid] Failed to create report:', dbError);
+      console.error('Failed to create report:', dbError);
       throw new Error('Failed to create report. Please try again.');
     }
 
     // Trigger Hybrid Inngest function
     try {
-      console.log('[Hybrid] Sending Inngest event for report:', report.id);
+      console.log('Sending Inngest event for report:', report.id);
 
       const sendResult = await inngest.send({
         name: 'report/generate-hybrid',
@@ -248,7 +248,7 @@ export const startHybridReportGeneration = enhanceAction(
         },
       });
 
-      console.log('[Hybrid] Inngest event sent successfully:', {
+      console.log('Inngest event sent successfully:', {
         reportId: report.id,
         eventIds: sendResult.ids,
       });
@@ -258,19 +258,19 @@ export const startHybridReportGeneration = enhanceAction(
         try {
           await markFirstReportUsed(user.id);
           console.log(
-            '[Hybrid] Marked first report as used for user:',
+            'Marked first report as used for user:',
             user.id,
           );
         } catch (markError) {
           // Log but don't fail - report is already created
           console.error(
-            '[Hybrid] Failed to mark first report used:',
+            'Failed to mark first report used:',
             markError,
           );
         }
       }
     } catch (inngestError) {
-      console.error('[Hybrid] Failed to trigger Inngest:', inngestError);
+      console.error('Failed to trigger Inngest:', inngestError);
       await client
         .from('sparlo_reports')
         .update({
@@ -345,7 +345,7 @@ export const answerHybridClarification = enhanceAction(
       .eq('id', data.reportId);
 
     if (updateError) {
-      console.error('[Hybrid] Failed to update report:', updateError);
+      console.error('Failed to update report:', updateError);
       throw new Error('Failed to update report. Please try again.');
     }
 

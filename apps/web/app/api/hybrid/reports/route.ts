@@ -185,7 +185,7 @@ export const POST = enhanceRouteHandler(
       .insert({
         account_id: user.id,
         conversation_id: conversationId,
-        title: `[Hybrid] ${sanitizedChallenge.slice(0, 90)}`,
+        title: `${sanitizedChallenge.slice(0, 90)}`,
         status: 'processing',
         current_step: 'an0-m',
         messages: [

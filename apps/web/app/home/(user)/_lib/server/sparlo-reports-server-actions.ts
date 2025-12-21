@@ -375,10 +375,10 @@ export const startReportGeneration = enhanceAction(
       throw new Error(`Failed to create report: ${dbError.message}`);
     }
 
-    // Trigger Inngest function
+    // Trigger Inngest hybrid flow
     try {
       await inngest.send({
-        name: 'report/generate',
+        name: 'report/generate-hybrid',
         data: {
           reportId: report.id,
           accountId: user.id,
