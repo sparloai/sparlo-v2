@@ -43,7 +43,9 @@ const DAILY_LIMIT = 50; // Testing limit
 const SUPER_ADMIN_USER_IDS = (process.env.SUPER_ADMIN_USER_IDS ?? '').split(',').filter(Boolean);
 
 function isSuperAdmin(userId: string): boolean {
-  return SUPER_ADMIN_USER_IDS.includes(userId);
+  const isAdmin = SUPER_ADMIN_USER_IDS.includes(userId);
+  console.log(`[Super Admin Check] userId=${userId}, adminIds=${JSON.stringify(SUPER_ADMIN_USER_IDS)}, isAdmin=${isAdmin}`);
+  return isAdmin;
 }
 
 // Image magic bytes for validation
