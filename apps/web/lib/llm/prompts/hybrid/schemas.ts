@@ -468,6 +468,22 @@ export const EmergingPracticeSchema = z
 export type EmergingPractice = z.infer<typeof EmergingPracticeSchema>;
 
 /**
+ * Transfer difficulty enum with lenient parsing
+ * LLM sometimes outputs "MODERATE - explanation" so we extract just the enum part
+ */
+const TransferDifficultySchema = z
+  .string()
+  .transform((val) => {
+    // Extract enum value before any " - " explanation
+    const enumPart = val.split(' - ')[0]?.trim().toUpperCase();
+    if (['OBVIOUS', 'MODERATE', 'NON_OBVIOUS'].includes(enumPart ?? '')) {
+      return enumPart as 'OBVIOUS' | 'MODERATE' | 'NON_OBVIOUS';
+    }
+    return 'MODERATE'; // fallback
+  })
+  .pipe(z.enum(['OBVIOUS', 'MODERATE', 'NON_OBVIOUS']));
+
+/**
  * Cross-domain transfer - found in another industry
  */
 export const CrossDomainTransferItemSchema = z
@@ -475,7 +491,7 @@ export const CrossDomainTransferItemSchema = z
     concept_id: z.string(),
     title: z.string(),
     source_domain: z.string(),
-    transfer_difficulty: z.enum(['OBVIOUS', 'MODERATE', 'NON_OBVIOUS']),
+    transfer_difficulty: TransferDifficultySchema,
   })
   .passthrough();
 export type CrossDomainTransferItem = z.infer<
