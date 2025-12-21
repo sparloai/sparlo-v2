@@ -36,8 +36,8 @@ const StartHybridReportSchema = z.object({
 
 // Rate limiting constants
 const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
-const MAX_REPORTS_PER_WINDOW = 10; // Testing limit
-const DAILY_LIMIT = 50; // Testing limit
+const MAX_REPORTS_PER_WINDOW = 100; // Increased for testing
+const DAILY_LIMIT = 500; // Increased for testing
 
 // Super admin bypass for testing (comma-separated user IDs)
 const SUPER_ADMIN_USER_IDS = (process.env.SUPER_ADMIN_USER_IDS ?? '').split(',').filter(Boolean);
