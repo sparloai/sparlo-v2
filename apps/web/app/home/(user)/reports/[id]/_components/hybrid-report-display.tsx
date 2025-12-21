@@ -37,11 +37,29 @@ import { cn } from '@kit/ui/utils';
  * - Self-Critique
  */
 
+// Structured executive summary format (new)
+interface StructuredExecutiveSummary {
+  narrative_lead?: string;
+  viability?: string;
+  viability_label?: string;
+  the_problem?: string;
+  core_insight?: {
+    headline?: string;
+    explanation?: string;
+  };
+  primary_recommendation?: string;
+  recommended_path?: Array<{
+    step?: number;
+    action?: string;
+    rationale?: string;
+  }>;
+}
+
 interface HybridReportDisplayProps {
   reportData: {
     mode: 'hybrid';
     report?: {
-      executive_summary?: string;
+      executive_summary?: string | StructuredExecutiveSummary;
       problem_restatement?: string;
       key_insights?: string[];
       next_steps?: string[];
@@ -436,9 +454,37 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
             subtitle="The bottom line"
           />
           <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-6 dark:border-violet-800 dark:from-violet-900/30 dark:to-zinc-900">
-            <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
-              {report.executive_summary}
-            </p>
+            {typeof report.executive_summary === 'string' ? (
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
+                {report.executive_summary}
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {/* Narrative lead */}
+                {report.executive_summary.narrative_lead && (
+                  <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
+                    {report.executive_summary.narrative_lead}
+                  </p>
+                )}
+                {/* Core insight */}
+                {report.executive_summary.core_insight && (
+                  <div className="rounded-lg bg-white/60 p-4 dark:bg-zinc-800/60">
+                    <h4 className="mb-2 font-semibold text-zinc-900 dark:text-white">
+                      {report.executive_summary.core_insight.headline}
+                    </h4>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                      {report.executive_summary.core_insight.explanation}
+                    </p>
+                  </div>
+                )}
+                {/* Primary recommendation */}
+                {report.executive_summary.primary_recommendation && (
+                  <p className="text-sm font-medium text-violet-700 dark:text-violet-400">
+                    {report.executive_summary.primary_recommendation}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </section>
       )}
