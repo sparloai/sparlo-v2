@@ -349,7 +349,7 @@ export const startReportGeneration = enhanceAction(
 
     const conversationId = crypto.randomUUID();
 
-    // Create the report record
+    // Create the report record with mode set immediately for clarification event routing
     const { data: report, error: dbError } = await client
       .from('sparlo_reports')
       .insert({
@@ -358,6 +358,7 @@ export const startReportGeneration = enhanceAction(
         title: data.designChallenge.slice(0, 100),
         status: 'processing',
         current_step: 'an0',
+        report_data: { mode: 'hybrid' }, // Set mode early for clarification event routing
         messages: [
           {
             id: crypto.randomUUID(),
@@ -429,10 +430,10 @@ export const answerClarification = enhanceAction(
     // P0 Security: Verify ownership before answering
     await verifyReportOwnership(data.reportId, user.id);
 
-    // Get the report to verify status
+    // Get the report to verify status AND mode
     const { data: report, error: fetchError } = await client
       .from('sparlo_reports')
-      .select('id, status, clarifications')
+      .select('id, status, clarifications, report_data')
       .eq('id', data.reportId)
       .single();
 
@@ -468,10 +469,30 @@ export const answerClarification = enhanceAction(
       throw new Error(`Failed to update report: ${updateError.message}`);
     }
 
-    // Resume Inngest workflow
+    // Determine correct event based on report mode
+    const reportData = report.report_data as { mode?: string } | null;
+    const mode = reportData?.mode;
+
+    type ClarificationEventName =
+      | 'report/clarification-answered'
+      | 'report/discovery-clarification-answered'
+      | 'report/hybrid-clarification-answered';
+
+    let eventName: ClarificationEventName = 'report/clarification-answered';
+    if (mode === 'discovery') {
+      eventName = 'report/discovery-clarification-answered';
+    } else if (mode === 'hybrid') {
+      eventName = 'report/hybrid-clarification-answered';
+    }
+
+    console.log('[Clarify Server Action] Report ID:', data.reportId);
+    console.log('[Clarify Server Action] Mode detected:', mode);
+    console.log('[Clarify Server Action] Sending event:', eventName);
+
+    // Resume Inngest workflow with correct event
     try {
       await inngest.send({
-        name: 'report/clarification-answered',
+        name: eventName,
         data: {
           reportId: data.reportId,
           answer: data.answer,

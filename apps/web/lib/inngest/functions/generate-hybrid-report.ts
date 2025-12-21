@@ -669,9 +669,11 @@ The BEST solution wins regardless of origin (simple vs complex, conventional vs 
           });
         }
 
-        // Update with Claude-generated title
+        // Update with Claude-generated title (check header.title first, then legacy report_title)
         const generatedTitle =
-          an5mResult.result.report_title ?? 'Hybrid Analysis Complete';
+          an5mResult.result.header?.title ??
+          an5mResult.result.report_title ??
+          'Hybrid Analysis Complete';
 
         await updateProgress({
           status: 'complete',
