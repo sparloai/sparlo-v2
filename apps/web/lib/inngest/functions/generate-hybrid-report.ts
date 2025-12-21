@@ -669,11 +669,16 @@ The BEST solution wins regardless of origin (simple vs complex, conventional vs 
           });
         }
 
+        // Update with Claude-generated title
+        const generatedTitle =
+          an5mResult.result.report_title ?? 'Hybrid Analysis Complete';
+
         await updateProgress({
           status: 'complete',
           current_step: 'complete',
           phase_progress: 100,
-          headline: an5mResult.result.report_title ?? 'Hybrid Analysis Complete',
+          title: generatedTitle,
+          headline: generatedTitle,
           report_data: {
             mode: 'hybrid',
             report: an5mResult.result,
