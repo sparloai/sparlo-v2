@@ -77,7 +77,29 @@ Browse by category when facing similar problems. Each doc includes:
 - Code examples
 - Gotchas and lessons learned
 
-## Recent Changes (Last 48 Hours)
+## Recent Changes (Dec 20, 2025)
+
+### Architecture
+1. **Unified Hybrid Report Flow** - All reports now use hybrid flow (see `architecture/unified-hybrid-report-flow.md`)
+2. **Claude-Generated Headlines** - Report titles from AI instead of truncated challenge text
+3. **Reports Dashboard Refactoring** - Type consolidation, shared components (see `architecture/reports-dashboard-refactoring.md`)
+
+### Features Added
+1. **Usage-Based Billing with Freemium** - First report free, subscription required after (see `features/usage-based-billing-freemium.md`)
+2. **Realtime Polling Fallback** - Guaranteed progress updates when Realtime fails (see `features/realtime-polling-fallback.md`)
+
+### UI Fixes
+1. **Structured Executive Summary Rendering** - Fixed React Error #31 for object rendering (see `ui/structured-executive-summary-rendering.md`)
+
+### Security Hardening
+1. **Schema Backward Compatibility** - SafeUrlSchema and SeverityLevel case handling (see `security/schema-backward-compatibility.md`)
+
+### Prompt Engineering
+1. **Discovery Flow Prior Art Evidence** - Source citation requirements (see `prompt-engineering/discovery-flow-prior-art-evidence.md`)
+
+---
+
+## Previous Changes (Dec 19, 2025)
 
 ### Features Added
 1. **Token-Based Usage Tracking** - Monthly usage limits with subscription alignment
