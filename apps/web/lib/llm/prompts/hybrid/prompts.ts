@@ -49,6 +49,35 @@ You are analyzing for 4 solution tracks:
 - What abandoned technologies might now be viable?
 - What frontier materials enable new approaches?
 
+## CONSTRAINT INTERROGATION (Required - Including Technical Specs)
+
+For EVERY constraint—including technical specifications—ask:
+
+### Precision Questions
+- **"Hot water regeneration"** → What temperature exactly? 60°C? 80°C? 95°C? This changes which chemistries are viable.
+- **"2.5% CO2"** → Is this measured or estimated? Peak or average? Variation matters for kinetics.
+- **"Sub-second response"** → What's the actual system requirement? Would 2 seconds work?
+
+### Constraint Classification
+For each constraint, classify:
+- **HARD_PHYSICS**: Cannot be changed (laws of thermodynamics)
+- **HARD_SYSTEM**: Fixed by existing equipment/infrastructure
+- **SOFT_NEGOTIABLE**: Could potentially be relaxed with tradeoffs
+- **ASSUMED**: We're guessing because user didn't specify
+
+### Questions to Ask (Even If User Didn't Invite Them)
+1. **Precision:** "You said [X]. What's the actual specification?"
+2. **Boundary:** "What happens at [X+20%]? Does that open new options?"
+3. **Source:** "Is this measured, calculated, or assumed?"
+4. **Flexibility:** "Is this a hard physics constraint or a preference?"
+
+### If User Didn't Specify, State Your Assumption
+Don't silently assume. Document:
+- What was stated
+- What clarification is needed
+- What we're assuming for analysis
+- What changes if assumption is wrong
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
@@ -61,6 +90,15 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     "success_metrics": ["How we'll know it's solved"],
     "industry_assumptions": ["What industry takes for granted"]
   },
+  "constraint_analysis": [
+    {
+      "stated": "What user said",
+      "clarification_needed": "What we need to know",
+      "assumed_for_analysis": "Our working assumption",
+      "if_different": "What changes if assumption is wrong",
+      "classification": "HARD_PHYSICS | HARD_SYSTEM | SOFT_NEGOTIABLE | ASSUMED"
+    }
+  ],
   "landscape_map": {
     "current_approaches": ["What industry currently does"],
     "known_limitations": ["Why current approaches fall short"],
@@ -909,40 +947,64 @@ The narrative_lead should be 2-4 sentences that set the voice and hook the reade
 EXAMPLE:
 "The core challenge isn't functionalization chemistry - it's thermodynamic incompatibility. Dilute CO2 (2.5 kPa) requires high-affinity amines for meaningful capture, but hot water regeneration can only overcome binding energies below 55-60 kJ/mol. The numbers don't close for conventional amines. But there's a path: force CO2 through the bicarbonate pathway, and the thermodynamics work."
 
+## ROOT CAUSE SATISFACTION CHECK (Required)
+
+Before presenting the primary recommendation, explicitly show the chain:
+
+1. **Root Cause Identified:** State the fundamental constraint/physics that limits solutions
+2. **Constraint Derived:** What must be true for a solution to work
+3. **Primary Recommendation:** State it
+4. **How It Satisfies Constraint:** Explicit physics/engineering link
+
+### Example (CO2 Capture)
+- Root Cause: Hot water regeneration can only overcome binding energies <55-60 kJ/mol
+- Constraint: Amine must have binding energy below this threshold
+- Primary Recommendation: BTCA-crosslinked branched PEI
+- How It Satisfies: Branched PEI's secondary amines form unstable carbamates (not stable carbamates like MEA). Carbamate binding energy: ~45-50 kJ/mol. ✓ Within regeneration window.
+
+### Example (Slurry Pump)
+- Root Cause: Centrifugal force exceeds gland packing seal capability at this solids loading
+- Constraint: Seal must exclude particles without contact pressure
+- Primary Recommendation: Expeller seal
+- How It Satisfies: Expeller creates outward fluid flow via impeller action. Flow velocity exceeds particle settling velocity. ✓ Dynamic exclusion without contact wear.
+
+### Anti-Pattern (Don't Do This)
+❌ "The thermodynamics don't work with MEA. Use PEI instead." (Missing: WHY does PEI work when MEA doesn't?)
+✓ "MEA binding energy is 80 kJ/mol, above the 55-60 kJ/mol regeneration limit. Branched PEI's secondary amines form unstable carbamates at 45-50 kJ/mol, within the window."
+
 ## SECTION ORDER
 
 1. HEADER
 2. EXECUTIVE SUMMARY (with narrative_lead and primary_recommendation)
-3. HONEST ASSESSMENT (problem type, expected value, candid assessment)
-4. CONSTRAINTS
-5. PROBLEM ANALYSIS (with physics/equations, min/target/stretch metrics)
-6. WHAT INDUSTRY MISSED (conventional approaches, paradigm history, blind spots)
-7. CROSS-DOMAIN SEARCH (replaces key_patterns - enhanced challenge frame, domains searched, revelations)
-8. EXECUTION TRACK
+3. CONSTRAINTS
+4. PROBLEM ANALYSIS (with physics/equations, min/target/stretch metrics)
+5. WHAT INDUSTRY MISSED (conventional approaches, paradigm history, blind spots)
+6. CROSS-DOMAIN SEARCH (enhanced challenge frame, domains searched, revelations)
+7. EXECUTION TRACK
    - Intro paragraph
+   - Root cause satisfaction check (REQUIRED)
    - Primary recommendation (FULL DEPTH with validation gates)
    - Supplier arbitrage (if source_type === CATALOG) OR why_not_obvious (if TRANSFER/FIRST_PRINCIPLES)
    - Supporting concepts (abbreviated)
    - Fallback trigger (when to pivot)
-9. INNOVATION PORTFOLIO
+8. INNOVATION PORTFOLIO
    - Intro paragraph
    - Recommended innovation (FULL DEPTH - the moonshot worth betting on)
    - Parallel investigations (medium depth - worth testing)
    - Frontier watch (monitor only - not ready yet)
-10. STRATEGIC INTEGRATION
-    - Portfolio view (how execution + innovation work together)
-    - Resource allocation (percentages with rationale)
-    - Decision architecture (tradeoff-based flowchart)
-    - Action plan (timeframe-based)
-    - Personal recommendation
-11. PARADIGM INSIGHT (if exists)
-12. VALIDATION SUMMARY
-13. CHALLENGE THE FRAME
-14. STRATEGIC IMPLICATIONS (near/medium/long-term)
-15. RISKS & WATCHOUTS
-16. SELF-CRITIQUE
-17. APPENDIX
-18. METADATA
+9. STRATEGIC INTEGRATION
+   - Portfolio view (how execution + innovation work together)
+   - Decision architecture (tradeoff-based flowchart)
+   - Action plan (timeframe-based)
+   - Personal recommendation
+10. PARADIGM INSIGHT (if exists)
+11. VALIDATION SUMMARY
+12. CHALLENGE THE FRAME
+13. STRATEGIC IMPLICATIONS (near/medium/long-term)
+14. RISKS & WATCHOUTS
+15. SELF-CRITIQUE
+16. APPENDIX
+17. METADATA
 
 ## EXECUTION TRACK (PRIMARY RECOMMENDATION)
 
@@ -1009,33 +1071,6 @@ CRITICAL: Respond with ONLY valid JSON.
     "recommended_path": [
       {"step": 1, "action": "What to do first", "rationale": "Why"}
     ]
-  },
-  "honest_assessment": {
-    "primary_recommendation_type": "CATALOG | EMERGING_PRACTICE | CROSS_DOMAIN | PARADIGM | OPTIMIZATION",
-    "what_you_could_get_elsewhere": {
-      "from_supplier_call": ["What a 30-min supplier call would tell you"],
-      "from_literature_search": ["What a literature search would reveal"],
-      "from_industry_consultant": ["What a consultant would provide"]
-    },
-    "what_sparlo_provides": {
-      "unique_contributions": ["Specific things only we provide"],
-      "integration_value": "How we connect disparate insights (if applicable)",
-      "decision_framework_value": "Value of our structured decision approach (if applicable)",
-      "cross_domain_value": "Value of our cross-domain synthesis (if applicable)"
-    },
-    "calibrated_claims": {
-      "paradigm_insight_claim": "JUSTIFIED | OVERSTATED | NOT_CLAIMED",
-      "novelty_claim": "HIGH | MEDIUM | LOW",
-      "expert_reaction_prediction": "SURPRISED_AND_GRATEFUL | USEFUL_FRAMEWORK | COULD_GET_ELSEWHERE"
-    },
-    "supplier_arbitrage": {
-      "who_to_call": "Specific vendor/supplier (if primary is CATALOG or EMERGING)",
-      "what_to_ask": ["Question 1", "Question 2"],
-      "what_to_push_back_on": ["Common upsell 1"],
-      "what_they_wont_volunteer": ["Hidden info 1"]
-    },
-    "the_question_you_should_ask_us": "The hard question we should be asked",
-    "if_we_were_wrong_about_this": "What we'd be wrong about and implications"
   },
   "constraints": {
     "hard_constraints": ["Must-have requirements"],
@@ -1111,6 +1146,12 @@ CRITICAL: Respond with ONLY valid JSON.
   },
   "execution_track": {
     "intro": "Context-setting paragraph for the safe bet recommendation",
+    "root_cause_satisfaction": {
+      "root_cause": "The fundamental physics/engineering constraint",
+      "constraint_derived": "What must be true for any solution to work",
+      "how_recommendation_satisfies": "Explicit link showing primary recommendation meets constraint",
+      "explicit_link": "The physics/engineering connection (e.g., 'Binding energy 45 kJ/mol < 55 kJ/mol threshold')"
+    },
     "primary": {
       "id": "exec-primary",
       "title": "Primary recommendation title",
@@ -1294,13 +1335,6 @@ CRITICAL: Respond with ONLY valid JSON.
       "innovation_portfolio_role": "Role of innovation bets",
       "combined_strategy": "How they work together"
     },
-    "resource_allocation": {
-      "execution_track_percent": 60,
-      "recommended_innovation_percent": 25,
-      "parallel_investigations_percent": 10,
-      "frontier_watch_percent": 5,
-      "rationale": "Why this split makes sense"
-    },
     "decision_architecture": {
       "primary_tradeoff": {
         "question": "The key decision you face",
@@ -1392,7 +1426,6 @@ CRITICAL: Respond with ONLY valid JSON.
   },
   "appendix": {
     "additional_resources": ["Resource links"],
-    "methodology_notes": "How this analysis was conducted",
     "data_sources": ["Data sources used"]
   },
   "metadata": {
@@ -1410,13 +1443,12 @@ Innovation bets get proper portfolio treatment - recommended, parallel, frontier
 Insights are the prize - we always explain WHERE we found it and WHY industry missed it.
 MERIT is the only criterion.
 
-GUARANTEE: Every report includes honest_assessment with calibrated_claims.
+GUARANTEE: Every report includes root_cause_satisfaction showing explicit physics link.
 GUARANTEE: Every concept explains the_insight with where_we_found_it.
 GUARANTEE: Execution track gets the same analytical depth as innovation portfolio.
 GUARANTEE: Presentation is calibrated to primary_recommendation_type from AN4 solution_classification.
 GUARANTEE: If primary is CATALOG, supplier_arbitrage section is prominent.
-GUARANTEE: Operational alternatives are considered before capital-intensive solutions.
-GUARANTEE: The honesty check is applied - would a senior engineer say "I could have gotten this from a phone call"?`;
+GUARANTEE: Operational alternatives are considered before capital-intensive solutions.`;
 
 export const AN5_M_METADATA = {
   id: 'an5-m',

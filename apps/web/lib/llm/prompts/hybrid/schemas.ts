@@ -150,10 +150,24 @@ const DiscoverySeedSchema = z
   })
   .passthrough();
 
+// Constraint analysis for technical spec interrogation
+const ConstraintAnalysisItemSchema = z
+  .object({
+    stated: z.string(),
+    clarification_needed: z.string().nullable().optional(),
+    assumed_for_analysis: z.string().nullable().optional(),
+    if_different: z.string().nullable().optional(),
+    classification: z
+      .enum(['HARD_PHYSICS', 'HARD_SYSTEM', 'SOFT_NEGOTIABLE', 'ASSUMED'])
+      .catch('ASSUMED'),
+  })
+  .passthrough();
+
 const AN0_M_AnalysisSchema = z
   .object({
     needs_clarification: z.literal(false),
     problem_analysis: ProblemAnalysisSchema,
+    constraint_analysis: z.array(ConstraintAnalysisItemSchema).default([]),
     landscape_map: LandscapeMapSchema,
     discovery_seeds: z.array(DiscoverySeedSchema).catch([]),
     physics_essence: z
@@ -972,11 +986,25 @@ export const ExecutionTrackPrimarySchema = z
 export type ExecutionTrackPrimary = z.infer<typeof ExecutionTrackPrimarySchema>;
 
 /**
+ * Root Cause Satisfaction - explicit link between root cause and recommendation
+ */
+export const RootCauseSatisfactionSchema = z
+  .object({
+    root_cause: z.string(),
+    constraint_derived: z.string(),
+    how_recommendation_satisfies: z.string(),
+    explicit_link: z.string(), // The physics/engineering connection
+  })
+  .passthrough();
+export type RootCauseSatisfaction = z.infer<typeof RootCauseSatisfactionSchema>;
+
+/**
  * Execution Track - complete section for safe bet recommendation
  */
 export const ExecutionTrackSchema = z
   .object({
     intro: z.string(),
+    root_cause_satisfaction: RootCauseSatisfactionSchema.optional(),
     primary: ExecutionTrackPrimarySchema,
     supplier_arbitrage: SupplierArbitrageSchema.optional(), // When source_type === CATALOG
     why_not_obvious: WhyNotObviousSchema.optional(), // When source_type === TRANSFER/FIRST_PRINCIPLES
@@ -1275,10 +1303,9 @@ export type OperationalAlternativesSection = z.infer<
  */
 export const StrategicIntegrationSchema = z
   .object({
-    // NEW: Operational alternatives before capital investment
+    // Operational alternatives before capital investment
     operational_alternatives: OperationalAlternativesSectionSchema.optional(),
     portfolio_view: PortfolioViewSchema,
-    resource_allocation: ResourceAllocationSchema,
     decision_architecture: NewDecisionArchitectureSchema,
     personal_recommendation: NewPersonalRecommendationSchema,
   })
@@ -1943,7 +1970,6 @@ const NextStepsGranularSchema = z
 const AppendixSchema = z
   .object({
     additional_resources: z.array(z.string()).catch([]),
-    methodology_notes: z.string().optional(),
     data_sources: z.array(z.string()).catch([]),
   })
   .passthrough();
@@ -1977,8 +2003,7 @@ export const AN5_M_OutputSchema = z
       ])
       .optional(),
 
-    // NEW: Execution Track + Innovation Portfolio Framework
-    honest_assessment: HonestAssessmentSchema.optional(),
+    // Execution Track + Innovation Portfolio Framework
     cross_domain_search: CrossDomainSearchSchema.optional(),
     execution_track: ExecutionTrackSchema.optional(),
     innovation_portfolio: InnovationPortfolioSchema.optional(),

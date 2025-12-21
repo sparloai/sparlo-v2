@@ -105,6 +105,8 @@ export {
   type NewSupportingConcept,
   ExecutionTrackPrimarySchema,
   type ExecutionTrackPrimary,
+  RootCauseSatisfactionSchema,
+  type RootCauseSatisfaction,
   ExecutionTrackSchema,
   type ExecutionTrack,
   SelectionRationaleSchema,
