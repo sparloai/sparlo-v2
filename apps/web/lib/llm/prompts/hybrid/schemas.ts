@@ -467,7 +467,7 @@ export const SolutionClassificationType = z
   .string()
   .transform((val) => {
     const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
-    return SOLUTION_CLASS_MAPPINGS[normalized] ?? 'CATALOG'; // Default fallback
+    return SOLUTION_CLASS_MAPPINGS[normalized] ?? 'EMERGING_PRACTICE'; // Neutral fallback
   })
   .pipe(z.enum(SOLUTION_CLASS_CANONICAL));
 export type SolutionClassificationType = z.infer<
