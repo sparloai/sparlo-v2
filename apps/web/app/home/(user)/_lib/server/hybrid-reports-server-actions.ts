@@ -39,6 +39,13 @@ const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 const MAX_REPORTS_PER_WINDOW = 10; // Testing limit
 const DAILY_LIMIT = 50; // Testing limit
 
+// Super admin bypass for testing (comma-separated user IDs)
+const SUPER_ADMIN_USER_IDS = (process.env.SUPER_ADMIN_USER_IDS ?? '').split(',').filter(Boolean);
+
+function isSuperAdmin(userId: string): boolean {
+  return SUPER_ADMIN_USER_IDS.includes(userId);
+}
+
 // Image magic bytes for validation
 const IMAGE_SIGNATURES: Record<string, number[]> = {
   'image/jpeg': [0xff, 0xd8, 0xff],
@@ -140,64 +147,72 @@ export const startHybridReportGeneration = enhanceAction(
       }
     }
 
-    // Check usage limits FIRST (freemium: first report free, then subscription required)
-    const usage = await checkUsageAllowed(
-      user.id,
-      USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
-    );
+    // Super admin bypass - skip all usage and rate limits
+    const superAdmin = isSuperAdmin(user.id);
+    let isFirstReport = false;
 
-    if (!usage.allowed) {
-      if (usage.reason === 'subscription_required') {
-        throw new Error(
-          'Your free report has been used. Please subscribe to generate more reports.',
+    if (!superAdmin) {
+      // Check usage limits FIRST (freemium: first report free, then subscription required)
+      const usage = await checkUsageAllowed(
+        user.id,
+        USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
+      );
+
+      if (!usage.allowed) {
+        if (usage.reason === 'subscription_required') {
+          throw new Error(
+            'Your free report has been used. Please subscribe to generate more reports.',
+          );
+        }
+        if (usage.reason === 'limit_exceeded') {
+          throw new Error(
+            `Usage limit reached (${usage.percentage.toFixed(0)}% used). ` +
+              `Upgrade your plan or wait until ${usage.periodEnd ? new Date(usage.periodEnd).toLocaleDateString() : 'next billing cycle'}.`,
+          );
+        }
+      }
+
+      if (usage.isWarning) {
+        console.log(
+          `[Usage Warning] User ${user.id} at ${usage.percentage.toFixed(0)}% usage`,
         );
       }
-      if (usage.reason === 'limit_exceeded') {
+
+      // Track if this is the first report (for marking after success)
+      isFirstReport = usage.isFirstReport;
+
+      // Rate limiting - check recent reports
+      const windowStart = new Date(
+        Date.now() - RATE_LIMIT_WINDOW_MS,
+      ).toISOString();
+      const dayStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+      const [recentResult, dailyResult] = await Promise.all([
+        client
+          .from('sparlo_reports')
+          .select('id', { count: 'exact', head: true })
+          .eq('account_id', user.id)
+          .gte('created_at', windowStart),
+        client
+          .from('sparlo_reports')
+          .select('id', { count: 'exact', head: true })
+          .eq('account_id', user.id)
+          .gte('created_at', dayStart),
+      ]);
+
+      if (recentResult.count && recentResult.count >= MAX_REPORTS_PER_WINDOW) {
         throw new Error(
-          `Usage limit reached (${usage.percentage.toFixed(0)}% used). ` +
-            `Upgrade your plan or wait until ${usage.periodEnd ? new Date(usage.periodEnd).toLocaleDateString() : 'next billing cycle'}.`,
+          'Rate limit exceeded. Please wait 5 minutes between reports.',
         );
       }
-    }
 
-    if (usage.isWarning) {
-      console.log(
-        `[Usage Warning] User ${user.id} at ${usage.percentage.toFixed(0)}% usage`,
-      );
-    }
-
-    // Track if this is the first report (for marking after success)
-    const isFirstReport = usage.isFirstReport;
-
-    // Rate limiting - check recent reports
-    const windowStart = new Date(
-      Date.now() - RATE_LIMIT_WINDOW_MS,
-    ).toISOString();
-    const dayStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-
-    const [recentResult, dailyResult] = await Promise.all([
-      client
-        .from('sparlo_reports')
-        .select('id', { count: 'exact', head: true })
-        .eq('account_id', user.id)
-        .gte('created_at', windowStart),
-      client
-        .from('sparlo_reports')
-        .select('id', { count: 'exact', head: true })
-        .eq('account_id', user.id)
-        .gte('created_at', dayStart),
-    ]);
-
-    if (recentResult.count && recentResult.count >= MAX_REPORTS_PER_WINDOW) {
-      throw new Error(
-        'Rate limit exceeded. Please wait 5 minutes between reports.',
-      );
-    }
-
-    if (dailyResult.count && dailyResult.count >= DAILY_LIMIT) {
-      throw new Error(
-        `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.`,
-      );
+      if (dailyResult.count && dailyResult.count >= DAILY_LIMIT) {
+        throw new Error(
+          `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.`,
+        );
+      }
+    } else {
+      console.log(`[Super Admin] Bypassing usage/rate limits for user ${user.id}`);
     }
 
     const conversationId = crypto.randomUUID();
