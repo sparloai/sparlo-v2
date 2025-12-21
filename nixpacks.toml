@@ -18,4 +18,6 @@ INNGEST_EVENT_KEY = "build-placeholder"
 INNGEST_SIGNING_KEY = "build-placeholder"
 
 [start]
+# Use Next.js standalone server - Railway handles graceful shutdown via health checks
+# Inngest streaming mode ensures functions complete during deployments
 cmd = "node apps/web/.next/standalone/apps/web/server.js"
