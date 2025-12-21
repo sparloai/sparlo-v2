@@ -1,13 +1,18 @@
 import { z } from 'zod';
 
 /**
- * Hybrid Mode Zod Schemas
+ * Hybrid Mode Zod Schemas (v3.1.1 - Antifragile Enums)
  *
  * Validation patterns:
  * - .default([]) for optional arrays (field missing)
  * - .catch([]) for error recovery (malformed LLM output)
  * - .optional() for optional fields
  * - .passthrough() to preserve extra LLM output (required for forward compatibility)
+ * - .nullable().optional() for fields where LLM sends explicit null
+ *
+ * Antifragile enum pattern (handles LLM variations):
+ * - string().transform(normalize).pipe(enum) maps variations to canonical values
+ * - Example: CROSS_DOMAIN → TRANSFER, EMERGING → EMERGING_PRACTICE
  *
  * Security patterns:
  * - SafeUrlSchema validates URL format and blocks dangerous protocols
