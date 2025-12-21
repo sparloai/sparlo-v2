@@ -444,7 +444,7 @@ export type SolutionClassificationType = z.infer<
 /**
  * Catalog solution - supplier sells this in their product line
  */
-const CatalogSolutionSchema = z
+export const CatalogSolutionSchema = z
   .object({
     concept_id: z.string(),
     title: z.string(),
@@ -452,11 +452,12 @@ const CatalogSolutionSchema = z
     how_discoverable: z.string(), // "Phone call to X" or "Search for Y"
   })
   .passthrough();
+export type CatalogSolution = z.infer<typeof CatalogSolutionSchema>;
 
 /**
  * Emerging practice - suppliers moving this direction, not yet standard
  */
-const EmergingPracticeSchema = z
+export const EmergingPracticeSchema = z
   .object({
     concept_id: z.string(),
     title: z.string(),
@@ -464,11 +465,12 @@ const EmergingPracticeSchema = z
     how_far_from_standard: z.string(), // "2-3 years" or "Already common in segment X"
   })
   .passthrough();
+export type EmergingPractice = z.infer<typeof EmergingPracticeSchema>;
 
 /**
  * Cross-domain transfer - found in another industry
  */
-const CrossDomainTransferItemSchema = z
+export const CrossDomainTransferItemSchema = z
   .object({
     concept_id: z.string(),
     title: z.string(),
@@ -476,11 +478,14 @@ const CrossDomainTransferItemSchema = z
     transfer_difficulty: z.enum(['OBVIOUS', 'MODERATE', 'NON_OBVIOUS']),
   })
   .passthrough();
+export type CrossDomainTransferItem = z.infer<
+  typeof CrossDomainTransferItemSchema
+>;
 
 /**
  * Paradigm insight - industry hasn't seen this approach
  */
-const ParadigmInsightItemSchema = z
+export const ParadigmInsightItemSchema = z
   .object({
     concept_id: z.string(),
     title: z.string(),
@@ -489,11 +494,12 @@ const ParadigmInsightItemSchema = z
     validation: z.string(), // Why this is genuinely paradigm-level
   })
   .passthrough();
+export type ParadigmInsightItem = z.infer<typeof ParadigmInsightItemSchema>;
 
 /**
  * What we found - classifies all concepts by type
  */
-const WhatWeFoundSchema = z
+export const WhatWeFoundSchema = z
   .object({
     catalog_solutions: z.array(CatalogSolutionSchema).default([]),
     emerging_practice: z.array(EmergingPracticeSchema).default([]),
@@ -501,6 +507,7 @@ const WhatWeFoundSchema = z
     paradigm_insights: z.array(ParadigmInsightItemSchema).default([]),
   })
   .passthrough();
+export type WhatWeFound = z.infer<typeof WhatWeFoundSchema>;
 
 /**
  * Recommended emphasis for AN5 calibration
@@ -517,7 +524,7 @@ export type RecommendedEmphasis = z.infer<typeof RecommendedEmphasis>;
 /**
  * Presentation calibration for AN5 - honest calibration
  */
-const PresentationCalibrationSchema = z
+export const PresentationCalibrationSchema = z
   .object({
     phone_call_equivalent: z.string(), // What user would learn from 30-min supplier call
     literature_equivalent: z.string(), // What user would learn from searching best practices
@@ -1144,18 +1151,21 @@ export type ProblemType = z.infer<typeof ProblemType>;
 /**
  * What you could get elsewhere - sources comparison
  */
-const WhatYouCouldGetElsewhereSchema = z
+export const WhatYouCouldGetElsewhereSchema = z
   .object({
     from_supplier_call: z.array(z.string()).default([]),
     from_literature_search: z.array(z.string()).default([]),
     from_industry_consultant: z.array(z.string()).default([]),
   })
   .passthrough();
+export type WhatYouCouldGetElsewhere = z.infer<
+  typeof WhatYouCouldGetElsewhereSchema
+>;
 
 /**
  * What Sparlo uniquely provides
  */
-const WhatSparlorovidesSchema = z
+export const WhatSparloProvidesSchema = z
   .object({
     unique_contributions: z.array(z.string()).default([]),
     integration_value: z.string().optional(),
@@ -1163,11 +1173,12 @@ const WhatSparlorovidesSchema = z
     cross_domain_value: z.string().optional(),
   })
   .passthrough();
+export type WhatSparloProvides = z.infer<typeof WhatSparloProvidesSchema>;
 
 /**
  * Calibrated claims - honest self-assessment
  */
-const CalibratedClaimsSchema = z
+export const CalibratedClaimsSchema = z
   .object({
     paradigm_insight_claim: z
       .enum(['JUSTIFIED', 'OVERSTATED', 'NOT_CLAIMED'])
@@ -1182,6 +1193,7 @@ const CalibratedClaimsSchema = z
       .catch('USEFUL_FRAMEWORK'),
   })
   .passthrough();
+export type CalibratedClaims = z.infer<typeof CalibratedClaimsSchema>;
 
 /**
  * Supplier arbitrage guidance - for CATALOG recommendations
@@ -1208,16 +1220,12 @@ export const HonestAssessmentSchema = z
 
     // Legacy fields (kept for backward compatibility)
     problem_type: ProblemType.optional(),
-    what_you_could_get_elsewhere: z
-      .union([
-        z.array(z.string()),
-        WhatYouCouldGetElsewhereSchema,
-      ])
-      .optional(),
+    // P1 FIX: Removed union type ambiguity - use structured format only
+    what_you_could_get_elsewhere: WhatYouCouldGetElsewhereSchema.optional(),
     what_we_provide_beyond_that: z.array(z.string()).default([]),
 
     // New structured format
-    what_sparlo_provides: WhatSparlorovidesSchema.optional(),
+    what_sparlo_provides: WhatSparloProvidesSchema.optional(),
 
     // Calibrated claims
     calibrated_claims: CalibratedClaimsSchema.optional(),
