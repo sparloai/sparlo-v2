@@ -429,14 +429,47 @@ export type HybridConcept = z.infer<typeof ConceptSchema>;
 
 /**
  * Solution classification type - classifies what we FOUND (not what we searched for)
+ * Antifragile: maps LLM variations to canonical values with fallback
  */
-export const SolutionClassificationType = z.enum([
-  'CATALOG', // Supplier sells this in their product line
-  'EMERGING_PRACTICE', // Suppliers moving this direction, not yet standard
-  'CROSS_DOMAIN', // Found in another industry, transfer required
-  'PARADIGM', // Industry hasn't seen this approach
-  'OPTIMIZATION', // Known approach, parameter tuning
-]);
+const SOLUTION_CLASS_CANONICAL = [
+  'CATALOG',
+  'EMERGING_PRACTICE',
+  'CROSS_DOMAIN',
+  'PARADIGM',
+  'OPTIMIZATION',
+] as const;
+
+const SOLUTION_CLASS_MAPPINGS: Record<string, (typeof SOLUTION_CLASS_CANONICAL)[number]> = {
+  CATALOG: 'CATALOG',
+  EMERGING_PRACTICE: 'EMERGING_PRACTICE',
+  CROSS_DOMAIN: 'CROSS_DOMAIN',
+  PARADIGM: 'PARADIGM',
+  OPTIMIZATION: 'OPTIMIZATION',
+  // LLM variations
+  CATALOG_SOLUTION: 'CATALOG',
+  SUPPLIER: 'CATALOG',
+  VENDOR: 'CATALOG',
+  OFF_THE_SHELF: 'CATALOG',
+  EMERGING: 'EMERGING_PRACTICE',
+  TRANSFER: 'CROSS_DOMAIN',
+  CROSS_DOMAIN_TRANSFER: 'CROSS_DOMAIN',
+  DOMAIN_TRANSFER: 'CROSS_DOMAIN',
+  PARADIGM_SHIFT: 'PARADIGM',
+  PARADIGM_INSIGHT: 'PARADIGM',
+  NOVEL: 'PARADIGM',
+  FIRST_PRINCIPLES: 'PARADIGM',
+  OPTIMIZE: 'OPTIMIZATION',
+  IMPROVEMENT: 'OPTIMIZATION',
+  PARAMETER_TUNING: 'OPTIMIZATION',
+};
+
+export const SolutionClassificationType = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return SOLUTION_CLASS_MAPPINGS[normalized] ?? 'CATALOG'; // Default fallback
+  })
+  .pipe(z.enum(SOLUTION_CLASS_CANONICAL));
 export type SolutionClassificationType = z.infer<
   typeof SolutionClassificationType
 >;
@@ -527,14 +560,47 @@ export type WhatWeFound = z.infer<typeof WhatWeFoundSchema>;
 
 /**
  * Recommended emphasis for AN5 calibration
+ * Antifragile: maps LLM variations to canonical values with fallback
  */
-export const RecommendedEmphasis = z.enum([
-  'SUPPLIER_ARBITRAGE', // Help them have better supplier conversations
-  'DECISION_FRAMEWORK', // Structure and validation gates
-  'CROSS_DOMAIN_SYNTHESIS', // The transfer is our value
-  'PARADIGM_INSIGHT', // The reframe is our value
-  'INTEGRATION', // Combining known elements in novel way
-]);
+const EMPHASIS_CANONICAL = [
+  'SUPPLIER_ARBITRAGE',
+  'DECISION_FRAMEWORK',
+  'CROSS_DOMAIN_SYNTHESIS',
+  'PARADIGM_INSIGHT',
+  'INTEGRATION',
+] as const;
+
+const EMPHASIS_MAPPINGS: Record<string, (typeof EMPHASIS_CANONICAL)[number]> = {
+  SUPPLIER_ARBITRAGE: 'SUPPLIER_ARBITRAGE',
+  DECISION_FRAMEWORK: 'DECISION_FRAMEWORK',
+  CROSS_DOMAIN_SYNTHESIS: 'CROSS_DOMAIN_SYNTHESIS',
+  PARADIGM_INSIGHT: 'PARADIGM_INSIGHT',
+  INTEGRATION: 'INTEGRATION',
+  // LLM variations
+  ARBITRAGE: 'SUPPLIER_ARBITRAGE',
+  SUPPLIER: 'SUPPLIER_ARBITRAGE',
+  VENDOR: 'SUPPLIER_ARBITRAGE',
+  FRAMEWORK: 'DECISION_FRAMEWORK',
+  DECISION: 'DECISION_FRAMEWORK',
+  VALIDATION: 'DECISION_FRAMEWORK',
+  CROSS_DOMAIN: 'CROSS_DOMAIN_SYNTHESIS',
+  TRANSFER: 'CROSS_DOMAIN_SYNTHESIS',
+  SYNTHESIS: 'CROSS_DOMAIN_SYNTHESIS',
+  PARADIGM: 'PARADIGM_INSIGHT',
+  INSIGHT: 'PARADIGM_INSIGHT',
+  REFRAME: 'PARADIGM_INSIGHT',
+  INTEGRATE: 'INTEGRATION',
+  COMBINE: 'INTEGRATION',
+  NOVEL_COMBINATION: 'INTEGRATION',
+};
+
+export const RecommendedEmphasis = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return EMPHASIS_MAPPINGS[normalized] ?? 'DECISION_FRAMEWORK'; // Default fallback
+  })
+  .pipe(z.enum(EMPHASIS_CANONICAL));
 export type RecommendedEmphasis = z.infer<typeof RecommendedEmphasis>;
 
 /**
@@ -681,25 +747,86 @@ export type HybridValidationResult = z.infer<typeof ValidationResultSchema>;
 
 /**
  * Source type for execution track concepts
+ * Antifragile: maps LLM variations to canonical values with fallback
  */
-export const SourceType = z.enum([
+const SOURCE_TYPE_CANONICAL = [
   'CATALOG',
   'TRANSFER',
   'OPTIMIZATION',
   'FIRST_PRINCIPLES',
   'EMERGING_PRACTICE',
-]);
+] as const;
+
+const SOURCE_TYPE_MAPPINGS: Record<string, (typeof SOURCE_TYPE_CANONICAL)[number]> = {
+  // Direct matches
+  CATALOG: 'CATALOG',
+  TRANSFER: 'TRANSFER',
+  OPTIMIZATION: 'OPTIMIZATION',
+  FIRST_PRINCIPLES: 'FIRST_PRINCIPLES',
+  EMERGING_PRACTICE: 'EMERGING_PRACTICE',
+  // Common LLM variations
+  CROSS_DOMAIN: 'TRANSFER',
+  CROSS_DOMAIN_TRANSFER: 'TRANSFER',
+  DOMAIN_TRANSFER: 'TRANSFER',
+  EMERGING: 'EMERGING_PRACTICE',
+  PRACTICE: 'EMERGING_PRACTICE',
+  CATALOG_SOLUTION: 'CATALOG',
+  VENDOR: 'CATALOG',
+  SUPPLIER: 'CATALOG',
+  OFF_THE_SHELF: 'CATALOG',
+  NOVEL: 'FIRST_PRINCIPLES',
+  NEW: 'FIRST_PRINCIPLES',
+  OPTIMIZE: 'OPTIMIZATION',
+  IMPROVEMENT: 'OPTIMIZATION',
+};
+
+export const SourceType = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return SOURCE_TYPE_MAPPINGS[normalized] ?? 'TRANSFER'; // Default fallback
+  })
+  .pipe(z.enum(SOURCE_TYPE_CANONICAL));
 export type SourceType = z.infer<typeof SourceType>;
 
 /**
  * Innovation type for portfolio concepts (new framework)
+ * Antifragile: maps LLM variations to canonical values with fallback
  */
-export const PortfolioInnovationType = z.enum([
+const INNOVATION_TYPE_CANONICAL = [
   'PARADIGM_SHIFT',
   'CROSS_DOMAIN_TRANSFER',
   'TECHNOLOGY_REVIVAL',
   'FIRST_PRINCIPLES',
-]);
+] as const;
+
+const INNOVATION_TYPE_MAPPINGS: Record<string, (typeof INNOVATION_TYPE_CANONICAL)[number]> = {
+  PARADIGM_SHIFT: 'PARADIGM_SHIFT',
+  CROSS_DOMAIN_TRANSFER: 'CROSS_DOMAIN_TRANSFER',
+  TECHNOLOGY_REVIVAL: 'TECHNOLOGY_REVIVAL',
+  FIRST_PRINCIPLES: 'FIRST_PRINCIPLES',
+  // LLM variations
+  PARADIGM: 'PARADIGM_SHIFT',
+  SHIFT: 'PARADIGM_SHIFT',
+  PARADIGM_INSIGHT: 'PARADIGM_SHIFT',
+  CROSS_DOMAIN: 'CROSS_DOMAIN_TRANSFER',
+  TRANSFER: 'CROSS_DOMAIN_TRANSFER',
+  DOMAIN_TRANSFER: 'CROSS_DOMAIN_TRANSFER',
+  REVIVAL: 'TECHNOLOGY_REVIVAL',
+  ABANDONED_TECH: 'TECHNOLOGY_REVIVAL',
+  ABANDONED_TECHNOLOGY: 'TECHNOLOGY_REVIVAL',
+  FIRST_PRINCIPLE: 'FIRST_PRINCIPLES',
+  NOVEL: 'FIRST_PRINCIPLES',
+  NEW: 'FIRST_PRINCIPLES',
+};
+
+export const PortfolioInnovationType = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return INNOVATION_TYPE_MAPPINGS[normalized] ?? 'CROSS_DOMAIN_TRANSFER'; // Default fallback
+  })
+  .pipe(z.enum(INNOVATION_TYPE_CANONICAL));
 export type PortfolioInnovationType = z.infer<typeof PortfolioInnovationType>;
 
 /**
