@@ -278,6 +278,126 @@ interface StrategicIntegration {
   };
 }
 
+// ============================================
+// Types for LLM Output Schema (AN5-M)
+// ============================================
+
+interface EconomicsValue {
+  value?: string;
+  basis?: 'CALCULATED' | 'ESTIMATED' | 'ASSUMED';
+  rationale?: string;
+}
+
+interface SustainabilityFlag {
+  type?: 'NONE' | 'CAUTION' | 'BENEFIT' | 'LIFECYCLE_TRADEOFF' | 'IRONY' | 'SUPPLY_CHAIN';
+  summary?: string | null;
+  detail?: string | null;
+  alternative?: string | null;
+}
+
+interface CoupledEffect {
+  domain?: string;
+  effect?: string;
+  direction?: 'BETTER' | 'WORSE' | 'NEUTRAL';
+  magnitude?: 'MINOR' | 'MODERATE' | 'MAJOR';
+  quantified?: string;
+  mitigation?: string;
+}
+
+interface IPConsiderations {
+  freedom_to_operate?: 'GREEN' | 'YELLOW' | 'RED';
+  rationale?: string;
+  key_patents_to_review?: string[];
+  patentability_potential?: 'HIGH' | 'MEDIUM' | 'LOW' | 'NOT_NOVEL';
+}
+
+interface FirstValidationStep {
+  gating_question?: string;
+  test?: string;
+  cost?: string;
+  timeline?: string;
+  go_no_go?: string;
+  go_criteria?: string;
+  no_go_criteria?: string;
+}
+
+interface ProblemAnalysisBenchmark {
+  entity?: string;
+  approach?: string;
+  current_performance?: string;
+  target_roadmap?: string;
+  source?: string;
+}
+
+interface ProblemAnalysis {
+  current_state_of_art?: {
+    benchmarks?: ProblemAnalysisBenchmark[];
+    no_competitors_note?: string | null;
+  };
+  what_industry_does_today?: Array<{
+    approach?: string;
+    limitation?: string;
+  }>;
+  why_its_hard?: {
+    prose?: string;
+    governing_equation?: {
+      equation?: string;
+      explanation?: string;
+    };
+    factors?: Array<{
+      factor?: string;
+      explanation?: string;
+    }>;
+  };
+  first_principles_insight?: {
+    headline?: string;
+    explanation?: string;
+  };
+  root_cause_hypotheses?: Array<{
+    hypothesis?: string;
+    evidence?: string;
+    implication?: string;
+  }>;
+  success_metrics?: Array<{
+    metric?: string;
+    target?: string;
+    minimum_viable?: string;
+    stretch?: string;
+    unit?: string;
+  }>;
+}
+
+interface ConstraintsAndMetrics {
+  hard_constraints?: string[];
+  soft_constraints?: string[];
+  assumptions?: string[];
+  success_metrics?: Array<{
+    metric?: string;
+    target?: string;
+    minimum_viable?: string;
+    stretch?: string;
+    unit?: string;
+  }>;
+}
+
+interface ChallengeTheFrame {
+  assumption?: string;
+  challenge?: string;
+  implication?: string;
+}
+
+interface RiskAndWatchout {
+  category?: string;
+  risk?: string;
+  severity?: 'high' | 'medium' | 'low';
+  mitigation?: string;
+}
+
+interface InnovationAnalysis {
+  domains_searched?: string[];
+  reframe?: string;
+}
+
 /**
  * Hybrid Report Display Component
  *
@@ -326,6 +446,7 @@ interface HybridReportDisplayProps {
       other_concepts?: ParallelConcept[];
       self_critique?: {
         confidence_level?: string;
+        overall_confidence?: string;
         confidence_rationale?: string;
         what_we_might_be_wrong_about?: string[];
         unexplored_directions?: string[];
@@ -336,6 +457,15 @@ interface HybridReportDisplayProps {
       execution_track?: ExecutionTrack;
       innovation_portfolio?: InnovationPortfolio;
       strategic_integration?: StrategicIntegration;
+      // AN5-M output fields
+      brief?: string;
+      problem_analysis?: ProblemAnalysis;
+      constraints_and_metrics?: ConstraintsAndMetrics;
+      challenge_the_frame?: ChallengeTheFrame[];
+      risks_and_watchouts?: RiskAndWatchout[];
+      what_id_actually_do?: string;
+      follow_up_prompts?: string[];
+      innovation_analysis?: InnovationAnalysis;
     };
   };
 }
@@ -1668,6 +1798,449 @@ function InnovationPortfolioSection({
   );
 }
 
+// ============================================
+// Problem Analysis Section
+// ============================================
+
+function ProblemAnalysisSection({
+  analysis,
+}: {
+  analysis?: ProblemAnalysis;
+}) {
+  if (!analysis) return null;
+
+  return (
+    <section id="problem-analysis">
+      <SectionHeader
+        title="Problem Analysis"
+        subtitle="Understanding the landscape"
+      />
+      <div className="space-y-8">
+        {/* Current State of the Art - Benchmarks Table */}
+        {analysis.current_state_of_art?.benchmarks &&
+          analysis.current_state_of_art.benchmarks.length > 0 && (
+            <CardWithHeader icon={Target} label="Current State of the Art">
+              <AuraTable
+                headers={[
+                  'Entity',
+                  'Approach',
+                  'Current Performance',
+                  'Target/Roadmap',
+                  'Source',
+                ]}
+              >
+                {analysis.current_state_of_art.benchmarks.map((b, idx) => (
+                  <tr key={idx} className="border-b border-zinc-100 last:border-0">
+                    <td className="px-4 py-3 text-sm font-medium text-zinc-900">
+                      {b.entity}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-700">
+                      {b.approach}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-700">
+                      {b.current_performance}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-700">
+                      {b.target_roadmap}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-500">
+                      {b.source}
+                    </td>
+                  </tr>
+                ))}
+              </AuraTable>
+              {analysis.current_state_of_art.no_competitors_note && (
+                <p className="mt-4 text-sm italic text-zinc-500">
+                  {analysis.current_state_of_art.no_competitors_note}
+                </p>
+              )}
+            </CardWithHeader>
+          )}
+
+        {/* What Industry Does Today */}
+        {analysis.what_industry_does_today &&
+          analysis.what_industry_does_today.length > 0 && (
+            <CardWithHeader icon={Users} label="What Industry Does Today">
+              <div className="space-y-3">
+                {analysis.what_industry_does_today.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-lg border border-zinc-200 p-4"
+                  >
+                    <p className="font-medium text-zinc-900">{item.approach}</p>
+                    {item.limitation && (
+                      <p className="mt-1 text-sm text-amber-700">
+                        Limitation: {item.limitation}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardWithHeader>
+          )}
+
+        {/* Why It's Hard */}
+        {analysis.why_its_hard && (
+          <CardWithHeader icon={AlertTriangle} label="Why It's Hard">
+            <div className="space-y-6">
+              {analysis.why_its_hard.prose && (
+                <p className="text-base leading-relaxed text-zinc-700">
+                  {analysis.why_its_hard.prose}
+                </p>
+              )}
+              {analysis.why_its_hard.governing_equation && (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+                  <MonoLabel>Governing Equation</MonoLabel>
+                  <p className="mt-2 font-mono text-sm text-zinc-900">
+                    {analysis.why_its_hard.governing_equation.equation}
+                  </p>
+                  {analysis.why_its_hard.governing_equation.explanation && (
+                    <p className="mt-2 text-sm text-zinc-600">
+                      {analysis.why_its_hard.governing_equation.explanation}
+                    </p>
+                  )}
+                </div>
+              )}
+              {analysis.why_its_hard.factors &&
+                analysis.why_its_hard.factors.length > 0 && (
+                  <div className="space-y-2">
+                    {analysis.why_its_hard.factors.map((f, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-start gap-3 rounded-lg border border-zinc-200 p-3"
+                      >
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-700">
+                          {idx + 1}
+                        </span>
+                        <div>
+                          <p className="font-medium text-zinc-900">{f.factor}</p>
+                          {f.explanation && (
+                            <p className="mt-1 text-sm text-zinc-600">
+                              {f.explanation}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+            </div>
+          </CardWithHeader>
+        )}
+
+        {/* First Principles Insight */}
+        {analysis.first_principles_insight && (
+          <DarkSection label="First Principles Insight">
+            <p className="text-xl font-medium leading-relaxed text-white">
+              {analysis.first_principles_insight.headline}
+            </p>
+            {analysis.first_principles_insight.explanation && (
+              <p className="mt-4 text-base leading-relaxed text-zinc-300">
+                {analysis.first_principles_insight.explanation}
+              </p>
+            )}
+          </DarkSection>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// Constraints & Metrics Section
+// ============================================
+
+function ConstraintsSection({
+  constraints,
+}: {
+  constraints?: ConstraintsAndMetrics;
+}) {
+  if (!constraints) return null;
+
+  return (
+    <section id="constraints">
+      <SectionHeader
+        title="Constraints & Metrics"
+        subtitle="Requirements and success criteria"
+      />
+      <div className="space-y-6">
+        {/* Hard Constraints */}
+        {constraints.hard_constraints && constraints.hard_constraints.length > 0 && (
+          <CardWithHeader icon={Shield} label="Hard Constraints">
+            <ul className="space-y-2">
+              {constraints.hard_constraints.map((c, idx) => (
+                <li key={idx} className="flex items-start gap-3 text-sm">
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
+                  <span className="text-zinc-700">{c}</span>
+                </li>
+              ))}
+            </ul>
+          </CardWithHeader>
+        )}
+
+        {/* Soft Constraints */}
+        {constraints.soft_constraints && constraints.soft_constraints.length > 0 && (
+          <CardWithHeader icon={ListChecks} label="Soft Constraints">
+            <ul className="space-y-2">
+              {constraints.soft_constraints.map((c, idx) => (
+                <li key={idx} className="flex items-start gap-3 text-sm">
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+                  <span className="text-zinc-700">{c}</span>
+                </li>
+              ))}
+            </ul>
+          </CardWithHeader>
+        )}
+
+        {/* Assumptions */}
+        {constraints.assumptions && constraints.assumptions.length > 0 && (
+          <CardWithHeader icon={Brain} label="Assumptions">
+            <ul className="space-y-2">
+              {constraints.assumptions.map((a, idx) => (
+                <li key={idx} className="flex items-start gap-3 text-sm">
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-zinc-400" />
+                  <span className="text-zinc-600">{a}</span>
+                </li>
+              ))}
+            </ul>
+          </CardWithHeader>
+        )}
+
+        {/* Success Metrics Table */}
+        {constraints.success_metrics && constraints.success_metrics.length > 0 && (
+          <CardWithHeader icon={Target} label="Success Metrics">
+            <AuraTable
+              headers={['Metric', 'Target', 'Minimum Viable', 'Stretch', 'Unit']}
+            >
+              {constraints.success_metrics.map((m, idx) => (
+                <tr key={idx} className="border-b border-zinc-100 last:border-0">
+                  <td className="px-4 py-3 text-sm font-medium text-zinc-900">
+                    {m.metric}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-semibold text-green-700">
+                    {m.target}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-zinc-700">
+                    {m.minimum_viable}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-zinc-700">
+                    {m.stretch}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-zinc-500">{m.unit}</td>
+                </tr>
+              ))}
+            </AuraTable>
+          </CardWithHeader>
+        )}
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// Challenge the Frame Section
+// ============================================
+
+function ChallengeTheFrameSection({
+  challenges,
+}: {
+  challenges?: ChallengeTheFrame[];
+}) {
+  if (!challenges || challenges.length === 0) return null;
+
+  return (
+    <section id="challenge-the-frame">
+      <SectionHeader
+        title="Challenge the Frame"
+        subtitle="Questioning key assumptions"
+      />
+      <div className="space-y-4">
+        {challenges.map((c, idx) => (
+          <div
+            key={idx}
+            className="rounded-xl border border-amber-200 bg-amber-50/30 p-6"
+          >
+            <div className="mb-3">
+              <MonoLabel>Assumption</MonoLabel>
+              <p className="mt-1 font-medium text-zinc-900">{c.assumption}</p>
+            </div>
+            <div className="mb-3">
+              <MonoLabel>Challenge</MonoLabel>
+              <p className="mt-1 text-zinc-700">{c.challenge}</p>
+            </div>
+            {c.implication && (
+              <div className="rounded-lg border border-amber-200 bg-white/50 p-3">
+                <MonoLabel>Implication</MonoLabel>
+                <p className="mt-1 text-sm text-amber-800">{c.implication}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// Risks & Watchouts Section
+// ============================================
+
+function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
+  if (!risks || risks.length === 0) return null;
+
+  const severityColors = {
+    high: 'bg-red-100 text-red-800 border-red-200',
+    medium: 'bg-amber-100 text-amber-800 border-amber-200',
+    low: 'bg-green-100 text-green-800 border-green-200',
+  };
+
+  return (
+    <section id="risks">
+      <SectionHeader
+        title="Risks & Watchouts"
+        subtitle="What could go wrong"
+      />
+      <div className="space-y-3">
+        {risks.map((r, idx) => (
+          <div
+            key={idx}
+            className="rounded-lg border border-zinc-200 bg-white p-4"
+          >
+            <div className="mb-2 flex items-start justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-500" />
+                <span className="font-medium text-zinc-900">{r.risk}</span>
+              </div>
+              <div className="flex gap-2">
+                {r.category && (
+                  <Badge variant="outline" className="text-xs">
+                    {r.category}
+                  </Badge>
+                )}
+                {r.severity && (
+                  <Badge
+                    className={cn(
+                      'text-xs capitalize',
+                      severityColors[r.severity]
+                    )}
+                  >
+                    {r.severity}
+                  </Badge>
+                )}
+              </div>
+            </div>
+            {r.mitigation && (
+              <p className="ml-6 text-sm text-zinc-600">
+                <span className="font-medium">Mitigation:</span> {r.mitigation}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// What I'd Actually Do Section
+// ============================================
+
+function WhatIdActuallyDoSection({ content }: { content?: string }) {
+  if (!content) return null;
+
+  return (
+    <section id="what-id-actually-do">
+      <SectionHeader
+        title="What I'd Actually Do"
+        subtitle="Personal recommendation from the analysis"
+      />
+      <DarkSection label="If This Were My Project">
+        <div className="prose prose-invert max-w-none">
+          {content.split('\n\n').map((paragraph, idx) => (
+            <p key={idx} className="text-base leading-relaxed text-zinc-100">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      </DarkSection>
+    </section>
+  );
+}
+
+// ============================================
+// Follow-up Prompts Section
+// ============================================
+
+function FollowUpPromptsSection({ prompts }: { prompts?: string[] }) {
+  if (!prompts || prompts.length === 0) return null;
+
+  return (
+    <section id="follow-up-prompts">
+      <SectionHeader
+        title="Suggested Follow-ups"
+        subtitle="Questions to explore next"
+      />
+      <div className="grid gap-3 sm:grid-cols-2">
+        {prompts.map((prompt, idx) => (
+          <div
+            key={idx}
+            className="group flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-200 bg-white p-4 transition-colors hover:border-violet-300 hover:bg-violet-50/30"
+          >
+            <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" />
+            <p className="text-sm text-zinc-700 group-hover:text-zinc-900">
+              {prompt}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ============================================
+// Innovation Analysis Section
+// ============================================
+
+function InnovationAnalysisSection({
+  analysis,
+}: {
+  analysis?: InnovationAnalysis;
+}) {
+  if (!analysis) return null;
+
+  return (
+    <section id="innovation-analysis">
+      <SectionHeader
+        title="Innovation Analysis"
+        subtitle="How we approached the search"
+      />
+      <div className="space-y-6">
+        {analysis.reframe && (
+          <DarkSection label="The Reframe">
+            <p className="text-lg leading-relaxed text-zinc-100">
+              {analysis.reframe}
+            </p>
+          </DarkSection>
+        )}
+        {analysis.domains_searched && analysis.domains_searched.length > 0 && (
+          <CardWithHeader icon={Layers} label="Domains Searched">
+            <div className="flex flex-wrap gap-2">
+              {analysis.domains_searched.map((domain, idx) => (
+                <span
+                  key={idx}
+                  className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm text-zinc-700"
+                >
+                  {domain}
+                </span>
+              ))}
+            </div>
+          </CardWithHeader>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function StrategicIntegrationSection({
   integration,
 }: {
@@ -2075,6 +2648,18 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {/* NEW: Honest Assessment */}
       <HonestAssessmentSection assessment={report.honest_assessment} />
 
+      {/* Problem Analysis - from AN5-M output */}
+      <ProblemAnalysisSection analysis={report.problem_analysis} />
+
+      {/* Constraints & Metrics */}
+      <ConstraintsSection constraints={report.constraints_and_metrics} />
+
+      {/* Challenge the Frame */}
+      <ChallengeTheFrameSection challenges={report.challenge_the_frame} />
+
+      {/* Innovation Analysis */}
+      <InnovationAnalysisSection analysis={report.innovation_analysis} />
+
       {/* Problem Restatement */}
       {report.problem_restatement && (
         <section id="problem-restatement">
@@ -2345,6 +2930,15 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
           </div>
         </section>
       )}
+
+      {/* Risks & Watchouts */}
+      <RisksSection risks={report.risks_and_watchouts} />
+
+      {/* What I'd Actually Do */}
+      <WhatIdActuallyDoSection content={report.what_id_actually_do} />
+
+      {/* Follow-up Prompts */}
+      <FollowUpPromptsSection prompts={report.follow_up_prompts} />
     </div>
   );
 }
