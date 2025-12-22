@@ -40,11 +40,15 @@ const MAX_REPORTS_PER_WINDOW = 100; // Increased for testing
 const DAILY_LIMIT = 500; // Increased for testing
 
 // Super admin bypass for testing (comma-separated user IDs)
-const SUPER_ADMIN_USER_IDS = (process.env.SUPER_ADMIN_USER_IDS ?? '').split(',').filter(Boolean);
+const SUPER_ADMIN_USER_IDS = (process.env.SUPER_ADMIN_USER_IDS ?? '')
+  .split(',')
+  .filter(Boolean);
 
 function isSuperAdmin(userId: string): boolean {
   const isAdmin = SUPER_ADMIN_USER_IDS.includes(userId);
-  console.log(`[Super Admin Check] userId=${userId}, adminIds=${JSON.stringify(SUPER_ADMIN_USER_IDS)}, isAdmin=${isAdmin}`);
+  console.log(
+    `[Super Admin Check] userId=${userId}, adminIds=${JSON.stringify(SUPER_ADMIN_USER_IDS)}, isAdmin=${isAdmin}`,
+  );
   return isAdmin;
 }
 
@@ -214,7 +218,9 @@ export const startHybridReportGeneration = enhanceAction(
         );
       }
     } else {
-      console.log(`[Super Admin] Bypassing usage/rate limits for user ${user.id}`);
+      console.log(
+        `[Super Admin] Bypassing usage/rate limits for user ${user.id}`,
+      );
     }
 
     const conversationId = crypto.randomUUID();
@@ -274,16 +280,10 @@ export const startHybridReportGeneration = enhanceAction(
       if (isFirstReport) {
         try {
           await markFirstReportUsed(user.id);
-          console.log(
-            'Marked first report as used for user:',
-            user.id,
-          );
+          console.log('Marked first report as used for user:', user.id);
         } catch (markError) {
           // Log but don't fail - report is already created
-          console.error(
-            'Failed to mark first report used:',
-            markError,
-          );
+          console.error('Failed to mark first report used:', markError);
         }
       }
     } catch (inngestError) {

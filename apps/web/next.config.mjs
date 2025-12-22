@@ -35,7 +35,7 @@ const config = {
       fullUrl: true,
     },
   },
-  serverExternalPackages: ['pino', 'thread-stream'],
+  serverExternalPackages: ['pino', 'thread-stream', '@react-pdf/renderer'],
   // needed for supporting dynamic imports for local content
   outputFileTracingIncludes: {
     '/*': ['./content/**/*'],
