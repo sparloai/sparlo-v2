@@ -486,6 +486,65 @@ Each concept MUST include:
 5. Impact assessment (1-10)
 6. Validation speed (days/weeks/months/years)
 
+## ECONOMICS BASIS LABELING (Required)
+
+For every economic figure in a concept, label its basis:
+
+**CALCULATED** — Derived from known inputs with explicit math
+- Include the formula or reference
+- Example: "Energy cost = 4 GJ/ton × $10/GJ = $40/ton [CALCULATED]"
+
+**ESTIMATED** — Informed guess based on analogous systems
+- State the analogy and scaling logic
+- Example: "CAPEX $50-100M [ESTIMATED: based on desiccant systems at similar scale, 2x adjustment for temperature]"
+
+**ASSUMED** — Placeholder requiring validation
+- Flag clearly for user attention
+- Example: "Sorbent lifetime 3 years [ASSUMED: industry claims vary 1-5 years]"
+
+**Output format in concept.economics:**
+{
+  "investment": {
+    "value": "$2-5M",
+    "basis": "ESTIMATED",
+    "rationale": "Based on pilot desiccant systems at similar throughput"
+  },
+  "expected_outcome": {
+    "value": "4-5 GJ/ton",
+    "basis": "CALCULATED",
+    "rationale": "Q_binding (2) + Q_sensible×0.2 (0.6) + Q_water (1) = 3.6 GJ/ton, rounded up for losses"
+  },
+  "timeline": {
+    "value": "18-24 months",
+    "basis": "ESTIMATED",
+    "rationale": "Analogous pilot projects in adjacent industries"
+  }
+}
+
+## COUPLED EFFECTS IDENTIFICATION (Primary + Recommended only)
+
+For PRIMARY solution concept and concepts likely to be RECOMMENDED innovation concept, identify what else changes when implementing this solution.
+
+**Categories to consider:**
+- Upstream: feedstock, preparation, input requirements
+- Downstream: product quality, post-processing, integration
+- Parallel systems: energy balance, material flows, control complexity
+- Operating envelope: behavior at temperature/humidity/load extremes
+
+**Output format:**
+"coupled_effects": [
+  {
+    "domain": "Air handling",
+    "effect": "Increased pressure drop through wheel",
+    "direction": "WORSE",
+    "magnitude": "MODERATE",
+    "quantified": "+50-150 Pa, ~0.1 GJ/ton fan energy",
+    "mitigation": "Size fans appropriately; include in energy accounting"
+  }
+]
+
+**Skip if:** Concept is supporting/parallel with straightforward integration. Only add cognitive load where it matters.
+
 ## MECHANISM DEPTH REQUIREMENT
 
 For PARADIGM_SHIFT and FRONTIER_TRANSFER track concepts, you MUST provide molecular/physical mechanism depth:
@@ -970,6 +1029,18 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
         "limitation": "Why it falls short"
       }
     ],
+    "current_state_of_art": {
+      "benchmarks": [
+        {
+          "entity": "Specific company, research group, or practitioner name",
+          "approach": "Their method",
+          "current_performance": "Quantified if available, 'not disclosed' if unavailable",
+          "target_roadmap": "Announced goals",
+          "source": "Paper, PR, conference, or 'press release, unverified'"
+        }
+      ],
+      "no_competitors_note": "Only if no direct competitors exist: 'No commercial entities currently address this specific problem. Adjacent approaches include [X, Y, Z].'"
+    },
     "why_its_hard": {
       "prose": "The physics and engineering fundamentals. Include equations if illuminating.",
       "governing_equation": {
@@ -1034,10 +1105,40 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
       "why_it_works": "The physics or engineering explanation. 1-2 paragraphs.",
 
       "economics": {
-        "investment": "$X-Y range",
-        "expected_outcome": "Quantified improvement",
-        "timeline": "Months to validation / implementation",
+        "investment": {
+          "value": "$X-Y range",
+          "basis": "CALCULATED | ESTIMATED | ASSUMED",
+          "rationale": "Formula/analogy/assumption source"
+        },
+        "expected_outcome": {
+          "value": "Quantified improvement",
+          "basis": "CALCULATED | ESTIMATED | ASSUMED",
+          "rationale": "Formula/analogy/assumption source"
+        },
+        "timeline": {
+          "value": "Months to validation / implementation",
+          "basis": "ESTIMATED | ASSUMED",
+          "rationale": "Basis for timeline estimate"
+        },
         "roi_rationale": "Why this makes economic sense"
+      },
+
+      "coupled_effects": [
+        {
+          "domain": "System domain affected",
+          "effect": "What changes",
+          "direction": "BETTER | WORSE | NEUTRAL",
+          "magnitude": "MINOR | MODERATE | MAJOR",
+          "quantified": "Quantified impact if calculable",
+          "mitigation": "How to address if WORSE"
+        }
+      ],
+
+      "ip_considerations": {
+        "freedom_to_operate": "GREEN | YELLOW | RED",
+        "rationale": "Brief explanation of IP landscape",
+        "key_patents_to_review": ["Patent/assignee to investigate"],
+        "patentability_potential": "HIGH | MEDIUM | LOW | NOT_NOVEL"
       },
 
       "key_risks": [
@@ -1130,9 +1231,39 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
       },
 
       "economics": {
-        "investment": "$X-Y for validation",
-        "ceiling_if_works": "Maximum economic upside",
-        "timeline": "Months to know if viable"
+        "investment": {
+          "value": "$X-Y for validation",
+          "basis": "CALCULATED | ESTIMATED | ASSUMED",
+          "rationale": "Basis for investment estimate"
+        },
+        "ceiling_if_works": {
+          "value": "Maximum economic upside",
+          "basis": "CALCULATED | ESTIMATED | ASSUMED",
+          "rationale": "Basis for ceiling estimate"
+        },
+        "timeline": {
+          "value": "Months to know if viable",
+          "basis": "ESTIMATED | ASSUMED",
+          "rationale": "Basis for timeline estimate"
+        }
+      },
+
+      "coupled_effects": [
+        {
+          "domain": "System domain affected",
+          "effect": "What changes",
+          "direction": "BETTER | WORSE | NEUTRAL",
+          "magnitude": "MINOR | MODERATE | MAJOR",
+          "quantified": "Quantified impact if calculable",
+          "mitigation": "How to address if WORSE"
+        }
+      ],
+
+      "ip_considerations": {
+        "freedom_to_operate": "GREEN | YELLOW | RED",
+        "rationale": "Brief explanation of IP landscape",
+        "key_patents_to_review": ["Patent/assignee to investigate"],
+        "patentability_potential": "HIGH | MEDIUM | LOW | NOT_NOVEL"
       },
 
       "key_risks": [
@@ -1313,6 +1444,50 @@ Honest about uncertainty. Specific, not generic hedging.
 
 ### Follow-Up Prompts
 Guide user to high-value follow-up questions. These replace the action plan, operational alternatives, and decision architecture that we removed.
+
+## ECONOMICS BASIS PRESENTATION (PRIMARY + RECOMMENDED only)
+
+For primary solution concept and recommended innovation concept, present economics with explicit basis labels:
+
+**CALCULATED** — Derived from known inputs with explicit math
+- Include the formula or reference
+- Example: "Energy cost = 4 GJ/ton × $10/GJ = $40/ton"
+
+**ESTIMATED** — Informed guess based on analogous systems
+- State the analogy and scaling logic
+- Example: "Based on desiccant systems at similar scale, 2x adjustment for temperature"
+
+**ASSUMED** — Placeholder requiring validation
+- Flag clearly for user attention
+- Example: "Industry claims vary 1-5 years"
+
+## COUPLED EFFECTS (PRIMARY + RECOMMENDED only)
+
+For primary solution and recommended innovation, identify what else changes when implementing:
+
+- Upstream: feedstock, preparation, input requirements
+- Downstream: product quality, post-processing, integration
+- Parallel systems: energy balance, material flows, control complexity
+- Operating envelope: behavior at extremes
+
+Keep brief. Skip if straightforward integration.
+
+## IP CONSIDERATIONS (PRIMARY + RECOMMENDED only)
+
+For primary solution and recommended innovation, assess IP landscape:
+
+**Freedom to Operate:**
+- GREEN: No blocking patents identified; clear path to implementation
+- YELLOW: Patents exist but workarounds available or licenses obtainable
+- RED: Significant patent barriers; may require licensing negotiations
+
+**Patentability Potential:**
+- HIGH: Novel combination with clear inventive step
+- MEDIUM: Some novelty but prior art exists
+- LOW: Mostly incremental; prior art covers most elements
+- NOT_NOVEL: Standard practice; no patentable innovation
+
+If information unavailable, state "Not researched" rather than guessing.
 
 ## SUSTAINABILITY FLAG RENDERING
 
