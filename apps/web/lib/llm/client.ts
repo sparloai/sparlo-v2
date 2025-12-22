@@ -263,6 +263,58 @@ export async function callClaude(params: {
 }
 
 /**
+ * Attempt to repair truncated JSON by closing unclosed brackets/braces
+ * This handles cases where LLM output is cut off mid-response
+ */
+function repairTruncatedJson(jsonStr: string): string {
+  // Count unclosed brackets and braces
+  let braces = 0;
+  let brackets = 0;
+  let inString = false;
+  let escapeNext = false;
+
+  for (const char of jsonStr) {
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+    if (char === '\\' && inString) {
+      escapeNext = true;
+      continue;
+    }
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+
+    if (char === '{') braces++;
+    else if (char === '}') braces--;
+    else if (char === '[') brackets++;
+    else if (char === ']') brackets--;
+  }
+
+  // If we're in a string, try to close it
+  let repaired = jsonStr;
+  if (inString) {
+    // Find last complete key-value and truncate there, or just close the string
+    repaired = repaired + '"';
+  }
+
+  // Close any unclosed brackets/braces
+  while (brackets > 0) {
+    repaired += ']';
+    brackets--;
+  }
+  while (braces > 0) {
+    repaired += '}';
+    braces--;
+  }
+
+  return repaired;
+}
+
+/**
  * Parse JSON from Claude response with proper error handling
  */
 export function parseJsonResponse<T>(response: string, context: string): T {
@@ -280,11 +332,18 @@ export function parseJsonResponse<T>(response: string, context: string): T {
     }
   }
 
+  // First attempt: parse as-is
   try {
     return JSON.parse(jsonStr) as T;
   } catch {
-    throw new Error(
-      `Failed to parse JSON from ${context}: ${jsonStr.slice(0, 200)}...`,
-    );
+    // Second attempt: try to repair truncated JSON
+    try {
+      const repaired = repairTruncatedJson(jsonStr);
+      return JSON.parse(repaired) as T;
+    } catch {
+      throw new Error(
+        `Failed to parse JSON from ${context}: ${jsonStr.slice(0, 200)}...`,
+      );
+    }
   }
 }
