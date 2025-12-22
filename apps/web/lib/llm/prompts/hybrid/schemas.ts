@@ -1539,14 +1539,15 @@ const ExecutiveSummarySchema = z
     narrative_lead: z.string(), // Opening paragraph with voice
     viability: ViabilityVerdict.catch('uncertain'),
     viability_label: z.string().optional(),
-    the_problem: z.string(),
+    the_problem: z.string().optional(),
     core_insight: z
       .object({
         headline: z.string(),
         explanation: z.string(),
       })
-      .passthrough(),
-    primary_recommendation: z.string(), // One sentence with confidence
+      .passthrough()
+      .optional(),
+    primary_recommendation: z.string().optional(), // One sentence with confidence
     recommended_path: z.array(RecommendedPathStepSchema).catch([]),
   })
   .passthrough();
@@ -1593,19 +1594,22 @@ const ReportProblemAnalysisSchema = z
           .passthrough()
           .optional(),
       })
-      .passthrough(),
+      .passthrough()
+      .optional(),
     why_its_hard: z
       .object({
         prose: z.string(),
         factors: z.array(z.string()).catch([]),
       })
-      .passthrough(),
+      .passthrough()
+      .optional(),
     first_principles_insight: z
       .object({
         headline: z.string(),
         explanation: z.string(),
       })
-      .passthrough(),
+      .passthrough()
+      .optional(),
     root_cause_hypotheses: z.array(RootCauseHypothesisSchema).catch([]),
     success_metrics: z.array(SuccessMetricSchema).catch([]),
   })
