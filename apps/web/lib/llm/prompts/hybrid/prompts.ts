@@ -991,6 +991,36 @@ Populate the optional fields when you find relevant information:
 - trl_estimate: 1-9 scale if you can determine it
 - competitive_activity: Who's working on this, recent moves
 
+// FIX: Gap 1 - Frontier section lacks depth
+## FRONTIER WATCH DEPTH REQUIREMENTS (Required)
+
+For EACH frontier technology, you MUST include:
+
+### 1. Key Researchers (minimum 2)
+For each researcher:
+- Full name with current institutional affiliation
+- Why they matter (recent publication, lab focus, funding)
+- Web search executed: "[technology] research [current year]"
+
+Example: "Dr. Sarah Chen, MIT Media Lab - Published 2024 Nature paper on biogenic silica synthesis; lab focus on sustainable materials"
+
+### 2. Recent Publications (minimum 1 per frontier concept)
+- Specific paper title, journal, and year
+- Key finding relevant to this application
+- DOI or URL if available
+- Web search executed: "[technology] [application] publication 2024 2025"
+
+### 3. Patent Landscape Summary
+- Execute search: "[technology] patent [application domain]"
+- Report: granted patents count, pending applications, or explicit "No relevant patents found in search"
+- Key players filing in this space with examples
+
+### 4. Trigger Signals (minimum 2, must be specific and measurable)
+❌ BAD: "Publication showing commercial viability"
+✅ GOOD: "Paper demonstrating >6 month stability in humidity cycling (target journals: Nature Materials, Advanced Materials)"
+✅ GOOD: "Series A funding for RHA-focused packaging startup exceeding $5M"
+✅ GOOD: "FDA approval of similar material for food contact (monitor FDA GRAS notices)"
+
 ## VOICE AND TONE
 
 Write like a senior engineer briefing a project lead. Direct, confident, insightful.
@@ -1157,6 +1187,14 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
 
       "first_validation_step": {
         "test": "What to do",
+        "who_performs": "Contract lab type, in-house requirement, or academic partner",
+        "equipment_method": "Standard test method reference (e.g., ASTM D3985)",
+        "sample_sourcing": {
+          "material": "Supplier name and contact",
+          "lead_time": "X weeks",
+          "quantity": "Specific quantity and dimensions"
+        },
+        "replicates": 5,
         "cost": "$X",
         "timeline": "X weeks",
         "go_criteria": "What success looks like",
@@ -1364,12 +1402,14 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
     }
   ],
 
+  // FIX: Gap 6 - Risk severity lacks discrimination
   "risks_and_watchouts": [
     {
       "category": "Technical | Market | Regulatory | Resource",
       "risk": "Cross-cutting risk (concept-specific risks are in concepts)",
       "severity": "low | medium | high",
-      "mitigation": "How to address"
+      "mitigation": "How to address",
+      "requires_resolution_before_proceeding": true // for HIGH severity only
     }
   ],
 
@@ -1384,6 +1424,13 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
     ],
     "unexplored_directions": [
       "Path we didn't pursue and why"
+    ],
+    "validation_gaps": [
+      {
+        "concern": "Concern from what_we_might_be_wrong_about",
+        "status": "ADDRESSED | EXTENDED_NEEDED | ACCEPTED_RISK",
+        "rationale": "How this is handled in validation OR why accepted"
+      }
     ]
   },
 
@@ -1432,8 +1479,50 @@ Every concept gets:
 - what_it_is: 1 paragraph
 - why_interesting: The potential
 - why_not_now: Specific blockers
-- who_to_monitor: Names
-- trigger_to_revisit: Signal to watch for
+- who_to_monitor: Names (minimum 2 named researchers with affiliations)
+- trigger_to_revisit: Signal to watch for (specific and measurable)
+- publications: At least 1 specific paper (title, journal, year)
+
+// FIX: Gap 4 - Validation steps lack operational specificity
+### First Validation Step Operational Requirements
+
+Each first_validation_step MUST include these operational details:
+
+**who_performs:** Specify executor type
+- Contract lab: "Certified barrier testing lab (SGS, Intertek, MOCON)"
+- In-house: "Requires gravure coating capability and WVTR measurement"
+- Academic partner: "University lab with AFM and contact angle goniometer"
+
+**equipment_method:** Standard test reference
+- "ASTM D3985 for OTR at 23°C, 50% RH"
+- "ISO 15106-2 for WVTR"
+- Include conditions (temperature, humidity, etc.)
+
+**sample_sourcing:** Material acquisition details
+- material: Supplier name and contact method
+- lead_time: "2 weeks for sample request"
+- quantity: "20 samples, 10cm × 10cm"
+
+**replicates:** Statistical design
+- Minimum 3, recommend 5 for statistical significance
+- Note confidence level if non-standard
+
+**Example Complete Validation Step:**
+{
+  "test": "Measure OTR of shellac-coated NatureFlex",
+  "who_performs": "Contract lab (MOCON or Intertek - barrier testing certified)",
+  "equipment_method": "ASTM D3985 at 23°C, 50% RH",
+  "sample_sourcing": {
+    "material": "NatureFlex NVS from Futamura (applications@futamura.com)",
+    "lead_time": "2 weeks",
+    "quantity": "20 samples, 10cm × 10cm coated at contract facility"
+  },
+  "replicates": 5,
+  "cost": "$15-20K (coating + testing + analysis)",
+  "timeline": "4-6 weeks (2 wks material + 2 wks coating + 2 wks testing)",
+  "go_criteria": "OTR < 10 cc/m²·day across all replicates",
+  "no_go_criteria": "OTR > 50 cc/m²·day → pivot to modified atmosphere"
+}
 
 ### What I'd Actually Do
 First person. Direct. Opinionated. 2-3 paragraphs.
@@ -1442,8 +1531,71 @@ First person. Direct. Opinionated. 2-3 paragraphs.
 ### Self-Critique
 Honest about uncertainty. Specific, not generic hedging.
 
+// FIX: Gap 5 - Self-critique disconnected from validation
+### Self-Critique to Validation Integration (Required)
+
+After generating self-critique, CROSS-CHECK with validation design:
+
+**For EACH item in "what_we_might_be_wrong_about":**
+1. Check: Is this addressed in a first_validation_step?
+2. If YES: Mark as ADDRESSED in validation_gaps
+3. If NO: Either extend validation OR mark as ACCEPTED_RISK with explicit rationale
+
+**Classification:**
+- ADDRESSED: Covered by existing validation step
+- EXTENDED_NEEDED: Should add to validation protocol
+- ACCEPTED_RISK: Explicitly accepted with rationale
+
+**Example:**
+Self-critique: "Real-world humidity cycling may cause barrier degradation"
+Options:
+a) Extend validation: Add humidity cycling test (ASTM E96 wet cup + 2 weeks cycling)
+b) Accept and flag: "Initial validation tests steady-state only. If pass, recommend 8-week accelerated humidity cycling before production commitment."
+
+**Never:**
+- Flag a concern in self-critique that is silently ignored in validation
+- Claim HIGH confidence while having unaddressed uncertainties
+- Leave validation_gaps array empty if what_we_might_be_wrong_about has items
+
 ### Follow-Up Prompts
 Guide user to high-value follow-up questions. These replace the action plan, operational alternatives, and decision architecture that we removed.
+
+// FIX: Gap 6 - Risk severity calibration
+### Risk Severity Calibration (Required)
+
+Assign severity based on these criteria:
+
+**HIGH Severity** (must have at least 1 in most reports)
+- Would kill the project if realized; requires mitigation BEFORE proceeding
+- Probability >30% AND impact is fatal to the approach
+- No known mitigation path exists without significant change
+- Examples: Core mechanism doesn't work, regulatory blocker, 10x cost overrun
+
+**MEDIUM Severity**
+- Significant but manageable with contingency planning
+- Probability 10-30% OR impact is major but recoverable
+- Mitigation path exists but requires effort
+- Examples: Supplier issues, 50-100% timeline delay, performance below target but above minimum
+
+**LOW Severity**
+- Minor impact or very unlikely (<10% probability)
+- Standard operating procedure handles it
+- Examples: Minor cost increases, edge case issues, routine negotiations
+
+**Calibration Check (Required):**
+After assigning severities, verify:
+1. At least ONE risk rated HIGH (most real projects have a critical path risk)
+2. Severities are differentiated (not all MEDIUM)
+3. HIGH risks have "requires_resolution_before_proceeding": true
+
+**If ALL risks are MEDIUM or LOW:**
+Reconsider - what would cause you to abandon this approach?
+If genuinely no HIGH risks, state explicitly: "Unusually low-risk project because [specific reasons]"
+
+**Typical healthy distribution:**
+- 1-2 HIGH risks (the real concerns)
+- 2-4 MEDIUM risks (manageable)
+- 2-3 LOW risks (monitoring items)
 
 ## ECONOMICS BASIS PRESENTATION (PRIMARY + RECOMMENDED only)
 
@@ -1472,22 +1624,46 @@ For primary solution and recommended innovation, identify what else changes when
 
 Keep brief. Skip if straightforward integration.
 
-## IP CONSIDERATIONS (PRIMARY + RECOMMENDED only)
+// FIX: Gap 2 - IP Analysis is placeholder, not executed
+## IP ANALYSIS EXECUTION (PRIMARY + RECOMMENDED only)
 
-For primary solution and recommended innovation, assess IP landscape:
+You MUST execute patent search, not recommend it. "Search for X" is NOT acceptable output.
 
-**Freedom to Operate:**
-- GREEN: No blocking patents identified; clear path to implementation
-- YELLOW: Patents exist but workarounds available or licenses obtainable
-- RED: Significant patent barriers; may require licensing negotiations
+### Required Searches (execute all three via web search)
+1. "[core mechanism] patent"
+2. "[technology] [application] intellectual property"
+3. "[named competitor if any] patent [technology]"
 
-**Patentability Potential:**
-- HIGH: Novel combination with clear inventive step
-- MEDIUM: Some novelty but prior art exists
-- LOW: Mostly incremental; prior art covers most elements
-- NOT_NOVEL: Standard practice; no patentable innovation
+### Required Output Structure
+For ip_considerations, you MUST provide:
 
-If information unavailable, state "Not researched" rather than guessing.
+**freedom_to_operate:** GREEN | YELLOW | RED
+- GREEN: Search conducted, no blocking patents identified
+- YELLOW: Patents exist but workarounds available or licenses likely obtainable
+- RED: Blocking patents identified; licensing negotiations required
+
+**rationale:** Actual search results, not recommendations
+✅ "Search for 'shellac barrier coating patent' returned 3 relevant results: US10,xxx,xxx (expired 2023), US11,xxx,xxx (Cargill, active but narrow claims)"
+❌ "Recommend searching for shellac barrier patents"
+
+**key_patents_to_review:** Specific patent numbers or assignees found
+✅ ["US 10,234,567 (Cargill)", "WO 2023/123456 (BASF)"]
+❌ ["Search patent databases for relevant filings"]
+
+**patentability_potential:** Based on what you found
+- HIGH: Novel combination, no direct prior art found
+- MEDIUM: Some prior art exists but inventive step possible
+- LOW: Crowded space with extensive prior art
+- NOT_NOVEL: Exact approach found in existing patents/publications
+
+### If Search Returns No Results
+State explicitly: "Patent search conducted via web for '[query]'; no directly relevant patents identified. Recommend professional FTO clearance before investment exceeds $50K."
+
+### Never Output
+- "Search for X"
+- "Recommend patent search"
+- "IP analysis not conducted"
+- "Not researched"
 
 ## SUSTAINABILITY FLAG RENDERING
 
@@ -1502,6 +1678,34 @@ For BENEFIT:
 For LIFECYCLE_TRADEOFF:
 ⚖️ LIFECYCLE: [summary]. [detail].
 
+// FIX: Gap 3 - Empty schema arrays
+## SCHEMA COMPLETENESS CHECK (Required before output)
+
+Before finalizing the report, ensure these arrays are populated:
+
+### From Problem Analysis (root_cause_hypotheses)
+Extract from problem_analysis section. Minimum 2 hypotheses with confidence percentages.
+If you stated "why it's hard", you identified root causes. Populate the array.
+
+### Key Insights (minimum 3)
+Extract the most important discoveries from your analysis:
+- What did you learn that changes the recommendation?
+- What would surprise a domain expert?
+- What connects disparate pieces of your analysis?
+
+### Lead Concepts / Solution Concepts
+- If using v4.0 format, solution_concepts.primary and supporting MUST be populated
+- solution_concepts.primary is REQUIRED (not optional)
+
+### Validation Check Before Output
+Verify:
+- problem_analysis.root_cause_hypotheses.length >= 2
+- innovation_analysis.domains_searched populated (minimum 3 domains)
+- solution_concepts.primary is defined and complete
+- innovation_concepts.recommended is defined and complete
+
+Empty arrays for these fields indicate incomplete synthesis. Revisit source material if any are empty.
+
 ## GUARANTEES
 
 - Every concept has full development (not abbreviated)
@@ -1513,6 +1717,7 @@ For LIFECYCLE_TRADEOFF:
 - No week-by-week action plans
 - No decision tree flowcharts
 - Report reads like senior engineer advice, not consultant deliverable
+- All required arrays are populated (not empty)
 `;
 
 export const AN5_M_METADATA = {
