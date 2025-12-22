@@ -1181,6 +1181,7 @@ export type ParallelInvestigation = z.infer<typeof ParallelInvestigationSchema>;
 
 /**
  * Frontier Watch - monitor only concepts
+ * Enhanced with optional web search fields for current intelligence
  */
 export const FrontierWatchSchema = z
   .object({
@@ -1197,6 +1198,11 @@ export const FrontierWatchSchema = z
     trigger_to_revisit: z.string(),
     who_to_monitor: z.string(),
     earliest_viability: z.string(),
+
+    // Web search enhanced fields (optional)
+    recent_developments: z.string().optional(),
+    trl_estimate: z.number().int().min(1).max(9).optional(),
+    competitive_activity: z.string().optional(),
   })
   .passthrough();
 export type FrontierWatch = z.infer<typeof FrontierWatchSchema>;

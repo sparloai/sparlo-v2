@@ -1,5 +1,7 @@
 'use client';
 
+import { memo } from 'react';
+
 import {
   AlertTriangle,
   ArrowRight,
@@ -9,19 +11,13 @@ import {
   CheckCircle2,
   ChevronRight,
   Clock,
-  Compass,
   DollarSign,
-  Eye,
-  FileText,
-  Gauge,
   GitBranch,
   Layers,
   Lightbulb,
   ListChecks,
   MessageSquare,
   PieChart,
-  Rocket,
-  Search,
   Shield,
   Sparkles,
   Target,
@@ -30,6 +26,17 @@ import {
   Zap,
 } from 'lucide-react';
 
+import {
+  AuraBadge,
+  AuraTable,
+  CardWithHeader,
+  DarkSection,
+  MetadataInfoCard,
+  MonoLabel,
+  NumberedHeader,
+  SectionHeader,
+  ViabilityAssessment,
+} from '@kit/ui/aura';
 import { Badge } from '@kit/ui/badge';
 import { cn } from '@kit/ui/utils';
 
@@ -185,6 +192,10 @@ interface FrontierWatch {
   trigger_to_revisit?: string;
   who_to_monitor?: string;
   earliest_viability?: string;
+  // Web search enhanced fields
+  recent_developments?: string;
+  trl_estimate?: number;
+  competitive_activity?: string;
 }
 
 interface InnovationPortfolio {
@@ -373,59 +384,35 @@ interface ParallelConcept {
   when_to_consider?: string;
 }
 
-function SectionHeader({
-  icon: Icon,
-  title,
-  subtitle,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  subtitle?: string;
-}) {
-  return (
-    <div className="mb-6 flex items-start gap-3">
-      <div className="rounded-lg bg-violet-100 p-2 dark:bg-violet-900/30">
-        <Icon className="h-5 w-5 text-violet-700 dark:text-violet-400" />
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold text-zinc-900 dark:text-white">
-          {title}
-        </h2>
-        {subtitle && (
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {subtitle}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
+// ============================================
+// Report-specific Badge Components
+// ============================================
 
-function TrackBadge({ track }: { track?: string }) {
-  const trackConfig: Record<string, { label: string; className: string }> = {
-    simpler_path: {
-      label: 'Simpler Path',
-      className:
-        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    },
-    best_fit: {
-      label: 'Best Fit',
-      className:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    },
-    paradigm_shift: {
-      label: 'Paradigm Shift',
-      className:
-        'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-    },
-    frontier_transfer: {
-      label: 'Frontier Transfer',
-      className:
-        'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    },
-  };
+const TRACK_CONFIG: Record<string, { label: string; className: string }> = {
+  simpler_path: {
+    label: 'Simpler Path',
+    className:
+      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  },
+  best_fit: {
+    label: 'Best Fit',
+    className:
+      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  },
+  paradigm_shift: {
+    label: 'Paradigm Shift',
+    className:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+  },
+  frontier_transfer: {
+    label: 'Frontier Transfer',
+    className:
+      'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+  },
+};
 
-  const config = track ? trackConfig[track] : null;
+const TrackBadge = memo(function TrackBadge({ track }: { track?: string }) {
+  const config = track ? TRACK_CONFIG[track] : null;
   if (!config) return null;
 
   return (
@@ -433,24 +420,28 @@ function TrackBadge({ track }: { track?: string }) {
       {config.label}
     </Badge>
   );
-}
+});
 
-function ConfidenceBadge({ level }: { level?: string }) {
-  const levelConfig: Record<string, { className: string }> = {
-    high: {
-      className:
-        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-    },
-    medium: {
-      className:
-        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-    },
-    low: {
-      className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-    },
-  };
+const CONFIDENCE_CONFIG: Record<string, { className: string }> = {
+  high: {
+    className:
+      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  },
+  medium: {
+    className:
+      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  },
+  low: {
+    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  },
+};
 
-  const config = level ? levelConfig[level] : levelConfig.medium;
+const ConfidenceBadge = memo(function ConfidenceBadge({
+  level,
+}: {
+  level?: string;
+}) {
+  const config = level ? CONFIDENCE_CONFIG[level] : CONFIDENCE_CONFIG.medium;
 
   return (
     <Badge
@@ -460,7 +451,7 @@ function ConfidenceBadge({ level }: { level?: string }) {
       {level || 'Medium'} Confidence
     </Badge>
   );
-}
+});
 
 function RecommendationCard({
   recommendation,
@@ -684,8 +675,8 @@ function RecommendationCard({
 // NEW: Execution Track + Innovation Portfolio Components
 // ============================================
 
-function SourceTypeBadge({ sourceType }: { sourceType?: string }) {
-  const config: Record<string, { label: string; className: string }> = {
+const SOURCE_TYPE_CONFIG: Record<string, { label: string; className: string }> =
+  {
     CATALOG: {
       label: 'Catalog Solution',
       className:
@@ -708,7 +699,12 @@ function SourceTypeBadge({ sourceType }: { sourceType?: string }) {
     },
   };
 
-  const typeConfig = sourceType ? config[sourceType] : null;
+const SourceTypeBadge = memo(function SourceTypeBadge({
+  sourceType,
+}: {
+  sourceType?: string;
+}) {
+  const typeConfig = sourceType ? SOURCE_TYPE_CONFIG[sourceType] : null;
   if (!typeConfig) return null;
 
   return (
@@ -716,38 +712,194 @@ function SourceTypeBadge({ sourceType }: { sourceType?: string }) {
       {typeConfig.label}
     </Badge>
   );
-}
+});
 
-function InnovationTypeBadge({ innovationType }: { innovationType?: string }) {
-  const config: Record<string, { label: string; className: string }> = {
-    PARADIGM_SHIFT: {
-      label: 'Paradigm Shift',
-      className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-    },
-    CROSS_DOMAIN_TRANSFER: {
-      label: 'Cross-Domain',
-      className:
-        'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-    },
-    TECHNOLOGY_REVIVAL: {
-      label: 'Tech Revival',
-      className:
-        'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
-    },
-    FIRST_PRINCIPLES: {
-      label: 'First Principles',
-      className:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    },
-  };
+const INNOVATION_TYPE_CONFIG: Record<
+  string,
+  { label: string; className: string }
+> = {
+  PARADIGM_SHIFT: {
+    label: 'Paradigm Shift',
+    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  },
+  CROSS_DOMAIN_TRANSFER: {
+    label: 'Cross-Domain',
+    className:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+  },
+  TECHNOLOGY_REVIVAL: {
+    label: 'Tech Revival',
+    className:
+      'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+  },
+  FIRST_PRINCIPLES: {
+    label: 'First Principles',
+    className:
+      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  },
+};
 
-  const typeConfig = innovationType ? config[innovationType] : null;
+const InnovationTypeBadge = memo(function InnovationTypeBadge({
+  innovationType,
+}: {
+  innovationType?: string;
+}) {
+  const typeConfig = innovationType
+    ? INNOVATION_TYPE_CONFIG[innovationType]
+    : null;
   if (!typeConfig) return null;
 
   return (
     <Badge variant="secondary" className={cn('text-xs', typeConfig.className)}>
       {typeConfig.label}
     </Badge>
+  );
+});
+
+function FrontierWatchCard({
+  item,
+  index,
+}: {
+  item: FrontierWatch;
+  index: number;
+}) {
+  return (
+    <div className="border border-zinc-200 rounded-xl overflow-hidden shadow-sm bg-white">
+      {/* Numbered Header */}
+      <NumberedHeader index={index} title={item.title ?? 'Untitled'} />
+
+      {/* Metadata Info Card */}
+      <MetadataInfoCard
+        items={[
+          ...(item.innovation_type
+            ? [{ label: 'Type', value: item.innovation_type }]
+            : []),
+          ...(item.earliest_viability
+            ? [{ label: 'Earliest Viability', value: item.earliest_viability }]
+            : []),
+          ...(item.trl_estimate
+            ? [{ label: 'Current TRL', value: `TRL ${item.trl_estimate}` }]
+            : []),
+        ]}
+      />
+
+      <div className="p-8 sm:p-10 space-y-8">
+        {/* One-liner / What It Is */}
+        {item.one_liner && (
+          <div>
+            <MonoLabel>What It Is</MonoLabel>
+            <p className="mt-3 text-base text-zinc-900 leading-relaxed font-normal">
+              {item.one_liner}
+            </p>
+          </div>
+        )}
+
+        {/* Why Interesting */}
+        {item.why_interesting && (
+          <div>
+            <MonoLabel>Why It&apos;s Interesting</MonoLabel>
+            <p className="mt-3 text-base text-zinc-700 leading-relaxed font-normal">
+              {item.why_interesting}
+            </p>
+          </div>
+        )}
+
+        {/* Why Not Now */}
+        {item.why_not_now && (
+          <div>
+            <MonoLabel>Why Not Now</MonoLabel>
+            <p className="mt-3 text-base text-zinc-700 leading-relaxed font-normal">
+              {item.why_not_now}
+            </p>
+          </div>
+        )}
+
+        {/* Monitoring Details Grid */}
+        {(item.trigger_to_revisit || item.who_to_monitor) && (
+          <div className="grid md:grid-cols-2 gap-6">
+            {item.trigger_to_revisit && (
+              <div className="border border-zinc-200 rounded-lg p-6">
+                <MonoLabel>Trigger to Revisit</MonoLabel>
+                <p className="mt-3 text-sm text-zinc-700 leading-relaxed">
+                  {item.trigger_to_revisit}
+                </p>
+              </div>
+            )}
+            {item.who_to_monitor && (
+              <div className="border border-zinc-200 rounded-lg p-6">
+                <MonoLabel>Who to Monitor</MonoLabel>
+                <p className="mt-3 text-sm text-zinc-700 leading-relaxed">
+                  {item.who_to_monitor}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Web search enhanced fields - dark section */}
+        {(item.recent_developments || item.competitive_activity) && (
+          <DarkSection label="Web Search Intelligence">
+            <div className="space-y-4 text-sm">
+              {item.recent_developments && (
+                <div>
+                  <span className="text-xs text-zinc-400 font-mono font-bold block mb-2">
+                    RECENT DEVELOPMENTS
+                  </span>
+                  <p className="text-zinc-100 leading-relaxed">
+                    {item.recent_developments}
+                  </p>
+                </div>
+              )}
+              {item.competitive_activity && (
+                <div>
+                  <span className="text-xs text-zinc-400 font-mono font-bold block mb-2">
+                    COMPETITIVE ACTIVITY
+                  </span>
+                  <p className="text-zinc-100 leading-relaxed">
+                    {item.competitive_activity}
+                  </p>
+                </div>
+              )}
+            </div>
+          </DarkSection>
+        )}
+
+        {/* Viability Assessment footer */}
+        {(item.earliest_viability || item.why_not_now) && (
+          <ViabilityAssessment
+            headline={item.why_not_now ?? 'Monitoring recommended'}
+            revisitTimeframe={item.earliest_viability}
+            revisitReason={item.trigger_to_revisit}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function FrontierWatchSection({
+  items,
+}: {
+  items: FrontierWatch[] | null | undefined;
+}) {
+  if (!items?.length) return null;
+
+  return (
+    <section id="frontier-watch">
+      <SectionHeader
+        title="Frontier Technologies"
+        subtitle="Emerging technologies and innovations to monitor"
+      />
+      <div className="space-y-12">
+        {items.map((item, idx) => (
+          <FrontierWatchCard
+            key={item.id ?? `frontier-${idx}`}
+            item={item}
+            index={idx + 1}
+          />
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -820,64 +972,61 @@ function HonestAssessmentSection({
   return (
     <section id="honest-assessment">
       <SectionHeader
-        icon={Gauge}
         title="Honest Assessment"
         subtitle="What we're actually delivering"
       />
-      <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-6 dark:border-amber-800/50 dark:bg-amber-900/20">
+      <div className="border border-zinc-200 rounded-xl shadow-sm bg-white overflow-hidden">
+        {/* Header with problem type */}
         {assessment.problem_type && (
-          <div className="mb-4">
-            <Badge variant="outline" className="text-sm capitalize">
+          <div className="bg-zinc-50/50 border-b border-zinc-200 p-6 flex items-center justify-between">
+            <MonoLabel>Problem Type</MonoLabel>
+            <AuraBadge variant="neutral">
               {assessment.problem_type.replace(/_/g, ' ')}
-            </Badge>
+            </AuraBadge>
           </div>
         )}
 
-        {assessment.expected_value_range && (
-          <div className="mb-4 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-lg bg-white/60 p-3 dark:bg-zinc-800/60">
-              <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                Floor
-              </span>
-              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                {assessment.expected_value_range.floor}
-              </p>
-            </div>
-            <div className="rounded-lg bg-white/60 p-3 dark:bg-zinc-800/60">
-              <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                Most Likely
-              </span>
-              <p className="text-sm font-medium text-green-700 dark:text-green-400">
-                {assessment.expected_value_range.most_likely}
-              </p>
-            </div>
-            <div className="rounded-lg bg-white/60 p-3 dark:bg-zinc-800/60">
-              <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                Ceiling
-              </span>
-              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
-                {assessment.expected_value_range.ceiling}
-              </p>
-            </div>
-          </div>
-        )}
+        <div className="p-8 sm:p-10 space-y-8">
+          {/* Value Range Table */}
+          {assessment.expected_value_range && (
+            <AuraTable headers={['Floor', 'Most Likely', 'Ceiling']}>
+              <tr>
+                <td className="px-6 py-4 text-sm text-zinc-700 font-normal">
+                  {assessment.expected_value_range.floor}
+                </td>
+                <td className="px-6 py-4 text-sm font-semibold text-green-700">
+                  {assessment.expected_value_range.most_likely}
+                </td>
+                <td className="px-6 py-4 text-sm text-zinc-700 font-normal">
+                  {assessment.expected_value_range.ceiling}
+                </td>
+              </tr>
+            </AuraTable>
+          )}
 
-        {assessment.candid_assessment && (
-          <p className="text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
-            {assessment.candid_assessment}
-          </p>
-        )}
+          {/* Candid Assessment */}
+          {assessment.candid_assessment && (
+            <div>
+              <MonoLabel>Candid Assessment</MonoLabel>
+              <p className="mt-3 text-base text-zinc-900 leading-relaxed font-normal">
+                {assessment.candid_assessment}
+              </p>
+            </div>
+          )}
 
-        {assessment.if_value_is_limited && (
-          <div className="mt-4 rounded-lg border border-amber-300 bg-white/60 p-3 dark:border-amber-700 dark:bg-zinc-800/60">
-            <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
-              What Would Need to Change
-            </span>
-            <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-              {assessment.if_value_is_limited}
-            </p>
-          </div>
-        )}
+          {/* What Would Need to Change */}
+          {assessment.if_value_is_limited && (
+            <div className="border border-amber-200 bg-amber-50/30 rounded-xl p-6">
+              <div className="flex items-center gap-3 mb-3">
+                <AlertTriangle className="h-5 w-5 text-amber-600" />
+                <MonoLabel>What Would Need to Change</MonoLabel>
+              </div>
+              <p className="text-base text-zinc-700 leading-relaxed">
+                {assessment.if_value_is_limited}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -889,102 +1038,94 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
   return (
     <section id="cross-domain-search">
       <SectionHeader
-        icon={Search}
         title="Cross-Domain Search"
         subtitle="Where we looked and what we found"
       />
-      <div className="space-y-4">
+      <div className="space-y-8">
+        {/* The Reframe - Dark Section */}
         {search.enhanced_challenge_frame && (
-          <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
-            <div className="mb-3 flex items-center gap-2">
-              <Compass className="h-4 w-4 text-zinc-400" />
-              <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                Problem Reframing
-              </span>
-            </div>
-            <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-300">
+          <DarkSection label="The Reframe">
+            <p className="text-lg sm:text-xl font-light leading-relaxed text-zinc-100 max-w-3xl mb-8">
               {search.enhanced_challenge_frame.reframing}
             </p>
             {search.enhanced_challenge_frame.search_queries &&
               search.enhanced_challenge_frame.search_queries.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {search.enhanced_challenge_frame.search_queries.map(
-                    (query, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
-                        {query}
-                      </Badge>
-                    ),
-                  )}
+                <div className="border-t border-zinc-800 pt-8">
+                  <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 mb-4">
+                    Search Queries
+                  </h4>
+                  <div className="flex flex-wrap gap-3">
+                    {search.enhanced_challenge_frame.search_queries.map(
+                      (query, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs font-mono font-medium border border-zinc-700 bg-zinc-900/50 px-3 py-1.5 rounded-full text-zinc-300"
+                        >
+                          {query}
+                        </span>
+                      ),
+                    )}
+                  </div>
                 </div>
               )}
-          </div>
+          </DarkSection>
         )}
 
+        {/* Domains Searched */}
         {search.domains_searched && search.domains_searched.length > 0 && (
-          <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
-            <div className="mb-4 flex items-center gap-2">
-              <Layers className="h-4 w-4 text-zinc-400" />
-              <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                Domains Searched
-              </span>
-            </div>
-            <div className="space-y-3">
+          <CardWithHeader icon={Layers} label="Domains Searched">
+            <div className="space-y-4">
               {search.domains_searched.map((domain, idx) => (
                 <div
                   key={idx}
-                  className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50"
+                  className="border border-zinc-200 rounded-lg p-6 hover:border-zinc-400 transition-colors"
                 >
-                  <div className="font-medium text-zinc-900 dark:text-white">
+                  <h5 className="font-semibold text-zinc-950 mb-2">
                     {domain.domain}
-                  </div>
+                  </h5>
                   {domain.mechanism_found && (
-                    <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+                    <p className="text-sm text-zinc-700 leading-relaxed">
                       {domain.mechanism_found}
                     </p>
                   )}
                   {domain.relevance && (
-                    <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-2 text-xs text-zinc-500">
                       → {domain.relevance}
                     </p>
                   )}
                 </div>
               ))}
             </div>
-          </div>
+          </CardWithHeader>
         )}
 
+        {/* Revelations */}
         {search.from_scratch_revelations &&
           search.from_scratch_revelations.length > 0 && (
-            <div className="rounded-xl border border-violet-200 bg-violet-50/50 p-6 dark:border-violet-800 dark:bg-violet-900/20">
-              <div className="mb-4 flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                  Revelations from Our Search
-                </span>
-              </div>
-              <div className="space-y-3">
+            <CardWithHeader icon={Sparkles} label="Key Revelations">
+              <ul className="space-y-4">
                 {search.from_scratch_revelations.map((rev, idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-lg bg-white/60 p-3 dark:bg-zinc-800/60"
-                  >
-                    <p className="font-medium text-zinc-900 dark:text-white">
-                      {rev.discovery}
-                    </p>
-                    {rev.source && (
-                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                        Source: {rev.source}
+                  <li key={idx} className="flex gap-4 items-start group">
+                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-zinc-300 group-hover:bg-zinc-950 transition-colors flex-shrink-0" />
+                    <div>
+                      <p className="text-base text-zinc-950 font-medium leading-relaxed">
+                        {rev.discovery}
                       </p>
-                    )}
-                    {rev.implication && (
-                      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
-                        → {rev.implication}
-                      </p>
-                    )}
-                  </div>
+                      {rev.source && (
+                        <p className="mt-1 text-xs text-zinc-500">
+                          Source: {rev.source}
+                        </p>
+                      )}
+                      {rev.implication && (
+                        <p className="mt-1 text-sm text-zinc-600 leading-relaxed">
+                          → {rev.implication}
+                        </p>
+                      )}
+                    </div>
+                  </li>
                 ))}
-              </div>
-            </div>
+              </ul>
+            </CardWithHeader>
           )}
       </div>
     </section>
@@ -997,7 +1138,6 @@ function ExecutionTrackSection({ track }: { track?: ExecutionTrack }) {
   return (
     <section id="execution-track">
       <SectionHeader
-        icon={Target}
         title="Execution Track"
         subtitle="Your primary recommendation - the safe bet"
       />
@@ -1311,7 +1451,6 @@ function InnovationPortfolioSection({
   return (
     <section id="innovation-portfolio">
       <SectionHeader
-        icon={Rocket}
         title="Innovation Portfolio"
         subtitle="Higher-risk bets with breakthrough potential"
       />
@@ -1524,51 +1663,6 @@ function InnovationPortfolioSection({
               </div>
             </div>
           )}
-
-        {/* Frontier Watch */}
-        {portfolio.frontier_watch && portfolio.frontier_watch.length > 0 && (
-          <div className="rounded-xl border border-zinc-200 bg-zinc-50/50 p-6 dark:border-zinc-700 dark:bg-zinc-800/50">
-            <div className="mb-4 flex items-center gap-2">
-              <Eye className="h-5 w-5 text-zinc-400" />
-              <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                Frontier Watch
-              </span>
-              <Badge variant="outline" className="text-xs">
-                Monitor Only
-              </Badge>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {portfolio.frontier_watch.map((fw, idx) => (
-                <div
-                  key={idx}
-                  className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800"
-                >
-                  <div className="mb-1 flex items-start justify-between gap-2">
-                    <h5 className="font-medium text-zinc-900 dark:text-white">
-                      {fw.title}
-                    </h5>
-                    <InnovationTypeBadge innovationType={fw.innovation_type} />
-                  </div>
-                  {fw.one_liner && (
-                    <p className="mb-2 text-sm text-zinc-600 dark:text-zinc-300">
-                      {fw.one_liner}
-                    </p>
-                  )}
-                  {fw.why_not_now && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Why not now: {fw.why_not_now}
-                    </p>
-                  )}
-                  {fw.earliest_viability && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Earliest viability: {fw.earliest_viability}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </section>
   );
@@ -1584,7 +1678,6 @@ function StrategicIntegrationSection({
   return (
     <section id="strategic-integration">
       <SectionHeader
-        icon={PieChart}
         title="Strategic Integration"
         subtitle="How to allocate resources across the portfolio"
       />
@@ -1883,43 +1976,73 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {report.executive_summary && (
         <section id="executive-summary">
           <SectionHeader
-            icon={Sparkles}
             title="Executive Summary"
             subtitle="The bottom line"
           />
-          <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-6 dark:border-violet-800 dark:from-violet-900/30 dark:to-zinc-900">
+          <CardWithHeader icon={Target} label="The Brief">
             {typeof report.executive_summary === 'string' ? (
-              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
+              <p className="text-xl sm:text-2xl text-zinc-950 font-light leading-relaxed">
                 {report.executive_summary}
               </p>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {/* Narrative lead */}
                 {report.executive_summary.narrative_lead && (
-                  <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
+                  <p className="text-xl sm:text-2xl text-zinc-950 font-light leading-relaxed">
                     {report.executive_summary.narrative_lead}
                   </p>
                 )}
                 {/* Core insight */}
                 {report.executive_summary.core_insight && (
-                  <div className="rounded-lg bg-white/60 p-4 dark:bg-zinc-800/60">
-                    <h4 className="mb-2 font-semibold text-zinc-900 dark:text-white">
+                  <div className="border-l-4 border-zinc-950 pl-8 py-2 bg-zinc-50/50 rounded-r-lg">
+                    <MonoLabel>Core Insight</MonoLabel>
+                    <p className="mt-3 text-xl text-zinc-950 font-medium leading-relaxed">
                       {report.executive_summary.core_insight.headline}
-                    </h4>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                      {report.executive_summary.core_insight.explanation}
                     </p>
+                    {report.executive_summary.core_insight.explanation && (
+                      <p className="mt-2 text-base text-zinc-600 font-normal leading-relaxed max-w-4xl">
+                        {report.executive_summary.core_insight.explanation}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {/* Viability badge */}
+                {report.executive_summary.viability && (
+                  <div className="flex items-center gap-3">
+                    <MonoLabel>Viability</MonoLabel>
+                    <AuraBadge
+                      variant={
+                        report.executive_summary.viability_label
+                          ?.toLowerCase()
+                          .includes('high') ||
+                        report.executive_summary.viability_label
+                          ?.toLowerCase()
+                          .includes('achievable')
+                          ? 'success'
+                          : report.executive_summary.viability_label
+                                ?.toLowerCase()
+                                .includes('low')
+                            ? 'warning'
+                            : 'neutral'
+                      }
+                    >
+                      {report.executive_summary.viability_label ??
+                        report.executive_summary.viability}
+                    </AuraBadge>
                   </div>
                 )}
                 {/* Primary recommendation */}
                 {report.executive_summary.primary_recommendation && (
-                  <p className="text-sm font-medium text-violet-700 dark:text-violet-400">
-                    {report.executive_summary.primary_recommendation}
-                  </p>
+                  <div className="border border-blue-100 bg-blue-50/30 rounded-xl p-6">
+                    <MonoLabel>Primary Recommendation</MonoLabel>
+                    <p className="mt-3 text-base text-zinc-900 font-medium leading-relaxed">
+                      {report.executive_summary.primary_recommendation}
+                    </p>
+                  </div>
                 )}
               </div>
             )}
-          </div>
+          </CardWithHeader>
         </section>
       )}
 
@@ -1930,7 +2053,6 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {report.problem_restatement && (
         <section id="problem-restatement">
           <SectionHeader
-            icon={FileText}
             title="Problem Restatement"
             subtitle="Reframing the challenge"
           />
@@ -1951,6 +2073,11 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {/* NEW: Innovation Portfolio (new framework) */}
       <InnovationPortfolioSection portfolio={report.innovation_portfolio} />
 
+      {/* NEW: Frontier Watch as top-level section */}
+      <FrontierWatchSection
+        items={report.innovation_portfolio?.frontier_watch}
+      />
+
       {/* NEW: Strategic Integration (new framework) */}
       <StrategicIntegrationSection integration={report.strategic_integration} />
 
@@ -1958,7 +2085,6 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {decision_architecture && !usesNewFramework && (
         <section id="decision-architecture">
           <SectionHeader
-            icon={Target}
             title="Decision Architecture"
             subtitle="Your action plan with fallback strategies"
           />
@@ -2040,7 +2166,6 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {report.key_insights && report.key_insights.length > 0 && (
         <section id="key-insights">
           <SectionHeader
-            icon={Lightbulb}
             title="Key Insights"
             subtitle="Critical learnings from this analysis"
           />
@@ -2066,7 +2191,6 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {report.next_steps && report.next_steps.length > 0 && (
         <section id="next-steps">
           <SectionHeader
-            icon={ListChecks}
             title="Next Steps"
             subtitle="Recommended actions in sequence"
           />
@@ -2090,7 +2214,6 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {report.other_concepts && report.other_concepts.length > 0 && (
         <section id="other-concepts">
           <SectionHeader
-            icon={Brain}
             title="Other Concepts Considered"
             subtitle="Lower priority but potentially valuable"
           />
@@ -2134,7 +2257,6 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {self_critique && (
         <section id="self-critique">
           <SectionHeader
-            icon={MessageSquare}
             title="Self-Critique"
             subtitle="Honest assessment of this analysis"
           />

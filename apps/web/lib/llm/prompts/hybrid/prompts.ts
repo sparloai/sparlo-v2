@@ -919,6 +919,19 @@ Concepts ARE the product. Every concept gets full development:
 - Sustainability flag (if applicable)
 - First validation step (one gate, not a timeline)
 
+## FRONTIER INTELLIGENCE (Web Search Enhanced)
+
+For frontier_watch items, use web search to enhance with current information:
+- Search for recent developments, announcements, and research activity
+- Identify specific researchers and labs to monitor
+- Assess competitive landscape and market timing
+- Estimate Technology Readiness Level where possible
+
+Populate the optional fields when you find relevant information:
+- recent_developments: Key findings from web search
+- trl_estimate: 1-9 scale if you can determine it
+- competitive_activity: Who's working on this, recent moves
+
 ## VOICE AND TONE
 
 Write like a senior engineer briefing a project lead. Direct, confident, insightful.
@@ -1203,7 +1216,11 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
 
         "who_to_monitor": ["Company/lab 1", "Company/lab 2", "Key conferences"],
 
-        "trigger_to_revisit": "What signal indicates this is ready for investment"
+        "trigger_to_revisit": "What signal indicates this is ready for investment",
+
+        "recent_developments": "MIT published breakthrough results in March 2024...",
+        "trl_estimate": 4,
+        "competitive_activity": "BASF and Dow both announced pilot programs..."
       }
     ]
   },
