@@ -722,8 +722,7 @@ function InnovationTypeBadge({ innovationType }: { innovationType?: string }) {
   const config: Record<string, { label: string; className: string }> = {
     PARADIGM_SHIFT: {
       label: 'Paradigm Shift',
-      className:
-        'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+      className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
     },
     CROSS_DOMAIN_TRANSFER: {
       label: 'Cross-Domain',
@@ -802,7 +801,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
           <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
             The Physics
           </span>
-          <p className="text-sm font-mono text-zinc-600 dark:text-zinc-300">
+          <p className="font-mono text-sm text-zinc-600 dark:text-zinc-300">
             {insight.physics}
           </p>
         </div>
@@ -911,11 +910,7 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
                 <div className="flex flex-wrap gap-2">
                   {search.enhanced_challenge_frame.search_queries.map(
                     (query, idx) => (
-                      <Badge
-                        key={idx}
-                        variant="secondary"
-                        className="text-xs"
-                      >
+                      <Badge key={idx} variant="secondary" className="text-xs">
                         {query}
                       </Badge>
                     ),
@@ -1362,7 +1357,10 @@ function InnovationPortfolioSection({
                   Why This One
                 </span>
                 <p className="text-sm text-zinc-700 dark:text-zinc-200">
-                  {portfolio.recommended_innovation.selection_rationale.why_this_one}
+                  {
+                    portfolio.recommended_innovation.selection_rationale
+                      .why_this_one
+                  }
                 </p>
                 {portfolio.recommended_innovation.selection_rationale
                   .ceiling_if_works && (
@@ -1390,7 +1388,10 @@ function InnovationPortfolioSection({
                   </span>
                 </div>
                 <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                  {portfolio.recommended_innovation.breakthrough_potential.if_it_works}
+                  {
+                    portfolio.recommended_innovation.breakthrough_potential
+                      .if_it_works
+                  }
                 </p>
                 {portfolio.recommended_innovation.breakthrough_potential
                   .estimated_improvement && (
@@ -1433,16 +1434,24 @@ function InnovationPortfolioSection({
                     </p>
                   </div>
                   <div>
-                    <span className="text-xs text-zinc-500">Cost/Timeline:</span>
+                    <span className="text-xs text-zinc-500">
+                      Cost/Timeline:
+                    </span>
                     <p className="text-zinc-700 dark:text-zinc-200">
                       {portfolio.recommended_innovation.validation_path.cost} /{' '}
-                      {portfolio.recommended_innovation.validation_path.timeline}
+                      {
+                        portfolio.recommended_innovation.validation_path
+                          .timeline
+                      }
                     </p>
                   </div>
                   <div>
                     <span className="text-xs text-zinc-500">Go/No-Go:</span>
                     <p className="text-zinc-700 dark:text-zinc-200">
-                      {portfolio.recommended_innovation.validation_path.go_no_go}
+                      {
+                        portfolio.recommended_innovation.validation_path
+                          .go_no_go
+                      }
                     </p>
                   </div>
                 </div>
@@ -1474,7 +1483,9 @@ function InnovationPortfolioSection({
                       <h5 className="font-medium text-zinc-900 dark:text-white">
                         {inv.title}
                       </h5>
-                      <InnovationTypeBadge innovationType={inv.innovation_type} />
+                      <InnovationTypeBadge
+                        innovationType={inv.innovation_type}
+                      />
                     </div>
                     {inv.one_liner && (
                       <p className="mb-2 text-sm text-zinc-600 dark:text-zinc-300">
@@ -1484,7 +1495,9 @@ function InnovationPortfolioSection({
                     <div className="grid gap-2 text-sm sm:grid-cols-2">
                       {inv.ceiling && (
                         <div>
-                          <span className="text-xs text-zinc-500">Ceiling:</span>
+                          <span className="text-xs text-zinc-500">
+                            Ceiling:
+                          </span>
                           <p className="text-green-700 dark:text-green-400">
                             {inv.ceiling}
                           </p>
@@ -1636,8 +1649,8 @@ function StrategicIntegrationSection({
                   </div>
                 </div>
               )}
-              {integration.resource_allocation.recommended_innovation_percent !==
-                undefined && (
+              {integration.resource_allocation
+                .recommended_innovation_percent !== undefined && (
                 <div className="rounded-lg bg-violet-50 p-3 text-center dark:bg-violet-900/20">
                   <div className="text-2xl font-bold text-violet-700 dark:text-violet-400">
                     {
@@ -1651,8 +1664,8 @@ function StrategicIntegrationSection({
                   </div>
                 </div>
               )}
-              {integration.resource_allocation.parallel_investigations_percent !==
-                undefined && (
+              {integration.resource_allocation
+                .parallel_investigations_percent !== undefined && (
                 <div className="rounded-lg bg-blue-50 p-3 text-center dark:bg-blue-900/20">
                   <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
                     {
@@ -1764,10 +1777,14 @@ function StrategicIntegrationSection({
                 </div>
               )}
             </div>
-            {integration.decision_architecture.primary_tradeoff.if_uncertain && (
+            {integration.decision_architecture.primary_tradeoff
+              .if_uncertain && (
               <p className="mt-4 rounded-lg bg-white/60 p-3 text-sm text-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200">
                 <strong>If uncertain:</strong>{' '}
-                {integration.decision_architecture.primary_tradeoff.if_uncertain}
+                {
+                  integration.decision_architecture.primary_tradeoff
+                    .if_uncertain
+                }
               </p>
             )}
           </div>

@@ -39,6 +39,7 @@ import type { ChatMessage } from '../_lib/schemas/chat.schema';
 import { DiscoveryReportDisplay } from './discovery-report-display';
 import { HybridReportDisplay } from './hybrid-report-display';
 import { ReportRenderer } from './report/report-renderer';
+import { ShareModal } from './share-modal';
 
 interface ReportData {
   markdown?: string;
@@ -108,6 +109,8 @@ export function ReportDisplay({
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const isUserScrolledUpRef = useRef(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Cancel the current streaming response
   const cancelStream = useCallback(() => {
@@ -131,6 +134,35 @@ export function ReportDisplay({
   const handleComplete = useCallback(() => {
     router.refresh();
   }, [router]);
+
+  // Handle PDF export
+  const handleExport = useCallback(async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch(`/api/reports/${report.id}/pdf`);
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${report.title
+        .replace(/[^a-z0-9]/gi, '-')
+        .toLowerCase()
+        .substring(0, 50)}-report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+      toast.success('PDF exported successfully');
+    } catch (error) {
+      console.error('[ReportDisplay] Export error:', error);
+      toast.error('Failed to export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [report.id, report.title]);
 
   // Extract markdown from report data
   const reportMarkdown = report.report_data?.markdown ?? '';
@@ -711,11 +743,22 @@ export function ReportDisplay({
                     Generated {new Date(report.created_at).toLocaleDateString()}
                   </div>
                   <div className="flex gap-2">
-                    <button className="btn">
-                      <Download className="btn-icon" />
-                      Export
+                    <button
+                      className="btn"
+                      onClick={handleExport}
+                      disabled={isExporting}
+                    >
+                      {isExporting ? (
+                        <Loader2 className="btn-icon animate-spin" />
+                      ) : (
+                        <Download className="btn-icon" />
+                      )}
+                      {isExporting ? 'Exporting...' : 'Export'}
                     </button>
-                    <button className="btn">
+                    <button
+                      className="btn"
+                      onClick={() => setIsShareModalOpen(true)}
+                    >
                       <Share2 className="btn-icon" />
                       Share
                     </button>
@@ -962,6 +1005,13 @@ export function ReportDisplay({
             </motion.aside>
           )}
         </AnimatePresence>
+
+        {/* Share Modal */}
+        <ShareModal
+          reportId={report.id}
+          open={isShareModalOpen}
+          onOpenChange={setIsShareModalOpen}
+        />
       </div>
     </div>
   );

@@ -49,6 +49,10 @@ export {
   ViabilityVerdict,
   TrackSchema,
   SafeUrlSchema,
+  // v4.0: Sustainability screening
+  SustainabilityFlagType,
+  SustainabilityFlagSchema,
+  type SustainabilityFlag,
   // NEW: Execution Track + Innovation Portfolio Framework (schemas and types)
   // Note: For Zod enums with same-name type exports, we export value only (type is inferred)
   SourceType,
@@ -265,17 +269,17 @@ export const HYBRID_SOLUTION_TRACKS = [
 export type HybridSolutionTrack = (typeof HYBRID_SOLUTION_TRACKS)[number];
 
 /**
- * Hybrid chain metadata (v2.0.0)
+ * Hybrid chain metadata (v4.0.0 - Narrative Flow)
  *
  * Note: `stages` is derived from HYBRID_PHASES to maintain single source of truth
  */
 export const HYBRID_CHAIN_METADATA = {
-  version: '3.1.0',
+  version: '4.0.0',
   name: 'Hybrid Innovation Chain',
   description:
-    'Full-spectrum solution search with calibrated presentation and paradigm insight surfacing',
+    'Full-spectrum solution search with streamlined narrative flow v4.0',
   philosophy:
-    'The best solution wins regardless of origin. Paradigm insights are surfaced prominently even when simpler paths win on merit. Presentation is calibrated to actual value delivered.',
+    'The best solution wins regardless of origin. Concepts are the product with full development. Sustainability flags appear inline where applicable.',
 
   // Derived from HYBRID_PHASES - single source of truth
   get stages() {
@@ -299,24 +303,25 @@ export const HYBRID_CHAIN_METADATA = {
   },
 
   guarantees: [
-    'At least 1 concept from each track',
+    // Core v4.0 guarantees
+    'Every concept has full development (not abbreviated)',
+    'Every concept explains the_insight with where_we_found_it',
+    'Economics explicit for every concept',
+    'Sustainability flags appear inline where applicable',
+    'Follow-up prompts guide user to action plan, supplier negotiation',
+    'No separate Honest Assessment section',
+    'No week-by-week action plans (single validation step instead)',
+    'Report reads like senior engineer advice, not consultant deliverable',
+    // Maintained from previous versions
+    'At least 2 concepts per track',
     'At least 1 concept from first principles',
     'At least 1 concept challenging industry assumption',
     'At least 1 concept from unexpected domain',
     'Self-critique section in every report',
     'Prior art documented for every concept',
-    'Decision architecture with primary + fallback + parallel',
     'Paradigm insights surfaced prominently when found',
     'Abandoned technology revival scan in every report',
-    'Strategic implications with near/medium/long-term framing',
-    'Personal recommendation with day-by-day action plan',
-    'Parallel explorations with full detail (not footnotes)',
-    // NEW v3.1.0 guarantees
     'Solution classification with honest calibration (AN4)',
     'Paradigm insight validation before claiming paradigm-level insight',
-    'Operational alternatives considered before capital-intensive solutions',
-    'Presentation calibrated to primary_recommendation_type',
-    'Supplier arbitrage guidance when primary is CATALOG',
-    'Calibrated claims with expert_reaction_prediction',
   ],
 };

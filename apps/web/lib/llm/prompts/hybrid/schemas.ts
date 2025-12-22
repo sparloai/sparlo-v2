@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Hybrid Mode Zod Schemas (v3.1.1 - Antifragile Enums)
+ * Hybrid Mode Zod Schemas (v4.0.0 - Narrative Flow)
  *
  * Validation patterns:
  * - .default([]) for optional arrays (field missing)
@@ -77,6 +77,29 @@ export const TrackSchema = z.enum([
 ]);
 
 export const ConfidenceLevel = SeverityLevel;
+
+/**
+ * Sustainability Flag Types for v4.0 Narrative Flow
+ * Flags material sustainability implications for concepts
+ */
+export const SustainabilityFlagType = z.enum([
+  'NONE',
+  'CAUTION',
+  'BENEFIT',
+  'LIFECYCLE_TRADEOFF',
+  'IRONY',
+  'SUPPLY_CHAIN',
+]);
+
+export const SustainabilityFlagSchema = z
+  .object({
+    type: SustainabilityFlagType.catch('NONE'),
+    summary: z.string().optional(),
+    detail: z.string().optional(),
+    alternative: z.string().optional(),
+  })
+  .passthrough();
+export type SustainabilityFlag = z.infer<typeof SustainabilityFlagSchema>;
 
 export const CapitalRequirement = z.enum([
   'minimal',
@@ -398,6 +421,8 @@ const ConceptSchema = z
       .catch('months'),
     why_not_tried: z.string().optional(),
     key_risk: z.string().optional(),
+    // v4.0: Sustainability screening for concepts
+    sustainability_flag: SustainabilityFlagSchema.optional(),
   })
   .passthrough();
 
@@ -415,7 +440,9 @@ export const OperationalAlternativeSchema = z
     comparison_to_capital_solutions: z.string(), // "X% of benefit at Y% of cost"
   })
   .passthrough();
-export type OperationalAlternative = z.infer<typeof OperationalAlternativeSchema>;
+export type OperationalAlternative = z.infer<
+  typeof OperationalAlternativeSchema
+>;
 
 export const AN3_M_OutputSchema = z
   .object({
@@ -458,7 +485,10 @@ const SOLUTION_CLASS_CANONICAL = [
   'OPTIMIZATION',
 ] as const;
 
-const SOLUTION_CLASS_MAPPINGS: Record<string, (typeof SOLUTION_CLASS_CANONICAL)[number]> = {
+const SOLUTION_CLASS_MAPPINGS: Record<
+  string,
+  (typeof SOLUTION_CLASS_CANONICAL)[number]
+> = {
   CATALOG: 'CATALOG',
   EMERGING_PRACTICE: 'EMERGING_PRACTICE',
   CROSS_DOMAIN: 'CROSS_DOMAIN',
@@ -700,6 +730,8 @@ const ValidationResultSchema = z
       .catch('investigate'),
     key_uncertainties: z.array(z.string()).catch([]),
     paradigm_assessment: ParadigmAssessmentSchema.optional(),
+    // v4.0: Sustainability screening for concepts
+    sustainability_flag: SustainabilityFlagSchema.optional(),
   })
   .passthrough();
 
@@ -776,7 +808,10 @@ const SOURCE_TYPE_CANONICAL = [
   'EMERGING_PRACTICE',
 ] as const;
 
-const SOURCE_TYPE_MAPPINGS: Record<string, (typeof SOURCE_TYPE_CANONICAL)[number]> = {
+const SOURCE_TYPE_MAPPINGS: Record<
+  string,
+  (typeof SOURCE_TYPE_CANONICAL)[number]
+> = {
   // Direct matches
   CATALOG: 'CATALOG',
   TRANSFER: 'TRANSFER',
@@ -819,7 +854,10 @@ const INNOVATION_TYPE_CANONICAL = [
   'FIRST_PRINCIPLES',
 ] as const;
 
-const INNOVATION_TYPE_MAPPINGS: Record<string, (typeof INNOVATION_TYPE_CANONICAL)[number]> = {
+const INNOVATION_TYPE_MAPPINGS: Record<
+  string,
+  (typeof INNOVATION_TYPE_CANONICAL)[number]
+> = {
   PARADIGM_SHIFT: 'PARADIGM_SHIFT',
   CROSS_DOMAIN_TRANSFER: 'CROSS_DOMAIN_TRANSFER',
   TECHNOLOGY_REVIVAL: 'TECHNOLOGY_REVIVAL',
@@ -1441,7 +1479,10 @@ export const CrossDomainSearchSchema = z
       .array(
         z.union([
           z.string(),
-          z.object({}).passthrough().transform((obj) => JSON.stringify(obj)),
+          z
+            .object({})
+            .passthrough()
+            .transform((obj) => JSON.stringify(obj)),
         ]),
       )
       .default([]),
