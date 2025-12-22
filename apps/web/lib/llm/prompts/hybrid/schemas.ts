@@ -94,9 +94,9 @@ export const SustainabilityFlagType = z.enum([
 export const SustainabilityFlagSchema = z
   .object({
     type: SustainabilityFlagType.catch('NONE'),
-    summary: z.string().optional(),
-    detail: z.string().optional(),
-    alternative: z.string().optional(),
+    summary: z.string().nullable().optional(),
+    detail: z.string().nullable().optional(),
+    alternative: z.string().nullable().optional(),
   })
   .passthrough();
 export type SustainabilityFlag = z.infer<typeof SustainabilityFlagSchema>;
