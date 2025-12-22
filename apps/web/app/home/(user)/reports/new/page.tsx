@@ -20,6 +20,7 @@ import { Alert, AlertDescription } from '@kit/ui/alert';
 import { cn } from '@kit/ui/utils';
 
 import { ProcessingScreen } from '../../_components/processing-screen';
+import { SubscriptionRequiredModal } from '../../_components/subscription-required-modal';
 import { startReportGeneration } from '../../_lib/server/sparlo-reports-server-actions';
 import { useReportProgress } from '../../_lib/use-report-progress';
 
@@ -44,6 +45,8 @@ interface FormState {
   isSubmitting: boolean;
   error: string | null;
   showRefusalWarning: boolean;
+  showUpgradeModal: boolean;
+  upgradeReason: 'subscription_required' | 'limit_exceeded';
 }
 
 interface ContextDetection {
@@ -89,6 +92,8 @@ const initialFormState: FormState = {
   isSubmitting: false,
   error: null,
   showRefusalWarning: false,
+  showUpgradeModal: false,
+  upgradeReason: 'subscription_required',
 };
 
 export default function NewReportPage() {
@@ -105,6 +110,8 @@ export default function NewReportPage() {
     isSubmitting,
     error,
     showRefusalWarning,
+    showUpgradeModal,
+    upgradeReason,
   } = formState;
 
   // File handling functions
@@ -246,14 +253,33 @@ export default function NewReportPage() {
       }
     } catch (err) {
       console.error('Failed to start report:', err);
-      setFormState((prev) => ({
-        ...prev,
-        error:
-          err instanceof Error
-            ? err.message
-            : 'Failed to start report generation',
-        isSubmitting: false,
-      }));
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to start report generation';
+
+      // Check if this is a usage/subscription error
+      const isUsageError =
+        errorMessage.includes('Usage limit') ||
+        errorMessage.includes('subscription');
+      const isLimitExceeded = errorMessage.includes('Usage limit');
+
+      if (isUsageError) {
+        setFormState((prev) => ({
+          ...prev,
+          showUpgradeModal: true,
+          upgradeReason: isLimitExceeded
+            ? 'limit_exceeded'
+            : 'subscription_required',
+          isSubmitting: false,
+        }));
+      } else {
+        setFormState((prev) => ({
+          ...prev,
+          error: errorMessage,
+          isSubmitting: false,
+        }));
+      }
     }
   }, [canSubmit, challengeText, isSubmitting, attachments]);
 
@@ -288,270 +314,279 @@ export default function NewReportPage() {
 
   // Input phase - Aura.build inspired design
   return (
-    <div
-      className="relative flex min-h-screen flex-col items-center justify-center bg-[--surface-base] px-4 py-12 text-[--text-secondary]"
-      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-    >
-      {/* Ambient Background Glows - only visible in dark mode */}
-      <div className="pointer-events-none absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 opacity-0 blur-[120px] dark:opacity-50" />
-      <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-emerald-900/5 opacity-0 blur-[100px] dark:opacity-50" />
+    <>
+      <SubscriptionRequiredModal
+        open={showUpgradeModal}
+        onOpenChange={(open) =>
+          setFormState((prev) => ({ ...prev, showUpgradeModal: open }))
+        }
+        reason={upgradeReason}
+      />
+      <div
+        className="relative flex min-h-screen flex-col items-center justify-center bg-[--surface-base] px-4 py-12 text-[--text-secondary]"
+        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      >
+        {/* Ambient Background Glows - only visible in dark mode */}
+        <div className="pointer-events-none absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 opacity-0 blur-[120px] dark:opacity-50" />
+        <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-emerald-900/5 opacity-0 blur-[100px] dark:opacity-50" />
 
-      <div className="relative z-10 w-full max-w-4xl">
-        {/* Refusal warning */}
-        {showRefusalWarning && (
-          <div className="mb-6">
-            <Alert
-              variant="destructive"
-              className="border-red-200 bg-red-50 text-red-800 dark:border-[#7f1d1d] dark:bg-[#7f1d1d]/10 dark:text-[#fca5a5]"
-            >
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>
-                  Your previous query was flagged by our AI safety filters.
-                </strong>{' '}
-                This is often a false positive for legitimate engineering
-                problems. Please rephrase your challenge, focusing on the
-                engineering aspects.
-              </AlertDescription>
-            </Alert>
-          </div>
-        )}
-
-        {/* Main Input Card */}
-        <div className="group relative">
-          <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
-            {/* Toolbar / Context Hinting */}
-            <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
-              <div className="flex items-center gap-2 font-mono text-xs tracking-wider text-[--text-muted] uppercase">
-                <Terminal className="h-4 w-4 text-[--text-muted]" />
-                <span>new analysis</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp"
-                  multiple
-                  onChange={handleFileSelect}
-                  className="hidden"
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={attachments.length >= MAX_ATTACHMENTS}
-                  className="group/btn flex items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-3 py-1.5 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  Attach
-                  {attachments.length > 0 && (
-                    <span className="text-violet-500">
-                      ({attachments.length})
-                    </span>
-                  )}
-                  <Paperclip className="h-3 w-3 transition-colors group-hover/btn:text-emerald-500" />
-                </button>
-              </div>
+        <div className="relative z-10 w-full max-w-4xl">
+          {/* Refusal warning */}
+          {showRefusalWarning && (
+            <div className="mb-6">
+              <Alert
+                variant="destructive"
+                className="border-red-200 bg-red-50 text-red-800 dark:border-[#7f1d1d] dark:bg-[#7f1d1d]/10 dark:text-[#fca5a5]"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>
+                    Your previous query was flagged by our AI safety filters.
+                  </strong>{' '}
+                  This is often a false positive for legitimate engineering
+                  problems. Please rephrase your challenge, focusing on the
+                  engineering aspects.
+                </AlertDescription>
+              </Alert>
             </div>
+          )}
 
-            {/* Text Area - Full height */}
-            <div className="flex min-h-[320px] flex-col p-6 md:p-8">
-              <textarea
-                value={challengeText}
-                onChange={(e) => {
-                  setFormState((prev) => ({
-                    ...prev,
-                    challengeText: e.target.value,
-                    showRefusalWarning: false,
-                  }));
-                }}
-                onKeyDown={handleKeyDown}
-                disabled={isSubmitting}
-                autoFocus
-                data-test="challenge-input"
-                placeholder="Describe the challenge."
-                spellCheck={false}
-                className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none disabled:opacity-40 md:text-xl"
-                style={{
-                  fontFamily: 'Soehne, Inter, sans-serif',
-                  outline: 'none',
-                }}
-              />
-            </div>
-
-            {/* Attachment Previews */}
-            {attachments.length > 0 && (
-              <div className="border-t border-[--border-subtle] px-6 py-4">
-                <div className="flex flex-wrap gap-3">
-                  {attachments.map((attachment) => (
-                    <div
-                      key={attachment.id}
-                      className="group relative h-16 w-16 overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface-overlay]"
-                    >
-                      <img
-                        src={attachment.preview}
-                        alt={attachment.file.name}
-                        className="h-full w-full object-cover"
-                      />
-                      <button
-                        onClick={() => removeAttachment(attachment.id)}
-                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
+          {/* Main Input Card */}
+          <div className="group relative">
+            <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
+              {/* Toolbar / Context Hinting */}
+              <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
+                <div className="flex items-center gap-2 font-mono text-xs tracking-wider text-[--text-muted] uppercase">
+                  <Terminal className="h-4 w-4 text-[--text-muted]" />
+                  <span>new analysis</span>
                 </div>
-                <p className="mt-2 text-xs text-[--text-muted]">
-                  {attachments.length} attachment
-                  {attachments.length !== 1 ? 's' : ''} - Images will be
-                  analyzed by Claude Vision
-                </p>
-              </div>
-            )}
-
-            {/* Context Awareness / Intelligence Layer */}
-            <div className="px-6 pb-6 md:px-8 md:pb-8">
-              <div className="flex flex-wrap items-center gap-3 select-none">
-                <span className="mr-1 font-mono text-xs font-medium tracking-widest text-[--text-muted] uppercase">
-                  Context Detection
-                </span>
-
-                {CONTEXT_DETECTIONS.map((context) => {
-                  const isDetected = detectedContexts.has(context.id);
-                  return (
-                    <div
-                      key={context.id}
-                      className={cn(
-                        'flex items-center gap-2 rounded-full px-3 py-1.5 transition-all duration-300',
-                        isDetected
-                          ? 'border border-violet-500/30 bg-violet-500/10 dark:border-violet-500/20'
-                          : 'border border-dashed border-[--border-default] bg-transparent text-[--text-muted]',
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          'h-1.5 w-1.5 rounded-full transition-all duration-300',
-                          isDetected
-                            ? 'bg-violet-500 shadow-[0_0_6px_rgba(139,92,246,0.8)]'
-                            : 'bg-[--border-default]',
-                        )}
-                      />
-                      <span
-                        className={cn(
-                          'text-xs font-medium',
-                          isDetected
-                            ? 'text-violet-700 dark:text-violet-300'
-                            : 'text-[--text-muted]',
-                        )}
-                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                      >
-                        {context.label}
-                      </span>
-                      {isDetected && (
-                        <Check className="h-3 w-3 text-violet-600 dark:text-violet-400" />
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Footer / Action Area */}
-            <div className="border-t border-[--border-subtle] bg-[--surface-overlay] p-2 dark:bg-neutral-900/30">
-              <div className="flex flex-col items-center justify-between gap-4 px-4 py-2 md:flex-row">
-                {/* Compute Estimate */}
                 <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[--border-subtle] bg-[--surface-base] dark:bg-neutral-900">
-                    <Clock className="h-4 w-4 text-[--text-muted]" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span
-                      className="text-[10px] font-semibold tracking-wider text-[--text-muted] uppercase"
-                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                    >
-                      ANALYSIS
-                    </span>
-                    <span
-                      className="font-mono text-xs text-[--text-secondary]"
-                      style={{
-                        fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
-                      }}
-                    >
-                      ~15 MINUTES
-                    </span>
-                  </div>
-                </div>
-
-                {/* Primary Action with keyboard shortcut */}
-                <div className="flex items-center gap-3">
-                  {/* Keyboard shortcut hint */}
-                  <div className="hidden items-center gap-1.5 md:flex">
-                    <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
-                      ⌘
-                    </kbd>
-                    <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
-                      ↵
-                    </kbd>
-                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    multiple
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
                   <button
-                    onClick={handleSubmit}
-                    disabled={!canSubmit || isSubmitting}
-                    data-test="challenge-submit"
-                    className={cn(
-                      'group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-8 py-4 transition-all duration-300 md:w-auto',
-                      canSubmit && !isSubmitting
-                        ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/25 hover:bg-violet-500 hover:shadow-violet-500/40 dark:bg-violet-600 dark:shadow-violet-500/20 dark:hover:bg-violet-500'
-                        : 'cursor-not-allowed bg-[--surface-overlay] text-[--text-muted] dark:bg-neutral-800 dark:text-neutral-500',
-                    )}
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={attachments.length >= MAX_ATTACHMENTS}
+                    className="group/btn flex items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-3 py-1.5 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary] disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <span
-                      className="relative z-10 text-base font-semibold tracking-tight"
-                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                    >
-                      {isSubmitting ? 'Running...' : 'Run Analysis'}
-                    </span>
-                    {!isSubmitting && (
-                      <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    Attach
+                    {attachments.length > 0 && (
+                      <span className="text-violet-500">
+                        ({attachments.length})
+                      </span>
                     )}
+                    <Paperclip className="h-3 w-3 transition-colors group-hover/btn:text-emerald-500" />
                   </button>
                 </div>
               </div>
+
+              {/* Text Area - Full height */}
+              <div className="flex min-h-[320px] flex-col p-6 md:p-8">
+                <textarea
+                  value={challengeText}
+                  onChange={(e) => {
+                    setFormState((prev) => ({
+                      ...prev,
+                      challengeText: e.target.value,
+                      showRefusalWarning: false,
+                    }));
+                  }}
+                  onKeyDown={handleKeyDown}
+                  disabled={isSubmitting}
+                  autoFocus
+                  data-test="challenge-input"
+                  placeholder="Describe the challenge."
+                  spellCheck={false}
+                  className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none disabled:opacity-40 md:text-xl"
+                  style={{
+                    fontFamily: 'Soehne, Inter, sans-serif',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              {/* Attachment Previews */}
+              {attachments.length > 0 && (
+                <div className="border-t border-[--border-subtle] px-6 py-4">
+                  <div className="flex flex-wrap gap-3">
+                    {attachments.map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="group relative h-16 w-16 overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface-overlay]"
+                      >
+                        <img
+                          src={attachment.preview}
+                          alt={attachment.file.name}
+                          className="h-full w-full object-cover"
+                        />
+                        <button
+                          onClick={() => removeAttachment(attachment.id)}
+                          className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-[--text-muted]">
+                    {attachments.length} attachment
+                    {attachments.length !== 1 ? 's' : ''} - Images will be
+                    analyzed by Claude Vision
+                  </p>
+                </div>
+              )}
+
+              {/* Context Awareness / Intelligence Layer */}
+              <div className="px-6 pb-6 md:px-8 md:pb-8">
+                <div className="flex flex-wrap items-center gap-3 select-none">
+                  <span className="mr-1 font-mono text-xs font-medium tracking-widest text-[--text-muted] uppercase">
+                    Context Detection
+                  </span>
+
+                  {CONTEXT_DETECTIONS.map((context) => {
+                    const isDetected = detectedContexts.has(context.id);
+                    return (
+                      <div
+                        key={context.id}
+                        className={cn(
+                          'flex items-center gap-2 rounded-full px-3 py-1.5 transition-all duration-300',
+                          isDetected
+                            ? 'border border-violet-500/30 bg-violet-500/10 dark:border-violet-500/20'
+                            : 'border border-dashed border-[--border-default] bg-transparent text-[--text-muted]',
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'h-1.5 w-1.5 rounded-full transition-all duration-300',
+                            isDetected
+                              ? 'bg-violet-500 shadow-[0_0_6px_rgba(139,92,246,0.8)]'
+                              : 'bg-[--border-default]',
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            'text-xs font-medium',
+                            isDetected
+                              ? 'text-violet-700 dark:text-violet-300'
+                              : 'text-[--text-muted]',
+                          )}
+                          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                        >
+                          {context.label}
+                        </span>
+                        {isDetected && (
+                          <Check className="h-3 w-3 text-violet-600 dark:text-violet-400" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Footer / Action Area */}
+              <div className="border-t border-[--border-subtle] bg-[--surface-overlay] p-2 dark:bg-neutral-900/30">
+                <div className="flex flex-col items-center justify-between gap-4 px-4 py-2 md:flex-row">
+                  {/* Compute Estimate */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[--border-subtle] bg-[--surface-base] dark:bg-neutral-900">
+                      <Clock className="h-4 w-4 text-[--text-muted]" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span
+                        className="text-[10px] font-semibold tracking-wider text-[--text-muted] uppercase"
+                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                      >
+                        ANALYSIS
+                      </span>
+                      <span
+                        className="font-mono text-xs text-[--text-secondary]"
+                        style={{
+                          fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
+                        }}
+                      >
+                        ~15 MINUTES
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Primary Action with keyboard shortcut */}
+                  <div className="flex items-center gap-3">
+                    {/* Keyboard shortcut hint */}
+                    <div className="hidden items-center gap-1.5 md:flex">
+                      <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
+                        ⌘
+                      </kbd>
+                      <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
+                        ↵
+                      </kbd>
+                    </div>
+                    <button
+                      onClick={handleSubmit}
+                      disabled={!canSubmit || isSubmitting}
+                      data-test="challenge-submit"
+                      className={cn(
+                        'group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-8 py-4 transition-all duration-300 md:w-auto',
+                        canSubmit && !isSubmitting
+                          ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/25 hover:bg-violet-500 hover:shadow-violet-500/40 dark:bg-violet-600 dark:shadow-violet-500/20 dark:hover:bg-violet-500'
+                          : 'cursor-not-allowed bg-[--surface-overlay] text-[--text-muted] dark:bg-neutral-800 dark:text-neutral-500',
+                      )}
+                    >
+                      <span
+                        className="relative z-10 text-base font-semibold tracking-tight"
+                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                      >
+                        {isSubmitting ? 'Running...' : 'Run Analysis'}
+                      </span>
+                      {!isSubmitting && (
+                        <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <p
+              className="mt-4 text-center text-sm text-red-600 dark:text-red-400"
+              style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+            >
+              {error}
+            </p>
+          )}
+
+          {/* Trust / Capability Indicators - Always visible */}
+          <div className="mt-8 flex flex-col items-center justify-center gap-6 opacity-60 md:flex-row">
+            <div className="flex items-center gap-2">
+              <Lock className="h-3 w-3 text-[--text-muted]" />
+              <span
+                className="font-mono text-xs tracking-tight text-[--text-secondary]"
+                style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+              >
+                DATA NEVER TRAINS AI
+              </span>
+            </div>
+            <div className="hidden h-3 w-px bg-[--border-default] md:block" />
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-3 w-3 text-emerald-600 dark:text-emerald-500" />
+              <span
+                className="font-mono text-xs tracking-tight text-[--text-secondary]"
+                style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+              >
+                BUILT ON SOC2 INFRASTRUCTURE
+              </span>
             </div>
           </div>
         </div>
-
-        {/* Error message */}
-        {error && (
-          <p
-            className="mt-4 text-center text-sm text-red-600 dark:text-red-400"
-            style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-          >
-            {error}
-          </p>
-        )}
-
-        {/* Trust / Capability Indicators - Always visible */}
-        <div className="mt-8 flex flex-col items-center justify-center gap-6 opacity-60 md:flex-row">
-          <div className="flex items-center gap-2">
-            <Lock className="h-3 w-3 text-[--text-muted]" />
-            <span
-              className="font-mono text-xs tracking-tight text-[--text-secondary]"
-              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
-            >
-              DATA NEVER TRAINS AI
-            </span>
-          </div>
-          <div className="hidden h-3 w-px bg-[--border-default] md:block" />
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="h-3 w-3 text-emerald-600 dark:text-emerald-500" />
-            <span
-              className="font-mono text-xs tracking-tight text-[--text-secondary]"
-              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
-            >
-              BUILT ON SOC2 INFRASTRUCTURE
-            </span>
-          </div>
-        </div>
       </div>
-    </div>
+    </>
   );
 }

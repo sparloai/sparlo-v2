@@ -1,9 +1,5 @@
+import { getPrimaryLineItem } from '@kit/billing';
 import { resolveProductPlan } from '@kit/billing-gateway';
-import {
-  BillingPortalCard,
-  CurrentLifetimeOrderCard,
-  CurrentSubscriptionCard,
-} from '@kit/billing-gateway/components';
 import { AppBreadcrumbs } from '@kit/ui/app-breadcrumbs';
 import { If } from '@kit/ui/if';
 import { PageBody } from '@kit/ui/page';
@@ -14,10 +10,8 @@ import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { withI18n } from '~/lib/i18n/with-i18n';
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 
-// local imports
 import { HomeLayoutPageHeader } from '../_components/home-page-header';
-import { createPersonalAccountBillingPortalSession } from '../billing/_lib/server/server-actions';
-import { PersonalAccountCheckoutForm } from './_components/personal-account-checkout-form';
+import { BillingPageContent } from './_components/billing-page-content';
 import { loadPersonalAccountBillingPageData } from './_lib/server/personal-account-billing-page.loader';
 
 export const generateMetadata = async () => {
@@ -32,11 +26,10 @@ export const generateMetadata = async () => {
 async function PersonalAccountBillingPage() {
   const user = await requireUserInServerComponent();
 
-  const [subscription, order, customerId] =
+  const [subscription, order, customerId, usage] =
     await loadPersonalAccountBillingPageData(user.id);
 
   const subscriptionVariantId = subscription?.items[0]?.variant_id;
-  const orderVariantId = order?.items[0]?.variant_id;
 
   const subscriptionProductPlan =
     subscription && subscriptionVariantId
@@ -47,12 +40,17 @@ async function PersonalAccountBillingPage() {
         )
       : undefined;
 
-  const orderProductPlan =
-    order && orderVariantId
-      ? await resolveProductPlan(billingConfig, orderVariantId, order.currency)
-      : undefined;
-
-  const hasBillingData = subscription || order;
+  // Get the current plan's price
+  let currentPlanPrice = 0;
+  if (subscriptionProductPlan?.plan) {
+    const lineItem = getPrimaryLineItem(
+      billingConfig,
+      subscriptionProductPlan.plan.id,
+    );
+    if (lineItem) {
+      currentPlanPrice = lineItem.cost / 100;
+    }
+  }
 
   return (
     <>
@@ -62,55 +60,18 @@ async function PersonalAccountBillingPage() {
       />
 
       <PageBody>
-        <div className={'flex max-w-2xl flex-col space-y-4'}>
-          <If
-            condition={hasBillingData}
-            fallback={
-              <>
-                <PersonalAccountCheckoutForm customerId={customerId} />
-              </>
-            }
-          >
-            <div className={'flex w-full flex-col space-y-6'}>
-              <If condition={subscription}>
-                {(subscription) => {
-                  return (
-                    <CurrentSubscriptionCard
-                      subscription={subscription}
-                      product={subscriptionProductPlan!.product}
-                      plan={subscriptionProductPlan!.plan}
-                    />
-                  );
-                }}
-              </If>
-
-              <If condition={order}>
-                {(order) => {
-                  return (
-                    <CurrentLifetimeOrderCard
-                      order={order}
-                      product={orderProductPlan!.product}
-                      plan={orderProductPlan!.plan}
-                    />
-                  );
-                }}
-              </If>
-            </div>
-          </If>
-
-          <If condition={customerId}>{() => <CustomerBillingPortalForm />}</If>
-        </div>
+        <BillingPageContent
+          subscription={subscription}
+          order={order}
+          customerId={customerId}
+          usage={usage}
+          billingConfig={billingConfig}
+          productPlan={subscriptionProductPlan}
+          currentPlanPrice={currentPlanPrice}
+        />
       </PageBody>
     </>
   );
 }
 
 export default withI18n(PersonalAccountBillingPage);
-
-function CustomerBillingPortalForm() {
-  return (
-    <form action={createPersonalAccountBillingPortalSession}>
-      <BillingPortalCard />
-    </form>
-  );
-}

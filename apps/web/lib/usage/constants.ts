@@ -8,8 +8,8 @@
  */
 
 export const USAGE_CONSTANTS = {
-  /** Default token limit for Starter tier / no subscription */
-  DEFAULT_TOKEN_LIMIT: 3_000_000,
+  /** Default token limit for Standard tier / no subscription */
+  DEFAULT_TOKEN_LIMIT: 2_700_000,
 
   /** Estimated tokens consumed per full report generation */
   ESTIMATED_TOKENS_PER_REPORT: 180_000,
@@ -33,24 +33,23 @@ export const USAGE_CONSTANTS = {
 /**
  * Token limits per subscription plan.
  * These values should match the billing configuration metadata.
+ *
+ * Calculated as: reports × 180,000 tokens per report
+ * - Standard: 15 reports × 180,000 = 2,700,000
+ * - Pro: 30 reports × 180,000 = 5,400,000
+ * - Max: 75 reports × 180,000 = 13,500,000
  */
 export const PLAN_TOKEN_LIMITS: Record<string, number> = {
-  'starter-monthly': 3_000_000,
-  'starter-yearly': 3_000_000,
-  'pro-monthly': 10_000_000,
-  'pro-yearly': 10_000_000,
-  'enterprise-monthly': 30_000_000,
-  'enterprise-yearly': 30_000_000,
+  'standard-monthly': 2_700_000,
+  'pro-monthly': 5_400_000,
+  'max-monthly': 13_500_000,
 } as const;
 
 /**
  * Report limits per subscription plan.
  */
 export const PLAN_REPORT_LIMITS: Record<string, number> = {
-  'starter-monthly': 15,
-  'starter-yearly': 15,
-  'pro-monthly': 50,
-  'pro-yearly': 50,
-  'enterprise-monthly': 150,
-  'enterprise-yearly': 150,
+  'standard-monthly': 15,
+  'pro-monthly': 30,
+  'max-monthly': 75,
 } as const;

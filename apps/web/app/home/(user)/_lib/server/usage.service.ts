@@ -5,23 +5,37 @@ import { getSupabaseServerClient } from '@kit/supabase/server-client';
 import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 import { UsageCheckResponseSchema } from '~/lib/usage/schemas';
 
-export interface UsageStatus {
-  allowed: boolean;
-  reason:
-    | 'ok'
-    | 'first_report_available'
-    | 'subscription_required'
-    | 'limit_exceeded';
-  tokensUsed: number;
-  tokensLimit: number;
-  percentage: number;
-  periodEnd: string | null;
-  isFirstReport: boolean;
-  hasActiveSubscription: boolean;
-  showUsageBar: boolean;
-  isWarning: boolean;
-  isAtLimit: boolean;
-}
+/**
+ * Discriminated union for usage status.
+ * Ensures type safety by coupling `allowed` with valid `reason` values.
+ */
+export type UsageStatus =
+  | {
+      allowed: true;
+      reason: 'ok' | 'first_report_available';
+      tokensUsed: number;
+      tokensLimit: number;
+      percentage: number;
+      periodEnd: string | null;
+      isFirstReport: boolean;
+      hasActiveSubscription: boolean;
+      showUsageBar: boolean;
+      isWarning: boolean;
+      isAtLimit: false;
+    }
+  | {
+      allowed: false;
+      reason: 'subscription_required' | 'limit_exceeded';
+      tokensUsed: number;
+      tokensLimit: number;
+      percentage: number;
+      periodEnd: string | null;
+      isFirstReport: false;
+      hasActiveSubscription: boolean;
+      showUsageBar: boolean;
+      isWarning: boolean;
+      isAtLimit: true;
+    };
 
 /**
  * Check if the account is allowed to generate a new report based on usage limits.
@@ -36,14 +50,11 @@ export async function checkUsageAllowed(
   // Check if account has used first free report
   // Note: first_report_used_at column added by migration 20251220231212
   // After migration, regenerate types with: pnpm supabase:web:typegen
-  const { data: account, error: accountError } = (await client
+  const { data: account, error: accountError } = await client
     .from('accounts')
-    .select('id')
+    .select('id, first_report_used_at')
     .eq('id', accountId)
-    .single()) as unknown as {
-    data: { id: string; first_report_used_at?: string | null } | null;
-    error: Error | null;
-  };
+    .single();
 
   if (accountError) {
     throw new Error(
@@ -51,7 +62,11 @@ export async function checkUsageAllowed(
     );
   }
 
-  const hasUsedFirstReport = !!account?.first_report_used_at;
+  const hasUsedFirstReport = !!(
+    account &&
+    'first_report_used_at' in account &&
+    account.first_report_used_at
+  );
 
   // Check for active subscription OR canceled subscription still in paid period (grace period)
   const { data: subscription, error: subError } = await client
@@ -125,19 +140,33 @@ export async function checkUsageAllowed(
 
   const { data: usage } = validated;
 
-  return {
-    allowed: usage.allowed,
-    reason: usage.allowed ? 'ok' : 'limit_exceeded',
+  const baseStatus = {
     tokensUsed: usage.tokens_used,
     tokensLimit: usage.tokens_limit,
     percentage: usage.percentage,
     periodEnd: subscription.period_ends_at ?? usage.period_end,
-    isFirstReport: false,
-    hasActiveSubscription: true,
+    hasActiveSubscription: true as const,
     showUsageBar:
       usage.percentage >= USAGE_CONSTANTS.USAGE_BAR_VISIBLE_THRESHOLD,
     isWarning: usage.percentage >= USAGE_CONSTANTS.WARNING_THRESHOLD,
-    isAtLimit: !usage.allowed,
+  };
+
+  if (usage.allowed) {
+    return {
+      ...baseStatus,
+      allowed: true as const,
+      reason: 'ok' as const,
+      isFirstReport: false,
+      isAtLimit: false as const,
+    };
+  }
+
+  return {
+    ...baseStatus,
+    allowed: false as const,
+    reason: 'limit_exceeded' as const,
+    isFirstReport: false as const,
+    isAtLimit: true as const,
   };
 }
 

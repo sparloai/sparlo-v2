@@ -764,7 +764,7 @@ function FrontierWatchCard({
   index: number;
 }) {
   return (
-    <div className="border border-zinc-200 rounded-xl overflow-hidden shadow-sm bg-white">
+    <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
       {/* Numbered Header */}
       <NumberedHeader index={index} title={item.title ?? 'Untitled'} />
 
@@ -783,12 +783,12 @@ function FrontierWatchCard({
         ]}
       />
 
-      <div className="p-8 sm:p-10 space-y-8">
+      <div className="space-y-8 p-8 sm:p-10">
         {/* One-liner / What It Is */}
         {item.one_liner && (
           <div>
             <MonoLabel>What It Is</MonoLabel>
-            <p className="mt-3 text-base text-zinc-900 leading-relaxed font-normal">
+            <p className="mt-3 text-base leading-relaxed font-normal text-zinc-900">
               {item.one_liner}
             </p>
           </div>
@@ -798,7 +798,7 @@ function FrontierWatchCard({
         {item.why_interesting && (
           <div>
             <MonoLabel>Why It&apos;s Interesting</MonoLabel>
-            <p className="mt-3 text-base text-zinc-700 leading-relaxed font-normal">
+            <p className="mt-3 text-base leading-relaxed font-normal text-zinc-700">
               {item.why_interesting}
             </p>
           </div>
@@ -808,7 +808,7 @@ function FrontierWatchCard({
         {item.why_not_now && (
           <div>
             <MonoLabel>Why Not Now</MonoLabel>
-            <p className="mt-3 text-base text-zinc-700 leading-relaxed font-normal">
+            <p className="mt-3 text-base leading-relaxed font-normal text-zinc-700">
               {item.why_not_now}
             </p>
           </div>
@@ -816,19 +816,19 @@ function FrontierWatchCard({
 
         {/* Monitoring Details Grid */}
         {(item.trigger_to_revisit || item.who_to_monitor) && (
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid gap-6 md:grid-cols-2">
             {item.trigger_to_revisit && (
-              <div className="border border-zinc-200 rounded-lg p-6">
+              <div className="rounded-lg border border-zinc-200 p-6">
                 <MonoLabel>Trigger to Revisit</MonoLabel>
-                <p className="mt-3 text-sm text-zinc-700 leading-relaxed">
+                <p className="mt-3 text-sm leading-relaxed text-zinc-700">
                   {item.trigger_to_revisit}
                 </p>
               </div>
             )}
             {item.who_to_monitor && (
-              <div className="border border-zinc-200 rounded-lg p-6">
+              <div className="rounded-lg border border-zinc-200 p-6">
                 <MonoLabel>Who to Monitor</MonoLabel>
-                <p className="mt-3 text-sm text-zinc-700 leading-relaxed">
+                <p className="mt-3 text-sm leading-relaxed text-zinc-700">
                   {item.who_to_monitor}
                 </p>
               </div>
@@ -842,20 +842,20 @@ function FrontierWatchCard({
             <div className="space-y-4 text-sm">
               {item.recent_developments && (
                 <div>
-                  <span className="text-xs text-zinc-400 font-mono font-bold block mb-2">
+                  <span className="mb-2 block font-mono text-xs font-bold text-zinc-400">
                     RECENT DEVELOPMENTS
                   </span>
-                  <p className="text-zinc-100 leading-relaxed">
+                  <p className="leading-relaxed text-zinc-100">
                     {item.recent_developments}
                   </p>
                 </div>
               )}
               {item.competitive_activity && (
                 <div>
-                  <span className="text-xs text-zinc-400 font-mono font-bold block mb-2">
+                  <span className="mb-2 block font-mono text-xs font-bold text-zinc-400">
                     COMPETITIVE ACTIVITY
                   </span>
-                  <p className="text-zinc-100 leading-relaxed">
+                  <p className="leading-relaxed text-zinc-100">
                     {item.competitive_activity}
                   </p>
                 </div>
@@ -975,10 +975,10 @@ function HonestAssessmentSection({
         title="Honest Assessment"
         subtitle="What we're actually delivering"
       />
-      <div className="border border-zinc-200 rounded-xl shadow-sm bg-white overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
         {/* Header with problem type */}
         {assessment.problem_type && (
-          <div className="bg-zinc-50/50 border-b border-zinc-200 p-6 flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-zinc-200 bg-zinc-50/50 p-6">
             <MonoLabel>Problem Type</MonoLabel>
             <AuraBadge variant="neutral">
               {assessment.problem_type.replace(/_/g, ' ')}
@@ -986,18 +986,18 @@ function HonestAssessmentSection({
           </div>
         )}
 
-        <div className="p-8 sm:p-10 space-y-8">
+        <div className="space-y-8 p-8 sm:p-10">
           {/* Value Range Table */}
           {assessment.expected_value_range && (
             <AuraTable headers={['Floor', 'Most Likely', 'Ceiling']}>
               <tr>
-                <td className="px-6 py-4 text-sm text-zinc-700 font-normal">
+                <td className="px-6 py-4 text-sm font-normal text-zinc-700">
                   {assessment.expected_value_range.floor}
                 </td>
                 <td className="px-6 py-4 text-sm font-semibold text-green-700">
                   {assessment.expected_value_range.most_likely}
                 </td>
-                <td className="px-6 py-4 text-sm text-zinc-700 font-normal">
+                <td className="px-6 py-4 text-sm font-normal text-zinc-700">
                   {assessment.expected_value_range.ceiling}
                 </td>
               </tr>
@@ -1008,7 +1008,7 @@ function HonestAssessmentSection({
           {assessment.candid_assessment && (
             <div>
               <MonoLabel>Candid Assessment</MonoLabel>
-              <p className="mt-3 text-base text-zinc-900 leading-relaxed font-normal">
+              <p className="mt-3 text-base leading-relaxed font-normal text-zinc-900">
                 {assessment.candid_assessment}
               </p>
             </div>
@@ -1016,12 +1016,12 @@ function HonestAssessmentSection({
 
           {/* What Would Need to Change */}
           {assessment.if_value_is_limited && (
-            <div className="border border-amber-200 bg-amber-50/30 rounded-xl p-6">
-              <div className="flex items-center gap-3 mb-3">
+            <div className="rounded-xl border border-amber-200 bg-amber-50/30 p-6">
+              <div className="mb-3 flex items-center gap-3">
                 <AlertTriangle className="h-5 w-5 text-amber-600" />
                 <MonoLabel>What Would Need to Change</MonoLabel>
               </div>
-              <p className="text-base text-zinc-700 leading-relaxed">
+              <p className="text-base leading-relaxed text-zinc-700">
                 {assessment.if_value_is_limited}
               </p>
             </div>
@@ -1045,13 +1045,13 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
         {/* The Reframe - Dark Section */}
         {search.enhanced_challenge_frame && (
           <DarkSection label="The Reframe">
-            <p className="text-lg sm:text-xl font-light leading-relaxed text-zinc-100 max-w-3xl mb-8">
+            <p className="mb-8 max-w-3xl text-lg leading-relaxed font-light text-zinc-100 sm:text-xl">
               {search.enhanced_challenge_frame.reframing}
             </p>
             {search.enhanced_challenge_frame.search_queries &&
               search.enhanced_challenge_frame.search_queries.length > 0 && (
                 <div className="border-t border-zinc-800 pt-8">
-                  <h4 className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 mb-4">
+                  <h4 className="mb-4 font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">
                     Search Queries
                   </h4>
                   <div className="flex flex-wrap gap-3">
@@ -1059,7 +1059,7 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
                       (query, idx) => (
                         <span
                           key={idx}
-                          className="text-xs font-mono font-medium border border-zinc-700 bg-zinc-900/50 px-3 py-1.5 rounded-full text-zinc-300"
+                          className="rounded-full border border-zinc-700 bg-zinc-900/50 px-3 py-1.5 font-mono text-xs font-medium text-zinc-300"
                         >
                           {query}
                         </span>
@@ -1078,13 +1078,13 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
               {search.domains_searched.map((domain, idx) => (
                 <div
                   key={idx}
-                  className="border border-zinc-200 rounded-lg p-6 hover:border-zinc-400 transition-colors"
+                  className="rounded-lg border border-zinc-200 p-6 transition-colors hover:border-zinc-400"
                 >
-                  <h5 className="font-semibold text-zinc-950 mb-2">
+                  <h5 className="mb-2 font-semibold text-zinc-950">
                     {domain.domain}
                   </h5>
                   {domain.mechanism_found && (
-                    <p className="text-sm text-zinc-700 leading-relaxed">
+                    <p className="text-sm leading-relaxed text-zinc-700">
                       {domain.mechanism_found}
                     </p>
                   )}
@@ -1105,10 +1105,10 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
             <CardWithHeader icon={Sparkles} label="Key Revelations">
               <ul className="space-y-4">
                 {search.from_scratch_revelations.map((rev, idx) => (
-                  <li key={idx} className="flex gap-4 items-start group">
-                    <span className="mt-2 w-1.5 h-1.5 rounded-full bg-zinc-300 group-hover:bg-zinc-950 transition-colors flex-shrink-0" />
+                  <li key={idx} className="group flex items-start gap-4">
+                    <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-300 transition-colors group-hover:bg-zinc-950" />
                     <div>
-                      <p className="text-base text-zinc-950 font-medium leading-relaxed">
+                      <p className="text-base leading-relaxed font-medium text-zinc-950">
                         {rev.discovery}
                       </p>
                       {rev.source && (
@@ -1117,7 +1117,7 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
                         </p>
                       )}
                       {rev.implication && (
-                        <p className="mt-1 text-sm text-zinc-600 leading-relaxed">
+                        <p className="mt-1 text-sm leading-relaxed text-zinc-600">
                           → {rev.implication}
                         </p>
                       )}
@@ -1966,41 +1966,67 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
 
   const { decision_architecture, self_critique } = report;
 
+  // Normalize field names: support both old (solution_concepts/innovation_concepts)
+  // and new (execution_track/innovation_portfolio) naming conventions
+  const rawReport = report as Record<string, unknown>;
+
+  // Map solution_concepts → execution_track if execution_track doesn't exist
+  const executionTrack =
+    report.execution_track ??
+    (rawReport.solution_concepts as ExecutionTrack | undefined);
+
+  // Map innovation_concepts → innovation_portfolio with field name normalization
+  const rawInnovationConcepts = rawReport.innovation_concepts as
+    | {
+        intro?: string;
+        recommended?: RecommendedInnovation;
+        parallel?: ParallelInvestigation[];
+        frontier_watch?: FrontierWatch[];
+      }
+    | undefined;
+
+  const innovationPortfolio: InnovationPortfolio | undefined =
+    report.innovation_portfolio ??
+    (rawInnovationConcepts
+      ? {
+          intro: rawInnovationConcepts.intro,
+          recommended_innovation: rawInnovationConcepts.recommended,
+          parallel_investigations: rawInnovationConcepts.parallel,
+          frontier_watch: rawInnovationConcepts.frontier_watch,
+        }
+      : undefined);
+
   // Detect if using new Execution Track + Innovation Portfolio framework
-  const usesNewFramework =
-    report.execution_track || report.innovation_portfolio;
+  const usesNewFramework = executionTrack || innovationPortfolio;
 
   return (
     <div className="space-y-12">
       {/* Executive Summary */}
       {report.executive_summary && (
         <section id="executive-summary">
-          <SectionHeader
-            title="Executive Summary"
-            subtitle="The bottom line"
-          />
+          <SectionHeader title="Executive Summary" subtitle="The bottom line" />
           <CardWithHeader icon={Target} label="The Brief">
             {typeof report.executive_summary === 'string' ? (
-              <p className="text-xl sm:text-2xl text-zinc-950 font-light leading-relaxed">
+              <p className="text-xl leading-relaxed font-light text-zinc-950 sm:text-2xl">
                 {report.executive_summary}
               </p>
             ) : (
               <div className="space-y-6">
                 {/* Narrative lead */}
                 {report.executive_summary.narrative_lead && (
-                  <p className="text-xl sm:text-2xl text-zinc-950 font-light leading-relaxed">
+                  <p className="text-xl leading-relaxed font-light text-zinc-950 sm:text-2xl">
                     {report.executive_summary.narrative_lead}
                   </p>
                 )}
                 {/* Core insight */}
                 {report.executive_summary.core_insight && (
-                  <div className="border-l-4 border-zinc-950 pl-8 py-2 bg-zinc-50/50 rounded-r-lg">
+                  <div className="rounded-r-lg border-l-4 border-zinc-950 bg-zinc-50/50 py-2 pl-8">
                     <MonoLabel>Core Insight</MonoLabel>
-                    <p className="mt-3 text-xl text-zinc-950 font-medium leading-relaxed">
+                    <p className="mt-3 text-xl leading-relaxed font-medium text-zinc-950">
                       {report.executive_summary.core_insight.headline}
                     </p>
                     {report.executive_summary.core_insight.explanation && (
-                      <p className="mt-2 text-base text-zinc-600 font-normal leading-relaxed max-w-4xl">
+                      <p className="mt-2 max-w-4xl text-base leading-relaxed font-normal text-zinc-600">
                         {report.executive_summary.core_insight.explanation}
                       </p>
                     )}
@@ -2033,9 +2059,9 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
                 )}
                 {/* Primary recommendation */}
                 {report.executive_summary.primary_recommendation && (
-                  <div className="border border-blue-100 bg-blue-50/30 rounded-xl p-6">
+                  <div className="rounded-xl border border-blue-100 bg-blue-50/30 p-6">
                     <MonoLabel>Primary Recommendation</MonoLabel>
-                    <p className="mt-3 text-base text-zinc-900 font-medium leading-relaxed">
+                    <p className="mt-3 text-base leading-relaxed font-medium text-zinc-900">
                       {report.executive_summary.primary_recommendation}
                     </p>
                   </div>
@@ -2068,15 +2094,13 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       <CrossDomainSearchSection search={report.cross_domain_search} />
 
       {/* NEW: Execution Track (new framework) */}
-      <ExecutionTrackSection track={report.execution_track} />
+      <ExecutionTrackSection track={executionTrack} />
 
       {/* NEW: Innovation Portfolio (new framework) */}
-      <InnovationPortfolioSection portfolio={report.innovation_portfolio} />
+      <InnovationPortfolioSection portfolio={innovationPortfolio} />
 
       {/* NEW: Frontier Watch as top-level section */}
-      <FrontierWatchSection
-        items={report.innovation_portfolio?.frontier_watch}
-      />
+      <FrontierWatchSection items={innovationPortfolio?.frontier_watch} />
 
       {/* NEW: Strategic Integration (new framework) */}
       <StrategicIntegrationSection integration={report.strategic_integration} />

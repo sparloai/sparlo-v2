@@ -64,230 +64,253 @@ export const generateDiscoveryReport = inngest.createFunction(
   },
   { event: 'report/generate-discovery' },
   async ({ event, step }) => {
-    console.log('[Discovery Function] Starting with event:', {
-      name: event.name,
-      reportId: event.data.reportId,
-      hasDesignChallenge: !!event.data.designChallenge,
-    });
-
-    const { reportId, designChallenge, conversationId, attachments } =
-      event.data;
-
-    // Convert attachments to ImageAttachment format for Claude vision
-    const imageAttachments: ImageAttachment[] = (attachments || [])
-      .filter((a: { media_type: string }) => a.media_type.startsWith('image/'))
-      .map((a: { media_type: string; data: string }) => ({
-        media_type: a.media_type as ImageAttachment['media_type'],
-        data: a.data,
-      }));
-
-    const supabase = getSupabaseServerAdminClient();
-    console.log('[Discovery Function] Supabase client initialized');
-
-    // Handle ClaudeRefusalError at the top level
-    try {
-      return await runDiscoveryGeneration();
-    } catch (error) {
-      if (error instanceof ClaudeRefusalError) {
-        await supabase
-          .from('sparlo_reports')
-          .update({
-            status: 'failed',
-            error_message: error.message,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', reportId);
-
-        return { success: false, reportId, error: error.message };
-      }
-      throw error;
-    }
-
-    async function runDiscoveryGeneration() {
-      // Helper to calculate total usage from collected step usages
-      function calculateTotalUsage(
-        usages: TokenUsage[],
-      ): TokenUsage & { costUsd: number; byStep: Record<string, TokenUsage> } {
-        const byStep: Record<string, TokenUsage> = {};
-        usages.forEach((u, i) => {
-          if (u && u.totalTokens > 0) {
-            byStep[`step-${i}`] = u;
-          }
-        });
-
-        const totals = usages.reduce(
-          (acc, usage) => {
-            if (!usage) return acc;
-            return {
-              inputTokens: acc.inputTokens + (usage.inputTokens || 0),
-              outputTokens: acc.outputTokens + (usage.outputTokens || 0),
-              totalTokens: acc.totalTokens + (usage.totalTokens || 0),
-            };
-          },
-          { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
-        );
-        return {
-          ...totals,
-          costUsd: calculateCost(
-            totals,
-            MODELS.OPUS as keyof typeof CLAUDE_PRICING,
-          ),
-          byStep,
+    // Track active execution for graceful shutdown
+    const tracker = (
+      globalThis as {
+        __inngestActiveExecutions?: {
+          increment: () => void;
+          decrement: () => void;
         };
       }
+    ).__inngestActiveExecutions;
+    tracker?.increment();
 
-      /**
-       * Helper: Update report progress in Supabase
-       */
-      async function updateProgress(updates: Record<string, unknown>) {
-        const { error } = await supabase
-          .from('sparlo_reports')
-          .update({
-            ...updates,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', reportId);
+    try {
+      console.log('[Discovery Function] Starting with event:', {
+        name: event.name,
+        reportId: event.data.reportId,
+        hasDesignChallenge: !!event.data.designChallenge,
+      });
 
-        if (error) {
-          console.error('Failed to update progress:', error);
+      const { reportId, designChallenge, conversationId, attachments } =
+        event.data;
+
+      // Convert attachments to ImageAttachment format for Claude vision
+      const imageAttachments: ImageAttachment[] = (attachments || [])
+        .filter((a: { media_type: string }) =>
+          a.media_type.startsWith('image/'),
+        )
+        .map((a: { media_type: string; data: string }) => ({
+          media_type: a.media_type as ImageAttachment['media_type'],
+          data: a.data,
+        }));
+
+      const supabase = getSupabaseServerAdminClient();
+      console.log('[Discovery Function] Supabase client initialized');
+
+      // Handle ClaudeRefusalError at the top level
+      try {
+        return await runDiscoveryGeneration();
+      } catch (error) {
+        if (error instanceof ClaudeRefusalError) {
+          await supabase
+            .from('sparlo_reports')
+            .update({
+              status: 'failed',
+              error_message: error.message,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', reportId);
+
+          return { success: false, reportId, error: error.message };
         }
+        throw error;
       }
 
-      // =========================================
-      // AN0-D: Discovery Problem Framing
-      // =========================================
-      const an0dResult = await step.run(
-        'an0-d-discovery-problem-framing',
-        async () => {
-          await updateProgress({
-            current_step: 'an0-d',
-            phase_progress: 0,
+      async function runDiscoveryGeneration() {
+        // Helper to calculate total usage from collected step usages
+        function calculateTotalUsage(
+          usages: TokenUsage[],
+        ): TokenUsage & {
+          costUsd: number;
+          byStep: Record<string, TokenUsage>;
+        } {
+          const byStep: Record<string, TokenUsage> = {};
+          usages.forEach((u, i) => {
+            if (u && u.totalTokens > 0) {
+              byStep[`step-${i}`] = u;
+            }
           });
 
-          // Include images for vision processing if attachments were provided
-          const userMessageWithContext =
-            imageAttachments.length > 0
-              ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
-              : designChallenge;
-
-          const { content, usage } = await callClaude({
-            model: MODELS.OPUS,
-            system: AN0_D_PROMPT,
-            userMessage: userMessageWithContext,
-            maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an0-d'],
-            temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an0-d'],
-            images: imageAttachments.length > 0 ? imageAttachments : undefined,
-          });
-
-          const parsed = parseJsonResponse<AN0DOutput>(content, 'AN0-D');
-          const validated = AN0DOutputSchema.parse(parsed);
-
-          await updateProgress({ phase_progress: 100 });
-
-          return { result: validated, usage };
-        },
-      );
-
-      // Handle clarification if needed
-      if (an0dResult.result.need_question === true) {
-        // Extract question with type narrowing
-        const clarificationQuestion = an0dResult.result.question;
-
-        await step.run('store-discovery-clarification', async () => {
-          await updateProgress({
-            status: 'clarifying',
-            clarifications: [
-              {
-                question: clarificationQuestion,
-                askedAt: new Date().toISOString(),
-              },
-            ],
-          });
-        });
-
-        // Wait for user to answer (up to 24 hours)
-        const clarificationEvent = await step.waitForEvent(
-          'wait-for-discovery-clarification',
-          {
-            event: 'report/discovery-clarification-answered',
-            match: 'data.reportId',
-            timeout: '24h',
-          },
-        );
-
-        if (!clarificationEvent) {
-          await updateProgress({
-            status: 'error',
-            error_message: 'Clarification timed out after 24 hours',
-          });
-          return { success: false, reportId, error: 'Clarification timed out' };
+          const totals = usages.reduce(
+            (acc, usage) => {
+              if (!usage) return acc;
+              return {
+                inputTokens: acc.inputTokens + (usage.inputTokens || 0),
+                outputTokens: acc.outputTokens + (usage.outputTokens || 0),
+                totalTokens: acc.totalTokens + (usage.totalTokens || 0),
+              };
+            },
+            { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+          );
+          return {
+            ...totals,
+            costUsd: calculateCost(
+              totals,
+              MODELS.OPUS as keyof typeof CLAUDE_PRICING,
+            ),
+            byStep,
+          };
         }
 
-        // Re-run AN0-D with clarification
-        const clarifiedResult = await step.run(
-          'an0-d-with-clarification',
+        /**
+         * Helper: Update report progress in Supabase
+         */
+        async function updateProgress(updates: Record<string, unknown>) {
+          const { error } = await supabase
+            .from('sparlo_reports')
+            .update({
+              ...updates,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', reportId);
+
+          if (error) {
+            console.error('Failed to update progress:', error);
+          }
+        }
+
+        // =========================================
+        // AN0-D: Discovery Problem Framing
+        // =========================================
+        const an0dResult = await step.run(
+          'an0-d-discovery-problem-framing',
           async () => {
-            const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+            await updateProgress({
+              current_step: 'an0-d',
+              phase_progress: 0,
+            });
+
+            // Include images for vision processing if attachments were provided
+            const userMessageWithContext =
+              imageAttachments.length > 0
+                ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
+                : designChallenge;
 
             const { content, usage } = await callClaude({
               model: MODELS.OPUS,
               system: AN0_D_PROMPT,
-              userMessage: clarifiedChallenge,
+              userMessage: userMessageWithContext,
               maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an0-d'],
               temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an0-d'],
+              images:
+                imageAttachments.length > 0 ? imageAttachments : undefined,
             });
 
             const parsed = parseJsonResponse<AN0DOutput>(content, 'AN0-D');
-            return { result: AN0DOutputSchema.parse(parsed), usage };
+            const validated = AN0DOutputSchema.parse(parsed);
+
+            await updateProgress({ phase_progress: 100 });
+
+            return { result: validated, usage };
           },
         );
 
-        if (clarifiedResult.result.need_question === true) {
-          await updateProgress({
-            status: 'error',
-            error_message: 'Unable to proceed after clarification',
+        // Handle clarification if needed
+        if (an0dResult.result.need_question === true) {
+          // Extract question with type narrowing
+          const clarificationQuestion = an0dResult.result.question;
+
+          await step.run('store-discovery-clarification', async () => {
+            await updateProgress({
+              status: 'clarifying',
+              clarifications: [
+                {
+                  question: clarificationQuestion,
+                  askedAt: new Date().toISOString(),
+                },
+              ],
+            });
           });
-          return {
-            success: false,
-            reportId,
-            error: 'Unable to proceed after clarification',
+
+          // Wait for user to answer (up to 24 hours)
+          const clarificationEvent = await step.waitForEvent(
+            'wait-for-discovery-clarification',
+            {
+              event: 'report/discovery-clarification-answered',
+              match: 'data.reportId',
+              timeout: '24h',
+            },
+          );
+
+          if (!clarificationEvent) {
+            await updateProgress({
+              status: 'error',
+              error_message: 'Clarification timed out after 24 hours',
+            });
+            return {
+              success: false,
+              reportId,
+              error: 'Clarification timed out',
+            };
+          }
+
+          // Re-run AN0-D with clarification
+          const clarifiedResult = await step.run(
+            'an0-d-with-clarification',
+            async () => {
+              const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+
+              const { content, usage } = await callClaude({
+                model: MODELS.OPUS,
+                system: AN0_D_PROMPT,
+                userMessage: clarifiedChallenge,
+                maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an0-d'],
+                temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an0-d'],
+              });
+
+              const parsed = parseJsonResponse<AN0DOutput>(content, 'AN0-D');
+              return { result: AN0DOutputSchema.parse(parsed), usage };
+            },
+          );
+
+          if (clarifiedResult.result.need_question === true) {
+            await updateProgress({
+              status: 'error',
+              error_message: 'Unable to proceed after clarification',
+            });
+            return {
+              success: false,
+              reportId,
+              error: 'Unable to proceed after clarification',
+            };
+          }
+
+          // Use clarified result (merge usage into an0dResult)
+          an0dResult.result = clarifiedResult.result;
+          an0dResult.usage = {
+            inputTokens:
+              an0dResult.usage.inputTokens + clarifiedResult.usage.inputTokens,
+            outputTokens:
+              an0dResult.usage.outputTokens +
+              clarifiedResult.usage.outputTokens,
+            totalTokens:
+              an0dResult.usage.totalTokens + clarifiedResult.usage.totalTokens,
           };
         }
 
-        // Use clarified result (merge usage into an0dResult)
-        an0dResult.result = clarifiedResult.result;
-        an0dResult.usage = {
-          inputTokens:
-            an0dResult.usage.inputTokens + clarifiedResult.usage.inputTokens,
-          outputTokens:
-            an0dResult.usage.outputTokens + clarifiedResult.usage.outputTokens,
-          totalTokens:
-            an0dResult.usage.totalTokens + clarifiedResult.usage.totalTokens,
-        };
-      }
+        // Type guard: we now have a full analysis
+        // Using 'as const' assertion since we've handled clarification above
+        const an0dAnalysis = an0dResult.result as Extract<
+          typeof an0dResult.result,
+          { need_question: false }
+        >;
+        if (!an0dAnalysis.original_ask) {
+          throw new Error('Unexpected state: missing analysis after handling');
+        }
 
-      // Type guard: we now have a full analysis
-      // Using 'as const' assertion since we've handled clarification above
-      const an0dAnalysis = an0dResult.result as Extract<
-        typeof an0dResult.result,
-        { need_question: false }
-      >;
-      if (!an0dAnalysis.original_ask) {
-        throw new Error('Unexpected state: missing analysis after handling');
-      }
+        // =========================================
+        // AN1.5-D: Discovery Teaching Selection
+        // =========================================
+        const an1_5dResult = await step.run(
+          'an1.5-d-teaching-selection',
+          async () => {
+            await updateProgress({
+              current_step: 'an1.5-d',
+              phase_progress: 0,
+            });
 
-      // =========================================
-      // AN1.5-D: Discovery Teaching Selection
-      // =========================================
-      const an1_5dResult = await step.run(
-        'an1.5-d-teaching-selection',
-        async () => {
-          await updateProgress({
-            current_step: 'an1.5-d',
-            phase_progress: 0,
-          });
-
-          const contextMessage = `## Problem Framing (Discovery Mode)
+            const contextMessage = `## Problem Framing (Discovery Mode)
 
 ${JSON.stringify(an0dResult.result, null, 2)}
 
@@ -302,35 +325,38 @@ Select the most instructive teaching examples from NON-OBVIOUS domains:
 
 Focus on examples that teach NEW WAYS OF THINKING about this problem.`;
 
-          const { content, usage } = await callClaude({
-            model: MODELS.OPUS,
-            system: AN1_5_D_PROMPT,
-            userMessage: contextMessage,
-            maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an1.5-d'],
-            temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an1.5-d'],
-          });
+            const { content, usage } = await callClaude({
+              model: MODELS.OPUS,
+              system: AN1_5_D_PROMPT,
+              userMessage: contextMessage,
+              maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an1.5-d'],
+              temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an1.5-d'],
+            });
 
-          const parsed = parseJsonResponse<AN1_5_D_Output>(content, 'AN1.5-D');
-          const validated = AN1_5_D_OutputSchema.parse(parsed);
+            const parsed = parseJsonResponse<AN1_5_D_Output>(
+              content,
+              'AN1.5-D',
+            );
+            const validated = AN1_5_D_OutputSchema.parse(parsed);
 
-          await updateProgress({ phase_progress: 100 });
+            await updateProgress({ phase_progress: 100 });
 
-          return { result: validated, usage };
-        },
-      );
+            return { result: validated, usage };
+          },
+        );
 
-      // =========================================
-      // AN1.7-D: Discovery Literature Gaps
-      // =========================================
-      const an1_7dResult = await step.run(
-        'an1.7-d-literature-gaps',
-        async () => {
-          await updateProgress({
-            current_step: 'an1.7-d',
-            phase_progress: 0,
-          });
+        // =========================================
+        // AN1.7-D: Discovery Literature Gaps
+        // =========================================
+        const an1_7dResult = await step.run(
+          'an1.7-d-literature-gaps',
+          async () => {
+            await updateProgress({
+              current_step: 'an1.7-d',
+              phase_progress: 0,
+            });
 
-          const contextMessage = `## Problem Framing (Discovery Mode)
+            const contextMessage = `## Problem Framing (Discovery Mode)
 
 ${JSON.stringify(an0dResult.result, null, 2)}
 
@@ -347,35 +373,38 @@ Search for what's MISSING in the literature:
 - Academic ideas that didn't make it to industry
 - Cross-domain solutions not yet applied`;
 
-          const { content, usage } = await callClaude({
-            model: MODELS.OPUS,
-            system: AN1_7_D_PROMPT,
-            userMessage: contextMessage,
-            maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an1.7-d'],
-            temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an1.7-d'],
-          });
+            const { content, usage } = await callClaude({
+              model: MODELS.OPUS,
+              system: AN1_7_D_PROMPT,
+              userMessage: contextMessage,
+              maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an1.7-d'],
+              temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an1.7-d'],
+            });
 
-          const parsed = parseJsonResponse<AN1_7_D_Output>(content, 'AN1.7-D');
-          const validated = AN1_7_D_OutputSchema.parse(parsed);
+            const parsed = parseJsonResponse<AN1_7_D_Output>(
+              content,
+              'AN1.7-D',
+            );
+            const validated = AN1_7_D_OutputSchema.parse(parsed);
 
-          await updateProgress({ phase_progress: 100 });
+            await updateProgress({ phase_progress: 100 });
 
-          return { result: validated, usage };
-        },
-      );
+            return { result: validated, usage };
+          },
+        );
 
-      // =========================================
-      // AN2-D: Discovery Methodology Briefing
-      // =========================================
-      const an2dResult = await step.run(
-        'an2-d-methodology-briefing',
-        async () => {
-          await updateProgress({
-            current_step: 'an2-d',
-            phase_progress: 0,
-          });
+        // =========================================
+        // AN2-D: Discovery Methodology Briefing
+        // =========================================
+        const an2dResult = await step.run(
+          'an2-d-methodology-briefing',
+          async () => {
+            await updateProgress({
+              current_step: 'an2-d',
+              phase_progress: 0,
+            });
 
-          const contextMessage = `## Problem Framing (Discovery Mode)
+            const contextMessage = `## Problem Framing (Discovery Mode)
 
 ${JSON.stringify(an0dResult.result, null, 2)}
 
@@ -395,35 +424,35 @@ Prepare the concept generator with:
 3. Cross-domain transfer strategies
 4. Novelty-first evaluation criteria`;
 
-          const { content, usage } = await callClaude({
-            model: MODELS.OPUS,
-            system: AN2_D_PROMPT,
-            userMessage: contextMessage,
-            maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an2-d'],
-            temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an2-d'],
-          });
+            const { content, usage } = await callClaude({
+              model: MODELS.OPUS,
+              system: AN2_D_PROMPT,
+              userMessage: contextMessage,
+              maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an2-d'],
+              temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an2-d'],
+            });
 
-          const parsed = parseJsonResponse<AN2_D_Output>(content, 'AN2-D');
-          const validated = AN2_D_OutputSchema.parse(parsed);
+            const parsed = parseJsonResponse<AN2_D_Output>(content, 'AN2-D');
+            const validated = AN2_D_OutputSchema.parse(parsed);
 
-          await updateProgress({ phase_progress: 100 });
+            await updateProgress({ phase_progress: 100 });
 
-          return { result: validated, usage };
-        },
-      );
+            return { result: validated, usage };
+          },
+        );
 
-      // =========================================
-      // AN3-D: Discovery Concept Generation
-      // =========================================
-      const an3dResult = await step.run(
-        'an3-d-concept-generation',
-        async () => {
-          await updateProgress({
-            current_step: 'an3-d',
-            phase_progress: 0,
-          });
+        // =========================================
+        // AN3-D: Discovery Concept Generation
+        // =========================================
+        const an3dResult = await step.run(
+          'an3-d-concept-generation',
+          async () => {
+            await updateProgress({
+              current_step: 'an3-d',
+              phase_progress: 0,
+            });
 
-          const contextMessage = `## Problem Framing (Discovery Mode)
+            const contextMessage = `## Problem Framing (Discovery Mode)
 
 ${JSON.stringify(an0dResult.result, null, 2)}
 
@@ -450,33 +479,33 @@ Generate AT LEAST 6 NOVEL concepts from:
 
 REJECT conventional approaches. Prioritize NOVELTY and BREAKTHROUGH POTENTIAL.`;
 
-          const { content, usage } = await callClaude({
-            model: MODELS.OPUS,
-            system: AN3_D_PROMPT,
-            userMessage: contextMessage,
-            maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an3-d'],
-            temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an3-d'],
+            const { content, usage } = await callClaude({
+              model: MODELS.OPUS,
+              system: AN3_D_PROMPT,
+              userMessage: contextMessage,
+              maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an3-d'],
+              temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an3-d'],
+            });
+
+            const parsed = parseJsonResponse<AN3_D_Output>(content, 'AN3-D');
+            const validated = AN3_D_OutputSchema.parse(parsed);
+
+            await updateProgress({ phase_progress: 100 });
+
+            return { result: validated, usage };
+          },
+        );
+
+        // =========================================
+        // AN4-D: Discovery Evaluation
+        // =========================================
+        const an4dResult = await step.run('an4-d-evaluation', async () => {
+          await updateProgress({
+            current_step: 'an4-d',
+            phase_progress: 0,
           });
 
-          const parsed = parseJsonResponse<AN3_D_Output>(content, 'AN3-D');
-          const validated = AN3_D_OutputSchema.parse(parsed);
-
-          await updateProgress({ phase_progress: 100 });
-
-          return { result: validated, usage };
-        },
-      );
-
-      // =========================================
-      // AN4-D: Discovery Evaluation
-      // =========================================
-      const an4dResult = await step.run('an4-d-evaluation', async () => {
-        await updateProgress({
-          current_step: 'an4-d',
-          phase_progress: 0,
-        });
-
-        const contextMessage = `## Discovery Concepts
+          const contextMessage = `## Discovery Concepts
 
 ${JSON.stringify(an3dResult.result, null, 2)}
 
@@ -494,32 +523,34 @@ Evaluate with NOVELTY as primary criterion:
 
 Accept higher risk for higher novelty.`;
 
-        const { content, usage } = await callClaude({
-          model: MODELS.OPUS,
-          system: AN4_D_PROMPT,
-          userMessage: contextMessage,
-          maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an4-d'],
-          temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an4-d'],
+          const { content, usage } = await callClaude({
+            model: MODELS.OPUS,
+            system: AN4_D_PROMPT,
+            userMessage: contextMessage,
+            maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an4-d'],
+            temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an4-d'],
+          });
+
+          const parsed = parseJsonResponse<AN4_D_Output>(content, 'AN4-D');
+          const validated = AN4_D_OutputSchema.parse(parsed);
+
+          await updateProgress({ phase_progress: 100 });
+
+          return { result: validated, usage };
         });
 
-        const parsed = parseJsonResponse<AN4_D_Output>(content, 'AN4-D');
-        const validated = AN4_D_OutputSchema.parse(parsed);
+        // =========================================
+        // AN5-D: Discovery Report Generation
+        // =========================================
+        const an5dResult = await step.run(
+          'an5-d-report-generation',
+          async () => {
+            await updateProgress({
+              current_step: 'an5-d',
+              phase_progress: 0,
+            });
 
-        await updateProgress({ phase_progress: 100 });
-
-        return { result: validated, usage };
-      });
-
-      // =========================================
-      // AN5-D: Discovery Report Generation
-      // =========================================
-      const an5dResult = await step.run('an5-d-report-generation', async () => {
-        await updateProgress({
-          current_step: 'an5-d',
-          phase_progress: 0,
-        });
-
-        const contextMessage = `## Original Problem
+            const contextMessage = `## Original Problem
 
 ${designChallenge}
 
@@ -549,82 +580,87 @@ Focus on:
 3. Why these haven't been tried
 4. Clear paths to VALIDATE novelty`;
 
-        const { content, usage } = await callClaude({
-          model: MODELS.OPUS,
-          system: AN5_D_PROMPT,
-          userMessage: contextMessage,
-          maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an5-d'],
-          temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an5-d'],
-        });
+            const { content, usage } = await callClaude({
+              model: MODELS.OPUS,
+              system: AN5_D_PROMPT,
+              userMessage: contextMessage,
+              maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an5-d'],
+              temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an5-d'],
+            });
 
-        const parsed = parseJsonResponse<AN5_D_Output>(content, 'AN5-D');
-        const validated = AN5_D_OutputSchema.parse(parsed);
+            const parsed = parseJsonResponse<AN5_D_Output>(content, 'AN5-D');
+            const validated = AN5_D_OutputSchema.parse(parsed);
 
-        await updateProgress({ phase_progress: 100 });
+            await updateProgress({ phase_progress: 100 });
 
-        return { result: validated, usage };
-      });
-
-      // =========================================
-      // Complete Report
-      // =========================================
-      // Collect all usages from step results
-      const allUsages = [
-        an0dResult.usage,
-        an1_5dResult.usage,
-        an1_7dResult.usage,
-        an2dResult.usage,
-        an3dResult.usage,
-        an4dResult.usage,
-        an5dResult.usage,
-      ];
-      const totalUsage = calculateTotalUsage(allUsages);
-
-      await step.run('complete-discovery-report', async () => {
-        // Persist token usage to database (P0-081 fix)
-        const { error: usageError } = await supabase.rpc('increment_usage', {
-          p_account_id: event.data.accountId,
-          p_tokens: totalUsage.totalTokens,
-          p_is_report: true,
-          p_is_chat: false,
-        });
-        if (usageError) {
-          console.error('[Usage] Failed to persist usage:', usageError);
-        } else {
-          console.log('[Usage] Persisted (Discovery):', {
-            accountId: event.data.accountId,
-            tokens: totalUsage.totalTokens,
-            costUsd: totalUsage.costUsd,
-          });
-        }
-
-        await updateProgress({
-          status: 'complete',
-          current_step: 'complete',
-          phase_progress: 100,
-          headline:
-            an5dResult.result.report.executive_summary?.one_liner ??
-            'Discovery Analysis Complete',
-          report_data: {
-            mode: 'discovery',
-            report: an5dResult.result.report,
-            metadata: an5dResult.result.metadata,
-            concepts: an3dResult.result.discovery_concepts,
-            evaluation: an4dResult.result,
-            literature_gaps: an1_7dResult.result,
-            teaching_examples: an1_5dResult.result,
-            problem_framing: an0dResult.result,
-            tokenUsage: totalUsage,
+            return { result: validated, usage };
           },
-        });
-      });
+        );
 
-      return {
-        success: true,
-        reportId,
-        conversationId,
-        tokenUsage: totalUsage,
-      };
+        // =========================================
+        // Complete Report
+        // =========================================
+        // Collect all usages from step results
+        const allUsages = [
+          an0dResult.usage,
+          an1_5dResult.usage,
+          an1_7dResult.usage,
+          an2dResult.usage,
+          an3dResult.usage,
+          an4dResult.usage,
+          an5dResult.usage,
+        ];
+        const totalUsage = calculateTotalUsage(allUsages);
+
+        await step.run('complete-discovery-report', async () => {
+          // Persist token usage to database (P0-081 fix)
+          const { error: usageError } = await supabase.rpc('increment_usage', {
+            p_account_id: event.data.accountId,
+            p_tokens: totalUsage.totalTokens,
+            p_is_report: true,
+            p_is_chat: false,
+          });
+          if (usageError) {
+            console.error('[Usage] Failed to persist usage:', usageError);
+          } else {
+            console.log('[Usage] Persisted (Discovery):', {
+              accountId: event.data.accountId,
+              tokens: totalUsage.totalTokens,
+              costUsd: totalUsage.costUsd,
+            });
+          }
+
+          await updateProgress({
+            status: 'complete',
+            current_step: 'complete',
+            phase_progress: 100,
+            headline:
+              an5dResult.result.report.executive_summary?.one_liner ??
+              'Discovery Analysis Complete',
+            report_data: {
+              mode: 'discovery',
+              report: an5dResult.result.report,
+              metadata: an5dResult.result.metadata,
+              concepts: an3dResult.result.discovery_concepts,
+              evaluation: an4dResult.result,
+              literature_gaps: an1_7dResult.result,
+              teaching_examples: an1_5dResult.result,
+              problem_framing: an0dResult.result,
+              tokenUsage: totalUsage,
+            },
+          });
+        });
+
+        return {
+          success: true,
+          reportId,
+          conversationId,
+          tokenUsage: totalUsage,
+        };
+      }
+    } finally {
+      // Always decrement on exit (success or error)
+      tracker?.decrement();
     }
   },
 );

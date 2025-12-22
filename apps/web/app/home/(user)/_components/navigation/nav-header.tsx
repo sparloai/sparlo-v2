@@ -76,10 +76,7 @@ export function NavHeader({
           <div className="flex items-center gap-4">
             {/* Usage indicator - only shows when >= 25% used */}
             {usage?.showUsageBar && (
-              <Link
-                href="/home/settings/billing"
-                className="hidden w-28 md:block"
-              >
+              <Link href="/home/billing" className="hidden w-28 md:block">
                 <UsageIndicator
                   tokensUsed={usage.tokensUsed}
                   tokensLimit={usage.tokensLimit}

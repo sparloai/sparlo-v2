@@ -168,29 +168,89 @@ RAILWAY_DEPLOYMENT_DRAINING_SECONDS=180  # 3 minutes draining
 
 ### Phase 1: Railway Configuration
 
-**File**: `railway.json`
-```json
-{
-  "$schema": "https://railway.com/railway.schema.json",
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 3,
-    "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 120,
-    "overlapSeconds": 300,
-    "drainingSeconds": 180
+**IMPORTANT**: Overlap and draining settings are **environment variables**, NOT `railway.json` fields.
+
+**Step 1: Add Environment Variables in Railway Dashboard**
+
+Navigate to your Railway service → Variables → Add:
+```bash
+RAILWAY_DEPLOYMENT_OVERLAP_SECONDS=300   # 5 minutes overlap
+RAILWAY_DEPLOYMENT_DRAINING_SECONDS=180  # 3 minutes draining
+```
+
+**Step 2: Add SIGTERM Handler for Graceful Inngest Shutdown**
+
+The default Next.js standalone server doesn't wait for in-flight Inngest steps to complete. We need to add signal handling.
+
+**File**: `apps/web/instrumentation.ts` (create if doesn't exist)
+```typescript
+export async function register() {
+  // Only run on server
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Track active Inngest executions
+    let activeExecutions = 0;
+    const MAX_SHUTDOWN_WAIT_MS = 180000; // 3 minutes (matches draining period)
+
+    // Expose for Inngest middleware to increment/decrement
+    (globalThis as any).__inngestActiveExecutions = {
+      increment: () => activeExecutions++,
+      decrement: () => activeExecutions--,
+      get: () => activeExecutions,
+    };
+
+    process.on('SIGTERM', async () => {
+      console.log('[Graceful Shutdown] SIGTERM received, waiting for Inngest executions...');
+
+      const startTime = Date.now();
+
+      // Wait for active executions to complete (with timeout)
+      while (activeExecutions > 0 && Date.now() - startTime < MAX_SHUTDOWN_WAIT_MS) {
+        console.log(`[Graceful Shutdown] Waiting for ${activeExecutions} active execution(s)...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      if (activeExecutions > 0) {
+        console.log(`[Graceful Shutdown] Timeout reached with ${activeExecutions} execution(s) still running`);
+      } else {
+        console.log('[Graceful Shutdown] All Inngest executions completed');
+      }
+
+      process.exit(0);
+    });
   }
 }
 ```
 
+**Step 3: Track Inngest Execution in Functions**
+
+Add execution tracking to each Inngest function:
+
+**File**: `apps/web/lib/inngest/functions/generate-hybrid-report.ts` (and others)
+```typescript
+// At the start of the function handler:
+const tracker = (globalThis as any).__inngestActiveExecutions;
+tracker?.increment();
+
+try {
+  // ... existing function logic ...
+} finally {
+  tracker?.decrement();
+}
+```
+
+**Step 4: Enable Manual Signal Handling**
+
+**File**: Add to Railway environment variables:
+```bash
+NEXT_MANUAL_SIG_HANDLE=true
+```
+
 **Validation**:
-1. Deploy change to staging
-2. Start a test report
+1. Deploy changes to staging
+2. Start a test report (hybrid or discovery)
 3. Trigger deployment mid-report
-4. Verify report completes
+4. Check logs for "[Graceful Shutdown]" messages
+5. Verify report completes successfully
 
 ---
 
@@ -291,25 +351,29 @@ export const { GET, POST, PUT } = serve({
 });
 ```
 
-#### Step 5: Create Worker Railway Config
+#### Step 5: Configure Worker Railway Environment Variables
 
-**File**: `apps/worker/railway.json`
-```json
-{
-  "$schema": "https://railway.com/railway.schema.json",
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10,
-    "healthcheckPath": "/health",
-    "healthcheckTimeout": 120,
-    "overlapSeconds": 600,
-    "drainingSeconds": 300
-  }
-}
+**In Railway Dashboard for Worker Service**, add:
+```bash
+# Deployment resilience - 15 minute grace period
+RAILWAY_DEPLOYMENT_OVERLAP_SECONDS=600   # 10 minutes overlap
+RAILWAY_DEPLOYMENT_DRAINING_SECONDS=300  # 5 minutes draining
+NEXT_MANUAL_SIG_HANDLE=true
+
+# Inngest configuration (copy from web service)
+INNGEST_EVENT_KEY=<your-event-key>
+INNGEST_SIGNING_KEY=<your-signing-key>
+
+# Database (copy from web service)
+DATABASE_URL=<your-database-url>
+SUPABASE_URL=<your-supabase-url>
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+
+# LLM API keys (copy from web service)
+ANTHROPIC_API_KEY=<your-anthropic-key>
 ```
+
+**Note**: Overlap and draining are environment variables, NOT `railway.json` fields.
 
 #### Step 6: Add Worker to Turborepo
 

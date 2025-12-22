@@ -20,7 +20,7 @@ export const SectionHeader = memo(function SectionHeader({
         {title}
       </h2>
       {subtitle && (
-        <p className="max-w-4xl text-lg font-normal leading-relaxed text-zinc-600">
+        <p className="max-w-4xl text-lg leading-relaxed font-normal text-zinc-600">
           {subtitle}
         </p>
       )}
@@ -48,7 +48,7 @@ export function CardWithHeader({
     >
       <div className="flex items-center gap-3 border-b border-zinc-200 bg-zinc-50/50 p-6">
         {Icon && <Icon className="h-5 w-5 text-zinc-950" />}
-        <h3 className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-600">
+        <h3 className="font-mono text-xs font-bold tracking-widest text-zinc-600 uppercase">
           {label}
         </h3>
       </div>
@@ -63,7 +63,7 @@ export const MonoLabel = memo(function MonoLabel({
   children: React.ReactNode;
 }) {
   return (
-    <span className="font-mono text-xs font-bold uppercase tracking-widest text-zinc-600">
+    <span className="font-mono text-xs font-bold tracking-widest text-zinc-600 uppercase">
       {children}
     </span>
   );
@@ -84,7 +84,7 @@ export function AuraTable({
             {headers.map((header) => (
               <th
                 key={header}
-                className="px-6 py-4 font-mono text-xs font-bold uppercase tracking-wider text-zinc-600"
+                className="px-6 py-4 font-mono text-xs font-bold tracking-wider text-zinc-600 uppercase"
               >
                 {header}
               </th>
@@ -106,7 +106,7 @@ export function DarkSection({
 }) {
   return (
     <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-white shadow-lg sm:p-10">
-      <h4 className="mb-4 font-mono text-sm font-bold uppercase tracking-widest text-zinc-400">
+      <h4 className="mb-4 font-mono text-sm font-bold tracking-widest text-zinc-400 uppercase">
         {label}
       </h4>
       {children}
@@ -133,7 +133,7 @@ export const AuraBadge = memo(function AuraBadge({
   return (
     <span
       className={cn(
-        'rounded border px-2.5 py-1 font-mono text-xs font-medium uppercase tracking-widest',
+        'rounded border px-2.5 py-1 font-mono text-xs font-medium tracking-widest uppercase',
         AURA_BADGE_VARIANTS[variant],
       )}
     >
@@ -174,7 +174,7 @@ export const MetadataInfoCard = memo(function MetadataInfoCard({
             {idx > 0 && (
               <div className="mr-6 hidden h-4 w-px bg-zinc-300 md:block" />
             )}
-            <span className="uppercase tracking-wider text-zinc-500">
+            <span className="tracking-wider text-zinc-500 uppercase">
               {item.label}:
             </span>
             <span className="font-semibold text-zinc-900">{item.value}</span>
@@ -200,7 +200,7 @@ export const ViabilityAssessment = memo(function ViabilityAssessment({
 }) {
   return (
     <div className="relative overflow-hidden rounded-xl bg-zinc-950 p-6 text-white md:p-8">
-      <h3 className="mb-4 font-mono text-xs font-bold uppercase tracking-widest text-zinc-400">
+      <h3 className="mb-4 font-mono text-xs font-bold tracking-widest text-zinc-400 uppercase">
         Viability Assessment
       </h3>
       <p className="mb-4 text-lg font-medium">{headline}</p>
