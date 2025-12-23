@@ -267,13 +267,89 @@ export async function callClaude(params: {
  * This handles cases where LLM output is cut off mid-response
  */
 function repairTruncatedJson(jsonStr: string): string {
-  // Count unclosed brackets and braces
+  // Track state while parsing
   let braces = 0;
   let brackets = 0;
   let inString = false;
   let escapeNext = false;
+  let lastValidIndex = 0;
+  let lastStructuralIndex = 0; // Last }, ], or complete string
 
-  for (const char of jsonStr) {
+  for (let i = 0; i < jsonStr.length; i++) {
+    const char = jsonStr[i];
+
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+    if (char === '\\' && inString) {
+      escapeNext = true;
+      continue;
+    }
+    if (char === '"') {
+      inString = !inString;
+      if (!inString) {
+        // Just closed a string
+        lastStructuralIndex = i;
+      }
+      continue;
+    }
+    if (inString) continue;
+
+    if (char === '{') {
+      braces++;
+      lastValidIndex = i;
+    } else if (char === '}') {
+      braces--;
+      lastStructuralIndex = i;
+      lastValidIndex = i;
+    } else if (char === '[') {
+      brackets++;
+      lastValidIndex = i;
+    } else if (char === ']') {
+      brackets--;
+      lastStructuralIndex = i;
+      lastValidIndex = i;
+    } else if (char === ',' || char === ':') {
+      lastValidIndex = i;
+    }
+  }
+
+  let repaired = jsonStr;
+
+  // If we're in a string, we need to handle it carefully
+  if (inString) {
+    // Strategy 1: Try to close the string and continue
+    // First, check if we're in a value or key position
+    // Truncate to last structural point and close from there
+    if (lastStructuralIndex > 0 && lastStructuralIndex < jsonStr.length - 1) {
+      // Truncate to last complete structure plus a bit
+      repaired = jsonStr.substring(0, lastStructuralIndex + 1);
+      // Recount after truncation
+      braces = 0;
+      brackets = 0;
+      for (const char of repaired) {
+        if (char === '{') braces++;
+        else if (char === '}') braces--;
+        else if (char === '[') brackets++;
+        else if (char === ']') brackets--;
+      }
+    } else {
+      // Just close the string
+      repaired = repaired + '"';
+    }
+  }
+
+  // Remove trailing comma if present (invalid JSON)
+  repaired = repaired.replace(/,\s*$/, '');
+
+  // Close any unclosed brackets/braces in correct order
+  // We need to track what was opened to close in reverse order
+  const openStack: string[] = [];
+  inString = false;
+  escapeNext = false;
+
+  for (const char of repaired) {
     if (escapeNext) {
       escapeNext = false;
       continue;
@@ -288,30 +364,72 @@ function repairTruncatedJson(jsonStr: string): string {
     }
     if (inString) continue;
 
-    if (char === '{') braces++;
-    else if (char === '}') braces--;
-    else if (char === '[') brackets++;
-    else if (char === ']') brackets--;
+    if (char === '{') openStack.push('{');
+    else if (char === '[') openStack.push('[');
+    else if (char === '}') {
+      if (openStack.length > 0 && openStack[openStack.length - 1] === '{') {
+        openStack.pop();
+      }
+    } else if (char === ']') {
+      if (openStack.length > 0 && openStack[openStack.length - 1] === '[') {
+        openStack.pop();
+      }
+    }
   }
 
-  // If we're in a string, try to close it
-  let repaired = jsonStr;
-  if (inString) {
-    // Find last complete key-value and truncate there, or just close the string
-    repaired = repaired + '"';
-  }
-
-  // Close any unclosed brackets/braces
-  while (brackets > 0) {
-    repaired += ']';
-    brackets--;
-  }
-  while (braces > 0) {
-    repaired += '}';
-    braces--;
+  // Close in reverse order
+  while (openStack.length > 0) {
+    const open = openStack.pop();
+    if (open === '{') repaired += '}';
+    else if (open === '[') repaired += ']';
   }
 
   return repaired;
+}
+
+/**
+ * Aggressively truncate JSON to last complete object/array
+ * Used as final fallback when normal repair fails
+ */
+function aggressiveTruncateJson(jsonStr: string): string {
+  // Find the last complete closing brace/bracket that balances
+  let depth = 0;
+  let inString = false;
+  let escapeNext = false;
+  let lastBalancedEnd = -1;
+
+  for (let i = 0; i < jsonStr.length; i++) {
+    const char = jsonStr[i];
+
+    if (escapeNext) {
+      escapeNext = false;
+      continue;
+    }
+    if (char === '\\' && inString) {
+      escapeNext = true;
+      continue;
+    }
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+
+    if (char === '{' || char === '[') {
+      depth++;
+    } else if (char === '}' || char === ']') {
+      depth--;
+      if (depth === 0) {
+        lastBalancedEnd = i;
+      }
+    }
+  }
+
+  if (lastBalancedEnd > 0) {
+    return jsonStr.substring(0, lastBalancedEnd + 1);
+  }
+
+  return jsonStr;
 }
 
 /**
@@ -335,15 +453,36 @@ export function parseJsonResponse<T>(response: string, context: string): T {
   // First attempt: parse as-is
   try {
     return JSON.parse(jsonStr) as T;
-  } catch {
+  } catch (firstError) {
     // Second attempt: try to repair truncated JSON
     try {
       const repaired = repairTruncatedJson(jsonStr);
+      console.log(`[JSON Repair] ${context}: Repaired truncated JSON`);
       return JSON.parse(repaired) as T;
-    } catch {
-      throw new Error(
-        `Failed to parse JSON from ${context}: ${jsonStr.slice(0, 200)}...`,
-      );
+    } catch (secondError) {
+      // Third attempt: aggressive truncation to last valid structure
+      try {
+        const truncated = aggressiveTruncateJson(jsonStr);
+        console.log(
+          `[JSON Repair] ${context}: Aggressive truncation applied`,
+        );
+        return JSON.parse(truncated) as T;
+      } catch (thirdError) {
+        // Log details for debugging
+        console.error(`[JSON Parse Error] ${context}:`, {
+          originalLength: response.length,
+          extractedLength: jsonStr.length,
+          firstError: firstError instanceof Error ? firstError.message : String(firstError),
+          secondError: secondError instanceof Error ? secondError.message : String(secondError),
+          thirdError: thirdError instanceof Error ? thirdError.message : String(thirdError),
+          preview: jsonStr.slice(0, 500),
+          ending: jsonStr.slice(-200),
+        });
+
+        throw new Error(
+          `Failed to parse JSON from ${context}: ${jsonStr.slice(0, 200)}...`,
+        );
+      }
     }
   }
 }
