@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto';
 import { z } from 'zod';
 
 import { DatabaseWebhookVerifierService } from './database-webhook-verifier.service';
@@ -16,7 +17,25 @@ export function createDatabaseWebhookVerifierService() {
 
 class PostgresDatabaseWebhookVerifierService implements DatabaseWebhookVerifierService {
   verifySignatureOrThrow(header: string) {
-    if (header !== webhooksSecret) {
+    const headerBuffer = Buffer.from(header);
+    const secretBuffer = Buffer.from(webhooksSecret);
+
+    // Pad to equal length to prevent length timing leak
+    const maxLength = Math.max(headerBuffer.length, secretBuffer.length);
+    const paddedHeader = Buffer.concat([
+      headerBuffer,
+      Buffer.alloc(maxLength - headerBuffer.length),
+    ]);
+    const paddedSecret = Buffer.concat([
+      secretBuffer,
+      Buffer.alloc(maxLength - secretBuffer.length),
+    ]);
+
+    // Both length AND content must match (checked after constant-time comparison)
+    const lengthMatch = headerBuffer.length === secretBuffer.length;
+    const contentMatch = timingSafeEqual(paddedHeader, paddedSecret);
+
+    if (!lengthMatch || !contentMatch) {
       throw new Error('Invalid signature');
     }
 

@@ -28,6 +28,9 @@ export const USAGE_CONSTANTS = {
 
   /** Hard limit - block new reports at this percentage */
   HARD_LIMIT_THRESHOLD: 100,
+
+  /** Maximum tokens allowed per single operation (DoS prevention) */
+  MAX_TOKENS_PER_OPERATION: 1_000_000,
 } as const;
 
 /**

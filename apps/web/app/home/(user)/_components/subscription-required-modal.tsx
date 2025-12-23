@@ -78,19 +78,18 @@ export function SubscriptionRequiredModal({
         <div className="bg-muted/50 -mx-6 mb-6 border-y px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Pro Plan</p>
+              <p className="font-medium">
+                {isSubscriptionRequired
+                  ? 'Start with a plan that fits'
+                  : 'Upgrade your plan'}
+              </p>
               <p className="text-muted-foreground text-sm">
-                Most popular choice
+                {isSubscriptionRequired
+                  ? 'Choose from Standard, Pro, or Max'
+                  : 'Get more reports and features'}
               </p>
             </div>
-            <div className="text-right">
-              <Badge variant="secondary" className="mb-1">
-                Best Value
-              </Badge>
-              <p className="text-lg font-bold">
-                $499<span className="text-muted-foreground text-sm">/mo</span>
-              </p>
-            </div>
+            <Badge variant="secondary">View Pricing</Badge>
           </div>
         </div>
 

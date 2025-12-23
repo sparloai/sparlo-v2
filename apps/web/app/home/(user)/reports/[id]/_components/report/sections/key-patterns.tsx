@@ -1,22 +1,44 @@
+import { Building2, Layers } from 'lucide-react';
+
 import type { KeyPattern } from '../../../_lib/schema/sparlo-report.schema';
+import { BaseCard } from '../shared/cards/base-card';
 import { SectionHeader } from '../shared/section-header';
+import { SectionEmptyState } from '../shared/section-skeleton';
 
 interface KeyPatternsProps {
-  data: KeyPattern[];
+  data: KeyPattern[] | null;
 }
 
 export function KeyPatterns({ data }: KeyPatternsProps) {
-  if (data.length === 0) return null;
+  if (!data || data.length === 0) {
+    return (
+      <section id="key-patterns" className="space-y-8">
+        <SectionHeader
+          id="key-patterns-header"
+          title="Key Patterns"
+          icon={Layers}
+        />
+        <SectionEmptyState message="Pattern analysis pending" />
+      </section>
+    );
+  }
 
   return (
     <section id="key-patterns" className="space-y-8">
-      <SectionHeader id="key-patterns-header" title="Key Patterns" />
+      <SectionHeader
+        id="key-patterns-header"
+        title="Key Patterns"
+        icon={Layers}
+        count={data.length}
+      />
 
       <div className="grid gap-6">
         {data.map((pattern) => (
-          <div
+          <BaseCard
             key={pattern.id}
-            className="space-y-4 rounded-xl border border-zinc-100 p-6 transition-colors hover:border-zinc-200"
+            variant="default"
+            emphasis="subtle"
+            className="space-y-4 transition-colors hover:border-zinc-300"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -27,7 +49,8 @@ export function KeyPatterns({ data }: KeyPatternsProps) {
                   {pattern.name}
                 </h3>
               </div>
-              <span className="shrink-0 rounded bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-500">
+              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-600">
+                <Building2 className="h-3.5 w-3.5" strokeWidth={1.5} />
                 {pattern.source_industry}
               </span>
             </div>
@@ -36,7 +59,7 @@ export function KeyPatterns({ data }: KeyPatternsProps) {
               {pattern.description}
             </p>
 
-            <div className="space-y-2 rounded-lg bg-zinc-50 p-4">
+            <div className="space-y-2 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
               <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
                 Why It Matters
               </h4>
@@ -48,14 +71,14 @@ export function KeyPatterns({ data }: KeyPatternsProps) {
                 {pattern.patent_refs.map((ref, i) => (
                   <span
                     key={i}
-                    className="rounded bg-zinc-100 px-2 py-1 font-mono text-xs text-zinc-500"
+                    className="rounded-full border border-zinc-200 bg-zinc-100 px-2.5 py-1 font-mono text-xs text-zinc-500"
                   >
                     {ref}
                   </span>
                 ))}
               </div>
             )}
-          </div>
+          </BaseCard>
         ))}
       </div>
     </section>

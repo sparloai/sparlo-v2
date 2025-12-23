@@ -1,7 +1,6 @@
 import { getPrimaryLineItem } from '@kit/billing';
 import { resolveProductPlan } from '@kit/billing-gateway';
 import { AppBreadcrumbs } from '@kit/ui/app-breadcrumbs';
-import { If } from '@kit/ui/if';
 import { PageBody } from '@kit/ui/page';
 import { Trans } from '@kit/ui/trans';
 

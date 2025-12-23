@@ -4,6 +4,14 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const ENABLE_REACT_COMPILER = process.env.ENABLE_REACT_COMPILER === 'true';
 
+const securityHeaders = [
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  { key: 'X-XSS-Protection', value: '1; mode=block' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  { key: 'Permissions-Policy', value: 'payment=(self "https://js.stripe.com")' },
+];
+
 const INTERNAL_PACKAGES = [
   '@kit/ui',
   '@kit/auth',
@@ -41,6 +49,7 @@ const config = {
     '/*': ['./content/**/*'],
   },
   redirects: getRedirects,
+  headers: getSecurityHeaders,
   turbopack: {
     resolveExtensions: ['.ts', '.tsx', '.js', '.jsx'],
     resolveAlias: getModulesAliases(),
@@ -121,6 +130,15 @@ async function getRedirects() {
       source: '/server-sitemap.xml',
       destination: '/sitemap.xml',
       permanent: true,
+    },
+  ];
+}
+
+async function getSecurityHeaders() {
+  return [
+    {
+      source: '/:path*',
+      headers: securityHeaders,
     },
   ];
 }

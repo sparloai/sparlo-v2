@@ -40,6 +40,21 @@ class UserBillingService {
     planId,
     productId,
   }: z.infer<typeof PersonalAccountCheckoutSchema>) {
+    // Validate plan exists in billing config BEFORE any database operations
+    const product = billingConfig.products.find(
+      (item) => item.id === productId,
+    );
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    // Validate the plan belongs to this product
+    const plan = product.plans.find((p) => p.id === planId);
+    if (!plan) {
+      throw new Error('Plan not found for this product');
+    }
+
     // get the authenticated user
     const { data: user, error } = await requireUser(this.client);
 
@@ -61,15 +76,8 @@ class UserBillingService {
     const api = createAccountsApi(this.client);
     const customerId = await api.getCustomerId(accountId);
 
-    const product = billingConfig.products.find(
-      (item) => item.id === productId,
-    );
-
-    if (!product) {
-      throw new Error('Product not found');
-    }
-
-    const { plan } = getProductPlanPair(billingConfig, planId);
+    // Use the validated plan from getProductPlanPair for consistency
+    const { plan: resolvedPlan } = getProductPlanPair(billingConfig, planId);
     const logger = await getLogger();
 
     logger.info(
@@ -89,7 +97,7 @@ class UserBillingService {
         accountId,
         customerEmail: user.email,
         customerId,
-        plan,
+        plan: resolvedPlan,
         variantQuantities: [],
         enableDiscountField: product.enableDiscountField,
       });

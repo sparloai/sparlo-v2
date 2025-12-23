@@ -463,18 +463,25 @@ export function parseJsonResponse<T>(response: string, context: string): T {
       // Third attempt: aggressive truncation to last valid structure
       try {
         const truncated = aggressiveTruncateJson(jsonStr);
-        console.log(
-          `[JSON Repair] ${context}: Aggressive truncation applied`,
-        );
+        console.log(`[JSON Repair] ${context}: Aggressive truncation applied`);
         return JSON.parse(truncated) as T;
       } catch (thirdError) {
         // Log details for debugging
         console.error(`[JSON Parse Error] ${context}:`, {
           originalLength: response.length,
           extractedLength: jsonStr.length,
-          firstError: firstError instanceof Error ? firstError.message : String(firstError),
-          secondError: secondError instanceof Error ? secondError.message : String(secondError),
-          thirdError: thirdError instanceof Error ? thirdError.message : String(thirdError),
+          firstError:
+            firstError instanceof Error
+              ? firstError.message
+              : String(firstError),
+          secondError:
+            secondError instanceof Error
+              ? secondError.message
+              : String(secondError),
+          thirdError:
+            thirdError instanceof Error
+              ? thirdError.message
+              : String(thirdError),
           preview: jsonStr.slice(0, 500),
           ending: jsonStr.slice(-200),
         });

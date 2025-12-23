@@ -1053,6 +1053,9 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
   },
 
   "problem_analysis": {
+    "whats_wrong": {
+      "prose": "What's failing or broken. Describe the failure mode viscerally - what does the user experience? 2-3 sentences."
+    },
     "what_industry_does_today": [
       {
         "approach": "Current industry approach",
