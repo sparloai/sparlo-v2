@@ -91,6 +91,144 @@ export const SustainabilityFlagType = z.enum([
   'SUPPLY_CHAIN',
 ]);
 
+// ============================================
+// v4.0 Narrative Flow Enums (AN5_M_PROMPT canonical)
+// ============================================
+
+/**
+ * Source type for solution concepts - where the solution came from
+ * Maps to solution_concepts.primary.source_type in AN5_M_PROMPT
+ */
+export const SolutionSourceType = z.enum([
+  'CATALOG',
+  'EMERGING',
+  'CROSS_DOMAIN',
+  'PARADIGM',
+]);
+export type SolutionSourceType = z.infer<typeof SolutionSourceType>;
+
+/**
+ * Innovation concept type - the nature of the innovation
+ * Maps to innovation_concepts.recommended.innovation_type in AN5_M_PROMPT
+ */
+export const InnovationConceptType = z.enum([
+  'CROSS_DOMAIN',
+  'PARADIGM',
+  'TECHNOLOGY_REVIVAL',
+  'FIRST_PRINCIPLES',
+]);
+export type InnovationConceptType = z.infer<typeof InnovationConceptType>;
+
+/**
+ * Frontier innovation type - for frontier_watch items
+ * Maps to innovation_concepts.frontier_watch[].innovation_type in AN5_M_PROMPT
+ */
+export const FrontierInnovationType = z.enum(['PARADIGM', 'EMERGING_SCIENCE']);
+export type FrontierInnovationType = z.infer<typeof FrontierInnovationType>;
+
+/**
+ * Supporting concept relationship to primary
+ * Maps to solution_concepts.supporting[].relationship in AN5_M_PROMPT
+ */
+export const SupportingRelationship = z.enum(['FALLBACK', 'COMPLEMENTARY']);
+export type SupportingRelationship = z.infer<typeof SupportingRelationship>;
+
+/**
+ * Economics basis - how the economic value was determined
+ * Maps to economics.*.basis fields in AN5_M_PROMPT
+ */
+export const EconomicsBasis = z.enum(['CALCULATED', 'ESTIMATED', 'ASSUMED']);
+export type EconomicsBasis = z.infer<typeof EconomicsBasis>;
+
+/**
+ * Freedom to operate assessment for IP considerations
+ * Maps to ip_considerations.freedom_to_operate in AN5_M_PROMPT
+ */
+export const FreedomToOperate = z.enum(['GREEN', 'YELLOW', 'RED']);
+export type FreedomToOperate = z.infer<typeof FreedomToOperate>;
+
+/**
+ * Effect direction for coupled effects
+ * Maps to coupled_effects[].direction in AN5_M_PROMPT
+ */
+export const EffectDirection = z.enum(['BETTER', 'WORSE', 'NEUTRAL']);
+export type EffectDirection = z.infer<typeof EffectDirection>;
+
+/**
+ * Effect magnitude for coupled effects
+ * Maps to coupled_effects[].magnitude in AN5_M_PROMPT
+ */
+export const EffectMagnitude = z.enum(['MINOR', 'MODERATE', 'MAJOR']);
+export type EffectMagnitude = z.infer<typeof EffectMagnitude>;
+
+// ============================================
+// v4.0 Narrative Flow Sub-Schemas (AN5_M_PROMPT canonical)
+// ============================================
+
+/**
+ * The Insight - reused across solution and innovation concepts
+ * Can be string for where_we_found_it (CATALOG) or object (CROSS_DOMAIN)
+ */
+export const TheInsightSchema = z
+  .object({
+    what: z.string(),
+    where_we_found_it: z
+      .union([
+        z.string(),
+        z
+          .object({
+            domain: z.string(),
+            how_they_use_it: z.string(),
+            why_it_transfers: z.string(),
+          })
+          .passthrough(),
+      ])
+      .optional(),
+    why_industry_missed_it: z.string(),
+  })
+  .passthrough();
+export type TheInsight = z.infer<typeof TheInsightSchema>;
+
+/**
+ * Economic Value - structured economic assessment with basis
+ */
+export const EconomicValueSchema = z
+  .object({
+    value: z.string(),
+    basis: EconomicsBasis,
+    rationale: z.string(),
+  })
+  .passthrough();
+export type EconomicValue = z.infer<typeof EconomicValueSchema>;
+
+/**
+ * Coupled Effect - secondary effects in other domains
+ */
+export const CoupledEffectSchema = z
+  .object({
+    domain: z.string(),
+    effect: z.string(),
+    direction: EffectDirection,
+    magnitude: EffectMagnitude,
+    quantified: z.string().optional(),
+    mitigation: z.string().optional(),
+  })
+  .passthrough();
+export type CoupledEffect = z.infer<typeof CoupledEffectSchema>;
+
+/**
+ * IP Considerations - patent and freedom to operate assessment
+ */
+export const IpConsiderationsSchema = z
+  .object({
+    freedom_to_operate: FreedomToOperate,
+    rationale: z.string(),
+    key_patents_to_review: z.array(z.string()).default([]),
+    patentability_potential: z.enum(['HIGH', 'MEDIUM', 'LOW', 'NOT_NOVEL']),
+  })
+  .passthrough();
+export type IpConsiderations = z.infer<typeof IpConsiderationsSchema>;
+
 export const SustainabilityFlagSchema = z
   .object({
     type: SustainabilityFlagType.catch('NONE'),
@@ -1513,6 +1651,279 @@ export type EnhancedChallengeFrame = z.infer<
 >;
 
 // ============================================
+// v4.0 Narrative Flow Concept Schemas (AN5_M_PROMPT canonical)
+// ============================================
+
+/**
+ * Innovation Analysis - replaces cross_domain_search
+ * Contains the problem reframe and domains searched
+ */
+export const InnovationAnalysisSchema = z
+  .object({
+    reframe: z.string(),
+    domains_searched: z.array(z.string()).default([]),
+  })
+  .passthrough();
+export type InnovationAnalysis = z.infer<typeof InnovationAnalysisSchema>;
+
+/**
+ * Constraints and Metrics - replaces constraints
+ * Adds success metrics with structured targets
+ */
+export const ConstraintsAndMetricsSchema = z
+  .object({
+    hard_constraints: z.array(z.string()).default([]),
+    soft_constraints: z.array(z.string()).default([]),
+    assumptions: z.array(z.string()).default([]),
+    success_metrics: z
+      .array(
+        z
+          .object({
+            metric: z.string(),
+            target: z.string(),
+            minimum_viable: z.string(),
+            stretch: z.string(),
+            unit: z.string().optional(),
+          })
+          .passthrough(),
+      )
+      .default([]),
+  })
+  .passthrough();
+export type ConstraintsAndMetrics = z.infer<typeof ConstraintsAndMetricsSchema>;
+
+/**
+ * Challenge Frame - simplified version for challenge_the_frame array
+ */
+export const ChallengeFrameV4Schema = z
+  .object({
+    assumption: z.string(),
+    challenge: z.string(),
+    implication: z.string(),
+  })
+  .passthrough();
+export type ChallengeFrameV4 = z.infer<typeof ChallengeFrameV4Schema>;
+
+// --- v4.0 Solution Concepts Structure ---
+
+/**
+ * Primary Solution Concept - the recommended solution with full detail
+ */
+export const PrimarySolutionConceptSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    confidence_percent: z.number().int().min(0).max(100),
+    source_type: SolutionSourceType,
+    what_it_is: z.string(),
+    the_insight: TheInsightSchema,
+    why_it_works: z.string(),
+    economics: z
+      .object({
+        investment: EconomicValueSchema,
+        expected_outcome: EconomicValueSchema,
+        timeline: EconomicValueSchema,
+        roi_rationale: z.string().optional(),
+      })
+      .passthrough(),
+    coupled_effects: z.array(CoupledEffectSchema).default([]),
+    ip_considerations: IpConsiderationsSchema.optional(),
+    key_risks: z
+      .array(
+        z.object({ risk: z.string(), mitigation: z.string() }).passthrough(),
+      )
+      .default([]),
+    sustainability_flag: SustainabilityFlagSchema.optional(),
+    first_validation_step: z
+      .object({
+        test: z.string(),
+        who_performs: z.string(),
+        equipment_method: z.string(),
+        sample_sourcing: z
+          .object({
+            material: z.string(),
+            lead_time: z.string(),
+            quantity: z.string(),
+          })
+          .passthrough(),
+        replicates: z.number().int().positive(),
+        cost: z.string(),
+        timeline: z.string(),
+        go_criteria: z.string(),
+        no_go_criteria: z.string(),
+      })
+      .passthrough(),
+  })
+  .passthrough();
+export type PrimarySolutionConcept = z.infer<
+  typeof PrimarySolutionConceptSchema
+>;
+
+/**
+ * Supporting Solution Concept - abbreviated concepts that complement the primary
+ */
+export const SupportingSolutionConceptSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    confidence_percent: z.number().int().min(0).max(100),
+    relationship: SupportingRelationship,
+    what_it_is: z.string(),
+    the_insight: TheInsightSchema,
+    why_it_works: z.string(),
+    economics: z
+      .object({
+        investment: z.string(),
+        expected_outcome: z.string(),
+        timeline: z.string(),
+      })
+      .passthrough(),
+    key_risk: z.string(),
+    sustainability_flag: SustainabilityFlagSchema.optional(),
+    when_to_use_instead: z.string(),
+  })
+  .passthrough();
+export type SupportingSolutionConcept = z.infer<
+  typeof SupportingSolutionConceptSchema
+>;
+
+/**
+ * Solution Concepts - v4.0 structure with primary + supporting
+ */
+export const SolutionConceptsV4Schema = z
+  .object({
+    intro: z.string().optional(),
+    primary: PrimarySolutionConceptSchema,
+    supporting: z.array(SupportingSolutionConceptSchema).default([]),
+  })
+  .passthrough();
+export type SolutionConceptsV4 = z.infer<typeof SolutionConceptsV4Schema>;
+
+// --- v4.0 Innovation Concepts Structure ---
+
+/**
+ * Recommended Innovation Concept - promoted innovation with full detail
+ */
+export const RecommendedInnovationConceptSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    confidence_percent: z.number().int().min(0).max(100),
+    innovation_type: InnovationConceptType,
+    what_it_is: z.string(),
+    the_insight: TheInsightSchema,
+    why_it_works: z.string(),
+    breakthrough_potential: z
+      .object({
+        if_it_works: z.string(),
+        estimated_improvement: z.string(),
+        industry_impact: z.string(),
+      })
+      .passthrough(),
+    economics: z
+      .object({
+        investment: EconomicValueSchema,
+        ceiling_if_works: EconomicValueSchema,
+        timeline: EconomicValueSchema,
+      })
+      .passthrough(),
+    coupled_effects: z.array(CoupledEffectSchema).default([]),
+    ip_considerations: IpConsiderationsSchema.optional(),
+    key_risks: z
+      .array(
+        z.object({ risk: z.string(), mitigation: z.string() }).passthrough(),
+      )
+      .default([]),
+    sustainability_flag: SustainabilityFlagSchema.optional(),
+    first_validation_step: z
+      .object({
+        gating_question: z.string(),
+        test: z.string(),
+        cost: z.string(),
+        timeline: z.string(),
+        go_no_go: z.string(),
+      })
+      .passthrough(),
+    why_this_one: z.string(),
+  })
+  .passthrough();
+export type RecommendedInnovationConcept = z.infer<
+  typeof RecommendedInnovationConceptSchema
+>;
+
+/**
+ * Parallel Innovation Concept - medium depth alternatives
+ */
+export const ParallelInnovationConceptSchema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    confidence_percent: z.number().int().min(0).max(100),
+    innovation_type: InnovationConceptType,
+    what_it_is: z.string(),
+    the_insight: TheInsightSchema,
+    why_it_works: z.string(),
+    economics: z
+      .object({
+        investment: z.string(),
+        ceiling_if_works: z.string(),
+      })
+      .passthrough(),
+    key_uncertainty: z.string(),
+    sustainability_flag: SustainabilityFlagSchema.optional(),
+    first_validation_step: z
+      .object({
+        test: z.string(),
+        cost: z.string(),
+        go_no_go: z.string(),
+      })
+      .passthrough(),
+    when_to_elevate: z.string(),
+  })
+  .passthrough();
+export type ParallelInnovationConcept = z.infer<
+  typeof ParallelInnovationConceptSchema
+>;
+
+/**
+ * Frontier Watch - monitor only concepts for future consideration
+ */
+export const FrontierWatchV4Schema = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    innovation_type: FrontierInnovationType,
+    earliest_viability: z.string(),
+    what_it_is: z.string(),
+    why_interesting: z.string(),
+    why_not_now: z.string(),
+    who_to_monitor: z.preprocess(
+      (val) =>
+        typeof val === 'string' ? val.split(',').map((s) => s.trim()) : val,
+      z.array(z.string()).default([]),
+    ),
+    trigger_to_revisit: z.string(),
+    recent_developments: z.string().optional(),
+    trl_estimate: z.number().int().min(1).max(9).optional(),
+    competitive_activity: z.string().optional(),
+  })
+  .passthrough();
+export type FrontierWatchV4 = z.infer<typeof FrontierWatchV4Schema>;
+
+/**
+ * Innovation Concepts - v4.0 structure with recommended + parallel + frontier_watch
+ */
+export const InnovationConceptsV4Schema = z
+  .object({
+    intro: z.string().optional(),
+    recommended: RecommendedInnovationConceptSchema.optional(),
+    parallel: z.array(ParallelInnovationConceptSchema).default([]),
+    frontier_watch: z.array(FrontierWatchV4Schema).default([]),
+  })
+  .passthrough();
+export type InnovationConceptsV4 = z.infer<typeof InnovationConceptsV4Schema>;
+
+// ============================================
 // AN5-M: Executive Report (Major Restructure)
 // ============================================
 
@@ -1980,7 +2391,8 @@ const ChallengeFrameSchema = z
   .passthrough();
 
 // --- Risks and Watchouts ---
-const RiskWatchoutSchema = z
+// Note: Legacy schema, v4.0 uses enhanced inline schema in AN5_M_OutputSchema
+const _RiskWatchoutSchema = z
   .object({
     category: z.string(),
     risk: z.string(),
@@ -1994,8 +2406,23 @@ const ReportSelfCritiqueSchema = z
   .object({
     what_we_might_be_wrong_about: z.array(z.string()).catch([]),
     unexplored_directions: z.array(z.string()).catch([]),
+    // v4.0: overall_confidence is the new canonical name
+    overall_confidence: ConfidenceLevel.optional(),
+    // Legacy: confidence_level kept for backward compatibility
     confidence_level: ConfidenceLevel.catch('medium'),
     confidence_rationale: z.string(),
+    // v4.0: validation_gaps array
+    validation_gaps: z
+      .array(
+        z
+          .object({
+            concern: z.string(),
+            status: z.enum(['ADDRESSED', 'EXTENDED_NEEDED', 'ACCEPTED_RISK']),
+            rationale: z.string(),
+          })
+          .passthrough(),
+      )
+      .default([]),
   })
   .passthrough();
 
@@ -2026,7 +2453,8 @@ const AppendixSchema = z
   .passthrough();
 
 // --- Metadata ---
-const MetadataSchema = z
+// Note: Legacy schema, v4.0 uses enhanced inline schema in AN5_M_OutputSchema
+const _MetadataSchema = z
   .object({
     generated_at: z.string().optional(),
     model_version: z.string().optional(),
@@ -2042,10 +2470,19 @@ const MetadataSchema = z
 
 export const AN5_M_OutputSchema = z
   .object({
-    // New structured format
+    // === v4.0 Narrative Flow Structure ===
     header: HeaderSchema.optional(),
+
+    // v4.0: brief - one paragraph executive summary
+    brief: z.string().optional(),
+
     executive_summary: z.union([ExecutiveSummarySchema, z.string()]),
+
+    // v4.0: constraints_and_metrics (new canonical name)
+    constraints_and_metrics: ConstraintsAndMetricsSchema.optional(),
+    // Legacy: constraints kept for backward compatibility
     constraints: ConstraintsSchema.optional(),
+
     problem_analysis: ReportProblemAnalysisSchema.optional(),
     what_industry_missed: z
       .union([
@@ -2054,33 +2491,78 @@ export const AN5_M_OutputSchema = z
       ])
       .optional(),
 
-    // Execution Track + Innovation Portfolio Framework
+    // v4.0: innovation_analysis (new canonical name, replaces cross_domain_search)
+    innovation_analysis: InnovationAnalysisSchema.optional(),
+    // Legacy: cross_domain_search kept for backward compatibility
     cross_domain_search: CrossDomainSearchSchema.optional(),
+
+    // v4.0: solution_concepts with new structure (primary + supporting)
+    // Uses union to accept both v4.0 and legacy structures
+    solution_concepts: z
+      .union([SolutionConceptsV4Schema, SolutionConceptsSchema])
+      .optional(),
+
+    // v4.0: innovation_concepts (new canonical name)
+    innovation_concepts: InnovationConceptsV4Schema.optional(),
+
+    // Legacy: execution_track + innovation_portfolio kept for backward compatibility
     execution_track: ExecutionTrackSchema.optional(),
     innovation_portfolio: InnovationPortfolioSchema.optional(),
     strategic_integration: StrategicIntegrationSchema.optional(),
 
-    // Existing fields (maintained for backward compatibility)
-    key_patterns: z.array(KeyPatternSchema).max(20).default([]),
-    solution_concepts: SolutionConceptsSchema.optional(),
-    paradigm_insight: ParadigmInsightSectionSchema.optional(),
-    decision_flowchart: DecisionFlowchartSchema.optional(),
-    personal_recommendation: PersonalRecommendationSchema.optional(),
-    validation_summary: ValidationSummarySchema.optional(),
+    // Challenge the frame (accepts both v4.0 and legacy formats)
     challenge_the_frame: z
       .array(z.union([ChallengeFrameSchema, EnhancedChallengeFrameSchema]))
       .max(10)
       .default([]),
-    strategic_implications: StrategicImplicationsSchema.optional(),
-    risks_and_watchouts: z.array(RiskWatchoutSchema).max(20).default([]),
+
+    // Risks and watchouts with v4.0 enhancement
+    risks_and_watchouts: z
+      .array(
+        z
+          .object({
+            category: z.string(),
+            risk: z.string(),
+            severity: SeverityLevel.catch('medium'),
+            mitigation: z.string().optional(),
+            requires_resolution_before_proceeding: z.boolean().optional(),
+          })
+          .passthrough(),
+      )
+      .max(20)
+      .default([]),
+
+    // v4.0: what_id_actually_do - personal recommendation prose
+    what_id_actually_do: z.string().optional(),
+
     self_critique: ReportSelfCritiqueSchema,
+
+    // v4.0: follow_up_prompts - suggested next questions
+    follow_up_prompts: z.array(z.string()).default([]),
+
+    metadata: z
+      .object({
+        generated_at: z.string(),
+        model_version: z.string(),
+        chain_version: z.string(),
+        framework: z.string().optional(),
+        total_concepts_generated: z.number().optional(),
+        tracks_covered: z.array(TrackSchema).catch([]),
+      })
+      .passthrough()
+      .optional(),
+
+    // === Legacy fields for backward compatibility ===
+    key_patterns: z.array(KeyPatternSchema).max(20).default([]),
+    paradigm_insight: ParadigmInsightSectionSchema.optional(),
+    decision_flowchart: DecisionFlowchartSchema.optional(),
+    personal_recommendation: PersonalRecommendationSchema.optional(),
+    validation_summary: ValidationSummarySchema.optional(),
+    strategic_implications: StrategicImplicationsSchema.optional(),
     next_steps: z
       .union([NextStepsGranularSchema, z.array(z.string()).max(20)])
       .optional(),
     appendix: AppendixSchema.optional(),
-    metadata: MetadataSchema.optional(),
-
-    // Legacy fields for backward compatibility (required for hybrid-report-display.tsx)
     report_title: z.string().max(100).optional(),
     decision_architecture: LegacyDecisionArchitectureSchema.optional(),
     other_concepts: z.array(OtherConceptSchema).max(30).default([]),

@@ -153,6 +153,47 @@ export {
   type CrossDomainSearch,
   EnhancedChallengeFrameSchema,
   type EnhancedChallengeFrame,
+  // v4.0 Narrative Flow - New enums
+  SolutionSourceType,
+  InnovationConceptType,
+  FrontierInnovationType,
+  SupportingRelationship,
+  EconomicsBasis,
+  FreedomToOperate,
+  EffectDirection,
+  EffectMagnitude,
+  // v4.0 Narrative Flow - Reusable sub-schemas
+  TheInsightSchema,
+  type TheInsight,
+  EconomicValueSchema,
+  type EconomicValue,
+  CoupledEffectSchema,
+  type CoupledEffect,
+  IpConsiderationsSchema,
+  type IpConsiderations,
+  // v4.0 Narrative Flow - New top-level schemas
+  InnovationAnalysisSchema,
+  type InnovationAnalysis,
+  ConstraintsAndMetricsSchema,
+  type ConstraintsAndMetrics,
+  ChallengeFrameV4Schema,
+  type ChallengeFrameV4,
+  // v4.0 Narrative Flow - Solution Concepts
+  PrimarySolutionConceptSchema,
+  type PrimarySolutionConcept,
+  SupportingSolutionConceptSchema,
+  type SupportingSolutionConcept,
+  SolutionConceptsV4Schema,
+  type SolutionConceptsV4,
+  // v4.0 Narrative Flow - Innovation Concepts
+  RecommendedInnovationConceptSchema,
+  type RecommendedInnovationConcept,
+  ParallelInnovationConceptSchema,
+  type ParallelInnovationConcept,
+  FrontierWatchV4Schema,
+  type FrontierWatchV4,
+  InnovationConceptsV4Schema,
+  type InnovationConceptsV4,
 } from './schemas';
 
 // Re-export all prompts

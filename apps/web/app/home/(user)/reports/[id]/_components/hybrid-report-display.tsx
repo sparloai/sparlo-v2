@@ -289,7 +289,13 @@ interface EconomicsValue {
 }
 
 interface SustainabilityFlag {
-  type?: 'NONE' | 'CAUTION' | 'BENEFIT' | 'LIFECYCLE_TRADEOFF' | 'IRONY' | 'SUPPLY_CHAIN';
+  type?:
+    | 'NONE'
+    | 'CAUTION'
+    | 'BENEFIT'
+    | 'LIFECYCLE_TRADEOFF'
+    | 'IRONY'
+    | 'SUPPLY_CHAIN';
   summary?: string | null;
   detail?: string | null;
   alternative?: string | null;
@@ -1802,11 +1808,7 @@ function InnovationPortfolioSection({
 // Problem Analysis Section
 // ============================================
 
-function ProblemAnalysisSection({
-  analysis,
-}: {
-  analysis?: ProblemAnalysis;
-}) {
+function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
   if (!analysis) return null;
 
   return (
@@ -1830,7 +1832,10 @@ function ProblemAnalysisSection({
                 ]}
               >
                 {analysis.current_state_of_art.benchmarks.map((b, idx) => (
-                  <tr key={idx} className="border-b border-zinc-100 last:border-0">
+                  <tr
+                    key={idx}
+                    className="border-b border-zinc-100 last:border-0"
+                  >
                     <td className="px-4 py-3 text-sm font-medium text-zinc-900">
                       {b.entity}
                     </td>
@@ -1850,7 +1855,7 @@ function ProblemAnalysisSection({
                 ))}
               </AuraTable>
               {analysis.current_state_of_art.no_competitors_note && (
-                <p className="mt-4 text-sm italic text-zinc-500">
+                <p className="mt-4 text-sm text-zinc-500 italic">
                   {analysis.current_state_of_art.no_competitors_note}
                 </p>
               )}
@@ -1913,7 +1918,9 @@ function ProblemAnalysisSection({
                           {idx + 1}
                         </span>
                         <div>
-                          <p className="font-medium text-zinc-900">{f.factor}</p>
+                          <p className="font-medium text-zinc-900">
+                            {f.factor}
+                          </p>
                           {f.explanation && (
                             <p className="mt-1 text-sm text-zinc-600">
                               {f.explanation}
@@ -1931,7 +1938,7 @@ function ProblemAnalysisSection({
         {/* First Principles Insight */}
         {analysis.first_principles_insight && (
           <DarkSection label="First Principles Insight">
-            <p className="text-xl font-medium leading-relaxed text-white">
+            <p className="text-xl leading-relaxed font-medium text-white">
               {analysis.first_principles_insight.headline}
             </p>
             {analysis.first_principles_insight.explanation && (
@@ -1965,32 +1972,34 @@ function ConstraintsSection({
       />
       <div className="space-y-6">
         {/* Hard Constraints */}
-        {constraints.hard_constraints && constraints.hard_constraints.length > 0 && (
-          <CardWithHeader icon={Shield} label="Hard Constraints">
-            <ul className="space-y-2">
-              {constraints.hard_constraints.map((c, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-sm">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
-                  <span className="text-zinc-700">{c}</span>
-                </li>
-              ))}
-            </ul>
-          </CardWithHeader>
-        )}
+        {constraints.hard_constraints &&
+          constraints.hard_constraints.length > 0 && (
+            <CardWithHeader icon={Shield} label="Hard Constraints">
+              <ul className="space-y-2">
+                {constraints.hard_constraints.map((c, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm">
+                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
+                    <span className="text-zinc-700">{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardWithHeader>
+          )}
 
         {/* Soft Constraints */}
-        {constraints.soft_constraints && constraints.soft_constraints.length > 0 && (
-          <CardWithHeader icon={ListChecks} label="Soft Constraints">
-            <ul className="space-y-2">
-              {constraints.soft_constraints.map((c, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-sm">
-                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500" />
-                  <span className="text-zinc-700">{c}</span>
-                </li>
-              ))}
-            </ul>
-          </CardWithHeader>
-        )}
+        {constraints.soft_constraints &&
+          constraints.soft_constraints.length > 0 && (
+            <CardWithHeader icon={ListChecks} label="Soft Constraints">
+              <ul className="space-y-2">
+                {constraints.soft_constraints.map((c, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm">
+                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500" />
+                    <span className="text-zinc-700">{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardWithHeader>
+          )}
 
         {/* Assumptions */}
         {constraints.assumptions && constraints.assumptions.length > 0 && (
@@ -2007,31 +2016,43 @@ function ConstraintsSection({
         )}
 
         {/* Success Metrics Table */}
-        {constraints.success_metrics && constraints.success_metrics.length > 0 && (
-          <CardWithHeader icon={Target} label="Success Metrics">
-            <AuraTable
-              headers={['Metric', 'Target', 'Minimum Viable', 'Stretch', 'Unit']}
-            >
-              {constraints.success_metrics.map((m, idx) => (
-                <tr key={idx} className="border-b border-zinc-100 last:border-0">
-                  <td className="px-4 py-3 text-sm font-medium text-zinc-900">
-                    {m.metric}
-                  </td>
-                  <td className="px-4 py-3 text-sm font-semibold text-green-700">
-                    {m.target}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-zinc-700">
-                    {m.minimum_viable}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-zinc-700">
-                    {m.stretch}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-zinc-500">{m.unit}</td>
-                </tr>
-              ))}
-            </AuraTable>
-          </CardWithHeader>
-        )}
+        {constraints.success_metrics &&
+          constraints.success_metrics.length > 0 && (
+            <CardWithHeader icon={Target} label="Success Metrics">
+              <AuraTable
+                headers={[
+                  'Metric',
+                  'Target',
+                  'Minimum Viable',
+                  'Stretch',
+                  'Unit',
+                ]}
+              >
+                {constraints.success_metrics.map((m, idx) => (
+                  <tr
+                    key={idx}
+                    className="border-b border-zinc-100 last:border-0"
+                  >
+                    <td className="px-4 py-3 text-sm font-medium text-zinc-900">
+                      {m.metric}
+                    </td>
+                    <td className="px-4 py-3 text-sm font-semibold text-green-700">
+                      {m.target}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-700">
+                      {m.minimum_viable}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-700">
+                      {m.stretch}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-zinc-500">
+                      {m.unit}
+                    </td>
+                  </tr>
+                ))}
+              </AuraTable>
+            </CardWithHeader>
+          )}
       </div>
     </section>
   );
@@ -2096,10 +2117,7 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
 
   return (
     <section id="risks">
-      <SectionHeader
-        title="Risks & Watchouts"
-        subtitle="What could go wrong"
-      />
+      <SectionHeader title="Risks & Watchouts" subtitle="What could go wrong" />
       <div className="space-y-3">
         {risks.map((r, idx) => (
           <div
@@ -2121,7 +2139,7 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
                   <Badge
                     className={cn(
                       'text-xs capitalize',
-                      severityColors[r.severity]
+                      severityColors[r.severity],
                     )}
                   >
                     {r.severity}
@@ -2870,12 +2888,17 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
             subtitle="Honest assessment of this analysis"
           />
           <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-6 dark:border-amber-800/50 dark:bg-amber-900/20">
-            {/* Confidence */}
+            {/* Confidence - v4.0 uses overall_confidence, fallback to confidence_level */}
             <div className="mb-4 flex items-center gap-2">
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
                 Overall Confidence:
               </span>
-              <ConfidenceBadge level={self_critique.confidence_level} />
+              <ConfidenceBadge
+                level={
+                  self_critique.overall_confidence ??
+                  self_critique.confidence_level
+                }
+              />
             </div>
 
             {self_critique.confidence_rationale && (
