@@ -233,24 +233,72 @@ export function ReportDisplay({
       return items;
     }
 
-    // For hybrid reports, generate TOC from decision architecture sections
+    // For hybrid reports, generate TOC from all available sections
     if (isHybrid) {
       const hybridData = report.report_data as {
         report?: {
+          brief?: unknown;
           executive_summary?: unknown;
+          honest_assessment?: unknown;
+          problem_analysis?: unknown;
+          constraints_and_metrics?: unknown;
+          challenge_the_frame?: unknown[];
+          innovation_analysis?: unknown;
           problem_restatement?: unknown;
+          cross_domain_search?: unknown;
+          execution_track?: unknown;
+          innovation_portfolio?: unknown;
+          solution_concepts?: unknown;
+          innovation_concepts?: unknown;
+          strategic_integration?: unknown;
           decision_architecture?: unknown;
           key_insights?: unknown[];
           next_steps?: unknown[];
           other_concepts?: unknown[];
           self_critique?: unknown;
+          risks_and_watchouts?: unknown[];
+          what_id_actually_do?: unknown;
+          follow_up_prompts?: unknown[];
         };
       };
       const r = hybridData?.report;
+
+      // Order matches the actual render order in HybridReportDisplay
+      if (r?.brief) items.push({ id: 'brief', title: 'The Brief', level: 2 });
       if (r?.executive_summary)
         items.push({
           id: 'executive-summary',
           title: 'Executive Summary',
+          level: 2,
+        });
+      if (r?.honest_assessment)
+        items.push({
+          id: 'honest-assessment',
+          title: 'Honest Assessment',
+          level: 2,
+        });
+      if (r?.problem_analysis)
+        items.push({
+          id: 'problem-analysis',
+          title: 'Problem Analysis',
+          level: 2,
+        });
+      if (r?.constraints_and_metrics)
+        items.push({ id: 'constraints', title: 'Constraints', level: 2 });
+      if (
+        r?.challenge_the_frame &&
+        Array.isArray(r.challenge_the_frame) &&
+        r.challenge_the_frame.length > 0
+      )
+        items.push({
+          id: 'challenge-the-frame',
+          title: 'Challenge the Frame',
+          level: 2,
+        });
+      if (r?.innovation_analysis)
+        items.push({
+          id: 'innovation-analysis',
+          title: 'Innovation Analysis',
           level: 2,
         });
       if (r?.problem_restatement)
@@ -259,25 +307,63 @@ export function ReportDisplay({
           title: 'Problem Restatement',
           level: 2,
         });
+      if (r?.cross_domain_search)
+        items.push({
+          id: 'cross-domain-search',
+          title: 'Cross-Domain Search',
+          level: 2,
+        });
+      // Check for execution_track or solution_concepts (both map to same section)
+      if (r?.execution_track || r?.solution_concepts)
+        items.push({
+          id: 'solution-concepts',
+          title: 'Solution Concepts',
+          level: 2,
+        });
+      // Check for innovation_portfolio or innovation_concepts (both map to same section)
+      if (r?.innovation_portfolio || r?.innovation_concepts)
+        items.push({
+          id: 'innovation-concepts',
+          title: 'Innovation Concepts',
+          level: 2,
+        });
+      if (r?.strategic_integration)
+        items.push({
+          id: 'strategic-integration',
+          title: 'Strategic Integration',
+          level: 2,
+        });
       if (r?.decision_architecture)
         items.push({
           id: 'decision-architecture',
           title: 'Decision Architecture',
           level: 2,
         });
-      if (r?.key_insights && r.key_insights.length > 0)
+      if (
+        r?.key_insights &&
+        Array.isArray(r.key_insights) &&
+        r.key_insights.length > 0
+      )
         items.push({
           id: 'key-insights',
           title: 'Key Insights',
           level: 2,
         });
-      if (r?.next_steps && r.next_steps.length > 0)
+      if (
+        r?.next_steps &&
+        Array.isArray(r.next_steps) &&
+        r.next_steps.length > 0
+      )
         items.push({
           id: 'next-steps',
           title: 'Next Steps',
           level: 2,
         });
-      if (r?.other_concepts && r.other_concepts.length > 0)
+      if (
+        r?.other_concepts &&
+        Array.isArray(r.other_concepts) &&
+        r.other_concepts.length > 0
+      )
         items.push({
           id: 'other-concepts',
           title: 'Other Concepts',
@@ -287,6 +373,32 @@ export function ReportDisplay({
         items.push({
           id: 'self-critique',
           title: 'Self-Critique',
+          level: 2,
+        });
+      if (
+        r?.risks_and_watchouts &&
+        Array.isArray(r.risks_and_watchouts) &&
+        r.risks_and_watchouts.length > 0
+      )
+        items.push({
+          id: 'risks',
+          title: 'Risks & Watchouts',
+          level: 2,
+        });
+      if (r?.what_id_actually_do)
+        items.push({
+          id: 'what-id-actually-do',
+          title: "What I'd Actually Do",
+          level: 2,
+        });
+      if (
+        r?.follow_up_prompts &&
+        Array.isArray(r.follow_up_prompts) &&
+        r.follow_up_prompts.length > 0
+      )
+        items.push({
+          id: 'follow-up-prompts',
+          title: 'Suggested Follow-ups',
           level: 2,
         });
       return items;

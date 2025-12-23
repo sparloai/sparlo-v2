@@ -3059,6 +3059,9 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
 
       {/* What I'd Actually Do */}
       <WhatIdActuallyDoSection content={report.what_id_actually_do} />
+
+      {/* Follow-up Prompts */}
+      <FollowUpPromptsSection prompts={report.follow_up_prompts} />
     </div>
   );
 }
