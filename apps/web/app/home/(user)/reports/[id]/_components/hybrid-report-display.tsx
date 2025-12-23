@@ -45,11 +45,14 @@ import type {
   ChallengeTheFrame,
   ConceptRecommendation,
   ConstraintsAndMetrics,
+  CoupledEffect,
   CrossDomainSearch,
   ExecutionTrack,
+  ExecutionTrackPrimary,
   FrontierWatch,
   HonestAssessment,
   HybridReportDisplayProps,
+  IPConsiderations,
   InnovationAnalysis,
   InnovationPortfolio,
   InsightBlock,
@@ -61,6 +64,7 @@ import type {
   StrategicIntegration,
   StructuredExecutiveSummary,
   SupportingConcept,
+  SustainabilityFlag,
 } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 /**
@@ -833,10 +837,10 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
   if (!track) return null;
 
   return (
-    <section id="execution-track">
+    <section id="solution-concepts">
       <SectionHeader
-        title="Execution Track"
-        subtitle="Your primary recommendation - the safe bet"
+        title="Solution Concepts"
+        subtitle="Proven approaches using validated technologies"
       />
       <div className="space-y-6">
         {track.intro && (
@@ -1200,9 +1204,9 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
   if (!portfolio) return null;
 
   return (
-    <section id="innovation-portfolio">
+    <section id="innovation-concepts">
       <SectionHeader
-        title="Innovation Portfolio"
+        title="Innovation Concepts"
         subtitle="Higher-risk bets with breakthrough potential"
       />
       <div className="space-y-6">
@@ -1270,19 +1274,26 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
               </div>
             )}
 
-            {portfolio.recommended_innovation.selection_rationale?.why_this_one && (
+            {portfolio.recommended_innovation.selection_rationale
+              ?.why_this_one && (
               <div className="mb-4 rounded-lg bg-white/60 p-4 dark:bg-zinc-800/60">
                 <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                   Why This One
                 </span>
                 <p className="text-sm text-zinc-700 dark:text-zinc-200">
-                  {portfolio.recommended_innovation.selection_rationale.why_this_one}
+                  {
+                    portfolio.recommended_innovation.selection_rationale
+                      .why_this_one
+                  }
                 </p>
                 {portfolio.recommended_innovation.selection_rationale
                   .ceiling_if_works && (
                   <p className="mt-2 text-sm font-medium text-violet-700 dark:text-violet-400">
                     Ceiling:{' '}
-                    {portfolio.recommended_innovation.selection_rationale.ceiling_if_works}
+                    {
+                      portfolio.recommended_innovation.selection_rationale
+                        .ceiling_if_works
+                    }
                   </p>
                 )}
               </div>
@@ -1292,7 +1303,8 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
               insight={portfolio.recommended_innovation.the_insight}
             />
 
-            {portfolio.recommended_innovation.breakthrough_potential?.if_it_works && (
+            {portfolio.recommended_innovation.breakthrough_potential
+              ?.if_it_works && (
               <div className="mt-4 rounded-lg border border-green-200 bg-green-50/50 p-4 dark:border-green-800 dark:bg-green-900/20">
                 <div className="mb-2 flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -1301,7 +1313,10 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                   </span>
                 </div>
                 <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                  {portfolio.recommended_innovation.breakthrough_potential.if_it_works}
+                  {
+                    portfolio.recommended_innovation.breakthrough_potential
+                      .if_it_works
+                  }
                 </p>
                 {portfolio.recommended_innovation.breakthrough_potential
                   .estimated_improvement && (
@@ -1334,31 +1349,43 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                   </p>
                 )}
                 <div className="grid gap-2 text-sm sm:grid-cols-3">
-                  {portfolio.recommended_innovation.validation_path.first_test && (
+                  {portfolio.recommended_innovation.validation_path
+                    .first_test && (
                     <div>
                       <span className="text-xs text-zinc-500">First Test:</span>
                       <p className="text-zinc-700 dark:text-zinc-200">
-                        {portfolio.recommended_innovation.validation_path.first_test}
+                        {
+                          portfolio.recommended_innovation.validation_path
+                            .first_test
+                        }
                       </p>
                     </div>
                   )}
                   {(portfolio.recommended_innovation.validation_path.cost ||
-                    portfolio.recommended_innovation.validation_path.timeline) && (
+                    portfolio.recommended_innovation.validation_path
+                      .timeline) && (
                     <div>
                       <span className="text-xs text-zinc-500">
                         Cost/Timeline:
                       </span>
                       <p className="text-zinc-700 dark:text-zinc-200">
-                        {portfolio.recommended_innovation.validation_path.cost ?? '—'} /{' '}
-                        {portfolio.recommended_innovation.validation_path.timeline ?? '—'}
+                        {portfolio.recommended_innovation.validation_path
+                          .cost ?? '—'}{' '}
+                        /{' '}
+                        {portfolio.recommended_innovation.validation_path
+                          .timeline ?? '—'}
                       </p>
                     </div>
                   )}
-                  {portfolio.recommended_innovation.validation_path.go_no_go && (
+                  {portfolio.recommended_innovation.validation_path
+                    .go_no_go && (
                     <div>
                       <span className="text-xs text-zinc-500">Go/No-Go:</span>
                       <p className="text-zinc-700 dark:text-zinc-200">
-                        {portfolio.recommended_innovation.validation_path.go_no_go}
+                        {
+                          portfolio.recommended_innovation.validation_path
+                            .go_no_go
+                        }
                       </p>
                     </div>
                   )}
@@ -1627,7 +1654,10 @@ const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
               <div className="space-y-4">
                 {analysis.root_cause_hypotheses.map((hypothesis, idx) => (
                   <div
-                    key={hypothesis.id ?? `hypothesis-${idx}-${hypothesis.name ?? hypothesis.hypothesis ?? ''}`}
+                    key={
+                      hypothesis.id ??
+                      `hypothesis-${idx}-${hypothesis.name ?? hypothesis.hypothesis ?? ''}`
+                    }
                     className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"
                   >
                     <div className="mb-2 flex items-center justify-between">
@@ -2279,17 +2309,120 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
   // and new (execution_track/innovation_portfolio) naming conventions
   const rawReport = report as Record<string, unknown>;
 
-  // Map solution_concepts → execution_track if execution_track doesn't exist
-  const executionTrack =
+  // Map solution_concepts → execution_track with proper field name normalization
+  const rawSolutionConcepts = rawReport.solution_concepts as
+    | {
+        intro?: string;
+        primary?: {
+          id?: string;
+          title?: string;
+          confidence_percent?: number;
+          source_type?: string;
+          what_it_is?: string;
+          why_it_works?: string;
+          economics?: {
+            expected_outcome?: {
+              value?: string;
+              basis?: string;
+              rationale?: string;
+            };
+            investment?: { value?: string; basis?: string; rationale?: string };
+            timeline?: { value?: string; basis?: string; rationale?: string };
+            roi_rationale?: string;
+          };
+          the_insight?: InsightBlock;
+          first_validation_step?: {
+            test?: string;
+            cost?: string;
+            timeline?: string;
+            go_criteria?: string;
+            no_go_criteria?: string;
+            replicates?: number;
+          };
+          key_risks?: Array<{ risk?: string; mitigation?: string }>;
+          coupled_effects?: CoupledEffect[];
+          sustainability_flag?: SustainabilityFlag;
+          ip_considerations?: IPConsiderations;
+        };
+        supporting?: Array<{
+          id?: string;
+          title?: string;
+          relationship?: string;
+          what_it_is?: string;
+          why_it_works?: string;
+          when_to_use_instead?: string;
+          confidence_percent?: number;
+          key_risk?: string;
+          economics?: {
+            expected_outcome?: string;
+            investment?: string;
+            timeline?: string;
+          };
+          the_insight?: InsightBlock;
+          sustainability_flag?: SustainabilityFlag;
+        }>;
+      }
+    | undefined;
+
+  const executionTrack: ExecutionTrack | undefined =
     report.execution_track ??
-    (rawReport.solution_concepts as ExecutionTrack | undefined);
+    (rawSolutionConcepts
+      ? {
+          intro: rawSolutionConcepts.intro,
+          primary: rawSolutionConcepts.primary
+            ? {
+                id: rawSolutionConcepts.primary.id,
+                title: rawSolutionConcepts.primary.title,
+                confidence: rawSolutionConcepts.primary.confidence_percent,
+                source_type: rawSolutionConcepts.primary
+                  .source_type as ExecutionTrackPrimary['source_type'],
+                what_it_is: rawSolutionConcepts.primary.what_it_is,
+                why_it_works: rawSolutionConcepts.primary.why_it_works,
+                expected_improvement:
+                  rawSolutionConcepts.primary.economics?.expected_outcome
+                    ?.value,
+                investment:
+                  rawSolutionConcepts.primary.economics?.investment?.value,
+                timeline:
+                  rawSolutionConcepts.primary.economics?.timeline?.value,
+                the_insight: rawSolutionConcepts.primary.the_insight,
+                validation_gates: rawSolutionConcepts.primary
+                  .first_validation_step
+                  ? [
+                      {
+                        test: rawSolutionConcepts.primary.first_validation_step
+                          .test,
+                        cost: rawSolutionConcepts.primary.first_validation_step
+                          .cost,
+                        success_criteria:
+                          rawSolutionConcepts.primary.first_validation_step
+                            .go_criteria,
+                      },
+                    ]
+                  : undefined,
+              }
+            : undefined,
+          supporting_concepts: rawSolutionConcepts.supporting?.map((s) => ({
+            id: s.id,
+            title: s.title,
+            relationship: s.relationship as SupportingConcept['relationship'],
+            one_liner: s.key_risk,
+            what_it_is: s.what_it_is,
+            why_it_works: s.why_it_works,
+            when_to_use_instead: s.when_to_use_instead,
+            confidence: s.confidence_percent,
+          })),
+        }
+      : undefined);
 
   // Map innovation_concepts → innovation_portfolio with field name normalization
   const rawInnovationConcepts = rawReport.innovation_concepts as
     | {
         intro?: string;
-        recommended?: RecommendedInnovation;
-        parallel?: ParallelInvestigation[];
+        recommended?: RecommendedInnovation & { confidence_percent?: number };
+        parallel?: Array<
+          ParallelInvestigation & { confidence_percent?: number }
+        >;
         frontier_watch?: FrontierWatch[];
       }
     | undefined;
@@ -2299,8 +2432,18 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
     (rawInnovationConcepts
       ? {
           intro: rawInnovationConcepts.intro,
-          recommended_innovation: rawInnovationConcepts.recommended,
-          parallel_investigations: rawInnovationConcepts.parallel,
+          recommended_innovation: rawInnovationConcepts.recommended
+            ? {
+                ...rawInnovationConcepts.recommended,
+                confidence:
+                  rawInnovationConcepts.recommended.confidence_percent ??
+                  rawInnovationConcepts.recommended.confidence,
+              }
+            : undefined,
+          parallel_investigations: rawInnovationConcepts.parallel?.map((p) => ({
+            ...p,
+            confidence: p.confidence_percent ?? p.confidence,
+          })),
           frontier_watch: rawInnovationConcepts.frontier_watch,
         }
       : undefined);
