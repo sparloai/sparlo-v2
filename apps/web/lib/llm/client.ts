@@ -272,8 +272,7 @@ function repairTruncatedJson(jsonStr: string): string {
   let brackets = 0;
   let inString = false;
   let escapeNext = false;
-  let lastValidIndex = 0;
-  let lastStructuralIndex = 0; // Last }, ], or complete string
+  let lastCompleteKeyValueEnd = 0; // Position after complete key-value pair (after value, at comma or before closing brace)
 
   for (let i = 0; i < jsonStr.length; i++) {
     const char = jsonStr[i];
@@ -288,43 +287,35 @@ function repairTruncatedJson(jsonStr: string): string {
     }
     if (char === '"') {
       inString = !inString;
-      if (!inString) {
-        // Just closed a string
-        lastStructuralIndex = i;
-      }
       continue;
     }
     if (inString) continue;
 
     if (char === '{') {
       braces++;
-      lastValidIndex = i;
     } else if (char === '}') {
       braces--;
-      lastStructuralIndex = i;
-      lastValidIndex = i;
+      // A closing brace means previous key-value pairs are complete
+      lastCompleteKeyValueEnd = i;
     } else if (char === '[') {
       brackets++;
-      lastValidIndex = i;
     } else if (char === ']') {
       brackets--;
-      lastStructuralIndex = i;
-      lastValidIndex = i;
-    } else if (char === ',' || char === ':') {
-      lastValidIndex = i;
+      lastCompleteKeyValueEnd = i;
+    } else if (char === ',') {
+      // Comma means the previous key-value pair is complete
+      lastCompleteKeyValueEnd = i;
     }
   }
 
   let repaired = jsonStr;
 
-  // If we're in a string, we need to handle it carefully
+  // If we're in a string, we're mid-value - truncate to last complete key-value
   if (inString) {
-    // Strategy 1: Try to close the string and continue
-    // First, check if we're in a value or key position
-    // Truncate to last structural point and close from there
-    if (lastStructuralIndex > 0 && lastStructuralIndex < jsonStr.length - 1) {
-      // Truncate to last complete structure plus a bit
-      repaired = jsonStr.substring(0, lastStructuralIndex + 1);
+    if (lastCompleteKeyValueEnd > 0) {
+      // Truncate to just after the last complete key-value pair
+      // If it ends with comma, include it (will be removed later if trailing)
+      repaired = jsonStr.substring(0, lastCompleteKeyValueEnd + 1);
       // Recount after truncation
       braces = 0;
       brackets = 0;
@@ -335,13 +326,17 @@ function repairTruncatedJson(jsonStr: string): string {
         else if (char === ']') brackets--;
       }
     } else {
-      // Just close the string
+      // No complete key-value found, just close the string
       repaired = repaired + '"';
     }
   }
 
   // Remove trailing comma if present (invalid JSON)
   repaired = repaired.replace(/,\s*$/, '');
+
+  // Also remove incomplete key-value patterns like ,"key": or ,"key"
+  repaired = repaired.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+  repaired = repaired.replace(/,\s*"[^"]*"\s*$/, '');
 
   // Close any unclosed brackets/braces in correct order
   // We need to track what was opened to close in reverse order
