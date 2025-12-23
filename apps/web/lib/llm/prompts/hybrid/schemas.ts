@@ -122,8 +122,27 @@ export type InnovationConceptType = z.infer<typeof InnovationConceptType>;
 /**
  * Frontier innovation type - for frontier_watch items
  * Maps to innovation_concepts.frontier_watch[].innovation_type in AN5_M_PROMPT
+ * Antifragile: maps LLM variations to canonical values
  */
-export const FrontierInnovationType = z.enum(['PARADIGM', 'EMERGING_SCIENCE']);
+const FRONTIER_INNOVATION_CANONICAL = ['PARADIGM', 'EMERGING_SCIENCE'] as const;
+const FRONTIER_INNOVATION_MAPPINGS: Record<
+  string,
+  (typeof FRONTIER_INNOVATION_CANONICAL)[number]
+> = {
+  PARADIGM: 'PARADIGM',
+  EMERGING_SCIENCE: 'EMERGING_SCIENCE',
+  // LLM variations
+  CROSS_DOMAIN: 'EMERGING_SCIENCE', // Map cross-domain to emerging science
+  TECHNOLOGY_REVIVAL: 'PARADIGM', // Revival concepts are paradigm-level
+  FIRST_PRINCIPLES: 'PARADIGM', // First principles are paradigm shifts
+};
+export const FrontierInnovationType = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return FRONTIER_INNOVATION_MAPPINGS[normalized] ?? 'EMERGING_SCIENCE';
+  })
+  .pipe(z.enum(FRONTIER_INNOVATION_CANONICAL));
 export type FrontierInnovationType = z.infer<typeof FrontierInnovationType>;
 
 /**
@@ -157,8 +176,31 @@ export type EffectDirection = z.infer<typeof EffectDirection>;
 /**
  * Effect magnitude for coupled effects
  * Maps to coupled_effects[].magnitude in AN5_M_PROMPT
+ * Antifragile: maps LLM variations to canonical values
  */
-export const EffectMagnitude = z.enum(['MINOR', 'MODERATE', 'MAJOR']);
+const EFFECT_MAGNITUDE_CANONICAL = ['MINOR', 'MODERATE', 'MAJOR'] as const;
+const EFFECT_MAGNITUDE_MAPPINGS: Record<
+  string,
+  (typeof EFFECT_MAGNITUDE_CANONICAL)[number]
+> = {
+  MINOR: 'MINOR',
+  MODERATE: 'MODERATE',
+  MAJOR: 'MAJOR',
+  // LLM variations
+  LOW: 'MINOR',
+  MEDIUM: 'MODERATE',
+  HIGH: 'MAJOR',
+  SIGNIFICANT: 'MAJOR',
+  SMALL: 'MINOR',
+  LARGE: 'MAJOR',
+};
+export const EffectMagnitude = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return EFFECT_MAGNITUDE_MAPPINGS[normalized] ?? 'MODERATE';
+  })
+  .pipe(z.enum(EFFECT_MAGNITUDE_CANONICAL));
 export type EffectMagnitude = z.infer<typeof EffectMagnitude>;
 
 // ============================================
@@ -210,8 +252,8 @@ export const CoupledEffectSchema = z
     effect: z.string(),
     direction: EffectDirection,
     magnitude: EffectMagnitude,
-    quantified: z.string().optional(),
-    mitigation: z.string().optional(),
+    quantified: z.string().nullable().optional(),
+    mitigation: z.string().nullable().optional(),
   })
   .passthrough();
 export type CoupledEffect = z.infer<typeof CoupledEffectSchema>;
