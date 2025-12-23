@@ -69,27 +69,20 @@ export const SeverityLevel = z
   .transform((val) => val.toLowerCase() as 'low' | 'medium' | 'high')
   .pipe(z.enum(['low', 'medium', 'high']));
 
-export const TrackSchema = z.enum([
-  'simpler_path',
-  'best_fit',
-  'paradigm_shift',
-  'frontier_transfer',
-]);
+export const TrackSchema = z
+  .enum(['simpler_path', 'best_fit', 'paradigm_shift', 'frontier_transfer'])
+  .catch('best_fit');
 
 export const ConfidenceLevel = SeverityLevel;
 
 /**
  * Sustainability Flag Types for v4.0 Narrative Flow
  * Flags material sustainability implications for concepts
+ * Antifragile with fallback to NONE
  */
-export const SustainabilityFlagType = z.enum([
-  'NONE',
-  'CAUTION',
-  'BENEFIT',
-  'LIFECYCLE_TRADEOFF',
-  'IRONY',
-  'SUPPLY_CHAIN',
-]);
+export const SustainabilityFlagType = z
+  .enum(['NONE', 'CAUTION', 'BENEFIT', 'LIFECYCLE_TRADEOFF', 'IRONY', 'SUPPLY_CHAIN'])
+  .catch('NONE');
 
 // ============================================
 // v4.0 Narrative Flow Enums (AN5_M_PROMPT canonical)
@@ -98,25 +91,68 @@ export const SustainabilityFlagType = z.enum([
 /**
  * Source type for solution concepts - where the solution came from
  * Maps to solution_concepts.primary.source_type in AN5_M_PROMPT
+ * Antifragile: maps LLM variations to canonical values with fallback
  */
-export const SolutionSourceType = z.enum([
-  'CATALOG',
-  'EMERGING',
-  'CROSS_DOMAIN',
-  'PARADIGM',
-]);
+const SOLUTION_SOURCE_CANONICAL = ['CATALOG', 'EMERGING', 'CROSS_DOMAIN', 'PARADIGM'] as const;
+const SOLUTION_SOURCE_MAPPINGS: Record<string, (typeof SOLUTION_SOURCE_CANONICAL)[number]> = {
+  CATALOG: 'CATALOG',
+  EMERGING: 'EMERGING',
+  CROSS_DOMAIN: 'CROSS_DOMAIN',
+  PARADIGM: 'PARADIGM',
+  // LLM variations
+  CATALOG_SOLUTION: 'CATALOG',
+  SUPPLIER: 'CATALOG',
+  VENDOR: 'CATALOG',
+  OFF_THE_SHELF: 'CATALOG',
+  EMERGING_PRACTICE: 'EMERGING',
+  NEW: 'EMERGING',
+  TRANSFER: 'CROSS_DOMAIN',
+  CROSS_DOMAIN_TRANSFER: 'CROSS_DOMAIN',
+  DOMAIN_TRANSFER: 'CROSS_DOMAIN',
+  PARADIGM_SHIFT: 'PARADIGM',
+  PARADIGM_INSIGHT: 'PARADIGM',
+  FIRST_PRINCIPLES: 'PARADIGM',
+};
+export const SolutionSourceType = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return SOLUTION_SOURCE_MAPPINGS[normalized] ?? 'EMERGING';
+  })
+  .pipe(z.enum(SOLUTION_SOURCE_CANONICAL));
 export type SolutionSourceType = z.infer<typeof SolutionSourceType>;
 
 /**
  * Innovation concept type - the nature of the innovation
  * Maps to innovation_concepts.recommended.innovation_type in AN5_M_PROMPT
+ * Antifragile: maps LLM variations to canonical values with fallback
  */
-export const InnovationConceptType = z.enum([
-  'CROSS_DOMAIN',
-  'PARADIGM',
-  'TECHNOLOGY_REVIVAL',
-  'FIRST_PRINCIPLES',
-]);
+const INNOVATION_CONCEPT_CANONICAL = ['CROSS_DOMAIN', 'PARADIGM', 'TECHNOLOGY_REVIVAL', 'FIRST_PRINCIPLES'] as const;
+const INNOVATION_CONCEPT_MAPPINGS: Record<string, (typeof INNOVATION_CONCEPT_CANONICAL)[number]> = {
+  CROSS_DOMAIN: 'CROSS_DOMAIN',
+  PARADIGM: 'PARADIGM',
+  TECHNOLOGY_REVIVAL: 'TECHNOLOGY_REVIVAL',
+  FIRST_PRINCIPLES: 'FIRST_PRINCIPLES',
+  // LLM variations
+  TRANSFER: 'CROSS_DOMAIN',
+  CROSS_DOMAIN_TRANSFER: 'CROSS_DOMAIN',
+  DOMAIN_TRANSFER: 'CROSS_DOMAIN',
+  PARADIGM_SHIFT: 'PARADIGM',
+  PARADIGM_INSIGHT: 'PARADIGM',
+  REVIVAL: 'TECHNOLOGY_REVIVAL',
+  ABANDONED_TECH: 'TECHNOLOGY_REVIVAL',
+  ABANDONED_TECHNOLOGY: 'TECHNOLOGY_REVIVAL',
+  FIRST_PRINCIPLE: 'FIRST_PRINCIPLES',
+  NOVEL: 'FIRST_PRINCIPLES',
+  NEW: 'FIRST_PRINCIPLES',
+};
+export const InnovationConceptType = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return INNOVATION_CONCEPT_MAPPINGS[normalized] ?? 'CROSS_DOMAIN';
+  })
+  .pipe(z.enum(INNOVATION_CONCEPT_CANONICAL));
 export type InnovationConceptType = z.infer<typeof InnovationConceptType>;
 
 /**
@@ -148,22 +184,29 @@ export type FrontierInnovationType = z.infer<typeof FrontierInnovationType>;
 /**
  * Supporting concept relationship to primary
  * Maps to solution_concepts.supporting[].relationship in AN5_M_PROMPT
+ * Antifragile with fallback
  */
-export const SupportingRelationship = z.enum(['FALLBACK', 'COMPLEMENTARY']);
+export const SupportingRelationship = z
+  .enum(['FALLBACK', 'COMPLEMENTARY'])
+  .catch('COMPLEMENTARY');
 export type SupportingRelationship = z.infer<typeof SupportingRelationship>;
 
 /**
  * Economics basis - how the economic value was determined
  * Maps to economics.*.basis fields in AN5_M_PROMPT
+ * Antifragile with fallback
  */
-export const EconomicsBasis = z.enum(['CALCULATED', 'ESTIMATED', 'ASSUMED']);
+export const EconomicsBasis = z
+  .enum(['CALCULATED', 'ESTIMATED', 'ASSUMED'])
+  .catch('ESTIMATED');
 export type EconomicsBasis = z.infer<typeof EconomicsBasis>;
 
 /**
  * Freedom to operate assessment for IP considerations
  * Maps to ip_considerations.freedom_to_operate in AN5_M_PROMPT
+ * Antifragile with fallback
  */
-export const FreedomToOperate = z.enum(['GREEN', 'YELLOW', 'RED']);
+export const FreedomToOperate = z.enum(['GREEN', 'YELLOW', 'RED']).catch('YELLOW');
 export type FreedomToOperate = z.infer<typeof FreedomToOperate>;
 
 /**
@@ -233,46 +276,49 @@ export type EffectMagnitude = z.infer<typeof EffectMagnitude>;
 /**
  * The Insight - reused across solution and innovation concepts
  * Can be string for where_we_found_it (CATALOG) or object (CROSS_DOMAIN)
+ * Antifragile: all fields have fallbacks
  */
 export const TheInsightSchema = z
   .object({
-    what: z.string(),
+    what: z.string().catch(''),
     where_we_found_it: z
       .union([
         z.string(),
         z
           .object({
-            domain: z.string(),
-            how_they_use_it: z.string(),
-            why_it_transfers: z.string(),
+            domain: z.string().catch(''),
+            how_they_use_it: z.string().catch(''),
+            why_it_transfers: z.string().catch(''),
           })
           .passthrough(),
       ])
       .optional(),
-    why_industry_missed_it: z.string(),
+    why_industry_missed_it: z.string().catch(''),
   })
   .passthrough();
 export type TheInsight = z.infer<typeof TheInsightSchema>;
 
 /**
  * Economic Value - structured economic assessment with basis
+ * Antifragile: all fields have fallbacks
  */
 export const EconomicValueSchema = z
   .object({
-    value: z.string(),
+    value: z.string().catch(''),
     basis: EconomicsBasis,
-    rationale: z.string(),
+    rationale: z.string().catch(''),
   })
   .passthrough();
 export type EconomicValue = z.infer<typeof EconomicValueSchema>;
 
 /**
  * Coupled Effect - secondary effects in other domains
+ * Antifragile: all fields have fallbacks
  */
 export const CoupledEffectSchema = z
   .object({
-    domain: z.string(),
-    effect: z.string(),
+    domain: z.string().catch(''),
+    effect: z.string().catch(''),
     direction: EffectDirection,
     magnitude: EffectMagnitude,
     quantified: z.string().nullable().optional(),
@@ -299,12 +345,13 @@ const PatentabilityPotentialSchema = z
 
 /**
  * IP Considerations - patent and freedom to operate assessment
+ * Antifragile: all fields have fallbacks
  */
 export const IpConsiderationsSchema = z
   .object({
     freedom_to_operate: FreedomToOperate,
-    rationale: z.string(),
-    key_patents_to_review: z.array(z.string()).default([]),
+    rationale: z.string().catch(''),
+    key_patents_to_review: z.array(z.string()).default([]).catch([]),
     patentability_potential: PatentabilityPotentialSchema,
   })
   .passthrough();
@@ -320,45 +367,38 @@ export const SustainabilityFlagSchema = z
   .passthrough();
 export type SustainabilityFlag = z.infer<typeof SustainabilityFlagSchema>;
 
-export const CapitalRequirement = z.enum([
-  'minimal',
-  'low',
-  'medium',
-  'high',
-  'very_high',
-]);
+export const CapitalRequirement = z
+  .enum(['minimal', 'low', 'medium', 'high', 'very_high'])
+  .catch('medium');
 
-export const ViabilityVerdict = z.enum([
-  'viable',
-  'conditionally_viable',
-  'not_viable',
-  'uncertain',
-]);
+export const ViabilityVerdict = z
+  .enum(['viable', 'conditionally_viable', 'not_viable', 'uncertain'])
+  .catch('uncertain');
 
 export const RiskItemSchema = z
   .object({
-    risk: z.string(),
+    risk: z.string().catch(''),
     likelihood: z.enum(['low', 'medium', 'high']).catch('medium'),
     impact: z.enum(['low', 'medium', 'high']).catch('medium'),
-    mitigation: z.string().optional(),
+    mitigation: z.string().nullable().optional(),
   })
   .passthrough();
 
 export const TestGateSchema = z
   .object({
-    name: z.string(),
-    description: z.string(),
-    success_criteria: z.string(),
-    estimated_cost: z.string().optional(),
-    estimated_time: z.string().optional(),
+    name: z.string().catch(''),
+    description: z.string().catch(''),
+    success_criteria: z.string().catch(''),
+    estimated_cost: z.string().nullable().optional(),
+    estimated_time: z.string().nullable().optional(),
   })
   .passthrough();
 
 export const PriorArtSchema = z
   .object({
-    source: z.string(),
-    relevance: z.string(),
-    what_it_proves: z.string().optional(),
+    source: z.string().catch(''),
+    relevance: z.string().catch(''),
+    what_it_proves: z.string().nullable().optional(),
     url: SafeUrlSchema,
   })
   .passthrough();
@@ -744,26 +784,28 @@ export type SolutionClassificationType = z.infer<
 
 /**
  * Catalog solution - supplier sells this in their product line
+ * Antifragile: all fields have fallbacks
  */
 export const CatalogSolutionSchema = z
   .object({
-    concept_id: z.string(),
-    title: z.string(),
-    supplier: z.string(),
-    how_discoverable: z.string(), // "Phone call to X" or "Search for Y"
+    concept_id: z.string().catch(''),
+    title: z.string().catch(''),
+    supplier: z.string().catch(''),
+    how_discoverable: z.string().catch(''), // "Phone call to X" or "Search for Y"
   })
   .passthrough();
 export type CatalogSolution = z.infer<typeof CatalogSolutionSchema>;
 
 /**
  * Emerging practice - suppliers moving this direction, not yet standard
+ * Antifragile: all fields have fallbacks
  */
 export const EmergingPracticeSchema = z
   .object({
-    concept_id: z.string(),
-    title: z.string(),
-    who_is_doing_it: z.string(),
-    how_far_from_standard: z.string(), // "2-3 years" or "Already common in segment X"
+    concept_id: z.string().catch(''),
+    title: z.string().catch(''),
+    who_is_doing_it: z.string().catch(''),
+    how_far_from_standard: z.string().catch(''), // "2-3 years" or "Already common in segment X"
   })
   .passthrough();
 export type EmergingPractice = z.infer<typeof EmergingPracticeSchema>;
@@ -786,12 +828,13 @@ const TransferDifficultySchema = z
 
 /**
  * Cross-domain transfer - found in another industry
+ * Antifragile: all fields have fallbacks
  */
 export const CrossDomainTransferItemSchema = z
   .object({
-    concept_id: z.string(),
-    title: z.string(),
-    source_domain: z.string(),
+    concept_id: z.string().catch(''),
+    title: z.string().catch(''),
+    source_domain: z.string().catch(''),
     transfer_difficulty: TransferDifficultySchema,
   })
   .passthrough();
@@ -801,14 +844,15 @@ export type CrossDomainTransferItem = z.infer<
 
 /**
  * Paradigm insight - industry hasn't seen this approach
+ * Antifragile: all fields have fallbacks
  */
 export const ParadigmInsightItemSchema = z
   .object({
-    concept_id: z.string(),
-    title: z.string(),
-    what_industry_believes: z.string(),
-    what_we_found: z.string(),
-    validation: z.string(), // Why this is genuinely paradigm-level
+    concept_id: z.string().catch(''),
+    title: z.string().catch(''),
+    what_industry_believes: z.string().catch(''),
+    what_we_found: z.string().catch(''),
+    validation: z.string().catch(''), // Why this is genuinely paradigm-level
   })
   .passthrough();
 export type ParadigmInsightItem = z.infer<typeof ParadigmInsightItemSchema>;
@@ -873,12 +917,13 @@ export type RecommendedEmphasis = z.infer<typeof RecommendedEmphasis>;
 
 /**
  * Presentation calibration for AN5 - honest calibration
+ * Antifragile: all fields have fallbacks
  */
 export const PresentationCalibrationSchema = z
   .object({
-    phone_call_equivalent: z.string(), // What user would learn from 30-min supplier call
-    literature_equivalent: z.string(), // What user would learn from searching best practices
-    sparlo_adds_beyond_that: z.array(z.string()).default([]), // Our actual value-add
+    phone_call_equivalent: z.string().catch(''), // What user would learn from 30-min supplier call
+    literature_equivalent: z.string().catch(''), // What user would learn from searching best practices
+    sparlo_adds_beyond_that: z.array(z.string()).default([]).catch([]), // Our actual value-add
     recommended_emphasis: RecommendedEmphasis,
   })
   .passthrough();
@@ -1107,25 +1152,27 @@ export type PortfolioInnovationType = z.infer<typeof PortfolioInnovationType>;
 
 /**
  * Where We Found It - the narrative power of cross-domain transfer
+ * Antifragile: all fields have fallbacks
  */
 export const WhereWeFoundItSchema = z
   .object({
-    domain: z.string(),
-    how_they_use_it: z.string(),
-    why_it_transfers: z.string(),
+    domain: z.string().catch(''),
+    how_they_use_it: z.string().catch(''),
+    why_it_transfers: z.string().catch(''),
   })
   .passthrough();
 export type WhereWeFoundIt = z.infer<typeof WhereWeFoundItSchema>;
 
 /**
  * The Insight Block - reused across execution track and innovation portfolio (new framework)
+ * Antifragile: all fields have fallbacks
  */
 export const NewInsightBlockSchema = z
   .object({
-    what: z.string(),
+    what: z.string().catch(''),
     where_we_found_it: WhereWeFoundItSchema.optional(), // Optional for FIRST_PRINCIPLES
-    why_industry_missed_it: z.string(),
-    physics: z.string(),
+    why_industry_missed_it: z.string().catch(''),
+    physics: z.string().catch(''),
   })
   .passthrough();
 export type NewInsightBlock = z.infer<typeof NewInsightBlockSchema>;
@@ -1133,15 +1180,16 @@ export type NewInsightBlock = z.infer<typeof NewInsightBlockSchema>;
 /**
  * Supplier Arbitrage - when source_type === CATALOG
  * How to negotiate with vendors and avoid being overcharged
+ * Antifragile: all fields have fallbacks
  */
 export const SupplierArbitrageSchema = z
   .object({
-    who_to_call: z.string(),
-    what_to_ask: z.array(z.string()).default([]),
-    what_to_push_back_on: z.array(z.string()).default([]),
-    what_they_wont_volunteer: z.array(z.string()).default([]),
-    how_to_verify: z.array(z.string()).default([]),
-    competitor_alternative: z.string().optional(),
+    who_to_call: z.string().catch(''),
+    what_to_ask: z.array(z.string()).default([]).catch([]),
+    what_to_push_back_on: z.array(z.string()).default([]).catch([]),
+    what_they_wont_volunteer: z.array(z.string()).default([]).catch([]),
+    how_to_verify: z.array(z.string()).default([]).catch([]),
+    competitor_alternative: z.string().nullable().optional(),
   })
   .passthrough();
 export type SupplierArbitrage = z.infer<typeof SupplierArbitrageSchema>;
@@ -1149,51 +1197,55 @@ export type SupplierArbitrage = z.infer<typeof SupplierArbitrageSchema>;
 /**
  * Why Not Obvious - when source_type === TRANSFER or FIRST_PRINCIPLES
  * Explains the knowledge barrier that prevented this insight
+ * Antifragile: all fields have fallbacks
  */
 export const WhyNotObviousSchema = z
   .object({
-    industry_gap: z.string(),
-    knowledge_barrier: z.string(),
-    our_contribution: z.string(),
+    industry_gap: z.string().catch(''),
+    knowledge_barrier: z.string().catch(''),
+    our_contribution: z.string().catch(''),
   })
   .passthrough();
 export type WhyNotObvious = z.infer<typeof WhyNotObviousSchema>;
 
 /**
  * Why Safe - validation for execution track primary
+ * Antifragile: all fields have fallbacks
  */
 export const WhySafeSchema = z
   .object({
-    track_record: z.string(),
-    precedent: z.array(z.string()).default([]),
-    failure_modes_understood: z.boolean().default(false),
+    track_record: z.string().catch(''),
+    precedent: z.array(z.string()).default([]).catch([]),
+    failure_modes_understood: z.boolean().default(false).catch(false),
   })
   .passthrough();
 export type WhySafe = z.infer<typeof WhySafeSchema>;
 
 /**
  * Fallback Trigger - when to pivot from execution track primary
+ * Antifragile: all fields have fallbacks
  */
 export const FallbackTriggerSchema = z
   .object({
-    conditions: z.array(z.string()).default([]),
-    pivot_to: z.string(),
-    sunk_cost_limit: z.string(),
+    conditions: z.array(z.string()).default([]).catch([]),
+    pivot_to: z.string().catch(''),
+    sunk_cost_limit: z.string().catch(''),
   })
   .passthrough();
 export type FallbackTrigger = z.infer<typeof FallbackTriggerSchema>;
 
 /**
  * Supporting Concept - abbreviated concepts that complement the primary
+ * Antifragile: all fields have fallbacks
  */
 export const NewSupportingConceptSchema = z
   .object({
-    id: z.string(),
-    title: z.string(),
-    relationship: z.enum(['COMPLEMENTARY', 'FALLBACK', 'PREREQUISITE']),
-    one_liner: z.string(),
+    id: z.string().catch(''),
+    title: z.string().catch(''),
+    relationship: z.enum(['COMPLEMENTARY', 'FALLBACK', 'PREREQUISITE']).catch('COMPLEMENTARY'),
+    one_liner: z.string().catch(''),
     confidence: z.number().int().min(0).max(100).catch(50),
-    validation_summary: z.string().optional(),
+    validation_summary: z.string().nullable().optional(),
   })
   .passthrough();
 export type NewSupportingConcept = z.infer<typeof NewSupportingConceptSchema>;
@@ -1273,24 +1325,26 @@ export type ExecutionTrack = z.infer<typeof ExecutionTrackSchema>;
 
 /**
  * Selection Rationale - why this innovation was selected from the portfolio
+ * Antifragile: all fields have fallbacks
  */
 export const SelectionRationaleSchema = z
   .object({
-    why_this_one: z.string(),
-    ceiling_if_works: z.string(),
-    vs_execution_track: z.string(),
+    why_this_one: z.string().catch(''),
+    ceiling_if_works: z.string().catch(''),
+    vs_execution_track: z.string().catch(''),
   })
   .passthrough();
 export type SelectionRationale = z.infer<typeof SelectionRationaleSchema>;
 
 /**
  * Breakthrough Potential - upside analysis (new framework)
+ * Antifragile: all fields have fallbacks
  */
 export const NewBreakthroughPotentialSchema = z
   .object({
-    if_it_works: z.string(),
-    estimated_improvement: z.string(),
-    industry_impact: z.string(),
+    if_it_works: z.string().catch(''),
+    estimated_improvement: z.string().catch(''),
+    industry_impact: z.string().catch(''),
   })
   .passthrough();
 export type NewBreakthroughPotential = z.infer<
@@ -1299,38 +1353,41 @@ export type NewBreakthroughPotential = z.infer<
 
 /**
  * Innovation Risks
+ * Antifragile: all fields have fallbacks
  */
 export const InnovationRisksSchema = z
   .object({
-    physics_risks: z.array(z.string()).default([]),
-    implementation_challenges: z.array(z.string()).default([]),
-    mitigation: z.array(z.string()).default([]),
+    physics_risks: z.array(z.string()).default([]).catch([]),
+    implementation_challenges: z.array(z.string()).default([]).catch([]),
+    mitigation: z.array(z.string()).default([]).catch([]),
   })
   .passthrough();
 export type InnovationRisks = z.infer<typeof InnovationRisksSchema>;
 
 /**
  * Validation Path - how to test without betting the farm
+ * Antifragile: all fields have fallbacks
  */
 export const ValidationPathSchema = z
   .object({
-    gating_question: z.string(),
-    first_test: z.string(),
-    cost: z.string(),
-    timeline: z.string(),
-    go_no_go: z.string(),
+    gating_question: z.string().catch(''),
+    first_test: z.string().catch(''),
+    cost: z.string().catch(''),
+    timeline: z.string().catch(''),
+    go_no_go: z.string().catch(''),
   })
   .passthrough();
 export type ValidationPath = z.infer<typeof ValidationPathSchema>;
 
 /**
  * Relationship to Execution Track
+ * Antifragile: all fields have fallbacks
  */
 export const RelationshipToExecutionSchema = z
   .object({
-    run_in_parallel: z.boolean().default(true),
-    when_to_elevate: z.string(),
-    complementary: z.boolean().default(false),
+    run_in_parallel: z.boolean().default(true).catch(true),
+    when_to_elevate: z.string().catch(''),
+    complementary: z.boolean().default(false).catch(false),
   })
   .passthrough();
 export type RelationshipToExecution = z.infer<
@@ -1577,14 +1634,11 @@ export type StrategicIntegration = z.infer<typeof StrategicIntegrationSchema>;
 
 /**
  * Problem Type classification
+ * Antifragile with fallback
  */
-export const ProblemType = z.enum([
-  'CATALOG',
-  'OPTIMIZATION',
-  'TRANSFER',
-  'PARADIGM',
-  'FRONTIER',
-]);
+export const ProblemType = z
+  .enum(['CATALOG', 'OPTIMIZATION', 'TRANSFER', 'PARADIGM', 'FRONTIER'])
+  .catch('OPTIMIZATION');
 export type ProblemType = z.infer<typeof ProblemType>;
 
 /**
@@ -1636,13 +1690,14 @@ export type CalibratedClaims = z.infer<typeof CalibratedClaimsSchema>;
 
 /**
  * Supplier arbitrage guidance - for CATALOG recommendations
+ * Antifragile: all fields have fallbacks
  */
 export const HonestSupplierArbitrageSchema = z
   .object({
-    who_to_call: z.string(),
-    what_to_ask: z.array(z.string()).default([]),
-    what_to_push_back_on: z.array(z.string()).default([]),
-    what_they_wont_volunteer: z.array(z.string()).default([]),
+    who_to_call: z.string().catch(''),
+    what_to_ask: z.array(z.string()).default([]).catch([]),
+    what_to_push_back_on: z.array(z.string()).default([]).catch([]),
+    what_they_wont_volunteer: z.array(z.string()).default([]).catch([]),
   })
   .passthrough();
 export type HonestSupplierArbitrage = z.infer<
@@ -1683,12 +1738,13 @@ export type HonestAssessment = z.infer<typeof HonestAssessmentSchema>;
 
 /**
  * From Scratch Revelation - what first-principles thinking revealed
+ * Antifragile: all fields have fallbacks
  */
 export const FromScratchRevelationSchema = z
   .object({
-    question: z.string(),
-    insight: z.string(),
-    implication: z.string(),
+    question: z.string().catch(''),
+    insight: z.string().catch(''),
+    implication: z.string().catch(''),
   })
   .passthrough();
 export type FromScratchRevelation = z.infer<typeof FromScratchRevelationSchema>;
@@ -1717,12 +1773,13 @@ export type CrossDomainSearch = z.infer<typeof CrossDomainSearchSchema>;
 
 /**
  * Enhanced Challenge Frame with constraint questioning
+ * Antifragile: all fields have fallbacks
  */
 export const EnhancedChallengeFrameSchema = z
   .object({
-    assumption: z.string(),
-    challenge: z.string(),
-    implication: z.string(),
+    assumption: z.string().catch(''),
+    challenge: z.string().catch(''),
+    implication: z.string().catch(''),
     constraint_questioned: z.string().nullable().optional(),
     what_if_relaxed: z.string().nullable().optional(),
   })
@@ -1738,11 +1795,12 @@ export type EnhancedChallengeFrame = z.infer<
 /**
  * Innovation Analysis - replaces cross_domain_search
  * Contains the problem reframe and domains searched
+ * Antifragile: all fields have fallbacks
  */
 export const InnovationAnalysisSchema = z
   .object({
-    reframe: z.string(),
-    domains_searched: z.array(z.string()).default([]),
+    reframe: z.string().catch(''),
+    domains_searched: z.array(z.string()).default([]).catch([]),
   })
   .passthrough();
 export type InnovationAnalysis = z.infer<typeof InnovationAnalysisSchema>;
@@ -1775,12 +1833,13 @@ export type ConstraintsAndMetrics = z.infer<typeof ConstraintsAndMetricsSchema>;
 
 /**
  * Challenge Frame - simplified version for challenge_the_frame array
+ * Antifragile: all fields have fallbacks
  */
 export const ChallengeFrameV4Schema = z
   .object({
-    assumption: z.string(),
-    challenge: z.string(),
-    implication: z.string(),
+    assumption: z.string().catch(''),
+    challenge: z.string().catch(''),
+    implication: z.string().catch(''),
   })
   .passthrough();
 export type ChallengeFrameV4 = z.infer<typeof ChallengeFrameV4Schema>;
@@ -1789,49 +1848,51 @@ export type ChallengeFrameV4 = z.infer<typeof ChallengeFrameV4Schema>;
 
 /**
  * Primary Solution Concept - the recommended solution with full detail
+ * Antifragile: all fields have fallbacks
  */
 export const PrimarySolutionConceptSchema = z
   .object({
-    id: z.string(),
-    title: z.string(),
-    confidence_percent: z.number().int().min(0).max(100),
+    id: z.string().catch(''),
+    title: z.string().catch(''),
+    confidence_percent: z.number().int().min(0).max(100).catch(50),
     source_type: SolutionSourceType,
-    what_it_is: z.string(),
+    what_it_is: z.string().catch(''),
     the_insight: TheInsightSchema,
-    why_it_works: z.string(),
+    why_it_works: z.string().catch(''),
     economics: z
       .object({
         investment: EconomicValueSchema,
         expected_outcome: EconomicValueSchema,
         timeline: EconomicValueSchema,
-        roi_rationale: z.string().optional(),
+        roi_rationale: z.string().nullable().optional(),
       })
       .passthrough(),
-    coupled_effects: z.array(CoupledEffectSchema).default([]),
+    coupled_effects: z.array(CoupledEffectSchema).default([]).catch([]),
     ip_considerations: IpConsiderationsSchema.optional(),
     key_risks: z
       .array(
-        z.object({ risk: z.string(), mitigation: z.string() }).passthrough(),
+        z.object({ risk: z.string().catch(''), mitigation: z.string().catch('') }).passthrough(),
       )
-      .default([]),
+      .default([])
+      .catch([]),
     sustainability_flag: SustainabilityFlagSchema.optional(),
     first_validation_step: z
       .object({
-        test: z.string(),
-        who_performs: z.string(),
-        equipment_method: z.string(),
+        test: z.string().catch(''),
+        who_performs: z.string().catch(''),
+        equipment_method: z.string().catch(''),
         sample_sourcing: z
           .object({
-            material: z.string(),
-            lead_time: z.string(),
-            quantity: z.string(),
+            material: z.string().catch(''),
+            lead_time: z.string().catch(''),
+            quantity: z.string().catch(''),
           })
           .passthrough(),
-        replicates: z.number().int().positive(),
-        cost: z.string(),
-        timeline: z.string(),
-        go_criteria: z.string(),
-        no_go_criteria: z.string(),
+        replicates: z.number().int().positive().catch(1),
+        cost: z.string().catch(''),
+        timeline: z.string().catch(''),
+        go_criteria: z.string().catch(''),
+        no_go_criteria: z.string().catch(''),
       })
       .passthrough(),
   })
@@ -1842,26 +1903,27 @@ export type PrimarySolutionConcept = z.infer<
 
 /**
  * Supporting Solution Concept - abbreviated concepts that complement the primary
+ * Antifragile: all fields have fallbacks
  */
 export const SupportingSolutionConceptSchema = z
   .object({
-    id: z.string(),
-    title: z.string(),
-    confidence_percent: z.number().int().min(0).max(100),
+    id: z.string().catch(''),
+    title: z.string().catch(''),
+    confidence_percent: z.number().int().min(0).max(100).catch(50),
     relationship: SupportingRelationship,
-    what_it_is: z.string(),
+    what_it_is: z.string().catch(''),
     the_insight: TheInsightSchema,
-    why_it_works: z.string(),
+    why_it_works: z.string().catch(''),
     economics: z
       .object({
-        investment: z.string(),
-        expected_outcome: z.string(),
-        timeline: z.string(),
+        investment: z.string().catch(''),
+        expected_outcome: z.string().catch(''),
+        timeline: z.string().catch(''),
       })
       .passthrough(),
-    key_risk: z.string(),
+    key_risk: z.string().catch(''),
     sustainability_flag: SustainabilityFlagSchema.optional(),
-    when_to_use_instead: z.string(),
+    when_to_use_instead: z.string().catch(''),
   })
   .passthrough();
 export type SupportingSolutionConcept = z.infer<
@@ -1884,21 +1946,22 @@ export type SolutionConceptsV4 = z.infer<typeof SolutionConceptsV4Schema>;
 
 /**
  * Recommended Innovation Concept - promoted innovation with full detail
+ * Antifragile: all fields have fallbacks
  */
 export const RecommendedInnovationConceptSchema = z
   .object({
-    id: z.string(),
-    title: z.string(),
-    confidence_percent: z.number().int().min(0).max(100),
+    id: z.string().catch(''),
+    title: z.string().catch(''),
+    confidence_percent: z.number().int().min(0).max(100).catch(50),
     innovation_type: InnovationConceptType,
-    what_it_is: z.string(),
+    what_it_is: z.string().catch(''),
     the_insight: TheInsightSchema,
-    why_it_works: z.string(),
+    why_it_works: z.string().catch(''),
     breakthrough_potential: z
       .object({
-        if_it_works: z.string(),
-        estimated_improvement: z.string(),
-        industry_impact: z.string(),
+        if_it_works: z.string().catch(''),
+        estimated_improvement: z.string().catch(''),
+        industry_impact: z.string().catch(''),
       })
       .passthrough(),
     economics: z
@@ -1908,24 +1971,25 @@ export const RecommendedInnovationConceptSchema = z
         timeline: EconomicValueSchema,
       })
       .passthrough(),
-    coupled_effects: z.array(CoupledEffectSchema).default([]),
+    coupled_effects: z.array(CoupledEffectSchema).default([]).catch([]),
     ip_considerations: IpConsiderationsSchema.optional(),
     key_risks: z
       .array(
-        z.object({ risk: z.string(), mitigation: z.string() }).passthrough(),
+        z.object({ risk: z.string().catch(''), mitigation: z.string().catch('') }).passthrough(),
       )
-      .default([]),
+      .default([])
+      .catch([]),
     sustainability_flag: SustainabilityFlagSchema.optional(),
     first_validation_step: z
       .object({
-        gating_question: z.string(),
-        test: z.string(),
-        cost: z.string(),
-        timeline: z.string(),
-        go_no_go: z.string(),
+        gating_question: z.string().catch(''),
+        test: z.string().catch(''),
+        cost: z.string().catch(''),
+        timeline: z.string().catch(''),
+        go_no_go: z.string().catch(''),
       })
       .passthrough(),
-    why_this_one: z.string(),
+    why_this_one: z.string().catch(''),
   })
   .passthrough();
 export type RecommendedInnovationConcept = z.infer<
@@ -1934,32 +1998,33 @@ export type RecommendedInnovationConcept = z.infer<
 
 /**
  * Parallel Innovation Concept - medium depth alternatives
+ * Antifragile: all fields have fallbacks
  */
 export const ParallelInnovationConceptSchema = z
   .object({
-    id: z.string(),
-    title: z.string(),
-    confidence_percent: z.number().int().min(0).max(100),
+    id: z.string().catch(''),
+    title: z.string().catch(''),
+    confidence_percent: z.number().int().min(0).max(100).catch(50),
     innovation_type: InnovationConceptType,
-    what_it_is: z.string(),
+    what_it_is: z.string().catch(''),
     the_insight: TheInsightSchema,
-    why_it_works: z.string(),
+    why_it_works: z.string().catch(''),
     economics: z
       .object({
-        investment: z.string(),
-        ceiling_if_works: z.string(),
+        investment: z.string().catch(''),
+        ceiling_if_works: z.string().catch(''),
       })
       .passthrough(),
-    key_uncertainty: z.string(),
+    key_uncertainty: z.string().catch(''),
     sustainability_flag: SustainabilityFlagSchema.optional(),
     first_validation_step: z
       .object({
-        test: z.string(),
-        cost: z.string(),
-        go_no_go: z.string(),
+        test: z.string().catch(''),
+        cost: z.string().catch(''),
+        go_no_go: z.string().catch(''),
       })
       .passthrough(),
-    when_to_elevate: z.string(),
+    when_to_elevate: z.string().catch(''),
   })
   .passthrough();
 export type ParallelInnovationConcept = z.infer<
@@ -1968,25 +2033,26 @@ export type ParallelInnovationConcept = z.infer<
 
 /**
  * Frontier Watch - monitor only concepts for future consideration
+ * Antifragile: all fields have fallbacks
  */
 export const FrontierWatchV4Schema = z
   .object({
-    id: z.string(),
-    title: z.string(),
+    id: z.string().catch(''),
+    title: z.string().catch(''),
     innovation_type: FrontierInnovationType,
-    earliest_viability: z.string(),
-    what_it_is: z.string(),
-    why_interesting: z.string(),
-    why_not_now: z.string(),
+    earliest_viability: z.string().catch(''),
+    what_it_is: z.string().catch(''),
+    why_interesting: z.string().catch(''),
+    why_not_now: z.string().catch(''),
     who_to_monitor: z.preprocess(
       (val) =>
         typeof val === 'string' ? val.split(',').map((s) => s.trim()) : val,
-      z.array(z.string()).default([]),
+      z.array(z.string()).default([]).catch([]),
     ),
-    trigger_to_revisit: z.string(),
-    recent_developments: z.string().optional(),
+    trigger_to_revisit: z.string().catch(''),
+    recent_developments: z.string().nullable().optional(),
     trl_estimate: z.number().int().min(1).max(9).optional(),
-    competitive_activity: z.string().optional(),
+    competitive_activity: z.string().nullable().optional(),
   })
   .passthrough();
 export type FrontierWatchV4 = z.infer<typeof FrontierWatchV4Schema>;
