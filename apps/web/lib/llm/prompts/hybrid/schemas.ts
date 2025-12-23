@@ -60,6 +60,39 @@ export const SafeUrlSchema = z
     message: 'Blocked URL protocol or host',
   });
 
+// ============================================
+// Antifragile Enum Factory
+// ============================================
+
+/**
+ * Creates an antifragile enum schema that maps LLM variations to canonical values
+ *
+ * @param canonical - Array of valid enum values
+ * @param mappings - Object mapping LLM variations to canonical values
+ * @param fallback - Default value when no mapping found
+ * @returns Zod schema that normalizes and validates enum values
+ *
+ * @example
+ * const StatusSchema = createAntifragileEnum(
+ *   ['ACTIVE', 'INACTIVE'] as const,
+ *   { ACTIVE: 'ACTIVE', ENABLED: 'ACTIVE', INACTIVE: 'INACTIVE', DISABLED: 'INACTIVE' },
+ *   'ACTIVE'
+ * );
+ */
+function createAntifragileEnum<T extends readonly [string, ...string[]]>(
+  canonical: T,
+  mappings: Record<string, T[number]>,
+  fallback: T[number],
+) {
+  return z
+    .string()
+    .transform((val) => {
+      const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+      return mappings[normalized] ?? fallback;
+    })
+    .pipe(z.enum(canonical));
+}
+
 /**
  * Severity/confidence level - accepts both cases for backward compatibility
  * Normalizes HIGH/MEDIUM/LOW to lowercase
@@ -81,7 +114,14 @@ export const ConfidenceLevel = SeverityLevel;
  * Antifragile with fallback to NONE
  */
 export const SustainabilityFlagType = z
-  .enum(['NONE', 'CAUTION', 'BENEFIT', 'LIFECYCLE_TRADEOFF', 'IRONY', 'SUPPLY_CHAIN'])
+  .enum([
+    'NONE',
+    'CAUTION',
+    'BENEFIT',
+    'LIFECYCLE_TRADEOFF',
+    'IRONY',
+    'SUPPLY_CHAIN',
+  ])
   .catch('NONE');
 
 // ============================================
@@ -93,8 +133,16 @@ export const SustainabilityFlagType = z
  * Maps to solution_concepts.primary.source_type in AN5_M_PROMPT
  * Antifragile: maps LLM variations to canonical values with fallback
  */
-const SOLUTION_SOURCE_CANONICAL = ['CATALOG', 'EMERGING', 'CROSS_DOMAIN', 'PARADIGM'] as const;
-const SOLUTION_SOURCE_MAPPINGS: Record<string, (typeof SOLUTION_SOURCE_CANONICAL)[number]> = {
+const SOLUTION_SOURCE_CANONICAL = [
+  'CATALOG',
+  'EMERGING',
+  'CROSS_DOMAIN',
+  'PARADIGM',
+] as const;
+const SOLUTION_SOURCE_MAPPINGS: Record<
+  string,
+  (typeof SOLUTION_SOURCE_CANONICAL)[number]
+> = {
   CATALOG: 'CATALOG',
   EMERGING: 'EMERGING',
   CROSS_DOMAIN: 'CROSS_DOMAIN',
@@ -113,13 +161,11 @@ const SOLUTION_SOURCE_MAPPINGS: Record<string, (typeof SOLUTION_SOURCE_CANONICAL
   PARADIGM_INSIGHT: 'PARADIGM',
   FIRST_PRINCIPLES: 'PARADIGM',
 };
-export const SolutionSourceType = z
-  .string()
-  .transform((val) => {
-    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
-    return SOLUTION_SOURCE_MAPPINGS[normalized] ?? 'EMERGING';
-  })
-  .pipe(z.enum(SOLUTION_SOURCE_CANONICAL));
+export const SolutionSourceType = createAntifragileEnum(
+  SOLUTION_SOURCE_CANONICAL,
+  SOLUTION_SOURCE_MAPPINGS,
+  'EMERGING',
+);
 export type SolutionSourceType = z.infer<typeof SolutionSourceType>;
 
 /**
@@ -127,8 +173,16 @@ export type SolutionSourceType = z.infer<typeof SolutionSourceType>;
  * Maps to innovation_concepts.recommended.innovation_type in AN5_M_PROMPT
  * Antifragile: maps LLM variations to canonical values with fallback
  */
-const INNOVATION_CONCEPT_CANONICAL = ['CROSS_DOMAIN', 'PARADIGM', 'TECHNOLOGY_REVIVAL', 'FIRST_PRINCIPLES'] as const;
-const INNOVATION_CONCEPT_MAPPINGS: Record<string, (typeof INNOVATION_CONCEPT_CANONICAL)[number]> = {
+const INNOVATION_CONCEPT_CANONICAL = [
+  'CROSS_DOMAIN',
+  'PARADIGM',
+  'TECHNOLOGY_REVIVAL',
+  'FIRST_PRINCIPLES',
+] as const;
+const INNOVATION_CONCEPT_MAPPINGS: Record<
+  string,
+  (typeof INNOVATION_CONCEPT_CANONICAL)[number]
+> = {
   CROSS_DOMAIN: 'CROSS_DOMAIN',
   PARADIGM: 'PARADIGM',
   TECHNOLOGY_REVIVAL: 'TECHNOLOGY_REVIVAL',
@@ -146,13 +200,11 @@ const INNOVATION_CONCEPT_MAPPINGS: Record<string, (typeof INNOVATION_CONCEPT_CAN
   NOVEL: 'FIRST_PRINCIPLES',
   NEW: 'FIRST_PRINCIPLES',
 };
-export const InnovationConceptType = z
-  .string()
-  .transform((val) => {
-    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
-    return INNOVATION_CONCEPT_MAPPINGS[normalized] ?? 'CROSS_DOMAIN';
-  })
-  .pipe(z.enum(INNOVATION_CONCEPT_CANONICAL));
+export const InnovationConceptType = createAntifragileEnum(
+  INNOVATION_CONCEPT_CANONICAL,
+  INNOVATION_CONCEPT_MAPPINGS,
+  'CROSS_DOMAIN',
+);
 export type InnovationConceptType = z.infer<typeof InnovationConceptType>;
 
 /**
@@ -172,13 +224,11 @@ const FRONTIER_INNOVATION_MAPPINGS: Record<
   TECHNOLOGY_REVIVAL: 'PARADIGM', // Revival concepts are paradigm-level
   FIRST_PRINCIPLES: 'PARADIGM', // First principles are paradigm shifts
 };
-export const FrontierInnovationType = z
-  .string()
-  .transform((val) => {
-    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
-    return FRONTIER_INNOVATION_MAPPINGS[normalized] ?? 'EMERGING_SCIENCE';
-  })
-  .pipe(z.enum(FRONTIER_INNOVATION_CANONICAL));
+export const FrontierInnovationType = createAntifragileEnum(
+  FRONTIER_INNOVATION_CANONICAL,
+  FRONTIER_INNOVATION_MAPPINGS,
+  'EMERGING_SCIENCE',
+);
 export type FrontierInnovationType = z.infer<typeof FrontierInnovationType>;
 
 /**
@@ -206,7 +256,9 @@ export type EconomicsBasis = z.infer<typeof EconomicsBasis>;
  * Maps to ip_considerations.freedom_to_operate in AN5_M_PROMPT
  * Antifragile with fallback
  */
-export const FreedomToOperate = z.enum(['GREEN', 'YELLOW', 'RED']).catch('YELLOW');
+export const FreedomToOperate = z
+  .enum(['GREEN', 'YELLOW', 'RED'])
+  .catch('YELLOW');
 export type FreedomToOperate = z.infer<typeof FreedomToOperate>;
 
 /**
@@ -230,13 +282,11 @@ const EFFECT_DIRECTION_MAPPINGS: Record<
   DEGRADED: 'WORSE',
   UNCHANGED: 'NEUTRAL',
 };
-export const EffectDirection = z
-  .string()
-  .transform((val) => {
-    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
-    return EFFECT_DIRECTION_MAPPINGS[normalized] ?? 'NEUTRAL';
-  })
-  .pipe(z.enum(EFFECT_DIRECTION_CANONICAL));
+export const EffectDirection = createAntifragileEnum(
+  EFFECT_DIRECTION_CANONICAL,
+  EFFECT_DIRECTION_MAPPINGS,
+  'NEUTRAL',
+);
 export type EffectDirection = z.infer<typeof EffectDirection>;
 
 /**
@@ -260,13 +310,11 @@ const EFFECT_MAGNITUDE_MAPPINGS: Record<
   SMALL: 'MINOR',
   LARGE: 'MAJOR',
 };
-export const EffectMagnitude = z
-  .string()
-  .transform((val) => {
-    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
-    return EFFECT_MAGNITUDE_MAPPINGS[normalized] ?? 'MODERATE';
-  })
-  .pipe(z.enum(EFFECT_MAGNITUDE_CANONICAL));
+export const EffectMagnitude = createAntifragileEnum(
+  EFFECT_MAGNITUDE_CANONICAL,
+  EFFECT_MAGNITUDE_MAPPINGS,
+  'MODERATE',
+);
 export type EffectMagnitude = z.infer<typeof EffectMagnitude>;
 
 // ============================================
@@ -330,18 +378,33 @@ export type CoupledEffect = z.infer<typeof CoupledEffectSchema>;
 /**
  * Patentability potential - extracts enum value before any explanation
  * LLM sometimes outputs "MEDIUM - explanation text"
+ * Antifragile: uses mapping object for type-safe transforms
  */
+const PATENTABILITY_CANONICAL = ['HIGH', 'MEDIUM', 'LOW', 'NOT_NOVEL'] as const;
+const PATENTABILITY_MAPPINGS: Record<
+  string,
+  (typeof PATENTABILITY_CANONICAL)[number]
+> = {
+  HIGH: 'HIGH',
+  MEDIUM: 'MEDIUM',
+  LOW: 'LOW',
+  NOT_NOVEL: 'NOT_NOVEL',
+  // LLM variations
+  NONE: 'NOT_NOVEL',
+  NO: 'NOT_NOVEL',
+};
 const PatentabilityPotentialSchema = z
   .string()
   .transform((val) => {
     // Extract enum value before any " - " explanation
-    const enumPart = val.split(' - ')[0]?.trim().toUpperCase();
-    if (['HIGH', 'MEDIUM', 'LOW', 'NOT_NOVEL'].includes(enumPart ?? '')) {
-      return enumPart as 'HIGH' | 'MEDIUM' | 'LOW' | 'NOT_NOVEL';
-    }
-    return 'MEDIUM'; // fallback
+    const enumPart = val
+      .split(' - ')[0]
+      ?.trim()
+      .toUpperCase()
+      .replace(/[-\s]/g, '_');
+    return PATENTABILITY_MAPPINGS[enumPart ?? ''] ?? 'MEDIUM';
   })
-  .pipe(z.enum(['HIGH', 'MEDIUM', 'LOW', 'NOT_NOVEL']));
+  .pipe(z.enum(PATENTABILITY_CANONICAL));
 
 /**
  * IP Considerations - patent and freedom to operate assessment
@@ -409,7 +472,7 @@ export const PriorArtSchema = z
 
 const ProblemAnalysisSchema = z
   .object({
-    core_challenge: z.string(),
+    core_challenge: z.string().catch(''),
     constraints: z.array(z.string()).catch([]),
     success_metrics: z.array(z.string()).catch([]),
     industry_assumptions: z.array(z.string()).catch([]),
@@ -426,16 +489,16 @@ const LandscapeMapSchema = z
 
 const DiscoverySeedSchema = z
   .object({
-    domain: z.string(),
-    potential_mechanism: z.string(),
-    why_relevant: z.string(),
+    domain: z.string().catch(''),
+    potential_mechanism: z.string().catch(''),
+    why_relevant: z.string().catch(''),
   })
   .passthrough();
 
 // Constraint analysis for technical spec interrogation
 const ConstraintAnalysisItemSchema = z
   .object({
-    stated: z.string(),
+    stated: z.string().catch(''),
     clarification_needed: z.string().nullable().optional(),
     assumed_for_analysis: z.string().nullable().optional(),
     if_different: z.string().nullable().optional(),
@@ -464,8 +527,8 @@ const AN0_M_AnalysisSchema = z
       .array(
         z
           .object({
-            what_industry_assumes: z.string(),
-            why_it_might_be_wrong: z.string(),
+            what_industry_assumes: z.string().catch(''),
+            why_it_might_be_wrong: z.string().catch(''),
             alternative_approach: z.string().optional(),
           })
           .passthrough(),
@@ -493,19 +556,19 @@ export type AN0_M_Output = z.infer<typeof AN0_M_OutputSchema>;
 
 const SelectedExampleSchema = z
   .object({
-    domain: z.string(),
-    mechanism: z.string(),
-    relevance_to_challenge: z.string(),
-    teaching_value: z.string(),
+    domain: z.string().catch(''),
+    mechanism: z.string().catch(''),
+    relevance_to_challenge: z.string().catch(''),
+    teaching_value: z.string().catch(''),
     track_affinity: TrackSchema.optional(),
   })
   .passthrough();
 
 const CrossDomainConnectionSchema = z
   .object({
-    from_domain: z.string(),
-    to_challenge: z.string(),
-    transfer_potential: z.string(),
+    from_domain: z.string().catch(''),
+    to_challenge: z.string().catch(''),
+    transfer_potential: z.string().catch(''),
   })
   .passthrough();
 
@@ -526,25 +589,25 @@ export type AN1_5_M_Output = z.infer<typeof AN1_5_M_OutputSchema>;
 
 const PrecedentFindingSchema = z
   .object({
-    source_type: z.string(),
-    finding: z.string(),
-    implications: z.string(),
+    source_type: z.string().catch(''),
+    finding: z.string().catch(''),
+    implications: z.string().catch(''),
     prior_art: PriorArtSchema.optional(),
   })
   .passthrough();
 
 const GapAnalysisSchema = z
   .object({
-    gap_description: z.string(),
-    why_unexplored: z.string(),
-    opportunity_signal: z.string(),
+    gap_description: z.string().catch(''),
+    why_unexplored: z.string().catch(''),
+    opportunity_signal: z.string().catch(''),
   })
   .passthrough();
 
 const AbandonedApproachSchema = z
   .object({
-    approach: z.string(),
-    why_abandoned: z.string(),
+    approach: z.string().catch(''),
+    why_abandoned: z.string().catch(''),
     changed_conditions: z.string().optional(),
     revival_potential: z.string().optional(),
   })
@@ -552,19 +615,19 @@ const AbandonedApproachSchema = z
 
 // Detailed abandoned technology analysis
 const EnablingChangeSchema = z.object({
-  change: z.string(),
-  relevance: z.string(),
+  change: z.string().catch(''),
+  relevance: z.string().catch(''),
 });
 
 const AbandonedTechnologyAnalysisSchema = z
   .object({
-    technology_name: z.string(),
-    original_era: z.string(),
-    original_application: z.string(),
-    why_abandoned: z.string(),
+    technology_name: z.string().catch(''),
+    original_era: z.string().catch(''),
+    original_application: z.string().catch(''),
+    why_abandoned: z.string().catch(''),
     enabling_changes_since: z.array(EnablingChangeSchema).max(20).default([]),
     revival_potential: SeverityLevel.catch('medium'),
-    revival_concept: z.string(),
+    revival_concept: z.string().catch(''),
     who_is_positioned: z.string().optional(),
     source_urls: z.array(SafeUrlSchema).max(10).default([]),
   })
@@ -583,10 +646,10 @@ export const AN1_7_M_OutputSchema = z
       .array(
         z
           .object({
-            title: z.string(),
+            title: z.string().catch(''),
             authors: z.string().optional(),
             year: z.string().optional(),
-            key_insight: z.string(),
+            key_insight: z.string().catch(''),
             url: SafeUrlSchema,
           })
           .passthrough(),
@@ -612,18 +675,18 @@ const GenerationGuidanceSchema = z
 
 const TrackSpecificGuidanceSchema = z
   .object({
-    simpler_path: z.string(),
-    best_fit: z.string(),
-    paradigm_shift: z.string(),
-    frontier_transfer: z.string(),
+    simpler_path: z.string().catch(''),
+    best_fit: z.string().catch(''),
+    paradigm_shift: z.string().catch(''),
+    frontier_transfer: z.string().catch(''),
   })
   .passthrough();
 
 const TrizParameterSchema = z
   .object({
-    parameter_id: z.number(),
-    parameter_name: z.string(),
-    relevance: z.string(),
+    parameter_id: z.number().catch(0),
+    parameter_name: z.string().catch(''),
+    relevance: z.string().catch(''),
   })
   .passthrough();
 
@@ -645,18 +708,18 @@ export type AN2_M_Output = z.infer<typeof AN2_M_OutputSchema>;
 
 // Quantified parameters for mechanism depth
 const QuantifiedParameterSchema = z.object({
-  parameter: z.string(),
-  value: z.string(),
-  significance: z.string(),
+  parameter: z.string().catch(''),
+  value: z.string().catch(''),
+  significance: z.string().catch(''),
 });
 
 // Mechanistic depth schema for paradigm/frontier concepts
 const MechanisticDepthSchema = z
   .object({
-    working_principle: z.string(),
+    working_principle: z.string().catch(''),
     molecular_mechanism: z.string().optional(),
     quantified_parameters: z.array(QuantifiedParameterSchema).default([]),
-    rate_limiting_step: z.string(),
+    rate_limiting_step: z.string().catch(''),
     key_parameters: z.array(z.string()).catch([]),
     thermodynamic_advantage: z.string().optional(),
     failure_modes: z.array(z.string()).catch([]),
@@ -665,11 +728,11 @@ const MechanisticDepthSchema = z
 
 const ConceptSchema = z
   .object({
-    id: z.string(),
-    title: z.string().max(500),
+    id: z.string().catch(''),
+    title: z.string().max(500).catch(''),
     track: TrackSchema,
-    description: z.string(),
-    mechanism: z.string(),
+    description: z.string().catch(''),
+    mechanism: z.string().catch(''),
     mechanistic_depth: MechanisticDepthSchema.optional(),
     source_domain: z.string().optional(),
     prior_art: z.array(PriorArtSchema).catch([]),
@@ -690,13 +753,13 @@ const ConceptSchema = z
  */
 export const OperationalAlternativeSchema = z
   .object({
-    title: z.string(),
-    what_changes: z.string(), // Operations, not technology
-    capital_required: z.string(), // Usually "minimal" or specific low amount
-    expected_benefit: z.string(), // "Could capture X% of benefit"
-    why_not_already_doing: z.string(), // Why this isn't obvious
-    validation_approach: z.string(),
-    comparison_to_capital_solutions: z.string(), // "X% of benefit at Y% of cost"
+    title: z.string().catch(''),
+    what_changes: z.string().catch(''), // Operations, not technology
+    capital_required: z.string().catch(''), // Usually "minimal" or specific low amount
+    expected_benefit: z.string().catch(''), // "Could capture X% of benefit"
+    why_not_already_doing: z.string().catch(''), // Why this isn't obvious
+    validation_approach: z.string().catch(''),
+    comparison_to_capital_solutions: z.string().catch(''), // "X% of benefit at Y% of cost"
   })
   .passthrough();
 export type OperationalAlternative = z.infer<
@@ -771,13 +834,11 @@ const SOLUTION_CLASS_MAPPINGS: Record<
   PARAMETER_TUNING: 'OPTIMIZATION',
 };
 
-export const SolutionClassificationType = z
-  .string()
-  .transform((val) => {
-    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
-    return SOLUTION_CLASS_MAPPINGS[normalized] ?? 'EMERGING_PRACTICE'; // Neutral fallback
-  })
-  .pipe(z.enum(SOLUTION_CLASS_CANONICAL));
+export const SolutionClassificationType = createAntifragileEnum(
+  SOLUTION_CLASS_CANONICAL,
+  SOLUTION_CLASS_MAPPINGS,
+  'EMERGING_PRACTICE', // Neutral fallback
+);
 export type SolutionClassificationType = z.infer<
   typeof SolutionClassificationType
 >;
@@ -1242,7 +1303,9 @@ export const NewSupportingConceptSchema = z
   .object({
     id: z.string().catch(''),
     title: z.string().catch(''),
-    relationship: z.enum(['COMPLEMENTARY', 'FALLBACK', 'PREREQUISITE']).catch('COMPLEMENTARY'),
+    relationship: z
+      .enum(['COMPLEMENTARY', 'FALLBACK', 'PREREQUISITE'])
+      .catch('COMPLEMENTARY'),
     one_liner: z.string().catch(''),
     confidence: z.number().int().min(0).max(100).catch(50),
     validation_summary: z.string().nullable().optional(),
@@ -1871,7 +1934,12 @@ export const PrimarySolutionConceptSchema = z
     ip_considerations: IpConsiderationsSchema.optional(),
     key_risks: z
       .array(
-        z.object({ risk: z.string().catch(''), mitigation: z.string().catch('') }).passthrough(),
+        z
+          .object({
+            risk: z.string().catch(''),
+            mitigation: z.string().catch(''),
+          })
+          .passthrough(),
       )
       .default([])
       .catch([]),
@@ -1975,7 +2043,12 @@ export const RecommendedInnovationConceptSchema = z
     ip_considerations: IpConsiderationsSchema.optional(),
     key_risks: z
       .array(
-        z.object({ risk: z.string().catch(''), mitigation: z.string().catch('') }).passthrough(),
+        z
+          .object({
+            risk: z.string().catch(''),
+            mitigation: z.string().catch(''),
+          })
+          .passthrough(),
       )
       .default([])
       .catch([]),
