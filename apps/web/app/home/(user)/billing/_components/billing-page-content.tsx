@@ -7,9 +7,10 @@ import type { BillingConfig } from '@kit/billing';
 import type { UsageCheckResponse } from '~/lib/usage/schemas';
 
 import { createPersonalAccountBillingPortalSession } from '../_lib/server/server-actions';
-import { CurrentPlanCard } from './current-plan-card';
-import { PricingTable } from './pricing-table';
-import { UsageCard } from './usage-card';
+import { AuraCurrentPlanCard } from './aura-current-plan-card';
+import { AuraPricingHeader } from './aura-pricing-header';
+import { AuraPricingTable } from './aura-pricing-table';
+import { AuraUsageCard } from './aura-usage-card';
 
 interface Subscription {
   id: string;
@@ -64,25 +65,22 @@ export function BillingPageContent({
   const hasActiveSubscription =
     subscription && subscription.status !== 'canceled';
 
-  // Show pricing table for non-subscribers
+  // NEW SUBSCRIBER: Show Aura-styled pricing
   if (!subscription && !order) {
     return (
-      <div className="space-y-8">
-        <div className="text-center">
-          <h2 className="mb-2 text-2xl font-bold">Choose Your Plan</h2>
-          <p className="text-muted-foreground mx-auto max-w-lg">
-            Get started with Sparlo and unlock powerful AI-driven financial
-            analysis for your business.
-          </p>
-        </div>
-        <PricingTable config={billingConfig} customerId={customerId} />
+      <div className="mx-auto max-w-5xl space-y-8 py-8 md:py-12">
+        <AuraPricingHeader
+          title="Choose Your Plan"
+          subtitle="Get started with Sparlo and unlock powerful AI-driven financial analysis for your business."
+        />
+        <AuraPricingTable config={billingConfig} customerId={customerId} />
       </div>
     );
   }
 
-  // Show subscription management for subscribers
+  // ACTIVE SUBSCRIBER: Show current plan + usage
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-5xl space-y-10 py-8 md:py-12">
       {/* Hidden form for billing portal session */}
       <form
         ref={formRef}
@@ -90,23 +88,28 @@ export function BillingPageContent({
         className="hidden"
       />
 
+      <AuraPricingHeader
+        title="Your Subscription"
+        subtitle="Manage your plan, view usage, and update billing settings."
+      />
+
       <div className="grid gap-6 lg:grid-cols-2">
-        {/* Current Plan */}
+        {/* Current Plan Card */}
         {productPlan && (
-          <CurrentPlanCard
+          <AuraCurrentPlanCard
             planName={productPlan.product.name}
-            planDescription={productPlan.product.description}
             price={currentPlanPrice}
             interval={productPlan.plan.interval ?? 'month'}
             status={subscription?.status ?? 'active'}
+            periodEnd={subscription?.period_ends_at ?? ''}
             features={productPlan.product.features}
             onManageSubscription={handleManageSubscription}
           />
         )}
 
-        {/* Usage Stats */}
+        {/* Usage Stats Card */}
         {usage && hasActiveSubscription && (
-          <UsageCard
+          <AuraUsageCard
             tokensUsed={usage.tokens_used}
             tokensLimit={usage.tokens_limit}
             reportsCount={usage.reports_count}
@@ -117,21 +120,18 @@ export function BillingPageContent({
         )}
       </div>
 
-      {/* Upgrade Options */}
+      {/* Upgrade Section */}
       {hasActiveSubscription && (
-        <div className="space-y-4">
-          <div className="border-t pt-8">
-            <h3 className="mb-2 text-lg font-semibold">Upgrade Your Plan</h3>
-            <p className="text-muted-foreground mb-6 text-sm">
-              Need more capacity? Upgrade to unlock additional reports and
-              features.
-            </p>
-            <PricingTable
-              config={billingConfig}
-              customerId={customerId}
-              currentPlanId={productPlan?.plan.id}
-            />
-          </div>
+        <div className="pt-8">
+          <AuraPricingHeader
+            title="Upgrade Your Plan"
+            subtitle="Need more capacity? Compare plans and upgrade instantly."
+          />
+          <AuraPricingTable
+            config={billingConfig}
+            customerId={customerId}
+            currentPlanId={productPlan?.plan.id}
+          />
         </div>
       )}
     </div>
