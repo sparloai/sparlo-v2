@@ -12,6 +12,7 @@ import {
   ChevronRight,
   Clock,
   DollarSign,
+  FileText,
   GitBranch,
   Layers,
   Lightbulb,
@@ -40,369 +41,27 @@ import {
 import { Badge } from '@kit/ui/badge';
 import { cn } from '@kit/ui/utils';
 
-// ============================================
-// NEW: Execution Track + Innovation Portfolio Types
-// ============================================
-
-interface WhereWeFoundIt {
-  domain?: string;
-  how_they_use_it?: string;
-  why_it_transfers?: string;
-}
-
-interface InsightBlock {
-  what?: string;
-  where_we_found_it?: WhereWeFoundIt;
-  why_industry_missed_it?: string;
-  physics?: string;
-}
-
-interface ValidationGate {
-  week?: string;
-  test?: string;
-  method?: string;
-  success_criteria?: string;
-  cost?: string;
-  decision_point?: string;
-}
-
-interface ExecutionTrackPrimary {
-  id?: string;
-  title?: string;
-  score?: number;
-  confidence?: number;
-  source_type?: 'CATALOG' | 'TRANSFER' | 'OPTIMIZATION' | 'FIRST_PRINCIPLES';
-  source?: string;
-  bottom_line?: string;
-  expected_improvement?: string;
-  timeline?: string;
-  investment?: string;
-  why_safe?: {
-    track_record?: string;
-    precedent?: string[];
-    failure_modes_understood?: boolean;
-  };
-  the_insight?: InsightBlock;
-  what_it_is?: string;
-  why_it_works?: string;
-  why_it_might_fail?: string[];
-  validation_gates?: ValidationGate[];
-}
-
-interface SupportingConcept {
-  id?: string;
-  title?: string;
-  relationship?: 'COMPLEMENTARY' | 'FALLBACK' | 'PREREQUISITE';
-  one_liner?: string;
-  confidence?: number;
-  validation_summary?: string;
-}
-
-interface ExecutionTrack {
-  intro?: string;
-  primary?: ExecutionTrackPrimary;
-  supplier_arbitrage?: {
-    who_to_call?: string;
-    what_to_ask?: string[];
-    what_to_push_back_on?: string[];
-    what_they_wont_volunteer?: string[];
-    how_to_verify?: string[];
-    competitor_alternative?: string;
-  };
-  why_not_obvious?: {
-    industry_gap?: string;
-    knowledge_barrier?: string;
-    our_contribution?: string;
-  };
-  supporting_concepts?: SupportingConcept[];
-  fallback_trigger?: {
-    conditions?: string[];
-    pivot_to?: string;
-    sunk_cost_limit?: string;
-  };
-}
-
-interface RecommendedInnovation {
-  id?: string;
-  title?: string;
-  score?: number;
-  confidence?: number;
-  selection_rationale?: {
-    why_this_one?: string;
-    ceiling_if_works?: string;
-    vs_execution_track?: string;
-  };
-  innovation_type?: string;
-  source_domain?: string;
-  the_insight?: InsightBlock;
-  how_it_works?: string[];
-  breakthrough_potential?: {
-    if_it_works?: string;
-    estimated_improvement?: string;
-    industry_impact?: string;
-  };
-  risks?: {
-    physics_risks?: string[];
-    implementation_challenges?: string[];
-    mitigation?: string[];
-  };
-  validation_path?: {
-    gating_question?: string;
-    first_test?: string;
-    cost?: string;
-    timeline?: string;
-    go_no_go?: string;
-  };
-  relationship_to_execution_track?: {
-    run_in_parallel?: boolean;
-    when_to_elevate?: string;
-    complementary?: boolean;
-  };
-}
-
-interface ParallelInvestigation {
-  id?: string;
-  title?: string;
-  score?: number;
-  confidence?: number;
-  innovation_type?: string;
-  source_domain?: string;
-  one_liner?: string;
-  the_insight?: InsightBlock;
-  ceiling?: string;
-  key_uncertainty?: string;
-  validation_approach?: {
-    test?: string;
-    cost?: string;
-    timeline?: string;
-    go_no_go?: string;
-  };
-  when_to_elevate?: string;
-  investment_recommendation?: string;
-}
-
-interface FrontierWatch {
-  id?: string;
-  title?: string;
-  one_liner?: string;
-  innovation_type?: string;
-  source_domain?: string;
-  why_interesting?: string;
-  why_not_now?: string;
-  trigger_to_revisit?: string;
-  who_to_monitor?: string;
-  earliest_viability?: string;
-  // Web search enhanced fields
-  recent_developments?: string;
-  trl_estimate?: number;
-  competitive_activity?: string;
-}
-
-interface InnovationPortfolio {
-  intro?: string;
-  recommended_innovation?: RecommendedInnovation;
-  parallel_investigations?: ParallelInvestigation[];
-  frontier_watch?: FrontierWatch[];
-}
-
-interface HonestAssessment {
-  problem_type?: string;
-  expected_value_range?: {
-    floor?: string;
-    ceiling?: string;
-    most_likely?: string;
-  };
-  candid_assessment?: string;
-  if_value_is_limited?: string;
-}
-
-interface CrossDomainSearch {
-  enhanced_challenge_frame?: {
-    reframing?: string;
-    search_queries?: string[];
-  };
-  domains_searched?: Array<{
-    domain?: string;
-    mechanism_found?: string;
-    relevance?: string;
-  }>;
-  from_scratch_revelations?: Array<{
-    discovery?: string;
-    source?: string;
-    implication?: string;
-  }>;
-}
-
-interface StrategicIntegration {
-  portfolio_view?: {
-    execution_track_role?: string;
-    innovation_portfolio_role?: string;
-    combined_strategy?: string;
-  };
-  resource_allocation?: {
-    execution_track_percent?: number;
-    recommended_innovation_percent?: number;
-    parallel_investigations_percent?: number;
-    frontier_watch_percent?: number;
-    rationale?: string;
-  };
-  decision_architecture?: {
-    primary_tradeoff?: {
-      question?: string;
-      option_a?: {
-        condition?: string;
-        path?: string;
-        what_you_get?: string;
-        what_you_give_up?: string;
-      };
-      option_b?: {
-        condition?: string;
-        path?: string;
-        what_you_get?: string;
-        what_you_give_up?: string;
-      };
-      if_uncertain?: string;
-    };
-    flowchart?: string;
-    summary?: string;
-  };
-  action_plan?: Array<{
-    timeframe?: string;
-    actions?: string[];
-    rationale?: string;
-    decision_gate?: string;
-  }>;
-  personal_recommendation?: {
-    intro?: string;
-    key_insight?: string;
-  };
-}
-
-// ============================================
-// Types for LLM Output Schema (AN5-M)
-// ============================================
-
-interface EconomicsValue {
-  value?: string;
-  basis?: 'CALCULATED' | 'ESTIMATED' | 'ASSUMED';
-  rationale?: string;
-}
-
-interface SustainabilityFlag {
-  type?:
-    | 'NONE'
-    | 'CAUTION'
-    | 'BENEFIT'
-    | 'LIFECYCLE_TRADEOFF'
-    | 'IRONY'
-    | 'SUPPLY_CHAIN';
-  summary?: string | null;
-  detail?: string | null;
-  alternative?: string | null;
-}
-
-interface CoupledEffect {
-  domain?: string;
-  effect?: string;
-  direction?: 'BETTER' | 'WORSE' | 'NEUTRAL';
-  magnitude?: 'MINOR' | 'MODERATE' | 'MAJOR';
-  quantified?: string;
-  mitigation?: string;
-}
-
-interface IPConsiderations {
-  freedom_to_operate?: 'GREEN' | 'YELLOW' | 'RED';
-  rationale?: string;
-  key_patents_to_review?: string[];
-  patentability_potential?: 'HIGH' | 'MEDIUM' | 'LOW' | 'NOT_NOVEL';
-}
-
-interface FirstValidationStep {
-  gating_question?: string;
-  test?: string;
-  cost?: string;
-  timeline?: string;
-  go_no_go?: string;
-  go_criteria?: string;
-  no_go_criteria?: string;
-}
-
-interface ProblemAnalysisBenchmark {
-  entity?: string;
-  approach?: string;
-  current_performance?: string;
-  target_roadmap?: string;
-  source?: string;
-}
-
-interface ProblemAnalysis {
-  current_state_of_art?: {
-    benchmarks?: ProblemAnalysisBenchmark[];
-    no_competitors_note?: string | null;
-  };
-  what_industry_does_today?: Array<{
-    approach?: string;
-    limitation?: string;
-  }>;
-  why_its_hard?: {
-    prose?: string;
-    governing_equation?: {
-      equation?: string;
-      explanation?: string;
-    };
-    factors?: Array<{
-      factor?: string;
-      explanation?: string;
-    }>;
-  };
-  first_principles_insight?: {
-    headline?: string;
-    explanation?: string;
-  };
-  root_cause_hypotheses?: Array<{
-    hypothesis?: string;
-    evidence?: string;
-    implication?: string;
-  }>;
-  success_metrics?: Array<{
-    metric?: string;
-    target?: string;
-    minimum_viable?: string;
-    stretch?: string;
-    unit?: string;
-  }>;
-}
-
-interface ConstraintsAndMetrics {
-  hard_constraints?: string[];
-  soft_constraints?: string[];
-  assumptions?: string[];
-  success_metrics?: Array<{
-    metric?: string;
-    target?: string;
-    minimum_viable?: string;
-    stretch?: string;
-    unit?: string;
-  }>;
-}
-
-interface ChallengeTheFrame {
-  assumption?: string;
-  challenge?: string;
-  implication?: string;
-}
-
-interface RiskAndWatchout {
-  category?: string;
-  risk?: string;
-  severity?: 'high' | 'medium' | 'low';
-  mitigation?: string;
-}
-
-interface InnovationAnalysis {
-  domains_searched?: string[];
-  reframe?: string;
-}
+import type {
+  ChallengeTheFrame,
+  ConceptRecommendation,
+  ConstraintsAndMetrics,
+  CrossDomainSearch,
+  ExecutionTrack,
+  FrontierWatch,
+  HonestAssessment,
+  HybridReportDisplayProps,
+  InnovationAnalysis,
+  InnovationPortfolio,
+  InsightBlock,
+  ParallelConcept,
+  ParallelInvestigation,
+  ProblemAnalysis,
+  RecommendedInnovation,
+  RiskAndWatchout,
+  StrategicIntegration,
+  StructuredExecutiveSummary,
+  SupportingConcept,
+} from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 /**
  * Hybrid Report Display Component
@@ -417,108 +76,6 @@ interface InnovationAnalysis {
  * - Next Steps
  * - Self-Critique
  */
-
-// Structured executive summary format (new)
-interface StructuredExecutiveSummary {
-  narrative_lead?: string;
-  viability?: string;
-  viability_label?: string;
-  the_problem?: string;
-  core_insight?: {
-    headline?: string;
-    explanation?: string;
-  };
-  primary_recommendation?: string;
-  recommended_path?: Array<{
-    step?: number;
-    action?: string;
-    rationale?: string;
-  }>;
-}
-
-interface HybridReportDisplayProps {
-  reportData: {
-    mode: 'hybrid';
-    report?: {
-      executive_summary?: string | StructuredExecutiveSummary;
-      problem_restatement?: string;
-      key_insights?: string[];
-      next_steps?: string[];
-      decision_architecture?: {
-        primary?: ConceptRecommendation;
-        fallback?: ConceptRecommendation;
-        parallel_exploration?: ParallelConcept[];
-      };
-      other_concepts?: ParallelConcept[];
-      self_critique?: {
-        confidence_level?: string;
-        overall_confidence?: string;
-        confidence_rationale?: string;
-        what_we_might_be_wrong_about?: string[];
-        unexplored_directions?: string[];
-      };
-      // NEW: Execution Track + Innovation Portfolio Framework
-      honest_assessment?: HonestAssessment;
-      cross_domain_search?: CrossDomainSearch;
-      execution_track?: ExecutionTrack;
-      innovation_portfolio?: InnovationPortfolio;
-      strategic_integration?: StrategicIntegration;
-      // AN5-M output fields
-      brief?: string;
-      problem_analysis?: ProblemAnalysis;
-      constraints_and_metrics?: ConstraintsAndMetrics;
-      challenge_the_frame?: ChallengeTheFrame[];
-      risks_and_watchouts?: RiskAndWatchout[];
-      what_id_actually_do?: string;
-      follow_up_prompts?: string[];
-      innovation_analysis?: InnovationAnalysis;
-    };
-  };
-}
-
-interface ConceptRecommendation {
-  id?: string;
-  title?: string;
-  track?: string;
-  executive_summary?: string;
-  why_it_wins?: string;
-  confidence_level?: string;
-  estimated_timeline?: string;
-  estimated_investment?: string;
-  how_to_test?: TestStep[];
-  key_risks?: Risk[];
-  prior_art_summary?: PriorArt[];
-}
-
-interface TestStep {
-  name?: string;
-  description?: string;
-  success_criteria?: string;
-  estimated_time?: string;
-  estimated_cost?: string;
-}
-
-interface Risk {
-  risk?: string;
-  likelihood?: string;
-  impact?: string;
-  mitigation?: string;
-}
-
-interface PriorArt {
-  source?: string;
-  relevance?: string;
-  what_it_proves?: string;
-}
-
-interface ParallelConcept {
-  id?: string;
-  title?: string;
-  track?: string;
-  one_liner?: string;
-  merit_score?: number;
-  when_to_consider?: string;
-}
 
 // ============================================
 // Report-specific Badge Components
@@ -1268,7 +825,11 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
   );
 }
 
-function ExecutionTrackSection({ track }: { track?: ExecutionTrack }) {
+const ExecutionTrackSection = memo(function ExecutionTrackSection({
+  track,
+}: {
+  track?: ExecutionTrack;
+}) {
   if (!track) return null;
 
   return (
@@ -1294,6 +855,11 @@ function ExecutionTrackSection({ track }: { track?: ExecutionTrack }) {
                   <span className="text-xs font-medium tracking-wider text-green-600 uppercase dark:text-green-400">
                     Primary Recommendation
                   </span>
+                  {track.primary.id && (
+                    <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
+                      {track.primary.id}
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                   {track.primary.title}
@@ -1313,6 +879,30 @@ function ExecutionTrackSection({ track }: { track?: ExecutionTrack }) {
               <p className="mb-4 text-base font-medium text-zinc-700 dark:text-zinc-200">
                 {track.primary.bottom_line}
               </p>
+            )}
+
+            {/* What It Is */}
+            {track.primary.what_it_is && (
+              <div className="mb-4">
+                <span className="text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+                  What It Is
+                </span>
+                <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
+                  {track.primary.what_it_is}
+                </p>
+              </div>
+            )}
+
+            {/* Why It Works */}
+            {track.primary.why_it_works && (
+              <div className="mb-4">
+                <span className="text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+                  Why It Works
+                </span>
+                <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
+                  {track.primary.why_it_works}
+                </p>
+              </div>
             )}
 
             <div className="mb-4 grid gap-3 sm:grid-cols-3">
@@ -1516,13 +1106,20 @@ function ExecutionTrackSection({ track }: { track?: ExecutionTrack }) {
             <div className="space-y-3">
               {track.supporting_concepts.map((concept, idx) => (
                 <div
-                  key={idx}
+                  key={concept.id ?? `concept-${idx}-${concept.title ?? ''}`}
                   className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50"
                 >
                   <div className="flex items-start justify-between gap-2">
-                    <h5 className="font-medium text-zinc-900 dark:text-white">
-                      {concept.title}
-                    </h5>
+                    <div className="flex items-center gap-2">
+                      {concept.id && (
+                        <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
+                          {concept.id}
+                        </span>
+                      )}
+                      <h5 className="font-medium text-zinc-900 dark:text-white">
+                        {concept.title}
+                      </h5>
+                    </div>
                     <Badge variant="outline" className="text-xs capitalize">
                       {concept.relationship?.toLowerCase()}
                     </Badge>
@@ -1531,6 +1128,24 @@ function ExecutionTrackSection({ track }: { track?: ExecutionTrack }) {
                     <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
                       {concept.one_liner}
                     </p>
+                  )}
+                  {concept.what_it_is && (
+                    <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+                      <span className="font-medium">What it is: </span>
+                      {concept.what_it_is}
+                    </p>
+                  )}
+                  {concept.why_it_works && (
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                      <span className="font-medium">Why it works: </span>
+                      {concept.why_it_works}
+                    </p>
+                  )}
+                  {concept.when_to_use_instead && (
+                    <div className="mt-3 rounded bg-amber-50 p-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
+                      <strong>When to use instead: </strong>
+                      {concept.when_to_use_instead}
+                    </div>
                   )}
                 </div>
               ))}
@@ -1575,9 +1190,9 @@ function ExecutionTrackSection({ track }: { track?: ExecutionTrack }) {
       </div>
     </section>
   );
-}
+});
 
-function InnovationPortfolioSection({
+const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
   portfolio,
 }: {
   portfolio?: InnovationPortfolio;
@@ -1607,6 +1222,11 @@ function InnovationPortfolioSection({
                   <span className="text-xs font-medium tracking-wider text-violet-600 uppercase dark:text-violet-400">
                     Recommended Innovation
                   </span>
+                  {portfolio.recommended_innovation.id && (
+                    <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
+                      {portfolio.recommended_innovation.id}
+                    </span>
+                  )}
                 </div>
                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                   {portfolio.recommended_innovation.title}
@@ -1626,25 +1246,43 @@ function InnovationPortfolioSection({
               </div>
             </div>
 
-            {portfolio.recommended_innovation.selection_rationale && (
+            {/* What It Is */}
+            {portfolio.recommended_innovation.what_it_is && (
+              <div className="mb-4">
+                <span className="text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+                  What It Is
+                </span>
+                <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
+                  {portfolio.recommended_innovation.what_it_is}
+                </p>
+              </div>
+            )}
+
+            {/* Why It Works */}
+            {portfolio.recommended_innovation.why_it_works && (
+              <div className="mb-4">
+                <span className="text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+                  Why It Works
+                </span>
+                <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
+                  {portfolio.recommended_innovation.why_it_works}
+                </p>
+              </div>
+            )}
+
+            {portfolio.recommended_innovation.selection_rationale?.why_this_one && (
               <div className="mb-4 rounded-lg bg-white/60 p-4 dark:bg-zinc-800/60">
                 <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                   Why This One
                 </span>
                 <p className="text-sm text-zinc-700 dark:text-zinc-200">
-                  {
-                    portfolio.recommended_innovation.selection_rationale
-                      .why_this_one
-                  }
+                  {portfolio.recommended_innovation.selection_rationale.why_this_one}
                 </p>
                 {portfolio.recommended_innovation.selection_rationale
                   .ceiling_if_works && (
                   <p className="mt-2 text-sm font-medium text-violet-700 dark:text-violet-400">
                     Ceiling:{' '}
-                    {
-                      portfolio.recommended_innovation.selection_rationale
-                        .ceiling_if_works
-                    }
+                    {portfolio.recommended_innovation.selection_rationale.ceiling_if_works}
                   </p>
                 )}
               </div>
@@ -1654,7 +1292,7 @@ function InnovationPortfolioSection({
               insight={portfolio.recommended_innovation.the_insight}
             />
 
-            {portfolio.recommended_innovation.breakthrough_potential && (
+            {portfolio.recommended_innovation.breakthrough_potential?.if_it_works && (
               <div className="mt-4 rounded-lg border border-green-200 bg-green-50/50 p-4 dark:border-green-800 dark:bg-green-900/20">
                 <div className="mb-2 flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
@@ -1663,10 +1301,7 @@ function InnovationPortfolioSection({
                   </span>
                 </div>
                 <p className="text-sm text-zinc-600 dark:text-zinc-300">
-                  {
-                    portfolio.recommended_innovation.breakthrough_potential
-                      .if_it_works
-                  }
+                  {portfolio.recommended_innovation.breakthrough_potential.if_it_works}
                 </p>
                 {portfolio.recommended_innovation.breakthrough_potential
                   .estimated_improvement && (
@@ -1699,36 +1334,34 @@ function InnovationPortfolioSection({
                   </p>
                 )}
                 <div className="grid gap-2 text-sm sm:grid-cols-3">
-                  <div>
-                    <span className="text-xs text-zinc-500">First Test:</span>
-                    <p className="text-zinc-700 dark:text-zinc-200">
-                      {
-                        portfolio.recommended_innovation.validation_path
-                          .first_test
-                      }
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-xs text-zinc-500">
-                      Cost/Timeline:
-                    </span>
-                    <p className="text-zinc-700 dark:text-zinc-200">
-                      {portfolio.recommended_innovation.validation_path.cost} /{' '}
-                      {
-                        portfolio.recommended_innovation.validation_path
-                          .timeline
-                      }
-                    </p>
-                  </div>
-                  <div>
-                    <span className="text-xs text-zinc-500">Go/No-Go:</span>
-                    <p className="text-zinc-700 dark:text-zinc-200">
-                      {
-                        portfolio.recommended_innovation.validation_path
-                          .go_no_go
-                      }
-                    </p>
-                  </div>
+                  {portfolio.recommended_innovation.validation_path.first_test && (
+                    <div>
+                      <span className="text-xs text-zinc-500">First Test:</span>
+                      <p className="text-zinc-700 dark:text-zinc-200">
+                        {portfolio.recommended_innovation.validation_path.first_test}
+                      </p>
+                    </div>
+                  )}
+                  {(portfolio.recommended_innovation.validation_path.cost ||
+                    portfolio.recommended_innovation.validation_path.timeline) && (
+                    <div>
+                      <span className="text-xs text-zinc-500">
+                        Cost/Timeline:
+                      </span>
+                      <p className="text-zinc-700 dark:text-zinc-200">
+                        {portfolio.recommended_innovation.validation_path.cost ?? '—'} /{' '}
+                        {portfolio.recommended_innovation.validation_path.timeline ?? '—'}
+                      </p>
+                    </div>
+                  )}
+                  {portfolio.recommended_innovation.validation_path.go_no_go && (
+                    <div>
+                      <span className="text-xs text-zinc-500">Go/No-Go:</span>
+                      <p className="text-zinc-700 dark:text-zinc-200">
+                        {portfolio.recommended_innovation.validation_path.go_no_go}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -1751,13 +1384,20 @@ function InnovationPortfolioSection({
               <div className="space-y-4">
                 {portfolio.parallel_investigations.map((inv, idx) => (
                   <div
-                    key={idx}
+                    key={inv.id ?? `investigation-${idx}-${inv.title ?? ''}`}
                     className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50"
                   >
                     <div className="mb-2 flex items-start justify-between gap-2">
-                      <h5 className="font-medium text-zinc-900 dark:text-white">
-                        {inv.title}
-                      </h5>
+                      <div className="flex items-center gap-2">
+                        {inv.id && (
+                          <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
+                            {inv.id}
+                          </span>
+                        )}
+                        <h5 className="font-medium text-zinc-900 dark:text-white">
+                          {inv.title}
+                        </h5>
+                      </div>
                       <InnovationTypeBadge
                         innovationType={inv.innovation_type}
                       />
@@ -1765,6 +1405,18 @@ function InnovationPortfolioSection({
                     {inv.one_liner && (
                       <p className="mb-2 text-sm text-zinc-600 dark:text-zinc-300">
                         {inv.one_liner}
+                      </p>
+                    )}
+                    {inv.what_it_is && (
+                      <p className="mb-2 text-sm text-zinc-600 dark:text-zinc-300">
+                        <span className="font-medium">What it is: </span>
+                        {inv.what_it_is}
+                      </p>
+                    )}
+                    {inv.why_it_works && (
+                      <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
+                        <span className="font-medium">Why it works: </span>
+                        {inv.why_it_works}
                       </p>
                     )}
                     <div className="grid gap-2 text-sm sm:grid-cols-2">
@@ -1794,6 +1446,12 @@ function InnovationPortfolioSection({
                         Recommendation: {inv.investment_recommendation}
                       </p>
                     )}
+                    {inv.when_to_elevate && (
+                      <div className="mt-3 rounded bg-violet-50 p-2 text-xs text-violet-700 dark:bg-violet-900/20 dark:text-violet-400">
+                        <strong>When to elevate: </strong>
+                        {inv.when_to_elevate}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1802,13 +1460,17 @@ function InnovationPortfolioSection({
       </div>
     </section>
   );
-}
+});
 
 // ============================================
 // Problem Analysis Section
 // ============================================
 
-function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
+const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
+  analysis,
+}: {
+  analysis?: ProblemAnalysis;
+}) {
   if (!analysis) return null;
 
   return (
@@ -1861,6 +1523,15 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
               )}
             </CardWithHeader>
           )}
+
+        {/* What's Wrong */}
+        {analysis.whats_wrong?.prose && (
+          <CardWithHeader icon={AlertTriangle} label="What's Wrong">
+            <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
+              {analysis.whats_wrong.prose}
+            </p>
+          </CardWithHeader>
+        )}
 
         {/* What Industry Does Today */}
         {analysis.what_industry_does_today &&
@@ -1948,16 +1619,63 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
             )}
           </DarkSection>
         )}
+
+        {/* Root Cause Hypotheses */}
+        {analysis.root_cause_hypotheses &&
+          analysis.root_cause_hypotheses.length > 0 && (
+            <CardWithHeader icon={Brain} label="Root Cause Hypotheses">
+              <div className="space-y-4">
+                {analysis.root_cause_hypotheses.map((hypothesis, idx) => (
+                  <div
+                    key={hypothesis.id ?? `hypothesis-${idx}-${hypothesis.name ?? hypothesis.hypothesis ?? ''}`}
+                    className="rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"
+                  >
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="font-medium text-zinc-900 dark:text-white">
+                        {hypothesis.name ?? hypothesis.hypothesis}
+                      </span>
+                      {(hypothesis.confidence_percent !== undefined ||
+                        hypothesis.confidence) && (
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            'text-xs',
+                            (hypothesis.confidence_percent ?? 0) >= 70 ||
+                              hypothesis.confidence?.toLowerCase() === 'high'
+                              ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              : (hypothesis.confidence_percent ?? 0) >= 40 ||
+                                  hypothesis.confidence?.toLowerCase() ===
+                                    'medium'
+                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                                : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                          )}
+                        >
+                          {hypothesis.confidence_percent !== undefined
+                            ? `${hypothesis.confidence_percent}%`
+                            : hypothesis.confidence}
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                      {hypothesis.explanation ??
+                        hypothesis.evidence ??
+                        hypothesis.implication}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardWithHeader>
+          )}
       </div>
     </section>
   );
-}
+});
 
 // ============================================
 // Constraints & Metrics Section
 // ============================================
 
-function ConstraintsSection({
+const ConstraintsSection = memo(function ConstraintsSection({
   constraints,
 }: {
   constraints?: ConstraintsAndMetrics;
@@ -2056,13 +1774,13 @@ function ConstraintsSection({
       </div>
     </section>
   );
-}
+});
 
 // ============================================
 // Challenge the Frame Section
 // ============================================
 
-function ChallengeTheFrameSection({
+const ChallengeTheFrameSection = memo(function ChallengeTheFrameSection({
   challenges,
 }: {
   challenges?: ChallengeTheFrame[];
@@ -2100,7 +1818,7 @@ function ChallengeTheFrameSection({
       </div>
     </section>
   );
-}
+});
 
 // ============================================
 // Risks & Watchouts Section
@@ -2592,6 +2310,21 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
 
   return (
     <div className="space-y-12">
+      {/* Brief - Original Problem Statement */}
+      {report.brief && (
+        <section id="brief">
+          <SectionHeader
+            title="The Problem"
+            subtitle="Original problem statement"
+          />
+          <CardWithHeader icon={FileText} label="Brief">
+            <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
+              {report.brief}
+            </p>
+          </CardWithHeader>
+        </section>
+      )}
+
       {/* Executive Summary */}
       {report.executive_summary && (
         <section id="executive-summary">
@@ -2948,6 +2681,47 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+            {/* Validation Gaps */}
+            {self_critique.validation_gaps &&
+              self_critique.validation_gaps.length > 0 && (
+                <div className="mt-4">
+                  <h5 className="mb-2 text-sm font-medium text-zinc-900 dark:text-white">
+                    Validation Gaps
+                  </h5>
+                  <div className="space-y-2">
+                    {self_critique.validation_gaps.map((gap, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-700 dark:bg-zinc-800"
+                      >
+                        <div className="mb-1 flex items-center justify-between">
+                          <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                            {gap.concern}
+                          </span>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              'text-xs',
+                              gap.status === 'ADDRESSED' &&
+                                'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                              gap.status === 'EXTENDED_NEEDED' &&
+                                'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                              gap.status === 'ACCEPTED_RISK' &&
+                                'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                            )}
+                          >
+                            {gap.status.replace(/_/g, ' ')}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                          {gap.rationale}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
           </div>

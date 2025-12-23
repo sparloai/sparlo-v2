@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { cache } from 'react';
+
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { USAGE_CONSTANTS } from '~/lib/usage/constants';
@@ -40,46 +42,44 @@ export type UsageStatus =
 /**
  * Check if the account is allowed to generate a new report based on usage limits.
  * Implements freemium model: first report is free, then requires subscription.
+ * Wrapped with React cache() for request-level deduplication.
  */
-export async function checkUsageAllowed(
+export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
   accountId: string,
   estimatedTokens: number = USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
 ): Promise<UsageStatus> {
   const client = getSupabaseServerClient();
 
-  // Check if account has used first free report
-  // Note: first_report_used_at column added by migration 20251220231212
-  // After migration, regenerate types with: pnpm supabase:web:typegen
-  const { data: account, error: accountError } = await client
-    .from('accounts')
-    .select('id, first_report_used_at')
-    .eq('id', accountId)
-    .single();
+  // Execute account and subscription queries in parallel for performance
+  const [accountResult, subscriptionResult] = await Promise.all([
+    client
+      .from('accounts')
+      .select('id, first_report_used_at')
+      .eq('id', accountId)
+      .single(),
+    client
+      .from('subscriptions')
+      .select('id, status, period_ends_at')
+      .eq('account_id', accountId)
+      .or('active.eq.true,and(status.eq.canceled,period_ends_at.gte.now())')
+      .maybeSingle(),
+  ]);
 
-  if (accountError) {
+  if (accountResult.error) {
     throw new Error(
-      `Failed to check first report status: ${accountError.message}`,
+      `Failed to check first report status: ${accountResult.error.message}`,
     );
   }
 
-  const hasUsedFirstReport = !!(
-    account &&
-    'first_report_used_at' in account &&
-    account.first_report_used_at
-  );
-
-  // Check for active subscription OR canceled subscription still in paid period (grace period)
-  const { data: subscription, error: subError } = await client
-    .from('subscriptions')
-    .select('id, status, period_ends_at')
-    .eq('account_id', accountId)
-    .or('active.eq.true,and(status.eq.canceled,period_ends_at.gte.now())')
-    .maybeSingle();
-
-  if (subError) {
-    throw new Error(`Failed to check subscription status: ${subError.message}`);
+  if (subscriptionResult.error) {
+    throw new Error(
+      `Failed to check subscription status: ${subscriptionResult.error.message}`,
+    );
   }
 
+  const account = accountResult.data;
+  const subscription = subscriptionResult.data;
+  const hasUsedFirstReport = !!account.first_report_used_at;
   const hasActiveSubscription = !!subscription;
 
   // First report is free
@@ -168,11 +168,12 @@ export async function checkUsageAllowed(
     isFirstReport: false as const,
     isAtLimit: true as const,
   };
-}
+});
 
 /**
  * Mark the account's first free report as used.
  * Uses conditional update to handle race conditions.
+ * @deprecated Use tryClaimFirstReport for race-condition-safe claiming
  */
 export async function markFirstReportUsed(accountId: string): Promise<void> {
   const client = getSupabaseServerClient();
@@ -193,4 +194,43 @@ export async function markFirstReportUsed(accountId: string): Promise<void> {
     // Already marked by concurrent request - this is fine, just log
     console.warn('[Usage] First report already marked for account:', accountId);
   }
+}
+
+/**
+ * Claim result for tryClaimFirstReport
+ */
+export type ClaimResult = 'CLAIMED' | 'ALREADY_USED' | 'UNAUTHORIZED';
+
+/**
+ * Atomically try to claim the first free report.
+ * This prevents the race condition where two concurrent requests could
+ * both pass the "is first report available" check.
+ *
+ * Usage pattern:
+ * 1. Call tryClaimFirstReport BEFORE generating the report
+ * 2. If 'CLAIMED', proceed with report generation
+ * 3. If 'ALREADY_USED', check subscription status and usage limits
+ * 4. If 'UNAUTHORIZED', throw authorization error
+ */
+export async function tryClaimFirstReport(
+  accountId: string,
+): Promise<ClaimResult> {
+  const client = getSupabaseServerClient();
+
+  const { data, error } = (await (client.rpc as CallableFunction)(
+    'try_claim_first_report',
+    { p_account_id: accountId },
+  )) as { data: string | null; error: Error | null };
+
+  if (error) {
+    throw new Error(`Failed to claim first report: ${error.message}`);
+  }
+
+  const result = data as ClaimResult;
+
+  if (result === 'UNAUTHORIZED') {
+    throw new Error('Unauthorized: You do not have access to this account');
+  }
+
+  return result;
 }

@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useCallback, useMemo, useState, useTransition } from 'react';
 
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-import { Check, Sparkles, Zap } from 'lucide-react';
+import { AlertCircle, Check, Sparkles, Zap } from 'lucide-react';
 
 import type { BillingConfig } from '@kit/billing';
 import { getPrimaryLineItem } from '@kit/billing';
 import { useAppEvents } from '@kit/shared/events';
+import { Alert, AlertDescription } from '@kit/ui/alert';
 import { Badge } from '@kit/ui/badge';
 import { Button } from '@kit/ui/button';
 import { cn } from '@kit/ui/utils';
@@ -44,10 +45,38 @@ export function PricingTable({
   const [pending, startTransition] = useTransition();
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [checkoutToken, setCheckoutToken] = useState<string | undefined>();
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const appEvents = useAppEvents();
 
-  const visibleProducts = config.products.filter((p) => !p.hidden);
+  const visibleProducts = useMemo(
+    () => config.products.filter((p) => !p.hidden),
+    [config.products],
+  );
   const canStartTrial = !customerId;
+
+  const handleSelectPlan = useCallback(
+    (planId: string, productId: string) => {
+      setSelectedPlan(planId);
+      setCheckoutError(null);
+      startTransition(async () => {
+        try {
+          appEvents.emit({ type: 'checkout.started', payload: { planId } });
+          const { checkoutToken } = await createPersonalAccountCheckoutSession({
+            planId,
+            productId,
+          });
+          setCheckoutToken(checkoutToken);
+        } catch (error) {
+          setSelectedPlan(null);
+          setCheckoutError(
+            'Failed to start checkout. Please try again or contact support.',
+          );
+          console.error('[Checkout] Error starting checkout session:', error);
+        }
+      });
+    },
+    [appEvents],
+  );
 
   if (checkoutToken) {
     return (
@@ -59,24 +88,14 @@ export function PricingTable({
     );
   }
 
-  const handleSelectPlan = (planId: string, productId: string) => {
-    setSelectedPlan(planId);
-    startTransition(async () => {
-      try {
-        appEvents.emit({ type: 'checkout.started', payload: { planId } });
-        const { checkoutToken } = await createPersonalAccountCheckoutSession({
-          planId,
-          productId,
-        });
-        setCheckoutToken(checkoutToken);
-      } catch {
-        setSelectedPlan(null);
-      }
-    });
-  };
-
   return (
     <div className="w-full">
+      {checkoutError && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{checkoutError}</AlertDescription>
+        </Alert>
+      )}
       <div className="grid gap-6 md:grid-cols-3">
         {visibleProducts.map((product) => {
           const plan = product.plans[0];
