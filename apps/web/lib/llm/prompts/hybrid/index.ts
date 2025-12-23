@@ -175,8 +175,9 @@ export {
 
 /**
  * Simple constants - no per-phase maps needed when all values are identical
+ * Max tokens set to Claude's maximum output limit to prevent truncation
  */
-export const HYBRID_MAX_TOKENS = 20000;
+export const HYBRID_MAX_TOKENS = 32000;
 export const HYBRID_MODEL = 'claude-opus-4-5-20251101';
 
 export const HYBRID_TEMPERATURES = {
