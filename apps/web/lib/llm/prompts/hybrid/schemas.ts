@@ -169,8 +169,31 @@ export type FreedomToOperate = z.infer<typeof FreedomToOperate>;
 /**
  * Effect direction for coupled effects
  * Maps to coupled_effects[].direction in AN5_M_PROMPT
+ * Antifragile: maps LLM variations to canonical values
  */
-export const EffectDirection = z.enum(['BETTER', 'WORSE', 'NEUTRAL']);
+const EFFECT_DIRECTION_CANONICAL = ['BETTER', 'WORSE', 'NEUTRAL'] as const;
+const EFFECT_DIRECTION_MAPPINGS: Record<
+  string,
+  (typeof EFFECT_DIRECTION_CANONICAL)[number]
+> = {
+  BETTER: 'BETTER',
+  WORSE: 'WORSE',
+  NEUTRAL: 'NEUTRAL',
+  // LLM variations
+  MIXED: 'NEUTRAL', // Mixed effects are neutral overall
+  POSITIVE: 'BETTER',
+  NEGATIVE: 'WORSE',
+  IMPROVED: 'BETTER',
+  DEGRADED: 'WORSE',
+  UNCHANGED: 'NEUTRAL',
+};
+export const EffectDirection = z
+  .string()
+  .transform((val) => {
+    const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
+    return EFFECT_DIRECTION_MAPPINGS[normalized] ?? 'NEUTRAL';
+  })
+  .pipe(z.enum(EFFECT_DIRECTION_CANONICAL));
 export type EffectDirection = z.infer<typeof EffectDirection>;
 
 /**
@@ -259,6 +282,22 @@ export const CoupledEffectSchema = z
 export type CoupledEffect = z.infer<typeof CoupledEffectSchema>;
 
 /**
+ * Patentability potential - extracts enum value before any explanation
+ * LLM sometimes outputs "MEDIUM - explanation text"
+ */
+const PatentabilityPotentialSchema = z
+  .string()
+  .transform((val) => {
+    // Extract enum value before any " - " explanation
+    const enumPart = val.split(' - ')[0]?.trim().toUpperCase();
+    if (['HIGH', 'MEDIUM', 'LOW', 'NOT_NOVEL'].includes(enumPart ?? '')) {
+      return enumPart as 'HIGH' | 'MEDIUM' | 'LOW' | 'NOT_NOVEL';
+    }
+    return 'MEDIUM'; // fallback
+  })
+  .pipe(z.enum(['HIGH', 'MEDIUM', 'LOW', 'NOT_NOVEL']));
+
+/**
  * IP Considerations - patent and freedom to operate assessment
  */
 export const IpConsiderationsSchema = z
@@ -266,7 +305,7 @@ export const IpConsiderationsSchema = z
     freedom_to_operate: FreedomToOperate,
     rationale: z.string(),
     key_patents_to_review: z.array(z.string()).default([]),
-    patentability_potential: z.enum(['HIGH', 'MEDIUM', 'LOW', 'NOT_NOVEL']),
+    patentability_potential: PatentabilityPotentialSchema,
   })
   .passthrough();
 export type IpConsiderations = z.infer<typeof IpConsiderationsSchema>;
