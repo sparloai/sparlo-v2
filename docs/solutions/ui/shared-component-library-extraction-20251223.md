@@ -186,5 +186,8 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
 
 ## Related Issues
 
-- See also: [type-extraction-large-components-20251223.md](../best-practices/type-extraction-large-components-20251223.md)
-- See also: [p1-security-fixes-code-review-20251223.md](../security-issues/p1-security-fixes-code-review-20251223.md)
+- See also: [design-system-extraction-pattern-20241222.md](../architecture/design-system-extraction-pattern-20241222.md) - Initial Aura design system extraction
+- See also: [aura-inspired-redesign.md](../ui/aura-inspired-redesign.md) - Aura design language reference
+- See also: [structured-executive-summary-rendering.md](../ui/structured-executive-summary-rendering.md) - Component rendering patterns
+- See also: [type-extraction-large-components-20251223.md](../best-practices/type-extraction-large-components-20251223.md) - Companion type extraction
+- See also: [p1-security-fixes-code-review-20251223.md](../security-issues/p1-security-fixes-code-review-20251223.md) - Related code review fixes

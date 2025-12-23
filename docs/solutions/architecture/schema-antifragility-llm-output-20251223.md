@@ -157,5 +157,8 @@ function repairTruncatedJson(jsonString: string): string {
 
 ## Related Issues
 
-- See also: [p1-security-fixes-code-review-20251223.md](../security-issues/p1-security-fixes-code-review-20251223.md)
-- See also: [type-extraction-large-components-20251223.md](../best-practices/type-extraction-large-components-20251223.md)
+- See also: [evidence-based-schema-patterns.md](../ai/evidence-based-schema-patterns.md) - Core Zod schema patterns
+- See also: [prompt-engineering-patterns.md](../ai/prompt-engineering-patterns.md) - LLM prompt patterns
+- See also: [unified-hybrid-report-flow.md](../architecture/unified-hybrid-report-flow.md) - Hybrid report architecture
+- See also: [p1-security-fixes-code-review-20251223.md](../security-issues/p1-security-fixes-code-review-20251223.md) - Related security fixes
+- See also: [type-extraction-large-components-20251223.md](../best-practices/type-extraction-large-components-20251223.md) - Type extraction pattern

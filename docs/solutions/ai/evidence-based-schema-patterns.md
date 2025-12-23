@@ -809,3 +809,7 @@ Your output must be valid JSON matching this structure:
 **Created**: 2025-12-19
 **Type**: Reference
 **Audience**: Engineers implementing evidence-based prompts
+
+## Related Issues
+
+- See also: [schema-antifragility-llm-output-20251223.md](../architecture/schema-antifragility-llm-output-20251223.md) - Antifragile schema patterns for handling LLM output variations

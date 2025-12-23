@@ -158,5 +158,7 @@ reports/
 
 ## Related Issues
 
-- See also: [p1-security-fixes-code-review-20251223.md](../security-issues/p1-security-fixes-code-review-20251223.md)
-- See also: [schema-antifragility-llm-output-20251223.md](../architecture/schema-antifragility-llm-output-20251223.md)
+- See also: [design-system-extraction-pattern-20241222.md](../architecture/design-system-extraction-pattern-20241222.md) - Earlier extraction pattern for UI components
+- See also: [shared-component-library-extraction-20251223.md](../ui/shared-component-library-extraction-20251223.md) - Companion component extraction
+- See also: [p1-security-fixes-code-review-20251223.md](../security-issues/p1-security-fixes-code-review-20251223.md) - Related P1/P2 fixes
+- See also: [schema-antifragility-llm-output-20251223.md](../architecture/schema-antifragility-llm-output-20251223.md) - Schema validation patterns

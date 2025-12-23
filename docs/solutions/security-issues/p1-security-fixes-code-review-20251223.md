@@ -193,5 +193,7 @@ const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
 ## Related Issues
 
-- See also: [schema-antifragility-llm-output-20251223.md](../architecture/schema-antifragility-llm-output-20251223.md)
-- See also: [type-extraction-large-components-20251223.md](../best-practices/type-extraction-large-components-20251223.md)
+- See also: [usage-tracking-security-hardening.md](../security/usage-tracking-security-hardening.md) - TOCTOU and authorization patterns
+- See also: [usage-based-billing-freemium.md](../features/usage-based-billing-freemium.md) - First report freemium model
+- See also: [schema-antifragility-llm-output-20251223.md](../architecture/schema-antifragility-llm-output-20251223.md) - Schema validation fixes
+- See also: [type-extraction-large-components-20251223.md](../best-practices/type-extraction-large-components-20251223.md) - Component refactoring

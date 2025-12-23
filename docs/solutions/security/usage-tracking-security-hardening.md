@@ -53,3 +53,7 @@ END IF;
 - `/apps/web/supabase/migrations/20251219232541_fix-usage-tracking-security.sql`
 
 **Version**: 1.0 | **Updated**: 2025-12-19
+
+## Related Issues
+
+- See also: [p1-security-fixes-code-review-20251223.md](../security-issues/p1-security-fixes-code-review-20251223.md) - Additional P1 security fixes (race conditions, token enumeration)

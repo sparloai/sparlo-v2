@@ -148,3 +148,5 @@ import {
 ## Related Issues
 
 - See also: [Aura Report Redesign Plan](../../plans/sparlo-aura-report-redesign.md)
+- See also: [type-extraction-large-components-20251223.md](../best-practices/type-extraction-large-components-20251223.md) - Follow-up type extraction (500+ lines)
+- See also: [shared-component-library-extraction-20251223.md](../ui/shared-component-library-extraction-20251223.md) - Follow-up component extraction (24 components)
