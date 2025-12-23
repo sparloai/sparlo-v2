@@ -89,22 +89,22 @@ const TRACK_CONFIG: Record<string, { label: string; className: string }> = {
   simpler_path: {
     label: 'Simpler Path',
     className:
-      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      'border border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400',
   },
   best_fit: {
     label: 'Best Fit',
     className:
-      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      'border border-blue-300 bg-zinc-50 text-blue-700 dark:border-blue-700 dark:bg-zinc-800 dark:text-blue-400',
   },
   paradigm_shift: {
     label: 'Paradigm Shift',
     className:
-      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      'border border-zinc-400 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   },
   frontier_transfer: {
     label: 'Frontier Transfer',
     className:
-      'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+      'border border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
   },
 };
 
@@ -122,14 +122,15 @@ const TrackBadge = memo(function TrackBadge({ track }: { track?: string }) {
 const CONFIDENCE_CONFIG: Record<string, { className: string }> = {
   high: {
     className:
-      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      'border border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400',
   },
   medium: {
     className:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      'border border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   },
   low: {
-    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    className:
+      'border border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
   },
 };
 
@@ -164,7 +165,7 @@ function RecommendationCard({
       className={cn(
         'rounded-xl border p-6',
         isPrimary
-          ? 'border-violet-200 bg-violet-50/50 dark:border-violet-800 dark:bg-violet-900/20'
+          ? 'border-l-4 border-zinc-200 border-l-zinc-900 bg-zinc-50/50 dark:border-zinc-700 dark:border-l-zinc-100 dark:bg-zinc-800/50'
           : 'border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50',
       )}
     >
@@ -308,7 +309,7 @@ function RecommendationCard({
             {recommendation.key_risks.map((risk, idx) => (
               <div
                 key={idx}
-                className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800/50 dark:bg-amber-900/20"
+                className="rounded-lg border border-l-4 border-zinc-200 border-l-orange-500 bg-zinc-50 p-3 dark:border-zinc-700 dark:border-l-orange-600 dark:bg-zinc-800"
               >
                 <div className="mb-1 flex items-center gap-2">
                   <span className="text-sm font-medium text-zinc-900 dark:text-white">
@@ -377,22 +378,22 @@ const SOURCE_TYPE_CONFIG: Record<string, { label: string; className: string }> =
     CATALOG: {
       label: 'Catalog Solution',
       className:
-        'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        'border border-blue-300 bg-zinc-50 text-blue-700 dark:border-blue-700 dark:bg-zinc-800 dark:text-blue-400',
     },
     TRANSFER: {
       label: 'Cross-Domain Transfer',
       className:
-        'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+        'border border-zinc-400 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
     },
     OPTIMIZATION: {
       label: 'Optimization',
       className:
-        'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        'border border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400',
     },
     FIRST_PRINCIPLES: {
       label: 'First Principles',
       className:
-        'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+        'border border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
     },
   };
 
@@ -417,22 +418,23 @@ const INNOVATION_TYPE_CONFIG: Record<
 > = {
   PARADIGM_SHIFT: {
     label: 'Paradigm Shift',
-    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    className:
+      'border border-zinc-400 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   },
   CROSS_DOMAIN_TRANSFER: {
     label: 'Cross-Domain',
     className:
-      'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+      'border border-zinc-400 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   },
   TECHNOLOGY_REVIVAL: {
     label: 'Tech Revival',
     className:
-      'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+      'border border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
   },
   FIRST_PRINCIPLES: {
     label: 'First Principles',
     className:
-      'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+      'border border-blue-300 bg-zinc-50 text-blue-700 dark:border-blue-700 dark:bg-zinc-800 dark:text-blue-400',
   },
 };
 
@@ -539,7 +541,7 @@ function FrontierWatchCard({
             <div className="space-y-4 text-sm">
               {item.recent_developments && (
                 <div>
-                  <span className="mb-2 block font-mono text-xs font-bold text-zinc-400">
+                  <span className="mb-2 block font-mono text-xs font-bold text-zinc-200">
                     RECENT DEVELOPMENTS
                   </span>
                   <p className="leading-relaxed text-zinc-100">
@@ -549,7 +551,7 @@ function FrontierWatchCard({
               )}
               {item.competitive_activity && (
                 <div>
-                  <span className="mb-2 block font-mono text-xs font-bold text-zinc-400">
+                  <span className="mb-2 block font-mono text-xs font-bold text-zinc-200">
                     COMPETITIVE ACTIVITY
                   </span>
                   <p className="leading-relaxed text-zinc-100">
@@ -604,11 +606,11 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
   if (!insight) return null;
 
   return (
-    <div className="space-y-3 rounded-lg border border-violet-200 bg-violet-50/50 p-4 dark:border-violet-800 dark:bg-violet-900/20">
+    <div className="space-y-3 rounded-lg border-l-4 border-zinc-300 bg-zinc-50 p-4 dark:border-zinc-600 dark:bg-zinc-800/50">
       <div className="flex items-start gap-2">
-        <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-violet-600 dark:text-violet-400" />
+        <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-zinc-600 dark:text-zinc-400" />
         <div>
-          <span className="text-xs font-medium tracking-wider text-violet-600 uppercase dark:text-violet-400">
+          <span className="text-xs font-medium tracking-wider text-zinc-600 uppercase dark:text-zinc-400">
             The Insight
           </span>
           <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-200">
@@ -713,12 +715,12 @@ function HonestAssessmentSection({
 
           {/* What Would Need to Change */}
           {assessment.if_value_is_limited && (
-            <div className="rounded-xl border border-amber-200 bg-amber-50/30 p-6">
+            <div className="rounded-xl border border-l-4 border-zinc-200 border-l-orange-500 bg-zinc-50/30 p-6 dark:border-zinc-700 dark:border-l-orange-600 dark:bg-zinc-800/30">
               <div className="mb-3 flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-amber-600" />
+                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                 <MonoLabel>What Would Need to Change</MonoLabel>
               </div>
-              <p className="text-base leading-relaxed text-zinc-700">
+              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
                 {assessment.if_value_is_limited}
               </p>
             </div>
@@ -748,7 +750,7 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
             {search.enhanced_challenge_frame.search_queries &&
               search.enhanced_challenge_frame.search_queries.length > 0 && (
                 <div className="border-t border-zinc-800 pt-8">
-                  <h4 className="mb-4 font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">
+                  <h4 className="mb-4 font-mono text-xs font-bold tracking-widest text-zinc-200 uppercase">
                     Search Queries
                   </h4>
                   <div className="flex flex-wrap gap-3">
@@ -756,7 +758,7 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
                       (query, idx) => (
                         <span
                           key={idx}
-                          className="rounded-full border border-zinc-700 bg-zinc-900/50 px-3 py-1.5 font-mono text-xs font-medium text-zinc-300"
+                          className="rounded-full border border-zinc-600 bg-zinc-800/50 px-3 py-1.5 font-mono text-xs font-medium text-zinc-100"
                         >
                           {query}
                         </span>
@@ -831,8 +833,14 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
 
 const ExecutionTrackSection = memo(function ExecutionTrackSection({
   track,
+  coupledEffects,
+  sustainabilityFlag,
+  ipConsiderations,
 }: {
   track?: ExecutionTrack;
+  coupledEffects?: CoupledEffect[];
+  sustainabilityFlag?: SustainabilityFlag;
+  ipConsiderations?: IPConsiderations;
 }) {
   if (!track) return null;
 
@@ -859,11 +867,6 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   <span className="text-xs font-medium tracking-wider text-green-600 uppercase dark:text-green-400">
                     Primary Recommendation
                   </span>
-                  {track.primary.id && (
-                    <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
-                      {track.primary.id}
-                    </span>
-                  )}
                 </div>
                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                   {track.primary.title}
@@ -992,12 +995,201 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   </div>
                 </div>
               )}
+
+            {/* Coupled Effects */}
+            {coupledEffects && coupledEffects.length > 0 && (
+              <div className="mt-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <GitBranch className="h-4 w-4 text-zinc-400" />
+                  <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                    Coupled Effects
+                  </span>
+                </div>
+                <div className="space-y-2">
+                  {coupledEffects.map((effect, idx) => (
+                    <div
+                      key={idx}
+                      className={cn(
+                        'rounded-lg border p-3',
+                        effect.direction === 'BETTER'
+                          ? 'border-l-4 border-zinc-200 border-l-green-500 bg-zinc-50/50 dark:border-zinc-700 dark:border-l-green-600 dark:bg-zinc-800/50'
+                          : effect.direction === 'WORSE'
+                            ? 'border-l-4 border-zinc-200 border-l-red-500 bg-zinc-50/50 dark:border-zinc-700 dark:border-l-red-600 dark:bg-zinc-800/50'
+                            : 'border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50',
+                      )}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium text-zinc-900 dark:text-white">
+                          {effect.domain}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              'text-xs',
+                              effect.direction === 'BETTER'
+                                ? 'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400'
+                                : effect.direction === 'WORSE'
+                                  ? 'border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400'
+                                  : 'border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+                            )}
+                          >
+                            {effect.direction}
+                          </Badge>
+                          {effect.magnitude && (
+                            <Badge variant="outline" className="text-xs">
+                              {effect.magnitude}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
+                        {effect.effect}
+                      </p>
+                      {effect.quantified && (
+                        <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                          Quantified: {effect.quantified}
+                        </p>
+                      )}
+                      {effect.mitigation && (
+                        <p className="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                          Mitigation: {effect.mitigation}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sustainability Flag */}
+            {sustainabilityFlag && sustainabilityFlag.type !== 'NONE' && (
+              <div
+                className={cn(
+                  'mt-4 rounded-lg border p-3',
+                  sustainabilityFlag.type === 'BENEFIT'
+                    ? 'border-l-4 border-zinc-200 border-l-green-500 bg-zinc-50/50 dark:border-zinc-700 dark:border-l-green-600 dark:bg-zinc-800/50'
+                    : sustainabilityFlag.type === 'CAUTION' ||
+                        sustainabilityFlag.type === 'LIFECYCLE_TRADEOFF'
+                      ? 'border-l-4 border-zinc-200 border-l-orange-500 bg-zinc-50/50 dark:border-zinc-700 dark:border-l-orange-600 dark:bg-zinc-800/50'
+                      : 'border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50',
+                )}
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <Sparkles
+                    className={cn(
+                      'h-4 w-4',
+                      sustainabilityFlag.type === 'BENEFIT'
+                        ? 'text-green-600 dark:text-green-400'
+                        : sustainabilityFlag.type === 'CAUTION' ||
+                            sustainabilityFlag.type === 'LIFECYCLE_TRADEOFF'
+                          ? 'text-orange-600 dark:text-orange-400'
+                          : 'text-zinc-400',
+                    )}
+                  />
+                  <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                    Sustainability
+                  </span>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      'text-xs',
+                      sustainabilityFlag.type === 'BENEFIT'
+                        ? 'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400'
+                        : sustainabilityFlag.type === 'CAUTION' ||
+                            sustainabilityFlag.type === 'LIFECYCLE_TRADEOFF'
+                          ? 'border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400'
+                          : 'border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+                    )}
+                  >
+                    {sustainabilityFlag.type?.replace(/_/g, ' ')}
+                  </Badge>
+                </div>
+                {sustainabilityFlag.summary && (
+                  <p className="text-sm text-zinc-700 dark:text-zinc-200">
+                    {sustainabilityFlag.summary}
+                  </p>
+                )}
+                {sustainabilityFlag.detail && (
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+                    {sustainabilityFlag.detail}
+                  </p>
+                )}
+                {sustainabilityFlag.alternative && (
+                  <p className="mt-2 text-xs text-blue-600 dark:text-blue-400">
+                    Alternative: {sustainabilityFlag.alternative}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* IP Considerations */}
+            {ipConsiderations && (
+              <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 dark:border-zinc-700 dark:bg-zinc-800/50">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-zinc-400" />
+                    <span className="text-sm font-medium text-zinc-900 dark:text-white">
+                      IP Considerations
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {ipConsiderations.freedom_to_operate && (
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'text-xs',
+                          ipConsiderations.freedom_to_operate === 'GREEN'
+                            ? 'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400'
+                            : ipConsiderations.freedom_to_operate === 'YELLOW'
+                              ? 'border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400'
+                              : 'border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
+                        )}
+                      >
+                        FTO: {ipConsiderations.freedom_to_operate}
+                      </Badge>
+                    )}
+                    {ipConsiderations.patentability_potential && (
+                      <Badge variant="outline" className="text-xs">
+                        Patentability:{' '}
+                        {ipConsiderations.patentability_potential}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                {ipConsiderations.rationale && (
+                  <p className="text-sm text-zinc-600 dark:text-zinc-300">
+                    {ipConsiderations.rationale}
+                  </p>
+                )}
+                {ipConsiderations.key_patents_to_review &&
+                  ipConsiderations.key_patents_to_review.length > 0 && (
+                    <div className="mt-2">
+                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                        Key Patents to Review
+                      </span>
+                      <ul className="mt-1 space-y-1">
+                        {ipConsiderations.key_patents_to_review.map(
+                          (patent, idx) => (
+                            <li
+                              key={idx}
+                              className="text-xs text-zinc-600 dark:text-zinc-300"
+                            >
+                              • {patent}
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    </div>
+                  )}
+              </div>
+            )}
           </div>
         )}
 
         {/* Supplier Arbitrage (for CATALOG source type) */}
         {track.supplier_arbitrage && (
-          <div className="rounded-xl border border-blue-200 bg-blue-50/50 p-6 dark:border-blue-800 dark:bg-blue-900/20">
+          <div className="rounded-xl border border-l-4 border-zinc-200 border-l-blue-500 bg-zinc-50/50 p-6 dark:border-zinc-700 dark:border-l-blue-600 dark:bg-zinc-800/50">
             <div className="mb-4 flex items-center gap-2">
               <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
@@ -1056,9 +1248,9 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
 
         {/* Why Not Obvious (for TRANSFER/FIRST_PRINCIPLES) */}
         {track.why_not_obvious && (
-          <div className="rounded-xl border border-purple-200 bg-purple-50/50 p-6 dark:border-purple-800 dark:bg-purple-900/20">
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
             <div className="mb-4 flex items-center gap-2">
-              <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <Brain className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
                 Why This Wasn&apos;t Obvious
               </span>
@@ -1089,7 +1281,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                     Our Contribution
                   </span>
-                  <p className="text-sm font-medium text-purple-700 dark:text-purple-400">
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     {track.why_not_obvious.our_contribution}
                   </p>
                 </div>
@@ -1115,11 +1307,6 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      {concept.id && (
-                        <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
-                          {concept.id}
-                        </span>
-                      )}
                       <h5 className="font-medium text-zinc-900 dark:text-white">
                         {concept.title}
                       </h5>
@@ -1146,7 +1333,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                     </p>
                   )}
                   {concept.when_to_use_instead && (
-                    <div className="mt-3 rounded bg-amber-50 p-2 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-400">
+                    <div className="mt-3 rounded border-l-4 border-l-orange-500 bg-zinc-50 p-2 text-xs text-zinc-700 dark:border-l-orange-600 dark:bg-zinc-800 dark:text-zinc-300">
                       <strong>When to use instead: </strong>
                       {concept.when_to_use_instead}
                     </div>
@@ -1159,9 +1346,9 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
 
         {/* Fallback Trigger */}
         {track.fallback_trigger && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-4 dark:border-amber-800/50 dark:bg-amber-900/20">
+          <div className="rounded-xl border border-l-4 border-zinc-200 border-l-orange-600 bg-white p-4 dark:border-zinc-700 dark:border-l-orange-500 dark:bg-zinc-800">
             <div className="mb-2 flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-500" />
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
                 When to Pivot
               </span>
@@ -1180,7 +1367,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                 </ul>
               )}
             {track.fallback_trigger.pivot_to && (
-              <p className="text-sm text-amber-700 dark:text-amber-400">
+              <p className="text-sm text-orange-700 dark:text-orange-400">
                 → Pivot to: {track.fallback_trigger.pivot_to}
               </p>
             )}
@@ -1218,19 +1405,14 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
 
         {/* Recommended Innovation */}
         {portfolio.recommended_innovation && (
-          <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-white p-6 dark:border-violet-800 dark:from-violet-900/30 dark:to-zinc-900">
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
             <div className="mb-4 flex items-start justify-between gap-4">
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-violet-600 dark:text-violet-400" />
-                  <span className="text-xs font-medium tracking-wider text-violet-600 uppercase dark:text-violet-400">
+                  <Sparkles className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
+                  <span className="text-xs font-medium tracking-wider text-zinc-600 uppercase dark:text-zinc-400">
                     Recommended Innovation
                   </span>
-                  {portfolio.recommended_innovation.id && (
-                    <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
-                      {portfolio.recommended_innovation.id}
-                    </span>
-                  )}
                 </div>
                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
                   {portfolio.recommended_innovation.title}
@@ -1305,7 +1487,7 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
 
             {portfolio.recommended_innovation.breakthrough_potential
               ?.if_it_works && (
-              <div className="mt-4 rounded-lg border border-green-200 bg-green-50/50 p-4 dark:border-green-800 dark:bg-green-900/20">
+              <div className="mt-4 rounded-lg border border-l-4 border-zinc-200 border-l-green-500 bg-zinc-50/50 p-4 dark:border-zinc-700 dark:border-l-green-600 dark:bg-zinc-800/50">
                 <div className="mb-2 flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <span className="text-sm font-medium text-zinc-900 dark:text-white">
@@ -1416,11 +1598,6 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                   >
                     <div className="mb-2 flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        {inv.id && (
-                          <span className="font-mono text-xs text-zinc-400 dark:text-zinc-500">
-                            {inv.id}
-                          </span>
-                        )}
                         <h5 className="font-medium text-zinc-900 dark:text-white">
                           {inv.title}
                         </h5>
@@ -1474,7 +1651,7 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                       </p>
                     )}
                     {inv.when_to_elevate && (
-                      <div className="mt-3 rounded bg-violet-50 p-2 text-xs text-violet-700 dark:bg-violet-900/20 dark:text-violet-400">
+                      <div className="mt-3 rounded border-l-4 border-l-zinc-400 bg-zinc-50 p-2 text-xs text-zinc-700 dark:border-l-zinc-500 dark:bg-zinc-800 dark:text-zinc-300">
                         <strong>When to elevate: </strong>
                         {inv.when_to_elevate}
                       </div>
@@ -1507,7 +1684,103 @@ const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
         subtitle="Understanding the landscape"
       />
       <div className="space-y-8">
-        {/* Current State of the Art - Benchmarks Table */}
+        {/* 1. What's Wrong */}
+        {analysis.whats_wrong?.prose && (
+          <CardWithHeader icon={AlertTriangle} label="What's Wrong">
+            <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
+              {analysis.whats_wrong.prose}
+            </p>
+          </CardWithHeader>
+        )}
+
+        {/* 2. Why It's Hard */}
+        {analysis.why_its_hard && (
+          <CardWithHeader icon={AlertTriangle} label="Why It's Hard">
+            <div className="space-y-6">
+              {analysis.why_its_hard.prose && (
+                <p className="text-base leading-relaxed text-zinc-700">
+                  {analysis.why_its_hard.prose}
+                </p>
+              )}
+              {analysis.why_its_hard.governing_equation && (
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+                  <MonoLabel>Governing Equation</MonoLabel>
+                  <p className="mt-2 font-mono text-sm text-zinc-900">
+                    {analysis.why_its_hard.governing_equation.equation}
+                  </p>
+                  {analysis.why_its_hard.governing_equation.explanation && (
+                    <p className="mt-2 text-sm text-zinc-600">
+                      {analysis.why_its_hard.governing_equation.explanation}
+                    </p>
+                  )}
+                </div>
+              )}
+              {analysis.why_its_hard.factors &&
+                analysis.why_its_hard.factors.length > 0 && (
+                  <div className="space-y-2">
+                    {analysis.why_its_hard.factors.map((f, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-start gap-3 rounded-lg border border-zinc-200 p-3"
+                      >
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-700">
+                          {idx + 1}
+                        </span>
+                        <div>
+                          <p className="font-medium text-zinc-900">
+                            {f.factor}
+                          </p>
+                          {f.explanation && (
+                            <p className="mt-1 text-sm text-zinc-600">
+                              {f.explanation}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+            </div>
+          </CardWithHeader>
+        )}
+
+        {/* 3. First Principles Insight */}
+        {analysis.first_principles_insight && (
+          <DarkSection label="First Principles Insight">
+            <p className="text-xl leading-relaxed font-medium text-white">
+              {analysis.first_principles_insight.headline}
+            </p>
+            {analysis.first_principles_insight.explanation && (
+              <p className="mt-4 text-base leading-relaxed text-zinc-200">
+                {analysis.first_principles_insight.explanation}
+              </p>
+            )}
+          </DarkSection>
+        )}
+
+        {/* 4. What Industry Does Today */}
+        {analysis.what_industry_does_today &&
+          analysis.what_industry_does_today.length > 0 && (
+            <CardWithHeader icon={Users} label="What Industry Does Today">
+              <div className="space-y-3">
+                {analysis.what_industry_does_today.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="rounded-lg border border-zinc-200 p-4"
+                  >
+                    <p className="font-medium text-zinc-900">{item.approach}</p>
+                    {item.limitation && (
+                      <p className="mt-1 text-sm text-orange-700">
+                        Limitation: {item.limitation}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </CardWithHeader>
+          )}
+
+        {/* 5. Current State of the Art - Benchmarks Table */}
         {analysis.current_state_of_art?.benchmarks &&
           analysis.current_state_of_art.benchmarks.length > 0 && (
             <CardWithHeader icon={Target} label="Current State of the Art">
@@ -1551,102 +1824,6 @@ const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
             </CardWithHeader>
           )}
 
-        {/* What's Wrong */}
-        {analysis.whats_wrong?.prose && (
-          <CardWithHeader icon={AlertTriangle} label="What's Wrong">
-            <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
-              {analysis.whats_wrong.prose}
-            </p>
-          </CardWithHeader>
-        )}
-
-        {/* What Industry Does Today */}
-        {analysis.what_industry_does_today &&
-          analysis.what_industry_does_today.length > 0 && (
-            <CardWithHeader icon={Users} label="What Industry Does Today">
-              <div className="space-y-3">
-                {analysis.what_industry_does_today.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="rounded-lg border border-zinc-200 p-4"
-                  >
-                    <p className="font-medium text-zinc-900">{item.approach}</p>
-                    {item.limitation && (
-                      <p className="mt-1 text-sm text-amber-700">
-                        Limitation: {item.limitation}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </CardWithHeader>
-          )}
-
-        {/* Why It's Hard */}
-        {analysis.why_its_hard && (
-          <CardWithHeader icon={AlertTriangle} label="Why It's Hard">
-            <div className="space-y-6">
-              {analysis.why_its_hard.prose && (
-                <p className="text-base leading-relaxed text-zinc-700">
-                  {analysis.why_its_hard.prose}
-                </p>
-              )}
-              {analysis.why_its_hard.governing_equation && (
-                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-                  <MonoLabel>Governing Equation</MonoLabel>
-                  <p className="mt-2 font-mono text-sm text-zinc-900">
-                    {analysis.why_its_hard.governing_equation.equation}
-                  </p>
-                  {analysis.why_its_hard.governing_equation.explanation && (
-                    <p className="mt-2 text-sm text-zinc-600">
-                      {analysis.why_its_hard.governing_equation.explanation}
-                    </p>
-                  )}
-                </div>
-              )}
-              {analysis.why_its_hard.factors &&
-                analysis.why_its_hard.factors.length > 0 && (
-                  <div className="space-y-2">
-                    {analysis.why_its_hard.factors.map((f, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-start gap-3 rounded-lg border border-zinc-200 p-3"
-                      >
-                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-700">
-                          {idx + 1}
-                        </span>
-                        <div>
-                          <p className="font-medium text-zinc-900">
-                            {f.factor}
-                          </p>
-                          {f.explanation && (
-                            <p className="mt-1 text-sm text-zinc-600">
-                              {f.explanation}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-            </div>
-          </CardWithHeader>
-        )}
-
-        {/* First Principles Insight */}
-        {analysis.first_principles_insight && (
-          <DarkSection label="First Principles Insight">
-            <p className="text-xl leading-relaxed font-medium text-white">
-              {analysis.first_principles_insight.headline}
-            </p>
-            {analysis.first_principles_insight.explanation && (
-              <p className="mt-4 text-base leading-relaxed text-zinc-300">
-                {analysis.first_principles_insight.explanation}
-              </p>
-            )}
-          </DarkSection>
-        )}
-
         {/* Root Cause Hypotheses */}
         {analysis.root_cause_hypotheses &&
           analysis.root_cause_hypotheses.length > 0 && (
@@ -1672,12 +1849,12 @@ const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
                             'text-xs',
                             (hypothesis.confidence_percent ?? 0) >= 70 ||
                               hypothesis.confidence?.toLowerCase() === 'high'
-                              ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                              ? 'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400'
                               : (hypothesis.confidence_percent ?? 0) >= 40 ||
                                   hypothesis.confidence?.toLowerCase() ===
                                     'medium'
-                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
-                                : 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                                ? 'border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                                : 'border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
                           )}
                         >
                           {hypothesis.confidence_percent !== undefined
@@ -1827,7 +2004,7 @@ const ChallengeTheFrameSection = memo(function ChallengeTheFrameSection({
         {challenges.map((c, idx) => (
           <div
             key={idx}
-            className="rounded-xl border border-amber-200 bg-amber-50/30 p-6"
+            className="rounded-xl border border-zinc-200 bg-zinc-50/30 p-6 dark:border-zinc-700 dark:bg-zinc-800/30"
           >
             <div className="mb-3">
               <MonoLabel>Assumption</MonoLabel>
@@ -1858,9 +2035,10 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
   if (!risks || risks.length === 0) return null;
 
   const severityColors = {
-    high: 'bg-red-100 text-red-800 border-red-200',
-    medium: 'bg-amber-100 text-amber-800 border-amber-200',
-    low: 'bg-green-100 text-green-800 border-green-200',
+    high: 'border border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
+    medium:
+      'border border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
+    low: 'border border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   };
 
   return (
@@ -2032,7 +2210,7 @@ function StrategicIntegrationSection({
             </div>
             <div className="space-y-3">
               {integration.portfolio_view.execution_track_role && (
-                <div className="rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
+                <div className="rounded-lg border border-l-4 border-zinc-200 border-l-green-500 bg-zinc-50 p-3 dark:border-zinc-700 dark:border-l-green-600 dark:bg-zinc-800">
                   <span className="text-xs font-medium text-green-700 dark:text-green-400">
                     Execution Track
                   </span>
@@ -2042,8 +2220,8 @@ function StrategicIntegrationSection({
                 </div>
               )}
               {integration.portfolio_view.innovation_portfolio_role && (
-                <div className="rounded-lg bg-violet-50 p-3 dark:bg-violet-900/20">
-                  <span className="text-xs font-medium text-violet-700 dark:text-violet-400">
+                <div className="rounded-lg border border-l-4 border-zinc-200 border-l-zinc-500 bg-zinc-50 p-3 dark:border-zinc-700 dark:border-l-zinc-400 dark:bg-zinc-800">
+                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
                     Innovation Portfolio
                   </span>
                   <p className="text-sm text-zinc-600 dark:text-zinc-300">
@@ -2072,7 +2250,7 @@ function StrategicIntegrationSection({
             <div className="mb-4 grid gap-2 sm:grid-cols-4">
               {integration.resource_allocation.execution_track_percent !==
                 undefined && (
-                <div className="rounded-lg bg-green-50 p-3 text-center dark:bg-green-900/20">
+                <div className="rounded-lg border border-l-4 border-zinc-200 border-l-green-500 bg-zinc-50 p-3 text-center dark:border-zinc-700 dark:border-l-green-600 dark:bg-zinc-800">
                   <div className="text-2xl font-bold text-green-700 dark:text-green-400">
                     {integration.resource_allocation.execution_track_percent}%
                   </div>
@@ -2083,8 +2261,8 @@ function StrategicIntegrationSection({
               )}
               {integration.resource_allocation
                 .recommended_innovation_percent !== undefined && (
-                <div className="rounded-lg bg-violet-50 p-3 text-center dark:bg-violet-900/20">
-                  <div className="text-2xl font-bold text-violet-700 dark:text-violet-400">
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-center dark:border-zinc-700 dark:bg-zinc-800">
+                  <div className="text-2xl font-bold text-zinc-700 dark:text-zinc-300">
                     {
                       integration.resource_allocation
                         .recommended_innovation_percent
@@ -2098,7 +2276,7 @@ function StrategicIntegrationSection({
               )}
               {integration.resource_allocation
                 .parallel_investigations_percent !== undefined && (
-                <div className="rounded-lg bg-blue-50 p-3 text-center dark:bg-blue-900/20">
+                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-center dark:border-zinc-700 dark:bg-zinc-800">
                   <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
                     {
                       integration.resource_allocation
@@ -2133,9 +2311,9 @@ function StrategicIntegrationSection({
 
         {/* Decision Architecture */}
         {integration.decision_architecture?.primary_tradeoff && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-6 dark:border-amber-800/50 dark:bg-amber-900/20">
+          <div className="rounded-xl border border-l-4 border-zinc-200 border-l-zinc-500 bg-zinc-50/50 p-6 dark:border-zinc-700 dark:border-l-zinc-400 dark:bg-zinc-800/50">
             <div className="mb-4 flex items-center gap-2">
-              <GitBranch className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <GitBranch className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
                 The Primary Tradeoff
               </span>
@@ -2457,7 +2635,7 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {report.brief && (
         <section id="brief">
           <SectionHeader
-            title="The Problem"
+            title="The Brief"
             subtitle="Original problem statement"
           />
           <CardWithHeader icon={FileText} label="Brief">
@@ -2472,7 +2650,7 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {report.executive_summary && (
         <section id="executive-summary">
           <SectionHeader title="Executive Summary" subtitle="The bottom line" />
-          <CardWithHeader icon={Target} label="The Brief">
+          <CardWithHeader icon={Target} label="Executive Summary">
             {typeof report.executive_summary === 'string' ? (
               <p className="text-xl leading-relaxed font-light text-zinc-950 sm:text-2xl">
                 {report.executive_summary}
@@ -2526,9 +2704,9 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
                 )}
                 {/* Primary recommendation */}
                 {report.executive_summary.primary_recommendation && (
-                  <div className="rounded-xl border border-blue-100 bg-blue-50/30 p-6">
+                  <div className="rounded-xl border border-l-4 border-zinc-200 border-l-zinc-900 bg-zinc-50/30 p-6 dark:border-zinc-700 dark:border-l-zinc-100 dark:bg-zinc-800/30">
                     <MonoLabel>Primary Recommendation</MonoLabel>
-                    <p className="mt-3 text-base leading-relaxed font-medium text-zinc-900">
+                    <p className="mt-3 text-base leading-relaxed font-medium text-zinc-900 dark:text-white">
                       {report.executive_summary.primary_recommendation}
                     </p>
                   </div>
@@ -2573,7 +2751,12 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       <CrossDomainSearchSection search={report.cross_domain_search} />
 
       {/* NEW: Execution Track (new framework) */}
-      <ExecutionTrackSection track={executionTrack} />
+      <ExecutionTrackSection
+        track={executionTrack}
+        coupledEffects={rawSolutionConcepts?.primary?.coupled_effects}
+        sustainabilityFlag={rawSolutionConcepts?.primary?.sustainability_flag}
+        ipConsiderations={rawSolutionConcepts?.primary?.ip_considerations}
+      />
 
       {/* NEW: Innovation Portfolio (new framework) */}
       <InnovationPortfolioSection portfolio={innovationPortfolio} />
@@ -2763,7 +2946,7 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
             title="Self-Critique"
             subtitle="Honest assessment of this analysis"
           />
-          <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-6 dark:border-amber-800/50 dark:bg-amber-900/20">
+          <div className="rounded-xl border border-l-4 border-zinc-200 border-l-orange-600 bg-white p-6 dark:border-zinc-700 dark:border-l-orange-500 dark:bg-zinc-800">
             {/* Confidence - v4.0 uses overall_confidence, fallback to confidence_level */}
             <div className="mb-4 flex items-center gap-2">
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
@@ -2797,7 +2980,7 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
                           key={idx}
                           className="flex gap-2 text-sm text-zinc-600 dark:text-zinc-300"
                         >
-                          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" />
+                          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-600" />
                           {item}
                         </li>
                       ),
@@ -2849,11 +3032,11 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
                             className={cn(
                               'text-xs',
                               gap.status === 'ADDRESSED' &&
-                                'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                                'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400',
                               gap.status === 'EXTENDED_NEEDED' &&
-                                'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+                                'border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
                               gap.status === 'ACCEPTED_RISK' &&
-                                'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+                                'border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
                             )}
                           >
                             {gap.status.replace(/_/g, ' ')}
@@ -2876,9 +3059,6 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
 
       {/* What I'd Actually Do */}
       <WhatIdActuallyDoSection content={report.what_id_actually_do} />
-
-      {/* Follow-up Prompts */}
-      <FollowUpPromptsSection prompts={report.follow_up_prompts} />
     </div>
   );
 }
