@@ -1,36 +1,23 @@
 import { Document, Page, StyleSheet, Text, View } from '@react-pdf/renderer';
 
-// Import legacy types for backward compatibility
-import type {
-  ConceptRecommendation as LegacyConceptRecommendation,
-  ExecutiveSummary as LegacyExecutiveSummary,
-  ProblemAnalysis as LegacyProblemAnalysis,
-  RiskItem,
-} from '~/home/(user)/reports/_lib/types/report-data.types';
-
 import type { ReportForPDF } from '../_lib/types';
-// Import hybrid types for new report format
 import type {
-  ExecutionTrackPrimary,
-  ConceptRecommendation as HybridConceptRecommendation,
-  ProblemAnalysis as HybridProblemAnalysis,
+  ChallengeTheFrame,
+  ConstraintsAndMetrics,
+  ExecutionTrack,
+  FrontierWatch,
   HybridReportData,
-  RecommendedInnovation,
+  InnovationAnalysis,
+  InnovationPortfolio,
+  InsightBlock,
+  ParallelInvestigation,
+  ProblemAnalysis,
+  ProblemAnalysisBenchmark,
   RiskAndWatchout,
   StructuredExecutiveSummary,
   SupportingConcept,
+  ValidationGate,
 } from '../_lib/types';
-
-// Union types to handle both legacy and hybrid formats
-type ExecutiveSummaryData =
-  | string
-  | StructuredExecutiveSummary
-  | LegacyExecutiveSummary;
-type ProblemAnalysisData = HybridProblemAnalysis | LegacyProblemAnalysis;
-type ConceptRecommendation =
-  | HybridConceptRecommendation
-  | LegacyConceptRecommendation;
-type RiskData = RiskAndWatchout | RiskItem;
 
 // ============================================
 // Aura-Inspired PDF Styles
@@ -38,6 +25,7 @@ type RiskData = RiskAndWatchout | RiskItem;
 
 const colors = {
   zinc950: '#09090b',
+  zinc900: '#18181b',
   zinc800: '#27272a',
   zinc700: '#3f3f46',
   zinc600: '#52525b',
@@ -48,16 +36,20 @@ const colors = {
   zinc100: '#f4f4f5',
   zinc50: '#fafafa',
   white: '#ffffff',
-  green600: '#16a34a',
+  green700: '#15803d',
   green100: '#dcfce7',
-  amber600: '#d97706',
+  amber700: '#b45309',
+  amber500: '#f59e0b',
   amber100: '#fef3c7',
-  red600: '#dc2626',
+  red700: '#b91c1c',
+  red500: '#ef4444',
   red100: '#fee2e2',
-  blue600: '#2563eb',
+  blue700: '#1d4ed8',
   blue100: '#dbeafe',
-  violet600: '#7c3aed',
+  violet700: '#6d28d9',
+  violet500: '#8b5cf6',
   violet100: '#ede9fe',
+  orange500: '#f97316',
 };
 
 const styles = StyleSheet.create({
@@ -98,8 +90,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 12,
     paddingBottom: 8,
     borderBottomWidth: 2,
@@ -113,10 +103,15 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   sectionSubtitle: {
-    fontSize: 12,
+    fontSize: 9,
+    color: colors.zinc500,
+    marginTop: 2,
+  },
+  subsectionTitle: {
+    fontSize: 11,
     fontFamily: 'Helvetica-Bold',
     color: colors.zinc800,
-    marginBottom: 8,
+    marginBottom: 6,
     marginTop: 12,
   },
   // Content
@@ -164,6 +159,15 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
     color: colors.zinc600,
   },
+  // Mono Label (matches HTML MonoLabel component)
+  monoLabel: {
+    fontSize: 9,
+    fontFamily: 'Helvetica-Bold',
+    color: colors.zinc500,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
+  },
   // Badges
   badge: {
     paddingHorizontal: 8,
@@ -183,37 +187,19 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginBottom: 8,
   },
-  // Confidence colors
-  badgeHigh: {
-    backgroundColor: colors.green100,
-  },
-  badgeHighText: {
-    color: colors.green600,
-  },
-  badgeMedium: {
-    backgroundColor: colors.amber100,
-  },
-  badgeMediumText: {
-    color: colors.amber600,
-  },
-  badgeLow: {
-    backgroundColor: colors.red100,
-  },
-  badgeLowText: {
-    color: colors.red600,
-  },
-  badgeInfo: {
-    backgroundColor: colors.blue100,
-  },
-  badgeInfoText: {
-    color: colors.blue600,
-  },
-  badgePrimary: {
-    backgroundColor: colors.violet100,
-  },
-  badgePrimaryText: {
-    color: colors.violet600,
-  },
+  // Badge variants
+  badgeSuccess: { backgroundColor: colors.green100 },
+  badgeSuccessText: { color: colors.green700 },
+  badgeWarning: { backgroundColor: colors.amber100 },
+  badgeWarningText: { color: colors.amber700 },
+  badgeDanger: { backgroundColor: colors.red100 },
+  badgeDangerText: { color: colors.red700 },
+  badgeInfo: { backgroundColor: colors.blue100 },
+  badgeInfoText: { color: colors.blue700 },
+  badgePrimary: { backgroundColor: colors.violet100 },
+  badgePrimaryText: { color: colors.violet700 },
+  badgeNeutral: { backgroundColor: colors.zinc100 },
+  badgeNeutralText: { color: colors.zinc700 },
   // Lists
   listItem: {
     flexDirection: 'row',
@@ -237,6 +223,75 @@ const styles = StyleSheet.create({
     lineHeight: 1.5,
     color: colors.zinc700,
   },
+  // Colored dots for constraints
+  dotRed: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.red500,
+    marginRight: 8,
+    marginTop: 4,
+  },
+  dotAmber: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.amber500,
+    marginRight: 8,
+    marginTop: 4,
+  },
+  dotGray: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.zinc400,
+    marginRight: 8,
+    marginTop: 4,
+  },
+  // Tables
+  table: {
+    borderWidth: 1,
+    borderColor: colors.zinc200,
+    borderRadius: 4,
+    marginBottom: 12,
+  },
+  tableHeader: {
+    flexDirection: 'row',
+    backgroundColor: colors.zinc50,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.zinc200,
+    padding: 8,
+  },
+  tableHeaderCell: {
+    flex: 1,
+    fontSize: 8,
+    fontFamily: 'Helvetica-Bold',
+    color: colors.zinc600,
+    textTransform: 'uppercase',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.zinc100,
+    padding: 8,
+  },
+  tableCell: {
+    flex: 1,
+    fontSize: 9,
+    color: colors.zinc700,
+  },
+  tableCellBold: {
+    flex: 1,
+    fontSize: 9,
+    fontFamily: 'Helvetica-Bold',
+    color: colors.zinc900,
+  },
+  tableCellHighlight: {
+    flex: 1,
+    fontSize: 9,
+    fontFamily: 'Helvetica-Bold',
+    color: colors.green700,
+  },
   // Grid
   row: {
     flexDirection: 'row',
@@ -244,6 +299,10 @@ const styles = StyleSheet.create({
   },
   col2: {
     width: '50%',
+    paddingRight: 8,
+  },
+  col3: {
+    width: '33%',
     paddingRight: 8,
   },
   // Metadata
@@ -264,7 +323,9 @@ const styles = StyleSheet.create({
   // Insight box
   insightBox: {
     backgroundColor: colors.zinc100,
-    borderRadius: 6,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.zinc950,
+    borderRadius: 4,
     padding: 12,
     marginTop: 8,
     marginBottom: 8,
@@ -277,10 +338,20 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   insightText: {
-    fontSize: 10,
+    fontSize: 11,
     fontFamily: 'Helvetica-Bold',
     color: colors.zinc950,
     lineHeight: 1.4,
+  },
+  // Warning box
+  warningBox: {
+    backgroundColor: colors.zinc50,
+    borderLeftWidth: 4,
+    borderLeftColor: colors.orange500,
+    borderRadius: 4,
+    padding: 12,
+    marginTop: 8,
+    marginBottom: 8,
   },
   // Footer
   footer: {
@@ -308,55 +379,71 @@ const styles = StyleSheet.create({
 // Helper Components
 // ============================================
 
-function SectionHeader({ title }: { title: string }) {
+function SectionHeader({
+  title,
+  subtitle,
+}: {
+  title: string;
+  subtitle?: string;
+}) {
   return (
     <View style={styles.sectionHeader}>
       <Text style={styles.sectionTitle}>{title}</Text>
+      {subtitle && <Text style={styles.sectionSubtitle}>{subtitle}</Text>}
     </View>
   );
 }
 
-function ConfidenceBadge({ level }: { level?: string }) {
-  const normalizedLevel = level?.toLowerCase() ?? 'medium';
-  const isHigh = normalizedLevel === 'high' || normalizedLevel.includes('high');
-  const isLow = normalizedLevel === 'low' || normalizedLevel.includes('low');
+function MonoLabel({ children }: { children: string }) {
+  return <Text style={styles.monoLabel}>{children}</Text>;
+}
+
+function ConfidenceBadge({ level }: { level?: number | string }) {
+  let label: string;
+  let isHigh = false;
+  let isLow = false;
+
+  if (typeof level === 'number') {
+    label = `${level}%`;
+    isHigh = level >= 70;
+    isLow = level < 40;
+  } else {
+    const normalized = level?.toLowerCase() ?? 'medium';
+    label = level ?? 'Medium';
+    isHigh = normalized === 'high' || normalized.includes('high');
+    isLow = normalized === 'low' || normalized.includes('low');
+  }
 
   return (
     <View
       style={[
         styles.badge,
         isHigh
-          ? styles.badgeHigh
+          ? styles.badgeSuccess
           : isLow
-            ? styles.badgeLow
-            : styles.badgeMedium,
+            ? styles.badgeDanger
+            : styles.badgeWarning,
       ]}
     >
       <Text
         style={[
           styles.badgeText,
           isHigh
-            ? styles.badgeHighText
+            ? styles.badgeSuccessText
             : isLow
-              ? styles.badgeLowText
-              : styles.badgeMediumText,
+              ? styles.badgeDangerText
+              : styles.badgeWarningText,
         ]}
       >
-        {level ?? 'Medium'} Confidence
+        {label} Confidence
       </Text>
     </View>
   );
 }
 
-function TrackBadge({ track }: { track?: string }) {
-  if (!track) return null;
-
-  const label = track
-    .replace(/_/g, ' ')
-    .split(' ')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
-    .join(' ');
-
+function SourceTypeBadge({ type }: { type?: string }) {
+  if (!type) return null;
+  const label = type.replace(/_/g, ' ');
   return (
     <View style={[styles.badge, styles.badgeInfo]}>
       <Text style={[styles.badgeText, styles.badgeInfoText]}>{label}</Text>
@@ -364,185 +451,576 @@ function TrackBadge({ track }: { track?: string }) {
   );
 }
 
-// ============================================
-// Section Components
-// ============================================
+function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
+  if (!insight) return null;
 
-function ExecutiveSummarySection({ data }: { data?: ExecutiveSummaryData }) {
-  if (!data) return null;
-
-  // Handle string format
-  if (typeof data === 'string') {
-    return (
-      <View style={styles.section}>
-        <SectionHeader title="Executive Summary" />
-        <Text style={styles.paragraph}>{data}</Text>
-      </View>
-    );
-  }
-
-  // Helper to check if step is legacy format (step_number, content)
-  const isLegacyStep = (
-    step: unknown,
-  ): step is { step_number: number; content: string } => {
-    return (
-      typeof step === 'object' &&
-      step !== null &&
-      'step_number' in step &&
-      'content' in step
-    );
-  };
-
-  // Handle structured format (both legacy and hybrid)
   return (
-    <View style={styles.section}>
-      <SectionHeader title="Executive Summary" />
-
-      {/* Narrative Lead */}
-      {data.narrative_lead && (
-        <Text style={[styles.paragraph, { fontFamily: 'Helvetica-Oblique' }]}>
-          {data.narrative_lead}
-        </Text>
-      )}
-
-      {/* Core Insight */}
-      {data.core_insight && (
-        <View style={styles.insightBox}>
-          <Text style={styles.insightLabel}>Core Insight</Text>
-          {data.core_insight.headline && (
-            <Text style={styles.insightText}>{data.core_insight.headline}</Text>
+    <View style={styles.insightBox}>
+      <MonoLabel>The Insight</MonoLabel>
+      {insight.what && <Text style={styles.insightText}>{insight.what}</Text>}
+      {insight.where_we_found_it && (
+        <View style={{ marginTop: 8 }}>
+          <Text style={styles.cardContent}>
+            <Text style={{ fontFamily: 'Helvetica-Bold' }}>Domain: </Text>
+            {insight.where_we_found_it.domain}
+          </Text>
+          {insight.where_we_found_it.how_they_use_it && (
+            <Text style={styles.cardContent}>
+              <Text style={{ fontFamily: 'Helvetica-Bold' }}>
+                How they use it:{' '}
+              </Text>
+              {insight.where_we_found_it.how_they_use_it}
+            </Text>
           )}
-          {data.core_insight.explanation && (
-            <Text style={[styles.cardContent, { marginTop: 4 }]}>
-              {data.core_insight.explanation}
+          {insight.where_we_found_it.why_it_transfers && (
+            <Text style={styles.cardContent}>
+              <Text style={{ fontFamily: 'Helvetica-Bold' }}>
+                Why it transfers:{' '}
+              </Text>
+              {insight.where_we_found_it.why_it_transfers}
             </Text>
           )}
         </View>
       )}
-
-      {/* The Problem */}
-      {data.the_problem && (
+      {insight.why_industry_missed_it && (
         <View style={{ marginTop: 8 }}>
-          <Text style={styles.sectionSubtitle}>The Problem</Text>
-          <Text style={styles.paragraph}>{data.the_problem}</Text>
-        </View>
-      )}
-
-      {/* Primary Recommendation */}
-      {data.primary_recommendation && (
-        <View style={{ marginTop: 8 }}>
-          <Text style={styles.sectionSubtitle}>Primary Recommendation</Text>
-          <Text style={styles.paragraph}>{data.primary_recommendation}</Text>
-        </View>
-      )}
-
-      {/* Recommended Path - handles both legacy and hybrid formats */}
-      {data.recommended_path && data.recommended_path.length > 0 && (
-        <View style={{ marginTop: 8 }}>
-          <Text style={styles.sectionSubtitle}>Recommended Path</Text>
-          {data.recommended_path.map((step, i) => {
-            // Handle legacy format: {step_number, content}
-            if (isLegacyStep(step)) {
-              return (
-                <View key={i} style={styles.listItem}>
-                  <Text style={styles.listNumber}>{step.step_number}.</Text>
-                  <Text style={styles.listContent}>{step.content}</Text>
-                </View>
-              );
-            }
-            // Handle hybrid format: {step?, action?, rationale?}
-            return (
-              <View key={i} style={styles.listItem}>
-                <Text style={styles.listNumber}>{step.step ?? i + 1}.</Text>
-                <Text style={styles.listContent}>{step.action ?? ''}</Text>
-              </View>
-            );
-          })}
+          <Text style={styles.cardContent}>
+            <Text style={{ fontFamily: 'Helvetica-Bold' }}>
+              Why industry missed it:{' '}
+            </Text>
+            {insight.why_industry_missed_it}
+          </Text>
         </View>
       )}
     </View>
   );
 }
 
-function ProblemAnalysisSection({ data }: { data?: ProblemAnalysisData }) {
-  if (!data) return null;
+// ============================================
+// 1. Brief Section
+// ============================================
 
-  // Type guard for hybrid first_principles_insight (only exists in hybrid format)
-  const hasFirstPrinciplesInsight = (
-    d: ProblemAnalysisData,
-  ): d is HybridProblemAnalysis => {
-    return (
-      'first_principles_insight' in d && d.first_principles_insight != null
-    );
-  };
-
-  // Render factor - handles both string and object formats
-  const renderFactor = (factor: unknown, i: number) => {
-    let content: string;
-    if (typeof factor === 'string') {
-      content = factor;
-    } else if (
-      typeof factor === 'object' &&
-      factor !== null &&
-      'factor' in factor
-    ) {
-      const f = factor as { factor?: string; explanation?: string };
-      content = f.explanation
-        ? `${f.factor}: ${f.explanation}`
-        : (f.factor ?? '');
-    } else {
-      return null;
-    }
-
-    return (
-      <View key={i} style={styles.listItem}>
-        <Text style={styles.listBullet}>•</Text>
-        <Text style={styles.listContent}>{content}</Text>
-      </View>
-    );
-  };
+function BriefSection({ brief }: { brief?: string }) {
+  if (!brief) return null;
 
   return (
     <View style={styles.section}>
-      <SectionHeader title="Problem Analysis" />
+      <SectionHeader title="The Brief" subtitle="Original problem statement" />
+      <View style={styles.card}>
+        <Text style={styles.paragraph}>{brief}</Text>
+      </View>
+    </View>
+  );
+}
+
+// ============================================
+// 2. Problem Analysis Section
+// ============================================
+
+function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
+  if (!analysis) return null;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader
+        title="Problem Analysis"
+        subtitle="Understanding the challenge"
+      />
 
       {/* What's Wrong */}
-      {data.whats_wrong?.prose && (
+      {analysis.whats_wrong?.prose && (
         <View style={styles.card}>
-          <Text style={styles.cardLabel}>What&apos;s Wrong</Text>
-          <Text style={styles.cardContent}>{data.whats_wrong.prose}</Text>
+          <MonoLabel>What&apos;s Wrong</MonoLabel>
+          <Text style={styles.paragraph}>{analysis.whats_wrong.prose}</Text>
         </View>
       )}
 
       {/* Why It's Hard */}
-      {data.why_its_hard?.prose && (
+      {analysis.why_its_hard && (
         <View style={styles.card}>
-          <Text style={styles.cardLabel}>Why It&apos;s Hard</Text>
-          <Text style={styles.cardContent}>{data.why_its_hard.prose}</Text>
-
-          {data.why_its_hard.factors &&
-            data.why_its_hard.factors.length > 0 && (
+          <MonoLabel>Why It&apos;s Hard</MonoLabel>
+          {analysis.why_its_hard.prose && (
+            <Text style={styles.paragraph}>{analysis.why_its_hard.prose}</Text>
+          )}
+          {analysis.why_its_hard.governing_equation && (
+            <View style={[styles.insightBox, { marginTop: 8 }]}>
+              <Text
+                style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}
+              >
+                {analysis.why_its_hard.governing_equation.equation}
+              </Text>
+              {analysis.why_its_hard.governing_equation.explanation && (
+                <Text style={[styles.cardContent, { marginTop: 4 }]}>
+                  {analysis.why_its_hard.governing_equation.explanation}
+                </Text>
+              )}
+            </View>
+          )}
+          {analysis.why_its_hard.factors &&
+            analysis.why_its_hard.factors.length > 0 && (
               <View style={{ marginTop: 8 }}>
-                {data.why_its_hard.factors.map((factor, i) =>
-                  renderFactor(factor, i),
-                )}
+                {analysis.why_its_hard.factors.map((f, i) => (
+                  <View key={i} style={styles.listItem}>
+                    <Text style={styles.listBullet}>•</Text>
+                    <Text style={styles.listContent}>
+                      {typeof f === 'string'
+                        ? f
+                        : `${f.factor}: ${f.explanation}`}
+                    </Text>
+                  </View>
+                ))}
               </View>
             )}
         </View>
       )}
 
-      {/* First Principles Insight (hybrid format only) */}
-      {hasFirstPrinciplesInsight(data) && (
+      {/* First Principles Insight */}
+      {analysis.first_principles_insight && (
         <View style={styles.insightBox}>
-          <Text style={styles.insightLabel}>First Principles Insight</Text>
-          {data.first_principles_insight?.headline && (
+          <MonoLabel>First Principles Insight</MonoLabel>
+          {analysis.first_principles_insight.headline && (
             <Text style={styles.insightText}>
-              {data.first_principles_insight.headline}
+              {analysis.first_principles_insight.headline}
             </Text>
           )}
-          {data.first_principles_insight?.explanation && (
+          {analysis.first_principles_insight.explanation && (
             <Text style={[styles.cardContent, { marginTop: 4 }]}>
-              {data.first_principles_insight.explanation}
+              {analysis.first_principles_insight.explanation}
+            </Text>
+          )}
+        </View>
+      )}
+
+      {/* Current State of Art - Benchmarks */}
+      {analysis.current_state_of_art?.benchmarks &&
+        analysis.current_state_of_art.benchmarks.length > 0 && (
+          <View style={{ marginTop: 12 }}>
+            <Text style={styles.subsectionTitle}>Current State of Art</Text>
+            <View style={styles.table}>
+              <View style={styles.tableHeader}>
+                <Text style={styles.tableHeaderCell}>Entity</Text>
+                <Text style={styles.tableHeaderCell}>Approach</Text>
+                <Text style={styles.tableHeaderCell}>Performance</Text>
+              </View>
+              {analysis.current_state_of_art.benchmarks.map(
+                (b: ProblemAnalysisBenchmark, i: number) => (
+                  <View key={i} style={styles.tableRow}>
+                    <Text style={styles.tableCellBold}>{b.entity}</Text>
+                    <Text style={styles.tableCell}>{b.approach}</Text>
+                    <Text style={styles.tableCell}>
+                      {b.current_performance}
+                    </Text>
+                  </View>
+                ),
+              )}
+            </View>
+          </View>
+        )}
+
+      {/* What Industry Does Today */}
+      {analysis.what_industry_does_today &&
+        analysis.what_industry_does_today.length > 0 && (
+          <View style={{ marginTop: 12 }}>
+            <Text style={styles.subsectionTitle}>What Industry Does Today</Text>
+            {analysis.what_industry_does_today.map((item, i) => (
+              <View key={i} style={[styles.card, { marginBottom: 8 }]}>
+                <Text
+                  style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}
+                >
+                  {item.approach}
+                </Text>
+                {item.limitation && (
+                  <Text
+                    style={[styles.cardContent, { color: colors.amber700 }]}
+                  >
+                    Limitation: {item.limitation}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
+      {/* Root Cause Hypotheses */}
+      {analysis.root_cause_hypotheses &&
+        analysis.root_cause_hypotheses.length > 0 && (
+          <View style={{ marginTop: 12 }}>
+            <Text style={styles.subsectionTitle}>Root Cause Hypotheses</Text>
+            {analysis.root_cause_hypotheses.map((h, i) => (
+              <View key={i} style={styles.card}>
+                <View style={styles.row}>
+                  <Text style={styles.cardTitle}>
+                    {h.name ?? h.hypothesis ?? `Hypothesis ${i + 1}`}
+                  </Text>
+                </View>
+                {(h.confidence_percent || h.confidence) && (
+                  <View style={styles.badgeRow}>
+                    <ConfidenceBadge
+                      level={h.confidence_percent ?? h.confidence}
+                    />
+                  </View>
+                )}
+                {h.explanation && (
+                  <Text style={styles.cardContent}>{h.explanation}</Text>
+                )}
+                {h.evidence && (
+                  <Text style={[styles.cardContent, { marginTop: 4 }]}>
+                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>
+                      Evidence:{' '}
+                    </Text>
+                    {h.evidence}
+                  </Text>
+                )}
+                {h.implication && (
+                  <Text style={[styles.cardContent, { marginTop: 4 }]}>
+                    <Text style={{ fontFamily: 'Helvetica-Bold' }}>
+                      Implication:{' '}
+                    </Text>
+                    {h.implication}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+
+      {/* Success Metrics */}
+      {analysis.success_metrics && analysis.success_metrics.length > 0 && (
+        <View style={{ marginTop: 12 }}>
+          <Text style={styles.subsectionTitle}>Success Metrics</Text>
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={styles.tableHeaderCell}>Metric</Text>
+              <Text style={styles.tableHeaderCell}>Target</Text>
+              <Text style={styles.tableHeaderCell}>Min Viable</Text>
+              <Text style={styles.tableHeaderCell}>Stretch</Text>
+            </View>
+            {analysis.success_metrics.map((m, i) => (
+              <View key={i} style={styles.tableRow}>
+                <Text style={styles.tableCellBold}>{m.metric}</Text>
+                <Text style={styles.tableCellHighlight}>{m.target}</Text>
+                <Text style={styles.tableCell}>{m.minimum_viable}</Text>
+                <Text style={styles.tableCell}>{m.stretch}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
+    </View>
+  );
+}
+
+// ============================================
+// 3. Executive Summary Section
+// ============================================
+
+function ExecutiveSummarySection({
+  summary,
+}: {
+  summary?: string | StructuredExecutiveSummary;
+}) {
+  if (!summary) return null;
+
+  if (typeof summary === 'string') {
+    return (
+      <View style={styles.section}>
+        <SectionHeader title="Executive Summary" subtitle="The bottom line" />
+        <View style={styles.card}>
+          <Text style={[styles.paragraph, { fontSize: 12 }]}>{summary}</Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader title="Executive Summary" subtitle="The bottom line" />
+      <View style={styles.card}>
+        {/* Narrative Lead */}
+        {summary.narrative_lead && (
+          <Text
+            style={[
+              styles.paragraph,
+              { fontSize: 12, fontFamily: 'Helvetica' },
+            ]}
+          >
+            {summary.narrative_lead}
+          </Text>
+        )}
+
+        {/* Core Insight */}
+        {summary.core_insight && (
+          <View style={styles.insightBox}>
+            <MonoLabel>Core Insight</MonoLabel>
+            {summary.core_insight.headline && (
+              <Text style={styles.insightText}>
+                {summary.core_insight.headline}
+              </Text>
+            )}
+            {summary.core_insight.explanation && (
+              <Text style={[styles.cardContent, { marginTop: 4 }]}>
+                {summary.core_insight.explanation}
+              </Text>
+            )}
+          </View>
+        )}
+
+        {/* Viability */}
+        {summary.viability && (
+          <View style={[styles.row, { marginTop: 8 }]}>
+            <MonoLabel>Viability</MonoLabel>
+            <View
+              style={[styles.badge, styles.badgeNeutral, { marginLeft: 8 }]}
+            >
+              <Text style={[styles.badgeText, styles.badgeNeutralText]}>
+                {summary.viability_label ?? summary.viability}
+              </Text>
+            </View>
+          </View>
+        )}
+
+        {/* Primary Recommendation */}
+        {summary.primary_recommendation && (
+          <View style={[styles.cardHighlight, { marginTop: 12 }]}>
+            <MonoLabel>Primary Recommendation</MonoLabel>
+            <Text style={[styles.paragraph, { fontFamily: 'Helvetica-Bold' }]}>
+              {summary.primary_recommendation}
+            </Text>
+          </View>
+        )}
+
+        {/* Recommended Path */}
+        {summary.recommended_path && summary.recommended_path.length > 0 && (
+          <View style={{ marginTop: 12 }}>
+            <MonoLabel>Recommended Path</MonoLabel>
+            {summary.recommended_path.map((step, i) => {
+              const stepNum =
+                'step_number' in step
+                  ? (step as { step_number: number }).step_number
+                  : (step.step ?? i + 1);
+              const action =
+                'content' in step
+                  ? (step as { content: string }).content
+                  : (step.action ?? '');
+              return (
+                <View key={i} style={styles.listItem}>
+                  <Text style={styles.listNumber}>{stepNum}.</Text>
+                  <Text style={styles.listContent}>{action}</Text>
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+// ============================================
+// 4. Solution Concepts Section (formerly Execution Track)
+// ============================================
+
+function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
+  if (!track) return null;
+
+  const primary = track.primary;
+  const supporting = track.supporting_concepts;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader
+        title="Solution Concepts"
+        subtitle="Proven approaches and alternatives"
+      />
+
+      {/* Intro */}
+      {track.intro && (
+        <Text style={[styles.paragraph, { marginBottom: 12 }]}>
+          {track.intro}
+        </Text>
+      )}
+
+      {/* Primary Solution */}
+      {primary && (
+        <View style={styles.cardHighlight}>
+          <View style={styles.badgeRow}>
+            <View style={[styles.badge, styles.badgePrimary]}>
+              <Text style={[styles.badgeText, styles.badgePrimaryText]}>
+                Primary
+              </Text>
+            </View>
+            <SourceTypeBadge type={primary.source_type} />
+            {primary.confidence !== undefined && (
+              <ConfidenceBadge level={primary.confidence} />
+            )}
+          </View>
+
+          <Text style={styles.cardTitle}>{primary.title}</Text>
+
+          {primary.bottom_line && (
+            <Text style={[styles.paragraph, { marginTop: 4 }]}>
+              {primary.bottom_line}
+            </Text>
+          )}
+
+          {primary.what_it_is && (
+            <View style={{ marginTop: 8 }}>
+              <MonoLabel>What It Is</MonoLabel>
+              <Text style={styles.cardContent}>{primary.what_it_is}</Text>
+            </View>
+          )}
+
+          {primary.why_it_works && (
+            <View style={{ marginTop: 8 }}>
+              <MonoLabel>Why It Works</MonoLabel>
+              <Text style={styles.cardContent}>{primary.why_it_works}</Text>
+            </View>
+          )}
+
+          {/* The Insight */}
+          <InsightBlockDisplay insight={primary.the_insight} />
+
+          {/* Economics */}
+          {(primary.expected_improvement ||
+            primary.investment ||
+            primary.timeline) && (
+            <View style={[styles.row, { marginTop: 12 }]}>
+              {primary.expected_improvement && (
+                <View style={styles.col3}>
+                  <MonoLabel>Expected Improvement</MonoLabel>
+                  <Text style={styles.metaValue}>
+                    {primary.expected_improvement}
+                  </Text>
+                </View>
+              )}
+              {primary.investment && (
+                <View style={styles.col3}>
+                  <MonoLabel>Investment</MonoLabel>
+                  <Text style={styles.metaValue}>{primary.investment}</Text>
+                </View>
+              )}
+              {primary.timeline && (
+                <View style={styles.col3}>
+                  <MonoLabel>Timeline</MonoLabel>
+                  <Text style={styles.metaValue}>{primary.timeline}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
+          {/* Validation Gates */}
+          {primary.validation_gates && primary.validation_gates.length > 0 && (
+            <View style={{ marginTop: 12 }}>
+              <MonoLabel>Validation Gates</MonoLabel>
+              {primary.validation_gates.map(
+                (gate: ValidationGate, i: number) => (
+                  <View key={i} style={[styles.card, { marginTop: 6 }]}>
+                    {gate.week && (
+                      <Text
+                        style={[
+                          styles.cardContent,
+                          { fontFamily: 'Helvetica-Bold' },
+                        ]}
+                      >
+                        {gate.week}
+                      </Text>
+                    )}
+                    {gate.test && (
+                      <Text style={styles.cardContent}>{gate.test}</Text>
+                    )}
+                    {gate.success_criteria && (
+                      <Text
+                        style={[styles.cardContent, { color: colors.green700 }]}
+                      >
+                        Success: {gate.success_criteria}
+                      </Text>
+                    )}
+                  </View>
+                ),
+              )}
+            </View>
+          )}
+
+          {/* Why It Might Fail */}
+          {primary.why_it_might_fail &&
+            primary.why_it_might_fail.length > 0 && (
+              <View style={[styles.warningBox, { marginTop: 12 }]}>
+                <MonoLabel>Why It Might Fail</MonoLabel>
+                {primary.why_it_might_fail.map((reason, i) => (
+                  <View key={i} style={styles.listItem}>
+                    <Text style={styles.listBullet}>•</Text>
+                    <Text style={styles.listContent}>{reason}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+        </View>
+      )}
+
+      {/* Supporting Concepts */}
+      {supporting && supporting.length > 0 && (
+        <View style={{ marginTop: 16 }}>
+          <Text style={styles.subsectionTitle}>Supporting Concepts</Text>
+          {supporting.map((concept: SupportingConcept, i: number) => (
+            <View key={concept.id ?? i} style={styles.card}>
+              <View style={styles.badgeRow}>
+                {concept.relationship && (
+                  <View style={[styles.badge, styles.badgeInfo]}>
+                    <Text style={[styles.badgeText, styles.badgeInfoText]}>
+                      {concept.relationship}
+                    </Text>
+                  </View>
+                )}
+                {concept.confidence !== undefined && (
+                  <ConfidenceBadge level={concept.confidence} />
+                )}
+              </View>
+
+              <Text style={styles.cardTitle}>{concept.title}</Text>
+
+              {concept.one_liner && (
+                <Text style={styles.cardContent}>{concept.one_liner}</Text>
+              )}
+
+              {concept.what_it_is && (
+                <View style={{ marginTop: 6 }}>
+                  <MonoLabel>What It Is</MonoLabel>
+                  <Text style={styles.cardContent}>{concept.what_it_is}</Text>
+                </View>
+              )}
+
+              {concept.when_to_use_instead && (
+                <View style={{ marginTop: 6 }}>
+                  <MonoLabel>When to Use Instead</MonoLabel>
+                  <Text style={styles.cardContent}>
+                    {concept.when_to_use_instead}
+                  </Text>
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Fallback Trigger */}
+      {track.fallback_trigger && (
+        <View style={[styles.warningBox, { marginTop: 12 }]}>
+          <MonoLabel>Fallback Trigger</MonoLabel>
+          {track.fallback_trigger.conditions &&
+            track.fallback_trigger.conditions.length > 0 && (
+              <View style={{ marginTop: 4 }}>
+                {track.fallback_trigger.conditions.map((c, i) => (
+                  <View key={i} style={styles.listItem}>
+                    <Text style={styles.listBullet}>•</Text>
+                    <Text style={styles.listContent}>{c}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          {track.fallback_trigger.pivot_to && (
+            <Text style={[styles.cardContent, { marginTop: 4 }]}>
+              <Text style={{ fontFamily: 'Helvetica-Bold' }}>Pivot to: </Text>
+              {track.fallback_trigger.pivot_to}
             </Text>
           )}
         </View>
@@ -551,93 +1029,182 @@ function ProblemAnalysisSection({ data }: { data?: ProblemAnalysisData }) {
   );
 }
 
-function RecommendationCard({
-  recommendation,
-  type,
-}: {
-  recommendation: ConceptRecommendation;
-  type: 'primary' | 'fallback';
-}) {
-  const isPrimary = type === 'primary';
+// ============================================
+// 5. Innovation Concepts Section
+// ============================================
 
-  // Safely extract hybrid-only properties using type guards
-  const track = 'track' in recommendation ? recommendation.track : undefined;
-  const keyRisks =
-    'key_risks' in recommendation
-      ? (recommendation.key_risks as
-          | Array<{ risk?: string; mitigation?: string }>
-          | undefined)
-      : undefined;
+function InnovationConceptsSection({
+  portfolio,
+}: {
+  portfolio?: InnovationPortfolio;
+}) {
+  if (!portfolio) return null;
+
+  const recommended = portfolio.recommended_innovation;
+  const parallel = portfolio.parallel_investigations;
 
   return (
-    <View style={isPrimary ? styles.cardHighlight : styles.card}>
-      {/* Label */}
-      <View style={styles.badgeRow}>
-        <View style={[styles.badge, styles.badgePrimary]}>
-          <Text style={[styles.badgeText, styles.badgePrimaryText]}>
-            {isPrimary ? 'Primary Recommendation' : 'Fallback Strategy'}
-          </Text>
-        </View>
-      </View>
+    <View style={styles.section}>
+      <SectionHeader
+        title="Innovation Concepts"
+        subtitle="Higher-risk, higher-reward approaches"
+      />
 
-      {/* Title */}
-      <Text style={styles.cardTitle}>{recommendation.title ?? 'Untitled'}</Text>
-
-      {/* Badges */}
-      <View style={styles.badgeRow}>
-        <TrackBadge track={track} />
-        <ConfidenceBadge level={recommendation.confidence_level} />
-      </View>
-
-      {/* Executive Summary */}
-      {recommendation.executive_summary && (
-        <Text style={styles.cardContent}>
-          {recommendation.executive_summary}
+      {/* Intro */}
+      {portfolio.intro && (
+        <Text style={[styles.paragraph, { marginBottom: 12 }]}>
+          {portfolio.intro}
         </Text>
       )}
 
-      {/* Why It Wins */}
-      {recommendation.why_it_wins && (
-        <View style={[styles.insightBox, { marginTop: 8 }]}>
-          <Text style={styles.insightLabel}>Why This Wins</Text>
-          <Text style={styles.cardContent}>{recommendation.why_it_wins}</Text>
+      {/* Recommended Innovation */}
+      {recommended && (
+        <View style={styles.cardHighlight}>
+          <View style={styles.badgeRow}>
+            <View style={[styles.badge, styles.badgePrimary]}>
+              <Text style={[styles.badgeText, styles.badgePrimaryText]}>
+                Recommended
+              </Text>
+            </View>
+            {recommended.innovation_type && (
+              <View style={[styles.badge, styles.badgeInfo]}>
+                <Text style={[styles.badgeText, styles.badgeInfoText]}>
+                  {recommended.innovation_type.replace(/_/g, ' ')}
+                </Text>
+              </View>
+            )}
+            {recommended.confidence !== undefined && (
+              <ConfidenceBadge level={recommended.confidence} />
+            )}
+          </View>
+
+          <Text style={styles.cardTitle}>{recommended.title}</Text>
+
+          {recommended.what_it_is && (
+            <View style={{ marginTop: 8 }}>
+              <MonoLabel>What It Is</MonoLabel>
+              <Text style={styles.cardContent}>{recommended.what_it_is}</Text>
+            </View>
+          )}
+
+          {recommended.why_it_works && (
+            <View style={{ marginTop: 8 }}>
+              <MonoLabel>Why It Works</MonoLabel>
+              <Text style={styles.cardContent}>{recommended.why_it_works}</Text>
+            </View>
+          )}
+
+          {/* The Insight */}
+          <InsightBlockDisplay insight={recommended.the_insight} />
+
+          {/* Breakthrough Potential */}
+          {recommended.breakthrough_potential && (
+            <View style={[styles.insightBox, { marginTop: 12 }]}>
+              <MonoLabel>Breakthrough Potential</MonoLabel>
+              {recommended.breakthrough_potential.if_it_works && (
+                <Text style={styles.insightText}>
+                  {recommended.breakthrough_potential.if_it_works}
+                </Text>
+              )}
+              {recommended.breakthrough_potential.estimated_improvement && (
+                <Text style={[styles.cardContent, { marginTop: 4 }]}>
+                  Estimated improvement:{' '}
+                  {recommended.breakthrough_potential.estimated_improvement}
+                </Text>
+              )}
+            </View>
+          )}
+
+          {/* Validation Path */}
+          {recommended.validation_path && (
+            <View style={{ marginTop: 12 }}>
+              <MonoLabel>Validation Path</MonoLabel>
+              {recommended.validation_path.first_test && (
+                <Text style={styles.cardContent}>
+                  First test: {recommended.validation_path.first_test}
+                </Text>
+              )}
+              {recommended.validation_path.timeline && (
+                <Text style={styles.cardContent}>
+                  Timeline: {recommended.validation_path.timeline}
+                </Text>
+              )}
+              {recommended.validation_path.cost && (
+                <Text style={styles.cardContent}>
+                  Cost: {recommended.validation_path.cost}
+                </Text>
+              )}
+            </View>
+          )}
+
+          {/* Risks */}
+          {recommended.risks && (
+            <View style={[styles.warningBox, { marginTop: 12 }]}>
+              <MonoLabel>Risks</MonoLabel>
+              {recommended.risks.physics_risks?.map((r, i) => (
+                <View key={i} style={styles.listItem}>
+                  <Text style={styles.listBullet}>•</Text>
+                  <Text style={styles.listContent}>{r}</Text>
+                </View>
+              ))}
+              {recommended.risks.implementation_challenges?.map((r, i) => (
+                <View key={i} style={styles.listItem}>
+                  <Text style={styles.listBullet}>•</Text>
+                  <Text style={styles.listContent}>{r}</Text>
+                </View>
+              ))}
+            </View>
+          )}
         </View>
       )}
 
-      {/* Timeline & Investment */}
-      {(recommendation.estimated_timeline ||
-        recommendation.estimated_investment) && (
-        <View style={[styles.row, { marginTop: 8 }]}>
-          {recommendation.estimated_timeline && (
-            <View style={styles.col2}>
-              <Text style={styles.metaLabel}>Timeline</Text>
-              <Text style={styles.metaValue}>
-                {recommendation.estimated_timeline}
-              </Text>
-            </View>
-          )}
-          {recommendation.estimated_investment && (
-            <View style={styles.col2}>
-              <Text style={styles.metaLabel}>Investment</Text>
-              <Text style={styles.metaValue}>
-                {recommendation.estimated_investment}
-              </Text>
-            </View>
-          )}
-        </View>
-      )}
+      {/* Parallel Investigations */}
+      {parallel && parallel.length > 0 && (
+        <View style={{ marginTop: 16 }}>
+          <Text style={styles.subsectionTitle}>Parallel Investigations</Text>
+          {parallel.map((inv: ParallelInvestigation, i: number) => (
+            <View key={inv.id ?? i} style={styles.card}>
+              <View style={styles.badgeRow}>
+                {inv.innovation_type && (
+                  <View style={[styles.badge, styles.badgeInfo]}>
+                    <Text style={[styles.badgeText, styles.badgeInfoText]}>
+                      {inv.innovation_type.replace(/_/g, ' ')}
+                    </Text>
+                  </View>
+                )}
+                {inv.confidence !== undefined && (
+                  <ConfidenceBadge level={inv.confidence} />
+                )}
+              </View>
 
-      {/* Key Risks (hybrid format only) */}
-      {keyRisks && keyRisks.length > 0 && (
-        <View style={{ marginTop: 8 }}>
-          <Text style={styles.cardLabel}>Key Risks</Text>
-          {keyRisks.slice(0, 3).map((risk, i) => (
-            <View key={i} style={styles.listItem}>
-              <Text style={styles.listBullet}>⚠</Text>
-              <Text style={styles.listContent}>
-                {risk.risk ?? ''}
-                {risk.mitigation && ` → ${risk.mitigation}`}
-              </Text>
+              <Text style={styles.cardTitle}>{inv.title}</Text>
+
+              {inv.one_liner && (
+                <Text style={styles.cardContent}>{inv.one_liner}</Text>
+              )}
+
+              {inv.what_it_is && (
+                <View style={{ marginTop: 6 }}>
+                  <MonoLabel>What It Is</MonoLabel>
+                  <Text style={styles.cardContent}>{inv.what_it_is}</Text>
+                </View>
+              )}
+
+              {inv.ceiling && (
+                <View style={{ marginTop: 6 }}>
+                  <MonoLabel>Ceiling</MonoLabel>
+                  <Text style={styles.cardContent}>{inv.ceiling}</Text>
+                </View>
+              )}
+
+              {inv.key_uncertainty && (
+                <View style={{ marginTop: 6 }}>
+                  <MonoLabel>Key Uncertainty</MonoLabel>
+                  <Text style={styles.cardContent}>{inv.key_uncertainty}</Text>
+                </View>
+              )}
+
+              <InsightBlockDisplay insight={inv.the_insight} />
             </View>
           ))}
         </View>
@@ -646,132 +1213,218 @@ function RecommendationCard({
   );
 }
 
-function DecisionArchitectureSection({
-  primary,
-  fallback,
-}: {
-  primary?: ConceptRecommendation;
-  fallback?: ConceptRecommendation;
-}) {
-  if (!primary && !fallback) return null;
+// ============================================
+// 6. Frontier Watch Section
+// ============================================
+
+function FrontierWatchSection({ items }: { items?: FrontierWatch[] }) {
+  if (!items || items.length === 0) return null;
 
   return (
     <View style={styles.section}>
-      <SectionHeader title="Decision Architecture" />
+      <SectionHeader
+        title="Frontier Watch"
+        subtitle="Emerging technologies to monitor"
+      />
 
-      {primary && (
-        <RecommendationCard recommendation={primary} type="primary" />
-      )}
-      {fallback && (
-        <RecommendationCard recommendation={fallback} type="fallback" />
-      )}
-    </View>
-  );
-}
-
-function ExecutionTrackSection({ data }: { data?: ExecutionTrackPrimary }) {
-  if (!data) return null;
-
-  return (
-    <View style={styles.section}>
-      <SectionHeader title="Execution Track" />
-
-      <View style={styles.cardHighlight}>
-        {/* Title & Badges */}
-        <Text style={styles.cardTitle}>{data.title ?? 'Primary Track'}</Text>
-
-        <View style={styles.badgeRow}>
-          {data.source_type && (
-            <View style={[styles.badge, styles.badgeInfo]}>
-              <Text style={[styles.badgeText, styles.badgeInfoText]}>
-                {data.source_type.replace(/_/g, ' ')}
-              </Text>
-            </View>
-          )}
-          {data.confidence !== undefined && (
-            <ConfidenceBadge
-              level={
-                data.confidence >= 70
-                  ? 'High'
-                  : data.confidence >= 40
-                    ? 'Medium'
-                    : 'Low'
-              }
-            />
-          )}
-        </View>
-
-        {/* Bottom Line */}
-        {data.bottom_line && (
-          <Text style={[styles.paragraph, { marginTop: 8 }]}>
-            {data.bottom_line}
-          </Text>
-        )}
-
-        {/* Key Metrics */}
-        {(data.timeline || data.investment || data.expected_improvement) && (
-          <View style={[styles.row, { marginTop: 8 }]}>
-            {data.expected_improvement && (
-              <View style={styles.col2}>
-                <Text style={styles.metaLabel}>Expected Improvement</Text>
-                <Text style={styles.metaValue}>
-                  {data.expected_improvement}
+      {items.map((item: FrontierWatch, i: number) => (
+        <View key={item.id ?? i} style={styles.card}>
+          <View style={styles.badgeRow}>
+            {item.innovation_type && (
+              <View style={[styles.badge, styles.badgeNeutral]}>
+                <Text style={[styles.badgeText, styles.badgeNeutralText]}>
+                  {item.innovation_type.replace(/_/g, ' ')}
                 </Text>
               </View>
             )}
-            {data.timeline && (
-              <View style={styles.col2}>
-                <Text style={styles.metaLabel}>Timeline</Text>
-                <Text style={styles.metaValue}>{data.timeline}</Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {/* Why It Works */}
-        {data.why_it_works && (
-          <View style={{ marginTop: 8 }}>
-            <Text style={styles.cardLabel}>Why It Works</Text>
-            <Text style={styles.cardContent}>{data.why_it_works}</Text>
-          </View>
-        )}
-      </View>
-    </View>
-  );
-}
-
-function SupportingConceptsSection({ data }: { data?: SupportingConcept[] }) {
-  if (!data || data.length === 0) return null;
-
-  return (
-    <View style={styles.section}>
-      <SectionHeader title="Supporting Concepts" />
-
-      {data.map((concept, i) => (
-        <View key={concept.id ?? i} style={styles.card}>
-          <Text style={styles.cardTitle}>
-            {concept.title ?? `Concept ${i + 1}`}
-          </Text>
-
-          {concept.relationship && (
-            <View style={styles.badgeRow}>
+            {item.trl_estimate !== undefined && (
               <View style={[styles.badge, styles.badgeInfo]}>
                 <Text style={[styles.badgeText, styles.badgeInfoText]}>
-                  {concept.relationship}
+                  TRL {item.trl_estimate}
                 </Text>
               </View>
+            )}
+          </View>
+
+          <Text style={styles.cardTitle}>{item.title}</Text>
+
+          {item.one_liner && (
+            <Text style={styles.cardContent}>{item.one_liner}</Text>
+          )}
+
+          {item.why_interesting && (
+            <View style={{ marginTop: 6 }}>
+              <MonoLabel>Why Interesting</MonoLabel>
+              <Text style={styles.cardContent}>{item.why_interesting}</Text>
             </View>
           )}
 
-          {concept.one_liner && (
-            <Text style={styles.cardContent}>{concept.one_liner}</Text>
+          {item.why_not_now && (
+            <View style={{ marginTop: 6 }}>
+              <MonoLabel>Why Not Now</MonoLabel>
+              <Text style={styles.cardContent}>{item.why_not_now}</Text>
+            </View>
           )}
 
-          {concept.when_to_use_instead && (
+          {item.trigger_to_revisit && (
             <View style={{ marginTop: 6 }}>
-              <Text style={styles.metaLabel}>When to Use Instead</Text>
-              <Text style={styles.cardContent}>
-                {concept.when_to_use_instead}
+              <MonoLabel>Trigger to Revisit</MonoLabel>
+              <Text style={styles.cardContent}>{item.trigger_to_revisit}</Text>
+            </View>
+          )}
+
+          {item.earliest_viability && (
+            <View style={{ marginTop: 6 }}>
+              <MonoLabel>Earliest Viability</MonoLabel>
+              <Text style={styles.cardContent}>{item.earliest_viability}</Text>
+            </View>
+          )}
+        </View>
+      ))}
+    </View>
+  );
+}
+
+// ============================================
+// 7. Constraints & Metrics Section
+// ============================================
+
+function ConstraintsSection({
+  constraints,
+}: {
+  constraints?: ConstraintsAndMetrics;
+}) {
+  if (!constraints) return null;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader
+        title="Constraints & Metrics"
+        subtitle="Requirements and success criteria"
+      />
+
+      {/* Hard Constraints */}
+      {constraints.hard_constraints &&
+        constraints.hard_constraints.length > 0 && (
+          <View style={styles.card}>
+            <MonoLabel>Hard Constraints</MonoLabel>
+            {constraints.hard_constraints.map((c, i) => (
+              <View
+                key={i}
+                style={[styles.listItem, { alignItems: 'flex-start' }]}
+              >
+                <View style={styles.dotRed} />
+                <Text style={styles.listContent}>{c}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+      {/* Soft Constraints */}
+      {constraints.soft_constraints &&
+        constraints.soft_constraints.length > 0 && (
+          <View style={styles.card}>
+            <MonoLabel>Soft Constraints</MonoLabel>
+            {constraints.soft_constraints.map((c, i) => (
+              <View
+                key={i}
+                style={[styles.listItem, { alignItems: 'flex-start' }]}
+              >
+                <View style={styles.dotAmber} />
+                <Text style={styles.listContent}>{c}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+      {/* Assumptions */}
+      {constraints.assumptions && constraints.assumptions.length > 0 && (
+        <View style={styles.card}>
+          <MonoLabel>Assumptions</MonoLabel>
+          {constraints.assumptions.map((a, i) => (
+            <View
+              key={i}
+              style={[styles.listItem, { alignItems: 'flex-start' }]}
+            >
+              <View style={styles.dotGray} />
+              <Text style={styles.listContent}>{a}</Text>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Success Metrics Table */}
+      {constraints.success_metrics &&
+        constraints.success_metrics.length > 0 && (
+          <View style={{ marginTop: 8 }}>
+            <MonoLabel>Success Metrics</MonoLabel>
+            <View style={[styles.table, { marginTop: 8 }]}>
+              <View style={styles.tableHeader}>
+                <Text style={styles.tableHeaderCell}>Metric</Text>
+                <Text style={styles.tableHeaderCell}>Target</Text>
+                <Text style={styles.tableHeaderCell}>Min Viable</Text>
+                <Text style={styles.tableHeaderCell}>Stretch</Text>
+              </View>
+              {constraints.success_metrics.map((m, i) => (
+                <View key={i} style={styles.tableRow}>
+                  <Text style={styles.tableCellBold}>{m.metric}</Text>
+                  <Text style={styles.tableCellHighlight}>{m.target}</Text>
+                  <Text style={styles.tableCell}>{m.minimum_viable}</Text>
+                  <Text style={styles.tableCell}>{m.stretch}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+    </View>
+  );
+}
+
+// ============================================
+// 8. Challenge the Frame Section
+// ============================================
+
+function ChallengeTheFrameSection({
+  challenges,
+}: {
+  challenges?: ChallengeTheFrame[];
+}) {
+  if (!challenges || challenges.length === 0) return null;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader
+        title="Challenge the Frame"
+        subtitle="Questioning key assumptions"
+      />
+
+      {challenges.map((c, i) => (
+        <View key={i} style={styles.card}>
+          <View style={{ marginBottom: 8 }}>
+            <MonoLabel>Assumption</MonoLabel>
+            <Text
+              style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}
+            >
+              {c.assumption}
+            </Text>
+          </View>
+
+          <View style={{ marginBottom: 8 }}>
+            <MonoLabel>Challenge</MonoLabel>
+            <Text style={styles.cardContent}>{c.challenge}</Text>
+          </View>
+
+          {c.implication && (
+            <View
+              style={{
+                backgroundColor: colors.amber100,
+                borderRadius: 4,
+                padding: 8,
+              }}
+            >
+              <MonoLabel>Implication</MonoLabel>
+              <Text style={[styles.cardContent, { color: colors.amber700 }]}>
+                {c.implication}
               </Text>
             </View>
           )}
@@ -781,94 +1434,172 @@ function SupportingConceptsSection({ data }: { data?: SupportingConcept[] }) {
   );
 }
 
-function InnovationPortfolioSection({
-  recommended,
+// ============================================
+// 9. Innovation Analysis Section
+// ============================================
+
+function InnovationAnalysisSection({
+  analysis,
 }: {
-  recommended?: RecommendedInnovation;
+  analysis?: InnovationAnalysis;
 }) {
-  if (!recommended) return null;
+  if (!analysis) return null;
 
   return (
     <View style={styles.section}>
-      <SectionHeader title="Innovation Portfolio" />
+      <SectionHeader
+        title="Innovation Analysis"
+        subtitle="Cross-domain search strategy"
+      />
 
       <View style={styles.card}>
-        <Text style={styles.cardLabel}>Recommended Innovation</Text>
-        <Text style={styles.cardTitle}>
-          {recommended.title ?? 'Innovation'}
-        </Text>
+        {analysis.reframe && (
+          <View style={{ marginBottom: 8 }}>
+            <MonoLabel>Reframe</MonoLabel>
+            <Text style={styles.cardContent}>{analysis.reframe}</Text>
+          </View>
+        )}
 
-        {recommended.innovation_type && (
-          <View style={styles.badgeRow}>
-            <View style={[styles.badge, styles.badgePrimary]}>
-              <Text style={[styles.badgeText, styles.badgePrimaryText]}>
-                {recommended.innovation_type.replace(/_/g, ' ')}
-              </Text>
+        {analysis.domains_searched && analysis.domains_searched.length > 0 && (
+          <View>
+            <MonoLabel>Domains Searched</MonoLabel>
+            <View style={styles.badgeRow}>
+              {analysis.domains_searched.map((d, i) => (
+                <View key={i} style={[styles.badge, styles.badgeNeutral]}>
+                  <Text style={[styles.badgeText, styles.badgeNeutralText]}>
+                    {d}
+                  </Text>
+                </View>
+              ))}
             </View>
-          </View>
-        )}
-
-        {recommended.what_it_is && (
-          <Text style={styles.cardContent}>{recommended.what_it_is}</Text>
-        )}
-
-        {/* Breakthrough Potential */}
-        {recommended.breakthrough_potential?.if_it_works && (
-          <View style={[styles.insightBox, { marginTop: 8 }]}>
-            <Text style={styles.insightLabel}>If It Works</Text>
-            <Text style={styles.cardContent}>
-              {recommended.breakthrough_potential.if_it_works}
-            </Text>
-          </View>
-        )}
-
-        {/* Validation Path */}
-        {recommended.validation_path && (
-          <View style={{ marginTop: 8 }}>
-            <Text style={styles.cardLabel}>Validation Path</Text>
-            {recommended.validation_path.first_test && (
-              <Text style={styles.cardContent}>
-                First Test: {recommended.validation_path.first_test}
-              </Text>
-            )}
-            {recommended.validation_path.timeline && (
-              <Text style={styles.cardContent}>
-                Timeline: {recommended.validation_path.timeline}
-              </Text>
-            )}
           </View>
         )}
       </View>
     </View>
   );
 }
+
+// ============================================
+// 10. Risks & Watchouts Section
+// ============================================
+
+function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
+  if (!risks || risks.length === 0) return null;
+
+  const getSeverityStyle = (severity?: string) => {
+    switch (severity?.toLowerCase()) {
+      case 'high':
+        return { badge: styles.badgeDanger, text: styles.badgeDangerText };
+      case 'medium':
+        return { badge: styles.badgeWarning, text: styles.badgeWarningText };
+      default:
+        return { badge: styles.badgeSuccess, text: styles.badgeSuccessText };
+    }
+  };
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader title="Risks & Watchouts" subtitle="Potential pitfalls" />
+
+      {risks.map((risk, i) => {
+        const severityStyles = getSeverityStyle(risk.severity);
+
+        return (
+          <View key={i} style={styles.card}>
+            <View style={styles.badgeRow}>
+              {risk.category && (
+                <View style={[styles.badge, styles.badgeNeutral]}>
+                  <Text style={[styles.badgeText, styles.badgeNeutralText]}>
+                    {risk.category}
+                  </Text>
+                </View>
+              )}
+              {risk.severity && (
+                <View style={[styles.badge, severityStyles.badge]}>
+                  <Text style={[styles.badgeText, severityStyles.text]}>
+                    {risk.severity.toUpperCase()}
+                  </Text>
+                </View>
+              )}
+            </View>
+
+            <Text style={styles.cardContent}>{risk.risk}</Text>
+
+            {risk.mitigation && (
+              <View style={{ marginTop: 6 }}>
+                <MonoLabel>Mitigation</MonoLabel>
+                <Text style={styles.cardContent}>{risk.mitigation}</Text>
+              </View>
+            )}
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+// ============================================
+// 11. Key Insights Section
+// ============================================
 
 function KeyInsightsSection({ insights }: { insights?: string[] }) {
   if (!insights || insights.length === 0) return null;
 
   return (
     <View style={styles.section}>
-      <SectionHeader title="Key Insights" />
+      <SectionHeader
+        title="Key Insights"
+        subtitle="Critical learnings from this analysis"
+      />
 
       {insights.map((insight, i) => (
-        <View key={i} style={styles.listItem}>
-          <Text style={styles.listBullet}>💡</Text>
-          <Text style={styles.listContent}>{insight}</Text>
+        <View key={i} style={styles.card}>
+          <View style={styles.listItem}>
+            <View
+              style={{
+                width: 20,
+                height: 20,
+                borderRadius: 10,
+                backgroundColor: colors.violet100,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 8,
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 10,
+                  fontFamily: 'Helvetica-Bold',
+                  color: colors.violet700,
+                }}
+              >
+                {i + 1}
+              </Text>
+            </View>
+            <Text style={[styles.listContent, { flex: 1 }]}>{insight}</Text>
+          </View>
         </View>
       ))}
     </View>
   );
 }
 
+// ============================================
+// 12. Next Steps Section
+// ============================================
+
 function NextStepsSection({ steps }: { steps?: string[] }) {
   if (!steps || steps.length === 0) return null;
 
   return (
     <View style={styles.section}>
-      <SectionHeader title="Next Steps" />
+      <SectionHeader
+        title="Next Steps"
+        subtitle="Recommended actions in sequence"
+      />
 
       {steps.map((step, i) => (
-        <View key={i} style={styles.listItem}>
+        <View key={i} style={[styles.listItem, { marginBottom: 8 }]}>
           <Text style={styles.listNumber}>{i + 1}.</Text>
           <Text style={styles.listContent}>{step}</Text>
         </View>
@@ -877,84 +1608,23 @@ function NextStepsSection({ steps }: { steps?: string[] }) {
   );
 }
 
-function RisksSection({ risks }: { risks?: RiskData[] }) {
-  if (!risks || risks.length === 0) return null;
+// ============================================
+// 13. What I'd Actually Do Section
+// ============================================
 
-  const getSeverityStyle = (severity?: string) => {
-    switch (severity?.toLowerCase()) {
-      case 'high':
-        return { badge: styles.badgeLow, text: styles.badgeLowText };
-      case 'medium':
-        return { badge: styles.badgeMedium, text: styles.badgeMediumText };
-      default:
-        return { badge: styles.badgeHigh, text: styles.badgeHighText };
-    }
-  };
-
-  // Helper to extract risk text (handles both legacy and hybrid formats)
-  const getRiskText = (r: RiskData): string => {
-    // Hybrid format has 'risk', legacy has 'name' + 'description'
-    if ('risk' in r && r.risk) return r.risk;
-    if ('name' in r && 'description' in r) {
-      return r.description ? `${r.name}: ${r.description}` : r.name;
-    }
-    return '';
-  };
-
-  // Helper to get severity (only in hybrid format)
-  const getSeverity = (r: RiskData): string | undefined => {
-    return 'severity' in r ? r.severity : undefined;
-  };
-
-  // Helper to get category (only in hybrid format)
-  const getCategory = (r: RiskData): string | undefined => {
-    return 'category' in r ? r.category : undefined;
-  };
-
-  // Helper to get mitigation
-  const getMitigation = (r: RiskData): string | undefined => {
-    return 'mitigation' in r ? r.mitigation : undefined;
-  };
+function WhatIdActuallyDoSection({ content }: { content?: string }) {
+  if (!content) return null;
 
   return (
     <View style={styles.section}>
-      <SectionHeader title="Risks & Watchouts" />
+      <SectionHeader
+        title="What I'd Actually Do"
+        subtitle="Personal recommendation"
+      />
 
-      {risks.map((risk, i) => {
-        const severity = getSeverity(risk);
-        const category = getCategory(risk);
-        const severityStyles = getSeverityStyle(severity);
-
-        return (
-          <View key={i} style={styles.card}>
-            <View style={styles.badgeRow}>
-              {category && (
-                <View style={[styles.badge, styles.badgeInfo]}>
-                  <Text style={[styles.badgeText, styles.badgeInfoText]}>
-                    {category}
-                  </Text>
-                </View>
-              )}
-              {severity && (
-                <View style={[styles.badge, severityStyles.badge]}>
-                  <Text style={[styles.badgeText, severityStyles.text]}>
-                    {severity.toUpperCase()}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            <Text style={styles.cardContent}>{getRiskText(risk)}</Text>
-
-            {getMitigation(risk) && (
-              <View style={{ marginTop: 6 }}>
-                <Text style={styles.metaLabel}>Mitigation</Text>
-                <Text style={styles.cardContent}>{getMitigation(risk)}</Text>
-              </View>
-            )}
-          </View>
-        );
-      })}
+      <View style={styles.cardHighlight}>
+        <Text style={styles.paragraph}>{content}</Text>
+      </View>
     </View>
   );
 }
@@ -982,43 +1652,29 @@ export function ReportPDFDocument({ report }: Props) {
 
   const reportData = report.report_data;
 
-  // Extract data based on report structure
+  // Extract all data from report
   let hybridData: HybridReportData | undefined;
-  let executiveSummary: ExecutiveSummaryData | undefined;
-  let problemAnalysis: ProblemAnalysisData | undefined;
-  let decisionArchitecture:
-    | {
-        primary?: ConceptRecommendation;
-        fallback?: ConceptRecommendation;
-      }
-    | undefined;
-  let executionTrack: ExecutionTrackPrimary | undefined;
-  let supportingConcepts: SupportingConcept[] | undefined;
-  let recommendedInnovation: RecommendedInnovation | undefined;
-  let keyInsights: string[] | undefined;
-  let nextSteps: string[] | undefined;
-  let risksAndWatchouts: RiskData[] | undefined;
 
   if (isHybridReport(reportData)) {
     hybridData = reportData.report;
-    executiveSummary = hybridData?.executive_summary;
-    problemAnalysis = hybridData?.problem_analysis;
-    decisionArchitecture = hybridData?.decision_architecture;
-    executionTrack = hybridData?.execution_track?.primary;
-    supportingConcepts = hybridData?.execution_track?.supporting_concepts;
-    recommendedInnovation =
-      hybridData?.innovation_portfolio?.recommended_innovation;
-    keyInsights = hybridData?.key_insights;
-    nextSteps = hybridData?.next_steps;
-    risksAndWatchouts = hybridData?.risks_and_watchouts;
-  } else if (reportData) {
-    // Handle legacy/standard report format
-    executiveSummary = reportData.executive_summary;
-    problemAnalysis = reportData.problem_analysis;
-    decisionArchitecture = reportData.report?.decision_architecture;
-    keyInsights = reportData.report?.key_insights;
-    nextSteps = reportData.report?.next_steps;
-    risksAndWatchouts = reportData.risks_and_watchouts;
+  }
+
+  // If not hybrid, we don't render much
+  if (!hybridData) {
+    return (
+      <Document>
+        <Page size="A4" style={styles.page}>
+          <View style={styles.header}>
+            <Text style={styles.logo}>SPARLO</Text>
+            <Text style={styles.title}>{report.title}</Text>
+            {report.headline && (
+              <Text style={styles.headline}>{report.headline}</Text>
+            )}
+          </View>
+          <Text style={styles.paragraph}>Report data not available.</Text>
+        </Page>
+      </Document>
+    );
   }
 
   return (
@@ -1033,35 +1689,48 @@ export function ReportPDFDocument({ report }: Props) {
           )}
         </View>
 
-        {/* Executive Summary */}
-        <ExecutiveSummarySection data={executiveSummary} />
+        {/* 1. Brief */}
+        <BriefSection brief={hybridData.brief} />
 
-        {/* Problem Analysis */}
-        <ProblemAnalysisSection data={problemAnalysis} />
+        {/* 2. Problem Analysis */}
+        <ProblemAnalysisSection analysis={hybridData.problem_analysis} />
 
-        {/* Decision Architecture */}
-        <DecisionArchitectureSection
-          primary={decisionArchitecture?.primary}
-          fallback={decisionArchitecture?.fallback}
+        {/* 3. Executive Summary */}
+        <ExecutiveSummarySection summary={hybridData.executive_summary} />
+
+        {/* 4. Solution Concepts (formerly Execution Track) */}
+        <SolutionConceptsSection track={hybridData.execution_track} />
+
+        {/* 5. Innovation Concepts (formerly Innovation Portfolio) */}
+        <InnovationConceptsSection
+          portfolio={hybridData.innovation_portfolio}
         />
 
-        {/* Execution Track */}
-        <ExecutionTrackSection data={executionTrack} />
+        {/* 6. Frontier Watch */}
+        <FrontierWatchSection
+          items={hybridData.innovation_portfolio?.frontier_watch}
+        />
 
-        {/* Supporting Concepts */}
-        <SupportingConceptsSection data={supportingConcepts} />
+        {/* 7. Constraints & Metrics */}
+        <ConstraintsSection constraints={hybridData.constraints_and_metrics} />
 
-        {/* Innovation Portfolio */}
-        <InnovationPortfolioSection recommended={recommendedInnovation} />
+        {/* 8. Challenge the Frame */}
+        <ChallengeTheFrameSection challenges={hybridData.challenge_the_frame} />
 
-        {/* Key Insights */}
-        <KeyInsightsSection insights={keyInsights} />
+        {/* 9. Innovation Analysis */}
+        <InnovationAnalysisSection analysis={hybridData.innovation_analysis} />
 
-        {/* Next Steps */}
-        <NextStepsSection steps={nextSteps} />
+        {/* 10. Risks & Watchouts */}
+        <RisksSection risks={hybridData.risks_and_watchouts} />
 
-        {/* Risks */}
-        <RisksSection risks={risksAndWatchouts} />
+        {/* 11. Key Insights */}
+        <KeyInsightsSection insights={hybridData.key_insights} />
+
+        {/* 12. Next Steps */}
+        <NextStepsSection steps={hybridData.next_steps} />
+
+        {/* 13. What I'd Actually Do */}
+        <WhatIdActuallyDoSection content={hybridData.what_id_actually_do} />
 
         {/* Footer */}
         <View style={styles.footer} fixed>
