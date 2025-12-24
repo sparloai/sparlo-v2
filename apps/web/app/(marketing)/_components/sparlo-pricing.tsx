@@ -36,7 +36,7 @@ export function SparloPricing() {
           <h1 className="mb-4 text-4xl font-semibold tracking-tight text-zinc-950 md:text-5xl dark:text-white">
             Plans
           </h1>
-          <p className="text-lg font-normal leading-relaxed text-zinc-500 dark:text-zinc-400">
+          <p className="text-lg leading-relaxed font-normal text-zinc-500 dark:text-zinc-400">
             Engineering intelligence for professional teams.
           </p>
         </div>
@@ -49,7 +49,7 @@ export function SparloPricing() {
               className="group flex flex-col rounded-lg border border-zinc-200 bg-white p-8 transition-colors duration-300 hover:border-zinc-300 md:p-10 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700"
             >
               <div className="mb-8">
-                <h3 className="mb-6 text-xs font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+                <h3 className="mb-6 text-xs font-medium tracking-widest text-zinc-500 uppercase dark:text-zinc-400">
                   {tier.name}
                 </h3>
                 <div className="flex items-baseline gap-1">
@@ -75,7 +75,7 @@ export function SparloPricing() {
 
               <Link
                 href={tier.href}
-                className="bg-primary hover:bg-primary/90 block w-full rounded px-4 py-3 text-center text-sm font-medium text-white transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                className="bg-primary hover:bg-primary/90 focus-visible:ring-primary block w-full rounded px-4 py-3 text-center text-sm font-medium text-white transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 {tier.cta}
               </Link>
@@ -89,7 +89,7 @@ export function SparloPricing() {
             Need an enterprise agreement?{' '}
             <Link
               href="/contact"
-              className="font-medium text-zinc-950 underline-offset-4 decoration-zinc-300 hover:underline dark:text-white dark:decoration-zinc-600"
+              className="font-medium text-zinc-950 decoration-zinc-300 underline-offset-4 hover:underline dark:text-white dark:decoration-zinc-600"
             >
               Contact us
             </Link>

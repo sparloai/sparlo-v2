@@ -1,10 +1,8 @@
 import { redirect } from 'next/navigation';
 
 import { getBillingGatewayProvider } from '@kit/billing-gateway';
-import { AppBreadcrumbs } from '@kit/ui/app-breadcrumbs';
-import { PageBody } from '@kit/ui/page';
-import { Trans } from '@kit/ui/trans';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
+import { PageBody } from '@kit/ui/page';
 
 import appConfig from '~/config/app.config';
 import billingConfig from '~/config/billing.config';
@@ -13,7 +11,6 @@ import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { withI18n } from '~/lib/i18n/with-i18n';
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 
-import { HomeLayoutPageHeader } from '../_components/home-page-header';
 import { AuraPricingHeader } from './_components/aura-pricing-header';
 import { AuraPricingTable } from './_components/aura-pricing-table';
 import { loadPersonalAccountBillingPageData } from './_lib/server/personal-account-billing-page.loader';
@@ -54,24 +51,16 @@ async function PersonalAccountBillingPage() {
     redirect(session.url);
   }
 
-  // NON-SUBSCRIBER: Show pricing table
+  // NON-SUBSCRIBER: Show Aura pricing page
   return (
-    <>
-      <HomeLayoutPageHeader
-        title={<Trans i18nKey={'common:routes.billing'} />}
-        description={<AppBreadcrumbs />}
-      />
-
-      <PageBody>
-        <div className="mx-auto max-w-5xl space-y-8 py-8 md:py-12">
-          <AuraPricingHeader
-            title="Choose Your Plan"
-            subtitle="Get started with Sparlo and unlock powerful AI-driven innovation reports."
-          />
+    <PageBody>
+      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center py-20 md:py-32">
+        <div className="mx-auto w-full max-w-7xl px-6">
+          <AuraPricingHeader title="Plans" />
           <AuraPricingTable config={billingConfig} customerId={customerId} />
         </div>
-      </PageBody>
-    </>
+      </div>
+    </PageBody>
   );
 }
 

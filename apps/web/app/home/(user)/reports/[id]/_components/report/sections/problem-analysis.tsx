@@ -37,10 +37,10 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
       <div className="grid gap-8 md:grid-cols-2">
         {/* What's Wrong */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-500 uppercase">
             What&apos;s Wrong
           </h3>
-          <p className="text-base leading-relaxed text-zinc-700">
+          <p className="text-lg leading-relaxed text-zinc-700">
             {data.whats_wrong.prose}
           </p>
           {data.whats_wrong.technical_note && (
@@ -59,10 +59,10 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
 
         {/* Why It's Hard */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-500 uppercase">
             Why It&apos;s Hard
           </h3>
-          <p className="text-base leading-relaxed text-zinc-700">
+          <p className="text-lg leading-relaxed text-zinc-700">
             {data.why_its_hard.prose}
           </p>
           <BulletList items={data.why_its_hard.factors} />
@@ -84,7 +84,7 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
       {/* Root Cause Hypotheses */}
       {data.root_cause_hypotheses.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-500 uppercase">
             Root Cause Hypotheses
           </h3>
           <div className="grid gap-4">
@@ -104,7 +104,7 @@ export function ProblemAnalysis({ data }: ProblemAnalysisProps) {
       {/* Success Metrics */}
       {data.success_metrics.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+          <h3 className="text-sm font-semibold tracking-wider text-zinc-500 uppercase">
             Success Metrics
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
