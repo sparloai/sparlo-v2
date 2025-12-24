@@ -135,13 +135,11 @@ function SectionHeader({
   title: string;
 }) {
   return (
-    <div className="mb-8 flex items-center gap-3">
+    <div className="mb-6 flex items-center gap-3">
       <div className="rounded-lg bg-emerald-100 p-2">
         <Icon className="h-5 w-5 text-emerald-700" />
       </div>
-      <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
-        {title}
-      </h2>
+      <h2 className="text-xl font-semibold text-zinc-900">{title}</h2>
     </div>
   );
 }
@@ -236,20 +234,18 @@ export function DiscoveryReportDisplay({
   return (
     <div className="space-y-12">
       {/* Header */}
-      <header className="border-b border-emerald-100 pb-10">
+      <header className="border-b border-emerald-100 pb-8">
         <Badge
           className="mb-4 bg-emerald-100 text-emerald-800"
           variant="outline"
         >
           Discovery Mode
         </Badge>
-        <h1 className="mb-4 text-4xl font-bold tracking-tight text-zinc-900 lg:text-5xl">
+        <h1 className="mb-3 text-3xl font-bold text-zinc-900">
           {report.header?.title || 'Discovery Report'}
         </h1>
         {report.header?.tagline && (
-          <p className="text-xl leading-relaxed text-zinc-600">
-            {report.header.tagline}
-          </p>
+          <p className="text-lg text-zinc-600">{report.header.tagline}</p>
         )}
       </header>
 
@@ -261,47 +257,47 @@ export function DiscoveryReportDisplay({
         >
           <SectionHeader icon={Sparkles} title="Executive Summary" />
           {report.executive_summary.one_liner && (
-            <p className="mb-6 text-xl leading-relaxed font-medium text-emerald-900">
+            <p className="mb-4 text-lg font-medium text-emerald-900">
               {report.executive_summary.one_liner}
             </p>
           )}
           <div className="grid gap-4 md:grid-cols-2">
             {report.executive_summary.key_discovery && (
-              <div className="rounded-lg bg-white p-5">
-                <p className="mb-2 text-base font-semibold text-emerald-700">
+              <div className="rounded-lg bg-white p-4">
+                <p className="mb-1 text-sm font-medium text-emerald-700">
                   Key Discovery
                 </p>
-                <p className="text-lg leading-relaxed text-zinc-700">
+                <p className="text-zinc-700">
                   {report.executive_summary.key_discovery}
                 </p>
               </div>
             )}
             {report.executive_summary.recommended_action && (
-              <div className="rounded-lg bg-white p-5">
-                <p className="mb-2 text-base font-semibold text-emerald-700">
+              <div className="rounded-lg bg-white p-4">
+                <p className="mb-1 text-sm font-medium text-emerald-700">
                   Recommended Action
                 </p>
-                <p className="text-lg leading-relaxed text-zinc-700">
+                <p className="text-zinc-700">
                   {report.executive_summary.recommended_action}
                 </p>
               </div>
             )}
             {report.executive_summary.timeline_to_validation && (
-              <div className="rounded-lg bg-white p-5">
-                <p className="mb-2 text-base font-semibold text-emerald-700">
+              <div className="rounded-lg bg-white p-4">
+                <p className="mb-1 text-sm font-medium text-emerald-700">
                   Timeline to Validation
                 </p>
-                <p className="text-lg leading-relaxed text-zinc-700">
+                <p className="text-zinc-700">
                   {report.executive_summary.timeline_to_validation}
                 </p>
               </div>
             )}
             {report.executive_summary.investment_required && (
-              <div className="rounded-lg bg-white p-5">
-                <p className="mb-2 text-base font-semibold text-emerald-700">
+              <div className="rounded-lg bg-white p-4">
+                <p className="mb-1 text-sm font-medium text-emerald-700">
                   Investment Required
                 </p>
-                <p className="text-lg leading-relaxed text-zinc-700">
+                <p className="text-zinc-700">
                   {report.executive_summary.investment_required}
                 </p>
               </div>
@@ -378,15 +374,15 @@ export function DiscoveryReportDisplay({
       {report.what_industry_missed && (
         <section id="what-industry-missed">
           <SectionHeader icon={Search} title="What Industry Missed" />
-          <div className="space-y-8">
+          <div className="space-y-6">
             {report.what_industry_missed.conventional_approaches &&
               report.what_industry_missed.conventional_approaches.length >
                 0 && (
                 <div>
-                  <p className="mb-3 text-base font-semibold text-zinc-600">
+                  <p className="mb-2 text-sm font-medium text-zinc-500">
                     Conventional Approaches
                   </p>
-                  <ul className="list-inside list-disc space-y-2 text-lg leading-relaxed text-zinc-700">
+                  <ul className="list-inside list-disc space-y-1 text-zinc-700">
                     {report.what_industry_missed.conventional_approaches.map(
                       (approach, i) => (
                         <li key={i}>{approach}</li>
@@ -396,11 +392,11 @@ export function DiscoveryReportDisplay({
                 </div>
               )}
             {report.what_industry_missed.why_they_do_it && (
-              <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
-                <p className="mb-2 text-base font-semibold text-zinc-600">
+              <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+                <p className="mb-1 text-sm font-medium text-zinc-500">
                   Why They Do It
                 </p>
-                <p className="text-lg leading-relaxed text-zinc-700">
+                <p className="text-zinc-700">
                   {report.what_industry_missed.why_they_do_it}
                 </p>
               </div>
@@ -408,34 +404,34 @@ export function DiscoveryReportDisplay({
             {report.what_industry_missed.blind_spots &&
               report.what_industry_missed.blind_spots.length > 0 && (
                 <div>
-                  <p className="mb-3 text-base font-semibold text-zinc-600">
+                  <p className="mb-3 text-sm font-medium text-zinc-500">
                     Blind Spots
                   </p>
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {report.what_industry_missed.blind_spots.map((spot, i) => (
                       <div
                         key={i}
-                        className="rounded-lg border border-amber-200 bg-amber-50 p-5"
+                        className="rounded-lg border border-amber-200 bg-amber-50 p-4"
                       >
                         {spot.assumption && (
-                          <p className="mb-2 text-base leading-relaxed">
-                            <span className="font-semibold text-amber-800">
+                          <p className="mb-1">
+                            <span className="font-medium text-amber-800">
                               Assumption:
                             </span>{' '}
                             {spot.assumption}
                           </p>
                         )}
                         {spot.challenge && (
-                          <p className="mb-2 text-base leading-relaxed">
-                            <span className="font-semibold text-amber-800">
+                          <p className="mb-1">
+                            <span className="font-medium text-amber-800">
                               Challenge:
                             </span>{' '}
                             {spot.challenge}
                           </p>
                         )}
                         {spot.opportunity && (
-                          <p className="text-base leading-relaxed">
-                            <span className="font-semibold text-emerald-700">
+                          <p>
+                            <span className="font-medium text-emerald-700">
                               Opportunity:
                             </span>{' '}
                             {spot.opportunity}
@@ -449,17 +445,13 @@ export function DiscoveryReportDisplay({
             {report.what_industry_missed.unexplored_territories &&
               report.what_industry_missed.unexplored_territories.length > 0 && (
                 <div>
-                  <p className="mb-3 text-base font-semibold text-zinc-600">
+                  <p className="mb-2 text-sm font-medium text-zinc-500">
                     Unexplored Territories
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {report.what_industry_missed.unexplored_territories.map(
                       (territory, i) => (
-                        <Badge
-                          key={i}
-                          variant="outline"
-                          className="bg-white px-3 py-1 text-base"
-                        >
+                        <Badge key={i} variant="outline" className="bg-white">
                           {territory}
                         </Badge>
                       ),

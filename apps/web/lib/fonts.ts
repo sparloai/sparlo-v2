@@ -37,44 +37,13 @@ const soehne = localFont({
 const sans = soehne;
 
 /**
- * @mono
- * @description Söhne Mono font (monospace typeface).
- * Söhne license required. Place font files in /public/fonts/:
- * - Soehne-Mono-Buch.woff2 (400)
- * - Soehne-Mono-Kraeftig.woff2 (500)
- * - Soehne-Mono-halbFett.woff2 (600)
- */
-const mono = localFont({
-  src: [
-    {
-      path: '../public/fonts/Soehne-Mono-Buch.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/Soehne-Mono-Kraeftig.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/Soehne-Mono-halbFett.woff2',
-      weight: '600',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-mono',
-  display: 'swap',
-  fallback: ['JetBrains Mono', 'SF Mono', 'ui-monospace', 'monospace'],
-});
-
-/**
  * @heading
  * @description Heading font (same as sans for brand consistency).
  */
 const heading = sans;
 
 // we export these fonts into the root layout
-export { sans, heading, mono };
+export { sans, heading };
 
 /**
  * @name getFontsClassName
@@ -84,12 +53,13 @@ export function getFontsClassName(theme?: string) {
   const dark = theme === 'dark';
   const light = !dark;
 
-  const font = [sans.variable, heading.variable, mono.variable].reduce<
-    string[]
-  >((acc, curr) => {
-    if (acc.includes(curr)) return acc;
-    return [...acc, curr];
-  }, []);
+  const font = [sans.variable, heading.variable].reduce<string[]>(
+    (acc, curr) => {
+      if (acc.includes(curr)) return acc;
+      return [...acc, curr];
+    },
+    [],
+  );
 
   return cn(...font, {
     dark,

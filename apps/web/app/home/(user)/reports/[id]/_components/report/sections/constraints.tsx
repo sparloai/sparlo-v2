@@ -25,7 +25,7 @@ function ConstraintText({
           {technicalValues.map((value, i) => (
             <code
               key={i}
-              className="rounded bg-zinc-100 px-1.5 py-1 font-mono text-base text-zinc-700"
+              className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs text-zinc-700"
             >
               {value}
             </code>
@@ -47,32 +47,32 @@ export function Constraints({ data }: ConstraintsProps) {
       <div className="grid gap-12 md:grid-cols-2">
         {/* From Input */}
         <div>
-          <div className="mb-6 flex items-center gap-2">
+          <div className="mb-4 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
+              width="14"
+              height="14"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-zinc-500"
+              className="text-zinc-400"
             >
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
-            <h3 className="text-base font-semibold tracking-wider text-zinc-600 uppercase">
+            <h3 className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">
               From Your Input
             </h3>
           </div>
-          <ul className="space-y-4">
+          <ul className="space-y-3">
             {data.from_input.map((item, index) => (
               <li
                 key={index}
-                className="group flex gap-3 text-lg leading-relaxed text-zinc-700"
+                className="group flex gap-3 text-sm leading-relaxed text-zinc-600"
               >
-                <span className="mt-2.5 h-2 w-2 shrink-0 rounded-full bg-zinc-300 transition-colors group-hover:bg-zinc-900" />
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-zinc-300 transition-colors group-hover:bg-zinc-900" />
                 <span>
                   <ConstraintText
                     text={item.constraint}
@@ -80,7 +80,7 @@ export function Constraints({ data }: ConstraintsProps) {
                     technicalValues={item.technical_values}
                   />
                   {item.note && (
-                    <span className="text-zinc-500 italic"> — {item.note}</span>
+                    <span className="text-zinc-400 italic"> — {item.note}</span>
                   )}
                 </span>
               </li>
@@ -89,35 +89,35 @@ export function Constraints({ data }: ConstraintsProps) {
         </div>
 
         {/* Assumptions */}
-        <div className="rounded-lg border border-zinc-100/50 bg-zinc-50/80 p-6">
-          <div className="mb-6 flex items-center gap-2">
+        <div className="rounded-lg border border-zinc-100/50 bg-zinc-50/80 p-5">
+          <div className="mb-4 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
+              width="14"
+              height="14"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-orange-500"
+              className="text-orange-400"
             >
               <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
               <line x1="12" y1="9" x2="12" y2="13" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
-            <h3 className="text-base font-semibold tracking-wider text-orange-700 uppercase">
+            <h3 className="text-xs font-semibold tracking-wider text-orange-600/80 uppercase">
               Assumptions Made
             </h3>
           </div>
-          <ul className="space-y-4">
+          <ul className="space-y-3">
             {data.assumptions.map((item, index) => (
               <li
                 key={index}
-                className="flex gap-3 text-lg leading-relaxed text-zinc-700"
+                className="flex gap-3 text-sm leading-relaxed text-zinc-600"
               >
-                <div className="mt-2.5 h-2 w-2 shrink-0 rounded-full bg-orange-400" />
+                <div className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-orange-300" />
                 <ConstraintText
                   text={item.assumption}
                   technicalValues={item.technical_values}

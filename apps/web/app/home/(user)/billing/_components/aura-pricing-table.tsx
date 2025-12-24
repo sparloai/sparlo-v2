@@ -88,7 +88,7 @@ export function AuraPricingTable({
       <div className="mx-auto max-w-2xl">
         <button
           onClick={resetCheckout}
-          className="mb-6 flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-zinc-950"
+          className="mb-6 flex items-center gap-2 text-sm text-zinc-600 transition-colors hover:text-zinc-950"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to plans
@@ -111,7 +111,7 @@ export function AuraPricingTable({
         </Alert>
       )}
 
-      <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-3 lg:gap-12">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {visibleProducts.map((product) => {
           const plan = product.plans[0];
           if (!plan) return null;
@@ -120,6 +120,7 @@ export function AuraPricingTable({
           if (!primaryLineItem) return null;
 
           const price = primaryLineItem.cost / 100;
+          const isHighlighted = product.highlighted;
           const isCurrent = currentPlanId === plan.id;
           const isPending = pending && checkout.selectedPlan === plan.id;
 
@@ -131,6 +132,7 @@ export function AuraPricingTable({
               interval={plan.interval ?? 'month'}
               description={product.description}
               features={product.features}
+              isPopular={isHighlighted}
               isCurrent={isCurrent}
               onSelect={() => handleSelectPlan(plan.id, product.id)}
               disabled={pending}
@@ -140,7 +142,7 @@ export function AuraPricingTable({
         })}
       </div>
 
-      <div className="mt-16 text-center">
+      <div className="mt-12 text-center">
         <p className="text-sm text-zinc-500">
           Need an enterprise agreement?{' '}
           <Link

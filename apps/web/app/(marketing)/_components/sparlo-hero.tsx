@@ -64,7 +64,7 @@ export function SparloHero() {
               <div className="animate-cta-reveal flex flex-col items-start gap-3">
                 <Link
                   href="/auth/sign-up"
-                  className="group bg-primary hover:bg-primary/90 focus-visible:ring-primary flex items-center justify-center gap-3 rounded-sm py-3 pr-6 pl-8 text-[15px] font-medium text-white shadow-[0_4px_20px_-4px_rgba(124,58,237,0.3)] transition-all hover:shadow-[0_8px_30px_-4px_rgba(124,58,237,0.4)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98]"
+                  className="group bg-primary hover:bg-primary/90 flex items-center justify-center gap-3 rounded-sm py-3 pr-6 pl-8 text-[15px] font-medium text-white shadow-[0_4px_20px_-4px_rgba(124,58,237,0.3)] transition-all hover:shadow-[0_8px_30px_-4px_rgba(124,58,237,0.4)] active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
                   <span className="tracking-tight">Run Analysis</span>
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

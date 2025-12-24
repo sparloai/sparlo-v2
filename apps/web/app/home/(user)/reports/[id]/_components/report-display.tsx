@@ -16,6 +16,7 @@ import {
   MessageSquare,
   Send,
   Share2,
+  Sparkles,
   Square,
   X,
 } from 'lucide-react';
@@ -821,37 +822,16 @@ export function ReportDisplay({
               </Link>
 
               {/* Report Header */}
-              <header className="mb-12">
+              <header className="mb-10">
                 <div className="mb-6 flex items-start justify-between gap-6">
-                  <div className="space-y-4">
-                    <h1 className="text-4xl font-bold tracking-tight text-zinc-900 lg:text-5xl">
+                  <div className="space-y-3">
+                    <div className="text-label flex items-center gap-2">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Sparlo Intelligence Briefing
+                    </div>
+                    <h1 className="heading-display heading-display--lg">
                       {report.title}
                     </h1>
-                    <div className="flex items-center gap-3 text-sm text-zinc-500">
-                      <span>
-                        {new Date(report.created_at).toLocaleDateString(
-                          'en-US',
-                          {
-                            month: '2-digit',
-                            day: '2-digit',
-                            year: 'numeric',
-                          },
-                        )}
-                      </span>
-                      <span className="text-zinc-300">•</span>
-                      <span>
-                        {new Date(report.created_at).toLocaleTimeString(
-                          'en-US',
-                          {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: false,
-                          },
-                        )}
-                      </span>
-                      <span className="text-zinc-300">•</span>
-                      <span>8 min read</span>
-                    </div>
                   </div>
                   <div className="status status--high">
                     <span className="status-dot" />
@@ -859,7 +839,10 @@ export function ReportDisplay({
                   </div>
                 </div>
 
-                <div className="flex items-center justify-end">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-[--text-muted]">
+                    Generated {new Date(report.created_at).toLocaleDateString()}
+                  </div>
                   <div className="flex gap-2">
                     <button
                       className="btn"
