@@ -2089,16 +2089,16 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
 }
 
 // ============================================
-// What I'd Actually Do Section
+// Recommendation Section
 // ============================================
 
-function WhatIdActuallyDoSection({ content }: { content?: string }) {
+function RecommendationSection({ content }: { content?: string }) {
   if (!content) return null;
 
   return (
-    <section id="what-id-actually-do">
+    <section id="recommendation">
       <SectionHeader
-        title="What I'd Actually Do"
+        title="Recommendation"
         subtitle="Personal recommendation from the analysis"
       />
       <DarkSection label="If This Were My Project">
@@ -3060,8 +3060,8 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
       {/* Risks & Watchouts */}
       <RisksSection risks={report.risks_and_watchouts} />
 
-      {/* What I'd Actually Do */}
-      <WhatIdActuallyDoSection content={report.what_id_actually_do} />
+      {/* Recommendation */}
+      <RecommendationSection content={report.what_id_actually_do} />
     </div>
   );
 }

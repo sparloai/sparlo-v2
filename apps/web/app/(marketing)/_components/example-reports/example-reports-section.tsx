@@ -27,6 +27,22 @@ interface TocItem {
   level: number;
 }
 
+// TOC items for hybrid report (Climate tab)
+const HYBRID_TOC_ITEMS: TocItem[] = [
+  { id: 'brief', title: 'The Brief', level: 2 },
+  { id: 'executive-summary', title: 'Executive Summary', level: 2 },
+  { id: 'problem-analysis', title: 'Problem Analysis', level: 2 },
+  { id: 'constraints', title: 'Constraints', level: 2 },
+  { id: 'challenge-the-frame', title: 'Challenge the Frame', level: 2 },
+  { id: 'innovation-analysis', title: 'Innovation Analysis', level: 2 },
+  { id: 'solution-concepts', title: 'Solution Concepts', level: 2 },
+  { id: 'innovation-concepts', title: 'Innovation Concepts', level: 2 },
+  { id: 'frontier-watch', title: 'Frontier Technologies', level: 2 },
+  { id: 'self-critique', title: 'Self-Critique', level: 2 },
+  { id: 'risks', title: 'Risks & Watchouts', level: 2 },
+  { id: 'recommendation', title: 'Recommendation', level: 2 },
+];
+
 export function ExampleReportsSection() {
   const [activeTab, setActiveTab] = useState(0);
   const [activeSection, setActiveSection] = useState<string | null>(null);
@@ -34,14 +50,17 @@ export function ExampleReportsSection() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const report = EXAMPLE_REPORTS[activeTab]!;
 
-  // Generate TOC from report sections
+  // Generate TOC from report sections (use custom TOC for hybrid reports)
   const tocItems: TocItem[] = useMemo(() => {
+    if (report.id === 'climate-tech') {
+      return HYBRID_TOC_ITEMS;
+    }
     return report.sections.map((section) => ({
       id: section.id,
       title: section.title,
       level: 2,
     }));
-  }, [report.sections]);
+  }, [report.id, report.sections]);
 
   // Track active section on scroll
   useEffect(() => {
