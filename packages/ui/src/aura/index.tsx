@@ -16,7 +16,7 @@ export const SectionHeader = memo(function SectionHeader({
 }) {
   return (
     <div className="mb-10 border-l-4 border-zinc-950 py-1 pl-6">
-      <h2 className="mb-3 text-2xl font-semibold tracking-tight text-zinc-950">
+      <h2 className="mb-3 text-3xl font-semibold tracking-tight text-zinc-950">
         {title}
       </h2>
       {subtitle && (
@@ -48,7 +48,7 @@ export function CardWithHeader({
     >
       <div className="flex items-center gap-3 border-b border-zinc-200 bg-zinc-50/50 p-6">
         {Icon && <Icon className="h-5 w-5 text-zinc-950" />}
-        <h3 className="font-mono text-xs font-bold tracking-widest text-zinc-600 uppercase">
+        <h3 className="font-mono text-base font-bold tracking-widest text-zinc-600 uppercase">
           {label}
         </h3>
       </div>
@@ -63,7 +63,7 @@ export const MonoLabel = memo(function MonoLabel({
   children: React.ReactNode;
 }) {
   return (
-    <span className="font-mono text-xs font-bold tracking-widest text-zinc-600 uppercase">
+    <span className="font-mono text-base font-bold tracking-widest text-zinc-600 uppercase">
       {children}
     </span>
   );
@@ -84,7 +84,7 @@ export function AuraTable({
             {headers.map((header) => (
               <th
                 key={header}
-                className="px-6 py-4 font-mono text-xs font-bold tracking-wider text-zinc-600 uppercase"
+                className="px-6 py-4 font-mono text-base font-bold tracking-wider text-zinc-600 uppercase"
               >
                 {header}
               </th>
@@ -106,7 +106,7 @@ export function DarkSection({
 }) {
   return (
     <div className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 p-8 text-white shadow-lg sm:p-10">
-      <h4 className="mb-4 font-mono text-sm font-bold tracking-widest text-zinc-400 uppercase">
+      <h4 className="mb-4 font-mono text-base font-bold tracking-widest text-zinc-100 uppercase">
         {label}
       </h4>
       {children}
@@ -150,11 +150,11 @@ export const NumberedHeader = memo(function NumberedHeader({
   title: string;
 }) {
   return (
-    <div className="mb-6 flex items-center gap-4">
+    <div className="mb-8 flex items-center gap-4">
       <div className="flex h-8 w-8 items-center justify-center rounded bg-zinc-950 font-mono text-sm font-medium text-white">
         {String(index).padStart(2, '0')}
       </div>
-      <h2 className="text-2xl font-semibold tracking-tight text-zinc-900">
+      <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
         {title}
       </h2>
     </div>
@@ -200,24 +200,24 @@ export const ViabilityAssessment = memo(function ViabilityAssessment({
 }) {
   return (
     <div className="relative overflow-hidden rounded-xl bg-zinc-950 p-6 text-white md:p-8">
-      <h3 className="mb-4 font-mono text-xs font-bold tracking-widest text-zinc-400 uppercase">
+      <h3 className="mb-4 font-mono text-base font-bold tracking-widest text-zinc-100 uppercase">
         Viability Assessment
       </h3>
       <p className="mb-4 text-lg font-medium">{headline}</p>
       {description && (
-        <p className="mb-6 max-w-3xl text-sm leading-relaxed text-zinc-400">
+        <p className="mb-6 max-w-3xl text-base leading-relaxed text-zinc-200">
           {description}
         </p>
       )}
       {(revisitTimeframe || alternativeStrategy) && (
-        <div className="grid gap-6 border-t border-zinc-800 pt-6 text-sm md:grid-cols-2">
+        <div className="grid gap-6 border-t border-zinc-800 pt-6 text-base md:grid-cols-2">
           {revisitTimeframe && (
             <div>
               <strong className="mb-1 block text-white">
                 Revisit in {revisitTimeframe}
               </strong>
               {revisitReason && (
-                <span className="text-zinc-500">{revisitReason}</span>
+                <span className="text-zinc-300">{revisitReason}</span>
               )}
             </div>
           )}
@@ -226,7 +226,7 @@ export const ViabilityAssessment = memo(function ViabilityAssessment({
               <strong className="mb-1 block text-white">
                 Alternative Strategy
               </strong>
-              <span className="text-zinc-500">{alternativeStrategy}</span>
+              <span className="text-zinc-300">{alternativeStrategy}</span>
             </div>
           )}
         </div>

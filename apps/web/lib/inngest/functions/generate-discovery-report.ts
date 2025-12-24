@@ -119,9 +119,7 @@ export const generateDiscoveryReport = inngest.createFunction(
 
       async function runDiscoveryGeneration() {
         // Helper to calculate total usage from collected step usages
-        function calculateTotalUsage(
-          usages: TokenUsage[],
-        ): TokenUsage & {
+        function calculateTotalUsage(usages: TokenUsage[]): TokenUsage & {
           costUsd: number;
           byStep: Record<string, TokenUsage>;
         } {

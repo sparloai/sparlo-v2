@@ -24,16 +24,11 @@
     --void-elevated: #f5f5f5;
     --void-surface: #ebebeb;
 
-    /* Gradient for depth - subtle in light mode */
-    --void-gradient: linear-gradient(
-        180deg,
-        rgba(124, 58, 237, 0.03) 0%,
-        transparent 30%
-      ),
-      var(--void-black);
+    /* Gradient for depth - pure white, no purple hue */
+    --void-gradient: var(--void-black);
 
-    /* Grid overlay - very subtle */
-    --grid-color: rgba(0, 0, 0, 0.02);
+    /* Grid overlay - disabled for clean white background */
+    --grid-color: transparent;
     --grid-size: 64px;
 
     /* Noise texture - disabled in light mode */
@@ -114,15 +109,16 @@
     --font-mono: 'Söhne Mono', 'JetBrains Mono', 'SF Mono', 'Fira Code',
       monospace;
 
-    /* Type scale */
-    --text-xs: 10px;
-    --text-sm: 12px;
-    --text-base: 14px;
-    --text-lg: 16px;
-    --text-xl: 18px;
-    --text-2xl: 22px;
-    --text-3xl: 28px;
+    /* Type scale - Apple-inspired with 18px body text baseline */
+    --text-xs: 12px;
+    --text-sm: 14px;
+    --text-base: 18px;
+    --text-lg: 20px;
+    --text-xl: 22px;
+    --text-2xl: 26px;
+    --text-3xl: 30px;
     --text-4xl: 36px;
+    --text-5xl: 48px;
 
     /* Line heights */
     --leading-none: 1;
