@@ -61,28 +61,103 @@
   animation: headline-reveal 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   animation-delay: 300ms;
   opacity: 0;
+  will-change: opacity, transform;
 }
 
 .animate-subhead-reveal {
   animation: subhead-reveal 500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   animation-delay: 600ms;
   opacity: 0;
+  will-change: opacity, transform;
 }
 
 .animate-cta-reveal {
   animation: cta-reveal 400ms ease-out forwards;
   animation-delay: 900ms;
   opacity: 0;
+  will-change: opacity, transform;
 }
 
 .animate-micro-fade {
   animation: micro-fade 300ms ease-out forwards;
   animation-delay: 1100ms;
   opacity: 0;
+  will-change: opacity;
 }
 
 .animate-secondary-fade {
   animation: micro-fade 300ms ease-out forwards;
   animation-delay: 1000ms;
   opacity: 0;
+  will-change: opacity;
+}
+
+/* Technical Grid Background */
+.technical-grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: 40px 40px;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  pointer-events: none;
+  transition: background-color 0.5s ease;
+}
+
+:where(.dark, .dark *) .technical-grid-bg {
+  background-color: #09090b;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+}
+
+/* Blinking Cursor */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+/* Subtle Bounce for scroll indicator */
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 2s infinite;
+}
+
+/* Staggered reveal delays */
+.reveal-delay-1 { animation-delay: 0.1s; }
+.reveal-delay-2 { animation-delay: 0.2s; }
+.reveal-delay-3 { animation-delay: 0.3s; }
+.reveal-delay-4 { animation-delay: 0.4s; }
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blink,
+  .animate-bounce-subtle,
+  .animate-headline-reveal,
+  .animate-subhead-reveal,
+  .animate-cta-reveal,
+  .animate-micro-fade,
+  .animate-secondary-fade,
+  .animate-nav-fade {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+
+  .technical-grid-bg {
+    transition: none !important;
+  }
 }
