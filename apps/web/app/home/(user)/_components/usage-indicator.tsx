@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 import { Progress } from '@kit/ui/progress';
 import {
   Tooltip,
@@ -13,30 +15,19 @@ import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 interface UsageIndicatorProps {
   tokensUsed: number;
   tokensLimit: number;
-  reportsCount: number;
+  reportsCount?: number; // Unused but kept for backwards compatibility
   periodEnd: string;
 }
 
 export function UsageIndicator({
   tokensUsed,
   tokensLimit,
-  reportsCount,
   periodEnd,
 }: UsageIndicatorProps) {
   const percentage = Math.min((tokensUsed / tokensLimit) * 100, 100);
   const isWarning = percentage >= USAGE_CONSTANTS.WARNING_THRESHOLD;
   const isCritical = percentage >= USAGE_CONSTANTS.CRITICAL_THRESHOLD;
   const isAtLimit = percentage >= USAGE_CONSTANTS.HARD_LIMIT_THRESHOLD;
-
-  const formatTokens = (tokens: number) => {
-    if (tokens >= 1_000_000) {
-      return `${(tokens / 1_000_000).toFixed(1)}M`;
-    }
-    if (tokens >= 1_000) {
-      return `${(tokens / 1_000).toFixed(0)}K`;
-    }
-    return tokens.toString();
-  };
 
   // Calculate days remaining from period end
   const periodEndDate = new Date(periodEnd);
@@ -80,31 +71,18 @@ export function UsageIndicator({
             />
           </div>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="w-64">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Tokens used:</span>
-              <span className="font-medium">
-                {formatTokens(tokensUsed)} / {formatTokens(tokensLimit)}
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Reports created:</span>
-              <span className="font-medium">{reportsCount}</span>
-            </div>
+        <TooltipContent side="bottom" className="w-48">
+          <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Resets in:</span>
               <span className="font-medium">{daysRemaining} days</span>
             </div>
-            {isWarning && (
-              <div className="text-muted-foreground border-t pt-2 text-xs">
-                {isAtLimit
-                  ? 'Upgrade your plan to continue generating reports.'
-                  : isCritical
-                    ? 'Almost at your limit. Upgrade soon.'
-                    : 'Running low on tokens. Consider upgrading.'}
-              </div>
-            )}
+            <Link
+              href="/home/billing"
+              className="block w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-center text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            >
+              Upgrade
+            </Link>
           </div>
         </TooltipContent>
       </Tooltip>

@@ -510,7 +510,7 @@ export default function NewReportPage() {
                           fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
                         }}
                       >
-                        ~15 MINUTES
+                        ~25 MINUTES
                       </span>
                     </div>
                   </div>
