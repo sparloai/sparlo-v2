@@ -1773,7 +1773,7 @@ const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
         {/* 4. What Industry Does Today */}
         {analysis.what_industry_does_today &&
           analysis.what_industry_does_today.length > 0 && (
-            <CardWithHeader icon={Users} label="What Industry is Doing">
+            <CardWithHeader icon={Users} label="What Industry Does Today">
               <div className="space-y-3">
                 {analysis.what_industry_does_today.map((item, idx) => (
                   <div
@@ -1795,7 +1795,7 @@ const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
         {/* 5. Current State of the Art - Benchmarks Table */}
         {analysis.current_state_of_art?.benchmarks &&
           analysis.current_state_of_art.benchmarks.length > 0 && (
-            <CardWithHeader icon={Target} label="Cutting Edge">
+            <CardWithHeader icon={Target} label="Current State of the Art">
               <AuraTable
                 headers={[
                   'Entity',
