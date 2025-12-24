@@ -8,32 +8,28 @@ export default createBillingSchema({
   provider,
   products: [
     {
-      id: 'standard',
-      name: 'Standard',
+      id: 'core',
+      name: 'Core',
       description: 'For individuals and small teams getting started',
       currency: 'USD',
       badge: 'Starter',
       plans: [
         {
-          name: 'Standard Monthly',
-          id: 'standard-monthly',
+          name: 'Core Monthly',
+          id: 'core-monthly',
           paymentType: 'recurring',
           interval: 'month',
           lineItems: [
             {
               id: 'price_1ShDIuEvKpUSC4D5L44n2jvV',
-              name: 'Standard',
-              cost: 299,
+              name: 'Core',
+              cost: 199,
               type: 'flat' as const,
             },
           ],
         },
       ],
-      features: [
-        '~15 reports per month',
-        '2.7M tokens included',
-        'Email support',
-      ],
+      features: ['Standard usage', '1 seat', 'Email support'],
     },
     {
       id: 'pro',
@@ -58,11 +54,7 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: [
-        '~30 reports per month',
-        '5.4M tokens included',
-        'Priority support',
-      ],
+      features: ['3× usage', '5 team seats', 'Priority support'],
     },
     {
       id: 'max',
@@ -85,11 +77,7 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: [
-        '~75 reports per month',
-        '13.5M tokens included',
-        'Dedicated support',
-      ],
+      features: ['7× usage', '10 team seats', 'Dedicated support'],
     },
   ],
 });
