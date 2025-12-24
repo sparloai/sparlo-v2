@@ -54,11 +54,9 @@ async function PersonalAccountBillingPage() {
   // NON-SUBSCRIBER: Show Aura pricing page
   return (
     <PageBody>
-      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center py-20 md:py-32">
-        <div className="mx-auto w-full max-w-7xl px-6">
-          <AuraPricingHeader title="Plans" />
-          <AuraPricingTable config={billingConfig} customerId={customerId} />
-        </div>
+      <div className="mx-auto w-full max-w-7xl px-6 py-12 font-sans">
+        <AuraPricingHeader title="Plans" />
+        <AuraPricingTable config={billingConfig} customerId={customerId} />
       </div>
     </PageBody>
   );

@@ -23,7 +23,7 @@ export default createBillingSchema({
             {
               id: 'price_1ShDIuEvKpUSC4D5L44n2jvV',
               name: 'Core',
-              cost: 199,
+              cost: 19900,
               type: 'flat' as const,
             },
           ],
@@ -48,7 +48,7 @@ export default createBillingSchema({
             {
               id: 'price_1ShDJwEvKpUSC4D5fKIiTcNf',
               name: 'Pro',
-              cost: 499,
+              cost: 49900,
               type: 'flat' as const,
             },
           ],
@@ -71,7 +71,7 @@ export default createBillingSchema({
             {
               id: 'price_1ShDLCEvKpUSC4D5DVyqvaJS',
               name: 'Max',
-              cost: 999,
+              cost: 99900,
               type: 'flat' as const,
             },
           ],

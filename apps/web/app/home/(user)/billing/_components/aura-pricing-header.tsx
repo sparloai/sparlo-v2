@@ -7,8 +7,8 @@ interface AuraPricingHeaderProps {
 
 export function AuraPricingHeader({ title }: AuraPricingHeaderProps) {
   return (
-    <div className="mb-20">
-      <h1 className="mb-4 text-4xl font-semibold tracking-tight text-zinc-950 md:text-5xl">
+    <div className="mb-12">
+      <h1 className="text-4xl font-semibold tracking-tight text-zinc-950 md:text-5xl">
         {title}
       </h1>
     </div>
