@@ -1,0 +1,14 @@
+[
+  {
+    "id": "01KD5SWMH2VTB2Q1DBD4ZN1VED",
+    "name": "report/generate-hybrid",
+    "data": {
+      "accountId": "c192c611-2926-4828-b007-50a529afd547",
+      "conversationId": "22db82d9-79f7-4abd-9503-c872738d827f",
+      "designChallenge": "CAR-T manufacturing costs $300-500K per patient, with 2-4 week vein-to-vein time during which patients often progress. The autologous model requires dedicated manufacturing per patient with no economies of scale. Allogeneic approaches solve cost but create rejection and persistence problems. Need a path to <$50K manufacturing cost while maintaining autologous-like persistence and efficacy. Process must work with variable input material quality—patient cells post-chemo are often in poor condition.",
+      "reportId": "93b092c8-2178-41b0-965b-340bce2a6e98",
+      "userId": "c192c611-2926-4828-b007-50a529afd547"
+    },
+    "ts": 1766500225570
+  }
+]
