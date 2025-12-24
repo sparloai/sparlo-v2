@@ -258,7 +258,6 @@ export function ReportDisplay({
           self_critique?: unknown;
           risks_and_watchouts?: unknown[];
           what_id_actually_do?: unknown;
-          follow_up_prompts?: unknown[];
         };
       };
       const r = hybridData?.report;
@@ -389,16 +388,6 @@ export function ReportDisplay({
         items.push({
           id: 'what-id-actually-do',
           title: "What I'd Actually Do",
-          level: 2,
-        });
-      if (
-        r?.follow_up_prompts &&
-        Array.isArray(r.follow_up_prompts) &&
-        r.follow_up_prompts.length > 0
-      )
-        items.push({
-          id: 'follow-up-prompts',
-          title: 'Suggested Follow-ups',
           level: 2,
         });
       return items;
@@ -818,11 +807,11 @@ export function ReportDisplay({
           {/* Main Content */}
           <div
             className={cn(
-              'min-w-0 flex-1 px-6 py-10 transition-all',
+              'min-w-0 flex-1 px-4 py-10 transition-all md:px-6 lg:px-4',
               isChatOpen && 'lg:mr-[420px]',
             )}
           >
-            <div className="mx-auto max-w-3xl">
+            <div className="mx-auto max-w-4xl">
               {/* Back link */}
               <Link
                 href="/home"
