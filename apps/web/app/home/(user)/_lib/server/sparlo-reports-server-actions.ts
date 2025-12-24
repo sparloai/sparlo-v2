@@ -13,6 +13,22 @@ import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 import type { ConversationStatus, Message, ReportResponse } from '../types';
 import { checkUsageAllowed } from './usage.service';
 
+// Super admin bypass for internal users (comma-separated user IDs)
+const SUPER_ADMIN_USER_IDS = (process.env.SUPER_ADMIN_USER_IDS ?? '')
+  .split(',')
+  .filter(Boolean);
+
+function isSuperAdmin(userId: string): boolean {
+  const isAdmin = SUPER_ADMIN_USER_IDS.includes(userId);
+  if (isAdmin) {
+    console.log(`[Super Admin] Bypassing usage limits for user: ${userId}`);
+  }
+  return isAdmin;
+}
+
+// Terminal statuses that allow archiving
+const TERMINAL_STATUSES = ['complete', 'error', 'failed', 'cancelled'] as const;
+
 // Schema for creating a report
 const CreateReportSchema = z.object({
   conversationId: z.string(),
@@ -22,6 +38,8 @@ const CreateReportSchema = z.object({
     'processing',
     'complete',
     'error',
+    'failed',
+    'cancelled',
     'confirm_rerun',
   ]),
   lastMessage: z.string().optional(),
@@ -41,7 +59,15 @@ const UpdateReportSchema = z.object({
   id: z.string().uuid(),
   title: z.string().optional(),
   status: z
-    .enum(['clarifying', 'processing', 'complete', 'error', 'confirm_rerun'])
+    .enum([
+      'clarifying',
+      'processing',
+      'complete',
+      'error',
+      'failed',
+      'cancelled',
+      'confirm_rerun',
+    ])
     .optional(),
   reportData: z.record(z.unknown()).optional(),
   messages: z.array(z.record(z.unknown())).optional(),
@@ -245,6 +271,25 @@ export const archiveReport = enhanceAction(
     // P0 Security: Verify ownership before archive
     await verifyReportOwnership(data.id, user.id);
 
+    // Fetch report to check status
+    const { data: existingReport, error: fetchError } = await client
+      .from('sparlo_reports')
+      .select('id, status')
+      .eq('id', data.id)
+      .single();
+
+    if (fetchError || !existingReport) {
+      throw new Error('Report not found');
+    }
+
+    // Only allow archiving terminal statuses
+    const status = existingReport.status as (typeof TERMINAL_STATUSES)[number];
+    if (!TERMINAL_STATUSES.includes(status)) {
+      throw new Error(
+        `Cannot archive report with status "${existingReport.status}". Only completed, errored, failed, or cancelled reports can be archived.`,
+      );
+    }
+
     const { data: report, error } = await client
       .from('sparlo_reports')
       .update({ archived: data.archived })
@@ -263,6 +308,90 @@ export const archiveReport = enhanceAction(
   },
   {
     schema: ArchiveReportSchema,
+    auth: true,
+  },
+);
+
+// Schema for cancelling a report
+const CancelReportSchema = z.object({
+  reportId: z.string().uuid(),
+});
+
+/**
+ * Cancel a report that is currently processing or waiting for clarification.
+ * Sends a cancellation event to Inngest and updates the database status.
+ *
+ * Idempotent: If already cancelled, returns success without error.
+ * Atomic: Updates database first (fail-safe), then sends Inngest event.
+ */
+export const cancelReportGeneration = enhanceAction(
+  async (data, user) => {
+    const client = getSupabaseServerClient();
+
+    // P0 Security: Verify ownership
+    await verifyReportOwnership(data.reportId, user.id);
+
+    // Fetch report to check current status
+    const { data: report, error: fetchError } = await client
+      .from('sparlo_reports')
+      .select('id, status, account_id')
+      .eq('id', data.reportId)
+      .single();
+
+    if (fetchError || !report) {
+      throw new Error('Report not found');
+    }
+
+    // Idempotent: If already cancelled, return success
+    if (report.status === 'cancelled') {
+      return { success: true, message: 'Report already cancelled' };
+    }
+
+    // Can only cancel reports that are processing or clarifying
+    if (report.status !== 'processing' && report.status !== 'clarifying') {
+      throw new Error(
+        `Cannot cancel report with status "${report.status}". Only processing or clarifying reports can be cancelled.`,
+      );
+    }
+
+    // Update to cancelled FIRST (atomic check - only if still cancellable)
+    // This ensures DB state is correct even if Inngest event fails
+    const { error: updateError } = await client
+      .from('sparlo_reports')
+      .update({
+        status: 'cancelled',
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', data.reportId)
+      .in('status', ['processing', 'clarifying']); // Atomic check
+
+    if (updateError) {
+      throw new Error(`Failed to cancel report: ${updateError.message}`);
+    }
+
+    // Send cancellation event to Inngest (even if this fails, status is already cancelled)
+    try {
+      await inngest.send({
+        name: 'report/cancel.requested',
+        data: {
+          reportId: data.reportId,
+          accountId: report.account_id,
+          cancelledBy: user.id,
+        },
+      });
+    } catch (inngestError) {
+      // Log but don't fail - status is already cancelled in DB
+      console.error(
+        '[Cancel] Failed to send cancellation event to Inngest:',
+        inngestError,
+      );
+    }
+
+    revalidatePath('/home');
+    return { success: true };
+  },
+  {
+    schema: CancelReportSchema,
     auth: true,
   },
 );
@@ -295,56 +424,69 @@ export const startReportGeneration = enhanceAction(
   async (data, user) => {
     const client = getSupabaseServerClient();
 
-    // Check usage limits FIRST (before any other checks)
-    const usage = await checkUsageAllowed(
-      user.id,
-      USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
-    );
+    // Super admin bypass - skip all usage and rate limits
+    const superAdmin = isSuperAdmin(user.id);
 
-    if (!usage.allowed) {
-      const periodInfo = usage.periodEnd
-        ? ` Wait until ${new Date(usage.periodEnd).toLocaleDateString()}.`
-        : '';
-      throw new Error(
-        `Usage limit reached (${usage.percentage.toFixed(0)}% used).${periodInfo}`,
+    if (!superAdmin) {
+      // Check usage limits FIRST (before any other checks)
+      const usage = await checkUsageAllowed(
+        user.id,
+        USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
       );
-    }
 
-    if (usage.isWarning) {
-      console.log(
-        `[Usage Warning] User ${user.id} at ${usage.percentage.toFixed(0)}% usage`,
-      );
-    }
+      if (!usage.allowed) {
+        if (usage.reason === 'subscription_required') {
+          throw new Error(
+            'Your free report has been used. Please subscribe to generate more reports.',
+          );
+        }
+        if (usage.reason === 'limit_exceeded') {
+          const periodInfo = usage.periodEnd
+            ? ` Wait until ${new Date(usage.periodEnd).toLocaleDateString()}.`
+            : '';
+          throw new Error(
+            `Usage limit reached (${usage.percentage.toFixed(0)}% used).${periodInfo}`,
+          );
+        }
+      }
 
-    // P1 Security: Rate limiting - check recent reports
-    const windowStart = new Date(
-      Date.now() - RATE_LIMIT_WINDOW_MS,
-    ).toISOString();
-    const dayStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      if (usage.isWarning) {
+        console.log(
+          `[Usage Warning] User ${user.id} at ${usage.percentage.toFixed(0)}% usage`,
+        );
+      }
+      // P1 Security: Rate limiting - check recent reports
+      const windowStart = new Date(
+        Date.now() - RATE_LIMIT_WINDOW_MS,
+      ).toISOString();
+      const dayStart = new Date(
+        Date.now() - 24 * 60 * 60 * 1000,
+      ).toISOString();
 
-    const [recentResult, dailyResult] = await Promise.all([
-      client
-        .from('sparlo_reports')
-        .select('id', { count: 'exact', head: true })
-        .eq('account_id', user.id)
-        .gte('created_at', windowStart),
-      client
-        .from('sparlo_reports')
-        .select('id', { count: 'exact', head: true })
-        .eq('account_id', user.id)
-        .gte('created_at', dayStart),
-    ]);
+      const [recentResult, dailyResult] = await Promise.all([
+        client
+          .from('sparlo_reports')
+          .select('id', { count: 'exact', head: true })
+          .eq('account_id', user.id)
+          .gte('created_at', windowStart),
+        client
+          .from('sparlo_reports')
+          .select('id', { count: 'exact', head: true })
+          .eq('account_id', user.id)
+          .gte('created_at', dayStart),
+      ]);
 
-    if (recentResult.count && recentResult.count >= MAX_REPORTS_PER_WINDOW) {
-      throw new Error(
-        'Rate limit exceeded. Please wait 5 minutes between reports.',
-      );
-    }
+      if (recentResult.count && recentResult.count >= MAX_REPORTS_PER_WINDOW) {
+        throw new Error(
+          'Rate limit exceeded. Please wait 5 minutes between reports.',
+        );
+      }
 
-    if (dailyResult.count && dailyResult.count >= DAILY_LIMIT) {
-      throw new Error(
-        `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.`,
-      );
+      if (dailyResult.count && dailyResult.count >= DAILY_LIMIT) {
+        throw new Error(
+          `Daily limit reached. You can create up to ${DAILY_LIMIT} reports per day.`,
+        );
+      }
     }
 
     const conversationId = crypto.randomUUID();
