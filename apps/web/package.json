@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check \"**/*.{ts,tsx}\" --ignore-path=\"../../.prettierignore\"",
-    "start": "next start",
+    "start": "HOSTNAME=0.0.0.0 node .next/standalone/apps/web/server.js",
     "start:test": "NODE_ENV=test next start",
     "typecheck": "tsc --noEmit",
     "supabase": "supabase",
