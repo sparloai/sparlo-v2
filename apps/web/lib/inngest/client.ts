@@ -72,7 +72,15 @@ export const HybridClarificationAnsweredEventSchema = z.object({
   answer: z.string().min(1),
 });
 
+// Cancel event schema
+export const ReportCancelEventSchema = z.object({
+  reportId: z.string().uuid(),
+  accountId: z.string().uuid(),
+  cancelledBy: z.string().uuid(),
+});
+
 export type ReportGenerateEvent = z.infer<typeof ReportGenerateEventSchema>;
+export type ReportCancelEvent = z.infer<typeof ReportCancelEventSchema>;
 export type ClarificationAnsweredEvent = z.infer<
   typeof ClarificationAnsweredEventSchema
 >;
@@ -105,6 +113,8 @@ type Events = {
   'report/hybrid-clarification-answered': {
     data: HybridClarificationAnsweredEvent;
   };
+  // Cancel event (works for all report types)
+  'report/cancel.requested': { data: ReportCancelEvent };
 };
 
 /**

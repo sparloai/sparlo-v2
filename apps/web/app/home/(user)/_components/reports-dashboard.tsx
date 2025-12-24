@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -12,11 +12,13 @@ import {
   Loader2,
   Plus,
   Search,
+  X,
 } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
 import { cn } from '@kit/ui/utils';
 
+import { cancelReportGeneration } from '../_lib/server/sparlo-reports-server-actions';
 import type { ConversationStatus, DashboardReport } from '../_lib/types';
 import { formatElapsed, useElapsedTime } from '../_lib/utils/elapsed-time';
 import { formatReportDate, truncateText } from '../_lib/utils/report-utils';
@@ -36,6 +38,59 @@ function ElapsedTime({ createdAt }: { createdAt: string }) {
     >
       {formatElapsed(elapsed)}
     </span>
+  );
+}
+
+/**
+ * CancelButton component - cancels a processing report with confirmation
+ */
+function CancelButton({
+  reportId,
+  onComplete,
+}: {
+  reportId: string;
+  onComplete: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleCancel = () => {
+    const confirmed = window.confirm(
+      'Are you sure you want to cancel this report?',
+    );
+
+    if (!confirmed) return;
+
+    startTransition(async () => {
+      try {
+        await cancelReportGeneration({ reportId });
+        onComplete();
+      } catch (error) {
+        console.error('Failed to cancel report:', error);
+        alert(
+          error instanceof Error ? error.message : 'Failed to cancel report',
+        );
+      }
+    });
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={(e) => {
+        e.stopPropagation();
+        handleCancel();
+      }}
+      disabled={isPending}
+      className="h-8 gap-1.5 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:text-amber-400 dark:hover:bg-amber-900/20 dark:hover:text-amber-300"
+    >
+      {isPending ? (
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+      ) : (
+        <X className="h-3.5 w-3.5" />
+      )}
+      Cancel
+    </Button>
   );
 }
 
@@ -162,6 +217,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
               const processing = isProcessing(report.status);
               const isComplete = report.status === 'complete';
               const isFailed = report.status === 'failed';
+              const isCancelled = report.status === 'cancelled';
               const isClickable = isComplete;
 
               // Use headline if available, otherwise truncate title
@@ -210,9 +266,75 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                         </div>
                       </div>
 
-                      {/* Loader Icon */}
-                      <div className="absolute top-1/2 right-5 -translate-y-1/2">
+                      {/* Cancel Button */}
+                      <div className="flex flex-shrink-0 items-center gap-2">
+                        <CancelButton
+                          reportId={report.id}
+                          onComplete={() => router.refresh()}
+                        />
                         <Loader2 className="h-4 w-4 animate-spin text-violet-500/50" />
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (isCancelled) {
+                // Cancelled state - zinc/gray theme, shows cancelled status and archive option
+                return (
+                  <div
+                    key={report.id}
+                    data-test={`report-card-${report.id}`}
+                    className={cn(
+                      'group relative block cursor-default bg-zinc-500/5 p-5 dark:bg-zinc-800/20',
+                      !isLast && 'border-b border-[--border-subtle]',
+                    )}
+                  >
+                    <div className="flex items-start gap-4">
+                      {/* Status Dot (Gray) */}
+                      <div className="mt-1.5 flex-shrink-0">
+                        <div className="h-2 w-2 rounded-full bg-zinc-400 dark:bg-zinc-500" />
+                      </div>
+
+                      {/* Content */}
+                      <div className="min-w-0 flex-1">
+                        <ModeLabel mode={report.mode} />
+                        <h3
+                          className="truncate pr-8 text-sm font-medium text-[--text-secondary] opacity-75"
+                          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                        >
+                          {displayTitle}
+                        </h3>
+                        <div className="mt-2 flex items-center gap-3">
+                          <span
+                            className="font-mono text-xs tracking-wider text-zinc-500 uppercase dark:text-zinc-400"
+                            style={{
+                              fontFamily:
+                                'Soehne Mono, JetBrains Mono, monospace',
+                            }}
+                          >
+                            Cancelled
+                          </span>
+                          <span className="h-3 w-px bg-[--border-default]" />
+                          <span
+                            className="font-mono text-xs text-[--text-muted]"
+                            style={{
+                              fontFamily:
+                                'Soehne Mono, JetBrains Mono, monospace',
+                            }}
+                          >
+                            {formatReportDate(report.created_at)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-shrink-0 items-center gap-2">
+                        <ArchiveToggleButton
+                          reportId={report.id}
+                          isArchived={false}
+                          onComplete={() => router.refresh()}
+                        />
                       </div>
                     </div>
                   </div>

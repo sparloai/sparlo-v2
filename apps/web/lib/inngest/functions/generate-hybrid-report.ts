@@ -68,6 +68,12 @@ export const generateHybridReport = inngest.createFunction(
   {
     id: 'sparlo-hybrid-report-generator',
     retries: 2,
+    cancelOn: [
+      {
+        event: 'report/cancel.requested',
+        match: 'data.reportId',
+      },
+    ],
   },
   { event: 'report/generate-hybrid' },
   async ({ event, step }) => {
@@ -169,9 +175,7 @@ export const generateHybridReport = inngest.createFunction(
         }
 
         // Helper to calculate total usage from collected step usages
-        function calculateTotalUsage(
-          usages: TokenUsage[],
-        ): TokenUsage & {
+        function calculateTotalUsage(usages: TokenUsage[]): TokenUsage & {
           costUsd: number;
           byStep: Record<string, TokenUsage>;
         } {

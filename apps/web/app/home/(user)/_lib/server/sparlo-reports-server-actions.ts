@@ -459,9 +459,7 @@ export const startReportGeneration = enhanceAction(
       const windowStart = new Date(
         Date.now() - RATE_LIMIT_WINDOW_MS,
       ).toISOString();
-      const dayStart = new Date(
-        Date.now() - 24 * 60 * 60 * 1000,
-      ).toISOString();
+      const dayStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
       const [recentResult, dailyResult] = await Promise.all([
         client

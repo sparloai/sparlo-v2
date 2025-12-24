@@ -11,6 +11,7 @@ import {
   FileText,
   Loader2,
   Plus,
+  XCircle,
 } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
@@ -100,6 +101,12 @@ function StatusBadge({ status }: { status: ConversationStatus }) {
       icon: AlertCircle,
       label: 'Failed',
       className: 'bg-[--status-warning]/15 text-[--status-warning]',
+      iconClassName: '',
+    },
+    cancelled: {
+      icon: XCircle,
+      label: 'Cancelled',
+      className: 'bg-[--text-muted]/15 text-[--text-muted]',
       iconClassName: '',
     },
     confirm_rerun: {
