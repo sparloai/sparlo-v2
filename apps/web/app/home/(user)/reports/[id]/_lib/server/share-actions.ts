@@ -38,12 +38,18 @@ export const generateShareLink = enhanceAction(
     } = await client.auth.getUser();
 
     // Atomic upsert: insert or return existing (prevents race condition)
+    // expires_at is required (NOT NULL) per migration 20251223114425
+    const thirtyDaysFromNow = new Date(
+      Date.now() + 30 * 24 * 60 * 60 * 1000,
+    ).toISOString();
+
     const { data: share, error: shareError } = await client
       .from('report_shares')
       .upsert(
         {
           report_id: data.reportId,
           created_by: user?.id,
+          expires_at: thirtyDaysFromNow,
         },
         {
           onConflict: 'report_id',
@@ -53,8 +59,20 @@ export const generateShareLink = enhanceAction(
       .select('share_token')
       .single();
 
-    if (shareError || !share) {
-      throw new Error('Failed to create share link');
+    if (shareError) {
+      console.error('[Share Link] Database error:', shareError);
+
+      // Map database errors to user-friendly messages
+      if (shareError.code === '23503') {
+        throw new Error('Report not found');
+      } else if (shareError.code === '42501') {
+        throw new Error('You do not have permission to share this report');
+      }
+      throw new Error('Failed to create share link. Please try again.');
+    }
+
+    if (!share) {
+      throw new Error('Share link was not created. Please try again.');
     }
 
     return {
