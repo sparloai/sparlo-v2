@@ -60,13 +60,26 @@ export const generateShareLink = enhanceAction(
       .single();
 
     if (shareError) {
-      console.error('[Share Link] Database error:', shareError);
+      console.error('[Share Link] Database error:', {
+        code: shareError.code,
+        message: shareError.message,
+        details: shareError.details,
+        hint: shareError.hint,
+      });
 
       // Map database errors to user-friendly messages
       if (shareError.code === '23503') {
         throw new Error('Report not found');
       } else if (shareError.code === '42501') {
         throw new Error('You do not have permission to share this report');
+      } else if (shareError.code === '42703') {
+        // Column does not exist - migration not applied
+        throw new Error(
+          'Database schema is out of date. Please contact support.',
+        );
+      } else if (shareError.code === '23505') {
+        // Unique violation - should be handled by upsert but just in case
+        throw new Error('A share link already exists for this report.');
       }
       throw new Error('Failed to create share link. Please try again.');
     }

@@ -22,6 +22,7 @@ export type {
   ProblemAnalysisBenchmark,
   RiskAndWatchout,
   SelfCritique,
+  ValidationGap,
   InsightBlock,
   ValidationGate,
   ConstraintsAndMetrics,

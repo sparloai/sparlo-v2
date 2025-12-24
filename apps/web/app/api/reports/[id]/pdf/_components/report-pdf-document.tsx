@@ -5,6 +5,7 @@ import type {
   ChallengeTheFrame,
   ConstraintsAndMetrics,
   ExecutionTrack,
+  ExecutionTrackPrimary,
   FrontierWatch,
   HybridReportData,
   InnovationAnalysis,
@@ -13,9 +14,12 @@ import type {
   ParallelInvestigation,
   ProblemAnalysis,
   ProblemAnalysisBenchmark,
+  RecommendedInnovation,
   RiskAndWatchout,
+  SelfCritique,
   StructuredExecutiveSummary,
   SupportingConcept,
+  ValidationGap,
   ValidationGate,
 } from '../_lib/types';
 
@@ -1630,6 +1634,116 @@ function WhatIdActuallyDoSection({ content }: { content?: string }) {
 }
 
 // ============================================
+// 14. Self-Critique Section
+// ============================================
+
+function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
+  if (!critique) return null;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader
+        title="Self-Critique"
+        subtitle="Honest assessment of this analysis"
+      />
+
+      <View style={styles.warningBox}>
+        {/* Confidence Level */}
+        {(critique.overall_confidence || critique.confidence_level) && (
+          <View style={[styles.row, { marginBottom: 8 }]}>
+            <MonoLabel>Overall Confidence</MonoLabel>
+            <ConfidenceBadge
+              level={critique.overall_confidence ?? critique.confidence_level}
+            />
+          </View>
+        )}
+
+        {critique.confidence_rationale && (
+          <Text style={[styles.cardContent, { marginBottom: 12 }]}>
+            {critique.confidence_rationale}
+          </Text>
+        )}
+
+        {/* What We Might Be Wrong About */}
+        {critique.what_we_might_be_wrong_about &&
+          critique.what_we_might_be_wrong_about.length > 0 && (
+            <View style={{ marginBottom: 12 }}>
+              <MonoLabel>What We Might Be Wrong About</MonoLabel>
+              {critique.what_we_might_be_wrong_about.map((item, i) => (
+                <View key={i} style={styles.listItem}>
+                  <Text style={[styles.listBullet, { color: colors.amber700 }]}>
+                    ⚠
+                  </Text>
+                  <Text style={styles.listContent}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+        {/* Unexplored Directions */}
+        {critique.unexplored_directions &&
+          critique.unexplored_directions.length > 0 && (
+            <View style={{ marginBottom: 12 }}>
+              <MonoLabel>Unexplored Directions</MonoLabel>
+              {critique.unexplored_directions.map((item, i) => (
+                <View key={i} style={styles.listItem}>
+                  <Text style={styles.listBullet}>→</Text>
+                  <Text style={styles.listContent}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+        {/* Validation Gaps */}
+        {critique.validation_gaps && critique.validation_gaps.length > 0 && (
+          <View>
+            <MonoLabel>Validation Gaps</MonoLabel>
+            {critique.validation_gaps.map((gap: ValidationGap, i: number) => (
+              <View key={i} style={[styles.card, { marginTop: 6 }]}>
+                <View style={[styles.row, { marginBottom: 4 }]}>
+                  <Text
+                    style={[
+                      styles.cardContent,
+                      { fontFamily: 'Helvetica-Bold', flex: 1 },
+                    ]}
+                  >
+                    {gap.concern}
+                  </Text>
+                  <View
+                    style={[
+                      styles.badge,
+                      gap.status === 'ADDRESSED'
+                        ? styles.badgeSuccess
+                        : gap.status === 'EXTENDED_NEEDED'
+                          ? styles.badgeWarning
+                          : styles.badgeDanger,
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.badgeText,
+                        gap.status === 'ADDRESSED'
+                          ? styles.badgeSuccessText
+                          : gap.status === 'EXTENDED_NEEDED'
+                            ? styles.badgeWarningText
+                            : styles.badgeDangerText,
+                      ]}
+                    >
+                      {gap.status?.replace(/_/g, ' ')}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.cardContent}>{gap.rationale}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+// ============================================
 // Main Document Component
 // ============================================
 
@@ -1677,6 +1791,136 @@ export function ReportPDFDocument({ report }: Props) {
     );
   }
 
+  // Normalize field names: support both old (execution_track/innovation_portfolio)
+  // and new (solution_concepts/innovation_concepts) naming conventions
+  const rawReport = hybridData as Record<string, unknown>;
+
+  // Map solution_concepts → execution_track with proper field name normalization
+  const rawSolutionConcepts = rawReport.solution_concepts as
+    | {
+        intro?: string;
+        primary?: {
+          id?: string;
+          title?: string;
+          confidence_percent?: number;
+          source_type?: string;
+          what_it_is?: string;
+          why_it_works?: string;
+          economics?: {
+            expected_outcome?: { value?: string };
+            investment?: { value?: string };
+            timeline?: { value?: string };
+          };
+          the_insight?: InsightBlock;
+          first_validation_step?: {
+            test?: string;
+            cost?: string;
+            go_criteria?: string;
+          };
+          key_risks?: Array<{ risk?: string; mitigation?: string }>;
+        };
+        supporting?: Array<{
+          id?: string;
+          title?: string;
+          relationship?: string;
+          what_it_is?: string;
+          why_it_works?: string;
+          when_to_use_instead?: string;
+          confidence_percent?: number;
+          key_risk?: string;
+          the_insight?: InsightBlock;
+        }>;
+      }
+    | undefined;
+
+  const executionTrack: ExecutionTrack | undefined =
+    hybridData.execution_track ??
+    (rawSolutionConcepts
+      ? {
+          intro: rawSolutionConcepts.intro,
+          primary: rawSolutionConcepts.primary
+            ? {
+                id: rawSolutionConcepts.primary.id,
+                title: rawSolutionConcepts.primary.title,
+                confidence: rawSolutionConcepts.primary.confidence_percent,
+                source_type: rawSolutionConcepts.primary
+                  .source_type as ExecutionTrackPrimary['source_type'],
+                what_it_is: rawSolutionConcepts.primary.what_it_is,
+                why_it_works: rawSolutionConcepts.primary.why_it_works,
+                expected_improvement:
+                  rawSolutionConcepts.primary.economics?.expected_outcome
+                    ?.value,
+                investment:
+                  rawSolutionConcepts.primary.economics?.investment?.value,
+                timeline:
+                  rawSolutionConcepts.primary.economics?.timeline?.value,
+                the_insight: rawSolutionConcepts.primary.the_insight,
+                validation_gates: rawSolutionConcepts.primary
+                  .first_validation_step
+                  ? [
+                      {
+                        test: rawSolutionConcepts.primary.first_validation_step
+                          .test,
+                        cost: rawSolutionConcepts.primary.first_validation_step
+                          .cost,
+                        success_criteria:
+                          rawSolutionConcepts.primary.first_validation_step
+                            .go_criteria,
+                      },
+                    ]
+                  : undefined,
+                why_it_might_fail: rawSolutionConcepts.primary.key_risks?.map(
+                  (r) => r.risk ?? '',
+                ),
+              }
+            : undefined,
+          supporting_concepts: rawSolutionConcepts.supporting?.map((s) => ({
+            id: s.id,
+            title: s.title,
+            relationship: s.relationship as SupportingConcept['relationship'],
+            one_liner: s.key_risk,
+            what_it_is: s.what_it_is,
+            why_it_works: s.why_it_works,
+            when_to_use_instead: s.when_to_use_instead,
+            confidence: s.confidence_percent,
+            the_insight: s.the_insight,
+          })),
+        }
+      : undefined);
+
+  // Map innovation_concepts → innovation_portfolio with field name normalization
+  const rawInnovationConcepts = rawReport.innovation_concepts as
+    | {
+        intro?: string;
+        recommended?: RecommendedInnovation & { confidence_percent?: number };
+        parallel?: Array<
+          ParallelInvestigation & { confidence_percent?: number }
+        >;
+        frontier_watch?: FrontierWatch[];
+      }
+    | undefined;
+
+  const innovationPortfolio: InnovationPortfolio | undefined =
+    hybridData.innovation_portfolio ??
+    (rawInnovationConcepts
+      ? {
+          intro: rawInnovationConcepts.intro,
+          recommended_innovation: rawInnovationConcepts.recommended
+            ? {
+                ...rawInnovationConcepts.recommended,
+                confidence:
+                  rawInnovationConcepts.recommended.confidence_percent ??
+                  rawInnovationConcepts.recommended.confidence,
+              }
+            : undefined,
+          parallel_investigations: rawInnovationConcepts.parallel?.map((p) => ({
+            ...p,
+            confidence: p.confidence_percent ?? p.confidence,
+          })),
+          frontier_watch: rawInnovationConcepts.frontier_watch,
+        }
+      : undefined);
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -1699,17 +1943,13 @@ export function ReportPDFDocument({ report }: Props) {
         <ExecutiveSummarySection summary={hybridData.executive_summary} />
 
         {/* 4. Solution Concepts (formerly Execution Track) */}
-        <SolutionConceptsSection track={hybridData.execution_track} />
+        <SolutionConceptsSection track={executionTrack} />
 
         {/* 5. Innovation Concepts (formerly Innovation Portfolio) */}
-        <InnovationConceptsSection
-          portfolio={hybridData.innovation_portfolio}
-        />
+        <InnovationConceptsSection portfolio={innovationPortfolio} />
 
         {/* 6. Frontier Watch */}
-        <FrontierWatchSection
-          items={hybridData.innovation_portfolio?.frontier_watch}
-        />
+        <FrontierWatchSection items={innovationPortfolio?.frontier_watch} />
 
         {/* 7. Constraints & Metrics */}
         <ConstraintsSection constraints={hybridData.constraints_and_metrics} />
@@ -1720,16 +1960,19 @@ export function ReportPDFDocument({ report }: Props) {
         {/* 9. Innovation Analysis */}
         <InnovationAnalysisSection analysis={hybridData.innovation_analysis} />
 
-        {/* 10. Risks & Watchouts */}
+        {/* 10. Self-Critique */}
+        <SelfCritiqueSection critique={hybridData.self_critique} />
+
+        {/* 11. Risks & Watchouts */}
         <RisksSection risks={hybridData.risks_and_watchouts} />
 
-        {/* 11. Key Insights */}
+        {/* 12. Key Insights */}
         <KeyInsightsSection insights={hybridData.key_insights} />
 
-        {/* 12. Next Steps */}
+        {/* 13. Next Steps */}
         <NextStepsSection steps={hybridData.next_steps} />
 
-        {/* 13. What I'd Actually Do */}
+        {/* 14. What I'd Actually Do */}
         <WhatIdActuallyDoSection content={hybridData.what_id_actually_do} />
 
         {/* Footer */}
