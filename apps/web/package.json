@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "analyze": "ANALYZE=true pnpm run build",
-    "build": "next build",
+    "build": "next build && cp -r .next/static .next/standalone/apps/web/.next/static && cp -r public .next/standalone/apps/web/public",
     "build:test": "NODE_ENV=test next build",
     "clean": "git clean -xdf .next .turbo node_modules",
     "dev": "next dev | pino-pretty -c",
