@@ -50,3 +50,9 @@ yarn-error.log*
 
 # ts-node cache
 node-compile-cache/.worktrees
+
+# Test outputs and logs
+apps/e2e/*.log
+apps/e2e/ux-audit-report/
+apps/e2e/test-results/
+dev-server.log
