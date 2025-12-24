@@ -1,0 +1,14 @@
+[
+  {
+    "id": "01KD9892Y1W3SHQ0NQN960H8YD",
+    "name": "report/generate-hybrid",
+    "data": {
+      "accountId": "c192c611-2926-4828-b007-50a529afd547",
+      "conversationId": "de6c7f68-4588-4e2f-9d4c-6ad1aee90ed7",
+      "designChallenge": "Commercial kitchens, hospitals, and universities generate 1-5 tons/week of food waste. Hauling costs $150-300/ton and rising. Composting requires space and management. Anaerobic digestion needs scale (100+ tons/day) to be economical. On-site dehydrators exist but consume 800-1200 kWh/ton, take 12-24 hours per batch, produce output that's not consistently compostable, and cost $30-50K for a 200 lb/day unit. Need on-site solution that reduces food waste volume by 80%+, processes 500+ lbs/day, uses <200 kWh/ton, produces stable output (compostable or fuel), and costs <$15K installed.",
+      "reportId": "3f82d8b6-74ff-4500-80ad-f3d3e770cfcd",
+      "userId": "c192c611-2926-4828-b007-50a529afd547"
+    },
+    "ts": 1766615976897
+  }
+]
