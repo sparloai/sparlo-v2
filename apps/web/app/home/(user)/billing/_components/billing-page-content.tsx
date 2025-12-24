@@ -65,15 +65,14 @@ export function BillingPageContent({
   const hasActiveSubscription =
     subscription && subscription.status !== 'canceled';
 
-  // NEW SUBSCRIBER: Show Aura-styled pricing
+  // NON-SUBSCRIBER: Show Aura pricing page
   if (!subscription && !order) {
     return (
-      <div className="mx-auto max-w-5xl space-y-8 py-8 md:py-12">
-        <AuraPricingHeader
-          title="Choose Your Plan"
-          subtitle="Get started with Sparlo and unlock powerful AI-driven financial analysis for your business."
-        />
-        <AuraPricingTable config={billingConfig} customerId={customerId} />
+      <div className="flex min-h-[calc(100vh-200px)] flex-col items-center justify-center py-20 md:py-32">
+        <div className="mx-auto w-full max-w-7xl px-6">
+          <AuraPricingHeader title="Plans" />
+          <AuraPricingTable config={billingConfig} customerId={customerId} />
+        </div>
       </div>
     );
   }
@@ -88,10 +87,7 @@ export function BillingPageContent({
         className="hidden"
       />
 
-      <AuraPricingHeader
-        title="Your Subscription"
-        subtitle="Manage your plan, view usage, and update billing settings."
-      />
+      <AuraPricingHeader title="Your Subscription" />
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Current Plan Card */}
@@ -123,10 +119,7 @@ export function BillingPageContent({
       {/* Upgrade Section */}
       {hasActiveSubscription && (
         <div className="pt-8">
-          <AuraPricingHeader
-            title="Upgrade Your Plan"
-            subtitle="Need more capacity? Compare plans and upgrade instantly."
-          />
+          <AuraPricingHeader title="Upgrade Your Plan" />
           <AuraPricingTable
             config={billingConfig}
             customerId={customerId}
