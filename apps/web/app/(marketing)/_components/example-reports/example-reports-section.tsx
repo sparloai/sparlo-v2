@@ -1,11 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { FileText, List, Lock, Target, X } from 'lucide-react';
 
-import { CardWithHeader, MonoLabel, SectionHeader } from '@kit/ui/aura';
+import { CardWithHeader, SectionHeader } from '@kit/ui/aura';
 import { Button } from '@kit/ui/button';
 import {
   Sheet,
@@ -16,6 +16,9 @@ import {
 } from '@kit/ui/sheet';
 import { cn } from '@kit/ui/utils';
 
+import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybrid-report-display';
+
+import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
 import { EXAMPLE_REPORTS } from './example-reports-data';
 
 interface TocItem {
@@ -209,6 +212,13 @@ export function ExampleReportsSection() {
             {/* Report Content */}
             {report.locked ? (
               <LockedOverlay report={report} />
+            ) : report.id === 'climate-tech' ? (
+              <HybridReportDisplay
+                reportData={{
+                  mode: 'hybrid',
+                  report: CLIMATE_HYBRID_REPORT,
+                }}
+              />
             ) : (
               <ReportContent report={report} activeSection={activeSection} />
             )}
