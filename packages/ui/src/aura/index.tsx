@@ -15,12 +15,21 @@ export const SectionHeader = memo(function SectionHeader({
   subtitle?: string;
 }) {
   return (
-    <div className="mb-10 border-l-4 border-[--accent-primary] py-1 pl-6 dark:border-[--accent-light]">
-      <h2 className="mb-3 text-3xl font-semibold tracking-tight text-[--text-primary]">
+    <div
+      className="mb-10 border-l-4 py-1 pl-6"
+      style={{ borderColor: 'var(--accent-primary, #7c3aed)' }}
+    >
+      <h2
+        className="mb-3 text-3xl font-semibold tracking-tight"
+        style={{ color: 'var(--text-primary, #09090b)' }}
+      >
         {title}
       </h2>
       {subtitle && (
-        <p className="max-w-4xl text-lg leading-relaxed font-normal text-[--text-secondary]">
+        <p
+          className="max-w-4xl text-lg leading-relaxed font-normal"
+          style={{ color: 'var(--text-secondary, #52525b)' }}
+        >
           {subtitle}
         </p>
       )}
@@ -41,14 +50,29 @@ export function CardWithHeader({
 }) {
   return (
     <section
-      className={cn(
-        'overflow-hidden rounded-lg border border-[--border-default] bg-[--void-black] shadow-[--elevation-2] transition-shadow hover:shadow-[--elevation-hover]',
-        className,
-      )}
+      className={cn('overflow-hidden rounded-lg border transition-shadow', className)}
+      style={{
+        borderColor: 'var(--border-default, rgba(0,0,0,0.1))',
+        backgroundColor: 'var(--void-black, #ffffff)',
+        boxShadow: 'var(--elevation-2, 0 2px 4px rgba(0,0,0,0.06))',
+      }}
     >
-      <div className="flex items-center gap-3 border-b border-[--border-subtle] bg-[--void-elevated] p-6">
-        {Icon && <Icon className="h-5 w-5 text-[--accent-primary]" />}
-        <h3 className="font-mono text-sm font-bold tracking-widest text-[--text-tertiary] uppercase">
+      <div
+        className="flex items-center gap-3 border-b p-6"
+        style={{
+          borderColor: 'var(--border-subtle, rgba(0,0,0,0.06))',
+          backgroundColor: 'var(--void-elevated, #f5f5f5)',
+        }}
+      >
+        {Icon && (
+          <span style={{ color: 'var(--accent-primary, #7c3aed)' }}>
+            <Icon className="h-5 w-5" />
+          </span>
+        )}
+        <h3
+          className="font-mono text-sm font-bold tracking-widest uppercase"
+          style={{ color: 'var(--text-tertiary, rgba(0,0,0,0.55))' }}
+        >
           {label}
         </h3>
       </div>
@@ -63,7 +87,10 @@ export const MonoLabel = memo(function MonoLabel({
   children: React.ReactNode;
 }) {
   return (
-    <span className="font-mono text-sm font-bold tracking-widest text-[--text-tertiary] uppercase">
+    <span
+      className="font-mono text-sm font-bold tracking-widest uppercase"
+      style={{ color: 'var(--text-tertiary, rgba(0,0,0,0.55))' }}
+    >
       {children}
     </span>
   );
@@ -77,21 +104,41 @@ export function AuraTable({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border border-[--border-default] shadow-[--elevation-1]">
+    <div
+      className="overflow-hidden rounded-lg border"
+      style={{
+        borderColor: 'var(--border-default, rgba(0,0,0,0.1))',
+        boxShadow: 'var(--elevation-1, 0 1px 2px rgba(0,0,0,0.05))',
+      }}
+    >
       <table className="w-full text-left">
-        <thead className="border-b border-[--border-subtle] bg-[--void-elevated]">
+        <thead
+          className="border-b"
+          style={{
+            borderColor: 'var(--border-subtle, rgba(0,0,0,0.06))',
+            backgroundColor: 'var(--void-elevated, #f5f5f5)',
+          }}
+        >
           <tr>
             {headers.map((header) => (
               <th
                 key={header}
-                className="px-6 py-4 font-mono text-xs font-bold tracking-wider text-[--text-tertiary] uppercase"
+                className="px-6 py-4 font-mono text-xs font-bold tracking-wider uppercase"
+                style={{ color: 'var(--text-tertiary, rgba(0,0,0,0.55))' }}
               >
                 {header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[--border-subtle] bg-[--void-black]">{children}</tbody>
+        <tbody
+          className="divide-y"
+          style={{
+            backgroundColor: 'var(--void-black, #ffffff)',
+          }}
+        >
+          {children}
+        </tbody>
       </table>
     </div>
   );
@@ -105,8 +152,19 @@ export function DarkSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-lg border border-[--border-strong] bg-[--void-deep] p-8 text-[--text-primary] shadow-[--elevation-3] sm:p-10">
-      <h4 className="mb-4 font-mono text-xs font-bold tracking-widest text-[--accent-light] uppercase">
+    <div
+      className="relative overflow-hidden rounded-lg border p-8 sm:p-10"
+      style={{
+        borderColor: 'var(--border-strong, rgba(0,0,0,0.15))',
+        backgroundColor: 'var(--void-deep, #fafafa)',
+        color: 'var(--text-primary, #09090b)',
+        boxShadow: 'var(--elevation-3, 0 4px 8px rgba(0,0,0,0.08))',
+      }}
+    >
+      <h4
+        className="mb-4 font-mono text-xs font-bold tracking-widest uppercase"
+        style={{ color: 'var(--accent-light, #8b5cf6)' }}
+      >
         {label}
       </h4>
       {children}
@@ -116,11 +174,27 @@ export function DarkSection({
 
 export type AuraBadgeVariant = 'success' | 'warning' | 'info' | 'neutral';
 
-const AURA_BADGE_VARIANTS: Record<AuraBadgeVariant, string> = {
-  success: 'bg-[--go-bg] text-[--go-text] border-[--go-border]',
-  warning: 'bg-[--warning-bg] text-[--warning-text] border-[--warning-border]',
-  info: 'bg-[--accent-subtle] text-[--accent-primary] border-[--accent-muted]',
-  neutral: 'bg-[--void-surface] text-[--text-secondary] border-[--border-default]',
+const AURA_BADGE_STYLES: Record<AuraBadgeVariant, React.CSSProperties> = {
+  success: {
+    backgroundColor: 'var(--go-bg, rgba(34,197,94,0.1))',
+    color: 'var(--go-text, #16a34a)',
+    borderColor: 'var(--go-border, rgba(34,197,94,0.3))',
+  },
+  warning: {
+    backgroundColor: 'var(--warning-bg, rgba(234,179,8,0.1))',
+    color: 'var(--warning-text, #ca8a04)',
+    borderColor: 'var(--warning-border, rgba(234,179,8,0.3))',
+  },
+  info: {
+    backgroundColor: 'var(--accent-subtle, rgba(124,58,237,0.05))',
+    color: 'var(--accent-primary, #7c3aed)',
+    borderColor: 'var(--accent-muted, rgba(124,58,237,0.1))',
+  },
+  neutral: {
+    backgroundColor: 'var(--void-surface, #ebebeb)',
+    color: 'var(--text-secondary, rgba(0,0,0,0.7))',
+    borderColor: 'var(--border-default, rgba(0,0,0,0.1))',
+  },
 };
 
 export const AuraBadge = memo(function AuraBadge({
@@ -132,10 +206,8 @@ export const AuraBadge = memo(function AuraBadge({
 }) {
   return (
     <span
-      className={cn(
-        'rounded-[--radius-sm] border px-2.5 py-1 font-mono text-xs font-medium tracking-widest uppercase',
-        AURA_BADGE_VARIANTS[variant],
-      )}
+      className="rounded border px-2.5 py-1 font-mono text-xs font-medium tracking-widest uppercase"
+      style={AURA_BADGE_STYLES[variant]}
     >
       {children}
     </span>
@@ -151,10 +223,19 @@ export const NumberedHeader = memo(function NumberedHeader({
 }) {
   return (
     <div className="mb-8 flex items-center gap-4">
-      <div className="flex h-8 w-8 items-center justify-center rounded-[--radius-sm] bg-[--accent-primary] font-mono text-sm font-medium text-white shadow-[--glow-violet]">
+      <div
+        className="flex h-8 w-8 items-center justify-center rounded font-mono text-sm font-medium text-white"
+        style={{
+          backgroundColor: 'var(--accent-primary, #7c3aed)',
+          boxShadow: 'var(--glow-violet, 0 2px 8px rgba(124,58,237,0.15))',
+        }}
+      >
         {String(index).padStart(2, '0')}
       </div>
-      <h2 className="text-3xl font-semibold tracking-tight text-[--text-primary]">
+      <h2
+        className="text-3xl font-semibold tracking-tight"
+        style={{ color: 'var(--text-primary, #09090b)' }}
+      >
         {title}
       </h2>
     </div>
@@ -167,17 +248,34 @@ export const MetadataInfoCard = memo(function MetadataInfoCard({
   items: Array<{ label: string; value: string }>;
 }) {
   return (
-    <div className="mb-8 rounded-lg border border-[--border-default] bg-[--void-elevated] p-4 md:p-6">
+    <div
+      className="mb-8 rounded-lg border p-4 md:p-6"
+      style={{
+        borderColor: 'var(--border-default, rgba(0,0,0,0.1))',
+        backgroundColor: 'var(--void-elevated, #f5f5f5)',
+      }}
+    >
       <div className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs md:text-sm">
         {items.map((item, idx) => (
           <div key={item.label} className="flex items-center gap-2">
             {idx > 0 && (
-              <div className="mr-6 hidden h-4 w-px bg-[--border-strong] md:block" />
+              <div
+                className="mr-6 hidden h-4 w-px md:block"
+                style={{ backgroundColor: 'var(--border-strong, rgba(0,0,0,0.15))' }}
+              />
             )}
-            <span className="tracking-wider text-[--text-muted] uppercase">
+            <span
+              className="tracking-wider uppercase"
+              style={{ color: 'var(--text-muted, rgba(0,0,0,0.4))' }}
+            >
               {item.label}:
             </span>
-            <span className="font-semibold text-[--text-primary]">{item.value}</span>
+            <span
+              className="font-semibold"
+              style={{ color: 'var(--text-primary, #09090b)' }}
+            >
+              {item.value}
+            </span>
           </div>
         ))}
       </div>
@@ -199,34 +297,60 @@ export const ViabilityAssessment = memo(function ViabilityAssessment({
   alternativeStrategy?: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-lg bg-[--void-deep] p-6 text-[--text-primary] shadow-[--elevation-3] md:p-8">
-      <h3 className="mb-4 font-mono text-xs font-bold tracking-widest text-[--accent-light] uppercase">
+    <div
+      className="relative overflow-hidden rounded-lg p-6 md:p-8"
+      style={{
+        backgroundColor: 'var(--void-deep, #fafafa)',
+        color: 'var(--text-primary, #09090b)',
+        boxShadow: 'var(--elevation-3, 0 4px 8px rgba(0,0,0,0.08))',
+      }}
+    >
+      <h3
+        className="mb-4 font-mono text-xs font-bold tracking-widest uppercase"
+        style={{ color: 'var(--accent-light, #8b5cf6)' }}
+      >
         Viability Assessment
       </h3>
       <p className="mb-4 text-lg font-medium">{headline}</p>
       {description && (
-        <p className="mb-6 max-w-3xl text-base leading-relaxed text-[--text-secondary]">
+        <p
+          className="mb-6 max-w-3xl text-base leading-relaxed"
+          style={{ color: 'var(--text-secondary, rgba(0,0,0,0.7))' }}
+        >
           {description}
         </p>
       )}
       {(revisitTimeframe || alternativeStrategy) && (
-        <div className="grid gap-6 border-t border-[--border-strong] pt-6 text-base md:grid-cols-2">
+        <div
+          className="grid gap-6 border-t pt-6 text-base md:grid-cols-2"
+          style={{ borderColor: 'var(--border-strong, rgba(0,0,0,0.15))' }}
+        >
           {revisitTimeframe && (
             <div>
-              <strong className="mb-1 block text-[--text-primary]">
+              <strong
+                className="mb-1 block"
+                style={{ color: 'var(--text-primary, #09090b)' }}
+              >
                 Revisit in {revisitTimeframe}
               </strong>
               {revisitReason && (
-                <span className="text-[--text-secondary]">{revisitReason}</span>
+                <span style={{ color: 'var(--text-secondary, rgba(0,0,0,0.7))' }}>
+                  {revisitReason}
+                </span>
               )}
             </div>
           )}
           {alternativeStrategy && (
             <div>
-              <strong className="mb-1 block text-[--text-primary]">
+              <strong
+                className="mb-1 block"
+                style={{ color: 'var(--text-primary, #09090b)' }}
+              >
                 Alternative Strategy
               </strong>
-              <span className="text-[--text-secondary]">{alternativeStrategy}</span>
+              <span style={{ color: 'var(--text-secondary, rgba(0,0,0,0.7))' }}>
+                {alternativeStrategy}
+              </span>
             </div>
           )}
         </div>
