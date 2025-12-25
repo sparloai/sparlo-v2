@@ -256,6 +256,263 @@
 }
 
 /* ============================================
+   SECTION REVEAL
+   Staggered section entrance animation
+   ============================================ */
+@keyframes section-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes section-reveal-left {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Section entrance utility
+   Use --stagger-index inline style for dynamic delay:
+   <div class="section-animate" style="--stagger-index: 0">...</div>
+   <div class="section-animate" style="--stagger-index: 1">...</div>
+   Scales to any number of items without additional CSS rules.
+*/
+.section-animate {
+  --stagger-index: 0;
+  --stagger-delay: 80ms;
+  opacity: 0;
+  animation: section-reveal 600ms var(--ease-out-expo) forwards;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-delay));
+}
+
+/* ============================================
+   SCROLL-TRIGGERED REVEAL
+   CSS scroll-driven animations (progressive)
+   ============================================ */
+
+/* Scroll reveal base - hidden by default */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity 600ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    transform 600ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+/* Revealed state - add via JavaScript IntersectionObserver */
+.scroll-reveal--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Scroll reveal variants */
+.scroll-reveal--fade {
+  transform: none;
+}
+
+.scroll-reveal--left {
+  transform: translateX(-20px);
+}
+
+.scroll-reveal--left.scroll-reveal--visible {
+  transform: translateX(0);
+}
+
+.scroll-reveal--right {
+  transform: translateX(20px);
+}
+
+.scroll-reveal--right.scroll-reveal--visible {
+  transform: translateX(0);
+}
+
+.scroll-reveal--scale {
+  transform: scale(0.95);
+}
+
+.scroll-reveal--scale.scroll-reveal--visible {
+  transform: scale(1);
+}
+
+/* Staggered children reveal
+   Use --stagger-index on child elements for dynamic delay.
+   Default delay is 50ms per item if not specified.
+*/
+.scroll-reveal-stagger > * {
+  --stagger-index: 0;
+  --stagger-delay: 50ms;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 500ms var(--ease-out-expo),
+    transform 500ms var(--ease-out-expo);
+  transition-delay: calc(var(--stagger-index) * var(--stagger-delay));
+}
+
+.scroll-reveal-stagger--visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   SECTION DIVIDER ANIMATIONS
+   Animated line reveals for section breaks
+   ============================================ */
+@keyframes line-expand {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes line-expand-center {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.line-animate {
+  transform-origin: left center;
+  animation: line-expand 800ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+
+.line-animate--center {
+  transform-origin: center center;
+}
+
+.line-animate--right {
+  transform-origin: right center;
+}
+
+/* ============================================
+   CARD ENTRANCE ANIMATIONS
+   For module/card grids
+   ============================================ */
+@keyframes card-entrance {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-animate {
+  opacity: 0;
+  animation: card-entrance 500ms var(--ease-out-expo) forwards;
+}
+
+/* Staggered card grid animation
+   Use --stagger-index on child elements for dynamic delay.
+   Default delay is 75ms per card if not specified.
+*/
+.card-grid-animate > * {
+  --stagger-index: 0;
+  --stagger-delay: 75ms;
+  animation-delay: calc(var(--stagger-index) * var(--stagger-delay));
+}
+
+/* ============================================
+   READING RHYTHM - Scroll snapping (optional)
+   Smooth section-by-section reading
+   ============================================ */
+.scroll-rhythm {
+  scroll-snap-type: y proximity;
+}
+
+.scroll-rhythm-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  scroll-margin-top: var(--space-8);
+}
+
+/* ============================================
+   HIGHLIGHT FLASH
+   Brief highlight on anchor navigation
+   ============================================ */
+@keyframes highlight-flash {
+  0% {
+    background: rgba(139, 92, 246, 0.2);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+.highlight-on-anchor:target {
+  animation: highlight-flash 1.5s ease-out forwards;
+  border-radius: var(--radius-sm);
+}
+
+/* ============================================
+   PROGRESS REVEAL
+   Sequential reveal for progress indicators
+   Uses transform for GPU acceleration (no layout reflow)
+   ============================================ */
+@keyframes progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.progress-animate {
+  transform-origin: left center;
+  animation: progress-fill 800ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+
+/* ============================================
+   NUMBER COUNT UP (CSS only)
+   For animated numbers
+   ============================================ */
+@keyframes count-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.number-animate {
+  animation: count-reveal 400ms var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)) forwards;
+}
+
+/* ============================================
+   SMOOTH SCROLL BEHAVIOR
+   Native smooth scrolling for the report
+   ============================================ */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Scroll anchor offset for sticky headers */
+.scroll-anchor {
+  scroll-margin-top: calc(var(--space-8) + 60px);
+}
+
+/* ============================================
    REDUCED MOTION
    Respect user preferences
    ============================================ */
@@ -266,5 +523,25 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .section-animate,
+  .scroll-reveal,
+  .line-animate,
+  .card-animate,
+  .progress-animate,
+  .number-animate {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .scroll-reveal--visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .scroll-rhythm {
+    scroll-snap-type: none;
   }
 }

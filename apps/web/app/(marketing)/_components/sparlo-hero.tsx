@@ -136,6 +136,7 @@ export function SparloHero() {
               'CAR-T Manufacturing Cost Reduction: From $300K to $30K Through Integration, Not Invention',
               'On-Site Food Waste Processing: Mechanical-First Architecture for 80% Energy Reduction',
               'Breaking the Cold Chain Assumption: Multi-Mechanism Preservation for Smallholder Farmers',
+              'Recyclable High-Performance Composites: Repurposing Polyurethane Glycolysis at Industrial Scale',
             ].map((title, i) => (
               <div
                 key={i}

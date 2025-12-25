@@ -258,6 +258,8 @@
 
 /* ============================================
    CONSTRAINTS SECTION
+   Hard constraints: Non-negotiable requirements (red)
+   Soft constraints: Flexible preferences (amber)
    ============================================ */
 .constraints-section {
   display: grid;
@@ -272,14 +274,68 @@
   }
 }
 
+/* Constraints column wrapper */
+.constraints-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ----------------------------------------
+   HARD CONSTRAINTS COLUMN
+   ---------------------------------------- */
+.constraints-column--hard {
+  border-radius: var(--radius-sm);
+  padding: var(--space-5);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.04) 0%,
+    transparent 100%
+  );
+  border: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.constraints-column--hard .constraints-column-header {
+  color: var(--nogo-color);
+}
+
+/* ----------------------------------------
+   SOFT CONSTRAINTS COLUMN
+   ---------------------------------------- */
+.constraints-column--soft {
+  border-radius: var(--radius-sm);
+  padding: var(--space-5);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.04) 0%,
+    transparent 100%
+  );
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.constraints-column--soft .constraints-column-header {
+  color: var(--warning-color);
+}
+
+/* Column header */
 .constraints-column-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-family: var(--font-mono);
   font-size: 10px;
-  font-weight: var(--weight-semibold);
+  font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-widest);
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.constraints-column-header-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
 }
 
 .constraints-list {
@@ -288,20 +344,132 @@
   gap: var(--space-3);
 }
 
+/* Base constraint card */
 .constraint-card {
+  position: relative;
   background: var(--void-elevated);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   padding: var(--space-4) var(--space-5);
+  padding-left: var(--space-6);
+  /* Premium interaction */
+  transition:
+    transform var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    background-color var(--interaction-normal, 150ms) var(--ease-spring, cubic-bezier(0.4, 0, 0.2, 1));
+  transform: translateY(0) translateZ(0);
 }
 
+/* Left accent bar */
+.constraint-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  background: var(--border-strong);
+}
+
+.constraint-card:hover {
+  transform: translateY(-1px) translateZ(0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ----------------------------------------
+   HARD CONSTRAINT CARD
+   ---------------------------------------- */
+.constraint-card--hard {
+  background: linear-gradient(
+    90deg,
+    rgba(239, 68, 68, 0.06) 0%,
+    var(--void-elevated) 100%
+  );
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.constraint-card--hard::before {
+  background: var(--nogo-color);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+}
+
+.constraint-card--hard:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(239, 68, 68, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.1);
+}
+
+.constraint-card--hard .constraint-title {
+  color: var(--text-primary);
+}
+
+.constraint-card--hard .constraint-badge {
+  background: var(--nogo-bg);
+  color: var(--nogo-color);
+  border-color: var(--nogo-border);
+}
+
+/* ----------------------------------------
+   SOFT CONSTRAINT CARD
+   ---------------------------------------- */
+.constraint-card--soft {
+  background: linear-gradient(
+    90deg,
+    rgba(245, 158, 11, 0.05) 0%,
+    var(--void-elevated) 100%
+  );
+  border-color: rgba(245, 158, 11, 0.15);
+}
+
+.constraint-card--soft::before {
+  background: var(--warning-color);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.25);
+}
+
+.constraint-card--soft:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(245, 158, 11, 0.07) 0%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.08);
+}
+
+.constraint-card--soft .constraint-badge {
+  background: var(--warning-bg);
+  color: var(--warning-color);
+  border-color: var(--warning-border);
+}
+
+/* ----------------------------------------
+   ASSUMPTION VARIANT (legacy support)
+   ---------------------------------------- */
 .constraint-card--assumption {
   background: linear-gradient(
     90deg,
     rgba(245, 158, 11, 0.06) 0%,
     var(--void-elevated) 100%
   );
-  border-left: 3px solid var(--track-spark);
+}
+
+.constraint-card--assumption::before {
+  background: var(--track-spark);
+}
+
+/* ----------------------------------------
+   CONSTRAINT CONTENT
+   ---------------------------------------- */
+.constraint-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
 .constraint-title {
@@ -309,7 +477,22 @@
   font-size: var(--text-base);
   font-weight: var(--weight-semibold);
   color: var(--text-primary);
-  margin: 0 0 var(--space-1) 0;
+  margin: 0;
+  line-height: var(--leading-snug);
+}
+
+.constraint-badge {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
 }
 
 .constraint-detail {
@@ -322,6 +505,24 @@
 
 .constraint-card--assumption .constraint-detail {
   color: var(--track-spark);
+}
+
+/* Constraint impact indicator */
+.constraint-impact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.constraint-impact-icon {
+  width: 12px;
+  height: 12px;
 }
 
 /* ============================================
@@ -420,6 +621,18 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   padding: var(--space-5) var(--space-6);
+  /* Premium interaction */
+  transition:
+    transform var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    background-color var(--interaction-normal, 150ms) var(--ease-spring, cubic-bezier(0.4, 0, 0.2, 1));
+  transform: translateY(0) translateZ(0);
+}
+
+.hypothesis-card:hover {
+  transform: translateY(-1px) translateZ(0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.015);
 }
 
 .hypothesis-number {
@@ -486,6 +699,18 @@
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
+  /* Premium interaction */
+  transition:
+    transform var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color var(--interaction-normal, 150ms) var(--ease-spring, cubic-bezier(0.4, 0, 0.2, 1));
+  transform: translateY(0) translateZ(0);
+}
+
+.pattern-card:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  border-color: var(--border-strong);
 }
 
 .pattern-name {
@@ -553,6 +778,19 @@
   border-radius: var(--radius-sm);
   overflow: hidden;
   margin-bottom: var(--module-gap);
+  /* Premium interaction */
+  transition:
+    transform var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color var(--interaction-normal, 150ms) var(--ease-spring, cubic-bezier(0.4, 0, 0.2, 1));
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.concept-card:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-color: var(--border-strong);
 }
 
 .concept-card:last-child {
@@ -963,6 +1201,18 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   padding: var(--space-6);
+  /* Premium interaction */
+  transition:
+    transform var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color var(--interaction-normal, 150ms) var(--ease-spring, cubic-bezier(0.4, 0, 0.2, 1));
+  transform: translateY(0) translateZ(0);
+}
+
+.risk-card:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  border-color: var(--border-strong);
 }
 
 .risk-header {
@@ -1139,4 +1389,284 @@
   padding-left: var(--space-4);
   border-left: 2px solid var(--border-strong);
   margin: 0;
+}
+
+/* ============================================
+   EQUATION BLOCKS
+   First-class mathematical content styling
+   ============================================ */
+
+/* Display equation - centered, prominent */
+.equation-block {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+  margin: var(--space-8) 0;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.03) 0%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+}
+
+/* Left accent bar */
+.equation-block::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--violet-400);
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+/* Top glow line */
+.equation-block::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 92, 246, 0.3) 50%,
+    transparent 100%
+  );
+}
+
+/* Equation content wrapper */
+.equation-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+/* Main equation text */
+.equation-expression {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+  text-align: center;
+  /* Allow horizontal scroll for long equations */
+  overflow-x: auto;
+  max-width: 100%;
+  padding: var(--space-2) 0;
+}
+
+/* Large display variant */
+.equation-expression--lg {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+}
+
+/* Small variant */
+.equation-expression--sm {
+  font-size: var(--text-base);
+}
+
+/* Equation number/label */
+.equation-number {
+  position: absolute;
+  right: var(--space-5);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Equation description/annotation */
+.equation-description {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  text-align: center;
+  line-height: var(--leading-normal);
+  max-width: 500px;
+}
+
+/* Variable definitions */
+.equation-variables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: center;
+  margin-top: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.equation-variable {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.equation-variable-symbol {
+  color: var(--violet-400);
+  font-weight: var(--weight-semibold);
+}
+
+.equation-variable-equals {
+  color: var(--text-muted);
+}
+
+.equation-variable-definition {
+  color: var(--text-tertiary);
+  font-family: var(--font-body);
+}
+
+/* ----------------------------------------
+   INLINE EQUATION
+   For equations within text flow
+   ---------------------------------------- */
+.equation-inline {
+  display: inline;
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  padding: 2px 6px;
+  background: rgba(139, 92, 246, 0.08);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* Highlight important inline equations */
+.equation-inline--emphasis {
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* ----------------------------------------
+   FORMULA CARD
+   Prominent equation display with context
+   ---------------------------------------- */
+.formula-card {
+  background: var(--void-elevated);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin: var(--space-6) 0;
+}
+
+.formula-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-5);
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.formula-card-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--violet-400);
+}
+
+.formula-card-name {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.formula-card-body {
+  padding: var(--space-6);
+}
+
+.formula-card-equation {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  color: var(--text-primary);
+  text-align: center;
+  padding: var(--space-4) 0;
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.formula-card-explanation {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* ----------------------------------------
+   METRIC EQUATION
+   Equation with live/computed value
+   ---------------------------------------- */
+.metric-equation {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.metric-equation-formula {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+}
+
+.metric-equation-result {
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--text-primary);
+}
+
+.metric-equation-result--go {
+  color: var(--go-color);
+}
+
+.metric-equation-result--warning {
+  color: var(--warning-color);
+}
+
+.metric-equation-result--nogo {
+  color: var(--nogo-color);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .concept-card,
+  .constraint-card,
+  .risk-card,
+  .hypothesis-card,
+  .pattern-card {
+    transition: none;
+    transform: none;
+  }
+
+  .concept-card:hover,
+  .constraint-card:hover,
+  .risk-card:hover,
+  .hypothesis-card:hover,
+  .pattern-card:hover {
+    transform: none;
+  }
 }

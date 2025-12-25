@@ -6,13 +6,16 @@
  * These styles are only loaded when viewing report pages.
  */
 // Report Intelligence Briefing Theme - only loaded on report pages
-import '~/styles/report-animations.css';
+// Import order: tokens → base → animations → components → sections → tables → modules → interactions
+import '~/styles/report-tokens.css';
 import '~/styles/report-base.css';
+import '~/styles/report-animations.css';
 import '~/styles/report-components.css';
-import '~/styles/report-modules.css';
 import '~/styles/report-sections.css';
 import '~/styles/report-tables.css';
-import '~/styles/report-tokens.css';
+import '~/styles/report-modules.css';
+// Premium micro-interactions (last - overrides)
+import '~/styles/sparlo-interactions.css';
 
 export default function ReportsLayout({
   children,

@@ -10,6 +10,7 @@ interface ReportSection {
 interface ExampleReport {
   id: string;
   title: string;
+  headline: string;
   subtitle: string;
   locked: boolean;
   metadata: {
@@ -23,6 +24,7 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'climate-tech',
     title: 'Climate Tech',
+    headline: 'Recyclable High-Performance Composites: Repurposing Polyurethane Glycolysis at Industrial Scale',
     subtitle: 'Recyclable High-Performance Composite Matrix',
     locked: false,
     metadata: {
@@ -369,7 +371,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'food-waste',
     title: 'Waste',
-    subtitle: 'On-Site Food Waste Processing for Commercial Kitchens',
+    headline: 'On-Site Food Waste Processing: Mechanical-First Architecture for 80% Energy Reduction',
+    subtitle: 'Commercial Kitchen Waste-to-Value System',
     locked: false,
     metadata: {
       readTime: '20 min read',
@@ -380,7 +383,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'food-tech',
     title: 'Food Tech',
-    subtitle: 'Multi-Mechanism Preservation for Smallholder Farmers',
+    headline: 'Breaking the Cold Chain Assumption: Multi-Mechanism Preservation for Smallholder Farmers',
+    subtitle: 'Post-Harvest Loss Reduction System',
     locked: false,
     metadata: {
       readTime: '18 min read',
@@ -391,7 +395,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'biotech',
     title: 'Biotech',
-    subtitle: 'Endosomal Escape Enhancement for mRNA Therapeutics',
+    headline: 'Endosomal Escape Enhancement: pH-Responsive Lipid Architecture for 3x Cytosolic Delivery',
+    subtitle: 'mRNA Therapeutics Delivery Optimization',
     locked: false,
     metadata: {
       readTime: '22 min read',
@@ -402,7 +407,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'energy',
     title: 'Energy',
-    subtitle: 'EV Cold Chain: Depot-Centric Thermal Architecture',
+    headline: 'EV Fleet Thermal Management: Depot-Centric Pre-Conditioning for 40% Winter Range Recovery',
+    subtitle: 'Cold Climate Electric Vehicle Optimization',
     locked: false,
     metadata: {
       readTime: '24 min read',
@@ -413,8 +419,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'materials-science',
     title: 'Materials Science',
-    subtitle:
-      'Transparent Wood at Scale: From Lab Curiosity to Architectural Material',
+    headline: 'Transparent Wood at Scale: Lignin-Retention Processing for Architectural Glass Replacement',
+    subtitle: 'Sustainable Building Materials Innovation',
     locked: false,
     metadata: {
       readTime: '26 min read',

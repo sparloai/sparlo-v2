@@ -1,6 +1,7 @@
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 export const FOODTECH_HYBRID_REPORT: HybridReportData = {
+  title: 'Breaking the Cold Chain Assumption: Multi-Mechanism Preservation for Smallholder Farmers',
   brief:
     "30-40% of fruits and vegetables in sub-Saharan Africa and South Asia rot before reaching consumers—$15B+ annual loss for smallholder farmers. Cold chain doesn't exist (no grid, no roads). Current solutions are evaporative coolers (limited cooling, high humidity promotes mold) or solar-powered refrigeration (too expensive for <$5/day income farmers). Need preservation approach that extends shelf life of tomatoes, mangoes, and leafy greens from 3-5 days to 14-21 days without refrigeration, at <$0.01/kg cost. Must work at ambient 30-40°C, be farmer-operable without training, and use locally available or very cheap materials.",
 

@@ -68,28 +68,43 @@
 }
 
 /* ============================================
-   TYPOGRAPHY - Base styles
+   TYPOGRAPHY - Premium Refinements
+   Optical sizing, balanced text, refined spacing
    ============================================ */
 
-/* Display headings */
+/* Display headings - with text balancing */
 .heading-display {
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
   line-height: var(--leading-tight);
   letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
+  text-wrap: balance;
+  text-rendering: optimizeLegibility;
 }
 
 .heading-display--xl {
   font-size: var(--text-4xl);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .heading-display--lg {
   font-size: var(--text-3xl);
+  letter-spacing: -0.025em;
+  line-height: 1.15;
 }
 
 .heading-display--md {
   font-size: var(--text-2xl);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.heading-display--sm {
+  font-size: var(--text-xl);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
 }
 
 /* Section headers - monospace, uppercase */
@@ -110,25 +125,59 @@
   line-height: var(--leading-snug);
   letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
+  text-wrap: balance;
 }
 
-/* Body text */
+/* ----------------------------------------
+   BODY TEXT - Refined reading experience
+   ---------------------------------------- */
 .text-body {
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: var(--leading-relaxed);
   color: var(--text-secondary);
+  text-rendering: optimizeLegibility;
 }
 
 .text-body--lg {
   font-size: var(--text-lg);
+  line-height: 1.65;
 }
 
 .text-body--sm {
   font-size: var(--text-sm);
+  line-height: var(--leading-normal);
 }
 
-/* Labels - monospace */
+/* Prose - optimal reading width */
+.text-prose {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-relaxed);
+  color: var(--text-secondary);
+  max-width: 65ch;
+}
+
+.text-prose p {
+  margin-bottom: var(--space-4);
+}
+
+.text-prose p:last-child {
+  margin-bottom: 0;
+}
+
+/* Lead paragraph - larger intro text */
+.text-lead {
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: 1.7;
+  color: var(--text-secondary);
+  font-weight: var(--weight-normal);
+}
+
+/* ----------------------------------------
+   LABELS & DATA
+   ---------------------------------------- */
 .text-label {
   font-family: var(--font-mono);
   font-size: 9px;
@@ -138,12 +187,105 @@
   color: var(--text-muted);
 }
 
+.text-label--lg {
+  font-size: 10px;
+  letter-spacing: var(--tracking-wider);
+}
+
 /* Data values */
 .text-data {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
   font-weight: var(--weight-semibold);
   color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-data--lg {
+  font-size: var(--text-base);
+}
+
+/* Numeric data with tabular figures */
+.text-numeric {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ----------------------------------------
+   SPECIAL TEXT STYLES
+   ---------------------------------------- */
+
+/* Pull quote - highlighted insight */
+.text-pullquote {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  color: var(--text-primary);
+  font-style: italic;
+  padding-left: var(--space-5);
+  border-left: 3px solid var(--violet-400);
+}
+
+/* Highlight text */
+.text-highlight {
+  background: linear-gradient(
+    120deg,
+    rgba(139, 92, 246, 0.15) 0%,
+    rgba(139, 92, 246, 0.1) 100%
+  );
+  padding: 1px 4px;
+  border-radius: 2px;
+  color: var(--text-primary);
+}
+
+/* Muted/subtle text */
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-subtle {
+  color: var(--text-tertiary);
+}
+
+/* Accent colored text */
+.text-accent {
+  color: var(--violet-400);
+}
+
+.text-success {
+  color: var(--go-color);
+}
+
+.text-warning {
+  color: var(--warning-color);
+}
+
+.text-danger {
+  color: var(--nogo-color);
+}
+
+/* ----------------------------------------
+   INLINE ELEMENTS
+   ---------------------------------------- */
+
+/* Superscript/subscript for equations */
+.text-super {
+  font-size: 0.75em;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.text-sub {
+  font-size: 0.75em;
+  vertical-align: sub;
+  line-height: 0;
+}
+
+/* Small caps for abbreviations */
+.text-caps {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.05em;
 }
 
 /* Inline code */
@@ -218,6 +360,194 @@
 
 .report-page ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.15);
+}
+
+/* ============================================
+   INFORMATION ARCHITECTURE
+   Section grouping into narrative "acts"
+   ============================================ */
+
+/* Act container - groups related sections */
+.report-act {
+  position: relative;
+  margin-bottom: calc(var(--section-gap) * 1.5);
+  padding-bottom: var(--space-12);
+}
+
+/* Last act no bottom spacing */
+.report-act:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Act separator line */
+.report-act::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--border-strong) 50%,
+    transparent 100%
+  );
+}
+
+.report-act:last-child::after {
+  display: none;
+}
+
+/* Act header */
+.report-act-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  margin-bottom: var(--space-10);
+  padding-bottom: var(--space-4);
+}
+
+.report-act-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.15) 0%,
+    rgba(139, 92, 246, 0.05) 100%
+  );
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--violet-400);
+  flex-shrink: 0;
+}
+
+.report-act-info {
+  flex: 1;
+}
+
+.report-act-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--violet-400);
+  margin-bottom: var(--space-1);
+}
+
+.report-act-title {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.report-act-description {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-top: var(--space-2);
+}
+
+/* Act content wrapper */
+.report-act-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+/* ----------------------------------------
+   ACT VARIANTS
+   ---------------------------------------- */
+
+/* Discovery Act - Primary violet theme */
+.report-act--discovery .report-act-number {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.2) 0%,
+    rgba(139, 92, 246, 0.08) 100%
+  );
+  color: var(--violet-400);
+}
+
+.report-act--discovery .report-act-label {
+  color: var(--violet-400);
+}
+
+/* Analysis Act - Amber theme */
+.report-act--analysis .report-act-number {
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.15) 0%,
+    rgba(245, 158, 11, 0.05) 100%
+  );
+  border-color: rgba(245, 158, 11, 0.2);
+  color: var(--warning-color);
+}
+
+.report-act--analysis .report-act-label {
+  color: var(--warning-color);
+}
+
+/* Solution Act - Green theme */
+.report-act--solution .report-act-number {
+  background: linear-gradient(
+    135deg,
+    rgba(34, 197, 94, 0.15) 0%,
+    rgba(34, 197, 94, 0.05) 100%
+  );
+  border-color: rgba(34, 197, 94, 0.2);
+  color: var(--go-color);
+}
+
+.report-act--solution .report-act-label {
+  color: var(--go-color);
+}
+
+/* Action Act - Neutral */
+.report-act--action .report-act-number {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+.report-act--action .report-act-label {
+  color: var(--text-muted);
+}
+
+/* ----------------------------------------
+   SECTION BREADCRUMB
+   Shows current position in report
+   ---------------------------------------- */
+.section-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.breadcrumb-separator {
+  color: var(--border-strong);
+}
+
+.breadcrumb-current {
+  color: var(--text-secondary);
 }
 
 /* ============================================

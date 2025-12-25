@@ -15,8 +15,16 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   overflow: hidden;
-  transition: border-color var(--transition-base),
-    background var(--transition-base);
+  /* Elevation level 1 for base modules */
+  box-shadow: var(--elevation-1, 0 1px 3px rgba(0, 0, 0, 0.4));
+  /* Premium interaction */
+  transition:
+    transform var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    box-shadow var(--interaction-slow, 200ms) var(--ease-out-expo, cubic-bezier(0.16, 1, 0.3, 1)),
+    border-color var(--interaction-normal, 150ms) var(--ease-spring, cubic-bezier(0.4, 0, 0.2, 1)),
+    background var(--interaction-normal, 150ms) var(--ease-spring, cubic-bezier(0.4, 0, 0.2, 1));
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
 }
 
 /* Top edge glow line */
@@ -38,6 +46,8 @@
 
 /* Hover state */
 .module:hover {
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: var(--elevation-hover, 0 8px 24px rgba(0, 0, 0, 0.45));
   border-color: var(--border-strong);
   background: var(--void-surface);
 }
@@ -145,9 +155,13 @@
     rgba(124, 58, 237, 0.04) 0%,
     var(--void-elevated) 100%
   );
+  /* Higher elevation for primary modules */
+  box-shadow: var(--elevation-2, 0 2px 6px rgba(0, 0, 0, 0.5));
 }
 
 .module--primary:hover {
+  transform: translateY(-3px) translateZ(0);
+  box-shadow: var(--elevation-hover-accent, 0 8px 24px rgba(124, 58, 237, 0.2));
   border-color: rgba(124, 58, 237, 0.3);
 }
 
@@ -308,4 +322,22 @@
 
 .module-stack--tight {
   gap: var(--space-4);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .module,
+  .module--primary,
+  .module--spark {
+    transition: none;
+    transform: none;
+  }
+
+  .module:hover,
+  .module--primary:hover,
+  .module--spark:hover {
+    transform: none;
+  }
 }

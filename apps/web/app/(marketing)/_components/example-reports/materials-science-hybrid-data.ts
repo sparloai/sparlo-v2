@@ -1,6 +1,7 @@
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 export const MATERIALS_SCIENCE_HYBRID_REPORT: HybridReportData = {
+  title: 'Transparent Wood at Scale: Lignin-Retention Processing for Architectural Glass Replacement',
   brief:
     'Transparent wood (delignified, polymer-infiltrated) has been demonstrated at lab scale with 80-90% optical transmittance, 5x the impact resistance of glass, and natural insulating properties (R-value 5x glass). But production requires 12-24 hour chemical delignification, expensive polymer infiltration, and produces pieces limited to ~1m². Architectural applications need 2-3m² panels, production at <$50/ft² (vs. ~$500/ft² current), and outdoor durability (UV, moisture). Need scalable process that maintains optical and mechanical properties while cutting cost 90% and enabling larger formats.',
 

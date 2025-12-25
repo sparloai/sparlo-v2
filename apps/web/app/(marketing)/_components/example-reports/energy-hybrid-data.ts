@@ -1,6 +1,7 @@
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 export const ENERGY_HYBRID_REPORT: HybridReportData = {
+  title: 'EV Fleet Thermal Management: Depot-Centric Pre-Conditioning for 40% Winter Range Recovery',
   brief:
     "Refrigerated delivery vans for groceries and pharmaceuticals run diesel-powered compressor units that consume 30-40% of total vehicle fuel. Electric vans eliminate the engine but refrigeration still drains 40-60% of battery capacity, cutting delivery range in half. Current solutions are eutectic plates (limited hold time), oversized batteries (cost/weight), or trailer-mounted diesel gensets (defeats the purpose). Need refrigeration approach that maintains -20°C to +5°C for 8-hour delivery routes while consuming <15% of a 60kWh EV battery. Must handle 50+ door openings per route. Retrofit path preferred—fleet operators won't buy new vehicles just for this.",
 

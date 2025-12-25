@@ -1,0 +1,421 @@
+/**
+ * Sparlo Premium Interactions
+ *
+ * Micro-interactions and hover states that signal craft and intentionality.
+ * Designed to shift perception from "template" to "considered product."
+ *
+ * Philosophy:
+ * - Gentle highlights, not dramatic effects
+ * - Micro movements (2-4px max)
+ * - No layout shifts on hover
+ * - 150-200ms for instant feel
+ * - All animations respect prefers-reduced-motion
+ */
+
+/* ============================================
+   Base Interaction Variables
+   ============================================ */
+
+:root {
+  /* Timing */
+  --interaction-fast: 100ms;
+  --interaction-normal: 150ms;
+  --interaction-slow: 200ms;
+
+  /* Easing - matches Framer Motion spring feel */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Shadows for hover states */
+  --shadow-hover-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-hover-medium: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-hover-violet: 0 4px 16px rgba(139, 92, 246, 0.15);
+
+  /* Lifts */
+  --lift-subtle: -1px;
+  --lift-medium: -2px;
+  --lift-prominent: -4px;
+}
+
+/* ============================================
+   Button Interactions
+   ============================================ */
+
+/* Premium button base */
+.btn-interactive {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--interaction-normal) var(--ease-spring),
+    box-shadow var(--interaction-normal) var(--ease-spring),
+    background-color var(--interaction-fast) var(--ease-spring);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.btn-interactive:hover {
+  transform: translateY(var(--lift-subtle)) translateZ(0);
+  box-shadow: var(--shadow-hover-subtle);
+}
+
+.btn-interactive:active {
+  transform: translateY(0) scale(0.98) translateZ(0);
+  transition-duration: 50ms;
+}
+
+/* Primary button with violet glow */
+.btn-primary-interactive {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--interaction-normal) var(--ease-spring),
+    box-shadow var(--interaction-normal) var(--ease-spring);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.btn-primary-interactive:hover {
+  transform: translateY(var(--lift-medium)) translateZ(0);
+  box-shadow: var(--shadow-hover-violet);
+}
+
+.btn-primary-interactive:active {
+  transform: translateY(0) scale(0.98) translateZ(0);
+  transition-duration: 50ms;
+}
+
+/* Ghost button - subtle background on hover */
+.btn-ghost-interactive {
+  position: relative;
+  transition:
+    background-color var(--interaction-fast) var(--ease-spring),
+    color var(--interaction-fast) var(--ease-spring);
+}
+
+.btn-ghost-interactive::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity var(--interaction-fast) var(--ease-spring);
+}
+
+.btn-ghost-interactive:hover::before {
+  opacity: 0.05;
+}
+
+.btn-ghost-interactive:active::before {
+  opacity: 0.08;
+}
+
+/* ============================================
+   Card Interactions
+   ============================================ */
+
+/* Interactive card with lift */
+.card-interactive {
+  position: relative;
+  transition:
+    transform var(--interaction-slow) var(--ease-out-expo),
+    box-shadow var(--interaction-slow) var(--ease-out-expo);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.card-interactive:hover {
+  transform: translateY(var(--lift-medium)) translateZ(0);
+  box-shadow: var(--shadow-hover-medium);
+}
+
+/* Clickable card (like report cards) */
+.card-clickable {
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform var(--interaction-slow) var(--ease-out-expo),
+    box-shadow var(--interaction-slow) var(--ease-out-expo),
+    border-color var(--interaction-normal) var(--ease-spring);
+  transform: translateY(0) translateZ(0);
+  will-change: transform, box-shadow;
+}
+
+.card-clickable:hover {
+  transform: translateY(var(--lift-medium)) translateZ(0);
+  box-shadow: var(--shadow-hover-medium);
+}
+
+.card-clickable:active {
+  transform: translateY(0) scale(0.995) translateZ(0);
+  transition-duration: 50ms;
+}
+
+/* Report card with violet accent on hover */
+.card-report {
+  position: relative;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition:
+    transform var(--interaction-slow) var(--ease-out-expo),
+    box-shadow var(--interaction-slow) var(--ease-out-expo),
+    border-color var(--interaction-normal) var(--ease-spring),
+    background-color var(--interaction-normal) var(--ease-spring);
+  transform: translateY(0) translateZ(0);
+}
+
+.card-report:hover {
+  transform: translateY(var(--lift-subtle)) translateZ(0);
+  border-left-color: rgba(139, 92, 246, 0.5);
+  background-color: rgba(139, 92, 246, 0.02);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08);
+}
+
+/* ============================================
+   Navigation Interactions
+   ============================================ */
+
+/* Sidebar navigation item */
+.nav-item-interactive {
+  position: relative;
+  transition:
+    transform var(--interaction-fast) var(--ease-spring),
+    background-color var(--interaction-fast) var(--ease-spring),
+    color var(--interaction-fast) var(--ease-spring);
+}
+
+.nav-item-interactive::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: rgb(139 92 246 / 0);
+  transition: background-color var(--interaction-fast) var(--ease-spring);
+}
+
+.nav-item-interactive:hover {
+  transform: translateX(2px);
+}
+
+.nav-item-interactive:hover::before {
+  background-color: rgb(139 92 246 / 0.05);
+}
+
+.nav-item-interactive[data-active='true'] {
+  background-color: rgb(139 92 246 / 0.1);
+  color: rgb(167 139 250); /* violet-400 */
+}
+
+/* Table of contents item with indicator */
+.toc-item {
+  position: relative;
+  padding-left: 1rem;
+  transition:
+    color var(--interaction-fast) var(--ease-spring),
+    background-color var(--interaction-fast) var(--ease-spring);
+}
+
+.toc-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 0;
+  background-color: rgb(139 92 246);
+  border-radius: 1px;
+  transition: height var(--interaction-normal) var(--ease-out-expo);
+}
+
+.toc-item:hover::before {
+  height: 50%;
+}
+
+.toc-item[data-active='true']::before {
+  height: 100%;
+}
+
+/* ============================================
+   Link Interactions
+   ============================================ */
+
+/* Text link with underline animation */
+.link-interactive {
+  position: relative;
+  text-decoration: none;
+  transition: color var(--interaction-fast) var(--ease-spring);
+}
+
+.link-interactive::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background-color: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform var(--interaction-normal) var(--ease-out-expo);
+}
+
+.link-interactive:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Icon link */
+.link-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition:
+    color var(--interaction-fast) var(--ease-spring),
+    gap var(--interaction-normal) var(--ease-out-expo);
+}
+
+.link-icon:hover {
+  gap: 0.5rem;
+}
+
+/* ============================================
+   Table Row Interactions
+   ============================================ */
+
+.table-row-interactive {
+  position: relative;
+  transition: background-color var(--interaction-fast) var(--ease-spring);
+}
+
+.table-row-interactive::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgb(139 92 246 / 0);
+  pointer-events: none;
+  transition: background-color var(--interaction-fast) var(--ease-spring);
+}
+
+.table-row-interactive:hover::before {
+  background-color: rgb(139 92 246 / 0.03);
+}
+
+/* ============================================
+   Icon Interactions
+   ============================================ */
+
+.icon-interactive {
+  transition: transform var(--interaction-fast) var(--ease-out-back);
+}
+
+.icon-interactive:hover {
+  transform: scale(1.1);
+}
+
+/* Rotating icon (for expandable sections) */
+.icon-rotate {
+  transition: transform var(--interaction-normal) var(--ease-spring);
+}
+
+.icon-rotate[data-expanded='true'] {
+  transform: rotate(90deg);
+}
+
+/* ============================================
+   Badge Interactions
+   ============================================ */
+
+.badge-interactive {
+  transition:
+    transform var(--interaction-fast) var(--ease-spring),
+    box-shadow var(--interaction-fast) var(--ease-spring);
+}
+
+.badge-interactive:hover {
+  transform: scale(1.05);
+}
+
+/* ============================================
+   Focus States (Accessibility)
+   ============================================ */
+
+.focus-ring {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid rgb(139 92 246 / 0.5);
+  outline-offset: 2px;
+}
+
+/* Focus within for card-like containers */
+.focus-within-ring:focus-within {
+  outline: 2px solid rgb(139 92 246 / 0.3);
+  outline-offset: 2px;
+}
+
+/* ============================================
+   Reduced Motion
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-interactive,
+  .btn-primary-interactive,
+  .btn-ghost-interactive,
+  .card-interactive,
+  .card-clickable,
+  .card-report,
+  .nav-item-interactive,
+  .toc-item,
+  .link-interactive,
+  .link-icon,
+  .table-row-interactive,
+  .icon-interactive,
+  .icon-rotate,
+  .badge-interactive {
+    transition: none;
+    transform: none;
+  }
+
+  .btn-interactive:hover,
+  .btn-primary-interactive:hover,
+  .card-interactive:hover,
+  .card-clickable:hover,
+  .card-report:hover,
+  .nav-item-interactive:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Apply to any element for hover lift */
+.hover-lift {
+  transition: transform var(--interaction-slow) var(--ease-out-expo);
+}
+
+.hover-lift:hover {
+  transform: translateY(var(--lift-subtle));
+}
+
+/* Apply for scale on hover */
+.hover-scale {
+  transition: transform var(--interaction-normal) var(--ease-spring);
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Apply for opacity fade */
+.hover-fade {
+  transition: opacity var(--interaction-fast) var(--ease-spring);
+}
+
+.hover-fade:hover {
+  opacity: 0.8;
+}

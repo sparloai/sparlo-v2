@@ -465,6 +465,7 @@ export interface SelfCritique {
 }
 
 export interface HybridReportData {
+  title?: string;
   executive_summary?: string | StructuredExecutiveSummary;
   problem_restatement?: string;
   key_insights?: string[];

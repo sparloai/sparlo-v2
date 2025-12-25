@@ -2634,6 +2634,15 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
 
   return (
     <div className="space-y-12">
+      {/* Report Title */}
+      {report.title && (
+        <header className="border-b border-zinc-200 pb-8 dark:border-zinc-800">
+          <h1 className="text-3xl leading-tight font-semibold tracking-tight text-zinc-900 md:text-4xl lg:text-[2.5rem] dark:text-white">
+            {report.title}
+          </h1>
+        </header>
+      )}
+
       {/* Brief - Original Problem Statement */}
       {report.brief && (
         <section id="brief">

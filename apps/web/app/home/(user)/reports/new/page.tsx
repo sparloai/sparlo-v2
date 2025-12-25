@@ -401,7 +401,12 @@ export default function NewReportPage() {
                   disabled={isSubmitting}
                   autoFocus
                   data-test="challenge-input"
-                  placeholder="Problem, constraints, target metrics."
+                  placeholder={`Describe your technical challenge. Include:
+• The problem you're solving
+• Key constraints (cost, materials, time)
+• What success looks like
+
+E.g. 'We need to reduce our battery pack weight by 30% while maintaining 500+ charge cycles for our electric delivery vehicle fleet.'`}
                   spellCheck={false}
                   className="min-h-[240px] flex-1 resize-none rounded-lg border-0 bg-transparent p-2 text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] transition-shadow duration-200 focus:ring-1 focus:ring-violet-500/40 focus:outline-none disabled:opacity-40 md:text-xl"
                   style={{
