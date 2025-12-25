@@ -397,147 +397,29 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
       readTime: '22 min read',
       dataPoints: '3.8M data points',
     },
-    sections: [
-      {
-        id: 'brief',
-        number: '01',
-        title: 'The Brief',
-        content: (
-          <p className="text-lg leading-relaxed">
-            Current mRNA therapeutics suffer from poor endosomal escape
-            efficiency, with only 1-2% of delivered mRNA reaching the cytoplasm.
-            This limits therapeutic efficacy and requires high doses that
-            increase immunogenicity risk.
-          </p>
-        ),
-      },
-      {
-        id: 'executive-summary',
-        number: '02',
-        title: 'Executive Summary',
-        content: (
-          <p className="text-xl leading-relaxed font-light text-zinc-950">
-            Analysis of 3.8M data points across lipid chemistry, membrane
-            biophysics, and viral escape mechanisms reveals overlooked
-            approaches from adjacent domains that could increase endosomal
-            escape efficiency by 10-50x.
-          </p>
-        ),
-      },
-    ],
+    sections: [],
   },
   {
     id: 'energy',
     title: 'Energy',
-    subtitle: 'Solid-State Battery Dendrite Suppression',
+    subtitle: 'EV Cold Chain: Depot-Centric Thermal Architecture',
     locked: false,
     metadata: {
       readTime: '24 min read',
       dataPoints: '5.1M data points',
     },
-    sections: [
-      {
-        id: 'brief',
-        number: '01',
-        title: 'The Brief',
-        content: (
-          <p className="text-lg leading-relaxed">
-            Lithium dendrite growth through solid electrolytes causes short
-            circuits and capacity fade, preventing commercialization of
-            high-energy-density solid-state batteries. Current approaches focus
-            on mechanical suppression, but cross-domain insights suggest
-            alternative strategies.
-          </p>
-        ),
-      },
-      {
-        id: 'executive-summary',
-        number: '02',
-        title: 'Executive Summary',
-        content: (
-          <p className="text-xl leading-relaxed font-light text-zinc-950">
-            Cross-domain analysis of metallurgical grain boundary engineering
-            and biological mineralization processes reveals underexplored
-            approaches to dendrite suppression that could enable lithium metal
-            anodes at scale.
-          </p>
-        ),
-      },
-    ],
+    sections: [],
   },
   {
     id: 'materials-science',
     title: 'Materials Science',
-    subtitle: 'Self-Healing Concrete for Infrastructure',
-    locked: true,
+    subtitle:
+      'Transparent Wood at Scale: From Lab Curiosity to Architectural Material',
+    locked: false,
     metadata: {
       readTime: '26 min read',
       dataPoints: '6.3M data points',
     },
-    sections: [
-      {
-        id: 'brief',
-        number: '01',
-        title: 'The Brief',
-        content: (
-          <p className="text-lg leading-relaxed">
-            Concrete infrastructure deteriorates rapidly due to micro-crack
-            propagation, costing billions in maintenance and replacement.
-            Bio-inspired self-healing mechanisms offer a path to 100+ year
-            infrastructure.
-          </p>
-        ),
-      },
-    ],
-  },
-  {
-    id: 'agtech',
-    title: 'Agtech',
-    subtitle: 'Precision Fermentation Scale-Up',
-    locked: true,
-    metadata: {
-      readTime: '20 min read',
-      dataPoints: '4.7M data points',
-    },
-    sections: [
-      {
-        id: 'brief',
-        number: '01',
-        title: 'The Brief',
-        content: (
-          <p className="text-lg leading-relaxed">
-            Precision fermentation promises sustainable protein production, but
-            capital intensity and scale-up challenges limit commercial
-            viability. Need 10x cost reduction to compete with animal
-            agriculture.
-          </p>
-        ),
-      },
-    ],
-  },
-  {
-    id: 'waste',
-    title: 'Waste',
-    subtitle: 'Mixed Plastic Waste Chemical Recycling',
-    locked: true,
-    metadata: {
-      readTime: '28 min read',
-      dataPoints: '7.2M data points',
-    },
-    sections: [
-      {
-        id: 'brief',
-        number: '01',
-        title: 'The Brief',
-        content: (
-          <p className="text-lg leading-relaxed">
-            Only 9% of plastic waste is recycled. Mixed plastic streams are
-            incompatible with mechanical recycling. Need economically viable
-            chemical recycling that handles contaminated, mixed feedstocks
-            without extensive pre-sorting.
-          </p>
-        ),
-      },
-    ],
+    sections: [],
   },
 ];

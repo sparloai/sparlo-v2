@@ -19,9 +19,11 @@ import { cn } from '@kit/ui/utils';
 import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybrid-report-display';
 
 import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
+import { ENERGY_HYBRID_REPORT } from './energy-hybrid-data';
 import { EXAMPLE_REPORTS } from './example-reports-data';
 import { FOOD_HYBRID_REPORT } from './food-hybrid-data';
 import { FOODTECH_HYBRID_REPORT } from './foodtech-hybrid-data';
+import { MATERIALS_SCIENCE_HYBRID_REPORT } from './materials-science-hybrid-data';
 
 interface TocItem {
   id: string;
@@ -207,23 +209,27 @@ export function ExampleReportsSection() {
             {/* Report Header - hidden for hybrid reports which have their own structure */}
             {report.id !== 'climate-tech' &&
               report.id !== 'food-waste' &&
-              report.id !== 'food-tech' && (
-              <header className="mb-12">
-                <div className="space-y-4">
-                  <h1 className="text-4xl font-bold tracking-tight text-zinc-900 lg:text-5xl dark:text-white">
-                    {report.title}
-                  </h1>
-                  <p className="text-lg text-zinc-600 dark:text-zinc-400">
-                    {report.subtitle}
-                  </p>
-                  <div className="flex items-center gap-3 font-mono text-sm text-zinc-500 dark:text-zinc-500">
-                    <span>{report.metadata.readTime}</span>
-                    <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                    <span>{report.metadata.dataPoints}</span>
+              report.id !== 'food-tech' &&
+              report.id !== 'materials-science' &&
+              report.id !== 'energy' && (
+                <header className="mb-12">
+                  <div className="space-y-4">
+                    <h1 className="text-4xl font-bold tracking-tight text-zinc-900 lg:text-5xl dark:text-white">
+                      {report.title}
+                    </h1>
+                    <p className="text-lg text-zinc-600 dark:text-zinc-400">
+                      {report.subtitle}
+                    </p>
+                    <div className="flex items-center gap-3 font-mono text-sm text-zinc-500 dark:text-zinc-500">
+                      <span>{report.metadata.readTime}</span>
+                      <span className="text-zinc-300 dark:text-zinc-700">
+                        •
+                      </span>
+                      <span>{report.metadata.dataPoints}</span>
+                    </div>
                   </div>
-                </div>
-              </header>
-            )}
+                </header>
+              )}
 
             {/* Report Content */}
             {report.locked ? (
@@ -247,6 +253,20 @@ export function ExampleReportsSection() {
                 reportData={{
                   mode: 'hybrid',
                   report: FOODTECH_HYBRID_REPORT,
+                }}
+              />
+            ) : report.id === 'materials-science' ? (
+              <HybridReportDisplay
+                reportData={{
+                  mode: 'hybrid',
+                  report: MATERIALS_SCIENCE_HYBRID_REPORT,
+                }}
+              />
+            ) : report.id === 'energy' ? (
+              <HybridReportDisplay
+                reportData={{
+                  mode: 'hybrid',
+                  report: ENERGY_HYBRID_REPORT,
                 }}
               />
             ) : (

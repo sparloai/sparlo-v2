@@ -4,10 +4,11 @@ import { ArrowDown, ArrowRight, Cpu, Database, Globe } from 'lucide-react';
 
 const sectors = [
   { id: '01', name: 'Climate Tech' },
-  { id: '02', name: 'Energy Systems' },
-  { id: '03', name: 'Biotechnology' },
-  { id: '04', name: 'Waste Management' },
-  { id: '05', name: 'Raw Materials' },
+  { id: '02', name: 'Energy' },
+  { id: '03', name: 'Biotech' },
+  { id: '04', name: 'Waste' },
+  { id: '05', name: 'Materials Science' },
+  { id: '06', name: 'Food Tech' },
 ];
 
 export function SparloHero() {

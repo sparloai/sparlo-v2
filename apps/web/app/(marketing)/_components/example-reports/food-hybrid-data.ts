@@ -12,7 +12,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
     narrative_lead:
       "The food waste dehydration industry has been fighting thermodynamics for thirty years. Every commercial dehydrator on the market tries to evaporate 70% water content at 2,260 kJ/kg—a physics floor that guarantees 600+ kWh/ton minimum. Meanwhile, agricultural screw presses remove 50-70% of that water mechanically at 10-15 kWh/ton, and the olive oil industry has been doing continuous centrifugal separation at similar efficiency since the 1960s. The path to <200 kWh/ton isn't better heating—it's removing most of the water before you heat anything.",
     primary_recommendation:
-      "Deploy a Vincent CP-4 screw press ($6-8K) with solar cabinet finishing for $8-12K total installed cost, achieving 15-30 kWh/ton electrical consumption in sunny climates. For year-round reliability in variable climates, add a compact drum dryer with heat recovery for $12-18K total, targeting 150-200 kWh/ton. Both approaches use off-the-shelf equipment requiring only integration engineering, not invention.",
+      'Deploy a Vincent CP-4 screw press ($6-8K) with solar cabinet finishing for $8-12K total installed cost, achieving 15-30 kWh/ton electrical consumption in sunny climates. For year-round reliability in variable climates, add a compact drum dryer with heat recovery for $12-18K total, targeting 150-200 kWh/ton. Both approaches use off-the-shelf equipment requiring only integration engineering, not invention.',
     viability: 'viable',
   },
 
@@ -67,7 +67,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
       {
         approach: 'Compaction only',
         limitation:
-          "40-60% volume reduction but no stabilization—output still rots",
+          '40-60% volume reduction but no stabilization—output still rots',
       },
     ],
     first_principles_insight: {
@@ -78,7 +78,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
     },
     why_its_hard: {
       prose:
-        "Food waste is 60-80% water. Evaporating water requires overcoming the latent heat of vaporization—2,260 kJ/kg, which translates to a theoretical minimum of 627 kWh/ton just for the phase change. Real systems lose 30-50% additional energy to exhaust, radiation, and inefficient heat transfer. At small scale (500 lb/day), surface-to-volume ratios make heat retention even worse. The physics creates a floor that no amount of insulation or control optimization can break through if evaporation is the only water removal mechanism.",
+        'Food waste is 60-80% water. Evaporating water requires overcoming the latent heat of vaporization—2,260 kJ/kg, which translates to a theoretical minimum of 627 kWh/ton just for the phase change. Real systems lose 30-50% additional energy to exhaust, radiation, and inefficient heat transfer. At small scale (500 lb/day), surface-to-volume ratios make heat retention even worse. The physics creates a floor that no amount of insulation or control optimization can break through if evaporation is the only water removal mechanism.',
       governing_equation: {
         equation: 'Q = m × ΔH_vap = m × 2,260 kJ/kg',
         explanation:
@@ -151,7 +151,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
       challenge:
         'If wet-stable output (fermented, acidified) can find a disposal pathway, drying becomes unnecessary. AD facilities, regenerative farms, and direct soil incorporation are growing markets.',
       implication:
-        "If disposal pathways exist, fermentation (innov-recommended) becomes the clear winner at 98% energy reduction. Worth investing time to explore local AD facilities and farm partnerships before committing to thermal approach.",
+        'If disposal pathways exist, fermentation (innov-recommended) becomes the clear winner at 98% energy reduction. Worth investing time to explore local AD facilities and farm partnerships before committing to thermal approach.',
     },
     {
       assumption: 'On-site processing is required',
@@ -165,12 +165,12 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
       challenge:
         'If waste generation is variable, a smaller system with buffer capacity might be more economical than sizing for peak load.',
       implication:
-        "Audit actual waste generation over 2-4 weeks before specifying equipment. A 300 lb/day system at $8K might serve better than a 500 lb/day system at $15K if peaks can be buffered.",
+        'Audit actual waste generation over 2-4 weeks before specifying equipment. A 300 lb/day system at $8K might serve better than a 500 lb/day system at $15K if peaks can be buffered.',
     },
     {
       assumption: 'Fully autonomous operation is required',
       challenge:
-        "Commercial kitchens already have staff doing waste handling. 10-15 minutes/day of simple operation (loading press, spreading trays) might be acceptable and enables much simpler, cheaper systems.",
+        'Commercial kitchens already have staff doing waste handling. 10-15 minutes/day of simple operation (loading press, spreading trays) might be acceptable and enables much simpler, cheaper systems.',
       implication:
         'Semi-manual systems (screw press + solar cabinet) at $8-12K may be preferable to fully automated systems at $25-40K if staff time is available.',
     },
@@ -199,7 +199,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
       title: 'Screw Press + Solar Cabinet Hybrid',
       confidence: 88,
       what_it_is:
-        "An agricultural screw press designed for manure and food processing dewatering, combined with a passive solar drying cabinet for final moisture removal. The Vincent Corporation CP-4 screw press ($6-8K) handles 500+ lbs/day of food waste, using increasing compression along a tapered screw to squeeze free water through a perforated screen. Press cake exits at 40-50% solids—already a 50-60% mass reduction.\n\nThe press cake is spread on mesh trays in an insulated solar cabinet with a black absorber plate and passive convection chimney. Solar heating raises interior temperature to 50-70°C above ambient, completing drying to <15% moisture in 2-4 sunny days. Total electrical consumption is 15-30 kWh/ton (press motor and feeding system only); solar provides the thermal energy for free.\n\nThe system requires 3-5 days of buffer capacity to handle cloudy periods. For facilities in consistently sunny climates (Southwest US, Mediterranean), this is the simplest and cheapest path to meeting all specifications. For variable climates, the solar cabinet can be supplemented with a small electric heater for backup, adding 50-100 kWh/ton during cloudy periods.",
+        'An agricultural screw press designed for manure and food processing dewatering, combined with a passive solar drying cabinet for final moisture removal. The Vincent Corporation CP-4 screw press ($6-8K) handles 500+ lbs/day of food waste, using increasing compression along a tapered screw to squeeze free water through a perforated screen. Press cake exits at 40-50% solids—already a 50-60% mass reduction.\n\nThe press cake is spread on mesh trays in an insulated solar cabinet with a black absorber plate and passive convection chimney. Solar heating raises interior temperature to 50-70°C above ambient, completing drying to <15% moisture in 2-4 sunny days. Total electrical consumption is 15-30 kWh/ton (press motor and feeding system only); solar provides the thermal energy for free.\n\nThe system requires 3-5 days of buffer capacity to handle cloudy periods. For facilities in consistently sunny climates (Southwest US, Mediterranean), this is the simplest and cheapest path to meeting all specifications. For variable climates, the solar cabinet can be supplemented with a small electric heater for backup, adding 50-100 kWh/ton during cloudy periods.',
       why_it_works:
         "The physics are straightforward. Free water is held in the food matrix by capillary forces—surface tension effects in the pores and interstices of the material. These forces are weak (0.1-10 kPa). A screw press applies 200-500 kPa of pressure, easily overcoming capillary retention and forcing water through the screen.\n\nThe remaining 'bound water' is hydrogen-bonded to food polymers (starches, proteins, cellulose). These bonds are stronger (10-100 kJ/mol) and require thermal energy to break. But by this point, you've already removed 50-70% of the water mechanically. Solar radiation provides 800-1000 W/m² in sunny conditions; a 10 m² collector can deliver 6-8 kWh/day of thermal energy—enough to evaporate the remaining moisture from 200-300 lbs of press cake.",
       the_insight: {
@@ -280,7 +280,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
 
   innovation_portfolio: {
     intro:
-      "Innovation concepts offer higher ceilings with higher uncertainty. These challenge industry assumptions and could transform the economics of food waste processing—but require more validation and may need alternative disposal pathways.",
+      'Innovation concepts offer higher ceilings with higher uncertainty. These challenge industry assumptions and could transform the economics of food waste processing—but require more validation and may need alternative disposal pathways.',
     recommended_innovation: {
       id: 'innov-recommended',
       title: 'Rapid Lactic Fermentation for Wet Stability',
@@ -289,11 +289,12 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
       what_it_is:
         "This approach challenges the fundamental assumption that food waste must be dried to be stable. Instead, it uses lactic acid bacteria (LAB) to rapidly drop pH to 4.0, creating shelf-stable wet output—the same principle that makes sauerkraut, kimchi, and silage stable for months without refrigeration.\n\nFood waste is ground and mixed with 1-2% Lactobacillus inoculant (commercially available silage additives work well). The mixture is compacted into sealed containers to create anaerobic conditions. Within 48-72 hours, LAB ferment available sugars to lactic acid, dropping pH from 6-7 to 3.8-4.2. At this pH, putrefactive bacteria cannot grow, proteolytic enzymes are denatured, and the material is biologically stable.\n\nThe output is wet but stable—it won't rot, won't smell, won't attract pests. It's ideal feedstock for anaerobic digesters (AD facilities pay for high-quality feedstock), can be used for animal feed in some jurisdictions, or can be directly incorporated into soil. Energy consumption is near-zero: just grinding at 5-15 kWh/ton. Capital cost is minimal: grinder, sealed containers, and inoculant.\n\nThe catch: this produces wet output (no volume reduction beyond compaction), and you need a disposal pathway that accepts wet-stable material. If your local AD facility will take it, or you have a farm partnership, this is the most efficient solution by far. If you need dry output for conventional compost or landfill, this doesn't fit.",
       why_it_works:
-        "Lactobacillus converts glucose to lactic acid via glycolysis: C₆H₁₂O₆ → 2 CH₃CHOHCOOH (ΔG = -197 kJ/mol). This is an exergonic reaction—it releases energy rather than consuming it. The process is self-sustaining once inoculated.\n\nLactic acid dissociates (pKa 3.86), dropping pH. Below pH 4.5, several things happen: proteolytic enzymes denature and stop breaking down proteins (which would release ammonia and cause odor); Clostridium species (the main putrefactive bacteria) cannot germinate; and Lactobacillus dominates the microbiome through competitive exclusion.\n\nFood waste typically contains 10-20% fermentable sugars—far more than the 3% minimum needed for successful fermentation. The 48-72 hour timeline is conservative; well-inoculated, high-sugar waste can reach pH 4.0 in 24-36 hours.",
+        'Lactobacillus converts glucose to lactic acid via glycolysis: C₆H₁₂O₆ → 2 CH₃CHOHCOOH (ΔG = -197 kJ/mol). This is an exergonic reaction—it releases energy rather than consuming it. The process is self-sustaining once inoculated.\n\nLactic acid dissociates (pKa 3.86), dropping pH. Below pH 4.5, several things happen: proteolytic enzymes denature and stop breaking down proteins (which would release ammonia and cause odor); Clostridium species (the main putrefactive bacteria) cannot germinate; and Lactobacillus dominates the microbiome through competitive exclusion.\n\nFood waste typically contains 10-20% fermentable sugars—far more than the 3% minimum needed for successful fermentation. The 48-72 hour timeline is conservative; well-inoculated, high-sugar waste can reach pH 4.0 in 24-36 hours.',
       the_insight: {
         what: 'Stability requires either dryness (<15% moisture) OR acidity (pH <4.5). The industry chose drying; fermentation achieves the same stability at 1/100th the energy.',
         where_we_found_it: {
-          domain: 'Agricultural silage fermentation, traditional food preservation',
+          domain:
+            'Agricultural silage fermentation, traditional food preservation',
           how_they_use_it:
             'Farmers have preserved wet forage as silage for centuries. The global silage industry processes billions of tons annually using LAB inoculation.',
           why_it_transfers:
@@ -304,7 +305,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
       },
       selection_rationale: {
         why_this_one:
-          "This is the highest-impact paradigm shift identified. If the disposal pathway constraint can be satisfied, it delivers 98% energy reduction and 85% capital reduction vs. conventional approaches. The risk is entirely in market/infrastructure fit, not technology—the biology is proven at massive scale in the silage industry.",
+          'This is the highest-impact paradigm shift identified. If the disposal pathway constraint can be satisfied, it delivers 98% energy reduction and 85% capital reduction vs. conventional approaches. The risk is entirely in market/infrastructure fit, not technology—the biology is proven at massive scale in the silage industry.',
         ceiling_if_works:
           'Net-positive economics if output has value. AD facilities pay $20-50/ton for quality feedstock. Even at zero output value, the 98% energy reduction and 85% capital reduction make this economically superior if disposal pathway exists.',
         vs_execution_track:
@@ -372,9 +373,9 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
             'Cultural unfamiliarity with insect processing in Western food service. Regulatory uncertainty around larvae as animal feed. Requires biological husbandry skills different from equipment operation.',
         },
         key_uncertainty:
-          "Regulatory approval for larvae as animal feed varies by jurisdiction. FDA has approved BSF larvae for poultry and aquaculture feed; state regulations vary. Operator skill requirements are different from equipment operation—this is farming, not machine tending.",
+          'Regulatory approval for larvae as animal feed varies by jurisdiction. FDA has approved BSF larvae for poultry and aquaculture feed; state regulations vary. Operator skill requirements are different from equipment operation—this is farming, not machine tending.',
         when_to_elevate:
-          'Elevate to recommended if: (1) regulatory pathway for larvae as feed is clear in your jurisdiction, (2) local market exists for larvae (aquaculture, poultry farms), (3) operator is comfortable with biological system management, or (4) you\'re willing to invest 3-6 months in colony establishment and optimization.',
+          "Elevate to recommended if: (1) regulatory pathway for larvae as feed is clear in your jurisdiction, (2) local market exists for larvae (aquaculture, poultry farms), (3) operator is comfortable with biological system management, or (4) you're willing to invest 3-6 months in colony establishment and optimization.",
         ceiling:
           'Revenue-positive: larvae sell for $1,000-3,000/ton as animal feed ingredient; frass sells for $50-100/ton as fertilizer',
         investment_recommendation:
@@ -410,7 +411,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
         key_uncertainty:
           'Capital cost exceeds target. Safety systems for oxygen exclusion and temperature control add complexity. Air permitting may be required. Biochar market is less developed than compost market.',
         when_to_elevate:
-          "Elevate if: (1) biochar market develops locally, (2) carbon credit mechanisms mature, (3) capital budget is flexible, or (4) carbon sequestration is a strategic priority for the organization.",
+          'Elevate if: (1) biochar market develops locally, (2) carbon credit mechanisms mature, (3) capital budget is flexible, or (4) carbon sequestration is a strategic priority for the organization.',
         ceiling:
           'Biochar sells for $200-500/ton vs. compost at $20-50/ton. Carbon credit potential as markets mature. Each ton produces ~100 kg biochar with 50-70 kg fixed carbon stored for centuries.',
         investment_recommendation:
@@ -432,7 +433,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
         one_liner:
           'Rotary desiccant wheel system adapted from HVAC dehumidification for food waste drying, achieving near-zero electrical consumption (20-50 kWh/ton) in sunny climates.',
         why_interesting:
-          "If desiccant contamination from food volatiles can be managed, this offers 90%+ energy reduction in sunny climates with proven HVAC technology. Munters and Bry-Air have mature desiccant wheel products; the gap is application to food waste.",
+          'If desiccant contamination from food volatiles can be managed, this offers 90%+ energy reduction in sunny climates with proven HVAC technology. Munters and Bry-Air have mature desiccant wheel products; the gap is application to food waste.',
         why_not_now:
           'No commercial system designed for food waste exists. Desiccant contamination from food volatiles (oils, acids) is uncharacterized. Custom engineering required. 4-8 month development timeline.',
         earliest_viability: '2-3 years',
@@ -475,7 +476,7 @@ export const FOOD_HYBRID_REPORT: HybridReportData = {
     confidence_rationale:
       'Primary recommendation uses proven, commercial equipment with extensive prior art. Physics are well-understood. Main uncertainties are site-specific (climate, disposal pathways) rather than technical.',
     what_we_might_be_wrong_about: [
-      "We may be underestimating the difficulty of finding end-use pathways for non-compost outputs. Market development is often harder than technology development.",
+      'We may be underestimating the difficulty of finding end-use pathways for non-compost outputs. Market development is often harder than technology development.',
       "We may be overestimating operator willingness to manage semi-manual systems. Commercial kitchens want 'set and forget' solutions, and the screw press + solar cabinet requires daily attention.",
       'Press liquid disposal pathway is assumed but not validated. Some jurisdictions may have stricter limits than expected.',
       "Solar drying performance in variable climates may be worse than estimated. We've assumed 'sunny climate' but haven't quantified the boundary conditions.",

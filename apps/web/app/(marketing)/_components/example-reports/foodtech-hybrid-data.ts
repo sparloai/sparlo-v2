@@ -20,15 +20,17 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
     },
     why_its_hard: {
       prose:
-        "The physics are unforgiving. The Arrhenius equation tells us that decay reactions roughly double with every 10°C increase—at 35°C versus 5°C, decay proceeds 8x faster. But temperature is only part of the story. Climacteric fruits like tomatoes and mangoes have a positive feedback loop: ethylene triggers more ethylene production, which triggers more ripening, which produces more ethylene. This autocatalytic cascade, not temperature alone, is why a tomato can go from firm to mush in 48 hours at ambient conditions. Meanwhile, leafy greens face a different enemy: dehydration and microbial colonization. Any solution must address these fundamentally different decay pathways, ideally with the same simple materials.",
+        'The physics are unforgiving. The Arrhenius equation tells us that decay reactions roughly double with every 10°C increase—at 35°C versus 5°C, decay proceeds 8x faster. But temperature is only part of the story. Climacteric fruits like tomatoes and mangoes have a positive feedback loop: ethylene triggers more ethylene production, which triggers more ripening, which produces more ethylene. This autocatalytic cascade, not temperature alone, is why a tomato can go from firm to mush in 48 hours at ambient conditions. Meanwhile, leafy greens face a different enemy: dehydration and microbial colonization. Any solution must address these fundamentally different decay pathways, ideally with the same simple materials.',
       governing_equation: {
-        equation: 'k = A·e^(-Ea/RT) (Arrhenius) + dC2H4/dt = k·C2H4 (ethylene autocatalysis)',
+        equation:
+          'k = A·e^(-Ea/RT) (Arrhenius) + dC2H4/dt = k·C2H4 (ethylene autocatalysis)',
         explanation:
           'Decay rate k increases exponentially with temperature, while ethylene concentration increases exponentially with itself. Breaking the ethylene cascade can be more impactful than modest temperature reduction.',
       },
     },
     first_principles_insight: {
-      headline: 'For climacteric fruits, ethylene IS the problem—temperature is secondary',
+      headline:
+        'For climacteric fruits, ethylene IS the problem—temperature is secondary',
       explanation:
         "The 1-MCP literature proves that blocking ethylene perception alone achieves 3-5x shelf life extension at 20-25°C with zero cooling. This means the industry's obsession with cold chain is solving the wrong problem for 2 of our 3 target produce types. Charcoal adsorbs ethylene; lime oxidizes it. Both are essentially free waste products. The paradigm shift is recognizing that we don't need to fight thermodynamics—we need to interrupt a biochemical cascade.",
     },
@@ -135,7 +137,8 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
 
   challenge_the_frame: [
     {
-      assumption: 'Charcoal + lime will achieve similar ethylene control to 1-MCP',
+      assumption:
+        'Charcoal + lime will achieve similar ethylene control to 1-MCP',
       challenge:
         '1-MCP blocks ethylene receptors (preventing perception); charcoal/lime remove ethylene (reducing concentration). These are different mechanisms. If produce is already sensitized to ethylene or if removal rate is slower than production rate, results may differ significantly.',
       implication:
@@ -160,7 +163,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
       challenge:
         'Even with perfect ethylene control, Arrhenius kinetics mean decay at 35°C proceeds 4-8x faster than at 10°C. We may be able to achieve 10-14 days but not 21 days at ambient temperature.',
       implication:
-        "If maximum achievable is 10-14 days, reframe success metric around loss reduction percentage rather than absolute shelf life; 10 days vs. 3 days is still 70% loss reduction",
+        'If maximum achievable is 10-14 days, reframe success metric around loss reduction percentage rather than absolute shelf life; 10 days vs. 3 days is still 70% loss reduction',
     },
   ],
 
@@ -184,12 +187,13 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
       'Solution concepts use proven technologies requiring integration, not invention. These represent the lowest-risk path to achieving the 14-21 day shelf life target using materials that are already waste products in the target contexts.',
     primary: {
       id: 'sol-primary',
-      title: 'Ethylene-First Preservation System (Charcoal + Lime + Oil Coating)',
+      title:
+        'Ethylene-First Preservation System (Charcoal + Lime + Oil Coating)',
       confidence: 82,
       what_it_is:
-        "A three-component system that addresses the dominant decay pathway for each produce category using only waste materials. For climacteric fruits (tomatoes, mangoes): place produce in a container with a charcoal sachet (50-100g from coconut shells or rice husks) and lime-washed interior surfaces. The charcoal adsorbs ethylene through van der Waals forces; the lime (calcium hydroxide) chemically oxidizes any remaining ethylene while providing antimicrobial surface protection. For all produce types: apply a thin coating of locally available vegetable oil (coconut, mustard, or palm) before storage, which creates a hydrophobic barrier preventing surface moisture accumulation while reducing respiration rate by 30-40%.\n\nThe system is modular: farmers with existing Zeer pots can add oil-coated produce to capture cooling benefits without humidity damage. Farmers without Zeer pots can use any container with charcoal + lime for ethylene control alone. The charcoal is regenerated by placing in direct sunlight for 4-6 hours weekly, which drives off adsorbed ethylene and restores capacity. Lime whitewash is reapplied monthly or when visibly degraded.\n\nFor leafy greens (non-climacteric), the ethylene component is less critical. Instead, the oil coating prevents dehydration while dried neem leaves added to the container provide continuous antimicrobial volatile release. This addresses the microbial colonization pathway that dominates leafy green decay.",
+        'A three-component system that addresses the dominant decay pathway for each produce category using only waste materials. For climacteric fruits (tomatoes, mangoes): place produce in a container with a charcoal sachet (50-100g from coconut shells or rice husks) and lime-washed interior surfaces. The charcoal adsorbs ethylene through van der Waals forces; the lime (calcium hydroxide) chemically oxidizes any remaining ethylene while providing antimicrobial surface protection. For all produce types: apply a thin coating of locally available vegetable oil (coconut, mustard, or palm) before storage, which creates a hydrophobic barrier preventing surface moisture accumulation while reducing respiration rate by 30-40%.\n\nThe system is modular: farmers with existing Zeer pots can add oil-coated produce to capture cooling benefits without humidity damage. Farmers without Zeer pots can use any container with charcoal + lime for ethylene control alone. The charcoal is regenerated by placing in direct sunlight for 4-6 hours weekly, which drives off adsorbed ethylene and restores capacity. Lime whitewash is reapplied monthly or when visibly degraded.\n\nFor leafy greens (non-climacteric), the ethylene component is less critical. Instead, the oil coating prevents dehydration while dried neem leaves added to the container provide continuous antimicrobial volatile release. This addresses the microbial colonization pathway that dominates leafy green decay.',
       why_it_works:
-        "Activated charcoal has enormous surface area (300-500 m²/g even without industrial activation) with micropores (0.5-2 nm diameter) that physically trap ethylene molecules (0.4 nm diameter) through London dispersion forces. At 15-25 mg ethylene per gram charcoal, 100g can adsorb ethylene production from 20kg of tomatoes for 14+ days. Lime (Ca(OH)₂) reacts with ethylene to form calcium carbonate and water—a permanent removal rather than saturation-limited adsorption. The high pH (12+) of lime surfaces also inhibits bacterial and fungal growth.\n\nOil coating works through simple thermodynamics: triglyceride fatty acid chains create a non-polar surface that water cannot wet (contact angle >90°). This maintains surface water activity below 0.80—below the threshold for most bacterial and fungal growth—even when ambient humidity is 95%. Simultaneously, the oil film reduces oxygen permeability, slowing aerobic respiration by 30-40%.",
+        'Activated charcoal has enormous surface area (300-500 m²/g even without industrial activation) with micropores (0.5-2 nm diameter) that physically trap ethylene molecules (0.4 nm diameter) through London dispersion forces. At 15-25 mg ethylene per gram charcoal, 100g can adsorb ethylene production from 20kg of tomatoes for 14+ days. Lime (Ca(OH)₂) reacts with ethylene to form calcium carbonate and water—a permanent removal rather than saturation-limited adsorption. The high pH (12+) of lime surfaces also inhibits bacterial and fungal growth.\n\nOil coating works through simple thermodynamics: triglyceride fatty acid chains create a non-polar surface that water cannot wet (contact angle >90°). This maintains surface water activity below 0.80—below the threshold for most bacterial and fungal growth—even when ambient humidity is 95%. Simultaneously, the oil film reduces oxygen permeability, slowing aerobic respiration by 30-40%.',
       the_insight: {
         what: 'Ethylene cascade interruption, not temperature reduction, is the primary lever for climacteric fruit preservation',
         where_we_found_it: {
@@ -243,7 +247,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
         one_liner:
           'Universal base container with produce-specific modular inserts for optimized preservation',
         what_it_is:
-          "A universal base container (clay pot, woven basket, or wooden box) with produce-specific modular inserts that optimize for the dominant decay pathway of each category. Ethylene-scrubbing insert for climacteric fruits: charcoal sachet (50-100g) + lime-washed inner liner. Humidity-buffering insert for leafy greens: small water reservoir with fabric wick + charcoal for humidity buffering to maintain 90-95% RH. Antimicrobial insert for all: neem leaf sachet. Inserts are color-coded or shape-differentiated for easy selection.\n\nThis approach threads the needle between simplicity (one base system) and effectiveness (optimized interventions). The base container provides scale economies and familiarity; the inserts provide customization without complexity.",
+          'A universal base container (clay pot, woven basket, or wooden box) with produce-specific modular inserts that optimize for the dominant decay pathway of each category. Ethylene-scrubbing insert for climacteric fruits: charcoal sachet (50-100g) + lime-washed inner liner. Humidity-buffering insert for leafy greens: small water reservoir with fabric wick + charcoal for humidity buffering to maintain 90-95% RH. Antimicrobial insert for all: neem leaf sachet. Inserts are color-coded or shape-differentiated for easy selection.\n\nThis approach threads the needle between simplicity (one base system) and effectiveness (optimized interventions). The base container provides scale economies and familiarity; the inserts provide customization without complexity.',
         why_it_works:
           'For climacteric fruits: charcoal adsorbs ethylene, lime oxidizes it, breaking the autocatalytic cascade. For leafy greens: water reservoir maintains >90% RH preventing dehydration (the primary decay pathway), while charcoal prevents over-saturation and neem provides antimicrobial protection. Each insert addresses the rate-limiting decay mechanism for its produce category.',
         when_to_use_instead:
@@ -282,7 +286,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
       what_it_is:
         "Inoculate produce surfaces with lactic acid bacteria (LAB) from locally available fermented foods—yogurt whey, sauerkraut juice, kimchi liquid, or fermented vegetable brine. These beneficial bacteria colonize the produce surface first, establishing competitive exclusion against decay pathogens. The LAB consume surface nutrients, lower surface pH through lactic acid production (to 4.0-4.5, below pathogen tolerance), and produce antimicrobial compounds including bacteriocins and hydrogen peroxide.\n\nApplication is simple: dilute fermented food liquid 1:10 with clean water, dip or spray produce, allow to air dry. The treatment should be applied within hours of harvest, before pathogens can establish. The LAB population is self-sustaining once established, drawing nutrients from the produce surface.\n\nThis approach represents a paradigm shift from 'fight all microbes' to 'cultivate beneficial microbes.' We're applying organisms that people already consume daily in fermented foods—there's no food safety novelty, only application novelty.",
       why_it_works:
-        "LAB ferment surface sugars to lactic acid (pKa 3.86), dropping surface pH to 4.0-4.5 where most pathogens cannot grow. Bacteriocins (small antimicrobial peptides like nisin, plantaricin) insert into pathogen cell membranes causing lysis. H₂O₂ production oxidizes pathogen cellular components. Competition for iron and other micronutrients starves pathogens. The race for surface dominance is won by whoever colonizes first—LAB inoculation ensures the good guys win.\n\nTrias et al. (2008) demonstrated 2-3 log reduction (99-99.9% kill) in pathogen load on apples and lettuce using LAB surface treatment. The treatment is self-sustaining: once established, the LAB population maintains itself using produce surface nutrients.",
+        'LAB ferment surface sugars to lactic acid (pKa 3.86), dropping surface pH to 4.0-4.5 where most pathogens cannot grow. Bacteriocins (small antimicrobial peptides like nisin, plantaricin) insert into pathogen cell membranes causing lysis. H₂O₂ production oxidizes pathogen cellular components. Competition for iron and other micronutrients starves pathogens. The race for surface dominance is won by whoever colonizes first—LAB inoculation ensures the good guys win.\n\nTrias et al. (2008) demonstrated 2-3 log reduction (99-99.9% kill) in pathogen load on apples and lettuce using LAB surface treatment. The treatment is self-sustaining: once established, the LAB population maintains itself using produce surface nutrients.',
       innovation_type: 'CROSS_DOMAIN',
       source_domain: 'Fermented food microbiology and biocontrol research',
       the_insight: {
@@ -324,9 +328,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
           'GO if treated produce shows >40% reduction in decay incidence and surface pH drops to <5.0 within 48 hours. NO-GO if no pH change or decay incidence similar to control.',
       },
       risks: {
-        physics_risks: [
-          'Surface drying may kill LAB before establishment',
-        ],
+        physics_risks: ['Surface drying may kill LAB before establishment'],
         implementation_challenges: [
           'LAB strains in fermented foods may not be optimal for produce surface colonization',
           'Cultural/regulatory acceptance barriers',
@@ -351,7 +353,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
         confidence: 45,
         innovation_type: 'CROSS_DOMAIN',
         what_it_is:
-          "A semi-permeable storage container using layered natural materials (woven fabric, clay, charcoal) calibrated to match produce respiration rates. The container allows produce to create its own optimal low-O₂/high-CO₂ atmosphere without hermetic sealing or gas injection. Different fabric weaves and clay porosities can be combined to achieve target oxygen transmission rates for different produce types.\n\nThe key insight is that produce naturally modifies its own atmosphere through respiration. In a container with correctly calibrated permeability, O₂ concentration drops to 3-8% and CO₂ rises to 5-15%, dramatically slowing respiration and ethylene production without suffocating the tissue.",
+          'A semi-permeable storage container using layered natural materials (woven fabric, clay, charcoal) calibrated to match produce respiration rates. The container allows produce to create its own optimal low-O₂/high-CO₂ atmosphere without hermetic sealing or gas injection. Different fabric weaves and clay porosities can be combined to achieve target oxygen transmission rates for different produce types.\n\nThe key insight is that produce naturally modifies its own atmosphere through respiration. In a container with correctly calibrated permeability, O₂ concentration drops to 3-8% and CO₂ rises to 5-15%, dramatically slowing respiration and ethylene production without suffocating the tissue.',
         why_it_works:
           'Respiration follows Michaelis-Menten kinetics—rate decreases hyperbolically as O₂ drops below 8%. At 3-5% O₂, respiration is 50-70% of ambient rate. The system is self-regulating: if O₂ drops too low, respiration slows further, reducing O₂ consumption until equilibrium. Elevated CO₂ (5-10%) further suppresses respiration and provides antimicrobial effect.',
         the_insight: {
@@ -361,10 +363,10 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
             how_they_use_it:
               'US Patent 5,160,768 (expired) establishes the principle',
             why_it_transfers:
-              "Industrial MAP uses engineered plastics with precise OTR specifications. No one has systematically characterized natural material permeabilities to enable low-cost passive MAP.",
+              'Industrial MAP uses engineered plastics with precise OTR specifications. No one has systematically characterized natural material permeabilities to enable low-cost passive MAP.',
           },
           why_industry_missed_it:
-            "Industrial MAP uses engineered plastics with precise OTR specifications. No one has systematically characterized natural material permeabilities to enable low-cost passive MAP.",
+            'Industrial MAP uses engineered plastics with precise OTR specifications. No one has systematically characterized natural material permeabilities to enable low-cost passive MAP.',
         },
         key_uncertainty:
           'Natural material permeability consistency—can we achieve reliable atmosphere modification with variable materials?',
@@ -387,7 +389,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
         confidence: 40,
         innovation_type: 'CROSS_DOMAIN',
         what_it_is:
-          "Storage container vents made from humidity-responsive natural materials (human hair, certain plant fibers, or hygroscopic clay) that automatically open when internal humidity exceeds optimal levels and close when humidity drops. This maintains ideal 85-90% RH without sensors, power, or manual intervention.\n\nHuman hair expands ~2.5% in length from 0-100% RH—enough to actuate a simple lever mechanism. A vent designed with hair-based actuator would open when humidity rises (hair swells, pushing vent open) and close when humidity drops (hair shrinks, spring returns vent to closed position).",
+          'Storage container vents made from humidity-responsive natural materials (human hair, certain plant fibers, or hygroscopic clay) that automatically open when internal humidity exceeds optimal levels and close when humidity drops. This maintains ideal 85-90% RH without sensors, power, or manual intervention.\n\nHuman hair expands ~2.5% in length from 0-100% RH—enough to actuate a simple lever mechanism. A vent designed with hair-based actuator would open when humidity rises (hair swells, pushing vent open) and close when humidity drops (hair shrinks, spring returns vent to closed position).',
         why_it_works:
           'Hygroscopic materials absorb water into their structure, causing physical expansion. Hair absorbs water into cortex proteins; clay absorbs water between aluminosilicate layers. This absorption causes predictable dimensional change that can drive mechanical actuation.',
         the_insight: {
@@ -405,8 +407,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
           'Mechanical reliability over many cycles—hair degrades, clay may crack, calibration may drift',
         when_to_elevate:
           'If validation shows reliable mechanical actuation; if humidity control proves to be the limiting factor in other approaches',
-        ceiling:
-          'Maintains optimal humidity ±5% without manual intervention',
+        ceiling: 'Maintains optimal humidity ±5% without manual intervention',
         investment_recommendation:
           '$3-10 per container for vent mechanism. Achieves smart functionality without electronics.',
         validation_approach: {
@@ -418,49 +419,49 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
       },
     ],
     frontier_watch: [
-    {
-      id: 'frontier-1',
-      title: 'Living Biofilm Storage Surfaces',
-      innovation_type: 'PARADIGM',
-      trl_estimate: 2,
-      one_liner:
-        'Cultivate beneficial biofilm on container surfaces that actively maintains optimal conditions',
-      why_interesting:
-        'If achievable, this represents the ultimate in sustainable preservation: a living system that actively protects stored produce with zero ongoing inputs. The biofilm would be a permanent, self-maintaining feature of the container.',
-      why_not_now:
-        'Biofilms are complex ecosystems with emergent properties that may behave unpredictably. Risk of pathogen contamination or uncontrolled fermentation. Would require extensive validation and possibly strain selection/optimization. Regulatory and cultural acceptance barriers are significant. 12-24 months minimum for basic validation.',
-      trigger_to_revisit:
-        'Publication demonstrating stable beneficial biofilm on food contact surface with >6 month stability and no pathogen breakthrough; regulatory guidance on intentional biofilm applications in food systems',
-      who_to_monitor:
-        'Dr. Michael Doyle (University of Georgia Center for Food Safety), Dr. Maria Marco (UC Davis - fermented food microbiology), International Scientific Association for Probiotics and Prebiotics (ISAPP)',
-      earliest_viability: '3-5 years',
-      recent_developments:
-        "Search for 'beneficial biofilm food preservation 2024' returned primarily research on biofilm prevention rather than cultivation. The paradigm shift from 'biofilms are problems' to 'biofilms can be solutions' is nascent in academic literature.",
-      competitive_activity:
-        'No commercial entities identified working on this specific application. Academic research is scattered across food science, microbiology, and materials science without integration.',
-    },
-    {
-      id: 'frontier-2',
-      title: 'Trehalose Membrane Stabilization at Scale',
-      innovation_type: 'EMERGING_SCIENCE',
-      trl_estimate: 6,
-      one_liner:
-        'Trehalose dip mimics tardigrade survival mechanism for multi-week produce protection',
-      why_interesting:
-        'The mechanism is well-understood and proven. If costs continue to drop (or local production becomes viable), this could provide a one-time treatment with multi-week protective effect. Particularly valuable for high-value produce where the $0.25-1.50/kg treatment cost is acceptable.',
-      why_not_now:
-        'Current cost ($5-15/kg trehalose, requiring 50-100g per kg produce) implies $0.25-1.50/kg treatment cost—25-150x above the $0.01/kg target. Creates supply chain dependency incompatible with self-sufficiency goals. May become viable as prices continue to drop or for higher-value produce only.',
-      trigger_to_revisit:
-        'Trehalose price drops below $3/kg (enabling <$0.15/kg treatment cost); local enzymatic production from cassava starch demonstrated at village scale',
-      who_to_monitor:
-        'Hayashibara (Japan) - largest trehalose producer, Cargill - expanding trehalose production, Agricultural research institutions testing trehalose for postharvest applications',
-      earliest_viability: '2-3 years (cost-dependent)',
-      recent_developments:
-        "Search for 'trehalose agricultural application 2024' shows continued research interest but no breakthrough in cost reduction. Biotechnology advances in enzymatic production continue but haven't yet reached price points viable for staple produce preservation.",
-      competitive_activity:
-        'Hayashibara and Cargill dominate production. No competitors specifically targeting smallholder agricultural applications—market focus remains on food processing, cosmetics, and pharmaceuticals.',
-    },
-  ],
+      {
+        id: 'frontier-1',
+        title: 'Living Biofilm Storage Surfaces',
+        innovation_type: 'PARADIGM',
+        trl_estimate: 2,
+        one_liner:
+          'Cultivate beneficial biofilm on container surfaces that actively maintains optimal conditions',
+        why_interesting:
+          'If achievable, this represents the ultimate in sustainable preservation: a living system that actively protects stored produce with zero ongoing inputs. The biofilm would be a permanent, self-maintaining feature of the container.',
+        why_not_now:
+          'Biofilms are complex ecosystems with emergent properties that may behave unpredictably. Risk of pathogen contamination or uncontrolled fermentation. Would require extensive validation and possibly strain selection/optimization. Regulatory and cultural acceptance barriers are significant. 12-24 months minimum for basic validation.',
+        trigger_to_revisit:
+          'Publication demonstrating stable beneficial biofilm on food contact surface with >6 month stability and no pathogen breakthrough; regulatory guidance on intentional biofilm applications in food systems',
+        who_to_monitor:
+          'Dr. Michael Doyle (University of Georgia Center for Food Safety), Dr. Maria Marco (UC Davis - fermented food microbiology), International Scientific Association for Probiotics and Prebiotics (ISAPP)',
+        earliest_viability: '3-5 years',
+        recent_developments:
+          "Search for 'beneficial biofilm food preservation 2024' returned primarily research on biofilm prevention rather than cultivation. The paradigm shift from 'biofilms are problems' to 'biofilms can be solutions' is nascent in academic literature.",
+        competitive_activity:
+          'No commercial entities identified working on this specific application. Academic research is scattered across food science, microbiology, and materials science without integration.',
+      },
+      {
+        id: 'frontier-2',
+        title: 'Trehalose Membrane Stabilization at Scale',
+        innovation_type: 'EMERGING_SCIENCE',
+        trl_estimate: 6,
+        one_liner:
+          'Trehalose dip mimics tardigrade survival mechanism for multi-week produce protection',
+        why_interesting:
+          'The mechanism is well-understood and proven. If costs continue to drop (or local production becomes viable), this could provide a one-time treatment with multi-week protective effect. Particularly valuable for high-value produce where the $0.25-1.50/kg treatment cost is acceptable.',
+        why_not_now:
+          'Current cost ($5-15/kg trehalose, requiring 50-100g per kg produce) implies $0.25-1.50/kg treatment cost—25-150x above the $0.01/kg target. Creates supply chain dependency incompatible with self-sufficiency goals. May become viable as prices continue to drop or for higher-value produce only.',
+        trigger_to_revisit:
+          'Trehalose price drops below $3/kg (enabling <$0.15/kg treatment cost); local enzymatic production from cassava starch demonstrated at village scale',
+        who_to_monitor:
+          'Hayashibara (Japan) - largest trehalose producer, Cargill - expanding trehalose production, Agricultural research institutions testing trehalose for postharvest applications',
+        earliest_viability: '2-3 years (cost-dependent)',
+        recent_developments:
+          "Search for 'trehalose agricultural application 2024' shows continued research interest but no breakthrough in cost reduction. Biotechnology advances in enzymatic production continue but haven't yet reached price points viable for staple produce preservation.",
+        competitive_activity:
+          'Hayashibara and Cargill dominate production. No competitors specifically targeting smallholder agricultural applications—market focus remains on food processing, cosmetics, and pharmaceuticals.',
+      },
+    ],
   },
 
   self_critique: {

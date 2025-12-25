@@ -18,7 +18,8 @@ export const CLIMATE_HYBRID_REPORT: HybridReportData = {
 
   problem_analysis: {
     whats_wrong: {
-      prose: "Composite manufacturers face a growing waste crisis with no good options. Pyrolysis destroys 10-30% of fiber value through thermal damage and burns the matrix entirely—$15-30 MJ/kg of energy input to produce degraded fiber and zero chemical recovery. Landfilling wastes $20-40/kg fiber and faces increasing regulatory prohibition. The industry has accepted this as the cost of thermoset performance, but 500K+ tons annually represents billions in stranded value.",
+      prose:
+        'Composite manufacturers face a growing waste crisis with no good options. Pyrolysis destroys 10-30% of fiber value through thermal damage and burns the matrix entirely—$15-30 MJ/kg of energy input to produce degraded fiber and zero chemical recovery. Landfilling wastes $20-40/kg fiber and faces increasing regulatory prohibition. The industry has accepted this as the cost of thermoset performance, but 500K+ tons annually represents billions in stranded value.',
     },
     current_state_of_art: {
       benchmarks: [
@@ -80,7 +81,8 @@ export const CLIMATE_HYBRID_REPORT: HybridReportData = {
       },
     ],
     why_its_hard: {
-      prose: "The fundamental challenge is that the same crosslink density providing high Tg and creep resistance also makes the network resistant to dissolution. Thermoset networks are designed to be permanent—that's the point. Any bond labile enough for easy recycling is potentially labile during service. This creates an apparent tradeoff: either accept lower Tg (vitrimers with exchange reactions) or accept harsh recycling conditions (pyrolysis, aggressive solvolysis).",
+      prose:
+        "The fundamental challenge is that the same crosslink density providing high Tg and creep resistance also makes the network resistant to dissolution. Thermoset networks are designed to be permanent—that's the point. Any bond labile enough for easy recycling is potentially labile during service. This creates an apparent tradeoff: either accept lower Tg (vitrimers with exchange reactions) or accept harsh recycling conditions (pyrolysis, aggressive solvolysis).",
       governing_equation: {
         equation: 'Tg ≈ Tg∞ - K/ρx where ρx = crosslink density',
         explanation:
@@ -224,9 +226,9 @@ export const CLIMATE_HYBRID_REPORT: HybridReportData = {
           "Polyester thermosets were abandoned for aerospace in the 1970s-80s due to inferior properties vs. epoxy. The recycling advantage wasn't valued then, and the 'polyester = low performance' reputation persisted even as aromatic polyester chemistry (PEN, LCP) demonstrated high-performance capability.",
       },
       what_it_is:
-        "Design a thermoset matrix using aromatic diacids (isophthalic acid, 2,6-naphthalenedicarboxylic acid) and rigid diols (isosorbide, tricyclodecanedimethanol) with high crosslink density achieved through multifunctional monomers (trimellitic anhydride, glycerol). The aromatic backbone provides Tg >180°C while ester linkages throughout the network enable glycolysis recycling.\n\nDuring service, the hydrophobic aromatic matrix limits water access to ester bonds—uncatalyzed hydrolysis rate is ~10^-10 s^-1, meaning effectively zero degradation over 20-year service life. For recycling, immersion in excess ethylene glycol at 180-200°C with transesterification catalyst (zinc acetate at 0.1-0.5 wt%, titanium isopropoxide) drives ester exchange, fragmenting the network into soluble oligomers within 2-4 hours.",
+        'Design a thermoset matrix using aromatic diacids (isophthalic acid, 2,6-naphthalenedicarboxylic acid) and rigid diols (isosorbide, tricyclodecanedimethanol) with high crosslink density achieved through multifunctional monomers (trimellitic anhydride, glycerol). The aromatic backbone provides Tg >180°C while ester linkages throughout the network enable glycolysis recycling.\n\nDuring service, the hydrophobic aromatic matrix limits water access to ester bonds—uncatalyzed hydrolysis rate is ~10^-10 s^-1, meaning effectively zero degradation over 20-year service life. For recycling, immersion in excess ethylene glycol at 180-200°C with transesterification catalyst (zinc acetate at 0.1-0.5 wt%, titanium isopropoxide) drives ester exchange, fragmenting the network into soluble oligomers within 2-4 hours.',
       why_it_works:
-        "Transesterification equilibrium is driven by glycol concentration. At 10-100x molar excess of ethylene glycol, the equilibrium strongly favors network fragmentation into glycol-terminated oligomers. The reaction proceeds through nucleophilic attack of glycol hydroxyl on ester carbonyl, catalyzed by Lewis acid coordination to carbonyl oxygen.\n\nCritically, the same reaction is negligibly slow at service conditions. Without catalyst and excess glycol, ester hydrolysis at neutral pH and 80°C has a half-life of centuries. The trigger is truly orthogonal—you cannot accidentally glycolyze your wing spar.",
+        'Transesterification equilibrium is driven by glycol concentration. At 10-100x molar excess of ethylene glycol, the equilibrium strongly favors network fragmentation into glycol-terminated oligomers. The reaction proceeds through nucleophilic attack of glycol hydroxyl on ester carbonyl, catalyzed by Lewis acid coordination to carbonyl oxygen.\n\nCritically, the same reaction is negligibly slow at service conditions. Without catalyst and excess glycol, ester hydrolysis at neutral pH and 80°C has a half-life of centuries. The trigger is truly orthogonal—you cannot accidentally glycolyze your wing spar.',
       why_it_might_fail: [
         'Achieving Tg >180°C while maintaining processable viscosity for RTM',
         'Glycolysis rate may be slower for highly aromatic networks than for PU',
@@ -376,8 +378,7 @@ export const CLIMATE_HYBRID_REPORT: HybridReportData = {
     frontier_watch: [
       {
         id: 'frontier-1',
-        title:
-          'Inorganic Calcium Aluminate Matrix with Polymer Toughening',
+        title: 'Inorganic Calcium Aluminate Matrix with Polymer Toughening',
         innovation_type: 'PARADIGM',
         one_liner:
           'Replace organic polymer matrix entirely with calcium aluminate cement modified for composite processing',
