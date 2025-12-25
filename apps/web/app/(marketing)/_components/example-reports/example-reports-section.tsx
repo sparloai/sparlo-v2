@@ -21,6 +21,7 @@ import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybr
 import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
 import { EXAMPLE_REPORTS } from './example-reports-data';
 import { FOOD_HYBRID_REPORT } from './food-hybrid-data';
+import { FOODTECH_HYBRID_REPORT } from './foodtech-hybrid-data';
 
 interface TocItem {
   id: string;
@@ -204,7 +205,9 @@ export function ExampleReportsSection() {
         >
           <div className="mx-auto max-w-4xl">
             {/* Report Header - hidden for hybrid reports which have their own structure */}
-            {report.id !== 'climate-tech' && report.id !== 'food-waste' && (
+            {report.id !== 'climate-tech' &&
+              report.id !== 'food-waste' &&
+              report.id !== 'food-tech' && (
               <header className="mb-12">
                 <div className="space-y-4">
                   <h1 className="text-4xl font-bold tracking-tight text-zinc-900 lg:text-5xl dark:text-white">
@@ -237,6 +240,13 @@ export function ExampleReportsSection() {
                 reportData={{
                   mode: 'hybrid',
                   report: FOOD_HYBRID_REPORT,
+                }}
+              />
+            ) : report.id === 'food-tech' ? (
+              <HybridReportDisplay
+                reportData={{
+                  mode: 'hybrid',
+                  report: FOODTECH_HYBRID_REPORT,
                 }}
               />
             ) : (

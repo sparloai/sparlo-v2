@@ -368,12 +368,23 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   },
   {
     id: 'food-waste',
-    title: 'Food Tech',
+    title: 'Waste',
     subtitle: 'On-Site Food Waste Processing for Commercial Kitchens',
     locked: false,
     metadata: {
       readTime: '20 min read',
       dataPoints: '3.5M data points',
+    },
+    sections: [],
+  },
+  {
+    id: 'food-tech',
+    title: 'Food Tech',
+    subtitle: 'Multi-Mechanism Preservation for Smallholder Farmers',
+    locked: false,
+    metadata: {
+      readTime: '18 min read',
+      dataPoints: '2.8M data points',
     },
     sections: [],
   },
