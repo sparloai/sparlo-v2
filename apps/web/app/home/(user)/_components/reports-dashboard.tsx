@@ -412,9 +412,9 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                   key={report.id}
                   data-test={`report-card-${report.id}`}
                   className={cn(
-                    'group relative flex items-start gap-4 p-5 transition-all',
+                    'group relative flex items-start gap-4 p-5 transition-all duration-200',
                     isClickable &&
-                      'cursor-pointer hover:bg-[--surface-overlay]',
+                      'cursor-pointer hover:-translate-y-0.5 hover:bg-violet-500/5 hover:shadow-[0_4px_12px_rgba(139,92,246,0.1)] dark:hover:bg-violet-500/10',
                     !isLast && 'border-b border-[--border-subtle]',
                   )}
                   onClick={() =>
@@ -425,9 +425,9 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                   <div className="mt-1.5 flex-shrink-0">
                     <div
                       className={cn(
-                        'h-2 w-2 rounded-full',
+                        'h-2 w-2 rounded-full transition-all duration-200',
                         isComplete
-                          ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]'
+                          ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)] group-hover:shadow-[0_0_12px_rgba(16,185,129,0.6)]'
                           : 'bg-[--text-muted]',
                       )}
                     />

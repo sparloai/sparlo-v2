@@ -401,7 +401,12 @@ export default function NewReportPage() {
                   disabled={isSubmitting}
                   autoFocus
                   data-test="challenge-input"
-                  placeholder="Describe the challenge."
+                  placeholder={`Describe your engineering challenge. Include:
+• The problem you're solving
+• Key constraints (cost, materials, time)
+• What success looks like
+
+Example: "We need to reduce our battery pack weight by 30% while maintaining 500+ charge cycles for our electric delivery vehicle fleet."`}
                   spellCheck={false}
                   className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none disabled:opacity-40 md:text-xl"
                   style={{

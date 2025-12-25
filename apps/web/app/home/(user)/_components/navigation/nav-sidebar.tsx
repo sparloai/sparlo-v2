@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { formatDistanceToNow } from 'date-fns';
 import {
@@ -26,6 +26,7 @@ import {
 import { SubMenuModeToggle } from '@kit/ui/mode-toggle';
 import { Sheet, SheetContent } from '@kit/ui/sheet';
 import { Trans } from '@kit/ui/trans';
+import { cn } from '@kit/ui/utils';
 
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
 import type { UsageData } from '../../_lib/server/usage.loader';
@@ -48,9 +49,11 @@ const NAV_ITEMS = [
 function RecentReportItem({
   report,
   onClose,
+  isActive,
 }: {
   report: RecentReport;
   onClose: () => void;
+  isActive: boolean;
 }) {
   const modeLabel = report.mode === 'discovery' ? 'Discovery' : 'Analysis';
 
@@ -58,14 +61,31 @@ function RecentReportItem({
     <Link
       href={`/home/reports/${report.id}`}
       onClick={onClose}
-      className="flex items-start gap-3 rounded-md px-2 py-2.5 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+      className={cn(
+        'flex items-start gap-3 rounded-md border-l-2 px-2 py-2.5 transition-all duration-200',
+        isActive
+          ? 'border-l-violet-500 bg-violet-500/10 dark:bg-violet-500/15'
+          : 'border-l-transparent hover:border-l-violet-500/50 hover:bg-black/10 dark:hover:bg-white/10',
+      )}
     >
-      <div className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-black/40 dark:bg-white/40" />
+      <div
+        className={cn(
+          'mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full transition-colors',
+          isActive
+            ? 'bg-violet-500'
+            : 'bg-black/40 dark:bg-white/40',
+        )}
+      />
       <div className="min-w-0 flex-1">
         <span className="font-mono text-[10px] tracking-wider text-black/50 uppercase dark:text-white/50">
           [{modeLabel}]
         </span>
-        <p className="truncate text-sm text-black/80 dark:text-white/80">
+        <p className={cn(
+          'truncate text-sm transition-colors',
+          isActive
+            ? 'text-black dark:text-white'
+            : 'text-black/80 dark:text-white/80',
+        )}>
           {report.title || 'Untitled Report'}
         </p>
         <p className="font-mono text-xs text-black/40 dark:text-white/40">
@@ -74,7 +94,12 @@ function RecentReportItem({
           })}
         </p>
       </div>
-      <FileText className="mt-1 h-3.5 w-3.5 flex-shrink-0 text-black/30 dark:text-white/30" />
+      <FileText className={cn(
+        'mt-1 h-3.5 w-3.5 flex-shrink-0 transition-colors',
+        isActive
+          ? 'text-violet-500'
+          : 'text-black/30 dark:text-white/30',
+      )} />
     </Link>
   );
 }
@@ -88,10 +113,18 @@ export function NavSidebar({
   workspace,
 }: NavSidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const signOutMutation = useSignOut();
   const { resolvedTheme } = useTheme();
 
   const close = () => onOpenChange(false);
+
+  const isActivePath = (href: string) => {
+    if (href === '/home') {
+      return pathname === '/home';
+    }
+    return pathname.startsWith(href);
+  };
 
   const handleSignOut = async () => {
     await signOutMutation.mutateAsync();
@@ -133,19 +166,51 @@ export function NavSidebar({
 
         {/* Primary Navigation */}
         <nav className="space-y-1 p-2">
-          {NAV_ITEMS.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={close}
-              className="flex items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-            >
-              <Icon className="h-4 w-4 text-black/50 dark:text-white/50" />
-              <span className="text-sm font-medium text-black/80 dark:text-white/80">
-                {label}
-              </span>
-            </Link>
-          ))}
+          {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+            const isActive = isActivePath(href);
+            const isNewAnalysis = href === '/home/reports/new';
+
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={close}
+                className={cn(
+                  'flex items-center gap-3 rounded-md border-l-2 px-3 py-2.5 transition-all duration-200',
+                  isNewAnalysis
+                    ? isActive
+                      ? 'border-l-violet-500 bg-violet-500/15 dark:bg-violet-500/20'
+                      : 'border-l-violet-500/50 bg-violet-500/5 hover:border-l-violet-500 hover:bg-violet-500/15 dark:bg-violet-500/10 dark:hover:bg-violet-500/20'
+                    : isActive
+                      ? 'border-l-violet-500 bg-violet-500/10 dark:bg-violet-500/15'
+                      : 'border-l-transparent hover:border-l-violet-500/50 hover:bg-black/10 dark:hover:bg-white/10',
+                )}
+              >
+                <Icon
+                  className={cn(
+                    'h-4 w-4 transition-colors',
+                    isNewAnalysis
+                      ? 'text-violet-600 dark:text-violet-400'
+                      : isActive
+                        ? 'text-violet-500'
+                        : 'text-black/50 dark:text-white/50',
+                  )}
+                />
+                <span
+                  className={cn(
+                    'text-sm font-medium transition-colors',
+                    isNewAnalysis
+                      ? 'text-violet-700 dark:text-violet-300'
+                      : isActive
+                        ? 'text-black dark:text-white'
+                        : 'text-black/80 dark:text-white/80',
+                  )}
+                >
+                  {label}
+                </span>
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Recent Reports */}
@@ -167,6 +232,7 @@ export function NavSidebar({
                   key={report.id}
                   report={report}
                   onClose={close}
+                  isActive={pathname === `/home/reports/${report.id}`}
                 />
               ))}
             </div>
@@ -180,7 +246,7 @@ export function NavSidebar({
             <Link
               href="/home/settings/billing"
               onClick={close}
-              className="block border-b border-black/10 px-4 py-3 transition-colors hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5"
+              className="block border-b border-black/10 px-4 py-3 transition-all duration-200 hover:bg-black/10 dark:border-white/10 dark:hover:bg-white/10"
             >
               <UsageIndicator
                 tokensUsed={usage.tokensUsed}
@@ -195,7 +261,7 @@ export function NavSidebar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex w-full items-center gap-3 px-4 py-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                className="flex w-full items-center gap-3 px-4 py-3 transition-all duration-200 hover:bg-black/10 dark:hover:bg-white/10"
                 aria-label="Account menu"
               >
                 <div className="flex h-8 w-8 items-center justify-center rounded-full border border-black/10 bg-black/5 dark:border-white/10 dark:bg-white/5">

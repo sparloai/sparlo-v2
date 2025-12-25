@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { ArrowDown, ArrowRight, Cpu, Database, Globe } from 'lucide-react';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 
 const sectors = [
   { id: '01', name: 'Climate Tech' },
@@ -62,16 +62,16 @@ export function SparloHero() {
                 complex industry challenges.
               </p>
 
-              <div className="animate-cta-reveal flex flex-col items-start gap-3">
+              <div className="animate-cta-reveal flex flex-col items-start gap-4">
                 <Link
                   href="/auth/sign-up"
-                  className="group bg-primary hover:bg-primary/90 focus-visible:ring-primary flex items-center justify-center gap-3 rounded-sm py-3 pr-6 pl-8 text-[15px] font-medium text-white shadow-[0_4px_20px_-4px_rgba(124,58,237,0.3)] transition-all hover:shadow-[0_8px_30px_-4px_rgba(124,58,237,0.4)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98]"
+                  className="group bg-primary hover:bg-primary/90 focus-visible:ring-primary flex items-center justify-center gap-3 rounded-sm py-3.5 pr-6 pl-8 text-[15px] font-medium text-white shadow-[0_4px_20px_-4px_rgba(124,58,237,0.3)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_12px_35px_-4px_rgba(124,58,237,0.5)] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98]"
                 >
-                  <span className="tracking-tight">Run Analysis</span>
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <span className="tracking-tight">Run Your Free Analysis</span>
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </Link>
-                <span className="ml-1 font-mono text-[10px] tracking-normal text-zinc-400 normal-case dark:text-zinc-600">
-                  First Report Free
+                <span className="ml-1 text-sm font-medium tracking-tight text-zinc-600 dark:text-zinc-400">
+                  No credit card required
                 </span>
               </div>
             </div>
@@ -91,12 +91,12 @@ export function SparloHero() {
                 {sectors.map((sector) => (
                   <div
                     key={sector.id}
-                    className="group flex items-center gap-6"
+                    className="group flex cursor-default items-center gap-6 rounded-md py-1 transition-all duration-200 hover:bg-violet-500/5 hover:pl-2 dark:hover:bg-violet-500/10"
                   >
-                    <span className="group-hover:text-primary font-mono text-xs text-zinc-300 transition-colors dark:text-zinc-700">
+                    <span className="font-mono text-xs text-zinc-300 transition-colors duration-200 group-hover:text-violet-500 dark:text-zinc-700 dark:group-hover:text-violet-400">
                       {sector.id}
                     </span>
-                    <span className="text-zinc-500 transition-transform duration-300 group-hover:translate-x-2 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white">
+                    <span className="text-zinc-500 transition-all duration-200 group-hover:translate-x-1 group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-white">
                       {sector.name}
                     </span>
                   </div>
@@ -120,39 +120,43 @@ export function SparloHero() {
             <ArrowDown className="animate-bounce-subtle group-hover:text-primary h-4 w-4 text-zinc-600 dark:text-zinc-400" />
           </div>
         </a>
+      </div>
 
-        {/* Stats Ticker */}
-        <div className="mt-8 flex w-full max-w-[1600px] flex-col items-center justify-between border-t border-zinc-100 px-8 pt-6 text-zinc-400 md:flex-row dark:border-zinc-800/50 dark:text-zinc-600">
-          <span className="hidden font-mono text-[10px] tracking-wider uppercase md:block">
-            System Status: Nominal
-          </span>
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2">
-              <Cpu className="h-3.5 w-3.5" />
-              <span className="font-mono text-[10px] tracking-normal">
-                42.8 PF
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Database className="h-3.5 w-3.5" />
-              <span className="font-mono text-[10px] tracking-normal">
-                12 TB/D
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Globe className="h-3.5 w-3.5" />
-              <span className="font-mono text-[10px] tracking-normal">
-                US-EAST-1
-              </span>
-            </div>
+      {/* Report Titles Showcase */}
+      <section className="animate-secondary-fade z-10 mx-auto w-full max-w-[1200px] px-6 pt-16 pb-8">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-8 flex items-center gap-4">
+            <span className="font-mono text-[10px] tracking-wider text-zinc-400 uppercase dark:text-zinc-600">
+              Recent Reports
+            </span>
+            <div className="h-px flex-grow bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+          <div className="space-y-4">
+            {[
+              'CAR-T Manufacturing Cost Reduction: From $300K to $30K Through Integration, Not Invention',
+              'On-Site Food Waste Processing: Mechanical-First Architecture for 80% Energy Reduction',
+              'Breaking the Cold Chain Assumption: Multi-Mechanism Preservation for Smallholder Farmers',
+            ].map((title, i) => (
+              <div
+                key={i}
+                className="group flex cursor-default items-start gap-4 rounded-lg border border-zinc-100 bg-white/50 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:bg-white hover:shadow-[0_4px_12px_rgba(139,92,246,0.08)] dark:border-zinc-800/50 dark:bg-zinc-900/30 dark:hover:border-violet-500/30 dark:hover:bg-zinc-900/60 dark:hover:shadow-[0_4px_12px_rgba(139,92,246,0.15)]"
+              >
+                <div className="bg-primary/10 text-primary mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-mono text-xs transition-all duration-200 group-hover:bg-primary/20 group-hover:scale-110">
+                  {i + 1}
+                </div>
+                <p className="text-base leading-snug font-medium text-zinc-700 transition-colors duration-200 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-white">
+                  {title}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Description Section */}
       <section
         id="description"
-        className="animate-secondary-fade z-10 mx-auto w-full max-w-[1200px] px-6 pt-20 pb-12"
+        className="animate-secondary-fade z-10 mx-auto w-full max-w-[1200px] px-6 pt-12 pb-12"
       >
         <div className="mx-auto max-w-5xl text-center">
           <h2 className="text-3xl leading-[1.15] font-normal tracking-tight text-zinc-900 md:text-4xl lg:text-5xl dark:text-white">

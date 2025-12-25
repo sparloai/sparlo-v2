@@ -13,14 +13,21 @@ export function calculateElapsed(createdAt: string | null): number {
 }
 
 /**
- * Format elapsed seconds as M:SS
- * Note: Hour format intentionally omitted - reports typically take ~15 minutes.
- * Add hour support when needed (YAGNI).
+ * Format elapsed seconds as human-readable duration.
+ * Examples: "2m 30s elapsed", "1h 15m elapsed", "18h 39m elapsed"
  */
 export function formatElapsed(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+
+  if (hours > 0) {
+    return `${hours}h ${mins}m elapsed`;
+  }
+  if (mins > 0) {
+    return `${mins}m ${secs}s elapsed`;
+  }
+  return `${secs}s elapsed`;
 }
 
 /**

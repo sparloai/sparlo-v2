@@ -46,6 +46,10 @@
     scroll-padding-top: 56px;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   [id] {
     scroll-margin-top: 56px;
   }
