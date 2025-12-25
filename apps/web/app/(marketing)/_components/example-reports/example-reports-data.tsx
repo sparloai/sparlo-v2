@@ -367,6 +367,17 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
     ],
   },
   {
+    id: 'food-waste',
+    title: 'Waste',
+    subtitle: 'On-Site Food Waste Processing for Commercial Kitchens',
+    locked: false,
+    metadata: {
+      readTime: '20 min read',
+      dataPoints: '3.5M data points',
+    },
+    sections: [],
+  },
+  {
     id: 'biotech',
     title: 'Biotech',
     subtitle: 'Endosomal Escape Enhancement for mRNA Therapeutics',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { FileText, List, Lock, Target, X } from 'lucide-react';
@@ -20,6 +20,7 @@ import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybr
 
 import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
 import { EXAMPLE_REPORTS } from './example-reports-data';
+import { FOOD_HYBRID_REPORT } from './food-hybrid-data';
 
 interface TocItem {
   id: string;
@@ -50,17 +51,8 @@ export function ExampleReportsSection() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const report = EXAMPLE_REPORTS[activeTab]!;
 
-  // Generate TOC from report sections (use custom TOC for hybrid reports)
-  const tocItems: TocItem[] = useMemo(() => {
-    if (report.id === 'climate-tech') {
-      return HYBRID_TOC_ITEMS;
-    }
-    return report.sections.map((section) => ({
-      id: section.id,
-      title: section.title,
-      level: 2,
-    }));
-  }, [report.id, report.sections]);
+  // Use standardized TOC for all reports
+  const tocItems: TocItem[] = HYBRID_TOC_ITEMS;
 
   // Track active section on scroll
   useEffect(() => {
@@ -211,22 +203,24 @@ export function ExampleReportsSection() {
           )}
         >
           <div className="mx-auto max-w-4xl">
-            {/* Report Header */}
-            <header className="mb-12">
-              <div className="space-y-4">
-                <h1 className="text-4xl font-bold tracking-tight text-zinc-900 lg:text-5xl dark:text-white">
-                  {report.title}
-                </h1>
-                <p className="text-lg text-zinc-600 dark:text-zinc-400">
-                  {report.subtitle}
-                </p>
-                <div className="flex items-center gap-3 font-mono text-sm text-zinc-500 dark:text-zinc-500">
-                  <span>{report.metadata.readTime}</span>
-                  <span className="text-zinc-300 dark:text-zinc-700">•</span>
-                  <span>{report.metadata.dataPoints}</span>
+            {/* Report Header - hidden for hybrid reports which have their own structure */}
+            {report.id !== 'climate-tech' && report.id !== 'food-waste' && (
+              <header className="mb-12">
+                <div className="space-y-4">
+                  <h1 className="text-4xl font-bold tracking-tight text-zinc-900 lg:text-5xl dark:text-white">
+                    {report.title}
+                  </h1>
+                  <p className="text-lg text-zinc-600 dark:text-zinc-400">
+                    {report.subtitle}
+                  </p>
+                  <div className="flex items-center gap-3 font-mono text-sm text-zinc-500 dark:text-zinc-500">
+                    <span>{report.metadata.readTime}</span>
+                    <span className="text-zinc-300 dark:text-zinc-700">•</span>
+                    <span>{report.metadata.dataPoints}</span>
+                  </div>
                 </div>
-              </div>
-            </header>
+              </header>
+            )}
 
             {/* Report Content */}
             {report.locked ? (
@@ -236,6 +230,13 @@ export function ExampleReportsSection() {
                 reportData={{
                   mode: 'hybrid',
                   report: CLIMATE_HYBRID_REPORT,
+                }}
+              />
+            ) : report.id === 'food-waste' ? (
+              <HybridReportDisplay
+                reportData={{
+                  mode: 'hybrid',
+                  report: FOOD_HYBRID_REPORT,
                 }}
               />
             ) : (

@@ -1044,11 +1044,8 @@ BAD: "This report analyzes DDW production methods and recommends a partnership a
 
   "executive_summary": {
     "narrative_lead": "2-3 sentences that hook. Core insight woven in. This is the 'aha' moment.",
-    "viability": {
-      "assessment": "viable | conditionally_viable | uncertain | not_viable",
-      "confidence": 82,
-      "label": "Human-readable summary"
-    },
+    "viability": "viable | conditionally_viable | not_viable | uncertain",
+    "viability_label": "Human-readable summary like 'Viable with moderate confidence' or 'Needs validation'",
     "primary_recommendation": "2-3 sentences. What to do, what it achieves, what it costs."
   },
 
