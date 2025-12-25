@@ -368,7 +368,7 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   },
   {
     id: 'food-waste',
-    title: 'Waste',
+    title: 'Food Tech',
     subtitle: 'On-Site Food Waste Processing for Commercial Kitchens',
     locked: false,
     metadata: {
