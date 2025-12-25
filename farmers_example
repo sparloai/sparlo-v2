@@ -1,321 +1,304 @@
 {
   "result": {
-    "brief": "Commercial kitchens, hospitals, and universities generate 1-5 tons/week of food waste. Hauling costs $150-300/ton and rising. Composting requires space and management. Anaerobic digestion needs scale (100+ tons/day) to be economical. On-site dehydrators exist but consume 800-1200 kWh/ton, take 12-24 hours per batch, produce output that's not consistently compostable, and cost $30-50K for a 200 lb/day unit. Need on-site solution that reduces food waste volume by 80%+, processes 500+ lbs/day, uses <200 kWh/ton, produces stable output (compostable or fuel), and costs <$15K installed.",
+    "brief": "30-40% of fruits and vegetables in sub-Saharan Africa and South Asia rot before reaching consumers—$15B+ annual loss for smallholder farmers. Cold chain doesn't exist (no grid, no roads). Current solutions are evaporative coolers (limited cooling, high humidity promotes mold) or solar-powered refrigeration (too expensive for <$5/day income farmers). Need preservation approach that extends shelf life of tomatoes, mangoes, and leafy greens from 3-5 days to 14-21 days without refrigeration, at <$0.01/kg cost. Must work at ambient 30-40°C, be farmer-operable without training, and use locally available or very cheap materials.",
     "challenge_the_frame": [
       {
-        "assumption": "Output must be dry or compost-compatible",
-        "challenge": "If wet-stable output (fermented, acidified) can find a disposal pathway, drying becomes unnecessary. AD facilities, regenerative farms, and direct soil incorporation are growing markets.",
-        "implication": "If disposal pathways exist, fermentation (innov-recommended) becomes the clear winner at 98% energy reduction. Worth investing time to explore local AD facilities and farm partnerships before committing to thermal approach."
+        "assumption": "Charcoal + lime will achieve similar ethylene control to 1-MCP",
+        "challenge": "1-MCP blocks ethylene receptors (preventing perception); charcoal/lime remove ethylene (reducing concentration). These are different mechanisms. If produce is already sensitized to ethylene or if removal rate is slower than production rate, results may differ significantly.",
+        "implication": "If charcoal+lime shows <30% improvement vs. control, pivot to hot water treatment as primary intervention (which inactivates ethylene-producing enzymes directly)"
       },
       {
-        "assumption": "On-site processing is required",
-        "challenge": "If hauling costs are the driver, and a local AD facility or composting operation would accept wet waste at lower cost, the best 'solution' might be a partnership rather than equipment purchase.",
-        "implication": "Before investing $10-20K in equipment, verify that no local AD facility will accept wet food waste at <$100/ton. Some facilities pay for quality feedstock."
+        "assumption": "Farmers will adopt multi-step preservation practices",
+        "challenge": "Even simple interventions require behavior change. Oil coating adds handling time. Charcoal regeneration requires weekly attention. If adoption barriers are higher than expected, technically superior solutions may fail.",
+        "implication": "If adoption is <25% after training, simplify to single-step intervention (oil coating only, or charcoal only) even at cost of reduced efficacy"
       },
       {
-        "assumption": "500 lbs/day throughput is required",
-        "challenge": "If waste generation is variable, a smaller system with buffer capacity might be more economical than sizing for peak load.",
-        "implication": "Audit actual waste generation over 2-4 weeks before specifying equipment. A 300 lb/day system at $8K might serve better than a 500 lb/day system at $15K if peaks can be buffered."
+        "assumption": "30-40°C is daytime peak with cooler nights",
+        "challenge": "In humid tropical regions, nighttime temperatures may stay above 30°C with minimal diurnal swing. This eliminates passive thermal strategies and may accelerate decay beyond our models.",
+        "implication": "If humid tropical sites show <50% of dry-region results, develop humidity-specific protocol emphasizing antimicrobial interventions over thermal/atmosphere approaches"
       },
       {
-        "assumption": "Fully autonomous operation is required",
-        "challenge": "Commercial kitchens already have staff doing waste handling. 10-15 minutes/day of simple operation (loading press, spreading trays) might be acceptable and enables much simpler, cheaper systems.",
-        "implication": "Semi-manual systems (screw press + solar cabinet) at $8-12K may be preferable to fully automated systems at $25-40K if staff time is available."
+        "assumption": "The 14-21 day target is achievable without active cooling",
+        "challenge": "Even with perfect ethylene control, Arrhenius kinetics mean decay at 35°C proceeds 4-8x faster than at 10°C. We may be able to achieve 10-14 days but not 21 days at ambient temperature.",
+        "implication": "If maximum achievable is 10-14 days, reframe success metric around loss reduction percentage rather than absolute shelf life; 10 days vs. 3 days is still 70% loss reduction"
       }
     ],
     "constraints_and_metrics": {
       "assumptions": [
-        "24-hour operation acceptable with minimal supervision",
-        "Standard 240V electrical service available",
-        "Typical institutional waste mix: 50% fruit/veg, 20% grains, 15% meat/dairy, 15% other",
-        "Press liquid can be discharged to sewer (verify local regulations)",
-        "Some operator involvement acceptable (not fully autonomous)"
+        "Charcoal, clay, neem leaves, lime, and vegetable oils are locally available",
+        "Farmers have access to basic containers (baskets, pots)",
+        "30-40°C is daytime peak; nighttime may drop to 22-28°C in dry regions",
+        "Marketable quality means minor cosmetic defects acceptable, no rot, reasonable texture"
       ],
       "hard_constraints": [
-        "On-site operation (no off-site transport of wet waste)",
-        "Output must be stable (no rot, no pests, no odor for 30+ days)",
-        "Must handle mixed institutional food waste (variable composition)"
+        "No grid electricity available",
+        "Farmer income <$5/day limits capital to $20-50 maximum",
+        "Must work at 30-40°C ambient temperature",
+        "No cold chain for distribution—preservation must persist through transport"
       ],
       "soft_constraints": [
-        "<$15K installed cost (could flex to $18-20K for significantly better performance)",
-        "<200 kWh/ton (could accept 250 kWh/ton if other benefits compelling)",
-        "80%+ volume reduction (mass reduction may be acceptable alternative)",
-        "Compostable output (fuel or soil amendment pathways may be acceptable)"
+        "Operating cost <$0.01/kg (target, not absolute)",
+        "14-21 day shelf life (minimum viable may be 10-14 days)",
+        "Zero training (brief demonstration acceptable)",
+        "Single solution for all produce types (produce-specific variants acceptable)"
       ],
       "success_metrics": [
         {
-          "metric": "Energy consumption",
-          "minimum_viable": "<400 kWh/ton",
-          "stretch": "<100 kWh/ton",
-          "target": "<200 kWh/ton",
-          "unit": "kWh/ton processed"
+          "metric": "Shelf life extension",
+          "minimum_viable": "10 days",
+          "stretch": "28 days",
+          "target": "14-21 days",
+          "unit": "days from harvest to unmarketable"
         },
         {
-          "metric": "Installed cost",
-          "minimum_viable": "<$20,000",
-          "stretch": "<$10,000",
-          "target": "<$15,000",
-          "unit": "USD"
+          "metric": "Operating cost",
+          "minimum_viable": "$0.02/kg",
+          "stretch": "<$0.005/kg",
+          "target": "<$0.01/kg",
+          "unit": "USD per kg preserved"
         },
         {
-          "metric": "Throughput",
-          "minimum_viable": "300 lbs/day",
-          "stretch": "1000 lbs/day",
-          "target": "500 lbs/day",
-          "unit": "lbs/day"
+          "metric": "Capital investment",
+          "minimum_viable": "$50",
+          "stretch": "<$5",
+          "target": "<$20",
+          "unit": "USD per household"
         },
         {
-          "metric": "Volume reduction",
-          "minimum_viable": "70%",
-          "stretch": "90%",
-          "target": "80%",
-          "unit": "percent"
-        },
-        {
-          "metric": "Output stability",
-          "minimum_viable": "14 days",
-          "stretch": "90+ days",
-          "target": "30 days shelf-stable",
-          "unit": "days without degradation"
+          "metric": "Adoption rate",
+          "minimum_viable": "25%",
+          "stretch": ">80%",
+          "target": ">50% of trained farmers",
+          "unit": "percentage continuing use after 6 months"
         }
       ]
     },
     "executive_summary": {
-      "narrative_lead": "The food waste dehydration industry has been fighting thermodynamics for thirty years. Every commercial dehydrator on the market tries to evaporate 70% water content at 2,260 kJ/kg—a physics floor that guarantees 600+ kWh/ton minimum. Meanwhile, agricultural screw presses remove 50-70% of that water mechanically at 10-15 kWh/ton, and the olive oil industry has been doing continuous centrifugal separation at similar efficiency since the 1960s. The path to <200 kWh/ton isn't better heating—it's removing most of the water before you heat anything.",
-      "primary_recommendation": "Deploy a Vincent CP-4 screw press ($6-8K) with solar cabinet finishing for $8-12K total installed cost, achieving 15-30 kWh/ton electrical consumption in sunny climates. For year-round reliability in variable climates, add a compact drum dryer with heat recovery for $12-18K total, targeting 150-200 kWh/ton. Both approaches use off-the-shelf equipment requiring only integration engineering, not invention.",
+      "narrative_lead": "The produce preservation industry has been solving the wrong problem for decades. While billions flow into cold chain infrastructure, the 1-MCP literature proves that for climacteric fruits like tomatoes and mangoes, ethylene control alone achieves 3-5x shelf life extension at ambient temperature—no cooling required. The breakthrough insight is that charcoal from agricultural waste (coconut shells, rice husks) adsorbs ethylene at 40-60% the efficacy of commercial systems at 1/10th the cost, while lime whitewash chemically oxidizes any remaining ethylene. Combined with simple oil coatings that decouple produce from Zeer pot humidity, we can achieve the 14-21 day target using materials that cost essentially nothing because they're already waste products.",
+      "primary_recommendation": "Deploy the Ethylene-First Preservation System immediately: charcoal sachets + lime-washed containers for tomatoes and mangoes, with oil-coated produce in Zeer pots for leafy greens. Investment is $2-10 per household using waste materials. Validate with 2-week side-by-side trial (<$50) before scaling. This approach achieves 2-4x shelf life extension at <$0.005/kg operating cost—half the target budget—while eliminating dependency on electricity, supply chains, or technical expertise.",
       "recommended_path": [],
       "viability": "uncertain"
     },
     "follow_up_prompts": [
-      "Help me design the solar drying cabinet—what dimensions, materials, and configuration for my climate?",
-      "Create a detailed implementation plan for the screw press + thermal hybrid system",
-      "What questions should I ask Vincent Corporation about their trial program?",
-      "Help me find and evaluate local AD facilities that might accept fermented food waste",
-      "Compare the 10-year total cost of ownership for the top 3 approaches",
-      "What operational changes could reduce our food waste generation before we invest in processing equipment?"
+      "Design a detailed 30-day pilot program for testing the Ethylene-First Preservation System with 50 smallholder farmers",
+      "Help me create a simple visual training guide for charcoal+lime storage that works for farmers who cannot read",
+      "What operational changes should farmers make to harvest timing and handling to maximize preservation effectiveness?",
+      "Compare the economics of household-scale vs. cooperative-scale storage infrastructure",
+      "How should I adapt this approach for humid tropical climates where nighttime temperatures stay above 30°C?",
+      "Design a quality control protocol for locally produced charcoal to ensure consistent ethylene adsorption"
     ],
     "header": {
       "date": "2025-01-13",
-      "title": "On-Site Food Waste Processing: Mechanical-First Architecture for 80% Energy Reduction",
+      "title": "Breaking the Cold Chain Assumption: Multi-Mechanism Preservation for Smallholder Farmers in Sub-Saharan Africa and South Asia",
       "version": "4.0.0"
     },
     "innovation_analysis": {
       "domains_searched": [
-        "Agricultural manure handling",
-        "Olive oil extraction",
-        "Silage fermentation",
-        "HVAC dehumidification",
-        "Insect farming",
-        "Biomass torrefaction",
-        "Freeze concentration",
-        "Sewage sludge treatment"
+        "Plant hormone biology",
+        "Fermented food microbiology",
+        "Traditional pre-refrigeration storage",
+        "Edible coating science",
+        "Termite mound thermoregulation",
+        "Extremophile biology",
+        "Industrial modified atmosphere packaging",
+        "Biofilm ecology"
       ],
-      "reframe": "Instead of asking 'how do we evaporate water more efficiently,' we asked 'how do we avoid evaporating most of the water entirely.'"
+      "reframe": "Instead of asking 'how do we bring refrigeration to farmers?', we asked 'what if we interrupt the biochemical decay cascade using waste materials?'"
     },
     "innovation_concepts": {
       "frontier_watch": [
         {
-          "competitive_activity": "No commercial entities currently targeting food waste desiccant drying. Adjacent: Munters and Bry-Air serve industrial drying markets but haven't announced food waste applications.",
-          "earliest_viability": "2-3 years",
+          "competitive_activity": "No commercial entities identified working on this specific application. Academic research is scattered across food science, microbiology, and materials science without integration.",
+          "earliest_viability": "3-5 years",
           "id": "frontier-1",
-          "innovation_type": "EMERGING_SCIENCE",
-          "recent_developments": "NREL and Fraunhofer ISE have active research programs on solar-regenerated desiccant systems for HVAC applications. No food waste-specific work identified in 2024 literature search.",
-          "title": "Desiccant Wheel Drying with Solar Regeneration",
-          "trigger_to_revisit": "Publication demonstrating desiccant stability with food waste volatiles (target journals: Drying Technology, Applied Thermal Engineering) OR commercial pilot announcement by Munters or similar.",
-          "trl_estimate": 4,
-          "what_it_is": "Rotary desiccant wheel system adapted from HVAC dehumidification for food waste drying. Food waste spread in chamber with desiccant wheel continuously removing moisture. Wheel rotates through solar-heated regeneration zone (80-120°C). Near-zero electrical consumption in sunny climates—only fans and wheel motor (20-50 kWh/ton).",
+          "innovation_type": "PARADIGM",
+          "recent_developments": "Search for 'beneficial biofilm food preservation 2024' returned primarily research on biofilm prevention rather than cultivation. The paradigm shift from 'biofilms are problems' to 'biofilms can be solutions' is nascent in academic literature. Most relevant work is in fermented food vessel conditioning, not fresh produce.",
+          "title": "Living Biofilm Storage Surfaces",
+          "trigger_to_revisit": "Publication demonstrating stable beneficial biofilm on food contact surface with >6 month stability and no pathogen breakthrough; regulatory guidance on intentional biofilm applications in food systems",
+          "trl_estimate": 2,
+          "what_it_is": "Instead of fighting microbial growth, cultivate a beneficial biofilm on storage container surfaces that actively maintains optimal conditions. The biofilm (LAB + yeasts from traditional fermentation) consumes O₂, produces CO₂ and antimicrobial compounds, and self-regulates based on environmental conditions. Traditional fermentation vessels (koji molds, sourdough starters) maintain beneficial biofilms for years—the principle is proven, but application to fresh produce storage is uncharacterized.",
           "who_to_monitor": [
-            "Munters (desiccant dehumidification leader)",
-            "Bry-Air",
-            "NREL solar desiccant cooling research",
-            "Fraunhofer ISE"
+            "Dr. Michael Doyle, University of Georgia Center for Food Safety - biofilm ecology in food systems",
+            "Dr. Maria Marco, UC Davis - fermented food microbiology and LAB ecology",
+            "International Scientific Association for Probiotics and Prebiotics (ISAPP) - emerging applications"
           ],
-          "why_interesting": "If desiccant contamination from food volatiles can be managed, this offers 90%+ energy reduction in sunny climates with proven HVAC technology. Munters and Bry-Air have mature desiccant wheel products; the gap is application to food waste.",
-          "why_not_now": "No commercial system designed for food waste exists. Desiccant contamination from food volatiles (oils, acids) is uncharacterized. Custom engineering required. 4-8 month development timeline."
+          "why_interesting": "If achievable, this represents the ultimate in sustainable preservation: a living system that actively protects stored produce with zero ongoing inputs. The biofilm would be a permanent, self-maintaining feature of the container.",
+          "why_not_now": "Biofilms are complex ecosystems with emergent properties that may behave unpredictably. Risk of pathogen contamination or uncontrolled fermentation. Would require extensive validation and possibly strain selection/optimization. Regulatory and cultural acceptance barriers are significant. 12-24 months minimum for basic validation."
         },
         {
-          "competitive_activity": "No manufacturers currently marketing decanters for food waste. Opportunity for equipment dealer or integrator to develop this market.",
-          "earliest_viability": "1-2 years",
+          "competitive_activity": "Hayashibara and Cargill dominate production. No competitors specifically targeting smallholder agricultural applications—market focus remains on food processing, cosmetics, and pharmaceuticals.",
+          "earliest_viability": "2-3 years (cost-dependent)",
           "id": "frontier-2",
           "innovation_type": "EMERGING_SCIENCE",
-          "recent_developments": "Guillen et al. (2021) in Journal of Cleaner Production documented 10-25 kWh/ton for olive processing decanters. No food waste-specific applications published.",
-          "title": "Decanter Centrifuge Adaptation from Olive Oil Industry",
-          "trigger_to_revisit": "Successful pilot of decanter on mixed food waste demonstrating >6 month operation without major maintenance issues.",
+          "recent_developments": "Search for 'trehalose agricultural application 2024' shows continued research interest but no breakthrough in cost reduction. Biotechnology advances in enzymatic production continue but haven't yet reached price points viable for staple produce preservation.",
+          "title": "Trehalose Membrane Stabilization at Scale",
+          "trigger_to_revisit": "Trehalose price drops below $3/kg (enabling <$0.15/kg treatment cost); local enzymatic production from cassava starch demonstrated at village scale",
           "trl_estimate": 6,
-          "what_it_is": "Two-phase decanter centrifuges from olive oil processing adapted for food waste dewatering. Continuous separation at 15-25 kWh/ton achieves 45-55% solids—comparable to screw press but handles finer particles and higher throughput per unit.",
+          "what_it_is": "Trehalose is a non-reducing disaccharide that stabilizes cell membranes and proteins against stress, mimicking the mechanism tardigrades use to survive extreme conditions. Applied to produce surfaces (5-10% solution dip), trehalose maintains cellular integrity even under temperature fluctuation and partial dehydration. Production costs have dropped from $700/kg in the 1990s to $5-15/kg today through enzymatic production from starch.",
           "who_to_monitor": [
-            "Alfa Laval",
-            "GEA Westfalia",
-            "Pieralisi",
-            "Used olive equipment dealers (particularly in Mediterranean regions)"
+            "Hayashibara (Japan) - largest trehalose producer",
+            "Cargill - expanding trehalose production",
+            "Agricultural research institutions testing trehalose for postharvest applications"
           ],
-          "why_interesting": "Alfa Laval, GEA, and Pieralisi make small decanters (100-500 L/hr) in the $15-30K range used. Technology is mature and proven for organic slurries. Could offer better performance than screw press for certain waste streams.",
-          "why_not_now": "Food waste heterogeneity (bones, plastics, fibrous materials) may cause rapid wear or jamming. Used equipment availability is uncertain. Higher maintenance requirements than screw press. Capital cost likely exceeds target."
+          "why_interesting": "The mechanism is well-understood and proven. If costs continue to drop (or local production becomes viable), this could provide a one-time treatment with multi-week protective effect. Particularly valuable for high-value produce where the $0.25-1.50/kg treatment cost is acceptable.",
+          "why_not_now": "Current cost ($5-15/kg trehalose, requiring 50-100g per kg produce) implies $0.25-1.50/kg treatment cost—25-150x above the $0.01/kg target. Creates supply chain dependency incompatible with self-sufficiency goals. May become viable as prices continue to drop or for higher-value produce only."
         }
       ],
-      "intro": "Innovation concepts offer higher ceilings with higher uncertainty. These challenge industry assumptions and could transform the economics of food waste processing—but require more validation and may need alternative disposal pathways.",
+      "intro": "Innovation concepts offer higher ceilings with higher uncertainty. These represent parallel bets on breakthrough outcomes that could exceed the 14-21 day target or dramatically simplify implementation.",
       "parallel": [
         {
-          "confidence_percent": 70,
+          "confidence_percent": 45,
           "economics": {
-            "ceiling_if_works": "Revenue-positive: larvae sell for $1,000-3,000/ton as animal feed ingredient; frass sells for $50-100/ton as fertilizer",
-            "investment": "$8,000-15,000 for bin system, environmental controls, and starter colony"
+            "ceiling_if_works": "2-4x shelf life extension at ambient temperature",
+            "investment": "$5-15 per container (reusable 2-3 years)"
           },
           "first_validation_step": {
-            "cost": "$500-1,000 (starter colony from Symton BSF or similar, bins, environmental monitoring)",
-            "go_no_go": "GO: >50% mass reduction in 14 days, healthy larvae harvest. NO-GO: Colony crash, <30% reduction, or regulatory barrier in jurisdiction.",
-            "test": "Small-scale BSF trial with 50-100 lbs waste; verify larvae consumption rate and output quality"
+            "cost": "$50-100 (gas measurement is the main cost)",
+            "go_no_go": "GO if at least one natural material combination achieves 5-10% O₂ equilibrium. NO-GO if all natural materials either allow full O₂ (too permeable) or cause fermentation (too tight).",
+            "test": "Place respiring produce (tomatoes) in containers of varying materials: dense clay, porous clay, single-layer fabric, double-layer fabric, plastic film (control). Measure headspace O₂/CO₂ at 24h and 48h using portable gas analyzer or indicator tubes."
           },
           "id": "innov-parallel-1",
           "innovation_type": "CROSS_DOMAIN",
-          "key_uncertainty": "Regulatory approval for larvae as animal feed varies by jurisdiction. FDA has approved BSF larvae for poultry and aquaculture feed; state regulations vary. Operator skill requirements are different from equipment operation—this is farming, not machine tending.",
+          "key_uncertainty": "Natural material permeability consistency—can we achieve reliable atmosphere modification with variable materials?",
           "sustainability_flag": {
             "alternative": null,
-            "detail": "BSF larvae convert waste nutrients to high-quality protein that can feed chickens, fish, or pigs, closing the nutrient loop. Near-zero energy input. Larvae respire CO2 that was recently fixed by food crops—carbon neutral. Frass is superior to synthetic fertilizer for soil biology.",
-            "summary": "Circular system: waste → protein → animal feed → food production",
+            "detail": "All materials (clay, charcoal, fabric) are locally sourceable and biodegradable. Eliminates single-use plastic packaging used in industrial MAP.",
+            "summary": "Replaces plastic MAP packaging with natural materials; zero consumables after construction",
             "type": "BENEFIT"
           },
           "the_insight": {
-            "what": "Biological conversion transforms waste processing from cost center to potential profit center",
-            "where_we_found_it": "Insect farming industry (EnviroFlight, Enterra, Protix) processes thousands of tons/year at industrial scale. Asia has used BSF for decades.",
-            "why_industry_missed_it": "Cultural unfamiliarity with insect processing in Western food service. Regulatory uncertainty around larvae as animal feed. Requires biological husbandry skills different from equipment operation."
+            "what": "Produce creates its own optimal atmosphere if container permeability matches respiration rate",
+            "where_we_found_it": "Industrial MAP packaging; US Patent 5,160,768 (expired) establishes the principle",
+            "why_industry_missed_it": "Industrial MAP uses engineered plastics with precise OTR specifications. No one has systematically characterized natural material permeabilities to enable low-cost passive MAP."
           },
-          "title": "Black Soldier Fly Bioconversion",
-          "what_it_is": "Use Hermetia illucens (Black Soldier Fly) larvae as self-replicating biological processors. Larvae consume food waste at 50-100 mg/larva/day, achieving 50-70% mass reduction in 10-14 days with near-zero energy input. Outputs are valuable: larvae (40% protein, 35% fat) for animal feed, and frass (stable, nutrient-rich fertilizer).\n\nFood waste is spread in shallow bins (2-4 inch depth). BSF larvae (5,000-10,000 per kg waste) are introduced. Larvae consume waste continuously, growing from 1mm to 25mm over 10-14 days. Mature larvae self-harvest by crawling up ramps into collection containers. The system is essentially self-operating once established.",
-          "when_to_elevate": "Elevate to recommended if: (1) regulatory pathway for larvae as feed is clear in your jurisdiction, (2) local market exists for larvae (aquaculture, poultry farms), (3) operator is comfortable with biological system management, or (4) you're willing to invest 3-6 months in colony establishment and optimization.",
-          "why_it_works": "BSF larvae secrete digestive enzymes (proteases, lipases, amylases) into the food matrix, externally digesting it. Nutrients are assimilated into larval biomass at 15-25% conversion efficiency. Metabolic heat from larval activity (larvae maintain 30-35°C body temperature) drives moisture evaporation. Frass output is essentially pre-digested, microbially-stabilized material."
+          "title": "Natural Material Passive Modified Atmosphere Container",
+          "what_it_is": "A semi-permeable storage container using layered natural materials (woven fabric, clay, charcoal) calibrated to match produce respiration rates. The container allows produce to create its own optimal low-O₂/high-CO₂ atmosphere without hermetic sealing or gas injection. Different fabric weaves and clay porosities can be combined to achieve target oxygen transmission rates for different produce types.\n\nThe key insight is that produce naturally modifies its own atmosphere through respiration. In a container with correctly calibrated permeability, O₂ concentration drops to 3-8% and CO₂ rises to 5-15%, dramatically slowing respiration and ethylene production without suffocating the tissue.",
+          "when_to_elevate": "If validation shows consistent atmosphere modification achievable with specific material combinations; if charcoal+lime approach shows insufficient results for leafy greens",
+          "why_it_works": "Respiration follows Michaelis-Menten kinetics—rate decreases hyperbolically as O₂ drops below 8%. At 3-5% O₂, respiration is 50-70% of ambient rate. The system is self-regulating: if O₂ drops too low, respiration slows further, reducing O₂ consumption until equilibrium. Elevated CO₂ (5-10%) further suppresses respiration and provides antimicrobial effect."
         },
         {
-          "confidence_percent": 55,
+          "confidence_percent": 40,
           "economics": {
-            "ceiling_if_works": "Biochar sells for $200-500/ton vs. compost at $20-50/ton. Carbon credit potential as markets mature.",
-            "investment": "$15,000-25,000 (exceeds target)"
+            "ceiling_if_works": "Maintains optimal humidity ±5% without manual intervention",
+            "investment": "$3-10 per container for vent mechanism"
           },
           "first_validation_step": {
-            "cost": "$2,000-5,000 (university lab partnership or contract research)",
-            "go_no_go": "GO: Biochar meets quality specs, energy balance confirms partial self-sustaining operation. NO-GO: Excessive tar production, poor energy balance, or permitting barriers.",
-            "test": "Lab-scale torrefaction of press cake; verify biochar quality and energy balance"
+            "cost": "$20-30 for materials and humidity chamber setup",
+            "go_no_go": "GO if >1mm displacement achieved reliably over 100 cycles with <10% degradation. NO-GO if displacement inconsistent or material degrades significantly.",
+            "test": "Build simple lever mechanism actuated by 10cm hair bundle. Place in humidity chamber, cycle humidity 50-95% RH. Measure actuation displacement and response time over 100 cycles."
           },
           "id": "innov-parallel-2",
-          "innovation_type": "PARADIGM",
-          "key_uncertainty": "Capital cost exceeds target. Safety systems for oxygen exclusion and temperature control add complexity. Air permitting may be required. Biochar market is less developed than compost market.",
+          "innovation_type": "CROSS_DOMAIN",
+          "key_uncertainty": "Mechanical reliability over many cycles—hair degrades, clay may crack, calibration may drift",
           "sustainability_flag": {
             "alternative": null,
-            "detail": "Each ton of food waste produces ~100 kg biochar with 50-70 kg fixed carbon. This carbon, if added to soil, has half-life of 100-1000 years—removing it from the fast carbon cycle (atmospheric CO2 → food → decomposition → CO2) and locking it in the slow cycle (soil carbon). Net carbon-negative process.",
-            "summary": "Carbon sequestration: biochar stores carbon for centuries",
+            "detail": "Replaces electronic sensors and actuators with simple materials. No batteries to dispose of, no electronic waste, fully repairable with basic materials.",
+            "summary": "Achieves 'smart' functionality without electronics, batteries, or complex manufacturing",
             "type": "BENEFIT"
           },
           "the_insight": {
-            "what": "Carbonization creates the most stable possible output (100-1000 year half-life in soil) while sequestering carbon from the fast cycle",
-            "where_we_found_it": "Biomass energy industry; charcoal production has been practiced for millennia",
-            "why_industry_missed_it": "Torrefaction is 'energy industry' technology, not waste management. Fire/explosion risk concerns. Biochar market is emerging, not established."
+            "what": "Plant stomata achieve self-regulating gas exchange through humidity-responsive guard cells; this can be replicated mechanically",
+            "where_we_found_it": "Plant biology + historical hygrometer design (hair hygrometers invented 1783)",
+            "why_industry_missed_it": "Industrial solutions use electronic sensors and motorized vents. The low-tech mechanical approach is 'solved' by electronics in high-resource contexts."
           },
-          "title": "Torrefaction to Biochar",
-          "what_it_is": "Mild pyrolysis at 250-300°C converts food waste to hydrophobic biochar with 70% mass reduction. Pre-dried food waste (30-40% moisture via mechanical pressing) enters an insulated reactor in an oxygen-limited environment. Held for 30-60 minutes, volatiles (water, acetic acid, tars) are driven off and partially combusted to sustain reactor temperature. Output is biologically inert biochar with fuel value or soil amendment properties.\n\nThe process becomes partially self-sustaining after startup—combustion of released volatiles provides 30-40% of required heat. Net energy consumption is 200-350 kWh/ton including pre-drying.",
-          "when_to_elevate": "Elevate if: (1) biochar market develops locally, (2) carbon credit mechanisms mature, (3) capital budget is flexible, or (4) carbon sequestration is a strategic priority for the organization.",
-          "why_it_works": "At 200-300°C, hemicellulose decomposes first (220-315°C), releasing acetic acid, furfural, and water. Cellulose begins degrading above 280°C. Lignin partially carbonizes. Resulting biochar is 50-70% fixed carbon with hydrophobic surface due to loss of hydroxyl groups. Aromatization creates stable polycyclic structures resistant to biological attack."
+          "title": "Stomatal-Inspired Self-Regulating Humidity Vents",
+          "what_it_is": "Storage container vents made from humidity-responsive natural materials (human hair, certain plant fibers, or hygroscopic clay) that automatically open when internal humidity exceeds optimal levels and close when humidity drops. This maintains ideal 85-90% RH without sensors, power, or manual intervention.\n\nHuman hair expands ~2.5% in length from 0-100% RH—enough to actuate a simple lever mechanism. A vent designed with hair-based actuator would open when humidity rises (hair swells, pushing vent open) and close when humidity drops (hair shrinks, spring returns vent to closed position).",
+          "when_to_elevate": "If validation shows reliable mechanical actuation; if humidity control proves to be the limiting factor in other approaches",
+          "why_it_works": "Hygroscopic materials absorb water into their structure, causing physical expansion. Hair absorbs water into cortex proteins; clay absorbs water between aluminosilicate layers. This absorption causes predictable dimensional change that can drive mechanical actuation."
         }
       ],
       "recommended": {
         "breakthrough_potential": {
-          "estimated_improvement": "5-15 kWh/ton vs. 800-1200 kWh/ton baseline = 98% reduction. Capital cost $3-6K vs. $30-50K = 85% reduction.",
-          "if_it_works": "Eliminates 95%+ of energy consumption for food waste stabilization. Transforms waste processing from energy-intensive industrial operation to simple biological process.",
-          "industry_impact": "If disposal pathways develop (AD expansion, regenerative agriculture growth), this could obsolete thermal dehydration for most applications."
+          "estimated_improvement": "60-80% reduction in decay incidence; potentially 2-3x shelf life extension when combined with other interventions",
+          "if_it_works": "Zero-cost biological protection using waste streams from existing fermented food production. No consumables, no supply chain, no technical expertise required after initial training.",
+          "industry_impact": "Could establish new paradigm of 'probiotic produce' that challenges the sterility-focused food safety model"
         },
-        "confidence_percent": 75,
+        "confidence_percent": 55,
         "coupled_effects": [
           {
             "direction": "WORSE",
-            "domain": "Volume reduction",
-            "effect": "No volume reduction—only stabilization",
-            "magnitude": "MAJOR",
-            "mitigation": "If volume reduction required, combine with screw press first; ferment press cake only. Or accept that stable wet output may still need hauling but at lower frequency and to different destination.",
-            "quantified": "100% of input volume retained (minus some liquid drainage)"
-          },
-          {
-            "direction": "NEUTRAL",
-            "domain": "Disposal pathway",
-            "effect": "Output requires non-standard end use",
-            "magnitude": "MAJOR",
-            "mitigation": "Partner with local anaerobic digester or regenerative farm BEFORE implementation. Many AD facilities actively seek quality feedstock.",
-            "quantified": "Must identify AD facility, farm, or soil incorporation site willing to accept wet fermented material"
+            "domain": "Cultural acceptance",
+            "effect": "Some may be uncomfortable with intentionally adding bacteria to produce",
+            "magnitude": "MODERATE",
+            "mitigation": "Frame as 'protective culture' similar to cheese-making; emphasize that these are the same organisms in yogurt",
+            "quantified": "Varies by culture; likely higher acceptance where fermented foods are dietary staple"
           },
           {
             "direction": "WORSE",
-            "domain": "Buffer storage",
-            "effect": "48-72 hour fermentation time requires buffer capacity",
-            "magnitude": "MODERATE",
-            "mitigation": "Use rotating set of 3-4 containers; fill one per day, empty oldest. Total container cost ~$500-1,000.",
-            "quantified": "Need 1500-2000 lbs container capacity for 500 lb/day throughput"
+            "domain": "Consistency",
+            "effect": "Fermented food inoculum varies in LAB concentration and strain composition",
+            "magnitude": "MINOR",
+            "mitigation": "Use fresh, actively fermenting sources; standardize dilution ratio",
+            "quantified": "2-10x variation in LAB count between batches"
           }
         ],
         "economics": {
           "ceiling_if_works": {
-            "basis": "ESTIMATED",
-            "rationale": "AD facilities pay $20-50/ton for quality feedstock. Animal feed value higher. Even at zero output value, the 98% energy reduction and 85% capital reduction make this economically superior if disposal pathway exists.",
-            "value": "Net-positive economics if output has value"
+            "basis": "CALCULATED",
+            "rationale": "Waste input, no consumables, self-sustaining biological system",
+            "value": "Near-zero operating cost with 60-80% decay reduction"
           },
           "investment": {
             "basis": "CALCULATED",
-            "rationale": "Grinder: $1,500-3,000 (commercial food waste grinder). Sealed containers/drums: $500-1,000 (food-grade 55-gallon drums or IBC totes). Inoculant supply (1 year): $500-1,000 (Lallemand or similar silage inoculants at $0.50-2.00/ton). Compaction tool: $500.",
-            "value": "$3,000-6,000"
+            "rationale": "Yogurt whey and fermented vegetable liquids are often waste products with disposal cost. Farmers may already produce these foods.",
+            "value": "$0-2 for fermented food source"
           },
           "timeline": {
             "basis": "ESTIMATED",
-            "rationale": "Equipment is simple and available. Main work is establishing end-use partnership and training operators on anaerobic technique.",
-            "value": "1-2 weeks to operational; 48-72 hours per batch"
+            "rationale": "Simple trial design; materials immediately available",
+            "value": "4-8 weeks to validate; immediate implementation if successful"
           }
         },
         "first_validation_step": {
-          "cost": "$200-500 (inoculant, pH meter, containers, phone calls)",
-          "gating_question": "Can we achieve pH <4.2 within 72 hours with actual facility waste, and does a local disposal pathway exist?",
-          "go_no_go": "GO: pH <4.2 at 72 hours AND at least one disposal partner interested. NO-GO: pH >5.0 at 72 hours (fermentation failure) OR no disposal pathway within 50 miles → revert to mechanical-thermal hybrid.",
-          "test": "Ferment 50-100 lbs of actual facility waste in sealed 5-gallon buckets with commercial silage inoculant. Measure pH at 24, 48, 72 hours. Simultaneously contact local AD facilities and farms about accepting output.",
-          "timeline": "2-3 weeks (fermentation test + partner outreach)"
+          "cost": "$20-30 (produce + fermented foods + pH strips)",
+          "gating_question": "Do LAB from common fermented foods successfully colonize produce surfaces and reduce decay?",
+          "go_no_go": "GO if treated produce shows >40% reduction in decay incidence and surface pH drops to <5.0 within 48 hours. NO-GO if no pH change or decay incidence similar to control.",
+          "test": "Tomatoes dipped in diluted yogurt whey (1:10) vs. diluted fermented vegetable brine (1:10) vs. water control. Store at ambient temperature. Daily assessment of decay incidence and surface pH over 14 days.",
+          "timeline": "2 weeks"
         },
         "id": "innov-recommended",
-        "innovation_type": "PARADIGM",
+        "innovation_type": "CROSS_DOMAIN",
         "ip_considerations": {
           "freedom_to_operate": "GREEN",
           "key_patents_to_review": [
-            "None identified - traditional technology"
+            "None identified - academic research domain"
           ],
-          "patentability_potential": "NOT_NOVEL",
-          "rationale": "Search for 'lactic fermentation food waste patent' returned no blocking patents. LAB fermentation is traditional technology used for millennia. Silage inoculants are commodity products from multiple suppliers (Lallemand, Chr. Hansen, DuPont)."
+          "patentability_potential": "MEDIUM",
+          "rationale": "Search for 'lactic acid bacteria produce preservation patent' and 'probiotic fruit coating patent' returned research papers but no blocking patents for this specific application. LAB biocontrol is well-documented in academic literature but not commercially protected for fresh produce surface treatment."
         },
         "key_risks": [
           {
-            "mitigation": "Identify AD facility or farm partner BEFORE committing. If none exists within economical hauling distance, this approach doesn't fit.",
-            "risk": "No local disposal pathway accepts wet fermented material"
+            "mitigation": "Test multiple fermented food sources; yogurt LAB (L. bulgaricus, S. thermophilus) may differ from vegetable ferment LAB (L. plantarum, L. brevis) in colonization ability",
+            "risk": "LAB strains in fermented foods may not be optimal for produce surface colonization"
           },
           {
-            "mitigation": "Training on anaerobic technique (compaction, sealing). Use containers with airlocks. Monitor pH to confirm successful fermentation.",
-            "risk": "Operator error creates aerobic conditions, causing spoilage instead of fermentation"
+            "mitigation": "Apply in evening when humidity is higher; don't over-dry before storage",
+            "risk": "Surface drying may kill LAB before establishment"
           },
           {
-            "mitigation": "Test actual waste stream composition. Add molasses or other sugar source if needed ($5-10/ton). Or blend with high-sugar waste from other sources.",
-            "risk": "Low-sugar waste streams (mostly meat/dairy) ferment poorly"
+            "mitigation": "Frame as traditional practice extension; partner with food safety authorities for validation",
+            "risk": "Cultural/regulatory acceptance barriers"
           }
         ],
         "sustainability_flag": {
           "alternative": null,
-          "detail": "Eliminates 800-1200 kWh/ton energy consumption entirely. Fermented output has higher bioavailability for AD or soil biology than dried material. Preserves nitrogen that would be volatilized in thermal processing. Closes nutrient loop if output goes to agriculture.",
-          "summary": "Zero energy processing; output is valuable soil amendment or feed",
+          "detail": "Yogurt whey and fermented vegetable liquids are often waste products. Repurposing them for produce protection creates value from waste. No synthetic inputs, no residues, enhances rather than fights biology.",
+          "summary": "Uses waste stream from existing fermented food production; completely biological",
           "type": "BENEFIT"
         },
         "the_insight": {
-          "what": "Stability requires either dryness (<15% moisture) OR acidity (pH <4.5). The industry chose drying; fermentation achieves the same stability at 1/100th the energy.",
+          "what": "Competitive exclusion by beneficial microbes prevents pathogen establishment without chemical intervention",
           "where_we_found_it": {
-            "domain": "Agricultural silage fermentation, traditional food preservation",
-            "how_they_use_it": "Farmers have preserved wet forage as silage for centuries. The global silage industry processes billions of tons annually using LAB inoculation.",
-            "why_it_transfers": "Food waste has higher sugar content than forage crops, making it even easier to ferment. The microbiology is identical."
+            "domain": "Fermented food microbiology and biocontrol research",
+            "how_they_use_it": "LAB dominate fermented food ecosystems, preventing spoilage for months without refrigeration. Biocontrol research (Wisniewski & Wilson 1992) documents 60-90% decay reduction through competitive exclusion.",
+            "why_it_transfers": "The same LAB that preserve sauerkraut can colonize tomato surfaces. The ecological principle (first colonizer wins) is universal."
           },
-          "why_industry_missed_it": "Western waste management infrastructure (landfills, compost facilities) expects dry or composted material. Wet fermented output doesn't fit existing disposal pathways. The paradigm 'stable = dry' is so entrenched that alternatives weren't considered."
+          "why_industry_missed_it": "Food safety paradigm emphasizes elimination, not cultivation. Regulatory frameworks assume sterility is the goal. The idea of intentionally applying bacteria to fresh produce runs counter to hygiene-focused approaches, even though we eat these same bacteria daily."
         },
-        "title": "Rapid Lactic Fermentation for Wet Stability",
-        "what_it_is": "This approach challenges the fundamental assumption that food waste must be dried to be stable. Instead, it uses lactic acid bacteria (LAB) to rapidly drop pH to 4.0, creating shelf-stable wet output—the same principle that makes sauerkraut, kimchi, and silage stable for months without refrigeration.\n\nFood waste is ground and mixed with 1-2% Lactobacillus inoculant (commercially available silage additives work well). The mixture is compacted into sealed containers to create anaerobic conditions. Within 48-72 hours, LAB ferment available sugars to lactic acid, dropping pH from 6-7 to 3.8-4.2. At this pH, putrefactive bacteria cannot grow, proteolytic enzymes are denatured, and the material is biologically stable.\n\nThe output is wet but stable—it won't rot, won't smell, won't attract pests. It's ideal feedstock for anaerobic digesters (AD facilities pay for high-quality feedstock), can be used for animal feed in some jurisdictions, or can be directly incorporated into soil. Energy consumption is near-zero: just grinding at 5-15 kWh/ton. Capital cost is minimal: grinder, sealed containers, and inoculant.\n\nThe catch: this produces wet output (no volume reduction beyond compaction), and you need a disposal pathway that accepts wet-stable material. If your local AD facility will take it, or you have a farm partnership, this is the most efficient solution by far. If you need dry output for conventional compost or landfill, this doesn't fit.",
-        "why_it_works": "Lactobacillus converts glucose to lactic acid via glycolysis: C₆H₁₂O₆ → 2 CH₃CHOHCOOH (ΔG = -197 kJ/mol). This is an exergonic reaction—it releases energy rather than consuming it. The process is self-sustaining once inoculated.\n\nLactic acid dissociates (pKa 3.86), dropping pH. Below pH 4.5, several things happen: proteolytic enzymes denature and stop breaking down proteins (which would release ammonia and cause odor); Clostridium species (the main putrefactive bacteria) cannot germinate; and Lactobacillus dominates the microbiome through competitive exclusion.\n\nFood waste typically contains 10-20% fermentable sugars—far more than the 3% minimum needed for successful fermentation. The 48-72 hour timeline is conservative; well-inoculated, high-sugar waste can reach pH 4.0 in 24-36 hours.",
-        "why_this_one": "This is the highest-impact paradigm shift identified. If the disposal pathway constraint can be satisfied, it delivers 98% energy reduction and 85% capital reduction vs. conventional approaches. The risk is entirely in market/infrastructure fit, not technology—the biology is proven at massive scale in the silage industry. We're highlighting it because the potential upside justifies the effort to validate the disposal pathway."
+        "title": "Probiotic Surface Colonization from Fermented Foods",
+        "what_it_is": "Inoculate produce surfaces with lactic acid bacteria (LAB) from locally available fermented foods—yogurt whey, sauerkraut juice, kimchi liquid, or fermented vegetable brine. These beneficial bacteria colonize the produce surface first, establishing competitive exclusion against decay pathogens. The LAB consume surface nutrients, lower surface pH through lactic acid production (to 4.0-4.5, below pathogen tolerance), and produce antimicrobial compounds including bacteriocins and hydrogen peroxide.\n\nApplication is simple: dilute fermented food liquid 1:10 with clean water, dip or spray produce, allow to air dry. The treatment should be applied within hours of harvest, before pathogens can establish. The LAB population is self-sustaining once established, drawing nutrients from the produce surface.\n\nThis approach represents a paradigm shift from 'fight all microbes' to 'cultivate beneficial microbes.' We're applying organisms that people already consume daily in fermented foods—there's no food safety novelty, only application novelty.",
+        "why_it_works": "LAB ferment surface sugars to lactic acid (pKa 3.86), dropping surface pH to 4.0-4.5 where most pathogens cannot grow. Bacteriocins (small antimicrobial peptides like nisin, plantaricin) insert into pathogen cell membranes causing lysis. H₂O₂ production oxidizes pathogen cellular components. Competition for iron and other micronutrients starves pathogens. The race for surface dominance is won by whoever colonizes first—LAB inoculation ensures the good guys win.\n\nTrias et al. (2008) demonstrated 2-3 log reduction (99-99.9% kill) in pathogen load on apples and lettuce using LAB surface treatment. The treatment is self-sustaining: once established, the LAB population maintains itself using produce surface nutrients.",
+        "why_this_one": "This innovation has the highest ratio of potential impact to validation cost. If it works, it's essentially free and self-sustaining. The scientific basis (competitive exclusion, LAB antimicrobial production) is well-established—the uncertainty is only in the specific application to produce surfaces in field conditions. A $30 trial can answer the key question."
       }
     },
     "key_insights": [],
@@ -332,306 +315,324 @@
       "current_state_of_art": {
         "benchmarks": [
           {
-            "approach": "Accelerated aerobic composting with heat recovery",
-            "current_performance": "400-600 kWh/ton, 24-hour cycle",
-            "entity": "Oklin International (GG Series)",
-            "source": "Oklin technical specifications, 2023",
-            "target_roadmap": "Not disclosed"
+            "approach": "Comprehensive postharvest protocols combining temperature, atmosphere, and humidity control",
+            "current_performance": "Achieves 21-28 day shelf life for tomatoes at 12-15°C with proper atmosphere",
+            "entity": "UC Davis Postharvest Technology Center",
+            "source": "Kader (2002) Postharvest Technology of Horticultural Crops",
+            "target_roadmap": "Focus on cold chain optimization, not off-grid solutions"
           },
           {
-            "approach": "Aerobic digestion with cloud monitoring",
-            "current_performance": "800-1000 kWh/ton estimated, 24-hour cycle",
-            "entity": "BioHiTech (Revolution Series)",
-            "source": "Company website and press releases",
-            "target_roadmap": "Focus on data/monitoring, not energy reduction"
+            "approach": "Hermetic storage bags for grain",
+            "current_performance": ">95% adoption in some African regions; near-zero insect damage for grains",
+            "entity": "Purdue University (PICS program)",
+            "source": "Murdock & Baoua (2014) PICS technology paper",
+            "target_roadmap": "Expanding to more grain types; fresh produce not in scope"
           },
           {
-            "approach": "Screw press mechanical dewatering (not marketed for food waste finishing)",
-            "current_performance": "10-15 kWh/ton for dewatering step only",
-            "entity": "Vincent Corporation",
-            "source": "Vincent Corporation product catalog, 2024",
-            "target_roadmap": "Agricultural focus; not pursuing food waste market integration"
+            "approach": "Solar-powered cold storage",
+            "current_performance": "Achieves 4-10°C storage; $1000-5000 per unit",
+            "entity": "CoolBot / Promethean Power Systems",
+            "source": "Company websites and press releases",
+            "target_roadmap": "Cost reduction through scale; still targeting aggregation points, not individual farmers"
           }
         ],
         "no_competitors_note": null
       },
       "first_principles_insight": {
-        "explanation": "Free water is held at 0.1-10 kPa; screw presses apply 200-500 kPa. Mechanical separation at 10-15 kWh/ton removes the majority of water, leaving only bound water (hydrogen-bonded to food polymers) for thermal treatment. This transforms a 627 kWh/ton problem into a 150-250 kWh/ton problem.",
-        "headline": "50-70% of water in food waste is 'free water' held by weak capillary forces—it can be mechanically pressed out at 1/50th the energy cost of evaporation"
+        "explanation": "The 1-MCP literature proves that blocking ethylene perception alone achieves 3-5x shelf life extension at 20-25°C with zero cooling. This means the industry's obsession with cold chain is solving the wrong problem for 2 of our 3 target produce types. Charcoal adsorbs ethylene; lime oxidizes it. Both are essentially free waste products. The paradigm shift is recognizing that we don't need to fight thermodynamics—we need to interrupt a biochemical cascade.",
+        "headline": "For climacteric fruits, ethylene IS the problem—temperature is secondary"
       },
       "root_cause_hypotheses": [],
       "success_metrics": [],
       "what_industry_does_today": [
         {
-          "approach": "Thermal dehydrators (Eco-Digesters, BioHiTech)",
-          "limitation": "800-1200 kWh/ton energy consumption; $30-50K capital cost; 12-24 hour batch cycles"
+          "approach": "Evaporative coolers (Zeer pots)",
+          "limitation": "Achieves 10-15°C cooling but creates 85-95% humidity that accelerates fungal growth on fruits—the cooling benefit is partially offset by mold proliferation"
         },
         {
-          "approach": "Accelerated aerobic digesters (Oklin, WISErg)",
-          "limitation": "400-600 kWh/ton best case; 48-72 hour cycles; requires careful C:N management"
+          "approach": "Solar-powered refrigeration",
+          "limitation": "$300-1000+ capital cost is 60-200 days of farmer income; maintenance requirements, theft risk, and single point of failure make it impractical"
         },
         {
-          "approach": "Grinders with sewer discharge",
-          "limitation": "Banned in many jurisdictions; transfers problem to wastewater treatment"
+          "approach": "Commercial waxing/coating",
+          "limitation": "Requires consistent supply chain for coating materials that doesn't exist in rural areas; quality control is challenging"
         },
         {
-          "approach": "Compaction only",
-          "limitation": "40-60% volume reduction but no stabilization—output still rots"
+          "approach": "Hermetic storage (PICS bags)",
+          "limitation": "Designed for dormant seeds, not living tissue—fresh produce suffocates and ferments in zero-oxygen environment"
+        },
+        {
+          "approach": "1-MCP ethylene blocking",
+          "limitation": "Highly effective but requires cold chain for the chemical itself and controlled application environment"
         }
       ],
       "whats_wrong": {
-        "prose": "Current on-site food waste processors are expensive ($30-50K), energy-intensive (800-1200 kWh/ton), and slow (12-24 hours per batch). Commercial kitchens generating 500+ lbs/day face a choice between hauling costs that keep rising, composting programs that require space and expertise they don't have, or capital equipment that doesn't pencil out. The result is that most food waste still goes to landfill, where it generates methane and costs $150-300/ton in tipping fees."
+        "prose": "Farmers harvest tomatoes on Monday; by Thursday, 30-40% are rotting in the basket. The produce that does reach market is sold at distress prices because buyers know it won't last another day. A farmer earning $5/day loses $1.50-2.00 daily to spoilage—a 30-40% effective tax on their labor. The tragedy is that this loss is largely preventable with interventions costing pennies, but the knowledge gap between agricultural science and smallholder practice remains vast."
       },
       "why_its_hard": {
         "factors": [],
         "governing_equation": {
-          "equation": "Q = m × ΔH_vap = m × 2,260 kJ/kg",
-          "explanation": "Minimum energy to evaporate water. For 70% moisture food waste, this means 440 kWh/ton theoretical minimum for complete drying via evaporation alone."
+          "equation": "k = A·e^(-Ea/RT) (Arrhenius) + dC2H4/dt = k·C2H4 (ethylene autocatalysis)",
+          "explanation": "Decay rate k increases exponentially with temperature (Arrhenius), while ethylene concentration C2H4 increases exponentially with itself (autocatalysis). Breaking the ethylene cascade can be more impactful than modest temperature reduction."
         },
-        "prose": "Food waste is 60-80% water. Evaporating water requires overcoming the latent heat of vaporization—2,260 kJ/kg, which translates to a theoretical minimum of 627 kWh/ton just for the phase change. Real systems lose 30-50% additional energy to exhaust, radiation, and inefficient heat transfer. At small scale (500 lb/day), surface-to-volume ratios make heat retention even worse. The physics creates a floor that no amount of insulation or control optimization can break through if evaporation is the only water removal mechanism."
+        "prose": "The physics are unforgiving. The Arrhenius equation tells us that decay reactions roughly double with every 10°C increase—at 35°C versus 5°C, decay proceeds 8x faster. But temperature is only part of the story. Climacteric fruits like tomatoes and mangoes have a positive feedback loop: ethylene triggers more ethylene production, which triggers more ripening, which produces more ethylene. This autocatalytic cascade, not temperature alone, is why a tomato can go from firm to mush in 48 hours at ambient conditions. Meanwhile, leafy greens face a different enemy: dehydration and microbial colonization. Any solution must address these fundamentally different decay pathways, ideally with the same simple materials."
       }
     },
     "risks_and_watchouts": [
       {
-        "category": "Regulatory",
-        "mitigation": "Verify local sewer discharge regulations before purchase. Most jurisdictions permit food waste liquids; some may require grease trap or settling tank.",
+        "category": "Technical",
+        "mitigation": "Develop simple quality indicators (flotation test, color); prefer coconut shell charcoal; establish minimum pyrolysis temperature guidance",
         "requires_resolution_before_proceeding": false,
-        "risk": "Press liquid discharge may require sewer permit or exceed BOD/TSS limits in some jurisdictions",
+        "risk": "Charcoal quality variability from different feedstocks and pyrolysis conditions may result in inconsistent ethylene adsorption",
         "severity": "medium"
       },
       {
-        "category": "Market",
-        "mitigation": "Identify disposal partners BEFORE committing to innovation concepts. If no pathway exists within economical hauling distance, stick with solution concepts that produce compost-compatible output.",
+        "category": "Technical",
+        "mitigation": "Harvest at mature-green stage; gentle handling protocols; sort damaged produce for immediate consumption; consider hot water treatment to inactivate ethylene-producing enzymes",
         "requires_resolution_before_proceeding": true,
-        "risk": "No local disposal pathway for non-compost outputs (fermented, lime-stabilized, biochar)",
+        "risk": "Pre-harvest ethylene exposure or mechanical damage may trigger ripening cascade before storage interventions can take effect",
         "severity": "high"
       },
       {
-        "category": "Technical",
-        "mitigation": "Test actual facility waste stream before purchase. Most equipment handles typical institutional waste; unusual compositions (high fat, high fiber) may require pre-treatment or different approach.",
+        "category": "Market",
+        "mitigation": "Test market acceptance with buyers; use neutral oils; position as 'freshness coating' if needed",
         "requires_resolution_before_proceeding": false,
-        "risk": "Food waste heterogeneity causes equipment issues (screen clogging, centrifuge wear, fermentation failure)",
-        "severity": "medium"
+        "risk": "Oil-coated produce may have different appearance (slight sheen) that affects market acceptance",
+        "severity": "low"
       },
       {
         "category": "Resource",
-        "mitigation": "Start with simpler systems (press + solar, press + lime) that require minimal integration. Graduate to thermal hybrid only if simpler approaches don't meet needs.",
+        "mitigation": "Prioritize ethylene-first approach (no water required) in water-scarce regions; develop water-recycling protocols for hot water treatment",
         "requires_resolution_before_proceeding": false,
-        "risk": "Integration engineering for hybrid systems exceeds budget or timeline",
+        "risk": "Water scarcity in some regions may limit evaporative cooling and hot water treatment options",
+        "severity": "medium"
+      },
+      {
+        "category": "Regulatory",
+        "mitigation": "Frame as traditional practice extension; partner with food safety authorities for validation; focus initial deployment on local/informal markets",
+        "requires_resolution_before_proceeding": false,
+        "risk": "Probiotic surface treatment may face regulatory uncertainty in some markets",
         "severity": "medium"
       },
       {
         "category": "Technical",
-        "mitigation": "Size buffer capacity for 5-7 days of press cake accumulation. Add electric backup heater for extended cloudy periods. Or choose thermal hybrid (sol-support-1) for consistent throughput.",
-        "requires_resolution_before_proceeding": false,
-        "risk": "Solar drying is too slow in cloudy climates, creating throughput bottleneck",
-        "severity": "medium"
+        "mitigation": "Develop parallel protocol: oil coating + neem leaves + high-humidity Zeer pot specifically for leafy greens; validate separately",
+        "requires_resolution_before_proceeding": true,
+        "risk": "Leafy greens (non-climacteric) may not respond to ethylene-focused interventions, requiring parallel solution development",
+        "severity": "high"
       }
     ],
     "self_critique": {
       "confidence_level": "medium",
-      "confidence_rationale": "Primary recommendation uses proven, commercial equipment with extensive prior art. Physics are well-understood. Main uncertainties are site-specific (climate, disposal pathways) rather than technical.",
-      "overall_confidence": "high",
+      "confidence_rationale": "Strong evidence base for individual mechanisms (charcoal ethylene adsorption, oil coating respiration reduction, LAB competitive exclusion) but limited validation of combined system performance at 30-40°C ambient conditions in field settings",
+      "overall_confidence": "medium",
       "unexplored_directions": [
-        "Osmotic dehydration (salt/sugar solution pre-treatment) could remove 30-50% of water with zero thermal energy, but adds operational complexity and solution management. Worth investigating if mechanical dewatering alone is insufficient.",
-        "Mycelium colonization of food waste for stabilization—proven in packaging industry but not validated for food waste. Could produce value-added output but requires controlled substrate.",
-        "Supercritical CO2 extraction—could remove water and valuable compounds simultaneously. Equipment cost historically prohibitive but declining. Long-shot but potentially transformative."
+        "Calcium chloride dips for tissue firming—documented 30-50% extension but adds supply chain dependency",
+        "Solar-powered ozone generation—effective antimicrobial but safety concerns in enclosed spaces",
+        "Buried/underground storage using earth's thermal mass—high potential but requires land and construction investment",
+        "Chitosan coatings from seafood waste—excellent efficacy but limited to coastal regions with processing industry"
       ],
       "validation_gaps": [
         {
-          "concern": "Press liquid disposal pathway",
-          "rationale": "First validation step should include sewer discharge permit verification. Add to validation protocol: contact local water authority to confirm food waste press liquid is acceptable.",
+          "concern": "Charcoal+lime achieving similar results to 1-MCP",
+          "rationale": "First validation step directly tests charcoal+lime vs. control with quantified go/no-go criteria",
+          "status": "ADDRESSED"
+        },
+        {
+          "concern": "Adoption barriers may be higher than anticipated",
+          "rationale": "Technical validation doesn't test adoption. Recommend adding adoption tracking (% continuing use at 30/60/90 days) to pilot program design",
           "status": "EXTENDED_NEEDED"
         },
         {
-          "concern": "Solar drying performance in variable climates",
-          "rationale": "Mitigated by buffer capacity sizing and electric backup heater option. For consistently cloudy climates, thermal hybrid (sol-support-1) is the appropriate choice.",
-          "status": "ACCEPTED_RISK"
-        },
-        {
-          "concern": "Operator willingness for semi-manual systems",
-          "rationale": "This is a site-specific factor that the user must assess. We've noted that 10-15 min/day operation is required. If fully autonomous is required, budget increases to $25-40K for commercial dehydrators.",
-          "status": "ACCEPTED_RISK"
-        },
-        {
-          "concern": "End-use pathways for innovation concepts",
-          "rationale": "First validation step for fermentation (innov-recommended) explicitly requires identifying disposal partner before proceeding. NO-GO criteria includes 'no disposal pathway within 50 miles.'",
+          "concern": "14-21 day target may be unachievable at 35°C+",
+          "rationale": "Validation protocol runs for 14 days at ambient temperature; results will directly answer this question",
           "status": "ADDRESSED"
+        },
+        {
+          "concern": "Natural material variability",
+          "rationale": "Initial validation uses single charcoal source. Recommend testing 3+ charcoal sources in follow-up to characterize variability",
+          "status": "EXTENDED_NEEDED"
+        },
+        {
+          "concern": "Probiotic surface treatment barriers",
+          "rationale": "Cultural/regulatory barriers are context-specific and cannot be fully validated in technical trial. Recommend parallel cultural acceptance assessment in target communities",
+          "status": "ACCEPTED_RISK"
         }
       ],
       "what_we_might_be_wrong_about": [
-        "We may be underestimating the difficulty of finding end-use pathways for non-compost outputs. Market development is often harder than technology development.",
-        "We may be overestimating operator willingness to manage semi-manual systems. Commercial kitchens want 'set and forget' solutions, and the screw press + solar cabinet requires daily attention.",
-        "Press liquid disposal pathway is assumed but not validated. Some jurisdictions may have stricter limits than expected.",
-        "Solar drying performance in variable climates may be worse than estimated. We've assumed 'sunny climate' but haven't quantified the boundary conditions."
+        "Charcoal+lime achieving similar results to 1-MCP—the mechanisms are different (removal vs. receptor blocking) and efficacy may differ",
+        "Adoption barriers may be higher than anticipated—even simple interventions require behavior change",
+        "The 14-21 day target may be unachievable at 35°C+ without active cooling, even with perfect ethylene control",
+        "Natural material variability may prevent consistent results across different contexts and batches",
+        "Probiotic surface treatment may face unexpected cultural or regulatory barriers"
       ]
     },
     "solution_concepts": {
-      "intro": "Solution concepts use proven technologies requiring integration, not invention. These represent the lowest-risk paths to meeting specifications. Start here.",
+      "intro": "Solution concepts use proven technologies requiring integration, not invention. These represent the lowest-risk path to achieving the 14-21 day shelf life target using materials that are already waste products in the target contexts.",
       "primary": {
-        "confidence_percent": 88,
+        "confidence_percent": 82,
         "coupled_effects": [
           {
             "direction": "NEUTRAL",
-            "domain": "Liquid waste stream",
-            "effect": "Press liquid (40-60% of input mass) requires disposal pathway",
-            "magnitude": "MODERATE",
-            "mitigation": "Direct to sewer (permitted in most jurisdictions for food waste liquids) or use for fertigation if on-site landscaping exists. Verify local sewer discharge limits.",
-            "quantified": "200-300 lbs/day liquid at 3-5% suspended solids"
-          },
-          {
-            "direction": "WORSE",
-            "domain": "Weather dependence",
-            "effect": "Solar drying rate varies with weather; cloudy periods extend drying time",
-            "magnitude": "MODERATE",
-            "mitigation": "Size solar cabinet for 3-5 days of press cake accumulation. Add small electric heater ($200-500) for backup in extended cloudy periods.",
-            "quantified": "2-4 days sunny vs. 5-7 days cloudy; need 3-5 day buffer capacity"
-          },
-          {
-            "direction": "WORSE",
-            "domain": "Space requirement",
-            "effect": "Solar cabinet needs outdoor area with sun exposure",
+            "domain": "Taste/appearance",
+            "effect": "Oil coating may impart slight sheen; strongly flavored oils (mustard) may transfer taste",
             "magnitude": "MINOR",
-            "mitigation": "Roof mounting possible for most commercial buildings. Ground-level installation in parking area or yard.",
-            "quantified": "10-20 m² footprint for cabinet and access"
+            "mitigation": "Use neutral oils for produce sold fresh; mustard oil acceptable for produce that will be cooked",
+            "quantified": "Neutral oils (refined coconut, palm) have no detectable taste transfer"
+          },
+          {
+            "direction": "WORSE",
+            "domain": "Handling workflow",
+            "effect": "Adds 2-5 minutes per kg for oil application",
+            "magnitude": "MINOR",
+            "mitigation": "Batch processing; integrate with existing sorting/grading workflow",
+            "quantified": "~30 minutes for 10kg batch including setup"
+          },
+          {
+            "direction": "NEUTRAL",
+            "domain": "Charcoal production",
+            "effect": "Requires periodic charcoal production from agricultural waste",
+            "magnitude": "MINOR",
+            "mitigation": "Charcoal production is already common practice; can use existing supply",
+            "quantified": "100g charcoal per 20kg produce per 2 weeks; regenerable via sunlight"
           }
         ],
         "economics": {
           "expected_outcome": {
             "basis": "CALCULATED",
-            "rationale": "Press motor: 1-2 kW × 0.5-1 hr/500 lbs = 10-15 kWh/ton. Feeding/grinding: 5-15 kWh/ton. Solar drying: 0 kWh electrical. Total: 15-30 kWh/ton in sunny conditions.",
-            "value": "15-30 kWh/ton electrical + free solar thermal"
+            "rationale": "Bailén et al. (2006) showed 40-60% extension with charcoal alone. Oil coating adds 1.5-2x (Serrano et al. 2006). Effects are multiplicative: 1.5 × 1.7 = 2.5x conservative estimate.",
+            "value": "2-4x shelf life extension (7-14 days for tomatoes at 35°C vs. 3-5 days control)"
           },
           "investment": {
             "basis": "CALCULATED",
-            "rationale": "Vincent CP-4 screw press: $6,000-8,000 (manufacturer quote). Solar cabinet materials and construction: $1,500-3,000 (lumber, glazing, absorber plate, mesh trays). Installation and integration: $500-1,000.",
-            "value": "$8,000-12,000"
+            "rationale": "Charcoal from agricultural waste: ~free (labor only). Lime: $0.50-1/kg, need 0.5-1kg. Oil: already owned for cooking. Container: often already owned or $2-5 for clay pot.",
+            "value": "$2-10 per household"
           },
-          "roi_rationale": "At $150-300/ton hauling cost avoided, the system pays back in 30-80 tons of waste processed—roughly 4-10 months at 500 lbs/day. Energy savings of $100-150/ton vs. conventional dehydrators add to ROI.",
+          "roi_rationale": "A farmer losing $1.50/day to spoilage ($45/month) invests $5 once and reduces losses by 50-75%. Payback period is 3-7 days. ROI exceeds 1000% annually.",
           "timeline": {
             "basis": "ESTIMATED",
-            "rationale": "Press ships in 1-2 weeks from Vincent Corporation. Solar cabinet construction: 1 week with standard materials. Integration and testing: 1 week.",
-            "value": "2-4 weeks to operational"
+            "rationale": "All materials already available in target contexts. No new equipment or skills required.",
+            "value": "Implementable in days"
           }
         },
         "first_validation_step": {
-          "cost": "$500-1,500 (trial rental fee + shipping)",
-          "equipment_method": "Vincent CP-4 trial unit; measure input/output weights, moisture content (oven drying method AOAC 950.46), and electrical consumption",
-          "go_criteria": "Press cake at 40-50% solids; press liquid clear enough for sewer discharge; no screen clogging with typical waste mix",
-          "no_go_criteria": "Press cake >60% moisture (insufficient dewatering) OR frequent screen clogging → consider decanter centrifuge alternative (concept frontier-1)",
+          "cost": "$30-50 (primarily produce cost; materials are near-free)",
+          "equipment_method": "Visual quality scoring (1-5 scale for firmness, color, mold presence) daily for 14 days. No specialized equipment required. Photograph documentation.",
+          "go_criteria": "Charcoal+lime conditions show >50% reduction in decay incidence vs. control; oil-coated produce in Zeer pot shows <20% mold incidence vs. uncoated in Zeer pot",
+          "no_go_criteria": "No significant difference between charcoal+lime and control → revisit charcoal quality and quantity; pivot to hot water treatment as primary intervention",
           "replicates": 5,
           "sample_sourcing": {
-            "lead_time": "2-4 weeks for trial unit delivery",
-            "material": "Vincent Corporation trial program (contact: sales@vincentcorp.com, 813-248-2650)",
-            "quantity": "Process 500-1000 lbs of actual facility waste over 3-5 days"
+            "lead_time": "1-2 days for material assembly",
+            "material": "Locally harvested tomatoes at mature-green stage; coconut shell charcoal from local producer; agricultural lime from building supply",
+            "quantity": "25kg tomatoes (5 conditions × 5kg), 500g charcoal, 1kg lime, 500ml cooking oil"
           },
-          "test": "Rent or borrow a screw press and test on actual facility waste stream",
-          "timeline": "3-4 weeks (arrangement + trial + analysis)",
-          "who_performs": "In-house with Vincent Corporation technical support (they offer trial programs)"
+          "test": "Side-by-side comparison: (A) charcoal+lime container at ambient, (B) Zeer pot without charcoal, (C) Zeer pot with charcoal+lime, (D) oil-coated produce in Zeer pot, (E) control basket. 5kg tomatoes each condition.",
+          "timeline": "2 weeks for trial + 1 week for analysis",
+          "who_performs": "In-house or agricultural extension partner with basic measurement capability"
         },
         "id": "sol-primary",
         "ip_considerations": {
           "freedom_to_operate": "GREEN",
           "key_patents_to_review": [
-            "None identified - both technologies are public domain"
+            "US 4,515,266 (expired 1985) - carbon liner concept, now public domain"
           ],
           "patentability_potential": "LOW",
-          "rationale": "Search for 'screw press food waste patent' and 'solar food dryer patent' returned no blocking patents. Screw press technology is >100 years old (Vincent founded 1929). Solar food drying is traditional technology with extensive public domain documentation. US4974781 (vacuum food waste drying, 1990) is expired."
+          "rationale": "Search for 'charcoal ethylene scrubbing patent' and 'vegetable oil produce coating patent' returned expired patents only. US 4,515,266 (1985, expired) covers carbon-fabric liner concept—now public domain. Oil coating is traditional practice with no patent protection. Lime whitewash is ancient technology."
         },
         "key_risks": [
           {
-            "mitigation": "Size buffer capacity for 5-7 days; add electric backup heater; or choose thermal hybrid (concept sol-support-1) for variable climates",
-            "risk": "Weather dependence in cloudy climates limits throughput"
+            "mitigation": "Establish minimum pyrolysis temperature guidance (400°C+); prefer coconut shell charcoal which has highest surface area; provide simple quality test (does it float? reject)",
+            "risk": "Charcoal quality variability from different feedstocks may result in inconsistent ethylene adsorption"
           },
           {
-            "mitigation": "Pre-grind fibrous materials; clean screen daily; Vincent provides replacement screens at $200-400",
-            "risk": "Press screen clogging with fibrous waste (corn husks, celery)"
+            "mitigation": "Harvest at mature-green stage when possible; handle gently; sort damaged produce for immediate consumption",
+            "risk": "Pre-harvest ethylene exposure or mechanical damage may trigger cascade before storage begins"
           },
           {
-            "mitigation": "Verify local regulations before purchase; most jurisdictions permit food waste liquids; BOD/TSS typically within limits",
-            "risk": "Press liquid disposal may require sewer discharge permit"
+            "mitigation": "Parallel solution: oil coating + neem leaves + high-humidity Zeer pot for leafy greens specifically",
+            "risk": "Doesn't address leafy green preservation as effectively as climacteric fruits"
           }
         ],
-        "source_type": "CATALOG",
+        "source_type": "EMERGING",
         "sustainability_flag": {
           "alternative": null,
-          "detail": "Solar thermal replaces 400-600 kWh/ton of electrical consumption that conventional dehydrators require. No consumables beyond occasional screen replacement. Press liquid can be used for fertigation, closing the nutrient loop. Embodied energy payback in <6 months of operation. Carbon reduction of 300-500 kg CO2/ton processed vs. grid-powered thermal drying.",
-          "summary": "Near-zero operational energy in sunny climates",
+          "detail": "Charcoal from waste sequesters carbon. Neem is fast-growing and widely cultivated. Lime production from shells or limestone is low-energy. No synthetic inputs, no waste stream, fully biodegradable at end of life. Eliminates need for energy-intensive refrigeration.",
+          "summary": "Uses agricultural waste and naturally occurring materials with carbon-negative production",
           "type": "BENEFIT"
         },
         "the_insight": {
-          "what": "Free water in food waste (50-70% of total moisture) is held by capillary forces of 0.1-10 kPa, easily overcome by mechanical pressure of 200-500 kPa. This water can be removed at 1/50th the energy cost of evaporation.",
+          "what": "Ethylene cascade interruption, not temperature reduction, is the primary lever for climacteric fruit preservation",
           "where_we_found_it": {
-            "domain": "Agricultural manure handling and food processing",
-            "how_they_use_it": "Screw presses dewater manure, citrus pulp, and food processing waste at industrial scale. Vincent Corporation has been building these since 1929.",
-            "why_it_transfers": "Food waste has similar moisture content and mechanical properties to the substrates these presses were designed for. The CP-4 is already rated for food waste applications."
+            "domain": "1-MCP (ethylene receptor blocker) research literature",
+            "how_they_use_it": "Industrial postharvest treatment achieving 3-5x shelf life extension at ambient temperature",
+            "why_it_transfers": "The mechanism (preventing ethylene perception/production) can be achieved through removal (charcoal adsorption) and oxidation (lime reaction) rather than receptor blocking"
           },
-          "why_industry_missed_it": "Food waste equipment is sold through foodservice equipment distributors to facility managers. Agricultural equipment is sold through farm equipment dealers to farmers. The sales channels don't overlap, and neither side has incentive to cross-market."
+          "why_industry_missed_it": "Cold chain infrastructure is a multi-billion dollar industry with entrenched interests. Ethylene management is positioned as supplementary to refrigeration, not as a replacement. The translation from 1-MCP efficacy to charcoal+lime implementation hasn't been explicitly validated because no commercial incentive exists."
         },
-        "title": "Screw Press + Solar Cabinet Hybrid",
-        "what_it_is": "An agricultural screw press designed for manure and food processing dewatering, combined with a passive solar drying cabinet for final moisture removal. The Vincent Corporation CP-4 screw press ($6-8K) handles 500+ lbs/day of food waste, using increasing compression along a tapered screw to squeeze free water through a perforated screen. Press cake exits at 40-50% solids—already a 50-60% mass reduction.\n\nThe press cake is spread on mesh trays in an insulated solar cabinet with a black absorber plate and passive convection chimney. Solar heating raises interior temperature to 50-70°C above ambient, completing drying to <15% moisture in 2-4 sunny days. Total electrical consumption is 15-30 kWh/ton (press motor and feeding system only); solar provides the thermal energy for free.\n\nThe system requires 3-5 days of buffer capacity to handle cloudy periods. For facilities in consistently sunny climates (Southwest US, Mediterranean), this is the simplest and cheapest path to meeting all specifications. For variable climates, the solar cabinet can be supplemented with a small electric heater for backup, adding 50-100 kWh/ton during cloudy periods.",
-        "why_it_works": "The physics are straightforward. Free water is held in the food matrix by capillary forces—surface tension effects in the pores and interstices of the material. These forces are weak (0.1-10 kPa). A screw press applies 200-500 kPa of pressure, easily overcoming capillary retention and forcing water through the screen.\n\nThe remaining 'bound water' is hydrogen-bonded to food polymers (starches, proteins, cellulose). These bonds are stronger (10-100 kJ/mol) and require thermal energy to break. But by this point, you've already removed 50-70% of the water mechanically. Solar radiation provides 800-1000 W/m² in sunny conditions; a 10 m² collector can deliver 6-8 kWh/day of thermal energy—enough to evaporate the remaining moisture from 200-300 lbs of press cake."
+        "title": "Ethylene-First Preservation System (Charcoal + Lime + Oil Coating)",
+        "what_it_is": "A three-component system that addresses the dominant decay pathway for each produce category using only waste materials. For climacteric fruits (tomatoes, mangoes): place produce in a container with a charcoal sachet (50-100g from coconut shells or rice husks) and lime-washed interior surfaces. The charcoal adsorbs ethylene through van der Waals forces; the lime (calcium hydroxide) chemically oxidizes any remaining ethylene while providing antimicrobial surface protection. For all produce types: apply a thin coating of locally available vegetable oil (coconut, mustard, or palm) before storage, which creates a hydrophobic barrier preventing surface moisture accumulation while reducing respiration rate by 30-40%.\n\nThe system is modular: farmers with existing Zeer pots can add oil-coated produce to capture cooling benefits without humidity damage. Farmers without Zeer pots can use any container with charcoal + lime for ethylene control alone. The charcoal is regenerated by placing in direct sunlight for 4-6 hours weekly, which drives off adsorbed ethylene and restores capacity. Lime whitewash is reapplied monthly or when visibly degraded.\n\nFor leafy greens (non-climacteric), the ethylene component is less critical. Instead, the oil coating prevents dehydration while dried neem leaves added to the container provide continuous antimicrobial volatile release. This addresses the microbial colonization pathway that dominates leafy green decay.",
+        "why_it_works": "Activated charcoal has enormous surface area (300-500 m²/g even without industrial activation) with micropores (0.5-2 nm diameter) that physically trap ethylene molecules (0.4 nm diameter) through London dispersion forces. At 15-25 mg ethylene per gram charcoal, 100g can adsorb ethylene production from 20kg of tomatoes for 14+ days. Lime (Ca(OH)₂) reacts with ethylene to form calcium carbonate and water—a permanent removal rather than saturation-limited adsorption. The high pH (12+) of lime surfaces also inhibits bacterial and fungal growth.\n\nOil coating works through simple thermodynamics: triglyceride fatty acid chains create a non-polar surface that water cannot wet (contact angle >90°). This maintains surface water activity below 0.80—below the threshold for most bacterial and fungal growth—even when ambient humidity is 95%. Simultaneously, the oil film reduces oxygen permeability, slowing aerobic respiration by 30-40%."
       },
       "supporting": [
         {
-          "confidence_percent": 82,
+          "confidence_percent": 78,
           "economics": {
-            "expected_outcome": "150-200 kWh/ton, weather-independent",
-            "investment": "$12,000-18,000",
-            "timeline": "3-6 months (equipment procurement + custom integration)"
+            "expected_outcome": "2-3x shelf life extension for EACH produce category (vs. 1.5-2x for universal approach)",
+            "investment": "$5-10 for base container + 2-3 inserts",
+            "timeline": "Implementable in weeks with existing materials"
           },
           "id": "sol-support-1",
-          "key_risk": "Integration complexity and heat exchanger maintenance. System requires engineering to connect press output to dryer input and manage vapor recovery. Heat exchanger may foul with food volatiles, requiring monthly cleaning.",
-          "relationship": "FALLBACK",
+          "key_risk": "Added complexity may confuse users or lead to wrong insert selection. Need clear visual coding (color, shape) for insert-produce matching.",
+          "relationship": "COMPLEMENTARY",
           "sustainability_flag": {
             "alternative": null,
-            "detail": "Reduces electrical consumption from 800-1200 kWh/ton to 150-200 kWh/ton. At average US grid intensity, this represents 400-600 kg CO2/ton reduction. Heat recovery captures energy that conventional systems exhaust.",
-            "summary": "75-80% energy reduction vs. conventional thermal dehydrators",
+            "detail": "Base container lasts years; only inserts need periodic replacement/regeneration. All insert materials are locally sourceable and biodegradable.",
+            "summary": "All natural materials; modular design extends base container lifespan",
             "type": "BENEFIT"
           },
           "the_insight": {
-            "what": "Sequential water removal via lowest-energy method for each fraction: mechanical for free water (10-15 kWh/ton), thermal with 50% heat recovery for bound water (100-150 kWh/ton)",
-            "where_we_found_it": "Olive oil processing + brewery spent grain drying both use this staged approach at industrial scale",
-            "why_industry_missed_it": "Food waste equipment vendors sell complete systems; they don't encourage customers to combine equipment from different vendors/industries"
+            "what": "Tomatoes/mangoes (climacteric) and leafy greens (non-climacteric) have fundamentally different decay pathways requiring different interventions",
+            "where_we_found_it": "Industrial MAP packaging differentiates by produce type; Kader (2002) documents produce-specific optimal conditions",
+            "why_industry_missed_it": "Tension between simplicity and effectiveness. Development organizations prefer single solutions for easier training and adoption."
           },
-          "title": "Two-Stage Mechanical-Thermal Hybrid with Heat Recovery",
-          "what_it_is": "Screw press dewatering to 45% solids, followed by a compact heated drum dryer with vapor heat recovery. The press removes 50-60% of water mechanically at 15 kWh/ton. Press cake enters a jacketed auger conveyor at 120-150°C. Evaporated moisture passes through a plate heat exchanger, preheating incoming press cake. Condensate (clean water) is discharged. Dry output (<15% moisture) exits continuously.\n\nThis system achieves 150-200 kWh/ton regardless of weather, making it the right choice for facilities in variable climates or those requiring consistent throughput. The integration requires custom engineering but uses standard industrial components.",
-          "when_to_use_instead": "Choose this over primary when: (1) climate is too cloudy for reliable solar drying, (2) consistent daily throughput is required regardless of weather, (3) space constraints prevent solar cabinet installation, or (4) budget allows for higher capital cost in exchange for operational reliability.",
-          "why_it_works": "Mechanical removal eliminates 50-60% of water at 10-15 kWh/ton. The remaining 35-40% moisture requires thermal energy, but plate heat exchangers capture 50-60% of the latent heat from exhaust vapor and return it to the process. Net thermal consumption: 0.35 × (2260 kJ/kg ÷ 3.6 MJ/kWh) × (1 - 0.5 recovery) = 110 kWh/ton. Add mechanical and fan energy: total 150-200 kWh/ton."
+          "title": "Produce-Specific Modular Insert System",
+          "what_it_is": "A universal base container (clay pot, woven basket, or wooden box) with produce-specific modular inserts that optimize for the dominant decay pathway of each category. Ethylene-scrubbing insert for climacteric fruits: charcoal sachet (50-100g) + lime-washed inner liner. Humidity-buffering insert for leafy greens: small water reservoir with fabric wick + charcoal for humidity buffering to maintain 90-95% RH. Antimicrobial insert for all: neem leaf sachet. Inserts are color-coded or shape-differentiated for easy selection.\n\nThis approach threads the needle between simplicity (one base system) and effectiveness (optimized interventions). The base container provides scale economies and familiarity; the inserts provide customization without complexity.",
+          "when_to_use_instead": "When farmers store multiple produce types and want optimized results for each; when universal approach shows inadequate results for leafy greens specifically",
+          "why_it_works": "For climacteric fruits: charcoal adsorbs ethylene, lime oxidizes it, breaking the autocatalytic cascade. For leafy greens: water reservoir maintains >90% RH preventing dehydration (the primary decay pathway), while charcoal prevents over-saturation and neem provides antimicrobial protection. Each insert addresses the rate-limiting decay mechanism for its produce category."
         },
         {
-          "confidence_percent": 85,
+          "confidence_percent": 72,
           "economics": {
-            "expected_outcome": "15-20 kWh/ton + $10-15/ton lime cost",
-            "investment": "$7,000-10,000",
-            "timeline": "1-2 weeks to operational"
+            "expected_outcome": "1.5-2x shelf life extension + surface pathogen reduction",
+            "investment": "$5-20 for pot, fuel, and temperature indicator",
+            "timeline": "Implementable immediately with simple training"
           },
           "id": "sol-support-2",
-          "key_risk": "Output is not compost-compatible (high pH). Requires end-user willing to accept lime-stabilized material for soil amendment or landfill. Lime dust handling requires basic PPE.",
+          "key_risk": "Temperature precision is critical—too hot damages produce, too cool is ineffective. Need simple, foolproof temperature indication method.",
           "relationship": "COMPLEMENTARY",
           "sustainability_flag": {
-            "alternative": "Consider hydrated lime Ca(OH)2 which has lower embodied carbon if exothermic heating isn't needed",
-            "detail": "Quicklime production emits ~0.75 kg CO2/kg CaO. At 10% addition, this adds ~75 kg CO2/ton waste. However, output provides calcium and raises soil pH, displacing agricultural lime application. Net effect depends on end-use pathway.",
-            "summary": "Lime production has carbon footprint, but displaces fertilizer use",
+            "alternative": "Solar water heating for zero-fuel implementation",
+            "detail": "Energy required to heat water. However, if it eliminates need for continuous refrigeration, net energy balance is strongly positive. Solar water heating possible in sunny climates.",
+            "summary": "Requires fuel/energy input but is one-time treatment with multi-week benefit",
             "type": "LIFECYCLE_TRADEOFF"
           },
           "the_insight": {
-            "what": "Stability requires either low moisture (<15%) OR high pH (>11.5). Lime achieves the latter with zero drying energy.",
-            "where_we_found_it": "Sewage sludge stabilization has used lime for 100+ years (EPA/625/R-92/013)",
-            "why_industry_missed_it": "Lime stabilization is 'sewage technology'—cultural barrier to applying it to food waste. Output doesn't fit existing compost infrastructure."
+            "what": "Sub-lethal stress triggers protective dormancy response in plants, similar to how organisms prepare for drought or winter",
+            "where_we_found_it": "Plant stress biology literature; Lurie (1998) comprehensive review of postharvest heat treatments",
+            "why_industry_missed_it": "Industrial hot water treatment requires temperature control equipment. The insight that simple fire-heated water with finger-testing could work for farmer-scale implementation hasn't been validated."
           },
-          "title": "Screw Press + Lime Stabilization",
-          "what_it_is": "Mechanical dewatering followed by quicklime (CaO) addition for chemical stabilization. Press cake is mixed with 5-10% quicklime by weight. The exothermic hydration reaction (CaO + H2O → Ca(OH)2) generates heat, driving off additional moisture while raising pH to 12-13. High pH denatures enzymes, kills pathogens, and prevents microbial activity. Output is stable calcium-enriched soil amendment.\n\nThis is the fastest and cheapest path to stable output—operational in 1-2 weeks at $7-10K capital cost. The tradeoff: output is NOT compost-compatible and requires finding an end-user for lime-stabilized material (farms, landscapers, or direct soil incorporation).",
-          "when_to_use_instead": "Choose this when: (1) speed to deployment is critical, (2) a farm or landscaper partner exists who will take lime-stabilized output, (3) budget is tight and simplicity is valued, or (4) as a bridge solution while developing more sophisticated system.",
-          "why_it_works": "CaO hydration releases 65 kJ/mol (1160 kJ/kg CaO). At 10% addition rate, this provides ~116 kJ/kg waste—enough to evaporate 50g water/kg and raise temperature 30-40°C. pH >12 denatures proteins and lyses microbial cell membranes, creating biological stability without drying."
+          "title": "Hot Water Stress Priming Treatment",
+          "what_it_is": "Brief hot water dip (45-55°C for 5-10 minutes) immediately after harvest triggers heat shock protein expression that dramatically slows subsequent metabolism and increases stress tolerance. This one-time treatment provides multi-week protective effect. The treatment also kills surface pathogens (pasteurization effect) and inactivates ACC oxidase—the enzyme that produces ethylene.\n\nTemperature control is achieved using simple indicators: wax pellets that melt at target temperature, or the traditional 'elbow test' (water that's uncomfortable but not painful to touch is approximately 50°C). Produce is dipped in batches, then air-dried in shade before storage.",
+          "when_to_use_instead": "When ethylene-first approach shows insufficient results; when surface pathogen load is high; as synergistic addition to charcoal+lime system for maximum effect",
+          "why_it_works": "Heat shock activates HSF transcription factors, upregulating HSP70 and HSP90 chaperone proteins that prevent protein denaturation. Simultaneously, brief heat inactivates ACC oxidase (>90% at 50°C for 10 minutes) reducing ethylene production capacity. Surface pathogens are killed through thermal denaturation at temperatures plants survive."
         }
       ]
     },
-    "what_id_actually_do": "If this were my project, I'd start with a phone call to Vincent Corporation and ask about their trial program. For a few hundred dollars and a few weeks, you can test a screw press on your actual waste stream and know exactly what you're dealing with. That's the foundation for everything else.\n\nAssuming the press works (it almost certainly will—these things have been dewatering organic slurries since 1929), my next question would be about climate and disposal pathways. If you're in Phoenix or LA with reliable sun, build the solar cabinet and you're done for under $12K. If you're in Seattle or Boston, budget for the thermal hybrid at $15-18K.\n\nBut before I spent a dime on equipment, I'd make some phone calls to local AD facilities and farms. If someone within 30 miles will take wet fermented food waste—or better yet, pay you for it—the fermentation approach is a no-brainer. You're looking at $5K in equipment and essentially zero operating cost. The catch is finding that partner, but it's worth a week of phone calls to find out.\n\nThe innovation concepts (fermentation, BSF, torrefaction) are genuinely interesting, but they require either a non-standard disposal pathway or a higher risk tolerance. I wouldn't pursue them unless the simpler approaches don't fit your specific situation, or unless you're strategically interested in being early to a market that might grow significantly. The fermentation approach in particular could be transformative if AD infrastructure continues to expand—but that's a bet on infrastructure development, not just technology."
+    "what_id_actually_do": "If this were my project, I'd start tomorrow with a $50 trial. Buy 25kg of tomatoes at the local market, split into five conditions: (A) control basket, (B) basket with 100g charcoal sachet, (C) basket with charcoal + lime-washed interior, (D) Zeer pot with uncoated tomatoes, (E) Zeer pot with oil-coated tomatoes. Score them daily for firmness, color, and mold. In two weeks, you'll know which interventions actually work in your specific context.\n\nI'd bet on the charcoal+lime combination outperforming the Zeer pot alone, because the literature on ethylene control is compelling and Zeer pot humidity is a known problem. But I might be wrong—maybe your charcoal isn't activated enough, or your ambient humidity is so high that the Zeer pot doesn't create additional fungal pressure. The trial will tell you.\n\nWhile running that trial, I'd also do a parallel test of the probiotic surface treatment—it costs almost nothing (diluted yogurt whey) and could be a game-changer if it works. Dip half your tomatoes in the yogurt solution before putting them in the charcoal+lime basket. If the LAB-treated tomatoes show less mold, you've discovered something valuable.\n\nThe key insight I'd hold onto: we're not trying to replicate refrigeration. We're trying to interrupt the specific biochemical cascades that cause decay. For tomatoes and mangoes, that's ethylene. For leafy greens, that's dehydration and microbial growth. Match the intervention to the decay pathway, use waste materials, and iterate based on what actually works in your fields."
   },
   "usage": {
-    "inputTokens": 46474,
-    "outputTokens": 14104,
-    "totalTokens": 60578
+    "inputTokens": 55650,
+    "outputTokens": 13683,
+    "totalTokens": 69333
   }
 }
