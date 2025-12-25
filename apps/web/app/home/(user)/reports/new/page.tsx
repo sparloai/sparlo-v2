@@ -373,7 +373,7 @@ export default function NewReportPage() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={attachments.length >= MAX_ATTACHMENTS}
-                    className="group/btn flex items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-3 py-1.5 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary] disabled:cursor-not-allowed disabled:opacity-50"
+                    className="group/btn flex min-h-[44px] items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-4 py-2 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary] disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Attach
                     {attachments.length > 0 && (
@@ -401,19 +401,53 @@ export default function NewReportPage() {
                   disabled={isSubmitting}
                   autoFocus
                   data-test="challenge-input"
-                  placeholder={`Describe your engineering challenge. Include:
-• The problem you're solving
-• Key constraints (cost, materials, time)
-• What success looks like
-
-Example: "We need to reduce our battery pack weight by 30% while maintaining 500+ charge cycles for our electric delivery vehicle fleet."`}
+                  placeholder="Problem, constraints, target metrics."
                   spellCheck={false}
-                  className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none disabled:opacity-40 md:text-xl"
+                  className="min-h-[240px] flex-1 resize-none rounded-lg border-0 bg-transparent p-2 text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] transition-shadow duration-200 focus:ring-1 focus:ring-violet-500/40 focus:outline-none disabled:opacity-40 md:text-xl"
                   style={{
                     fontFamily: 'Soehne, Inter, sans-serif',
-                    outline: 'none',
                   }}
                 />
+
+                {/* Context Detection - directly below textarea */}
+                <div className="mt-4 flex flex-wrap items-center gap-2 select-none">
+                  {CONTEXT_DETECTIONS.map((context) => {
+                    const isDetected = detectedContexts.has(context.id);
+                    return (
+                      <div
+                        key={context.id}
+                        className={cn(
+                          'flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all duration-300',
+                          isDetected
+                            ? 'border border-violet-500/30 bg-violet-500/10 dark:border-violet-500/20'
+                            : 'border border-dashed border-[--border-default] bg-transparent',
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            'h-1.5 w-1.5 rounded-full transition-all duration-300',
+                            isDetected
+                              ? 'bg-violet-500 shadow-[0_0_6px_rgba(139,92,246,0.8)]'
+                              : 'bg-[--border-default]',
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            'text-xs',
+                            isDetected
+                              ? 'text-violet-700 dark:text-violet-300'
+                              : 'text-[--text-muted]',
+                          )}
+                        >
+                          {context.label}
+                        </span>
+                        {isDetected && (
+                          <Check className="h-3 w-3 text-violet-600 dark:text-violet-400" />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Attachment Previews */}
@@ -446,53 +480,6 @@ Example: "We need to reduce our battery pack weight by 30% while maintaining 500
                   </p>
                 </div>
               )}
-
-              {/* Context Awareness / Intelligence Layer */}
-              <div className="px-6 pb-6 md:px-8 md:pb-8">
-                <div className="flex flex-wrap items-center gap-3 select-none">
-                  <span className="mr-1 font-mono text-xs font-medium tracking-widest text-[--text-muted] uppercase">
-                    Context Detection
-                  </span>
-
-                  {CONTEXT_DETECTIONS.map((context) => {
-                    const isDetected = detectedContexts.has(context.id);
-                    return (
-                      <div
-                        key={context.id}
-                        className={cn(
-                          'flex items-center gap-2 rounded-full px-3 py-1.5 transition-all duration-300',
-                          isDetected
-                            ? 'border border-violet-500/30 bg-violet-500/10 dark:border-violet-500/20'
-                            : 'border border-dashed border-[--border-default] bg-transparent text-[--text-muted]',
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            'h-1.5 w-1.5 rounded-full transition-all duration-300',
-                            isDetected
-                              ? 'bg-violet-500 shadow-[0_0_6px_rgba(139,92,246,0.8)]'
-                              : 'bg-[--border-default]',
-                          )}
-                        />
-                        <span
-                          className={cn(
-                            'text-xs font-medium',
-                            isDetected
-                              ? 'text-violet-700 dark:text-violet-300'
-                              : 'text-[--text-muted]',
-                          )}
-                          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                        >
-                          {context.label}
-                        </span>
-                        {isDetected && (
-                          <Check className="h-3 w-3 text-violet-600 dark:text-violet-400" />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
 
               {/* Footer / Action Area */}
               <div className="border-t border-[--border-subtle] bg-[--surface-overlay] p-2 dark:bg-neutral-900/30">
@@ -539,7 +526,7 @@ Example: "We need to reduce our battery pack weight by 30% while maintaining 500
                         'group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-8 py-4 transition-all duration-300 md:w-auto',
                         canSubmit && !isSubmitting
                           ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/25 hover:bg-violet-500 hover:shadow-violet-500/40 dark:bg-violet-600 dark:shadow-violet-500/20 dark:hover:bg-violet-500'
-                          : 'cursor-not-allowed bg-[--surface-overlay] text-[--text-muted] dark:bg-neutral-800 dark:text-neutral-500',
+                          : 'cursor-not-allowed bg-neutral-200 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400',
                       )}
                     >
                       <span
@@ -586,7 +573,7 @@ Example: "We need to reduce our battery pack weight by 30% while maintaining 500
                 className="font-mono text-xs tracking-tight text-[--text-secondary]"
                 style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
               >
-                BUILT ON SOC2 INFRASTRUCTURE
+                SOC2 TYPE II
               </span>
             </div>
           </div>
