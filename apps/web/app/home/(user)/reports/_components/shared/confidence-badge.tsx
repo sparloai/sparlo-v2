@@ -10,14 +10,15 @@ interface ConfidenceBadgeProps {
 const levelConfig: Record<string, { className: string }> = {
   high: {
     className:
-      'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+      'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800',
   },
   medium: {
     className:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800',
   },
   low: {
-    className: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    className:
+      'bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700',
   },
 };
 

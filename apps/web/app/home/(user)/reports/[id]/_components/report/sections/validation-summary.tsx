@@ -17,8 +17,8 @@ export function ValidationSummary({ data }: ValidationSummaryProps) {
       <div className="grid gap-6 md:grid-cols-3">
         {/* Failure Modes */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-            Failure Modes Checked
+          <h3 className="text-xs font-semibold text-zinc-500">
+            Failure modes checked
           </h3>
           <div className="space-y-3">
             {data.failure_modes_checked.map((item, index) => (
@@ -32,8 +32,8 @@ export function ValidationSummary({ data }: ValidationSummaryProps) {
 
         {/* Parameter Bounds */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-            Parameter Bounds Validated
+          <h3 className="text-xs font-semibold text-zinc-500">
+            Parameter bounds validated
           </h3>
           <div className="space-y-3">
             {data.parameter_bounds_validated.map((item, index) => (
@@ -54,8 +54,8 @@ export function ValidationSummary({ data }: ValidationSummaryProps) {
 
         {/* Literature Precedent */}
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-            Literature Precedent
+          <h3 className="text-xs font-semibold text-zinc-500">
+            Literature precedent
           </h3>
           <div className="space-y-3">
             {data.literature_precedent.map((item, index) => (

@@ -42,7 +42,7 @@ export function KeyPatterns({ data }: KeyPatternsProps) {
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="font-mono text-xs tracking-wider text-zinc-400 uppercase">
+                <span className="text-xs text-zinc-400">
                   {pattern.id}
                 </span>
                 <h3 className="mt-1 text-lg font-semibold text-zinc-900">
@@ -60,8 +60,8 @@ export function KeyPatterns({ data }: KeyPatternsProps) {
             </p>
 
             <div className="space-y-2 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-              <h4 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-                Why It Matters
+              <h4 className="text-xs font-semibold text-zinc-500">
+                Why it matters
               </h4>
               <p className="text-sm text-zinc-700">{pattern.why_it_matters}</p>
             </div>

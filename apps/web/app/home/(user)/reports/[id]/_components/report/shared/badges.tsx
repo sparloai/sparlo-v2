@@ -19,19 +19,20 @@ interface ConfidenceBadgeProps {
 const confidenceStyles = {
   HIGH: 'bg-emerald-50 text-emerald-700 border-emerald-100',
   MEDIUM: 'bg-amber-50 text-amber-700 border-amber-100',
-  LOW: 'bg-red-50 text-red-700 border-red-100',
+  LOW: 'bg-zinc-100 text-zinc-600 border-zinc-200',
 } as const satisfies Record<ConfidenceLevelType, string>;
 
 export function ConfidenceBadge({ level, className }: ConfidenceBadgeProps) {
+  const displayLevel = level.charAt(0) + level.slice(1).toLowerCase();
   return (
     <span
       className={cn(
-        'rounded border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase',
+        'rounded border px-2.5 py-1 text-[10px] font-semibold',
         confidenceStyles[level],
         className,
       )}
     >
-      {level}
+      {displayLevel}
     </span>
   );
 }
@@ -49,18 +50,18 @@ interface ViabilityBadgeProps {
 const viabilityStyles = {
   GREEN: {
     container: 'bg-emerald-50 border-emerald-100',
-    dot: 'bg-emerald-500',
+    dot: 'bg-emerald-600',
     text: 'text-emerald-700',
   },
   YELLOW: {
     container: 'bg-amber-50 border-amber-100',
-    dot: 'bg-amber-500',
+    dot: 'bg-amber-600',
     text: 'text-amber-700',
   },
   RED: {
-    container: 'bg-red-50 border-red-100',
-    dot: 'bg-red-500',
-    text: 'text-red-700',
+    container: 'bg-zinc-100 border-zinc-200',
+    dot: 'bg-zinc-500',
+    text: 'text-zinc-600',
   },
 } as const satisfies Record<
   ViabilityVerdictType,
@@ -85,7 +86,7 @@ export function ViabilityBadge({
       <span className={cn('h-1.5 w-1.5 rounded-full', style.dot)} />
       <span
         className={cn(
-          'text-[10px] font-bold tracking-wide uppercase',
+          'text-[10px] font-semibold',
           style.text,
         )}
       >
@@ -115,7 +116,7 @@ export function TrackBadge({ track, label, className }: TrackBadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded border px-2 py-0.5 text-[10px] font-semibold tracking-wide uppercase',
+        'inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-[10px] font-semibold',
         trackStyles[track],
         className,
       )}
@@ -137,7 +138,7 @@ interface LikelihoodBadgeProps {
 
 const likelihoodStyles = {
   amber: 'bg-amber-50 text-amber-700 border-amber-100',
-  red: 'bg-red-50 text-red-700 border-red-100',
+  red: 'bg-zinc-100 text-zinc-600 border-zinc-200',
   gray: 'bg-zinc-50 text-zinc-600 border-zinc-200',
 } as const satisfies Record<LikelihoodColorType, string>;
 
@@ -149,7 +150,7 @@ export function LikelihoodBadge({
   return (
     <span
       className={cn(
-        'rounded border px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase',
+        'rounded border px-2.5 py-1 text-[10px] font-semibold',
         likelihoodStyles[color],
         className,
       )}

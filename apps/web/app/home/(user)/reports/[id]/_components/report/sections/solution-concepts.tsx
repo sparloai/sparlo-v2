@@ -45,8 +45,8 @@ export function SolutionConcepts({ data }: SolutionConceptsProps) {
       {/* Lead Concepts */}
       {data.lead_concepts.length > 0 && (
         <div className="space-y-6">
-          <h3 className="text-xs font-semibold tracking-wider text-emerald-600 uppercase">
-            Lead Concepts
+          <h3 className="text-xs font-semibold text-emerald-600">
+            Lead concepts
           </h3>
           {data.lead_concepts.map((concept) => (
             <LeadConceptCard key={concept.id} concept={concept} />
@@ -57,8 +57,8 @@ export function SolutionConcepts({ data }: SolutionConceptsProps) {
       {/* Other Concepts */}
       {data.other_concepts.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-            Other Concepts
+          <h3 className="text-xs font-semibold text-zinc-500">
+            Other concepts
           </h3>
           <div className="grid gap-4 md:grid-cols-2">
             {data.other_concepts.map((concept) => (
@@ -78,8 +78,8 @@ export function SolutionConcepts({ data }: SolutionConceptsProps) {
       {/* Comparison Table */}
       {data.comparison_table.length > 0 && (
         <div className="space-y-4">
-          <h3 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-            Concept Comparison
+          <h3 className="text-xs font-semibold text-zinc-500">
+            Concept comparison
           </h3>
           <div className="overflow-x-auto rounded-lg border border-zinc-200">
             <table className="w-full min-w-[700px] text-sm">

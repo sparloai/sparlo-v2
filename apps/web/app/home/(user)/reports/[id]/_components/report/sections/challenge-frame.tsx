@@ -30,7 +30,7 @@ export function ChallengeFrame({ data }: ChallengeFrameProps) {
             </p>
 
             <div className="ml-8 rounded-lg border border-amber-100 bg-white p-4">
-              <span className="text-xs font-bold tracking-wider text-amber-600 uppercase">
+              <span className="text-xs font-semibold text-amber-600">
                 {item.action_or_test.label}
               </span>
               <p className="mt-1 text-sm text-zinc-700">

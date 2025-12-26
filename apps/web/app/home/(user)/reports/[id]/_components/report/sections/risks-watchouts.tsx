@@ -62,7 +62,7 @@ export function RisksWatchouts({ data }: RisksWatchoutsProps) {
                     className="h-4 w-4 text-emerald-600"
                     strokeWidth={1.5}
                   />
-                  <h4 className="text-xs font-semibold tracking-wider text-emerald-700 uppercase">
+                  <h4 className="text-xs font-semibold text-emerald-700">
                     Mitigation
                   </h4>
                 </div>
@@ -71,7 +71,7 @@ export function RisksWatchouts({ data }: RisksWatchoutsProps) {
               <div className="space-y-2 rounded-lg border border-rose-200 bg-rose-50/50 p-4">
                 <div className="flex items-center gap-2">
                   <Zap className="h-4 w-4 text-rose-600" strokeWidth={1.5} />
-                  <h4 className="text-xs font-semibold tracking-wider text-rose-700 uppercase">
+                  <h4 className="text-xs font-semibold text-rose-700">
                     Trigger
                   </h4>
                 </div>

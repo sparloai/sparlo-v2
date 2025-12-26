@@ -116,13 +116,13 @@
     --sparlo-track-spark-bg: rgba(245, 158, 11, 0.12);
     --sparlo-track-spark-text: #d97706;
 
-    /* Status Colors */
-    --sparlo-success: #059669;
-    --sparlo-success-subtle: rgba(5, 150, 105, 0.12);
-    --sparlo-warning: #d97706;
-    --sparlo-warning-subtle: rgba(217, 119, 6, 0.12);
-    --sparlo-error: #dc2626;
-    --sparlo-error-subtle: rgba(220, 38, 38, 0.12);
+    /* Status Colors - Muted, Apple-like palette */
+    --sparlo-success: #30A46C;
+    --sparlo-success-subtle: rgba(48, 164, 108, 0.1);
+    --sparlo-warning: #B87514;
+    --sparlo-warning-subtle: rgba(184, 117, 20, 0.1);
+    --sparlo-error: #C53030;
+    --sparlo-error-subtle: rgba(197, 48, 48, 0.1);
     --sparlo-info: var(--sparlo-violet);
     --sparlo-info-subtle: var(--sparlo-violet-subtle);
 
@@ -236,11 +236,11 @@
 
     /* Semantic status */
     --status-success: var(--sparlo-success);
-    --status-success-subtle: rgba(16, 185, 129, 0.12);
+    --status-success-subtle: var(--sparlo-success-subtle);
     --status-warning: var(--sparlo-warning);
-    --status-warning-subtle: rgba(245, 158, 11, 0.12);
+    --status-warning-subtle: var(--sparlo-warning-subtle);
     --status-error: var(--sparlo-error);
-    --status-error-subtle: rgba(239, 68, 68, 0.12);
+    --status-error-subtle: var(--sparlo-error-subtle);
 
     /* ============================================
        GLASSMORPHIC NAVIGATION (Light Mode)
@@ -305,13 +305,13 @@
     --border-default: rgba(255, 255, 255, 0.1);
     --border-strong: rgba(255, 255, 255, 0.15);
 
-    /* Semantic status - slightly brighter for dark mode */
-    --status-success: #22c55e;
-    --status-success-subtle: rgba(34, 197, 94, 0.15);
-    --status-warning: #f59e0b;
-    --status-warning-subtle: rgba(245, 158, 11, 0.2);
-    --status-error: #ef4444;
-    --status-error-subtle: rgba(239, 68, 68, 0.15);
+    /* Semantic status - muted for dark mode */
+    --status-success: #3ECF8E;
+    --status-success-subtle: rgba(62, 207, 142, 0.12);
+    --status-warning: #D9A54B;
+    --status-warning-subtle: rgba(217, 165, 75, 0.15);
+    --status-error: #E5484D;
+    --status-error-subtle: rgba(229, 72, 77, 0.12);
 
     /* Accent shadow - brighter for dark backgrounds */
     --shadow-accent: 0 4px 14px -2px rgba(139, 92, 246, 0.5);

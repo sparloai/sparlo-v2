@@ -37,13 +37,13 @@ export function RecommendationCard({
             )}
             <span
               className={cn(
-                'text-xs font-medium tracking-wider uppercase',
+                'text-xs font-medium',
                 isPrimary
                   ? 'text-violet-600 dark:text-violet-400'
                   : 'text-zinc-500 dark:text-zinc-400',
               )}
             >
-              {isPrimary ? 'Primary Recommendation' : 'Fallback Strategy'}
+              {isPrimary ? 'Primary recommendation' : 'Fallback strategy'}
             </span>
           </div>
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">

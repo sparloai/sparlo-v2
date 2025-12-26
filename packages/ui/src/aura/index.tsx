@@ -73,7 +73,7 @@ export function CardWithHeader({
           </span>
         )}
         <h3
-          className="font-mono text-sm font-bold tracking-widest uppercase"
+          className="font-sans text-sm font-semibold tracking-wide"
           style={{ color: 'var(--text-tertiary, rgba(0,0,0,0.55))' }}
         >
           {label}
@@ -91,7 +91,7 @@ export const MonoLabel = memo(function MonoLabel({
 }) {
   return (
     <span
-      className="font-mono text-sm font-bold tracking-widest uppercase"
+      className="font-sans text-xs font-semibold tracking-wide"
       style={{ color: 'var(--text-tertiary, rgba(0,0,0,0.55))' }}
     >
       {children}
@@ -126,7 +126,7 @@ export function AuraTable({
             {headers.map((header) => (
               <th
                 key={header}
-                className="px-6 py-4 font-mono text-xs font-bold tracking-wider uppercase"
+                className="px-6 py-5 font-sans text-xs font-semibold tracking-wide text-left"
                 style={{ color: 'var(--text-tertiary, rgba(0,0,0,0.55))' }}
               >
                 {header}
@@ -165,7 +165,7 @@ export function DarkSection({
       }}
     >
       <h4
-        className="mb-4 font-mono text-xs font-bold tracking-widest uppercase"
+        className="mb-4 font-sans text-xs font-semibold tracking-wide"
         style={{ color: '#a78bfa' }}
       >
         {label}
@@ -209,7 +209,7 @@ export const AuraBadge = memo(function AuraBadge({
 }) {
   return (
     <span
-      className="rounded border px-2.5 py-1 font-mono text-xs font-medium tracking-widest uppercase"
+      className="rounded-md border px-2.5 py-1.5 font-sans text-xs font-medium"
       style={AURA_BADGE_STYLES[variant]}
     >
       {children}
@@ -270,10 +270,10 @@ export const MetadataInfoCard = memo(function MetadataInfoCard({
               />
             )}
             <span
-              className="tracking-wider uppercase"
+              className="tracking-wide"
               style={{ color: 'var(--text-muted, rgba(0,0,0,0.4))' }}
             >
-              {item.label}:
+              {item.label}
             </span>
             <span
               className="font-semibold"
@@ -311,7 +311,7 @@ export const ViabilityAssessment = memo(function ViabilityAssessment({
       }}
     >
       <h3
-        className="mb-4 font-mono text-xs font-bold tracking-widest uppercase"
+        className="mb-4 font-sans text-xs font-semibold tracking-wide"
         style={{ color: 'var(--accent-light, #8b5cf6)' }}
       >
         Viability Assessment

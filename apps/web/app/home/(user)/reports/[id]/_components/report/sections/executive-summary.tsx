@@ -46,8 +46,8 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
 
         {/* Core Insight */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold tracking-wider text-zinc-500 uppercase">
-            The Core Insight
+          <h3 className="text-sm font-semibold text-zinc-500">
+            The core insight
           </h3>
           <p className="text-xl font-semibold text-zinc-900">
             {data.core_insight.headline}
@@ -59,8 +59,8 @@ export function ExecutiveSummary({ data }: ExecutiveSummaryProps) {
 
         {/* Recommended Path */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold tracking-wider text-zinc-500 uppercase">
-            Recommended Path
+          <h3 className="text-sm font-semibold text-zinc-500">
+            Recommended path
           </h3>
           <div className="space-y-3">
             {data.recommended_path.map((step) => (
