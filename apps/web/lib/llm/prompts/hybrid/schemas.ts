@@ -1091,6 +1091,25 @@ const ParadigmInsightIdentifiedSchema = z
   })
   .passthrough();
 
+// Framing validation for narrative calibration
+const FramingValidationSchema = z
+  .object({
+    recommended_narrative_type: z
+      .enum(['CATALOG', 'EMERGING_PRACTICE', 'CROSS_DOMAIN', 'PARADIGM'])
+      .catch('CATALOG'),
+    paradigm_claim_justified: z.boolean().catch(false),
+    justification: z.string().catch(''),
+    senior_practitioner_surprise_test: z
+      .object({
+        would_be_surprised: z.boolean().catch(false),
+        reasoning: z.string().catch(''),
+      })
+      .passthrough(),
+    phone_call_equivalent: z.string().catch(''),
+    sparlo_unique_value: z.array(z.string()).catch([]),
+  })
+  .passthrough();
+
 export const AN4_M_OutputSchema = z
   .object({
     validation_results: z.array(ValidationResultSchema).max(50).default([]),
@@ -1111,6 +1130,8 @@ export const AN4_M_OutputSchema = z
       .default([]),
     // NEW: Post-search solution classification
     solution_classification: SolutionClassificationSchema.optional(),
+    // NEW: Framing validation for narrative calibration
+    framing_validation: FramingValidationSchema.optional(),
   })
   .passthrough();
 

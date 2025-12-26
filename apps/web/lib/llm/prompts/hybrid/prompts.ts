@@ -117,6 +117,13 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     "key_constraints": ["Non-negotiable physical requirements"]
   },
   "industry_blind_spots": [
+    // OPTIONAL - populate ONLY if genuine blind spot identified
+    // Criteria for inclusion:
+    // 1. A senior practitioner (15+ years experience) would be genuinely surprised
+    // 2. This approach is NOT in supplier marketing materials or recent case studies
+    // 3. You can name the specific assumption being challenged with evidence
+    // If industry approach is fundamentally sound, return empty array []
+    // Empty array is valid and honest - not every problem has an industry blind spot
     {
       "what_industry_assumes": "The assumption",
       "why_it_might_be_wrong": "Challenge to assumption",
@@ -801,6 +808,30 @@ For each concept, check for significant sustainability implications. Only flag i
 - Anything requiring detailed LCA to determine
 - Theoretical concerns without practical alternative
 
+## FRAMING VALIDATION (Required)
+
+Before finalizing evaluation, determine how AN5 should frame the narrative:
+
+**Classification criteria:**
+
+CATALOG: Primary recommendation is available from suppliers today. A phone call would surface this.
+- Frame around: selection criteria, integration approach, validation protocol, supplier negotiation
+
+EMERGING_PRACTICE: Early adopters are doing this; not yet mainstream.
+- Frame around: who's ahead, what they've learned, how to catch up
+
+CROSS_DOMAIN: Proven in another industry; transfer is the insight.
+- Frame around: source domain, why transfer wasn't obvious, how physics connects
+
+PARADIGM: Industry assumption is genuinely wrong; senior practitioners would be surprised.
+- Frame around: the specific assumption, evidence it's wrong, what changes
+- ONLY use if all three criteria met:
+  1. 15-year veteran would be genuinely surprised
+  2. Not in supplier marketing or recent case studies
+  3. Can cite specific assumption with evidence
+
+**Honesty check:** If you're uncertain between CROSS_DOMAIN and PARADIGM, choose CROSS_DOMAIN. Paradigm claims must clear a high bar.
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON.
@@ -916,6 +947,17 @@ CRITICAL: Respond with ONLY valid JSON.
       "sparlo_adds_beyond_that": ["Specific value-add 1", "Specific value-add 2"],
       "recommended_emphasis": "SUPPLIER_ARBITRAGE | DECISION_FRAMEWORK | CROSS_DOMAIN_SYNTHESIS | PARADIGM_INSIGHT | INTEGRATION"
     }
+  },
+  "framing_validation": {
+    "recommended_narrative_type": "CATALOG | EMERGING_PRACTICE | CROSS_DOMAIN | PARADIGM",
+    "paradigm_claim_justified": false,
+    "justification": "Explain why this classification - be specific about what exists vs what's novel",
+    "senior_practitioner_surprise_test": {
+      "would_be_surprised": false,
+      "reasoning": "What would a 15-year industry veteran already know vs. learn from this?"
+    },
+    "phone_call_equivalent": "What user would learn from 30-min call to the right supplier",
+    "sparlo_unique_value": ["Specific value-add 1 beyond supplier call", "Specific value-add 2"]
   }
 }
 
@@ -1025,11 +1067,56 @@ Example: "Dr. Sarah Chen, MIT Media Lab - Published 2024 Nature paper on biogeni
 
 Write like a senior engineer briefing a project lead. Direct, confident, insightful.
 
-The narrative_lead should hook the reader in 2-3 sentences with the core insight woven in:
+## NARRATIVE LEAD TEMPLATES (Required - Select Based on framing_validation.recommended_narrative_type)
 
-GOOD: "The DDW industry has been solving the wrong problem for decades. While producers invest millions in distillation columns, the chlor-alkali industry performs this separation at massive scale as an unvalued byproduct—1.9 million tonnes of deuterium-depleted hydrogen annually, currently burned for process heat."
+The narrative_lead MUST match the solution classification from AN4. Using paradigm framing for catalog solutions destroys credibility.
 
-BAD: "This report analyzes DDW production methods and recommends a partnership approach..."
+**If CATALOG:**
+"[Specific supplier/technology] already offers [capability]. The challenge isn't finding the solution—it's [selection/integration/validation/execution]. Here's how to get it right."
+
+Example: "Munters has manufactured desiccant wheels for decades. The adaptation to amine sorbents is engineering, not research—the question is whether the coating survives 1000+ cycles."
+
+**If EMERGING_PRACTICE:**
+"[Specific company/segment] is already doing this, achieving [quantified results]. The opportunity is [gap between early adopters and mainstream]."
+
+Example: "RetroFoam's thermal imaging QC protocol achieves 95% fill rates vs. 70-85% industry average. The technology exists—adoption is the bottleneck."
+
+**If CROSS_DOMAIN:**
+"The [source industry] solved this with [mechanism] [timeframe ago]. The transfer to [target domain] hasn't happened because [specific reason for disconnect], but the physics is identical."
+
+Example: "Desiccant dehumidification achieves 70-85% sensible heat recovery through rotary wheels—proven for 40 years in HVAC. DAC developers haven't adopted it because chemical engineers think in batch reactors, not continuous processes."
+
+**If PARADIGM (only when validated in AN4):**
+"The [industry] has assumed [specific assumption]. [Evidence this is wrong]. This reframes the solution space: [specific implication]."
+
+Example: "The 1-MCP literature proves that for climacteric fruits, ethylene control—not temperature—is the primary decay driver. Charcoal adsorbs ethylene at 40-60% the efficacy of commercial systems using agricultural waste."
+
+**BANNED PHRASES (unless PARADIGM is validated):**
+- "solving the wrong problem"
+- "optimizing the wrong variable"
+- "the industry has been wrong"
+- "decades of missed opportunity"
+- "everyone has missed"
+- "the real problem is" (when implying industry ignorance)
+
+**PRE-GENERATION CHECK:**
+Before writing the narrative_lead, verify:
+1. What is framing_validation.recommended_narrative_type from AN4?
+2. Am I using the matching template?
+3. If I want to use paradigm framing, is paradigm_claim_justified = true?
+
+**GOOD CATALOG example:**
+"Dense-pack cellulose with proper QC achieves R-13 plus 40% air leakage reduction—Building Science Corporation has documented this for 15 years. The gap isn't knowledge; it's execution. Here's how to close it."
+
+**GOOD CROSS_DOMAIN example:**
+"The desiccant industry solved sensible heat recovery decades ago with rotary wheels achieving 70-85% efficiency. The transfer to DAC amine systems hasn't happened because chemical engineers design batch reactors, not continuous processes. The physics is identical."
+
+**GOOD PARADIGM example (when justified):**
+"For climacteric fruits, the 1-MCP literature proves ethylene control alone achieves 3-5x shelf life at ambient temperature—no cooling required. Charcoal and lime, both agricultural waste products, can substitute for commercial ethylene scrubbers at 1/100th the cost."
+
+**BAD (paradigm framing for catalog solution):**
+"The retrofit insulation industry has been optimizing the wrong variable. While manufacturers chase R-value per inch, incomplete fill is the real problem."
+→ This is bad because Building Science Corporation has published this for 15+ years. It's not a blind spot.
 
 ## OUTPUT SCHEMA
 
