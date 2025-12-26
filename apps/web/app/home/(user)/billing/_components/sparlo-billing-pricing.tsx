@@ -173,9 +173,7 @@ export function SparloBillingPricing({
             const monthlyPlan = product.plans.find(
               (p) => p.interval === 'month',
             );
-            const annualPlan = product.plans.find(
-              (p) => p.interval === 'year',
-            );
+            const annualPlan = product.plans.find((p) => p.interval === 'year');
             const activePlan =
               billingPeriod === 'monthly' ? monthlyPlan : annualPlan;
 
@@ -188,7 +186,8 @@ export function SparloBillingPricing({
             const displayPrice =
               billingPeriod === 'annual' ? Math.round(price / 12) : price;
             const isCurrent = currentPlanId === activePlan.id;
-            const isPending = pending && checkout.selectedPlan === activePlan.id;
+            const isPending =
+              pending && checkout.selectedPlan === activePlan.id;
             const isHighlighted = index === 1; // Middle plan highlighted
 
             return (
@@ -197,7 +196,7 @@ export function SparloBillingPricing({
                 className={cn(
                   'group relative flex flex-col rounded-lg border p-8 transition-colors duration-300 md:p-10',
                   isHighlighted
-                    ? 'border-primary/50 bg-white dark:border-primary/30 dark:bg-zinc-900'
+                    ? 'border-primary/50 dark:border-primary/30 bg-white dark:bg-zinc-900'
                     : 'border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700',
                 )}
               >

@@ -142,7 +142,7 @@ export function SparloHero() {
                 key={i}
                 className="group flex cursor-default items-start gap-4 rounded-lg border border-zinc-100 bg-white/50 p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:bg-white hover:shadow-[0_4px_12px_rgba(139,92,246,0.08)] dark:border-zinc-800/50 dark:bg-zinc-900/30 dark:hover:border-violet-500/30 dark:hover:bg-zinc-900/60 dark:hover:shadow-[0_4px_12px_rgba(139,92,246,0.15)]"
               >
-                <div className="bg-primary/10 text-primary mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-mono text-xs transition-all duration-200 group-hover:bg-primary/20 group-hover:scale-110">
+                <div className="bg-primary/10 text-primary group-hover:bg-primary/20 mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full font-mono text-xs transition-all duration-200 group-hover:scale-110">
                   {i + 1}
                 </div>
                 <p className="text-base leading-snug font-medium text-zinc-700 transition-colors duration-200 group-hover:text-zinc-900 dark:text-zinc-300 dark:group-hover:text-white">

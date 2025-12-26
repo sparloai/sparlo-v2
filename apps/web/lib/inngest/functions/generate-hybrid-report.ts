@@ -39,6 +39,7 @@ import {
 } from '../../llm/prompts/hybrid';
 import { HYBRID_CACHED_PREFIX } from '../../llm/prompts/hybrid/cached-prefix';
 import { inngest } from '../client';
+import { handleReportFailure } from '../utils/report-failure-handler';
 
 /**
  * Generate Hybrid Report - Inngest Durable Function
@@ -74,6 +75,13 @@ export const generateHybridReport = inngest.createFunction(
         match: 'data.reportId',
       },
     ],
+    onFailure: async ({ error, event, step }) => {
+      const failureEvent = event as unknown as {
+        event: { data: { reportId: string } };
+      };
+      const reportId = failureEvent.event.data.reportId;
+      await handleReportFailure(reportId, error, step);
+    },
   },
   { event: 'report/generate-hybrid' },
   async ({ event, step }) => {

@@ -5,7 +5,8 @@ import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-r
  * Source: food_json from GitHub
  */
 export const FOOD_HYBRID_REPORT: HybridReportData = {
-  title: 'On-Site Food Waste Processing: Mechanical-First Architecture for 80% Energy Reduction',
+  title:
+    'On-Site Food Waste Processing: Mechanical-First Architecture for 80% Energy Reduction',
   brief:
     "Commercial kitchens, hospitals, and universities generate 1-5 tons/week of food waste. Hauling costs $150-300/ton and rising. Composting requires space and management. Anaerobic digestion needs scale (100+ tons/day) to be economical. On-site dehydrators exist but consume 800-1200 kWh/ton, take 12-24 hours per batch, produce output that's not consistently compostable, and cost $30-50K for a 200 lb/day unit. Need on-site solution that reduces food waste volume by 80%+, processes 500+ lbs/day, uses <200 kWh/ton, produces stable output (compostable or fuel), and costs <$15K installed.",
 

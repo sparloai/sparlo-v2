@@ -101,7 +101,7 @@ export function SparloPricing() {
               key={tier.name}
               className={`group relative flex flex-col rounded-lg border p-8 transition-colors duration-300 md:p-10 ${
                 tier.highlighted
-                  ? 'border-primary/50 bg-white dark:border-primary/30 dark:bg-zinc-900'
+                  ? 'border-primary/50 dark:border-primary/30 bg-white dark:bg-zinc-900'
                   : 'border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700'
               }`}
             >

@@ -71,21 +71,21 @@ function RecentReportItem({
       <div
         className={cn(
           'mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full transition-colors',
-          isActive
-            ? 'bg-violet-500'
-            : 'bg-black/40 dark:bg-white/40',
+          isActive ? 'bg-violet-500' : 'bg-black/40 dark:bg-white/40',
         )}
       />
       <div className="min-w-0 flex-1">
         <span className="font-mono text-[10px] tracking-wider text-black/50 uppercase dark:text-white/50">
           [{modeLabel}]
         </span>
-        <p className={cn(
-          'truncate text-sm transition-colors',
-          isActive
-            ? 'text-black dark:text-white'
-            : 'text-black/80 dark:text-white/80',
-        )}>
+        <p
+          className={cn(
+            'truncate text-sm transition-colors',
+            isActive
+              ? 'text-black dark:text-white'
+              : 'text-black/80 dark:text-white/80',
+          )}
+        >
           {report.title || 'Untitled Report'}
         </p>
         <p className="font-mono text-xs text-black/40 dark:text-white/40">
@@ -94,12 +94,12 @@ function RecentReportItem({
           })}
         </p>
       </div>
-      <FileText className={cn(
-        'mt-1 h-3.5 w-3.5 flex-shrink-0 transition-colors',
-        isActive
-          ? 'text-violet-500'
-          : 'text-black/30 dark:text-white/30',
-      )} />
+      <FileText
+        className={cn(
+          'mt-1 h-3.5 w-3.5 flex-shrink-0 transition-colors',
+          isActive ? 'text-violet-500' : 'text-black/30 dark:text-white/30',
+        )}
+      />
     </Link>
   );
 }

@@ -343,9 +343,9 @@ export default function HybridNewReportPage() {
           <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
             {/* Toolbar / Context Hinting */}
             <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
-              <div className="flex items-center gap-2 font-mono text-xs tracking-wider text-amber-600 uppercase dark:text-amber-400">
+              <div className="flex items-center gap-2 text-xs font-medium text-amber-600 dark:text-amber-400">
                 <Scale className="h-4 w-4" />
-                <span>hybrid analysis</span>
+                <span>Hybrid analysis</span>
               </div>
               <div className="flex items-center gap-3">
                 <input
@@ -448,8 +448,8 @@ export default function HybridNewReportPage() {
             {/* Context Awareness / Intelligence Layer */}
             <div className="px-6 pb-6 md:px-8 md:pb-8">
               <div className="flex flex-wrap items-center gap-3 select-none">
-                <span className="mr-1 font-mono text-xs font-medium tracking-widest text-[--text-muted] uppercase">
-                  Context Detection
+                <span className="mr-1 text-xs font-medium text-[--text-muted]">
+                  Context detection
                 </span>
 
                 {CONTEXT_DETECTIONS.map((context) => {
@@ -502,18 +502,18 @@ export default function HybridNewReportPage() {
                   </div>
                   <div className="flex flex-col">
                     <span
-                      className="text-[10px] font-semibold tracking-wider text-[--text-muted] uppercase"
+                      className="text-[10px] font-semibold text-[--text-muted]"
                       style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                     >
-                      HYBRID ANALYSIS
+                      Hybrid analysis
                     </span>
                     <span
-                      className="font-mono text-xs text-[--text-secondary]"
+                      className="text-xs text-[--text-secondary]"
                       style={{
-                        fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
+                        fontFamily: 'Soehne, Inter, sans-serif',
                       }}
                     >
-                      ~20 MINUTES
+                      ~20 minutes
                     </span>
                   </div>
                 </div>

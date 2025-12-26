@@ -356,9 +356,9 @@ export default function NewReportPage() {
             <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
               {/* Toolbar / Context Hinting */}
               <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
-                <div className="flex items-center gap-2 font-mono text-xs tracking-wider text-[--text-muted] uppercase">
+                <div className="flex items-center gap-2 text-xs font-medium text-[--text-muted]">
                   <Terminal className="h-4 w-4 text-[--text-muted]" />
-                  <span>new analysis</span>
+                  <span>New analysis</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <input
@@ -381,7 +381,7 @@ export default function NewReportPage() {
                         ({attachments.length})
                       </span>
                     )}
-                    <Paperclip className="h-3 w-3 transition-colors group-hover/btn:text-emerald-500" />
+                    <Paperclip className="h-3 w-3 transition-colors group-hover/btn:text-violet-500" />
                   </button>
                 </div>
               </div>
@@ -471,7 +471,7 @@ E.g. 'We need to reduce our battery pack weight by 30% while maintaining 500+ ch
                         />
                         <button
                           onClick={() => removeAttachment(attachment.id)}
-                          className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                          className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-600 text-white opacity-0 transition-opacity group-hover:opacity-100"
                         >
                           <X className="h-3 w-3" />
                         </button>
@@ -496,18 +496,18 @@ E.g. 'We need to reduce our battery pack weight by 30% while maintaining 500+ ch
                     </div>
                     <div className="flex flex-col">
                       <span
-                        className="text-[10px] font-semibold tracking-wider text-[--text-muted] uppercase"
+                        className="text-[10px] font-semibold text-[--text-muted]"
                         style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
                       >
-                        ANALYSIS
+                        Analysis
                       </span>
                       <span
-                        className="font-mono text-xs text-[--text-secondary]"
+                        className="text-xs text-[--text-secondary]"
                         style={{
-                          fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
+                          fontFamily: 'Soehne, Inter, sans-serif',
                         }}
                       >
-                        ~25 MINUTES
+                        ~25 minutes
                       </span>
                     </div>
                   </div>
@@ -573,7 +573,7 @@ E.g. 'We need to reduce our battery pack weight by 30% while maintaining 500+ ch
             </div>
             <div className="hidden h-3 w-px bg-[--border-default] md:block" />
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-3 w-3 text-emerald-600 dark:text-emerald-500" />
+              <ShieldCheck className="h-3 w-3 text-violet-600 dark:text-violet-500" />
               <span
                 className="font-mono text-xs tracking-tight text-[--text-secondary]"
                 style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}

@@ -50,7 +50,9 @@ async function PersonalAccountBillingPage() {
   }
 
   // NON-SUBSCRIBER: Show Sparlo pricing page
-  return <SparloBillingPricing config={billingConfig} customerId={customerId} />;
+  return (
+    <SparloBillingPricing config={billingConfig} customerId={customerId} />
+  );
 }
 
 export default withI18n(PersonalAccountBillingPage);

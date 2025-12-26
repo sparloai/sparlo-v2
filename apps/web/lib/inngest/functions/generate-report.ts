@@ -45,6 +45,7 @@ import {
   createInitialChainState,
 } from '../../llm/schemas/chain-state';
 import { inngest } from '../client';
+import { handleReportFailure } from '../utils/report-failure-handler';
 
 /**
  * Generate Report - Inngest Durable Function (v10)
@@ -64,30 +65,11 @@ export const generateReport = inngest.createFunction(
     id: 'generate-report',
     retries: 2,
     onFailure: async ({ error, event, step }) => {
-      // Type assertion for failure event which wraps the original event
       const failureEvent = event as unknown as {
         event: { data: { reportId: string } };
       };
       const reportId = failureEvent.event.data.reportId;
-
-      console.error('Report generation failed:', {
-        reportId,
-        error: error.message,
-        ...(process.env.NODE_ENV === 'development' && { stack: error.stack }),
-      });
-
-      await step.run('update-failed-status', async () => {
-        const supabase = getSupabaseServerAdminClient();
-        await supabase
-          .from('sparlo_reports')
-          .update({
-            status: 'failed',
-            error_message:
-              'Your report failed. Please submit a new analysis request and contact support for help if it happens repeatedly.',
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', reportId);
-      });
+      await handleReportFailure(reportId, error, step);
     },
   },
   { event: 'report/generate' },

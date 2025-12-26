@@ -5,7 +5,8 @@ import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-r
  * Source: composite_example_json from GitHub
  */
 export const CLIMATE_HYBRID_REPORT: HybridReportData = {
-  title: 'Recyclable High-Performance Composites: Repurposing Polyurethane Glycolysis at Industrial Scale',
+  title:
+    'Recyclable High-Performance Composites: Repurposing Polyurethane Glycolysis at Industrial Scale',
   brief:
     "Carbon fiber reinforced thermosets dominate aerospace and automotive lightweighting, but end-of-life is landfill or energy-intensive pyrolysis that destroys the fiber. Thermoplastic composites are recyclable but can't match thermoset performance at high temperatures and lack creep resistance. Industry produces 500K+ tons of composite waste annually, growing rapidly. Need composite system with thermoset-like performance (Tg >180°C, creep resistance, processability) that can be chemically or thermally recycled to recover fibers at >90% property retention. Must work with existing manufacturing processes (autoclave, RTM, filament winding).",
 

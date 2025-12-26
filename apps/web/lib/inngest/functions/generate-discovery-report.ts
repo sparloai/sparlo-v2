@@ -37,6 +37,7 @@ import {
   DISCOVERY_CHAIN_CONFIG,
 } from '../../llm/prompts/discovery';
 import { inngest } from '../client';
+import { handleReportFailure } from '../utils/report-failure-handler';
 
 /**
  * Generate Discovery Report - Inngest Durable Function
@@ -61,6 +62,13 @@ export const generateDiscoveryReport = inngest.createFunction(
   {
     id: 'discovery-report-generator',
     retries: 2,
+    onFailure: async ({ error, event, step }) => {
+      const failureEvent = event as unknown as {
+        event: { data: { reportId: string } };
+      };
+      const reportId = failureEvent.event.data.reportId;
+      await handleReportFailure(reportId, error, step);
+    },
   },
   { event: 'report/generate-discovery' },
   async ({ event, step }) => {
