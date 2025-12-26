@@ -569,12 +569,82 @@ def status():
         click.echo(f"\nResults: Sparlo {sparlo_wins} | Claude {claude_wins} | Ties {evaluated - sparlo_wins - claude_wins}")
 
 
+def start_sparlo_report(problem_text: str) -> tuple[str, str]:
+    """Start a Sparlo report and return (report_id, error). Does NOT poll."""
+    if not BENCHMARK_API_KEY:
+        return ("", "BENCHMARK_API_KEY not set")
+
+    headers = {"x-benchmark-api-key": BENCHMARK_API_KEY}
+
+    try:
+        resp = requests.post(
+            f"{SPARLO_URL}/api/benchmark/reports",
+            json={"designChallenge": problem_text},
+            headers=headers,
+            timeout=60
+        )
+
+        if resp.status_code != 200:
+            return ("", f"HTTP {resp.status_code}: {resp.text[:100]}")
+
+        return (resp.json()["reportId"], "")
+    except Exception as e:
+        return ("", str(e))
+
+
+def poll_sparlo_report(report_id: str, problem_id: str, problem_text: str) -> tuple[str, str, dict]:
+    """Poll a single Sparlo report. Returns (output, status, report_data)."""
+    headers = {"x-benchmark-api-key": BENCHMARK_API_KEY}
+
+    try:
+        resp = requests.get(
+            f"{SPARLO_URL}/api/benchmark/reports/{report_id}",
+            headers=headers,
+            timeout=30
+        )
+
+        if resp.status_code != 200:
+            return ("", "error", {})
+
+        data = resp.json()
+        status = data.get("status")
+
+        if status == "complete":
+            report_data = data.get("reportData", {})
+            if isinstance(report_data, dict):
+                output = str(report_data.get("report", report_data))
+            else:
+                output = str(report_data)
+
+            # Save full JSON
+            full_report = {
+                "benchmark_id": problem_id,
+                "sparlo_report_id": report_id,
+                "problem_text": problem_text,
+                "generated_at": datetime.now().isoformat(),
+                "status": status,
+                "title": data.get("title"),
+                "report_data": report_data
+            }
+            report_file = REPORTS_DIR / f"{problem_id}_sparlo.json"
+            with open(report_file, 'w') as f:
+                json.dump(full_report, f, indent=2, default=str)
+
+            return (output, "complete", report_data)
+        elif status == "error":
+            return ("", "error", {})
+        else:
+            return ("", status, {})
+    except Exception:
+        return ("", "error", {})
+
+
 @cli.command()
 @click.argument('problems_file', type=click.Path(exists=True))
 @click.option('--start', default=0, help='Start from problem index (0-based)')
 @click.option('--count', default=None, type=int, help='Number of problems to run (default: all)')
 def batch(problems_file, start, count):
-    """Run multiple problems from a JSON file.
+    """Run multiple problems from a JSON file (parallel execution).
 
     PROBLEMS_FILE should be a JSON file with an array of problem objects:
 
@@ -592,6 +662,9 @@ def batch(problems_file, start, count):
       },
       ...
     ]
+
+    Runs all Sparlo and Claude requests in parallel for ~30 min total runtime
+    instead of ~25 min per problem sequentially.
     """
     with open(problems_file, 'r') as f:
         problems = json.load(f)
@@ -605,25 +678,31 @@ def batch(problems_file, start, count):
     if count:
         problems = problems[:count]
 
-    click.echo(f"Running {len(problems)} problems from {problems_file}...")
-    click.echo(f"Estimated time: {len(problems) * 25} minutes\n")
+    click.echo(f"Running {len(problems)} problems from {problems_file} (parallel mode)...")
+    click.echo(f"Estimated time: ~30 minutes (all problems run simultaneously)\n")
 
+    # Validate all problems first
+    required = ['problem', 'segment', 'summary', 'prior_art', 'domain', 'contradiction', 'sweetspot', 'expected']
+    valid_problems = []
     for i, p in enumerate(problems):
-        click.echo(f"\n{'='*60}")
-        click.echo(f"PROBLEM {i+1}/{len(problems)}: {p.get('summary', 'No summary')}")
-        click.echo(f"{'='*60}")
-
-        # Validate required fields
-        required = ['problem', 'segment', 'summary', 'prior_art', 'domain', 'contradiction', 'sweetspot', 'expected']
         missing = [f for f in required if f not in p]
         if missing:
-            click.echo(f"  SKIPPING: Missing fields: {missing}")
-            continue
+            click.echo(f"  SKIPPING problem {i+1}: Missing fields: {missing}")
+        else:
+            valid_problems.append(p)
 
-        # Generate problem_id
+    if not valid_problems:
+        click.echo("No valid problems to run.")
+        return
+
+    # Phase 1: Start all Sparlo reports
+    click.echo(f"\n{'='*60}")
+    click.echo("PHASE 1: Starting all Sparlo reports...")
+    click.echo(f"{'='*60}")
+
+    jobs = []  # List of {problem_id, problem, sparlo_report_id, metadata}
+    for i, p in enumerate(valid_problems):
         problem_id = str(uuid.uuid4())
-        click.echo(f"Problem ID: {problem_id}")
-
         metadata = {
             "problem_id": problem_id,
             "segment": p['segment'],
@@ -635,34 +714,112 @@ def batch(problems_file, start, count):
             "expected_grade": p['expected']
         }
 
-        # Run Sparlo
-        click.echo("\nRunning Sparlo API (~25 minutes)...")
-        sparlo_out, sparlo_status, sparlo_time, _ = run_sparlo(p['problem'], problem_id)
-        click.echo(f"  Sparlo: {sparlo_status} in {sparlo_time:.0f}s")
+        report_id, error = start_sparlo_report(p['problem'])
+        if error:
+            click.echo(f"  [{i+1}] {p['summary'][:40]} - ERROR: {error}")
+            continue
 
-        # Run Claude
-        click.echo("\nRunning Claude API...")
+        click.echo(f"  [{i+1}] {p['summary'][:40]} - Started: {report_id[:8]}...")
+        jobs.append({
+            "problem_id": problem_id,
+            "problem": p,
+            "sparlo_report_id": report_id,
+            "metadata": metadata,
+            "sparlo_start": time.time()
+        })
+
+    if not jobs:
+        click.echo("No Sparlo reports started successfully.")
+        return
+
+    # Phase 2: Run all Claude requests
+    click.echo(f"\n{'='*60}")
+    click.echo("PHASE 2: Running all Claude requests...")
+    click.echo(f"{'='*60}")
+
+    for i, job in enumerate(jobs):
+        p = job['problem']
+        click.echo(f"  [{i+1}/{len(jobs)}] {p['summary'][:40]}...", nl=False)
+
         claude_out, claude_status, claude_time = run_claude(p['problem'])
-        click.echo(f"  Claude: {claude_status} in {claude_time:.0f}s")
+        job['claude_output'] = claude_out
+        job['claude_status'] = claude_status
+        job['claude_time'] = claude_time
+
+        click.echo(f" {claude_status} ({claude_time:.0f}s)")
 
         # Save Claude output
         if claude_status == "complete":
             claude_report = {
-                "benchmark_id": problem_id,
+                "benchmark_id": job['problem_id'],
                 "problem_text": p['problem'],
-                "metadata": metadata,
+                "metadata": job['metadata'],
                 "generated_at": datetime.now().isoformat(),
                 "duration_seconds": claude_time,
                 "status": claude_status,
                 "output": claude_out
             }
-            claude_file = REPORTS_DIR / f"{problem_id}_claude.json"
+            claude_file = REPORTS_DIR / f"{job['problem_id']}_claude.json"
             with open(claude_file, 'w') as f:
                 json.dump(claude_report, f, indent=2)
 
-        # Write to CSV
+    # Phase 3: Poll all Sparlo reports until complete
+    click.echo(f"\n{'='*60}")
+    click.echo("PHASE 3: Waiting for Sparlo reports to complete...")
+    click.echo(f"{'='*60}")
+
+    pending = jobs.copy()
+    poll_start = time.time()
+    max_wait = 2100  # 35 minutes
+
+    while pending and (time.time() - poll_start) < max_wait:
+        time.sleep(30)
+
+        still_pending = []
+        for job in pending:
+            output, status, report_data = poll_sparlo_report(
+                job['sparlo_report_id'],
+                job['problem_id'],
+                job['problem']['problem']
+            )
+
+            p = job['problem']
+            elapsed = time.time() - job['sparlo_start']
+
+            if status == "complete":
+                job['sparlo_output'] = output
+                job['sparlo_status'] = "complete"
+                job['sparlo_time'] = elapsed
+                click.echo(f"  COMPLETE: {p['summary'][:40]} ({elapsed:.0f}s)")
+            elif status == "error":
+                job['sparlo_output'] = ""
+                job['sparlo_status'] = "error"
+                job['sparlo_time'] = elapsed
+                click.echo(f"  ERROR: {p['summary'][:40]}")
+            else:
+                still_pending.append(job)
+                click.echo(f"  PENDING: {p['summary'][:40]} - {status} ({elapsed:.0f}s)")
+
+        pending = still_pending
+
+        if pending:
+            click.echo(f"  ... {len(pending)} reports still processing ...")
+
+    # Mark any remaining as timeout
+    for job in pending:
+        job['sparlo_output'] = ""
+        job['sparlo_status'] = "timeout"
+        job['sparlo_time'] = time.time() - job['sparlo_start']
+
+    # Phase 4: Write all results to CSV
+    click.echo(f"\n{'='*60}")
+    click.echo("PHASE 4: Saving results...")
+    click.echo(f"{'='*60}")
+
+    for job in jobs:
+        p = job['problem']
         row = {
-            "problem_id": problem_id,
+            "problem_id": job['problem_id'],
             "created_at": datetime.now().isoformat(),
             "problem_text": p['problem'],
             "segment": p['segment'],
@@ -672,12 +829,12 @@ def batch(problems_file, start, count):
             "contradiction": p['contradiction'],
             "sweetspot_pred": p['sweetspot'],
             "expected_grade": p['expected'],
-            "sparlo_output": sparlo_out,
-            "claude_output": claude_out,
-            "sparlo_status": sparlo_status,
-            "claude_status": claude_status,
-            "sparlo_time_sec": sparlo_time,
-            "claude_time_sec": claude_time,
+            "sparlo_output": job.get('sparlo_output', ''),
+            "claude_output": job.get('claude_output', ''),
+            "sparlo_status": job.get('sparlo_status', 'error'),
+            "claude_status": job.get('claude_status', 'error'),
+            "sparlo_time_sec": job.get('sparlo_time', 0),
+            "claude_time_sec": job.get('claude_time', 0),
             "evaluated": "false"
         }
 
@@ -685,10 +842,11 @@ def batch(problems_file, start, count):
             writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
             writer.writerow(row)
 
-        click.echo(f"\nSaved to {CSV_FILE}")
-
+    # Summary
+    complete = sum(1 for j in jobs if j.get('sparlo_status') == 'complete')
     click.echo(f"\n{'='*60}")
-    click.echo(f"BATCH COMPLETE: {len(problems)} problems processed")
+    click.echo(f"BATCH COMPLETE: {complete}/{len(jobs)} problems succeeded")
+    click.echo(f"Total time: {(time.time() - poll_start + 60):.0f}s")
     click.echo(f"Run 'python benchmark.py evaluate' to score all outputs")
     click.echo(f"{'='*60}")
 
