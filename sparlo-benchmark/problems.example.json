@@ -1,0 +1,102 @@
+[
+  {
+    "problem": "Our automated fruit harvesting gripper damages 12% of apples during pick. We need to reduce damage to <2% while maintaining 1.5 second cycle time. The gripper uses pneumatic fingers with silicone pads. Apples range from 60-90mm diameter.",
+    "segment": "PDC",
+    "summary": "Fruit gripper damage reduction",
+    "prior_art": "Medium",
+    "domain": "Cross",
+    "contradiction": "Sharp",
+    "sweetspot": 5,
+    "expected": "A"
+  },
+  {
+    "problem": "We need a portable baby bottle warmer that heats 150ml of refrigerated milk (4°C) to 37°C in under 90 seconds with ±2°C uniformity. Must be cordless, weigh under 500g, and work with standard bottle sizes. Current PCM warmers take 15+ minutes.",
+    "segment": "PDC",
+    "summary": "Fast portable bottle warmer",
+    "prior_art": "Medium",
+    "domain": "Cross",
+    "contradiction": "Sharp",
+    "sweetspot": 5,
+    "expected": "A"
+  },
+  {
+    "problem": "Our injection molding process for thin-wall containers (0.4mm) has 8% warpage rejection rate. Cycle time is 4.2 seconds. Material is PP with 2% talc. Mold has 4 cavities. We need <1% warpage while maintaining or improving cycle time.",
+    "segment": "RDH",
+    "summary": "Injection molding warpage",
+    "prior_art": "High",
+    "domain": "Single",
+    "contradiction": "Clear",
+    "sweetspot": 3,
+    "expected": "B"
+  },
+  {
+    "problem": "Design a passive cooling system for outdoor 5G small cell equipment that maintains junction temperature below 85°C in 45°C ambient with 150W heat dissipation. No fans allowed (dust/reliability). Current heatsink is 2kg, need to reduce to under 800g.",
+    "segment": "DTS",
+    "summary": "Passive 5G cooling system",
+    "prior_art": "Medium",
+    "domain": "Cross",
+    "contradiction": "Sharp",
+    "sweetspot": 4,
+    "expected": "A"
+  },
+  {
+    "problem": "We manufacture precision ceramic bearings for semiconductor equipment. Current surface finish is Ra 0.05μm achieved with diamond lapping at 45 min/part. Customer wants Ra 0.02μm. How can we achieve this without doubling process time?",
+    "segment": "RDH",
+    "summary": "Ceramic bearing surface finish",
+    "prior_art": "Low",
+    "domain": "Cross",
+    "contradiction": "Sharp",
+    "sweetspot": 5,
+    "expected": "A"
+  },
+  {
+    "problem": "Our lithium-ion battery pack for e-bikes experiences thermal runaway propagation in abuse testing. Need to prevent cell-to-cell propagation while keeping pack energy density above 180 Wh/kg. Current design uses 3mm aerogel between cells.",
+    "segment": "PDC",
+    "summary": "Battery thermal runaway prevention",
+    "prior_art": "High",
+    "domain": "Single",
+    "contradiction": "Clear",
+    "sweetspot": 3,
+    "expected": "B"
+  },
+  {
+    "problem": "Design a mechanism to deploy a 2m diameter antenna from a 10cm cube satellite. Must survive 50g launch loads, deploy reliably in vacuum at -40°C to +80°C, and achieve surface accuracy of λ/20 at 10 GHz. Mass budget: 400g.",
+    "segment": "DTS",
+    "summary": "CubeSat antenna deployment",
+    "prior_art": "Low",
+    "domain": "Cross",
+    "contradiction": "Sharp",
+    "sweetspot": 5,
+    "expected": "A"
+  },
+  {
+    "problem": "Our food processing line needs to detect bone fragments >2mm in chicken breast fillets moving at 1m/s on conveyor. X-ray systems cost $200K+. Need detection accuracy >99% at <$50K equipment cost. Line processes 10,000 kg/day.",
+    "segment": "IDF",
+    "summary": "Low-cost bone fragment detection",
+    "prior_art": "Medium",
+    "domain": "Cross",
+    "contradiction": "Sharp",
+    "sweetspot": 4,
+    "expected": "A"
+  },
+  {
+    "problem": "We need to seal a rotating shaft (50mm dia, 3000 RPM) against 10 bar pressure differential with zero leakage for hydrogen gas service. Conventional lip seals leak too much. Magnetic seals are too expensive ($15K+). Budget: $2K per seal.",
+    "segment": "RDH",
+    "summary": "Hydrogen rotating shaft seal",
+    "prior_art": "Medium",
+    "domain": "Cross",
+    "contradiction": "Sharp",
+    "sweetspot": 4,
+    "expected": "A"
+  },
+  {
+    "problem": "Our concrete 3D printer extrudes at 50mm/s with 30mm layer height. Print quality degrades above 35°C ambient due to premature setting. Need to print in desert conditions (45°C) without climate control. Material is standard Portland cement mix.",
+    "segment": "IDF",
+    "summary": "Hot climate concrete 3D printing",
+    "prior_art": "Low",
+    "domain": "Cross",
+    "contradiction": "Clear",
+    "sweetspot": 4,
+    "expected": "B"
+  }
+]

@@ -569,5 +569,129 @@ def status():
         click.echo(f"\nResults: Sparlo {sparlo_wins} | Claude {claude_wins} | Ties {evaluated - sparlo_wins - claude_wins}")
 
 
+@cli.command()
+@click.argument('problems_file', type=click.Path(exists=True))
+@click.option('--start', default=0, help='Start from problem index (0-based)')
+@click.option('--count', default=None, type=int, help='Number of problems to run (default: all)')
+def batch(problems_file, start, count):
+    """Run multiple problems from a JSON file.
+
+    PROBLEMS_FILE should be a JSON file with an array of problem objects:
+
+    \b
+    [
+      {
+        "problem": "Engineering problem description...",
+        "segment": "PDC",
+        "summary": "Short summary",
+        "prior_art": "Medium",
+        "domain": "Cross",
+        "contradiction": "Sharp",
+        "sweetspot": 5,
+        "expected": "A"
+      },
+      ...
+    ]
+    """
+    with open(problems_file, 'r') as f:
+        problems = json.load(f)
+
+    if not isinstance(problems, list):
+        click.echo("ERROR: JSON file must contain an array of problem objects")
+        return
+
+    # Apply start/count filters
+    problems = problems[start:]
+    if count:
+        problems = problems[:count]
+
+    click.echo(f"Running {len(problems)} problems from {problems_file}...")
+    click.echo(f"Estimated time: {len(problems) * 25} minutes\n")
+
+    for i, p in enumerate(problems):
+        click.echo(f"\n{'='*60}")
+        click.echo(f"PROBLEM {i+1}/{len(problems)}: {p.get('summary', 'No summary')}")
+        click.echo(f"{'='*60}")
+
+        # Validate required fields
+        required = ['problem', 'segment', 'summary', 'prior_art', 'domain', 'contradiction', 'sweetspot', 'expected']
+        missing = [f for f in required if f not in p]
+        if missing:
+            click.echo(f"  SKIPPING: Missing fields: {missing}")
+            continue
+
+        # Generate problem_id
+        problem_id = str(uuid.uuid4())
+        click.echo(f"Problem ID: {problem_id}")
+
+        metadata = {
+            "problem_id": problem_id,
+            "segment": p['segment'],
+            "problem_summary": p['summary'],
+            "prior_art": p['prior_art'],
+            "domain_spec": p['domain'],
+            "contradiction": p['contradiction'],
+            "sweetspot_pred": p['sweetspot'],
+            "expected_grade": p['expected']
+        }
+
+        # Run Sparlo
+        click.echo("\nRunning Sparlo API (~25 minutes)...")
+        sparlo_out, sparlo_status, sparlo_time, _ = run_sparlo(p['problem'], problem_id)
+        click.echo(f"  Sparlo: {sparlo_status} in {sparlo_time:.0f}s")
+
+        # Run Claude
+        click.echo("\nRunning Claude API...")
+        claude_out, claude_status, claude_time = run_claude(p['problem'])
+        click.echo(f"  Claude: {claude_status} in {claude_time:.0f}s")
+
+        # Save Claude output
+        if claude_status == "complete":
+            claude_report = {
+                "benchmark_id": problem_id,
+                "problem_text": p['problem'],
+                "metadata": metadata,
+                "generated_at": datetime.now().isoformat(),
+                "duration_seconds": claude_time,
+                "status": claude_status,
+                "output": claude_out
+            }
+            claude_file = REPORTS_DIR / f"{problem_id}_claude.json"
+            with open(claude_file, 'w') as f:
+                json.dump(claude_report, f, indent=2)
+
+        # Write to CSV
+        row = {
+            "problem_id": problem_id,
+            "created_at": datetime.now().isoformat(),
+            "problem_text": p['problem'],
+            "segment": p['segment'],
+            "problem_summary": p['summary'],
+            "prior_art": p['prior_art'],
+            "domain_spec": p['domain'],
+            "contradiction": p['contradiction'],
+            "sweetspot_pred": p['sweetspot'],
+            "expected_grade": p['expected'],
+            "sparlo_output": sparlo_out,
+            "claude_output": claude_out,
+            "sparlo_status": sparlo_status,
+            "claude_status": claude_status,
+            "sparlo_time_sec": sparlo_time,
+            "claude_time_sec": claude_time,
+            "evaluated": "false"
+        }
+
+        with open(CSV_FILE, 'a', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
+            writer.writerow(row)
+
+        click.echo(f"\nSaved to {CSV_FILE}")
+
+    click.echo(f"\n{'='*60}")
+    click.echo(f"BATCH COMPLETE: {len(problems)} problems processed")
+    click.echo(f"Run 'python benchmark.py evaluate' to score all outputs")
+    click.echo(f"{'='*60}")
+
+
 if __name__ == '__main__':
     cli()
