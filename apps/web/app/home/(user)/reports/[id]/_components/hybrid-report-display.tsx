@@ -38,7 +38,6 @@ import {
   SectionHeader,
   ViabilityAssessment,
 } from '@kit/ui/aura';
-import { Badge } from '@kit/ui/badge';
 import { cn } from '@kit/ui/utils';
 
 import type {
@@ -85,26 +84,13 @@ import type {
 // Report-specific Badge Components
 // ============================================
 
-const TRACK_CONFIG: Record<string, { label: string; className: string }> = {
-  simpler_path: {
-    label: 'Simpler Path',
-    className:
-      'border border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400',
-  },
-  best_fit: {
-    label: 'Best Fit',
-    className:
-      'border border-blue-300 bg-zinc-50 text-blue-700 dark:border-blue-700 dark:bg-zinc-800 dark:text-blue-400',
-  },
-  paradigm_shift: {
-    label: 'Paradigm Shift',
-    className:
-      'border border-zinc-400 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
-  },
+const TRACK_CONFIG: Record<string, { label: string; cssClass: string }> = {
+  simpler_path: { label: 'Simpler Path', cssClass: 'track-badge--simpler' },
+  best_fit: { label: 'Best Fit', cssClass: 'track-badge--bestfit' },
+  paradigm_shift: { label: 'Paradigm Shift', cssClass: 'track-badge--neutral' },
   frontier_transfer: {
     label: 'Frontier Transfer',
-    className:
-      'border border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
+    cssClass: 'track-badge--spark',
   },
 };
 
@@ -113,25 +99,14 @@ const TrackBadge = memo(function TrackBadge({ track }: { track?: string }) {
   if (!config) return null;
 
   return (
-    <Badge variant="secondary" className={cn('text-xs', config.className)}>
-      {config.label}
-    </Badge>
+    <span className={cn('track-badge', config.cssClass)}>{config.label}</span>
   );
 });
 
-const CONFIDENCE_CONFIG: Record<string, { className: string }> = {
-  high: {
-    className:
-      'border border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400',
-  },
-  medium: {
-    className:
-      'border border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
-  },
-  low: {
-    className:
-      'border border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
-  },
+const CONFIDENCE_CSS: Record<string, string> = {
+  high: 'confidence-badge--high',
+  medium: 'confidence-badge--medium',
+  low: 'confidence-badge--low',
 };
 
 const ConfidenceBadge = memo(function ConfidenceBadge({
@@ -139,15 +114,12 @@ const ConfidenceBadge = memo(function ConfidenceBadge({
 }: {
   level?: string;
 }) {
-  const config = level ? CONFIDENCE_CONFIG[level] : CONFIDENCE_CONFIG.medium;
+  const cssClass = level ? CONFIDENCE_CSS[level] : CONFIDENCE_CSS.medium;
 
   return (
-    <Badge
-      variant="secondary"
-      className={cn('text-xs capitalize', config?.className)}
-    >
+    <span className={cn('confidence-badge', cssClass)}>
       {level || 'Medium'} Confidence
-    </Badge>
+    </span>
   );
 });
 
@@ -324,9 +296,9 @@ function RecommendationCard({
                   <span className="text-sm font-medium text-zinc-900 dark:text-white">
                     {risk.risk}
                   </span>
-                  <Badge variant="outline" className="text-sm capitalize">
-                    {risk.likelihood} likelihood / {risk.impact} impact
-                  </Badge>
+                  <span className="badge-tag badge-tag--warning">
+                    {risk.likelihood} / {risk.impact}
+                  </span>
                 </div>
                 {risk.mitigation && (
                   <p className="text-sm text-zinc-600 dark:text-zinc-300">
@@ -382,27 +354,17 @@ function RecommendationCard({
 // NEW: Execution Track + Innovation Portfolio Components
 // ============================================
 
-const SOURCE_TYPE_CONFIG: Record<string, { label: string; className: string }> =
+const SOURCE_TYPE_CONFIG: Record<string, { label: string; cssClass: string }> =
   {
-    CATALOG: {
-      label: 'Catalog Solution',
-      className:
-        'border border-blue-300 bg-zinc-50 text-blue-700 dark:border-blue-700 dark:bg-zinc-800 dark:text-blue-400',
-    },
+    CATALOG: { label: 'Catalog Solution', cssClass: 'badge-pill--accent' },
     TRANSFER: {
       label: 'Cross-Domain Transfer',
-      className:
-        'border border-zinc-400 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+      cssClass: 'badge-pill--neutral',
     },
-    OPTIMIZATION: {
-      label: 'Optimization',
-      className:
-        'border border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400',
-    },
+    OPTIMIZATION: { label: 'Optimization', cssClass: 'badge-pill--go' },
     FIRST_PRINCIPLES: {
       label: 'First Principles',
-      className:
-        'border border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
+      cssClass: 'badge-pill--warning',
     },
   };
 
@@ -415,35 +377,28 @@ const SourceTypeBadge = memo(function SourceTypeBadge({
   if (!typeConfig) return null;
 
   return (
-    <Badge variant="secondary" className={cn('text-xs', typeConfig.className)}>
+    <span className={cn('badge-pill badge-pill--sm', typeConfig.cssClass)}>
       {typeConfig.label}
-    </Badge>
+    </span>
   );
 });
 
 const INNOVATION_TYPE_CONFIG: Record<
   string,
-  { label: string; className: string }
+  { label: string; cssClass: string }
 > = {
-  PARADIGM_SHIFT: {
-    label: 'Paradigm Shift',
-    className:
-      'border border-zinc-400 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
-  },
+  PARADIGM_SHIFT: { label: 'Paradigm Shift', cssClass: 'badge-pill--neutral' },
   CROSS_DOMAIN_TRANSFER: {
     label: 'Cross-Domain',
-    className:
-      'border border-zinc-400 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+    cssClass: 'badge-pill--neutral',
   },
   TECHNOLOGY_REVIVAL: {
     label: 'Tech Revival',
-    className:
-      'border border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
+    cssClass: 'badge-pill--warning',
   },
   FIRST_PRINCIPLES: {
     label: 'First Principles',
-    className:
-      'border border-blue-300 bg-zinc-50 text-blue-700 dark:border-blue-700 dark:bg-zinc-800 dark:text-blue-400',
+    cssClass: 'badge-pill--accent',
   },
 };
 
@@ -458,9 +413,9 @@ const InnovationTypeBadge = memo(function InnovationTypeBadge({
   if (!typeConfig) return null;
 
   return (
-    <Badge variant="secondary" className={cn('text-xs', typeConfig.className)}>
+    <span className={cn('badge-pill badge-pill--sm', typeConfig.cssClass)}>
       {typeConfig.label}
-    </Badge>
+    </span>
   );
 });
 
@@ -884,9 +839,11 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
               <div className="flex flex-wrap gap-2">
                 <SourceTypeBadge sourceType={track.primary.source_type} />
                 {track.primary.confidence !== undefined && (
-                  <Badge variant="outline" className="text-sm">
-                    {getConfidenceLabel(track.primary.confidence)} Confidence
-                  </Badge>
+                  <ConfidenceBadge
+                    level={getConfidenceLabel(
+                      track.primary.confidence,
+                    ).toLowerCase()}
+                  />
                 )}
               </div>
             </div>
@@ -1032,23 +989,22 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                           {effect.domain}
                         </span>
                         <div className="flex items-center gap-2">
-                          <Badge
-                            variant="outline"
+                          <span
                             className={cn(
-                              'text-xs',
+                              'badge-pill badge-pill--sm',
                               effect.direction === 'BETTER'
-                                ? 'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400'
+                                ? 'badge-pill--go'
                                 : effect.direction === 'WORSE'
-                                  ? 'border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400'
-                                  : 'border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+                                  ? 'badge-pill--nogo'
+                                  : 'badge-pill--neutral',
                             )}
                           >
                             {effect.direction}
-                          </Badge>
+                          </span>
                           {effect.magnitude && (
-                            <Badge variant="outline" className="text-sm">
+                            <span className="badge-tag badge-tag--neutral">
                               {effect.magnitude}
-                            </Badge>
+                            </span>
                           )}
                         </div>
                       </div>
@@ -1099,20 +1055,19 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   <span className="text-sm font-medium text-zinc-900 dark:text-white">
                     Sustainability
                   </span>
-                  <Badge
-                    variant="outline"
+                  <span
                     className={cn(
-                      'text-xs',
+                      'badge-pill badge-pill--sm',
                       sustainabilityFlag.type === 'BENEFIT'
-                        ? 'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400'
+                        ? 'badge-pill--go'
                         : sustainabilityFlag.type === 'CAUTION' ||
                             sustainabilityFlag.type === 'LIFECYCLE_TRADEOFF'
-                          ? 'border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400'
-                          : 'border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+                          ? 'badge-pill--warning'
+                          : 'badge-pill--neutral',
                     )}
                   >
                     {sustainabilityFlag.type?.replace(/_/g, ' ')}
-                  </Badge>
+                  </span>
                 </div>
                 {sustainabilityFlag.summary && (
                   <p className="text-sm text-zinc-700 dark:text-zinc-200">
@@ -1144,25 +1099,24 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   </div>
                   <div className="flex items-center gap-2">
                     {ipConsiderations.freedom_to_operate && (
-                      <Badge
-                        variant="outline"
+                      <span
                         className={cn(
-                          'text-xs',
+                          'badge-pill badge-pill--sm',
                           ipConsiderations.freedom_to_operate === 'GREEN'
-                            ? 'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400'
+                            ? 'badge-pill--go'
                             : ipConsiderations.freedom_to_operate === 'YELLOW'
-                              ? 'border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400'
-                              : 'border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
+                              ? 'badge-pill--warning'
+                              : 'badge-pill--nogo',
                         )}
                       >
                         FTO: {ipConsiderations.freedom_to_operate}
-                      </Badge>
+                      </span>
                     )}
                     {ipConsiderations.patentability_potential && (
-                      <Badge variant="outline" className="text-sm">
+                      <span className="badge-tag badge-tag--accent">
                         Patentability:{' '}
                         {ipConsiderations.patentability_potential}
-                      </Badge>
+                      </span>
                     )}
                   </div>
                 </div>
@@ -1320,9 +1274,9 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                         {concept.title}
                       </h5>
                     </div>
-                    <Badge variant="outline" className="text-sm capitalize">
+                    <span className="badge-tag badge-tag--neutral">
                       {concept.relationship?.toLowerCase()}
-                    </Badge>
+                    </span>
                   </div>
                   {concept.one_liner && (
                     <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-300">
@@ -1434,12 +1388,11 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                   }
                 />
                 {portfolio.recommended_innovation.confidence !== undefined && (
-                  <Badge variant="outline" className="text-sm">
-                    {getConfidenceLabel(
+                  <ConfidenceBadge
+                    level={getConfidenceLabel(
                       portfolio.recommended_innovation.confidence,
-                    )}{' '}
-                    Confidence
-                  </Badge>
+                    ).toLowerCase()}
+                  />
                 )}
               </div>
             </div>
@@ -1598,9 +1551,9 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                 <span className="text-sm font-medium text-zinc-900 dark:text-white">
                   Parallel Investigations
                 </span>
-                <Badge variant="secondary" className="text-sm">
+                <span className="badge-pill badge-pill--sm badge-pill--accent">
                   {portfolio.parallel_investigations.length}
-                </Badge>
+                </span>
               </div>
               <div className="space-y-4">
                 {portfolio.parallel_investigations.map((inv, idx) => (
@@ -1855,15 +1808,16 @@ const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
                       </span>
                       {(hypothesis.confidence_percent !== undefined ||
                         hypothesis.confidence) && (
-                        <Badge
-                          variant="outline"
-                          className="border-zinc-300 bg-zinc-50 text-sm text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-                        >
-                          {hypothesis.confidence_percent !== undefined
-                            ? getConfidenceLabel(hypothesis.confidence_percent)
-                            : hypothesis.confidence}{' '}
-                          Confidence
-                        </Badge>
+                        <ConfidenceBadge
+                          level={
+                            hypothesis.confidence_percent !== undefined
+                              ? getConfidenceLabel(
+                                  hypothesis.confidence_percent,
+                                ).toLowerCase()
+                              : (hypothesis.confidence?.toLowerCase() ??
+                                'medium')
+                          }
+                        />
                       )}
                     </div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-300">
@@ -2037,13 +1991,6 @@ const ChallengeTheFrameSection = memo(function ChallengeTheFrameSection({
 function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
   if (!risks || risks.length === 0) return null;
 
-  const severityColors = {
-    high: 'border border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
-    medium:
-      'border border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
-    low: 'border border-zinc-300 bg-zinc-50 text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
-  };
-
   return (
     <section id="risks">
       <SectionHeader title="Risks & Watchouts" subtitle="What could go wrong" />
@@ -2060,19 +2007,23 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
               </div>
               <div className="flex gap-2">
                 {r.category && (
-                  <Badge variant="outline" className="text-sm">
+                  <span className="badge-tag badge-tag--neutral">
                     {r.category}
-                  </Badge>
+                  </span>
                 )}
                 {r.severity && (
-                  <Badge
+                  <span
                     className={cn(
-                      'text-xs capitalize',
-                      severityColors[r.severity],
+                      'badge-pill badge-pill--sm',
+                      r.severity === 'high'
+                        ? 'badge-pill--nogo'
+                        : r.severity === 'medium'
+                          ? 'badge-pill--warning'
+                          : 'badge-pill--neutral',
                     )}
                   >
                     {r.severity}
-                  </Badge>
+                  </span>
                 )}
               </div>
             </div>
@@ -2419,9 +2370,9 @@ function StrategicIntegrationSection({
                   className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800/50"
                 >
                   <div className="mb-2 flex items-center gap-2">
-                    <Badge variant="outline" className="text-sm">
+                    <span className="badge-tag badge-tag--accent">
                       {step.timeframe}
-                    </Badge>
+                    </span>
                   </div>
                   {step.actions && step.actions.length > 0 && (
                     <ul className="space-y-1">
@@ -2829,9 +2780,9 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
                               {concept.title}
                             </h5>
                             {concept.merit_score !== undefined && (
-                              <Badge variant="outline" className="text-sm">
+                              <span className="badge-score badge-score--high">
                                 Merit: {concept.merit_score}/10
-                              </Badge>
+                              </span>
                             )}
                           </div>
                           <div className="mb-2">
@@ -2926,9 +2877,9 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
                     {concept.title}
                   </h5>
                   {concept.merit_score !== undefined && (
-                    <Badge variant="outline" className="text-sm">
+                    <span className="badge-score badge-score--high">
                       Merit: {concept.merit_score}/10
-                    </Badge>
+                    </span>
                   )}
                 </div>
                 <div className="mb-2">
@@ -3039,20 +2990,18 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
                           <span className="text-sm font-medium text-zinc-900 dark:text-white">
                             {gap.concern}
                           </span>
-                          <Badge
-                            variant="outline"
+                          <span
                             className={cn(
-                              'text-xs',
-                              gap.status === 'ADDRESSED' &&
-                                'border-green-300 bg-zinc-50 text-green-700 dark:border-green-700 dark:bg-zinc-800 dark:text-green-400',
+                              'badge-pill badge-pill--sm',
+                              gap.status === 'ADDRESSED' && 'badge-pill--go',
                               gap.status === 'EXTENDED_NEEDED' &&
-                                'border-orange-300 bg-zinc-50 text-orange-700 dark:border-orange-700 dark:bg-zinc-800 dark:text-orange-400',
+                                'badge-pill--warning',
                               gap.status === 'ACCEPTED_RISK' &&
-                                'border-red-300 bg-zinc-50 text-red-700 dark:border-red-700 dark:bg-zinc-800 dark:text-red-400',
+                                'badge-pill--nogo',
                             )}
                           >
                             {gap.status.replace(/_/g, ' ')}
-                          </Badge>
+                          </span>
                         </div>
                         <p className="text-sm text-zinc-600 dark:text-zinc-300">
                           {gap.rationale}

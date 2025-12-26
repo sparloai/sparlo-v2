@@ -50,7 +50,10 @@ export function CardWithHeader({
 }) {
   return (
     <section
-      className={cn('overflow-hidden rounded-lg border transition-shadow', className)}
+      className={cn(
+        'overflow-hidden rounded-lg border transition-shadow',
+        className,
+      )}
       style={{
         borderColor: 'var(--border-default, rgba(0,0,0,0.1))',
         backgroundColor: 'var(--void-black, #ffffff)',
@@ -261,7 +264,9 @@ export const MetadataInfoCard = memo(function MetadataInfoCard({
             {idx > 0 && (
               <div
                 className="mr-6 hidden h-4 w-px md:block"
-                style={{ backgroundColor: 'var(--border-strong, rgba(0,0,0,0.15))' }}
+                style={{
+                  backgroundColor: 'var(--border-strong, rgba(0,0,0,0.15))',
+                }}
               />
             )}
             <span
@@ -334,7 +339,9 @@ export const ViabilityAssessment = memo(function ViabilityAssessment({
                 Revisit in {revisitTimeframe}
               </strong>
               {revisitReason && (
-                <span style={{ color: 'var(--text-secondary, rgba(0,0,0,0.7))' }}>
+                <span
+                  style={{ color: 'var(--text-secondary, rgba(0,0,0,0.7))' }}
+                >
                   {revisitReason}
                 </span>
               )}
