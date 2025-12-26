@@ -127,25 +127,24 @@ interface DiscoveryReportDisplayProps {
   };
 }
 
+// Per Jobs Standard: no icons in section headers, typography is strong enough
 function SectionHeader({
-  icon: Icon,
+  icon: _Icon,
   title,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
 }) {
   return (
-    <div className="mb-8 flex items-center gap-3">
-      <div className="rounded-lg bg-emerald-100 p-2">
-        <Icon className="h-5 w-5 text-emerald-700" />
-      </div>
-      <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
+    <div className="mb-10 border-b border-zinc-100 pb-5 dark:border-zinc-800">
+      <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-white">
         {title}
       </h2>
     </div>
   );
 }
 
+// Per Jobs Standard: muted colors, no borders
 function CategoryBadge({ category }: { category?: string }) {
   const categoryLabels: Record<string, string> = {
     biological_transfer: 'Biological Transfer',
@@ -156,30 +155,39 @@ function CategoryBadge({ category }: { category?: string }) {
   };
 
   const categoryColors: Record<string, string> = {
-    biological_transfer: 'bg-green-100 text-green-800 border-green-200',
-    geological: 'bg-amber-100 text-amber-800 border-amber-200',
-    abandoned_tech: 'bg-purple-100 text-purple-800 border-purple-200',
-    frontier_material: 'bg-blue-100 text-blue-800 border-blue-200',
-    combination: 'bg-pink-100 text-pink-800 border-pink-200',
+    biological_transfer:
+      'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+    geological:
+      'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+    abandoned_tech:
+      'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400',
+    frontier_material:
+      'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+    combination:
+      'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   };
 
   if (!category) return null;
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${categoryColors[category] || 'border-zinc-200 bg-zinc-100 text-zinc-700'}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${categoryColors[category] || 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'}`}
     >
       {categoryLabels[category] || category}
     </span>
   );
 }
 
+// Per Jobs Standard: muted colors, no bright backgrounds
 function PriorityBadge({ priority }: { priority?: string }) {
   const priorityColors: Record<string, string> = {
-    must_pursue: 'bg-emerald-600 text-white',
-    should_explore: 'bg-blue-600 text-white',
-    worth_investigating: 'bg-amber-500 text-white',
-    park: 'bg-zinc-400 text-white',
+    must_pursue:
+      'bg-violet-100 text-violet-800 dark:bg-violet-950/50 dark:text-violet-300',
+    should_explore:
+      'bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300',
+    worth_investigating:
+      'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300',
+    park: 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500',
   };
 
   const priorityLabels: Record<string, string> = {
@@ -193,7 +201,10 @@ function PriorityBadge({ priority }: { priority?: string }) {
 
   return (
     <Badge
-      className={priorityColors[priority] || 'bg-zinc-100 text-zinc-700'}
+      className={
+        priorityColors[priority] ||
+        'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+      }
       variant="default"
     >
       {priorityLabels[priority] || priority}
@@ -201,20 +212,23 @@ function PriorityBadge({ priority }: { priority?: string }) {
   );
 }
 
+// Per Jobs Standard: no icons in badges, muted colors
 function NoveltyBadge({ level }: { level?: string }) {
   const colors: Record<string, string> = {
-    breakthrough: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-    significant: 'bg-blue-100 text-blue-800 border-blue-200',
-    moderate: 'bg-amber-100 text-amber-800 border-amber-200',
+    breakthrough:
+      'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400',
+    significant:
+      'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+    moderate:
+      'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
   };
 
   if (!level) return null;
 
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${colors[level] || 'bg-zinc-100 text-zinc-700'}`}
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${colors[level] || 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'}`}
     >
-      <Sparkles className="mr-1 h-3 w-3" />
       {level.charAt(0).toUpperCase() + level.slice(1)} Novelty
     </span>
   );
@@ -227,7 +241,7 @@ export function DiscoveryReportDisplay({
 
   if (!report) {
     return (
-      <div className="rounded-lg bg-amber-50 p-6 text-amber-800">
+      <div className="rounded-lg bg-zinc-100 p-6 text-zinc-700">
         <p>Discovery report data is not available.</p>
       </div>
     );
@@ -269,7 +283,7 @@ export function DiscoveryReportDisplay({
             {report.executive_summary.key_discovery && (
               <div className="rounded-lg bg-white p-5">
                 <p className="mb-2 text-base font-semibold text-emerald-700">
-                  Key Discovery
+                  Key discovery
                 </p>
                 <p className="text-lg leading-relaxed text-zinc-700">
                   {report.executive_summary.key_discovery}
@@ -279,7 +293,7 @@ export function DiscoveryReportDisplay({
             {report.executive_summary.recommended_action && (
               <div className="rounded-lg bg-white p-5">
                 <p className="mb-2 text-base font-semibold text-emerald-700">
-                  Recommended Action
+                  Recommended action
                 </p>
                 <p className="text-lg leading-relaxed text-zinc-700">
                   {report.executive_summary.recommended_action}
@@ -289,7 +303,7 @@ export function DiscoveryReportDisplay({
             {report.executive_summary.timeline_to_validation && (
               <div className="rounded-lg bg-white p-5">
                 <p className="mb-2 text-base font-semibold text-emerald-700">
-                  Timeline to Validation
+                  Timeline to validation
                 </p>
                 <p className="text-lg leading-relaxed text-zinc-700">
                   {report.executive_summary.timeline_to_validation}
@@ -299,7 +313,7 @@ export function DiscoveryReportDisplay({
             {report.executive_summary.investment_required && (
               <div className="rounded-lg bg-white p-5">
                 <p className="mb-2 text-base font-semibold text-emerald-700">
-                  Investment Required
+                  Investment required
                 </p>
                 <p className="text-lg leading-relaxed text-zinc-700">
                   {report.executive_summary.investment_required}
@@ -318,7 +332,7 @@ export function DiscoveryReportDisplay({
             {report.discovery_brief.original_problem && (
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
                 <p className="mb-1 text-sm font-medium text-zinc-500">
-                  Original Problem
+                  Original problem
                 </p>
                 <p className="text-zinc-800">
                   {report.discovery_brief.original_problem}
@@ -328,7 +342,7 @@ export function DiscoveryReportDisplay({
             {report.discovery_brief.industry_blind_spot && (
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
                 <p className="mb-1 text-sm font-medium text-amber-700">
-                  Industry Blind Spot
+                  Industry blind spot
                 </p>
                 <p className="text-zinc-800">
                   {report.discovery_brief.industry_blind_spot}
@@ -338,7 +352,7 @@ export function DiscoveryReportDisplay({
             {report.discovery_brief.discovery_thesis && (
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
                 <p className="mb-1 text-sm font-medium text-emerald-700">
-                  Discovery Thesis
+                  Discovery thesis
                 </p>
                 <p className="text-zinc-800">
                   {report.discovery_brief.discovery_thesis}
@@ -349,9 +363,9 @@ export function DiscoveryReportDisplay({
               report.discovery_brief.hunting_grounds.length > 0 && (
                 <div>
                   <p className="mb-2 text-sm font-medium text-zinc-500">
-                    Hunting Grounds
+                    Hunting grounds
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {report.discovery_brief.hunting_grounds.map((ground, i) => (
                       <Badge key={i} variant="outline">
                         {ground}
@@ -363,7 +377,7 @@ export function DiscoveryReportDisplay({
             {report.discovery_brief.key_finding && (
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
                 <p className="mb-1 text-sm font-medium text-blue-700">
-                  Key Finding
+                  Key finding
                 </p>
                 <p className="text-zinc-800">
                   {report.discovery_brief.key_finding}
@@ -384,7 +398,7 @@ export function DiscoveryReportDisplay({
                 0 && (
                 <div>
                   <p className="mb-3 text-base font-semibold text-zinc-600">
-                    Conventional Approaches
+                    Conventional approaches
                   </p>
                   <ul className="list-inside list-disc space-y-2 text-lg leading-relaxed text-zinc-700">
                     {report.what_industry_missed.conventional_approaches.map(
@@ -398,7 +412,7 @@ export function DiscoveryReportDisplay({
             {report.what_industry_missed.why_they_do_it && (
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-5">
                 <p className="mb-2 text-base font-semibold text-zinc-600">
-                  Why They Do It
+                  Why they do it
                 </p>
                 <p className="text-lg leading-relaxed text-zinc-700">
                   {report.what_industry_missed.why_they_do_it}
@@ -409,7 +423,7 @@ export function DiscoveryReportDisplay({
               report.what_industry_missed.blind_spots.length > 0 && (
                 <div>
                   <p className="mb-3 text-base font-semibold text-zinc-600">
-                    Blind Spots
+                    Blind spots
                   </p>
                   <div className="space-y-4">
                     {report.what_industry_missed.blind_spots.map((spot, i) => (
@@ -450,7 +464,7 @@ export function DiscoveryReportDisplay({
               report.what_industry_missed.unexplored_territories.length > 0 && (
                 <div>
                   <p className="mb-3 text-base font-semibold text-zinc-600">
-                    Unexplored Territories
+                    Unexplored territories
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {report.what_industry_missed.unexplored_territories.map(
@@ -495,14 +509,14 @@ export function DiscoveryReportDisplay({
 
                 {concept.source_domain && (
                   <p className="mb-4 text-sm text-zinc-500">
-                    Source Domain: {concept.source_domain}
+                    Source domain: {concept.source_domain}
                   </p>
                 )}
 
                 {concept.the_insight && (
                   <div className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
                     <p className="mb-2 text-sm font-medium text-emerald-700">
-                      The Insight
+                      The insight
                     </p>
                     {concept.the_insight.what_we_found && (
                       <p className="mb-2 text-zinc-800">
@@ -527,7 +541,7 @@ export function DiscoveryReportDisplay({
                 {concept.how_it_works && (
                   <div className="mb-4">
                     <p className="mb-2 text-sm font-medium text-zinc-500">
-                      How It Works
+                      How it works
                     </p>
                     {concept.how_it_works.mechanism && (
                       <p className="mb-2 text-zinc-700">
@@ -536,7 +550,7 @@ export function DiscoveryReportDisplay({
                     )}
                     {concept.how_it_works.key_components &&
                       concept.how_it_works.key_components.length > 0 && (
-                        <div className="mb-2 flex flex-wrap gap-1">
+                        <div className="mb-2 flex flex-wrap gap-3">
                           {concept.how_it_works.key_components.map(
                             (comp, j) => (
                               <Badge
@@ -562,7 +576,7 @@ export function DiscoveryReportDisplay({
                 {concept.breakthrough_potential && (
                   <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
                     <p className="mb-2 text-sm font-medium text-blue-700">
-                      Breakthrough Potential
+                      Breakthrough potential
                     </p>
                     {concept.breakthrough_potential.if_works && (
                       <p className="mb-1 text-zinc-700">
@@ -588,7 +602,7 @@ export function DiscoveryReportDisplay({
                 {concept.validation_path && (
                   <div className="mb-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
                     <p className="mb-2 text-sm font-medium text-zinc-700">
-                      Validation Path
+                      Validation path
                     </p>
                     <div className="grid gap-2 text-sm sm:grid-cols-2">
                       {concept.validation_path.first_test && (
@@ -622,13 +636,13 @@ export function DiscoveryReportDisplay({
                 {concept.risks_and_unknowns && (
                   <div className="rounded-lg border border-red-200 bg-red-50 p-4">
                     <p className="mb-2 text-sm font-medium text-red-700">
-                      Risks & Unknowns
+                      Risks & unknowns
                     </p>
                     {concept.risks_and_unknowns.physics_risks &&
                       concept.risks_and_unknowns.physics_risks.length > 0 && (
                         <div className="mb-2">
                           <p className="text-xs font-medium text-red-600">
-                            Physics Risks
+                            Physics risks
                           </p>
                           <ul className="list-inside list-disc text-sm text-zinc-700">
                             {concept.risks_and_unknowns.physics_risks.map(
@@ -644,7 +658,7 @@ export function DiscoveryReportDisplay({
                         .length > 0 && (
                         <div className="mb-2">
                           <p className="text-xs font-medium text-amber-600">
-                            Implementation Challenges
+                            Implementation challenges
                           </p>
                           <ul className="list-inside list-disc text-sm text-zinc-700">
                             {concept.risks_and_unknowns.implementation_challenges.map(
@@ -660,7 +674,7 @@ export function DiscoveryReportDisplay({
                         0 && (
                         <div>
                           <p className="text-xs font-medium text-emerald-600">
-                            Mitigation Ideas
+                            Mitigation ideas
                           </p>
                           <ul className="list-inside list-disc text-sm text-zinc-700">
                             {concept.risks_and_unknowns.mitigation_ideas.map(
@@ -688,7 +702,7 @@ export function DiscoveryReportDisplay({
               report.validation_roadmap.immediate_actions.length > 0 && (
                 <div>
                   <h3 className="mb-3 text-lg font-medium text-zinc-800">
-                    Immediate Actions
+                    Immediate actions
                   </h3>
                   <div className="space-y-2">
                     {report.validation_roadmap.immediate_actions.map(
@@ -795,7 +809,7 @@ export function DiscoveryReportDisplay({
             {report.why_this_matters.if_we_succeed && (
               <div className="rounded-lg bg-white p-4">
                 <p className="mb-1 text-sm font-medium text-emerald-700">
-                  If We Succeed
+                  If we succeed
                 </p>
                 <p className="text-zinc-700">
                   {report.why_this_matters.if_we_succeed}
@@ -805,7 +819,7 @@ export function DiscoveryReportDisplay({
             {report.why_this_matters.competitive_advantage && (
               <div className="rounded-lg bg-white p-4">
                 <p className="mb-1 text-sm font-medium text-emerald-700">
-                  Competitive Advantage
+                  Competitive advantage
                 </p>
                 <p className="text-zinc-700">
                   {report.why_this_matters.competitive_advantage}
@@ -815,7 +829,7 @@ export function DiscoveryReportDisplay({
             {report.why_this_matters.industry_implications && (
               <div className="rounded-lg bg-white p-4">
                 <p className="mb-1 text-sm font-medium text-emerald-700">
-                  Industry Implications
+                  Industry implications
                 </p>
                 <p className="text-zinc-700">
                   {report.why_this_matters.industry_implications}
@@ -825,7 +839,7 @@ export function DiscoveryReportDisplay({
             {report.why_this_matters.risk_of_not_pursuing && (
               <div className="rounded-lg bg-white p-4">
                 <p className="mb-1 text-sm font-medium text-amber-700">
-                  Risk of Not Pursuing
+                  Risk of not pursuing
                 </p>
                 <p className="text-zinc-700">
                   {report.why_this_matters.risk_of_not_pursuing}

@@ -1,5 +1,3 @@
-import { Lightbulb } from 'lucide-react';
-
 import { cn } from '@kit/ui/utils';
 
 interface Insight {
@@ -13,6 +11,7 @@ interface KeyInsightsListProps {
   className?: string;
 }
 
+// Per Jobs Standard: subtle shadows, muted colors, no heavy borders
 export function KeyInsightsList({
   insights,
   numbered = true,
@@ -27,22 +26,25 @@ export function KeyInsightsList({
       {insights.map((insight, index) => (
         <div
           key={index}
-          className="flex gap-3 rounded-lg border border-zinc-100 bg-white p-4 transition-colors hover:border-zinc-200"
+          className="flex gap-4 rounded-xl bg-white p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.04)] dark:bg-zinc-900 dark:shadow-[0_1px_3px_rgba(0,0,0,0.2)]"
         >
           {numbered ? (
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
               {index + 1}
             </span>
           ) : (
-            <Lightbulb
-              className="mt-0.5 h-5 w-5 shrink-0 text-amber-500"
-              strokeWidth={1.5}
-            />
+            <span className="mt-0.5 shrink-0 text-sm font-medium text-zinc-400 dark:text-zinc-500">
+              •
+            </span>
           )}
-          <div className="flex-1 space-y-1">
-            <p className="font-medium text-zinc-900">{insight.headline}</p>
+          <div className="flex-1 space-y-1.5">
+            <p className="font-medium text-zinc-900 dark:text-zinc-100">
+              {insight.headline}
+            </p>
             {insight.explanation && (
-              <p className="text-sm text-zinc-600">{insight.explanation}</p>
+              <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                {insight.explanation}
+              </p>
             )}
           </div>
         </div>

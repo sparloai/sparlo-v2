@@ -1,5 +1,3 @@
-import { Cpu, TrendingUp, Zap } from 'lucide-react';
-
 import { BaseCard } from './base-card';
 
 type MaturityLevel = 'emerging' | 'developing' | 'mature';
@@ -12,20 +10,21 @@ interface TechnologyCardProps {
   relevance?: string;
 }
 
+// Per Jobs Standard: muted colors, no icons, no borders
 const maturityConfig = {
   emerging: {
-    styles: 'bg-purple-50 text-purple-700 border-purple-200',
-    icon: Zap,
+    styles:
+      'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400',
     label: 'Emerging',
   },
   developing: {
-    styles: 'bg-amber-50 text-amber-700 border-amber-200',
-    icon: TrendingUp,
+    styles:
+      'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
     label: 'Developing',
   },
   mature: {
-    styles: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    icon: Cpu,
+    styles:
+      'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
     label: 'Mature',
   },
 } as const;
@@ -38,40 +37,39 @@ export function TechnologyCard({
   relevance,
 }: TechnologyCardProps) {
   const maturityInfo = maturity ? maturityConfig[maturity] : null;
-  const MaturityIcon = maturityInfo?.icon;
 
   return (
-    <BaseCard variant="default" emphasis="subtle" className="space-y-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Cpu className="h-5 w-5 text-zinc-400" strokeWidth={1.5} />
-          <h4 className="font-semibold text-zinc-900">{name}</h4>
-        </div>
-        {maturityInfo && MaturityIcon && (
+    <BaseCard variant="default" emphasis="subtle" className="space-y-5">
+      <div className="flex items-start justify-between gap-4">
+        <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">
+          {name}
+        </h4>
+        {maturityInfo && (
           <span
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${maturityInfo.styles}`}
+            className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-xs font-medium ${maturityInfo.styles}`}
           >
-            <MaturityIcon className="h-3.5 w-3.5" strokeWidth={1.5} />
             {maturityInfo.label}
           </span>
         )}
       </div>
 
-      <p className="text-sm text-zinc-600">{description}</p>
+      <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+        {description}
+      </p>
 
       {applications && applications.length > 0 && (
-        <div className="space-y-2">
-          <h5 className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">
-            Potential Applications
+        <div className="space-y-3">
+          <h5 className="text-xs font-medium tracking-wide text-zinc-500 dark:text-zinc-400">
+            Potential applications
           </h5>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {applications.map((app, i) => (
               <li
                 key={i}
-                className="flex items-start gap-2 text-sm text-zinc-600"
+                className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-400"
               >
-                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-zinc-400" />
-                {app}
+                <span className="mt-2.5 h-px w-3 shrink-0 bg-zinc-400 dark:bg-zinc-500" />
+                <span className="leading-relaxed">{app}</span>
               </li>
             ))}
           </ul>
@@ -79,9 +77,12 @@ export function TechnologyCard({
       )}
 
       {relevance && (
-        <div className="rounded-lg bg-zinc-50 p-3">
-          <p className="text-xs text-zinc-500">
-            <span className="font-medium">Relevance:</span> {relevance}
+        <div className="rounded-xl bg-zinc-50/50 p-4 dark:bg-zinc-800/30">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            <span className="font-medium text-zinc-700 dark:text-zinc-300">
+              Relevance:
+            </span>{' '}
+            {relevance}
           </p>
         </div>
       )}

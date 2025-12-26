@@ -755,7 +755,7 @@ export function ReportDisplay({
                 transition={{ duration: 0.2 }}
               >
                 <div className="sticky top-20 h-[calc(100vh-80px)] overflow-y-auto border-r border-[--border-subtle] bg-[--void-elevated]">
-                  <div className="p-5">
+                  <div className="p-6">
                     <div className="mb-5 flex items-center justify-between">
                       <span className="text-label">Contents</span>
                       <Button
@@ -806,11 +806,11 @@ export function ReportDisplay({
           {/* Main Content */}
           <div
             className={cn(
-              'min-w-0 flex-1 px-4 py-10 transition-all md:px-6 lg:px-4',
+              'min-w-0 flex-1 px-6 py-10 transition-all md:px-8 lg:px-10',
               isChatOpen && 'lg:mr-[420px]',
             )}
           >
-            <div className="mx-auto max-w-4xl">
+            <div className="mx-auto max-w-[680px]">
               {/* Back link */}
               <Link
                 href="/home"
@@ -953,20 +953,20 @@ export function ReportDisplay({
           </div>
         </div>
 
-        {/* Chat Toggle Button */}
+        {/* Chat Toggle Button - Per Jobs Standard: prominent CTA */}
         {!isChatOpen && (
           <motion.button
-            className="btn btn--primary fixed right-6 bottom-6 z-50 rounded-full shadow-lg"
-            style={{ boxShadow: 'var(--glow-violet)' }}
+            className="fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-2xl bg-zinc-900 px-6 py-4 text-white shadow-[0_8px_30px_rgba(0,0,0,0.12),0_4px_10px_rgba(0,0,0,0.08)] transition-all hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:hover:bg-zinc-100"
             onClick={() => setIsChatOpen(true)}
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            whileHover={{ scale: 1.02 }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           >
-            <MessageSquare className="h-5 w-5" />
-            <span className="text-sm font-medium">Ask about this report</span>
-            <span className="ml-1 rounded bg-white/20 px-1.5 py-0.5 text-[10px] font-medium">
-              ^/
+            <MessageSquare className="h-5 w-5" strokeWidth={1.5} />
+            <span className="text-[15px] font-medium">Ask about this report</span>
+            <span className="rounded-md bg-white/15 px-2 py-1 text-[11px] font-medium dark:bg-zinc-900/20">
+              ⌘/
             </span>
           </motion.button>
         )}
@@ -1185,21 +1185,22 @@ const markdownComponents = {
     </p>
   ),
   ul: ({ children, ...props }: React.HTMLProps<HTMLUListElement>) => (
-    <ul className="mb-5 ml-1 space-y-2.5" {...props}>
+    <ul className="mb-5 space-y-2.5" {...props}>
       {children}
     </ul>
   ),
   ol: ({ children }: React.HTMLProps<HTMLOListElement>) => (
-    <ol className="mb-5 ml-1 list-inside list-decimal space-y-2.5">
+    <ol className="mb-5 list-inside list-decimal space-y-2.5">
       {children}
     </ol>
   ),
   li: ({ children, ...props }: React.HTMLProps<HTMLLIElement>) => (
     <li
-      className="relative pl-2 leading-[1.7] text-[#4A4A4A] before:absolute before:left-[-12px] before:font-bold before:text-[#7C3AED] before:content-['•'] dark:text-neutral-300"
+      className="relative flex items-start gap-3 leading-[1.7] text-[#4A4A4A] dark:text-neutral-300"
       {...props}
     >
-      {children}
+      <span className="mt-2.5 h-px w-3 shrink-0 bg-zinc-400 dark:bg-zinc-500" />
+      <span>{children}</span>
     </li>
   ),
   strong: ({ children, ...props }: React.HTMLProps<HTMLElement>) => (
@@ -1221,7 +1222,7 @@ const markdownComponents = {
   ),
   th: ({ children, ...props }: React.HTMLProps<HTMLTableCellElement>) => (
     <th
-      className="border-b border-[#E5E5E5] px-4 py-3 text-left text-xs font-semibold tracking-wider text-[#1A1A1A] uppercase dark:border-neutral-800 dark:text-white"
+      className="border-b border-[#E5E5E5] px-4 py-3 text-left text-xs font-semibold text-[#1A1A1A] dark:border-neutral-800 dark:text-white"
       {...props}
     >
       {children}

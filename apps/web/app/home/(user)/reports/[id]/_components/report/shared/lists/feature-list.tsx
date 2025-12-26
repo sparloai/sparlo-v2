@@ -1,5 +1,3 @@
-import { Check } from 'lucide-react';
-
 import { cn } from '@kit/ui/utils';
 
 interface FeatureListProps {
@@ -8,6 +6,7 @@ interface FeatureListProps {
   className?: string;
 }
 
+// Per Jobs Standard: subtle custom-styled elements (checkmark as text)
 export function FeatureList({
   features,
   variant = 'default',
@@ -20,30 +19,26 @@ export function FeatureList({
   const isCompact = variant === 'compact';
 
   return (
-    <ul className={cn('space-y-2', className)}>
+    <ul className={cn('space-y-2.5', className)}>
       {features.map((feature, index) => (
         <li
           key={index}
           className={cn(
-            'flex items-start gap-2',
+            'flex items-start gap-3',
             isCompact ? 'text-sm' : 'text-base',
           )}
         >
           <span
             className={cn(
-              'mt-0.5 flex shrink-0 items-center justify-center rounded-full bg-emerald-100',
-              isCompact ? 'h-4 w-4' : 'h-5 w-5',
+              'shrink-0 font-medium text-emerald-600 dark:text-emerald-500',
+              isCompact ? 'mt-0.5 text-xs' : 'mt-0.5 text-sm',
             )}
           >
-            <Check
-              className={cn(
-                'text-emerald-600',
-                isCompact ? 'h-2.5 w-2.5' : 'h-3 w-3',
-              )}
-              strokeWidth={2.5}
-            />
+            +
           </span>
-          <span className="text-zinc-700">{feature}</span>
+          <span className="leading-relaxed text-zinc-700 dark:text-zinc-300">
+            {feature}
+          </span>
         </li>
       ))}
     </ul>

@@ -1,5 +1,3 @@
-import { AlertCircle, CheckCircle, XCircle } from 'lucide-react';
-
 import { cn } from '@kit/ui/utils';
 
 import type { ConfidenceLevelType } from '../../../../_lib/schema/sparlo-report.schema';
@@ -10,44 +8,40 @@ interface ConfidenceBadgeProps {
   className?: string;
 }
 
+// Per Jobs Standard: muted colors, no alarm tones, no borders
 const confidenceConfig = {
   HIGH: {
-    styles: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    icon: CheckCircle,
-    label: 'High Confidence',
+    styles: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+    label: 'High',
   },
   MEDIUM: {
-    styles: 'bg-amber-50 text-amber-700 border-amber-200',
-    icon: AlertCircle,
-    label: 'Medium Confidence',
+    styles: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+    label: 'Medium',
   },
   LOW: {
-    styles: 'bg-rose-50 text-rose-700 border-rose-200',
-    icon: XCircle,
-    label: 'Low Confidence',
+    styles: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+    label: 'Low',
   },
 } as const satisfies Record<
   ConfidenceLevelType,
-  { styles: string; icon: typeof CheckCircle; label: string }
+  { styles: string; label: string }
 >;
 
 export function ConfidenceBadge({
   level,
-  showIcon = false,
+  showIcon: _showIcon = false,
   className,
 }: ConfidenceBadgeProps) {
   const config = confidenceConfig[level];
-  const Icon = config.icon;
 
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+        'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium',
         config.styles,
         className,
       )}
     >
-      {showIcon && <Icon className="h-3.5 w-3.5" strokeWidth={1.5} />}
       {config.label}
     </span>
   );

@@ -1,5 +1,3 @@
-import { Lightbulb } from 'lucide-react';
-
 import { BaseCard } from './base-card';
 
 interface InsightCardProps {
@@ -8,6 +6,7 @@ interface InsightCardProps {
   variant?: 'default' | 'featured';
 }
 
+// Per Jobs Standard: subtle shadows, no borders or gradients, no icons
 export function InsightCard({
   headline,
   explanation,
@@ -15,30 +14,29 @@ export function InsightCard({
 }: InsightCardProps) {
   if (variant === 'featured') {
     return (
-      <div className="space-y-3 rounded-xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-zinc-100/50 p-6">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-amber-500" strokeWidth={1.5} />
-          <h3 className="text-xs font-bold tracking-wider text-zinc-500 uppercase">
-            First Principles Insight
-          </h3>
-        </div>
-        <p className="text-lg font-semibold text-zinc-900">{headline}</p>
-        <p className="text-base leading-relaxed text-zinc-600">{explanation}</p>
+      <div className="space-y-4 rounded-xl bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)] dark:bg-zinc-900 dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+        <span className="text-xs font-medium tracking-wide text-zinc-500 dark:text-zinc-400">
+          First principles insight
+        </span>
+        <p className="text-xl font-semibold leading-snug text-zinc-900 dark:text-zinc-100">
+          {headline}
+        </p>
+        <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
+          {explanation}
+        </p>
       </div>
     );
   }
 
   return (
     <BaseCard variant="default" emphasis="subtle">
-      <div className="flex items-start gap-3">
-        <Lightbulb
-          className="mt-0.5 h-5 w-5 shrink-0 text-amber-500"
-          strokeWidth={1.5}
-        />
-        <div className="space-y-1">
-          <p className="font-medium text-zinc-900">{headline}</p>
-          <p className="text-sm text-zinc-600">{explanation}</p>
-        </div>
+      <div className="space-y-2">
+        <p className="font-medium text-zinc-900 dark:text-zinc-100">
+          {headline}
+        </p>
+        <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+          {explanation}
+        </p>
       </div>
     </BaseCard>
   );

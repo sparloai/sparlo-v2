@@ -161,20 +161,20 @@ function RecommendationCard({
             )}
             <span
               className={cn(
-                'text-sm font-medium tracking-wider uppercase',
+                'text-sm font-medium',
                 isPrimary
                   ? 'text-violet-600 dark:text-violet-400'
                   : 'text-zinc-500 dark:text-zinc-400',
               )}
             >
-              {isPrimary ? 'Primary Recommendation' : 'Fallback Strategy'}
+              {isPrimary ? 'Primary recommendation' : 'Fallback strategy'}
             </span>
           </div>
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
             {recommendation.title}
           </h3>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-3">
           <TrackBadge track={recommendation.track} />
           <ConfidenceBadge level={recommendation.confidence_level} />
         </div>
@@ -193,7 +193,7 @@ function RecommendationCard({
           <div className="mb-2 flex items-center gap-2">
             <Zap className="h-4 w-4 text-amber-500" />
             <span className="text-sm font-medium text-zinc-900 dark:text-white">
-              Why This Wins
+              Why this wins
             </span>
           </div>
           <p className="text-sm text-zinc-600 dark:text-zinc-300">
@@ -238,7 +238,7 @@ function RecommendationCard({
           <div className="mb-3 flex items-center gap-2">
             <Beaker className="h-4 w-4 text-zinc-400" />
             <span className="text-sm font-medium text-zinc-900 dark:text-white">
-              Validation Steps
+              How to test
             </span>
           </div>
           <div className="space-y-3">
@@ -283,14 +283,14 @@ function RecommendationCard({
           <div className="mb-3 flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-amber-500" />
             <span className="text-sm font-medium text-zinc-900 dark:text-white">
-              Key Risks
+              Key risks
             </span>
           </div>
           <div className="space-y-2">
             {recommendation.key_risks.map((risk, idx) => (
               <div
                 key={idx}
-                className="rounded-lg border border-l-4 border-zinc-200 border-l-orange-500 bg-zinc-50 p-3 dark:border-zinc-700 dark:border-l-orange-600 dark:bg-zinc-800"
+                className="border-l-2 border-l-zinc-300 py-2 pl-4 dark:border-l-zinc-600"
               >
                 <div className="mb-1 flex items-center gap-2">
                   <span className="text-sm font-medium text-zinc-900 dark:text-white">
@@ -319,7 +319,7 @@ function RecommendationCard({
             <div className="mb-3 flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-zinc-400" />
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                Prior Art
+                Prior art
               </span>
             </div>
             <div className="space-y-2">
@@ -450,7 +450,7 @@ function FrontierWatchCard({
         {/* One-liner / What It Is */}
         {item.one_liner && (
           <div>
-            <MonoLabel>What It Is</MonoLabel>
+            <MonoLabel>What it is</MonoLabel>
             <p className="mt-3 text-base leading-relaxed font-normal text-zinc-900">
               {item.one_liner}
             </p>
@@ -460,7 +460,7 @@ function FrontierWatchCard({
         {/* Why Interesting */}
         {item.why_interesting && (
           <div>
-            <MonoLabel>Why It&apos;s Interesting</MonoLabel>
+            <MonoLabel>Why it&apos;s interesting</MonoLabel>
             <p className="mt-3 text-base leading-relaxed font-normal text-zinc-700">
               {item.why_interesting}
             </p>
@@ -470,7 +470,7 @@ function FrontierWatchCard({
         {/* Why Not Now */}
         {item.why_not_now && (
           <div>
-            <MonoLabel>Why Not Now</MonoLabel>
+            <MonoLabel>Why not now</MonoLabel>
             <p className="mt-3 text-base leading-relaxed font-normal text-zinc-700">
               {item.why_not_now}
             </p>
@@ -482,7 +482,7 @@ function FrontierWatchCard({
           <div className="grid gap-6 md:grid-cols-2">
             {item.trigger_to_revisit && (
               <div className="rounded-lg border border-zinc-200 p-6">
-                <MonoLabel>Trigger to Revisit</MonoLabel>
+                <MonoLabel>Trigger to revisit</MonoLabel>
                 <p className="mt-3 text-sm leading-relaxed text-zinc-700">
                   {item.trigger_to_revisit}
                 </p>
@@ -490,7 +490,7 @@ function FrontierWatchCard({
             )}
             {item.who_to_monitor && (
               <div className="rounded-lg border border-zinc-200 p-6">
-                <MonoLabel>Who to Monitor</MonoLabel>
+                <MonoLabel>Who to monitor</MonoLabel>
                 <p className="mt-3 text-sm leading-relaxed text-zinc-700">
                   {item.who_to_monitor}
                 </p>
@@ -505,8 +505,8 @@ function FrontierWatchCard({
             <div className="space-y-4 text-sm">
               {item.recent_developments && (
                 <div>
-                  <span className="mb-2 block font-mono text-xs font-bold text-zinc-200">
-                    RECENT DEVELOPMENTS
+                  <span className="mb-2 block text-xs font-semibold text-zinc-300">
+                    Recent developments
                   </span>
                   <p className="leading-relaxed text-zinc-100">
                     {item.recent_developments}
@@ -515,8 +515,8 @@ function FrontierWatchCard({
               )}
               {item.competitive_activity && (
                 <div>
-                  <span className="mb-2 block font-mono text-xs font-bold text-zinc-200">
-                    COMPETITIVE ACTIVITY
+                  <span className="mb-2 block text-xs font-semibold text-zinc-300">
+                    Competitive activity
                   </span>
                   <p className="leading-relaxed text-zinc-100">
                     {item.competitive_activity}
@@ -574,8 +574,8 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       <div className="flex items-start gap-2">
         <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-zinc-600 dark:text-zinc-400" />
         <div>
-          <span className="text-sm font-medium tracking-wider text-zinc-600 uppercase dark:text-zinc-400">
-            The Insight
+          <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            The insight
           </span>
           <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-200">
             {insight.what}
@@ -586,7 +586,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.where_we_found_it && (
         <div className="ml-6 rounded-lg bg-white/60 p-3 dark:bg-zinc-800/60">
           <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-            Where We Found It
+            Where we found it
           </span>
           <p className="text-sm text-zinc-700 dark:text-zinc-200">
             <strong>{insight.where_we_found_it.domain}:</strong>{' '}
@@ -603,7 +603,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.why_industry_missed_it && (
         <div className="ml-6">
           <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-            Why Industry Missed It
+            Why industry missed it
           </span>
           <p className="text-sm text-zinc-600 dark:text-zinc-300">
             {insight.why_industry_missed_it}
@@ -614,7 +614,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.physics && (
         <div className="ml-6">
           <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-            The Physics
+            The physics
           </span>
           <p className="font-mono text-sm text-zinc-600 dark:text-zinc-300">
             {insight.physics}
@@ -670,7 +670,7 @@ function HonestAssessmentSection({
           {/* Candid Assessment */}
           {assessment.candid_assessment && (
             <div>
-              <MonoLabel>Candid Assessment</MonoLabel>
+              <MonoLabel>Candid assessment</MonoLabel>
               <p className="mt-3 text-base leading-relaxed font-normal text-zinc-900">
                 {assessment.candid_assessment}
               </p>
@@ -679,12 +679,11 @@ function HonestAssessmentSection({
 
           {/* What Would Need to Change */}
           {assessment.if_value_is_limited && (
-            <div className="rounded-xl border border-l-4 border-zinc-200 border-l-orange-500 bg-zinc-50/30 p-6 dark:border-zinc-700 dark:border-l-orange-600 dark:bg-zinc-800/30">
-              <div className="mb-3 flex items-center gap-3">
-                <AlertTriangle className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                <MonoLabel>What Would Need to Change</MonoLabel>
-              </div>
-              <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-200">
+            <div className="border-l-2 border-l-zinc-300 py-3 pl-5 dark:border-l-zinc-600">
+              <p className="mb-1 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+                What would need to change
+              </p>
+              <p className="text-base leading-relaxed text-zinc-600 italic dark:text-zinc-300">
                 {assessment.if_value_is_limited}
               </p>
             </div>
@@ -714,8 +713,8 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
             {search.enhanced_challenge_frame.search_queries &&
               search.enhanced_challenge_frame.search_queries.length > 0 && (
                 <div className="border-t border-zinc-800 pt-8">
-                  <h4 className="mb-4 font-mono text-xs font-bold tracking-widest text-zinc-200 uppercase">
-                    Search Queries
+                  <h4 className="mb-4 text-xs font-semibold tracking-wide text-zinc-300">
+                    Search queries
                   </h4>
                   <div className="flex flex-wrap gap-3">
                     {search.enhanced_challenge_frame.search_queries.map(
@@ -736,7 +735,7 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
 
         {/* Domains Searched */}
         {search.domains_searched && search.domains_searched.length > 0 && (
-          <CardWithHeader icon={Layers} label="Domains Searched">
+          <CardWithHeader icon={Layers} label="Domains searched">
             <div className="space-y-4">
               {search.domains_searched.map((domain, idx) => (
                 <div
@@ -765,7 +764,7 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
         {/* Revelations */}
         {search.from_scratch_revelations &&
           search.from_scratch_revelations.length > 0 && (
-            <CardWithHeader icon={Sparkles} label="Key Revelations">
+            <CardWithHeader icon={Sparkles} label="Key revelations">
               <ul className="space-y-4">
                 {search.from_scratch_revelations.map((rev, idx) => (
                   <li key={idx} className="group flex items-start gap-4">
@@ -828,8 +827,8 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
                   <Shield className="h-5 w-5 text-zinc-700 dark:text-zinc-300" />
-                  <span className="text-sm font-medium tracking-wider text-zinc-700 uppercase dark:text-zinc-300">
-                    Primary Recommendation
+                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Primary recommendation
                   </span>
                 </div>
                 <h3 className="text-xl font-semibold text-zinc-900 dark:text-white">
@@ -857,8 +856,8 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
             {/* What It Is */}
             {track.primary.what_it_is && (
               <div className="mb-4">
-                <span className="text-sm font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-                  What It Is
+                <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  What it is
                 </span>
                 <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
                   {track.primary.what_it_is}
@@ -869,8 +868,8 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
             {/* Why It Works */}
             {track.primary.why_it_works && (
               <div className="mb-4">
-                <span className="text-sm font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-                  Why It Works
+                <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  Why it works
                 </span>
                 <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
                   {track.primary.why_it_works}
@@ -882,7 +881,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
               {track.primary.expected_improvement && (
                 <div className="rounded-lg bg-white/60 p-3 dark:bg-zinc-800/60">
                   <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                    Expected Improvement
+                    Expected improvement
                   </span>
                   <p className="text-sm font-medium text-green-700 dark:text-green-400">
                     {track.primary.expected_improvement}
@@ -926,7 +925,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   <div className="mb-3 flex items-center gap-2">
                     <Beaker className="h-4 w-4 text-zinc-400" />
                     <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                      Validation Gates
+                      Validation gates
                     </span>
                   </div>
                   <div className="space-y-2">
@@ -968,7 +967,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                 <div className="mb-3 flex items-center gap-2">
                   <GitBranch className="h-4 w-4 text-zinc-400" />
                   <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                    Coupled Effects
+                    Coupled effects
                   </span>
                 </div>
                 <div className="space-y-2">
@@ -1031,13 +1030,13 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
             {sustainabilityFlag && sustainabilityFlag.type !== 'NONE' && (
               <div
                 className={cn(
-                  'mt-4 rounded-lg border p-3',
+                  'mt-4 border-l-2 py-2 pl-4',
                   sustainabilityFlag.type === 'BENEFIT'
-                    ? 'border-l-4 border-zinc-200 border-l-green-500 bg-zinc-50/50 dark:border-zinc-700 dark:border-l-green-600 dark:bg-zinc-800/50'
+                    ? 'border-l-emerald-400 dark:border-l-emerald-500'
                     : sustainabilityFlag.type === 'CAUTION' ||
                         sustainabilityFlag.type === 'LIFECYCLE_TRADEOFF'
-                      ? 'border-l-4 border-zinc-200 border-l-orange-500 bg-zinc-50/50 dark:border-zinc-700 dark:border-l-orange-600 dark:bg-zinc-800/50'
-                      : 'border-zinc-200 bg-zinc-50/50 dark:border-zinc-700 dark:bg-zinc-800/50',
+                      ? 'border-l-amber-400 dark:border-l-amber-500'
+                      : 'border-l-zinc-300 dark:border-l-zinc-600',
                 )}
               >
                 <div className="mb-2 flex items-center gap-2">
@@ -1094,7 +1093,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   <div className="flex items-center gap-2">
                     <Shield className="h-4 w-4 text-zinc-400" />
                     <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                      IP Considerations
+                      IP considerations
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1129,7 +1128,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   ipConsiderations.key_patents_to_review.length > 0 && (
                     <div className="mt-2">
                       <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                        Key Patents to Review
+                        Key patents to review
                       </span>
                       <ul className="mt-1 space-y-1">
                         {ipConsiderations.key_patents_to_review.map(
@@ -1156,7 +1155,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
             <div className="mb-4 flex items-center gap-2">
               <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                Supplier Negotiation Guide
+                Supplier negotiation guide
               </span>
             </div>
             {track.supplier_arbitrage.who_to_call && (
@@ -1169,7 +1168,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                 track.supplier_arbitrage.what_to_ask.length > 0 && (
                   <div>
                     <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                      What to Ask
+                      What to ask
                     </span>
                     <ul className="mt-1 space-y-1">
                       {track.supplier_arbitrage.what_to_ask.map((q, idx) => (
@@ -1188,7 +1187,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                 track.supplier_arbitrage.what_to_push_back_on.length > 0 && (
                   <div>
                     <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                      What to Push Back On
+                      What to push back on
                     </span>
                     <ul className="mt-1 space-y-1">
                       {track.supplier_arbitrage.what_to_push_back_on.map(
@@ -1215,14 +1214,14 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
             <div className="mb-4 flex items-center gap-2">
               <Brain className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                Why This Wasn&apos;t Obvious
+                Why this wasn&apos;t obvious
               </span>
             </div>
             <div className="space-y-3">
               {track.why_not_obvious.industry_gap && (
                 <div>
                   <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                    Industry Gap
+                    Industry gap
                   </span>
                   <p className="text-sm text-zinc-600 dark:text-zinc-300">
                     {track.why_not_obvious.industry_gap}
@@ -1232,7 +1231,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
               {track.why_not_obvious.knowledge_barrier && (
                 <div>
                   <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                    Knowledge Barrier
+                    Knowledge barrier
                   </span>
                   <p className="text-sm text-zinc-600 dark:text-zinc-300">
                     {track.why_not_obvious.knowledge_barrier}
@@ -1242,7 +1241,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
               {track.why_not_obvious.our_contribution && (
                 <div>
                   <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                    Our Contribution
+                    Our contribution
                   </span>
                   <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     {track.why_not_obvious.our_contribution}
@@ -1259,7 +1258,7 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
             <div className="mb-4 flex items-center gap-2">
               <GitBranch className="h-5 w-5 text-zinc-400" />
               <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                Supporting Concepts
+                Supporting concepts
               </span>
             </div>
             <div className="space-y-3">
@@ -1296,9 +1295,9 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                     </p>
                   )}
                   {concept.when_to_use_instead && (
-                    <div className="mt-3 rounded border-l-4 border-l-orange-500 bg-zinc-50 p-2 text-xs text-zinc-700 dark:border-l-orange-600 dark:bg-zinc-800 dark:text-zinc-300">
-                      <strong>When to use instead: </strong>
-                      {concept.when_to_use_instead}
+                    <div className="mt-3 border-l-2 border-l-zinc-300 py-1 pl-3 text-xs text-zinc-600 dark:border-l-zinc-600 dark:text-zinc-400">
+                      <span className="font-medium">When to use instead: </span>
+                      <span className="italic">{concept.when_to_use_instead}</span>
                     </div>
                   )}
                 </div>
@@ -1309,13 +1308,10 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
 
         {/* Fallback Trigger */}
         {track.fallback_trigger && (
-          <div className="rounded-xl border border-l-4 border-zinc-200 border-l-orange-600 bg-white p-4 dark:border-zinc-700 dark:border-l-orange-500 dark:bg-zinc-800">
-            <div className="mb-2 flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-orange-600 dark:text-orange-500" />
-              <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                When to Pivot
-              </span>
-            </div>
+          <div className="border-l-2 border-l-zinc-300 py-3 pl-4 dark:border-l-zinc-600">
+            <p className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              When to pivot
+            </p>
             {track.fallback_trigger.conditions &&
               track.fallback_trigger.conditions.length > 0 && (
                 <ul className="mb-2 space-y-1">
@@ -1373,8 +1369,8 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
               <div className="flex-1">
                 <div className="mb-2 flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-zinc-600 dark:text-zinc-400" />
-                  <span className="text-sm font-medium tracking-wider text-zinc-600 uppercase dark:text-zinc-400">
-                    Recommended Innovation
+                  <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                    Recommended innovation
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
@@ -1400,8 +1396,8 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
             {/* What It Is */}
             {portfolio.recommended_innovation.what_it_is && (
               <div className="mb-4">
-                <span className="text-sm font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-                  What It Is
+                <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  What it is
                 </span>
                 <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
                   {portfolio.recommended_innovation.what_it_is}
@@ -1412,8 +1408,8 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
             {/* Why It Works */}
             {portfolio.recommended_innovation.why_it_works && (
               <div className="mb-4">
-                <span className="text-sm font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-                  Why It Works
+                <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  Why it works
                 </span>
                 <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-200">
                   {portfolio.recommended_innovation.why_it_works}
@@ -1425,7 +1421,7 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
               ?.why_this_one && (
               <div className="mb-4 rounded-lg bg-white/60 p-4 dark:bg-zinc-800/60">
                 <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                  Why This One
+                  Why this one
                 </span>
                 <p className="text-sm text-zinc-700 dark:text-zinc-200">
                   {
@@ -1456,7 +1452,7 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                 <div className="mb-2 flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
                   <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                    Breakthrough Potential
+                    Breakthrough potential
                   </span>
                 </div>
                 <p className="text-sm text-zinc-600 dark:text-zinc-300">
@@ -1482,7 +1478,7 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                 <div className="mb-2 flex items-center gap-2">
                   <Beaker className="h-4 w-4 text-zinc-400" />
                   <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                    Validation Path
+                    Validation path
                   </span>
                 </div>
                 {portfolio.recommended_innovation.validation_path
@@ -1549,7 +1545,7 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
               <div className="mb-4 flex items-center gap-2">
                 <Layers className="h-5 w-5 text-blue-500" />
                 <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                  Parallel Investigations
+                  Parallel investigations
                 </span>
                 <span className="badge-pill badge-pill--sm badge-pill--accent">
                   {portfolio.parallel_investigations.length}
@@ -1602,7 +1598,7 @@ const InnovationPortfolioSection = memo(function InnovationPortfolioSection({
                       {inv.key_uncertainty && (
                         <div>
                           <span className="text-sm text-zinc-500">
-                            Key Uncertainty:
+                            Key uncertainty:
                           </span>
                           <p className="text-amber-700 dark:text-amber-400">
                             {inv.key_uncertainty}
@@ -1669,7 +1665,7 @@ const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
               )}
               {analysis.why_its_hard.governing_equation && (
                 <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-                  <MonoLabel>Governing Equation</MonoLabel>
+                  <MonoLabel>Governing equation</MonoLabel>
                   <p className="mt-2 font-mono text-sm text-zinc-900">
                     {analysis.why_its_hard.governing_equation.equation}
                   </p>
@@ -2121,7 +2117,7 @@ function InnovationAnalysisSection({
           </DarkSection>
         )}
         {analysis.domains_searched && analysis.domains_searched.length > 0 && (
-          <CardWithHeader icon={Layers} label="Domains Searched">
+          <CardWithHeader icon={Layers} label="Domains searched">
             <div className="flex flex-wrap gap-2">
               {analysis.domains_searched.map((domain, idx) => (
                 <span
@@ -2909,11 +2905,11 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
             title="Self-Critique"
             subtitle="Honest assessment of this analysis"
           />
-          <div className="rounded-xl border border-l-4 border-zinc-200 border-l-orange-600 bg-white p-6 dark:border-zinc-700 dark:border-l-orange-500 dark:bg-zinc-800">
+          <div className="space-y-4">
             {/* Confidence - v4.0 uses overall_confidence, fallback to confidence_level */}
-            <div className="mb-4 flex items-center gap-2">
-              <span className="text-sm font-medium text-zinc-900 dark:text-white">
-                Overall Confidence:
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Overall Confidence
               </span>
               <ConfidenceBadge
                 level={

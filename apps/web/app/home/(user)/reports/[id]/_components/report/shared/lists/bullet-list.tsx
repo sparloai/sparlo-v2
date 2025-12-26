@@ -6,6 +6,7 @@ interface BulletListProps {
   className?: string;
 }
 
+// Per Jobs Standard: custom-styled bullet elements (em-dash style)
 export function BulletList({
   items,
   variant = 'default',
@@ -16,22 +17,26 @@ export function BulletList({
   }
 
   return (
-    <ul className={cn('space-y-2', className)}>
+    <ul className={cn('space-y-2.5', className)}>
       {items.map((item, index) => (
         <li
           key={index}
           className={cn(
-            'flex items-start gap-2 text-sm',
-            variant === 'muted' ? 'text-zinc-500' : 'text-zinc-600',
+            'flex items-start gap-3 text-sm',
+            variant === 'muted'
+              ? 'text-zinc-500 dark:text-zinc-500'
+              : 'text-zinc-600 dark:text-zinc-400',
           )}
         >
           <span
             className={cn(
-              'mt-2 h-1.5 w-1.5 shrink-0 rounded-full',
-              variant === 'muted' ? 'bg-zinc-300' : 'bg-zinc-400',
+              'mt-2.5 h-px w-3 shrink-0',
+              variant === 'muted'
+                ? 'bg-zinc-300 dark:bg-zinc-600'
+                : 'bg-zinc-400 dark:bg-zinc-500',
             )}
           />
-          <span>{item}</span>
+          <span className="leading-relaxed">{item}</span>
         </li>
       ))}
     </ul>
