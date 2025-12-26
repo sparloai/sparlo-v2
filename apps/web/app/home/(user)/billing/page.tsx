@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation';
 
 import { getBillingGatewayProvider } from '@kit/billing-gateway';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
-import { PageBody } from '@kit/ui/page';
 
 import appConfig from '~/config/app.config';
 import billingConfig from '~/config/billing.config';
@@ -11,8 +10,7 @@ import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { withI18n } from '~/lib/i18n/with-i18n';
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 
-import { AuraPricingHeader } from './_components/aura-pricing-header';
-import { AuraPricingTable } from './_components/aura-pricing-table';
+import { SparloBillingPricing } from './_components/sparlo-billing-pricing';
 import { loadPersonalAccountBillingPageData } from './_lib/server/personal-account-billing-page.loader';
 
 export const generateMetadata = async () => {
@@ -51,15 +49,8 @@ async function PersonalAccountBillingPage() {
     redirect(session.url);
   }
 
-  // NON-SUBSCRIBER: Show Aura pricing page
-  return (
-    <PageBody>
-      <div className="mx-auto w-full max-w-7xl px-6 py-12 font-sans">
-        <AuraPricingHeader title="Plans" />
-        <AuraPricingTable config={billingConfig} customerId={customerId} />
-      </div>
-    </PageBody>
-  );
+  // NON-SUBSCRIBER: Show Sparlo pricing page
+  return <SparloBillingPricing config={billingConfig} customerId={customerId} />;
 }
 
 export default withI18n(PersonalAccountBillingPage);

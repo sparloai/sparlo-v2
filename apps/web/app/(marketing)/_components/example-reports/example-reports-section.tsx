@@ -103,7 +103,7 @@ export function ExampleReportsSection() {
       className="relative min-h-screen bg-white dark:bg-zinc-950"
     >
       {/* Tab Navigation - Sticky below main nav */}
-      <div className="sticky top-14 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
+      <div className="sticky top-16 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="no-scrollbar flex gap-1 overflow-x-auto py-1">
             {EXAMPLE_REPORTS.map((r, i) => (
@@ -146,7 +146,7 @@ export function ExampleReportsSection() {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.2 }}
             >
-              <div className="sticky top-32 h-[calc(100vh-140px)] overflow-y-auto border-r border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
+              <div className="sticky top-36 h-[calc(100vh-150px)] overflow-y-auto border-r border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
                 <div className="p-5">
                   <div className="mb-5 flex items-center justify-between">
                     <span className="font-mono text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">

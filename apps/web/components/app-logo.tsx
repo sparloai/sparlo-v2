@@ -19,9 +19,9 @@ function LogoImage({ className }: { className?: string }) {
     <Image
       src={logoSrc}
       alt="Sparlo"
-      width={100}
-      height={25}
-      className={cn('h-6 w-auto', className)}
+      width={160}
+      height={40}
+      className={cn('h-10 w-auto', className)}
       priority
     />
   );

@@ -717,11 +717,11 @@ const QuantifiedParameterSchema = z.object({
 const MechanisticDepthSchema = z
   .object({
     working_principle: z.string().catch(''),
-    molecular_mechanism: z.string().optional(),
+    molecular_mechanism: z.string().nullable().optional(),
     quantified_parameters: z.array(QuantifiedParameterSchema).default([]),
     rate_limiting_step: z.string().catch(''),
     key_parameters: z.array(z.string()).catch([]),
-    thermodynamic_advantage: z.string().optional(),
+    thermodynamic_advantage: z.string().nullable().optional(),
     failure_modes: z.array(z.string()).catch([]),
   })
   .passthrough();
@@ -733,16 +733,16 @@ const ConceptSchema = z
     track: TrackSchema,
     description: z.string().catch(''),
     mechanism: z.string().catch(''),
-    mechanistic_depth: MechanisticDepthSchema.optional(),
-    source_domain: z.string().optional(),
+    mechanistic_depth: MechanisticDepthSchema.nullable().optional(),
+    source_domain: z.string().nullable().optional(),
     prior_art: z.array(PriorArtSchema).catch([]),
     feasibility_score: z.number().min(1).max(10).catch(5),
     impact_score: z.number().min(1).max(10).catch(5),
     validation_speed: z
       .enum(['days', 'weeks', 'months', 'years'])
       .catch('months'),
-    why_not_tried: z.string().optional(),
-    key_risk: z.string().optional(),
+    why_not_tried: z.string().nullable().optional(),
+    key_risk: z.string().nullable().optional(),
     // v4.0: Sustainability screening for concepts
     sustainability_flag: SustainabilityFlagSchema.optional(),
   })

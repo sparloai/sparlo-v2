@@ -43,7 +43,7 @@
 
   html,
   body {
-    scroll-padding-top: 56px;
+    scroll-padding-top: 64px;
   }
 
   html {
@@ -51,7 +51,7 @@
   }
 
   [id] {
-    scroll-margin-top: 56px;
+    scroll-margin-top: 64px;
   }
 
   *,

@@ -40,7 +40,7 @@ export function SparloPricing() {
   );
 
   return (
-    <main className="flex flex-grow flex-col items-center justify-center py-20 md:py-32">
+    <main className="flex flex-grow flex-col items-center justify-center pt-8 pb-20 md:pt-12 md:pb-32">
       <div className="mx-auto w-full max-w-7xl px-6">
         {/* Section Header */}
         <div className="mb-12 max-w-2xl">

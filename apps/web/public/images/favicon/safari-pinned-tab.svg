@@ -1,5 +1,28 @@
 <?xml version="1.0" standalone="no"?>
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="16" height="16" viewBox="0 0 16 16">
-<path fill="#000000" d="M8.1 2C5.55 2 4 3.15 4 5.45C4 7.42 5.32 8.4 7.62 9.06L9.76 9.63C11.24 10.04 11.73 10.53 11.73 11.35C11.73 12.34 10.91 12.98 9.27 12.98C7.46 12.98 6.31 12.16 6.15 10.68H3.35C3.52 13.3 5.49 15 9.27 15C12.06 15 14.03 13.69 14.03 11.23C14.03 9.26 12.71 8.11 10.25 7.46L8.11 6.88C6.8 6.47 6.31 6.02 6.31 5.2C6.31 4.21 7.13 3.65 8.61 3.65C10.09 3.65 11.07 4.3 11.24 5.61H14.04C13.87 3.06 11.9 2 8.1 2Z"/>
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <circle cx="2" cy="2" r="1" fill="black"/>
+  <circle cx="5" cy="2" r="1" fill="black"/>
+  <circle cx="8" cy="2" r="1" fill="black"/>
+  <circle cx="11" cy="2" r="1" fill="black"/>
+  <circle cx="14" cy="2" r="1" fill="black"/>
+  <circle cx="2" cy="5" r="1" fill="black"/>
+  <circle cx="5" cy="5" r="1" fill="black"/>
+  <circle cx="8" cy="5" r="1" fill="black"/>
+  <circle cx="11" cy="5" r="1" fill="black"/>
+  <circle cx="14" cy="5" r="1" fill="black"/>
+  <circle cx="2" cy="8" r="1" fill="black"/>
+  <circle cx="5" cy="8" r="1" fill="black"/>
+  <circle cx="8" cy="8" r="1" fill="black"/>
+  <circle cx="11" cy="8" r="1" fill="black"/>
+  <circle cx="14" cy="8" r="1" fill="black"/>
+  <circle cx="2" cy="11" r="1" fill="black"/>
+  <circle cx="5" cy="11" r="1" fill="black"/>
+  <circle cx="8" cy="11" r="1" fill="black"/>
+  <circle cx="11" cy="11" r="1" fill="black"/>
+  <circle cx="14" cy="11" r="1" fill="black"/>
+  <circle cx="2" cy="14" r="1" fill="black"/>
+  <circle cx="5" cy="14" r="1" fill="black"/>
+  <circle cx="8" cy="14" r="1" fill="black"/>
+  <circle cx="11" cy="14" r="1" fill="black"/>
+  <circle cx="14" cy="14" r="1" fill="black"/>
 </svg>

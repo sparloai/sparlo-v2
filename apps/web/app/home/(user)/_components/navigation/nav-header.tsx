@@ -48,13 +48,13 @@ export function NavHeader({
           'supports-[not(backdrop-filter)]:bg-[--nav-bg-solid]',
         )}
       >
-        <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
+        <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           {/* Left: Hamburger + Logo */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {/* Hamburger trigger */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-md transition-colors hover:bg-[--surface-overlay]"
+              className="flex h-10 w-10 items-center justify-center rounded-md transition-colors hover:bg-[--surface-overlay]"
               aria-label="Open navigation menu"
             >
               <Menu className="h-5 w-5 text-[--text-secondary]" />
@@ -64,9 +64,9 @@ export function NavHeader({
               <Image
                 src={logoSrc}
                 alt="Sparlo"
-                width={80}
-                height={20}
-                className="h-5 w-auto"
+                width={160}
+                height={40}
+                className="h-10 w-auto"
                 priority
               />
             </Link>
