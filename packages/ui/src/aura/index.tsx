@@ -155,15 +155,15 @@ export function DarkSection({
     <div
       className="relative overflow-hidden rounded-lg border p-8 sm:p-10"
       style={{
-        borderColor: 'var(--border-strong, rgba(0,0,0,0.15))',
-        backgroundColor: 'var(--void-deep, #fafafa)',
-        color: 'var(--text-primary, #09090b)',
-        boxShadow: 'var(--elevation-3, 0 4px 8px rgba(0,0,0,0.08))',
+        borderColor: 'rgba(63, 63, 70, 0.5)',
+        backgroundColor: '#18181b',
+        color: '#fafafa',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
       }}
     >
       <h4
         className="mb-4 font-mono text-xs font-bold tracking-widest uppercase"
-        style={{ color: 'var(--accent-light, #8b5cf6)' }}
+        style={{ color: '#a78bfa' }}
       >
         {label}
       </h4>

@@ -385,8 +385,8 @@ export function ReportDisplay({
         });
       if (r?.what_id_actually_do)
         items.push({
-          id: 'what-id-actually-do',
-          title: "What I'd Actually Do",
+          id: 'recommendation',
+          title: 'Recommendation',
           level: 2,
         });
       return items;
