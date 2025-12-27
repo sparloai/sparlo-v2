@@ -17,9 +17,9 @@ import { useReportProgress } from '../../_lib/use-report-progress';
  *
  * Features:
  * - White background with minimal chrome
- * - Two-step flow: Input → Clarification (optional) → Processing
+ * - Left border accent (connects to report style)
+ * - Larger, more substantial form presence
  * - No icons, text only
- * - Square corners, zinc palette
  */
 
 // Attachment types and constants
@@ -174,12 +174,9 @@ export default function NewReportPage() {
   const handleContinue = useCallback(async () => {
     if (!canSubmit || isSubmitting) return;
 
-    // For now, skip clarification and go directly to processing
-    // In the future, this could call an API to get a clarifying question
     setFormState((prev) => ({ ...prev, isSubmitting: true, error: null }));
 
     try {
-      // Prepare attachments for API
       const attachmentData = attachments.map((a) => ({
         filename: a.file.name,
         media_type: a.file.type as
@@ -196,7 +193,6 @@ export default function NewReportPage() {
       });
 
       if (result.reportId) {
-        // Clean up attachment previews
         attachments.forEach((a) => URL.revokeObjectURL(a.preview));
         setAttachments([]);
 
@@ -214,7 +210,6 @@ export default function NewReportPage() {
           ? err.message
           : 'Failed to start report generation';
 
-      // Check if this is a usage/subscription error
       const isUsageError =
         errorMessage.includes('Usage limit') ||
         errorMessage.includes('subscription');
@@ -255,7 +250,6 @@ export default function NewReportPage() {
         data: a.base64 || '',
       }));
 
-      // Combine problem with clarification if present
       const fullChallenge = clarificationResponse
         ? `${problemText.trim()}\n\nAdditional context: ${clarificationResponse.trim()}`
         : problemText.trim();
@@ -367,46 +361,47 @@ export default function NewReportPage() {
           }}
         >
           {/* Header */}
-          <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-6">
+          <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-5">
             <h1 className="text-[15px] leading-[1.2] tracking-[-0.02em] text-zinc-500">
               Clarification
             </h1>
           </header>
 
           {/* Main content */}
-          <div className="flex-1 px-8 py-12">
-            <div className="mx-auto max-w-2xl">
-              {/* Original problem shown */}
-              <div className="border-b border-zinc-200 pb-6">
-                <p className="mb-2 text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
-                  Your problem
-                </p>
-                <p className="text-[16px] leading-[1.4] tracking-[-0.02em] text-zinc-700">
-                  {problemText}
-                </p>
-              </div>
+          <div className="flex flex-1 items-center justify-center px-8 py-12">
+            <div className="w-full max-w-2xl">
+              {/* Left border accent */}
+              <div className="border-l-2 border-zinc-900 pl-8">
+                {/* Original problem shown */}
+                <div className="mb-8">
+                  <p className="mb-2 text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
+                    Your problem
+                  </p>
+                  <p className="text-[16px] leading-relaxed tracking-[-0.02em] text-zinc-700">
+                    {problemText}
+                  </p>
+                </div>
 
-              {/* System's clarifying question */}
-              <div className="py-6">
-                <p className="text-[17px] leading-[1.4] tracking-[-0.02em] text-zinc-900">
+                {/* System's clarifying question */}
+                <p className="mb-6 text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-900">
                   {clarifyingQuestion}
                 </p>
+
+                <textarea
+                  value={clarificationResponse}
+                  onChange={(e) =>
+                    setFormState((prev) => ({
+                      ...prev,
+                      clarificationResponse: e.target.value,
+                    }))
+                  }
+                  onKeyDown={handleKeyDown}
+                  placeholder="Your response..."
+                  className="h-40 w-full resize-none border-none bg-transparent p-0 text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
+                />
               </div>
 
-              <textarea
-                value={clarificationResponse}
-                onChange={(e) =>
-                  setFormState((prev) => ({
-                    ...prev,
-                    clarificationResponse: e.target.value,
-                  }))
-                }
-                onKeyDown={handleKeyDown}
-                placeholder="Your response..."
-                className="h-32 w-full resize-none border border-zinc-200 p-4 text-[16px] leading-[1.4] tracking-[-0.02em] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
-              />
-
-              <div className="mt-6 flex items-center justify-between">
+              <div className="mt-8 flex items-end justify-between pl-8">
                 <button
                   onClick={goBackToInput}
                   className="text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-500 transition-colors hover:text-zinc-700"
@@ -417,7 +412,7 @@ export default function NewReportPage() {
                   onClick={handleRunAnalysis}
                   disabled={isSubmitting}
                   className={cn(
-                    'px-6 py-3 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
+                    'px-8 py-4 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
                     isSubmitting
                       ? 'cursor-not-allowed bg-zinc-300 text-zinc-500'
                       : 'bg-zinc-900 text-white hover:bg-zinc-800',
@@ -428,7 +423,7 @@ export default function NewReportPage() {
               </div>
 
               {error && (
-                <p className="mt-4 text-[14px] leading-[1.2] tracking-[-0.02em] text-red-600">
+                <p className="mt-4 pl-8 text-[14px] leading-[1.2] tracking-[-0.02em] text-red-600">
                   {error}
                 </p>
               )}
@@ -457,7 +452,7 @@ export default function NewReportPage() {
         }}
       >
         {/* Header */}
-        <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-6">
+        <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-5">
           <h1 className="text-[15px] leading-[1.2] tracking-[-0.02em] text-zinc-500">
             New Analysis
           </h1>
@@ -494,32 +489,31 @@ export default function NewReportPage() {
         )}
 
         {/* Main content */}
-        <div className="flex flex-1 flex-col items-center justify-center px-8 py-16">
+        <div className="flex flex-1 items-center justify-center px-8 py-12">
           <div className="w-full max-w-2xl">
-            <textarea
-              value={problemText}
-              onChange={(e) => {
-                setFormState((prev) => ({
-                  ...prev,
-                  problemText: e.target.value,
-                  showRefusalWarning: false,
-                }));
-              }}
-              onKeyDown={handleKeyDown}
-              disabled={isSubmitting}
-              autoFocus
-              data-test="challenge-input"
-              placeholder="What engineering problem are you solving?"
-              className="h-48 w-full resize-none border border-zinc-200 p-6 text-[17px] leading-[1.4] tracking-[-0.02em] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none disabled:opacity-40"
-            />
-
-            <p className="mt-4 text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
-              Be specific about constraints and success criteria for better results.
-            </p>
+            {/* Left border accent - connects to report style */}
+            <div className="border-l-2 border-zinc-900 pl-8">
+              <textarea
+                value={problemText}
+                onChange={(e) => {
+                  setFormState((prev) => ({
+                    ...prev,
+                    problemText: e.target.value,
+                    showRefusalWarning: false,
+                  }));
+                }}
+                onKeyDown={handleKeyDown}
+                disabled={isSubmitting}
+                autoFocus
+                data-test="challenge-input"
+                placeholder="What engineering problem are you solving?"
+                className="h-56 w-full resize-none border-none bg-transparent p-0 text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 disabled:opacity-40"
+              />
+            </div>
 
             {/* Attachment Previews */}
             {attachments.length > 0 && (
-              <div className="mt-6 border-t border-zinc-200 pt-4">
+              <div className="mt-6 border-t border-zinc-200 pt-4 pl-8">
                 <div className="flex flex-wrap gap-3">
                   {attachments.map((attachment) => (
                     <div
@@ -544,9 +538,9 @@ export default function NewReportPage() {
               </div>
             )}
 
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-8 flex items-end justify-between pl-8">
               <p className="text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
-                ~25 min analysis
+                ~25 min · Include constraints and success criteria
               </p>
 
               <button
@@ -554,7 +548,7 @@ export default function NewReportPage() {
                 disabled={!canSubmit || isSubmitting}
                 data-test="challenge-submit"
                 className={cn(
-                  'px-6 py-3 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
+                  'px-8 py-4 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
                   canSubmit && !isSubmitting
                     ? 'bg-zinc-900 text-white hover:bg-zinc-800'
                     : 'cursor-not-allowed bg-zinc-200 text-zinc-400',
@@ -565,7 +559,7 @@ export default function NewReportPage() {
             </div>
 
             {error && (
-              <p className="mt-4 text-[14px] leading-[1.2] tracking-[-0.02em] text-red-600">
+              <p className="mt-4 pl-8 text-[14px] leading-[1.2] tracking-[-0.02em] text-red-600">
                 {error}
               </p>
             )}
