@@ -42,6 +42,51 @@ interface BrandSystemReportProps {
   title?: string;
   /** Whether to show the fixed sidebar TOC. Set to false when embedding in a page with its own TOC. */
   showToc?: boolean;
+  /** The user's original input/brief */
+  brief?: string;
+  /** When the report was created (ISO string) */
+  createdAt?: string;
+  /**
+   * Whether the report is inside a layout with the app sidebar.
+   * When true (default), TOC is positioned at left-16 and content has lg:ml-56.
+   * When false (landing page), TOC is at left-0 and content has lg:ml-56.
+   */
+  hasAppSidebar?: boolean;
+}
+
+/**
+ * Calculate estimated read time based on word count
+ * Average reading speed: 200-250 words per minute for technical content
+ */
+function calculateReadTime(data: HybridReportData): number {
+  // Recursively extract all text from the report
+  const extractText = (obj: unknown): string => {
+    if (typeof obj === 'string') return obj;
+    if (Array.isArray(obj)) return obj.map(extractText).join(' ');
+    if (typeof obj === 'object' && obj !== null) {
+      return Object.values(obj).map(extractText).join(' ');
+    }
+    return '';
+  };
+
+  const text = extractText(data);
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+  const minutesRaw = wordCount / 200; // 200 words per minute for technical content
+
+  // Round to nearest minute, minimum 1 minute
+  return Math.max(1, Math.round(minutesRaw));
+}
+
+/**
+ * Format date in a readable format: "Dec 27, 2025"
+ */
+function formatDate(isoString: string): string {
+  const date = new Date(isoString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 }
 
 // Known fields that we handle explicitly (both old and new names)
@@ -255,11 +300,15 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   reportData,
   title,
   showToc = true,
+  brief,
+  createdAt,
+  hasAppSidebar = true,
 }: BrandSystemReportProps) {
   // Normalize field names for backward compatibility
   const normalizedData = normalizeReportData(reportData);
   const tocSections = generateTocSections(
     normalizedData as Record<string, unknown>,
+    !!brief, // Include Brief in TOC if we have it
   );
 
   // Find unknown fields for graceful rendering
@@ -268,22 +317,47 @@ export const BrandSystemReport = memo(function BrandSystemReport({
       !KNOWN_FIELDS.has(key) && value !== null && value !== undefined,
   );
 
+  // Calculate read time
+  const readTime = calculateReadTime(normalizedData);
+
   return (
     <div className="relative min-h-screen bg-white">
       {/* Table of Contents - only show when showToc is true */}
-      {showToc && <TableOfContents sections={tocSections} />}
+      {showToc && (
+        <TableOfContents sections={tocSections} hasAppSidebar={hasAppSidebar} />
+      )}
 
-      {/* Main Content - adjust margin when TOC is hidden */}
+      {/* Main Content - adjust margin when TOC is shown (TOC is w-56 = 224px) */}
       <main
-        className={`max-w-3xl px-6 py-16 ${showToc ? 'lg:ml-72 lg:pr-8' : 'mx-auto'}`}
+        className={`max-w-3xl px-6 py-16 ${showToc ? 'lg:ml-56 lg:pr-8' : 'mx-auto'}`}
       >
-        {/* Report Title */}
+        {/* Report Title + Metadata */}
         {(title || normalizedData.title) && (
           <header className="mb-16">
-            <h1 className="text-[36px] leading-[1.1] font-semibold tracking-[-0.03em] text-zinc-900 md:text-[48px]">
+            <h1 className="font-heading text-[36px] leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900 md:text-[48px]">
               {title || normalizedData.title}
             </h1>
+            {/* Metadata row */}
+            <div className="mt-4 flex items-center gap-4 text-[14px] tracking-[-0.02em] text-zinc-500">
+              {createdAt && (
+                <span>{formatDate(createdAt)}</span>
+              )}
+              {createdAt && <span className="text-zinc-300">·</span>}
+              <span>{readTime} min read</span>
+            </div>
           </header>
+        )}
+
+        {/* Brief - User's original input */}
+        {brief && (
+          <Section id="brief">
+            <SectionTitle>The Brief</SectionTitle>
+            <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-6">
+              <p className="whitespace-pre-wrap text-[16px] leading-relaxed tracking-[-0.01em] text-zinc-700">
+                {brief}
+              </p>
+            </div>
+          </Section>
         )}
 
         {/* Executive Summary */}

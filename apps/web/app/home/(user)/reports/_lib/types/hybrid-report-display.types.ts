@@ -508,4 +508,21 @@ export interface HybridReportDisplayProps {
    * @default true
    */
   showToc?: boolean;
+  /**
+   * The user's original input/brief for this report.
+   * Displayed at the top of the report before the Executive Summary.
+   */
+  brief?: string;
+  /**
+   * When the report was created (ISO string).
+   * Used to display the report date in metadata.
+   */
+  createdAt?: string;
+  /**
+   * Whether the report is inside a layout with the app sidebar.
+   * When true (default), TOC is positioned at left-16 to clear the app sidebar.
+   * When false (landing page), TOC is at left-0.
+   * @default true
+   */
+  hasAppSidebar?: boolean;
 }

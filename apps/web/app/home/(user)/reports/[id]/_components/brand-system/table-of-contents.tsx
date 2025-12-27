@@ -12,10 +12,11 @@
  * - Intersection Observer for active tracking
  * - Smooth scrolling with offset
  */
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
-import { ChevronDown } from 'lucide-react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 // ============================================
 // TYPES
@@ -31,6 +32,12 @@ interface TableOfContentsProps {
   sections: TocSection[];
   variant?: 'sidebar' | 'floating' | 'both';
   scrollOffset?: number;
+  /**
+   * Whether the TOC is inside a layout with the app sidebar.
+   * When true (default), TOC is positioned at left-16 (64px) to clear the app sidebar.
+   * When false (landing page), TOC is positioned at left-0.
+   */
+  hasAppSidebar?: boolean;
 }
 
 // ============================================
@@ -42,6 +49,7 @@ interface SidebarTocProps {
   activeSection: string;
   onNavigate: (id: string) => void;
   progress: number;
+  hasAppSidebar: boolean;
 }
 
 const SidebarToc = memo(function SidebarToc({
@@ -49,11 +57,17 @@ const SidebarToc = memo(function SidebarToc({
   activeSection,
   onNavigate,
   progress,
+  hasAppSidebar,
 }: SidebarTocProps) {
   return (
-    <aside className="fixed left-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-64 overflow-y-auto border-r border-zinc-100 bg-white/95 p-8 backdrop-blur-sm lg:block">
+    <aside
+      className={cn(
+        'fixed top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-56 overflow-y-auto border-r border-zinc-100 bg-white/95 p-6 backdrop-blur-sm lg:block',
+        hasAppSidebar ? 'left-16' : 'left-0',
+      )}
+    >
       {/* Contents label */}
-      <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-zinc-400">
+      <p className="text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
         Contents
       </p>
 
@@ -61,7 +75,7 @@ const SidebarToc = memo(function SidebarToc({
       <nav className="relative mt-6 pl-4">
         {/* Progress line */}
         <div
-          className="absolute left-0 top-0 h-full w-px bg-zinc-100"
+          className="absolute top-0 left-0 h-full w-px bg-zinc-100"
           style={{
             background: `linear-gradient(to bottom, #18181b ${progress}%, #e4e4e7 ${progress}%)`,
           }}
@@ -88,7 +102,7 @@ const SidebarToc = memo(function SidebarToc({
 
               {/* Subsections */}
               {section.subsections && section.subsections.length > 0 && (
-                <ul className="ml-4 mt-1 space-y-1">
+                <ul className="mt-1 ml-4 space-y-1">
                   {section.subsections.map((sub) => (
                     <li key={sub.id}>
                       <button
@@ -169,11 +183,11 @@ const FloatingToc = memo(function FloatingToc({
   return (
     <nav
       className={cn(
-        'fixed right-8 top-1/2 z-40 hidden -translate-y-1/2 xl:block',
+        'fixed top-1/2 right-8 z-40 hidden -translate-y-1/2 xl:block',
         'transition-all duration-300',
         visible
           ? 'pointer-events-auto opacity-100'
-          : 'pointer-events-none opacity-0 translate-y-2',
+          : 'pointer-events-none translate-y-2 opacity-0',
       )}
     >
       <ul className="space-y-3">
@@ -193,7 +207,7 @@ const FloatingToc = memo(function FloatingToc({
               />
               <span
                 className={cn(
-                  'whitespace-nowrap text-[12px] transition-opacity',
+                  'text-[12px] whitespace-nowrap transition-opacity',
                   'opacity-0 group-hover:opacity-100',
                   activeSection === section.id
                     ? 'text-zinc-900'
@@ -277,7 +291,7 @@ const MobileToc = memo(function MobileToc({
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 animate-in fade-in slide-in-from-top-2 border-b border-zinc-200 bg-white shadow-lg duration-200">
+        <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 left-0 border-b border-zinc-200 bg-white shadow-lg duration-200">
           <nav className="px-6 py-4">
             <ul className="space-y-1">
               {sections.map((section) => (
@@ -311,6 +325,7 @@ export const TableOfContents = memo(function TableOfContents({
   sections,
   variant = 'both',
   scrollOffset = 100,
+  hasAppSidebar = true,
 }: TableOfContentsProps) {
   const [activeSection, setActiveSection] = useState<string>(
     sections[0]?.id || '',
@@ -416,6 +431,7 @@ export const TableOfContents = memo(function TableOfContents({
           activeSection={activeSection}
           onNavigate={handleNavigate}
           progress={progress}
+          hasAppSidebar={hasAppSidebar}
         />
       )}
 
@@ -442,8 +458,17 @@ export const TableOfContents = memo(function TableOfContents({
  */
 export function generateTocSections(
   reportData: Record<string, unknown>,
+  hasBrief = false,
 ): TocSection[] {
   const sections: TocSection[] = [];
+
+  // Brief (user's original input) - first if present
+  if (hasBrief) {
+    sections.push({
+      id: 'brief',
+      title: 'The Brief',
+    });
+  }
 
   // Executive Summary (always present)
   if (reportData.executive_summary || reportData.brief) {
@@ -556,9 +581,11 @@ export function generateTocSections(
   }
 
   // Recommendation
-  const strategicIntegration = reportData.strategic_integration as {
-    personal_recommendation?: unknown;
-  } | undefined;
+  const strategicIntegration = reportData.strategic_integration as
+    | {
+        personal_recommendation?: unknown;
+      }
+    | undefined;
   if (
     reportData.what_id_actually_do ||
     strategicIntegration?.personal_recommendation

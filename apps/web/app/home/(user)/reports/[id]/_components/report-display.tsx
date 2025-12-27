@@ -742,6 +742,9 @@ export function ReportDisplay({
   // Hybrid reports use brand system with full-page layout control
   // Render them separately to avoid layout conflicts
   if (isHybrid) {
+    // Extract user's original input for the Brief section
+    const userBrief = extractUserInput(report.report_data, report.title);
+
     return (
       <div className="report-page relative min-h-screen">
         {/* Full-width hybrid report with brand system */}
@@ -751,6 +754,8 @@ export function ReportDisplay({
               typeof HybridReportDisplay
             >[0]['reportData']
           }
+          brief={userBrief}
+          createdAt={report.created_at}
         />
 
         {/* Chat Toggle Button */}
@@ -764,7 +769,9 @@ export function ReportDisplay({
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           >
             <MessageSquare className="h-5 w-5" strokeWidth={1.5} />
-            <span className="text-[15px] font-medium">Ask about this report</span>
+            <span className="text-[15px] font-medium">
+              Ask about this report
+            </span>
             <span className="rounded-md bg-white/15 px-2 py-1 text-[11px] font-medium dark:bg-zinc-900/20">
               ⌘/
             </span>
@@ -854,9 +861,7 @@ export function ReportDisplay({
                           </p>
                         ) : (
                           <div className="prose prose-sm prose-gray dark:prose-invert max-w-none">
-                            <ReactMarkdown>
-                              {msg.content}
-                            </ReactMarkdown>
+                            <ReactMarkdown>{msg.content}</ReactMarkdown>
                           </div>
                         )}
                         {msg.isStreaming && (
@@ -1149,7 +1154,9 @@ export function ReportDisplay({
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           >
             <MessageSquare className="h-5 w-5" strokeWidth={1.5} />
-            <span className="text-[15px] font-medium">Ask about this report</span>
+            <span className="text-[15px] font-medium">
+              Ask about this report
+            </span>
             <span className="rounded-md bg-white/15 px-2 py-1 text-[11px] font-medium dark:bg-zinc-900/20">
               ⌘/
             </span>
@@ -1375,9 +1382,7 @@ const markdownComponents = {
     </ul>
   ),
   ol: ({ children }: React.HTMLProps<HTMLOListElement>) => (
-    <ol className="mb-5 list-inside list-decimal space-y-2.5">
-      {children}
-    </ol>
+    <ol className="mb-5 list-inside list-decimal space-y-2.5">{children}</ol>
   ),
   li: ({ children, ...props }: React.HTMLProps<HTMLLIElement>) => (
     <li
