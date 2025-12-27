@@ -85,14 +85,17 @@ export const EngineeringHero = memo(function EngineeringHero() {
       </nav>
 
       {/* Content Layer - Centered */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
+      <div
+        className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center"
+        style={{ fontFamily: 'var(--font-sans), system-ui, sans-serif' }}
+      >
         {/* Headline */}
-        <h1 className="text-[40px] font-medium leading-[1.1] tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
+        <h1 className="text-[40px] font-medium leading-[1.2] tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
           Engineering Intelligence Model
         </h1>
 
         {/* Subtitle */}
-        <p className="mt-6 max-w-[45ch] text-[18px] leading-[1.4] tracking-[-0.01em] text-zinc-300/90 md:text-[22px]">
+        <p className="mt-6 max-w-[45ch] text-[18px] leading-[1.2] tracking-[-0.02em] text-zinc-300/90 md:text-[22px]">
           Innovative solutions to complex technical challenges.
         </p>
 

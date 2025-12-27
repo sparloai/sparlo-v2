@@ -33,16 +33,16 @@ export const MethodologySection = memo(function MethodologySection() {
       <div className="mx-auto max-w-[1400px]">
         {/* The Process */}
         <div className="border-t border-zinc-200 pt-16">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-16">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-12">
             {/* Left column - Title */}
-            <div className="md:col-span-4">
+            <div className="md:col-span-3">
               <h2 className="text-[18px] font-normal leading-[1.2] tracking-[-0.02em] text-zinc-900 md:text-[20px]">
                 The Process
               </h2>
             </div>
 
-            {/* Right column - Steps */}
-            <div className="md:col-span-8">
+            {/* Right column - Steps (starts at column 5) */}
+            <div className="md:col-span-8 md:col-start-5">
               <div className="space-y-6">
                 {processSteps.map((step, idx) => (
                   <p
@@ -62,16 +62,16 @@ export const MethodologySection = memo(function MethodologySection() {
 
         {/* The Methodology */}
         <div className="mt-24 border-t border-zinc-200 pt-16">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-16">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-12">
             {/* Left column - Title */}
-            <div className="md:col-span-4">
+            <div className="md:col-span-3">
               <h2 className="text-[18px] font-normal leading-[1.2] tracking-[-0.02em] text-zinc-900 md:text-[20px]">
                 The Methodology
               </h2>
             </div>
 
-            {/* Right column - Steps */}
-            <div className="md:col-span-8">
+            {/* Right column - Steps (starts at column 5) */}
+            <div className="md:col-span-8 md:col-start-5">
               <div className="space-y-6">
                 {methodologySteps.map((step, idx) => (
                   <p
