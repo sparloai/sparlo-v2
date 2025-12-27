@@ -1,78 +1,56 @@
 'use client';
 
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo } from 'react';
 
 import Link from 'next/link';
 
 /**
  * Engineering Intelligence Hero Section
  *
- * Air Company Aesthetic - Full viewport video background
+ * Air Company Aesthetic - Pure, minimal, confident
  *
  * Features:
- * - Autoplay muted video background
- * - Centered typography hierarchy
- * - Minimal, confident copy
+ * - Solid dark background (no video)
+ * - Light font weight typography
+ * - Centered layout
  * - Single prominent CTA
  */
 
-// High-quality royalty-free video sources (Pexels)
-const VIDEO_SOURCES = [
-  'https://videos.pexels.com/video-files/3129671/3129671-uhd_2560_1440_30fps.mp4', // Technology/circuit
-  'https://videos.pexels.com/video-files/3141207/3141207-uhd_2560_1440_30fps.mp4', // Laboratory
-  'https://videos.pexels.com/video-files/4065385/4065385-uhd_2560_1440_30fps.mp4', // Data center
-];
-
 export const EngineeringHero = memo(function EngineeringHero() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.playbackRate = 0.75; // Slightly slower for dramatic effect
-    }
-  }, []);
-
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-zinc-950">
-      {/* Video Background */}
-      <div className="absolute inset-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          onCanPlay={() => setVideoLoaded(true)}
-          className={`h-full w-full object-cover transition-opacity duration-1000 ${
-            videoLoaded ? 'opacity-60' : 'opacity-0'
-          }`}
-          style={{ filter: 'grayscale(30%)' }}
-        >
-          <source src={VIDEO_SOURCES[0]} type="video/mp4" />
-        </video>
-
-        {/* Gradient overlay for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
-      </div>
-
+    <section className="relative flex h-screen w-full items-center justify-center bg-zinc-950">
       {/* Content Layer - Centered */}
-      <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
+      <div className="flex flex-col items-center px-8 text-center">
         {/* Headline */}
-        <h1 className="text-[40px] leading-[1.2] font-medium tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
+        <h1
+          className="text-[40px] leading-[1.2] font-light tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]"
+          style={{
+            fontFamily:
+              "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
+          }}
+        >
           Engineering Intelligence Model
         </h1>
 
         {/* Subtitle */}
-        <p className="mt-6 max-w-[45ch] text-[18px] leading-[1.2] tracking-[-0.02em] text-zinc-300/90 md:text-[22px]">
+        <p
+          className="mt-6 max-w-[45ch] text-[18px] leading-[1.2] font-light tracking-[-0.02em] text-white/70 md:text-[22px]"
+          style={{
+            fontFamily:
+              "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
+          }}
+        >
           Innovative solutions to complex technical challenges.
         </p>
 
         {/* CTA */}
         <Link
           href="/home"
-          className="mt-10 rounded-full bg-white/95 px-8 py-3.5 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 backdrop-blur-sm transition-all hover:bg-white hover:shadow-lg"
+          className="mt-10 bg-white px-8 py-3.5 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:bg-zinc-100"
+          style={{
+            fontFamily:
+              "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
+          }}
         >
           Run Analysis
         </Link>

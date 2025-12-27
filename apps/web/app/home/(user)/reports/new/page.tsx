@@ -1,28 +1,26 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import {
-  AlertTriangle,
-  ArrowRight,
-  Check,
-  Clock,
-  Lock,
-  Paperclip,
-  ShieldCheck,
-  Terminal,
-  X,
-} from 'lucide-react';
-
-import { Alert, AlertDescription } from '@kit/ui/alert';
 import { cn } from '@kit/ui/utils';
 
 import { ProcessingScreen } from '../../_components/processing-screen';
 import { SubscriptionRequiredModal } from '../../_components/subscription-required-modal';
 import { startReportGeneration } from '../../_lib/server/sparlo-reports-server-actions';
 import { useReportProgress } from '../../_lib/use-report-progress';
+
+/**
+ * New Analysis Page - Air Company Aesthetic (Light)
+ *
+ * Features:
+ * - White background with minimal chrome
+ * - Two-step flow: Input → Clarification (optional) → Processing
+ * - No icons, text only
+ * - Square corners, zinc palette
+ */
 
 // Attachment types and constants
 interface Attachment {
@@ -36,11 +34,13 @@ const MAX_ATTACHMENTS = 5;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-type PagePhase = 'input' | 'processing';
+type PageStep = 'input' | 'clarification' | 'processing';
 
 interface FormState {
-  phase: PagePhase;
-  challengeText: string;
+  step: PageStep;
+  problemText: string;
+  clarificationResponse: string;
+  clarifyingQuestion: string | null;
   reportId: string | null;
   isSubmitting: boolean;
   error: string | null;
@@ -49,45 +49,11 @@ interface FormState {
   upgradeReason: 'subscription_required' | 'limit_exceeded';
 }
 
-interface ContextDetection {
-  id: string;
-  label: string;
-  patterns: RegExp[];
-}
-
-const CONTEXT_DETECTIONS: ContextDetection[] = [
-  {
-    id: 'technical-goals',
-    label: 'Technical Goals',
-    patterns: [
-      /reduce|improve|increase|decrease|optimize|minimize|maximize/i,
-      /under\s+\d+|above\s+\d+|within\s+\d+/i,
-      /accuracy|precision|tolerance|efficiency/i,
-    ],
-  },
-  {
-    id: 'material-constraints',
-    label: 'Material Constraints',
-    patterns: [
-      /material|steel|aluminum|plastic|composite|alloy|polymer/i,
-      /weight|mass|density|strength|durability/i,
-      /temperature|thermal|heat|cold/i,
-    ],
-  },
-  {
-    id: 'cost-parameters',
-    label: 'Cost Parameters',
-    patterns: [
-      /cost|budget|price|expense|affordable/i,
-      /volume|units\/year|production|manufacturing/i,
-      /cannot increase cost|low.?cost|cost.?effective/i,
-    ],
-  },
-];
-
 const initialFormState: FormState = {
-  phase: 'input',
-  challengeText: '',
+  step: 'input',
+  problemText: '',
+  clarificationResponse: '',
+  clarifyingQuestion: null,
   reportId: null,
   isSubmitting: false,
   error: null,
@@ -104,8 +70,10 @@ export default function NewReportPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
-    phase,
-    challengeText,
+    step,
+    problemText,
+    clarificationResponse,
+    clarifyingQuestion,
     reportId,
     isSubmitting,
     error,
@@ -187,7 +155,7 @@ export default function NewReportPage() {
     if (prefill || errorType === 'refusal') {
       setFormState((prev) => ({
         ...prev,
-        challengeText: prefill || prev.challengeText,
+        problemText: prefill || prev.problemText,
         showRefusalWarning: errorType === 'refusal',
       }));
     }
@@ -201,25 +169,13 @@ export default function NewReportPage() {
   // Track progress once we have a report ID
   const { progress } = useReportProgress(reportId);
 
-  const canSubmit = challengeText.trim().length >= 50;
+  const canSubmit = problemText.trim().length >= 50;
 
-  // Detect context from input text
-  const detectedContexts = useMemo(() => {
-    const detected = new Set<string>();
-    for (const context of CONTEXT_DETECTIONS) {
-      for (const pattern of context.patterns) {
-        if (pattern.test(challengeText)) {
-          detected.add(context.id);
-          break;
-        }
-      }
-    }
-    return detected;
-  }, [challengeText]);
-
-  const handleSubmit = useCallback(async () => {
+  const handleContinue = useCallback(async () => {
     if (!canSubmit || isSubmitting) return;
 
+    // For now, skip clarification and go directly to processing
+    // In the future, this could call an API to get a clarifying question
     setFormState((prev) => ({ ...prev, isSubmitting: true, error: null }));
 
     try {
@@ -235,7 +191,7 @@ export default function NewReportPage() {
       }));
 
       const result = await startReportGeneration({
-        designChallenge: challengeText.trim(),
+        designChallenge: problemText.trim(),
         attachments: attachmentData.length > 0 ? attachmentData : undefined,
       });
 
@@ -247,7 +203,7 @@ export default function NewReportPage() {
         setFormState((prev) => ({
           ...prev,
           reportId: result.reportId,
-          phase: 'processing',
+          step: 'processing',
           isSubmitting: false,
         }));
       }
@@ -281,16 +237,88 @@ export default function NewReportPage() {
         }));
       }
     }
-  }, [canSubmit, challengeText, isSubmitting, attachments]);
+  }, [canSubmit, problemText, isSubmitting, attachments]);
+
+  const handleRunAnalysis = useCallback(async () => {
+    if (isSubmitting) return;
+
+    setFormState((prev) => ({ ...prev, isSubmitting: true, error: null }));
+
+    try {
+      const attachmentData = attachments.map((a) => ({
+        filename: a.file.name,
+        media_type: a.file.type as
+          | 'image/jpeg'
+          | 'image/png'
+          | 'image/gif'
+          | 'image/webp',
+        data: a.base64 || '',
+      }));
+
+      // Combine problem with clarification if present
+      const fullChallenge = clarificationResponse
+        ? `${problemText.trim()}\n\nAdditional context: ${clarificationResponse.trim()}`
+        : problemText.trim();
+
+      const result = await startReportGeneration({
+        designChallenge: fullChallenge,
+        attachments: attachmentData.length > 0 ? attachmentData : undefined,
+      });
+
+      if (result.reportId) {
+        attachments.forEach((a) => URL.revokeObjectURL(a.preview));
+        setAttachments([]);
+
+        setFormState((prev) => ({
+          ...prev,
+          reportId: result.reportId,
+          step: 'processing',
+          isSubmitting: false,
+        }));
+      }
+    } catch (err) {
+      console.error('Failed to start report:', err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : 'Failed to start report generation';
+
+      const isUsageError =
+        errorMessage.includes('Usage limit') ||
+        errorMessage.includes('subscription');
+      const isLimitExceeded = errorMessage.includes('Usage limit');
+
+      if (isUsageError) {
+        setFormState((prev) => ({
+          ...prev,
+          showUpgradeModal: true,
+          upgradeReason: isLimitExceeded
+            ? 'limit_exceeded'
+            : 'subscription_required',
+          isSubmitting: false,
+        }));
+      } else {
+        setFormState((prev) => ({
+          ...prev,
+          error: errorMessage,
+          isSubmitting: false,
+        }));
+      }
+    }
+  }, [isSubmitting, problemText, clarificationResponse, attachments]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
         e.preventDefault();
-        handleSubmit();
+        if (step === 'input') {
+          handleContinue();
+        } else if (step === 'clarification') {
+          handleRunAnalysis();
+        }
       }
     },
-    [handleSubmit],
+    [step, handleContinue, handleRunAnalysis],
   );
 
   const handleViewReport = useCallback(() => {
@@ -299,20 +327,119 @@ export default function NewReportPage() {
     }
   }, [reportId, router]);
 
+  const goBackToInput = useCallback(() => {
+    setFormState((prev) => ({
+      ...prev,
+      step: 'input',
+      clarifyingQuestion: null,
+    }));
+  }, []);
+
   // Show processing screen when we have a report in progress
-  if (phase === 'processing' && progress) {
+  if (step === 'processing' && progress) {
     return (
-      <div className="min-h-[calc(100vh-120px)] bg-[--surface-base]">
+      <div className="min-h-[calc(100vh-120px)] bg-white">
         <ProcessingScreen
           progress={progress}
           onComplete={handleViewReport}
-          designChallenge={challengeText}
+          designChallenge={problemText}
         />
       </div>
     );
   }
 
-  // Input phase - Aura.build inspired design
+  // Clarification step
+  if (step === 'clarification' && clarifyingQuestion) {
+    return (
+      <>
+        <SubscriptionRequiredModal
+          open={showUpgradeModal}
+          onOpenChange={(open) =>
+            setFormState((prev) => ({ ...prev, showUpgradeModal: open }))
+          }
+          reason={upgradeReason}
+        />
+        <main
+          className="flex min-h-screen flex-col bg-white"
+          style={{
+            fontFamily:
+              "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
+          }}
+        >
+          {/* Header */}
+          <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-6">
+            <h1 className="text-[15px] leading-[1.2] tracking-[-0.02em] text-zinc-500">
+              Clarification
+            </h1>
+          </header>
+
+          {/* Main content */}
+          <div className="flex-1 px-8 py-12">
+            <div className="mx-auto max-w-2xl">
+              {/* Original problem shown */}
+              <div className="border-b border-zinc-200 pb-6">
+                <p className="mb-2 text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
+                  Your problem
+                </p>
+                <p className="text-[16px] leading-[1.4] tracking-[-0.02em] text-zinc-700">
+                  {problemText}
+                </p>
+              </div>
+
+              {/* System's clarifying question */}
+              <div className="py-6">
+                <p className="text-[17px] leading-[1.4] tracking-[-0.02em] text-zinc-900">
+                  {clarifyingQuestion}
+                </p>
+              </div>
+
+              <textarea
+                value={clarificationResponse}
+                onChange={(e) =>
+                  setFormState((prev) => ({
+                    ...prev,
+                    clarificationResponse: e.target.value,
+                  }))
+                }
+                onKeyDown={handleKeyDown}
+                placeholder="Your response..."
+                className="h-32 w-full resize-none border border-zinc-200 p-4 text-[16px] leading-[1.4] tracking-[-0.02em] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none"
+              />
+
+              <div className="mt-6 flex items-center justify-between">
+                <button
+                  onClick={goBackToInput}
+                  className="text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-500 transition-colors hover:text-zinc-700"
+                >
+                  ← Edit problem
+                </button>
+                <button
+                  onClick={handleRunAnalysis}
+                  disabled={isSubmitting}
+                  className={cn(
+                    'px-6 py-3 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
+                    isSubmitting
+                      ? 'cursor-not-allowed bg-zinc-300 text-zinc-500'
+                      : 'bg-zinc-900 text-white hover:bg-zinc-800',
+                  )}
+                >
+                  {isSubmitting ? 'Starting...' : 'Run Analysis'}
+                </button>
+              </div>
+
+              {error && (
+                <p className="mt-4 text-[14px] leading-[1.2] tracking-[-0.02em] text-red-600">
+                  {error}
+                </p>
+              )}
+            </div>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  // Input step
   return (
     <>
       <SubscriptionRequiredModal
@@ -322,268 +449,129 @@ export default function NewReportPage() {
         }
         reason={upgradeReason}
       />
-      <div
-        className="relative flex min-h-screen flex-col items-center justify-center bg-[--surface-base] px-4 py-12 text-[--text-secondary]"
-        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      <main
+        className="flex min-h-screen flex-col bg-white"
+        style={{
+          fontFamily:
+            "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
+        }}
       >
-        {/* Ambient Background Glows - only visible in dark mode */}
-        <div className="pointer-events-none absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 opacity-0 blur-[120px] dark:opacity-50" />
-        <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-emerald-900/5 opacity-0 blur-[100px] dark:opacity-50" />
-
-        <div className="relative z-10 w-full max-w-4xl">
-          {/* Refusal warning */}
-          {showRefusalWarning && (
-            <div className="mb-6">
-              <Alert
-                variant="destructive"
-                className="border-red-200 bg-red-50 text-red-800 dark:border-[#7f1d1d] dark:bg-[#7f1d1d]/10 dark:text-[#fca5a5]"
-              >
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>
-                    Your previous query was flagged by our AI safety filters.
-                  </strong>{' '}
-                  This is often a false positive for legitimate engineering
-                  problems. Please rephrase your challenge, focusing on the
-                  engineering aspects.
-                </AlertDescription>
-              </Alert>
-            </div>
-          )}
-
-          {/* Main Input Card */}
-          <div className="group relative">
-            <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
-              {/* Toolbar / Context Hinting */}
-              <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
-                <div className="flex items-center gap-2 text-xs font-medium text-[--text-muted]">
-                  <Terminal className="h-4 w-4 text-[--text-muted]" />
-                  <span>New analysis</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/gif,image/webp"
-                    multiple
-                    onChange={handleFileSelect}
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={attachments.length >= MAX_ATTACHMENTS}
-                    className="group/btn flex min-h-[44px] items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-4 py-2 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary] disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Attach
-                    {attachments.length > 0 && (
-                      <span className="text-violet-500">
-                        ({attachments.length})
-                      </span>
-                    )}
-                    <Paperclip className="h-3 w-3 transition-colors group-hover/btn:text-violet-500" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Text Area - Full height */}
-              <div className="flex min-h-[320px] flex-col p-6 md:p-8">
-                <textarea
-                  value={challengeText}
-                  onChange={(e) => {
-                    setFormState((prev) => ({
-                      ...prev,
-                      challengeText: e.target.value,
-                      showRefusalWarning: false,
-                    }));
-                  }}
-                  onKeyDown={handleKeyDown}
-                  disabled={isSubmitting}
-                  autoFocus
-                  data-test="challenge-input"
-                  placeholder={`Describe your technical challenge. Include:
-• The problem you're solving
-• Key constraints (cost, materials, time)
-• What success looks like
-
-E.g. 'We need to reduce our battery pack weight by 30% while maintaining 500+ charge cycles for our electric delivery vehicle fleet.'`}
-                  spellCheck={false}
-                  className="min-h-[240px] flex-1 resize-none rounded-lg border-0 bg-transparent p-2 text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] transition-shadow duration-200 focus:ring-1 focus:ring-violet-500/40 focus:outline-none disabled:opacity-40 md:text-xl"
-                  style={{
-                    fontFamily: 'Soehne, Inter, sans-serif',
-                  }}
-                />
-
-                {/* Context Detection - directly below textarea */}
-                <div className="mt-4 flex flex-wrap items-center gap-2 select-none">
-                  {CONTEXT_DETECTIONS.map((context) => {
-                    const isDetected = detectedContexts.has(context.id);
-                    return (
-                      <div
-                        key={context.id}
-                        className={cn(
-                          'flex items-center gap-1.5 rounded-full px-2.5 py-1 transition-all duration-300',
-                          isDetected
-                            ? 'border border-violet-500/30 bg-violet-500/10 dark:border-violet-500/20'
-                            : 'border border-dashed border-[--border-default] bg-transparent',
-                        )}
-                      >
-                        <div
-                          className={cn(
-                            'h-1.5 w-1.5 rounded-full transition-all duration-300',
-                            isDetected
-                              ? 'bg-violet-500 shadow-[0_0_6px_rgba(139,92,246,0.8)]'
-                              : 'bg-[--border-default]',
-                          )}
-                        />
-                        <span
-                          className={cn(
-                            'text-xs',
-                            isDetected
-                              ? 'text-violet-700 dark:text-violet-300'
-                              : 'text-[--text-muted]',
-                          )}
-                        >
-                          {context.label}
-                        </span>
-                        {isDetected && (
-                          <Check className="h-3 w-3 text-violet-600 dark:text-violet-400" />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Attachment Previews */}
-              {attachments.length > 0 && (
-                <div className="border-t border-[--border-subtle] px-6 py-4">
-                  <div className="flex flex-wrap gap-3">
-                    {attachments.map((attachment) => (
-                      <div
-                        key={attachment.id}
-                        className="group relative h-16 w-16 overflow-hidden rounded-lg border border-[--border-subtle] bg-[--surface-overlay]"
-                      >
-                        <img
-                          src={attachment.preview}
-                          alt={attachment.file.name}
-                          className="h-full w-full object-cover"
-                        />
-                        <button
-                          onClick={() => removeAttachment(attachment.id)}
-                          className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-zinc-600 text-white opacity-0 transition-opacity group-hover:opacity-100"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="mt-2 text-xs text-[--text-muted]">
-                    {attachments.length} attachment
-                    {attachments.length !== 1 ? 's' : ''} - Images will be
-                    analyzed by Claude Vision
-                  </p>
-                </div>
-              )}
-
-              {/* Footer / Action Area */}
-              <div className="border-t border-[--border-subtle] bg-[--surface-overlay] p-2 dark:bg-neutral-900/30">
-                <div className="flex flex-col items-center justify-between gap-4 px-4 py-2 md:flex-row">
-                  {/* Compute Estimate */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[--border-subtle] bg-[--surface-base] dark:bg-neutral-900">
-                      <Clock className="h-4 w-4 text-[--text-muted]" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span
-                        className="text-[10px] font-semibold text-[--text-muted]"
-                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                      >
-                        Analysis
-                      </span>
-                      <span
-                        className="text-xs text-[--text-secondary]"
-                        style={{
-                          fontFamily: 'Soehne, Inter, sans-serif',
-                        }}
-                      >
-                        ~25 minutes
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Primary Action with keyboard shortcut */}
-                  <div className="flex items-center gap-3">
-                    {/* Keyboard shortcut hint */}
-                    <div className="hidden items-center gap-1.5 md:flex">
-                      <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
-                        ⌘
-                      </kbd>
-                      <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
-                        ↵
-                      </kbd>
-                    </div>
-                    <button
-                      onClick={handleSubmit}
-                      disabled={!canSubmit || isSubmitting}
-                      data-test="challenge-submit"
-                      className={cn(
-                        'group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-8 py-4 transition-all duration-300 md:w-auto',
-                        canSubmit && !isSubmitting
-                          ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/25 hover:bg-violet-500 hover:shadow-violet-500/40 dark:bg-violet-600 dark:shadow-violet-500/20 dark:hover:bg-violet-500'
-                          : 'cursor-not-allowed bg-neutral-200 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400',
-                      )}
-                    >
-                      <span
-                        className="relative z-10 text-base font-semibold tracking-tight"
-                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                      >
-                        {isSubmitting ? 'Running...' : 'Run Analysis'}
-                      </span>
-                      {!isSubmitting && (
-                        <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Error message */}
-          {error && (
-            <p
-              className="mt-4 text-center text-sm text-red-600 dark:text-red-400"
-              style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+        {/* Header */}
+        <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-6">
+          <h1 className="text-[15px] leading-[1.2] tracking-[-0.02em] text-zinc-500">
+            New Analysis
+          </h1>
+          <div className="flex items-center gap-4">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={attachments.length >= MAX_ATTACHMENTS}
+              className="text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {error}
-            </p>
-          )}
+              Attach file
+              {attachments.length > 0 && ` (${attachments.length})`}
+            </button>
+          </div>
+        </header>
 
-          {/* Trust / Capability Indicators - Always visible */}
-          <div className="mt-8 flex flex-col items-center justify-center gap-6 opacity-60 md:flex-row">
-            <div className="flex items-center gap-2">
-              <Lock className="h-3 w-3 text-[--text-muted]" />
-              <span
-                className="font-mono text-xs tracking-tight text-[--text-secondary]"
-                style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+        {/* Refusal warning */}
+        {showRefusalWarning && (
+          <div className="border-b border-red-200 bg-red-50 px-8 py-4">
+            <p className="text-[14px] leading-[1.4] tracking-[-0.02em] text-red-800">
+              <strong>Your previous query was flagged by our AI safety filters.</strong>{' '}
+              This is often a false positive for legitimate engineering problems.
+              Please rephrase your challenge, focusing on the engineering aspects.
+            </p>
+          </div>
+        )}
+
+        {/* Main content */}
+        <div className="flex flex-1 flex-col items-center justify-center px-8 py-16">
+          <div className="w-full max-w-2xl">
+            <textarea
+              value={problemText}
+              onChange={(e) => {
+                setFormState((prev) => ({
+                  ...prev,
+                  problemText: e.target.value,
+                  showRefusalWarning: false,
+                }));
+              }}
+              onKeyDown={handleKeyDown}
+              disabled={isSubmitting}
+              autoFocus
+              data-test="challenge-input"
+              placeholder="What engineering problem are you solving?"
+              className="h-48 w-full resize-none border border-zinc-200 p-6 text-[17px] leading-[1.4] tracking-[-0.02em] text-zinc-900 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none disabled:opacity-40"
+            />
+
+            <p className="mt-4 text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
+              Be specific about constraints and success criteria for better results.
+            </p>
+
+            {/* Attachment Previews */}
+            {attachments.length > 0 && (
+              <div className="mt-6 border-t border-zinc-200 pt-4">
+                <div className="flex flex-wrap gap-3">
+                  {attachments.map((attachment) => (
+                    <div
+                      key={attachment.id}
+                      className="group relative h-16 w-16 overflow-hidden border border-zinc-200"
+                    >
+                      <Image
+                        src={attachment.preview}
+                        alt={attachment.file.name}
+                        fill
+                        className="object-cover"
+                      />
+                      <button
+                        onClick={() => removeAttachment(attachment.id)}
+                        className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center bg-zinc-600 text-[10px] text-white opacity-0 transition-opacity group-hover:opacity-100"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6 flex items-center justify-between">
+              <p className="text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
+                ~25 min analysis
+              </p>
+
+              <button
+                onClick={handleContinue}
+                disabled={!canSubmit || isSubmitting}
+                data-test="challenge-submit"
+                className={cn(
+                  'px-6 py-3 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
+                  canSubmit && !isSubmitting
+                    ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+                    : 'cursor-not-allowed bg-zinc-200 text-zinc-400',
+                )}
               >
-                DATA NEVER TRAINS AI
-              </span>
+                {isSubmitting ? 'Starting...' : 'Run Analysis'}
+              </button>
             </div>
-            <div className="hidden h-3 w-px bg-[--border-default] md:block" />
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-3 w-3 text-violet-600 dark:text-violet-500" />
-              <span
-                className="font-mono text-xs tracking-tight text-[--text-secondary]"
-                style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
-              >
-                SOC2 TYPE II
-              </span>
-            </div>
+
+            {error && (
+              <p className="mt-4 text-[14px] leading-[1.2] tracking-[-0.02em] text-red-600">
+                {error}
+              </p>
+            )}
           </div>
         </div>
-      </div>
+      </main>
     </>
   );
 }
