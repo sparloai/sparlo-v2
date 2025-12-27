@@ -51,7 +51,7 @@ const SidebarToc = memo(function SidebarToc({
   progress,
 }: SidebarTocProps) {
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 overflow-y-auto border-r border-zinc-100 bg-white/95 p-8 backdrop-blur-sm lg:block">
+    <aside className="fixed left-0 top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-64 overflow-y-auto border-r border-zinc-100 bg-white/95 p-8 backdrop-blur-sm lg:block">
       {/* Contents label */}
       <p className="text-[12px] font-medium uppercase tracking-[0.08em] text-zinc-400">
         Contents
