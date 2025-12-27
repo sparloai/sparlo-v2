@@ -540,26 +540,15 @@ export default function NewReportPage() {
         reason={upgradeReason}
       />
       <main className="flex min-h-screen flex-col bg-white">
-        {/* Header - minimal, just file attachment */}
-        <header className="flex items-center justify-end border-b border-zinc-200 px-8 py-4">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp"
-            multiple
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={attachments.length >= MAX_ATTACHMENTS}
-            className="text-[14px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Attach file
-            {attachments.length > 0 && ` (${attachments.length})`}
-          </button>
-        </header>
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          multiple
+          onChange={handleFileSelect}
+          className="hidden"
+        />
 
         {/* Refusal warning */}
         {showRefusalWarning && (
@@ -603,23 +592,21 @@ export default function NewReportPage() {
               />
             </div>
 
-            {/* Live detection - appears after typing starts */}
-            {problemText.length > 20 && (
-              <div className="mt-10 flex items-center gap-8 pl-10">
-                <DetectionIndicator
-                  label="Problem"
-                  detected={hasProblemStatement(problemText)}
-                />
-                <DetectionIndicator
-                  label="Constraints"
-                  detected={hasConstraints(problemText)}
-                />
-                <DetectionIndicator
-                  label="Success criteria"
-                  detected={hasSuccessCriteria(problemText)}
-                />
-              </div>
-            )}
+            {/* Detection indicators - always visible */}
+            <div className="mt-10 flex items-center gap-8 pl-10">
+              <DetectionIndicator
+                label="Problem"
+                detected={hasProblemStatement(problemText)}
+              />
+              <DetectionIndicator
+                label="Constraints"
+                detected={hasConstraints(problemText)}
+              />
+              <DetectionIndicator
+                label="Success criteria"
+                detected={hasSuccessCriteria(problemText)}
+              />
+            </div>
 
             {/* Attachment Previews */}
             {attachments.length > 0 && (
@@ -650,9 +637,21 @@ export default function NewReportPage() {
 
             {/* Footer */}
             <div className="mt-12 flex items-center justify-between pl-10">
-              <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
-                ~10 min analysis
-              </p>
+              <div className="flex items-center gap-6">
+                <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
+                  ~25 min analysis
+                </p>
+                <span className="text-zinc-300">·</span>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={attachments.length >= MAX_ATTACHMENTS}
+                  className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Attach file
+                  {attachments.length > 0 && ` (${attachments.length})`}
+                </button>
+              </div>
 
               <button
                 onClick={handleContinue}
