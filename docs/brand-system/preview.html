@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sparlo Brand System - PrimaryRecommendationCard (Air Company Aesthetic)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Suisse Int'l Font - Trial versions */
+    @font-face {
+      font-family: 'Suisse Intl';
+      src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Suisse Intl';
+      src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Medium.woff2') format('woff2');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Suisse Intl';
+      src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Semibold.woff2') format('woff2');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    * {
+      font-family: 'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: #ffffff;
+      color: #18181b;
+    }
+
+    ::selection {
+      background-color: #18181b;
+      color: #ffffff;
+    }
+
+    /* Prose width utility */
+    .prose-width {
+      max-width: 65ch;
+    }
+  </style>
+  <script>
+    // Configure Tailwind to use Suisse Intl
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Suisse Intl"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-white">
+
+  <!-- Report Container -->
+  <div class="max-w-[900px] mx-auto px-10 py-20">
+
+    <!-- Section Header - Main section title -->
+    <h1 class="text-[36px] font-semibold tracking-tight text-zinc-900 mb-12">
+      Solution Concepts
+    </h1>
+
+    <!-- PrimaryRecommendationCard -->
+    <!-- Only visual distinction: 2px left border in zinc-900, white background -->
+    <article class="border-l-2 border-zinc-900 bg-white pl-10 space-y-12">
+
+      <!-- HEADER -->
+      <header class="space-y-4">
+        <!-- Subsection label -->
+        <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          Primary Recommendation
+        </span>
+
+        <!-- Title - the actual concept name -->
+        <h2 class="text-[28px] font-semibold tracking-tight text-zinc-900 leading-tight">
+          Smart Furniture BCG with Commodity Piezoelectric Films
+        </h2>
+
+        <!-- Meta line - NO PILLS, just text -->
+        <p class="text-[15px] tracking-wide text-zinc-500">
+          Catalog solution · High confidence
+        </p>
+      </header>
+
+      <!-- WHAT IT IS -->
+      <section class="space-y-4">
+        <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          What it is
+        </h3>
+        <p class="text-[18px] leading-relaxed text-zinc-600 prose-width">
+          Embed low-cost piezoelectric polymer films (PVDF or EMFi) in chair seats, bed mattresses, or floor mats to detect ballistocardiographic signals from heartbeat mechanical recoil. This redefines 'non-contact' as 'no worn device' rather than 'no physical coupling.' The approach is already commercial: Sleep Number's SleepIQ mattresses, Bosch and Toyota's driver drowsiness detection, and Murata's BCG sensor modules. The innovation opportunity isn't the sensing—it's extending to chairs, floors, and other furniture at consumer price points. PVDF films cost $5-20 per sensor, electronics are simple charge amplifiers plus microcontroller ($10-30), and the signal processing algorithms exist from automotive applications. Total BOM under $50 for a complete system.
+        </p>
+      </section>
+
+      <!-- WHY IT WORKS -->
+      <section class="space-y-4">
+        <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          Why it works
+        </h3>
+        <p class="text-[18px] leading-relaxed text-zinc-600 prose-width">
+          Each heartbeat ejects ~70mL of blood into the aorta, creating a mechanical impulse of 0.1-0.3 N·s that propagates through the body and into contact surfaces. The body's center of mass shifts 0.1-0.5mm with each beat, producing forces of 1-5 mN detectable by piezoelectric films. Respiration creates 10-100x larger signals (chest expansion 5-12mm). PVDF piezoelectric coefficient is 23 pC/N; EMFi is 10-20x more sensitive at 200-400 pC/N. The signal transmits through furniture padding with minimal attenuation because the mechanical coupling is direct.
+        </p>
+      </section>
+
+      <!-- ECONOMICS GRID - zinc-50, no visible borders, spacing only -->
+      <section class="grid grid-cols-3 gap-10 bg-zinc-50 p-8 -ml-10 pl-10">
+        <div>
+          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+            Expected improvement
+          </span>
+          <p class="text-[18px] font-medium text-zinc-900">±2-3 BPM HR, ±1 BPM RR</p>
+        </div>
+        <div>
+          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+            Timeline
+          </span>
+          <p class="text-[18px] font-medium text-zinc-900">3-6 months to prototype</p>
+        </div>
+        <div>
+          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+            Investment
+          </span>
+          <p class="text-[18px] font-medium text-zinc-900">$50-200K pilot</p>
+        </div>
+      </section>
+
+      <!-- THE INSIGHT - Dark Block -->
+      <section class="bg-zinc-900 p-10 -ml-10 pl-10 space-y-8">
+        <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase">
+          The insight
+        </span>
+        <p class="text-[22px] font-semibold leading-snug text-white prose-width">
+          Direct mechanical coupling provides 40-60dB better SNR than air-coupled sensing
+        </p>
+
+        <!-- Nested section - border separation instead of background -->
+        <div class="mt-8 pt-8 border-t border-zinc-800 space-y-6">
+          <div>
+            <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase block mb-3">
+              Where we found it
+            </span>
+            <p class="text-[15px] text-zinc-300 prose-width">
+              <span class="text-zinc-100 font-medium">Automotive driver monitoring (Bosch, Continental, Ford, Toyota):</span>
+              BCG sensors in car seats detect driver heart rate and drowsiness despite engine vibration
+            </p>
+            <p class="text-[15px] text-zinc-300 mt-3">
+              → Home environment is actually easier—no engine vibration, more stable seating
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-6">
+          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase block mb-3">
+            Why industry missed it
+          </span>
+          <p class="text-[15px] text-zinc-400 prose-width">
+            Industry didn't miss it—it's already commercial. The gap is that 'non-contact vital signs' research focused on air-coupled sensing as the differentiator, while BCG was siloed in automotive and sleep monitoring.
+          </p>
+        </div>
+      </section>
+
+      <!-- VALIDATION GATE -->
+      <section class="space-y-5">
+        <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          First validation step
+        </h3>
+        <div class="space-y-4">
+          <p class="text-[18px] font-medium text-zinc-900 prose-width">
+            Validate HR detection accuracy through standard office chair cushion
+          </p>
+          <p class="text-[15px] text-zinc-500">
+            $5-10K · Sensors, ECG reference, 10-subject pilot
+          </p>
+          <p class="text-[15px] text-zinc-600 prose-width">
+            <span class="text-zinc-900 font-medium">Success criteria:</span>
+            HR accuracy ±3 BPM vs. ECG across 10 subjects, >90% valid reading rate while seated
+          </p>
+        </div>
+      </section>
+
+      <!-- COUPLED EFFECTS - Inline text, no pill badges -->
+      <section class="space-y-8">
+        <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          Coupled effects
+        </h3>
+
+        <div class="space-y-8">
+          <!-- Neutral Effect -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-[18px] font-medium text-zinc-900">Furniture design</h4>
+              <span class="text-[15px]">
+                <span class="text-zinc-500">Neutral</span>
+                <span class="mx-2 text-zinc-300">·</span>
+                <span class="text-zinc-400">Minor</span>
+              </span>
+            </div>
+            <p class="text-[15px] text-zinc-600 prose-width">
+              Sensor integration affects furniture compliance and feel
+            </p>
+            <p class="text-[15px] text-zinc-500 prose-width">
+              PVDF films are 28-110µm thick; imperceptible under fabric. Use thin films; place under existing padding.
+            </p>
+          </div>
+
+          <!-- Worse Effect -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-[18px] font-medium text-zinc-900">Multi-occupancy</h4>
+              <span class="text-[15px]">
+                <span class="text-red-600">Worse</span>
+                <span class="mx-2 text-zinc-300">·</span>
+                <span class="text-zinc-400">Major</span>
+              </span>
+            </div>
+            <p class="text-[15px] text-zinc-600 prose-width">
+              Cannot separate signals from multiple people on same surface
+            </p>
+            <p class="text-[15px] text-zinc-500 prose-width">
+              Fails completely for shared surfaces like couches. Use individual seating; array of sensors for spatial separation; accept single-person limitation.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUSTAINABILITY - No colored background, just text -->
+      <section class="space-y-4">
+        <div class="flex items-baseline gap-4">
+          <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+            Sustainability
+          </h3>
+          <span class="text-[15px] text-emerald-600">Benefit</span>
+        </div>
+        <p class="text-[18px] text-zinc-600 prose-width">
+          Minimal materials, no RF emissions, extremely low power consumption
+        </p>
+        <p class="text-[15px] text-zinc-500 prose-width">
+          PVDF films require minimal raw materials. System runs on milliwatts. No electromagnetic emissions. 10-20 year sensor lifetime. Significantly lower environmental impact than wearables requiring batteries and periodic replacement.
+        </p>
+      </section>
+
+      <!-- IP CONSIDERATIONS - Inline text for FTO/Patentability -->
+      <section class="space-y-5">
+        <div class="flex items-baseline justify-between">
+          <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+            IP considerations
+          </h3>
+          <span class="text-[15px]">
+            <span class="text-amber-600">FTO: Yellow</span>
+            <span class="mx-2 text-zinc-300">·</span>
+            <span class="text-zinc-500">Patentability: Medium</span>
+          </span>
+        </div>
+        <p class="text-[15px] text-zinc-600 prose-width">
+          Search for 'ballistocardiography furniture patent' returned multiple relevant filings: US 10,123,xxx (Sleep Number, mattress BCG), US 9,xxx,xxx (Bosch, automotive seat sensing). Core BCG physics is not patentable, but specific implementations may require licensing or design-around.
+        </p>
+        <div class="pt-2">
+          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+            Key patents to review
+          </span>
+          <ul class="text-[15px] text-zinc-600 space-y-2">
+            <li>Sleep Number mattress sensing patents</li>
+            <li>Bosch/Continental automotive BCG patents</li>
+            <li>Murata sensor module patents</li>
+          </ul>
+        </div>
+      </section>
+
+    </article>
+
+    <!-- Footer -->
+    <footer class="mt-24 pt-10 border-t border-zinc-100 text-center">
+      <p class="text-[13px] text-zinc-400">
+        Sparlo Brand System · Air Company Aesthetic
+      </p>
+    </footer>
+
+  </div>
+</body>
+</html>
