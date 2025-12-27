@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -18,9 +18,9 @@ import type { RecentReport } from '../../_lib/server/recent-reports.loader';
  * Features:
  * - Dark background (zinc-950)
  * - No icons, text only
- * - Numbered reports list with minimal time formatting
- * - Collapsible/hidden by default
- * - Minimal user section
+ * - Resizable with drag handle (like Claude)
+ * - Actions at top, reports below
+ * - Minimal user section at bottom
  */
 
 interface NavSidebarProps {
@@ -30,6 +30,10 @@ interface NavSidebarProps {
   user: { id: string; email?: string | null };
   workspace: { name?: string | null };
 }
+
+const MIN_WIDTH = 240;
+const MAX_WIDTH = 480;
+const DEFAULT_WIDTH = 288; // 18rem = 288px
 
 /**
  * Format time in minimal style:
@@ -70,6 +74,8 @@ export const NavSidebar = memo(function NavSidebar({
   const router = useRouter();
   const signOut = useSignOut();
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(DEFAULT_WIDTH);
+  const [isResizing, setIsResizing] = useState(false);
 
   // Close on escape key
   useEffect(() => {
@@ -83,11 +89,12 @@ export const NavSidebar = memo(function NavSidebar({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [open, onOpenChange]);
 
-  // Close on click outside
+  // Close on click outside (but not on resize handle)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
         open &&
+        !isResizing &&
         sidebarRef.current &&
         !sidebarRef.current.contains(e.target as Node)
       ) {
@@ -97,7 +104,7 @@ export const NavSidebar = memo(function NavSidebar({
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [open, onOpenChange]);
+  }, [open, onOpenChange, isResizing]);
 
   // Prevent body scroll when open
   useEffect(() => {
@@ -110,6 +117,33 @@ export const NavSidebar = memo(function NavSidebar({
       document.body.style.overflow = '';
     };
   }, [open]);
+
+  // Handle resize
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, e.clientX));
+      setWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   const handleNewAnalysis = useCallback(() => {
     router.push(pathsConfig.app.home);
@@ -141,9 +175,11 @@ export const NavSidebar = memo(function NavSidebar({
       {/* Sidebar */}
       <div
         ref={sidebarRef}
+        style={{ width }}
         className={cn(
-          'fixed top-0 left-0 z-50 flex h-full w-72 flex-col bg-zinc-950 transition-transform duration-300',
+          'fixed top-0 left-0 z-50 flex h-full flex-col bg-zinc-950 transition-transform duration-300',
           open ? 'translate-x-0' : '-translate-x-full',
+          isResizing && 'select-none',
         )}
         role="dialog"
         aria-modal="true"
@@ -179,10 +215,27 @@ export const NavSidebar = memo(function NavSidebar({
           </button>
         </div>
 
+        {/* Actions - At Top */}
+        <div className="space-y-2 px-6 pb-6">
+          <button
+            onClick={handleNewAnalysis}
+            className="block text-[17px] leading-[1.2] tracking-[-0.02em] text-white transition-colors hover:text-zinc-300"
+          >
+            + New Analysis
+          </button>
+          <Link
+            href="/home/reports"
+            onClick={closeSidebar}
+            className="block text-[17px] leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white"
+          >
+            All Reports
+          </Link>
+        </div>
+
         {/* Reports List */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto border-t border-zinc-800 px-6 py-4">
           <div className="mb-4 text-[12px] font-medium tracking-[0.05em] text-zinc-600 uppercase">
-            Recent Reports
+            Recent
           </div>
 
           {recentReports.length > 0 ? (
@@ -218,23 +271,6 @@ export const NavSidebar = memo(function NavSidebar({
           )}
         </div>
 
-        {/* Actions */}
-        <div className="space-y-3 border-t border-zinc-800 px-6 py-4">
-          <button
-            onClick={handleNewAnalysis}
-            className="block text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white"
-          >
-            + New Analysis
-          </button>
-          <Link
-            href="/home/reports"
-            onClick={closeSidebar}
-            className="block text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white"
-          >
-            All Reports
-          </Link>
-        </div>
-
         {/* User Section */}
         <div className="border-t border-zinc-800 px-6 py-4">
           <div className="mb-3 text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
@@ -263,6 +299,16 @@ export const NavSidebar = memo(function NavSidebar({
             </button>
           </div>
         </div>
+
+        {/* Resize Handle */}
+        <div
+          onMouseDown={handleMouseDown}
+          className={cn(
+            'absolute top-0 right-0 h-full w-1 cursor-ew-resize transition-colors',
+            isResizing ? 'bg-zinc-600' : 'bg-transparent hover:bg-zinc-700',
+          )}
+          aria-label="Resize sidebar"
+        />
       </div>
     </>
   );
