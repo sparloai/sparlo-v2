@@ -2,6 +2,7 @@
 
 import { memo, useState } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { cn } from '@kit/ui/utils';
@@ -101,11 +102,23 @@ export const NavHeader = memo(function NavHeader({
               <MenuIcon isHovered={menuHovered} />
             </button>
 
-            <Link
-              href="/home"
-              className="text-[18px] leading-[1.2] font-semibold tracking-[-0.02em] text-zinc-900 transition-opacity hover:opacity-70 dark:text-white"
-            >
-              Sparlo
+            <Link href="/home" className="transition-opacity hover:opacity-70">
+              <Image
+                src="/images/sparlo-logo.png"
+                alt="Sparlo"
+                width={80}
+                height={22}
+                className="h-[22px] w-auto dark:hidden"
+                priority
+              />
+              <Image
+                src="/images/sparlo-logo-white.png"
+                alt="Sparlo"
+                width={80}
+                height={22}
+                className="hidden h-[22px] w-auto dark:block"
+                priority
+              />
             </Link>
           </div>
 

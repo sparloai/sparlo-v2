@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useState } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { PersonalAccountDropdown } from '@kit/accounts/personal-account-dropdown';
@@ -87,15 +88,16 @@ export const Navigation = memo(function Navigation({
         )}
       >
         <nav className="flex items-center justify-between px-6 py-5 md:px-12 lg:px-16">
-          {/* Logo - wordmark only */}
-          <Link
-            href="/"
-            className={cn(
-              'text-[18px] leading-[1.2] font-semibold tracking-[-0.02em] transition-colors',
-              isDark ? 'text-white' : 'text-zinc-900',
-            )}
-          >
-            Sparlo
+          {/* Logo */}
+          <Link href="/" className="transition-opacity hover:opacity-80">
+            <Image
+              src={isDark ? '/images/sparlo-logo-white.png' : '/images/sparlo-logo.png'}
+              alt="Sparlo"
+              width={90}
+              height={24}
+              className="h-6 w-auto"
+              priority
+            />
           </Link>
 
           {/* Right side - Auth */}
@@ -185,12 +187,14 @@ const MobileMenu = memo(function MobileMenu({
     <div className="fixed inset-0 z-50 bg-zinc-950 md:hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-5">
-        <Link
-          href="/"
-          onClick={onClose}
-          className="text-[18px] leading-[1.2] font-semibold tracking-[-0.02em] text-white"
-        >
-          Sparlo
+        <Link href="/" onClick={onClose}>
+          <Image
+            src="/images/sparlo-logo-white.png"
+            alt="Sparlo"
+            width={90}
+            height={24}
+            className="h-6 w-auto"
+          />
         </Link>
         <button
           onClick={onClose}

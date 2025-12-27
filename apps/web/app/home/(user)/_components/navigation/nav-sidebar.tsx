@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -213,12 +214,14 @@ export const NavSidebar = memo(function NavSidebar({
       >
         {/* Header - Stagger index 0 */}
         <div className="flex items-center justify-between px-6 py-5" style={contentStyle(0)}>
-          <Link
-            href="/home"
-            onClick={closeSidebar}
-            className="text-[18px] leading-[1.2] font-semibold tracking-[-0.02em] text-white"
-          >
-            Sparlo
+          <Link href="/home" onClick={closeSidebar}>
+            <Image
+              src="/images/sparlo-logo-white.png"
+              alt="Sparlo"
+              width={80}
+              height={22}
+              className="h-[22px] w-auto"
+            />
           </Link>
           <button
             onClick={closeSidebar}
