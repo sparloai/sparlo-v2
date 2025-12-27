@@ -497,4 +497,9 @@ export interface HybridReportDisplayProps {
     mode: 'hybrid';
     report?: HybridReportData;
   };
+  /**
+   * Use the new brand system styling (Air Company aesthetic)
+   * @default true
+   */
+  useBrandSystem?: boolean;
 }

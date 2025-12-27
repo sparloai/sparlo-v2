@@ -1,0 +1,49 @@
+/**
+ * Brand System Components
+ *
+ * Air Company Aesthetic - Technical Monograph
+ *
+ * A complete component library for rendering hybrid reports
+ * with premium typography-driven styling.
+ */
+
+// Main report component
+export { BrandSystemReport } from './brand-system-report';
+
+// Table of Contents
+export { TableOfContents, generateTocSections } from './table-of-contents';
+
+// Primitives
+export {
+  Section,
+  SectionTitle,
+  SectionSubtitle,
+  MonoLabel,
+  BodyText,
+  ArticleBlock,
+  ContentBlock,
+  AccentBorder,
+  HighlightBox,
+  SeverityIndicator,
+  ConstraintList,
+  NumberedItem,
+  MetadataGrid,
+  UnknownFieldRenderer,
+} from './primitives';
+
+// Section Components
+export {
+  ChallengeFrameSection,
+  ConstraintsSection,
+  CrossDomainSearchSection,
+  ExecutiveSummarySection,
+  FrontierTechnologiesSection,
+  HonestAssessmentSection,
+  InnovationConceptsSection,
+  ProblemAnalysisSection,
+  RecommendationSection,
+  RisksWatchoutsSection,
+  SelfCritiqueSection,
+  SolutionConceptsSection,
+  StrategicIntegrationSection,
+} from './sections';

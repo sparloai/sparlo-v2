@@ -1,7 +1,5 @@
 'use client';
 
-import { memo } from 'react';
-
 import {
   AlertTriangle,
   ArrowRight,
@@ -26,6 +24,10 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
+import { memo } from 'react';
+
+// Jobs Standard: Typography does the work. No decorative icons.
+// Only functional icons retained (none needed in report content)
 
 import {
   AuraBadge,
@@ -65,6 +67,8 @@ import type {
   SupportingConcept,
   SustainabilityFlag,
 } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+
+import { BrandSystemReport } from './brand-system';
 
 /**
  * Hybrid Report Display Component
@@ -2420,7 +2424,10 @@ function StrategicIntegrationSection({
   );
 }
 
-export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
+export function HybridReportDisplay({
+  reportData,
+  useBrandSystem = true,
+}: HybridReportDisplayProps) {
   const report = reportData.report;
 
   if (!report) {
@@ -2429,6 +2436,11 @@ export function HybridReportDisplay({ reportData }: HybridReportDisplayProps) {
         <p className="text-zinc-500">Report data not available</p>
       </div>
     );
+  }
+
+  // Use the new brand system styling if requested
+  if (useBrandSystem) {
+    return <BrandSystemReport reportData={report} title={report.title} />;
   }
 
   const { decision_architecture, self_critique } = report;
