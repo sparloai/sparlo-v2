@@ -16,7 +16,7 @@ import { NavSidebar } from './nav-sidebar';
  *
  * Features:
  * - Minimal, text-based wordmark
- * - Clean hamburger icon (no lucide)
+ * - Premium animated menu icon
  * - Usage indicator on right
  * - Transparent with subtle border
  */
@@ -28,6 +28,42 @@ interface NavHeaderProps {
   workspace: { name?: string | null };
 }
 
+/**
+ * Premium Menu Icon - Air Company Aesthetic
+ *
+ * Three horizontal lines with staggered animation on hover:
+ * - Lines spread apart vertically
+ * - Subtle width changes for visual interest
+ * - Smooth easing for premium feel
+ */
+function MenuIcon({ isHovered }: { isHovered: boolean }) {
+  return (
+    <div className="relative flex h-4 w-5 flex-col items-end justify-center gap-[5px]">
+      {/* Top line */}
+      <span
+        className={cn(
+          'h-[1.5px] bg-zinc-900 transition-all duration-300 ease-out dark:bg-zinc-100',
+          isHovered ? 'w-5 -translate-y-[1px]' : 'w-5',
+        )}
+      />
+      {/* Middle line */}
+      <span
+        className={cn(
+          'h-[1.5px] bg-zinc-900 transition-all duration-300 ease-out delay-[50ms] dark:bg-zinc-100',
+          isHovered ? 'w-3.5' : 'w-5',
+        )}
+      />
+      {/* Bottom line */}
+      <span
+        className={cn(
+          'h-[1.5px] bg-zinc-900 transition-all duration-300 ease-out delay-[100ms] dark:bg-zinc-100',
+          isHovered ? 'w-5 translate-y-[1px]' : 'w-5',
+        )}
+      />
+    </div>
+  );
+}
+
 export const NavHeader = memo(function NavHeader({
   usage,
   recentReports,
@@ -35,6 +71,7 @@ export const NavHeader = memo(function NavHeader({
   workspace,
 }: NavHeaderProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [menuHovered, setMenuHovered] = useState(false);
 
   return (
     <>
@@ -47,27 +84,21 @@ export const NavHeader = memo(function NavHeader({
         )}
       >
         <nav className="flex h-14 items-center justify-between px-4 sm:px-6">
-          {/* Left: Hamburger + Logo */}
-          <div className="flex items-center gap-4">
-            {/* Hamburger trigger */}
+          {/* Left: Menu + Logo */}
+          <div className="flex items-center gap-5">
+            {/* Menu trigger */}
             <button
               onClick={() => setSidebarOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              onMouseEnter={() => setMenuHovered(true)}
+              onMouseLeave={() => setMenuHovered(false)}
+              className={cn(
+                'group flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300',
+                'hover:bg-zinc-100 dark:hover:bg-zinc-800/80',
+                'active:scale-95',
+              )}
               aria-label="Open navigation menu"
             >
-              <svg
-                className="h-5 w-5 text-zinc-600 dark:text-zinc-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+              <MenuIcon isHovered={menuHovered} />
             </button>
 
             <Link
