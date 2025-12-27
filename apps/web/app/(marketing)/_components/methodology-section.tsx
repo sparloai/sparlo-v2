@@ -3,11 +3,11 @@ import { memo } from 'react';
 /**
  * Process & Methodology Section
  *
- * Air Company Aesthetic - Right-aligned body text layout
+ * Air Company Aesthetic - Two column layout
  *
  * Features:
- * - Left: Large section title
- * - Right: Content pushed far right with superscript numbers
+ * - Left column: Large section title
+ * - Right column: Content with superscript numbers (left-aligned text)
  * - Typography: -0.02em tracking, 1.2 line-height
  * - Near-monochrome palette
  */
@@ -41,8 +41,8 @@ export const MethodologySection = memo(function MethodologySection() {
               </h2>
             </div>
 
-            {/* Right - Steps (pushed far right) */}
-            <div className="md:w-1/2 md:text-right">
+            {/* Right - Steps (in right column, left-aligned text) */}
+            <div className="md:w-1/2">
               <div className="space-y-6">
                 {processSteps.map((step, idx) => (
                   <p
@@ -70,8 +70,8 @@ export const MethodologySection = memo(function MethodologySection() {
               </h2>
             </div>
 
-            {/* Right - Steps (pushed far right) */}
-            <div className="md:w-1/2 md:text-right">
+            {/* Right - Steps (in right column, left-aligned text) */}
+            <div className="md:w-1/2">
               <div className="space-y-6">
                 {methodologySteps.map((step, idx) => (
                   <p
