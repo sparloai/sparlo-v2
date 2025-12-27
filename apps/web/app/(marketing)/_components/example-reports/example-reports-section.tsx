@@ -120,7 +120,7 @@ export function ExampleReportsSection() {
                   });
                 }}
                 className={cn(
-                  'flex shrink-0 items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all',
+                  'flex shrink-0 items-center gap-2 rounded-md px-4 py-2.5 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] whitespace-nowrap transition-all',
                   activeTab === i
                     ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
                     : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
@@ -149,7 +149,7 @@ export function ExampleReportsSection() {
               <div className="sticky top-36 h-[calc(100vh-150px)] overflow-y-auto border-r border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
                 <div className="p-5">
                   <div className="mb-5 flex items-center justify-between">
-                    <span className="font-mono text-xs font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
+                    <span className="font-mono text-[11px] leading-[1.2] font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
                       Contents
                     </span>
                     <Button
@@ -167,7 +167,7 @@ export function ExampleReportsSection() {
                         key={`${item.id}-${index}`}
                         onClick={() => scrollToSection(item.id)}
                         className={cn(
-                          'group flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] transition-all',
+                          'group flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] leading-[1.2] tracking-[-0.02em] transition-all',
                           activeSection === item.id
                             ? 'bg-violet-100 font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
                             : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
@@ -189,13 +189,15 @@ export function ExampleReportsSection() {
         {/* TOC Toggle */}
         {!showToc && !report.locked && (
           <motion.button
-            className="fixed top-36 left-4 z-40 hidden items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm hover:bg-zinc-50 lg:flex dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+            className="fixed top-36 left-4 z-40 hidden items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] text-zinc-700 shadow-sm hover:bg-zinc-50 lg:flex dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
             onClick={() => setShowToc(true)}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
           >
             <List className="h-4 w-4" />
-            <span className="text-xs">Contents</span>
+            <span className="text-[12px] leading-[1.2] tracking-[-0.02em]">
+              Contents
+            </span>
           </motion.button>
         )}
 
@@ -214,13 +216,13 @@ export function ExampleReportsSection() {
               report.id !== 'energy' && (
                 <header className="mb-12">
                   <div className="space-y-4">
-                    <h1 className="text-4xl font-bold tracking-tight text-zinc-900 lg:text-5xl dark:text-white">
+                    <h1 className="text-[36px] leading-[1.2] font-semibold tracking-[-0.02em] text-zinc-900 lg:text-[48px] dark:text-white">
                       {report.title}
                     </h1>
-                    <p className="text-lg text-zinc-600 dark:text-zinc-400">
+                    <p className="text-[18px] leading-[1.2] tracking-[-0.02em] text-zinc-600 dark:text-zinc-400">
                       {report.subtitle}
                     </p>
-                    <div className="flex items-center gap-3 font-mono text-sm text-zinc-500 dark:text-zinc-500">
+                    <div className="flex items-center gap-3 font-mono text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-500 dark:text-zinc-500">
                       <span>{report.metadata.readTime}</span>
                       <span className="text-zinc-300 dark:text-zinc-700">
                         •
@@ -292,7 +294,7 @@ export function ExampleReportsSection() {
       <div className="fixed right-6 bottom-6 z-50 lg:hidden">
         {!report.locked && (
           <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-            <SheetTrigger className="flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white shadow-lg transition-transform hover:scale-105 active:scale-95 dark:bg-zinc-100 dark:text-zinc-900">
+            <SheetTrigger className="flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2.5 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] text-white shadow-lg transition-transform hover:scale-105 active:scale-95 dark:bg-zinc-100 dark:text-zinc-900">
               <List className="h-4 w-4" />
               Contents
             </SheetTrigger>
@@ -309,7 +311,7 @@ export function ExampleReportsSection() {
                       setSheetOpen(false);
                     }}
                     className={cn(
-                      'flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm transition-all',
+                      'flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-[14px] leading-[1.2] tracking-[-0.02em] transition-all',
                       activeSection === item.id
                         ? 'bg-violet-100 font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
                         : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800',
@@ -366,16 +368,16 @@ function LockedOverlay({ report }: { report: Report }) {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
             <Lock className="h-6 w-6 text-zinc-500" />
           </div>
-          <h3 className="text-2xl font-semibold text-zinc-900 dark:text-white">
+          <h3 className="text-[24px] leading-[1.2] font-semibold tracking-[-0.02em] text-zinc-900 dark:text-white">
             Premium Report
           </h3>
-          <p className="mt-2 max-w-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 max-w-sm text-[16px] leading-[1.2] tracking-[-0.02em] text-zinc-600 dark:text-zinc-400">
             Sign up to access the full {report.title} analysis and all other
             intelligence reports.
           </p>
           <a
             href="/auth/sign-up"
-            className="mt-6 inline-block rounded-md bg-violet-600 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-violet-700"
+            className="mt-6 inline-block rounded-md bg-violet-600 px-6 py-3 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] text-white transition-colors hover:bg-violet-700"
           >
             Get Started Free
           </a>

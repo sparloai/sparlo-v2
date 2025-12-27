@@ -57,41 +57,8 @@ export const EngineeringHero = memo(function EngineeringHero() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
       </div>
 
-      {/* Navigation */}
-      <nav className="absolute top-0 right-0 left-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
-        {/* Logo */}
-        <Link
-          href="/"
-          className="text-[18px] font-semibold tracking-[-0.02em] text-white"
-        >
-          Sparlo
-        </Link>
-
-        {/* Links */}
-        <div className="flex items-center gap-8">
-          <Link
-            href="/pricing"
-            className="hidden text-[14px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white sm:block"
-          >
-            Pricing
-          </Link>
-          <Link
-            href="/auth/sign-in"
-            className="text-[14px] tracking-[-0.02em] text-white"
-          >
-            Sign In
-          </Link>
-        </div>
-      </nav>
-
       {/* Content Layer - Centered */}
-      <div
-        className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center"
-        style={{
-          fontFamily:
-            "'Suisse Intl', 'Suisse', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
-        }}
-      >
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
         {/* Headline */}
         <h1 className="text-[40px] leading-[1.2] font-medium tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
           Engineering Intelligence Model
@@ -105,7 +72,7 @@ export const EngineeringHero = memo(function EngineeringHero() {
         {/* CTA */}
         <Link
           href="/home"
-          className="mt-10 rounded-full bg-white/95 px-8 py-3.5 text-[15px] font-medium tracking-[-0.01em] text-zinc-900 backdrop-blur-sm transition-all hover:bg-white hover:shadow-lg"
+          className="mt-10 rounded-full bg-white/95 px-8 py-3.5 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 backdrop-blur-sm transition-all hover:bg-white hover:shadow-lg"
         >
           Run Analysis
         </Link>

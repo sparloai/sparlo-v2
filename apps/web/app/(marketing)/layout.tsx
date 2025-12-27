@@ -1,7 +1,7 @@
 import { requireUser } from '@kit/supabase/require-user';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-import { LandingHeader } from '~/(marketing)/_components/landing-header';
+import { Navigation } from '~/(marketing)/_components/navigation';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
 async function SiteLayout(props: React.PropsWithChildren) {
@@ -11,12 +11,15 @@ async function SiteLayout(props: React.PropsWithChildren) {
   return (
     <div
       className={'flex min-h-[100vh] flex-col'}
-      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      style={{
+        fontFamily:
+          "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
+      }}
     >
-      <LandingHeader user={user.data} />
+      <Navigation user={user.data} variant="dark" />
 
-      {/* Add padding-top to account for fixed nav */}
-      <div className="pt-14">{props.children}</div>
+      {/* No padding-top - hero is full viewport with nav overlay */}
+      {props.children}
     </div>
   );
 }
