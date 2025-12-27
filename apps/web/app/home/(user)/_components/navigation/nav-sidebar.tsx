@@ -14,342 +14,377 @@ import pathsConfig from '~/config/paths.config';
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
 
 /**
- * App Sidebar - Air Company Aesthetic
+ * App Sidebar - Claude-style
  *
  * Features:
- * - Dark background (zinc-950)
- * - No icons, text only
- * - Resizable with drag handle (like Claude)
- * - Actions at top, reports below
- * - Minimal user section at bottom
- * - Premium staggered animations on open/close
+ * - Persistent sidebar (not overlay)
+ * - Expanded: icons + text + recent reports
+ * - Collapsed: icons only with tooltips
+ * - Settings dropdown at bottom
+ * - Smooth expand/collapse animation
  */
 
-// Premium easing - slightly slower start, smooth finish
-const EASE_OUT_EXPO = 'cubic-bezier(0.16, 1, 0.3, 1)';
-
-// Animation durations
-const SIDEBAR_DURATION = 400; // ms
-const CONTENT_STAGGER = 50; // ms between each content section
+const COLLAPSED_WIDTH = 64; // px
+const EXPANDED_WIDTH = 260; // px
+const STORAGE_KEY = 'sparlo-sidebar-collapsed';
 
 interface NavSidebarProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   recentReports: RecentReport[];
   user: { id: string; email?: string | null };
   workspace: { name?: string | null };
 }
 
-const MIN_WIDTH = 240;
-const MAX_WIDTH = 480;
-const DEFAULT_WIDTH = 288; // 18rem = 288px
+/**
+ * Tooltip component for collapsed state
+ */
+function Tooltip({
+  children,
+  label,
+  show,
+}: {
+  children: React.ReactNode;
+  label: string;
+  show: boolean;
+}) {
+  return (
+    <div className="relative">
+      {children}
+      {show && (
+        <div className="pointer-events-none absolute top-1/2 left-full z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded bg-zinc-900 px-2.5 py-1.5 text-[12px] text-white shadow-lg">
+          {label}
+          {/* Arrow */}
+          <div className="absolute top-1/2 right-full -translate-y-1/2 border-4 border-transparent border-r-zinc-900" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 /**
- * Format time in minimal style:
- * - Under 1 hour: "15m"
- * - Under 24 hours: "15h"
- * - Under 7 days: "3d"
- * - Otherwise: "Dec 15"
+ * Settings dropdown menu
  */
-function formatMinimalTime(date: Date | string): string {
-  const now = new Date();
-  const d = new Date(date);
-  const diffMs = now.getTime() - d.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+function SettingsDropdown({
+  isOpen,
+  onClose,
+  onSignOut,
+  collapsed,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSignOut: () => void;
+  collapsed: boolean;
+}) {
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  if (diffMins < 60) {
-    return `${Math.max(1, diffMins)}m`;
-  }
-  if (diffHours < 24) {
-    return `${diffHours}h`;
-  }
-  if (diffDays < 7) {
-    return `${diffDays}d`;
-  }
+  useEffect(() => {
+    if (!isOpen) return;
 
-  // Format as "Dec 15"
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      ref={dropdownRef}
+      className={cn(
+        'absolute bottom-full mb-2 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-800',
+        collapsed ? 'left-full ml-2' : 'left-0 right-0 mx-3',
+      )}
+    >
+      <Link
+        href={pathsConfig.app.personalAccountSettings}
+        onClick={onClose}
+        className="flex items-center gap-2 px-3 py-2 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        <SettingsIcon className="h-4 w-4" />
+        Settings
+      </Link>
+      <Link
+        href={pathsConfig.app.personalAccountBilling}
+        onClick={onClose}
+        className="flex items-center gap-2 px-3 py-2 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        <BillingIcon className="h-4 w-4" />
+        Billing
+      </Link>
+      <a
+        href="mailto:support@sparlo.ai"
+        onClick={onClose}
+        className="flex items-center gap-2 px-3 py-2 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        <HelpIcon className="h-4 w-4" />
+        Help
+      </a>
+      <div className="my-1 border-t border-zinc-200 dark:border-zinc-700" />
+      <button
+        onClick={() => {
+          onSignOut();
+          onClose();
+        }}
+        className="flex w-full items-center gap-2 px-3 py-2 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        <LogOutIcon className="h-4 w-4" />
+        Log out
+      </button>
+    </div>
+  );
+}
+
+// Icons
+function PlusIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+    </svg>
+  );
+}
+
+function ReportsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+    </svg>
+  );
+}
+
+function SettingsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    </svg>
+  );
+}
+
+function BillingIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+    </svg>
+  );
+}
+
+function HelpIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+    </svg>
+  );
+}
+
+function LogOutIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
+    </svg>
+  );
+}
+
+function CollapseIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+    </svg>
+  );
+}
+
+function ExpandIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+  );
 }
 
 export const NavSidebar = memo(function NavSidebar({
-  open,
-  onOpenChange,
   recentReports,
   user,
   workspace,
 }: NavSidebarProps) {
   const router = useRouter();
   const signOut = useSignOut();
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(DEFAULT_WIDTH);
-  const [isResizing, setIsResizing] = useState(false);
-  const [hasEverOpened, setHasEverOpened] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
-  // Track if sidebar has ever been opened (for initial render optimization)
+  // Load collapsed state from localStorage
   useEffect(() => {
-    if (open && !hasEverOpened) {
-      setHasEverOpened(true);
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored !== null) {
+      setCollapsed(stored === 'true');
     }
-  }, [open, hasEverOpened]);
-
-  // Close on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open) {
-        onOpenChange(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [open, onOpenChange]);
-
-  // Close on click outside is now handled by backdrop onClick
-
-  // Prevent body scroll when open
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
-
-  // Handle resize
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsResizing(true);
   }, []);
 
-  useEffect(() => {
-    if (!isResizing) return;
-
-    const handleMouseMove = (e: MouseEvent) => {
-      const newWidth = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, e.clientX));
-      setWidth(newWidth);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isResizing]);
+  // Save collapsed state to localStorage
+  const toggleCollapsed = useCallback(() => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(STORAGE_KEY, String(next));
+      return next;
+    });
+    setSettingsOpen(false);
+  }, []);
 
   const handleNewAnalysis = useCallback(() => {
     router.push(pathsConfig.app.home);
-    onOpenChange(false);
-  }, [router, onOpenChange]);
+  }, [router]);
 
   const handleSignOut = useCallback(async () => {
     await signOut.mutateAsync();
-    onOpenChange(false);
-  }, [signOut, onOpenChange]);
+  }, [signOut]);
 
-  const closeSidebar = useCallback(() => {
-    onOpenChange(false);
-  }, [onOpenChange]);
-
-  // Don't render anything until sidebar has been opened at least once
-  if (!hasEverOpened) return null;
-
-  // Inline styles for premium animations (CSS-in-JS for dynamic timing)
-  const sidebarStyle = {
-    width,
-    transition: `transform ${SIDEBAR_DURATION}ms ${EASE_OUT_EXPO}`,
-  };
-
-  const backdropStyle = {
-    transition: `opacity ${SIDEBAR_DURATION}ms ${EASE_OUT_EXPO}, backdrop-filter ${SIDEBAR_DURATION}ms ${EASE_OUT_EXPO}`,
-  };
-
-  // Staggered content animation helper
-  const contentStyle = (index: number) => ({
-    opacity: open ? 1 : 0,
-    transform: open ? 'translateY(0)' : 'translateY(8px)',
-    transition: open
-      ? `opacity ${300}ms ${EASE_OUT_EXPO} ${100 + index * CONTENT_STAGGER}ms, transform ${300}ms ${EASE_OUT_EXPO} ${100 + index * CONTENT_STAGGER}ms`
-      : `opacity ${200}ms ${EASE_OUT_EXPO}, transform ${200}ms ${EASE_OUT_EXPO}`,
-  });
+  const width = collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH;
 
   return (
-    <>
-      {/* Backdrop - Premium blur + fade */}
-      <div
-        className={cn(
-          'fixed inset-0 z-40',
-          open
-            ? 'pointer-events-auto bg-black/60 backdrop-blur-sm'
-            : 'pointer-events-none bg-black/0 backdrop-blur-none',
-        )}
-        style={backdropStyle}
-        onClick={closeSidebar}
-        aria-hidden="true"
-      />
-
-      {/* Sidebar - Smooth slide with premium easing */}
-      <div
-        ref={sidebarRef}
-        style={sidebarStyle}
-        className={cn(
-          'fixed top-0 left-0 z-50 flex h-full flex-col bg-zinc-950',
-          open ? 'translate-x-0' : '-translate-x-full',
-          isResizing && 'select-none',
-          !open && 'pointer-events-none',
-        )}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Navigation sidebar"
-      >
-        {/* Header - Stagger index 0 */}
-        <div className="flex items-center justify-between px-6 py-5" style={contentStyle(0)}>
-          <Link href="/home" onClick={closeSidebar}>
+    <aside
+      style={{ width }}
+      className={cn(
+        'fixed top-0 left-0 z-40 flex h-screen flex-col border-r border-zinc-200 bg-white transition-[width] duration-300 ease-out dark:border-zinc-800 dark:bg-zinc-950',
+      )}
+    >
+      {/* Header */}
+      <div className={cn('flex h-14 items-center border-b border-zinc-200 dark:border-zinc-800', collapsed ? 'justify-center px-0' : 'justify-between px-4')}>
+        {!collapsed && (
+          <Link href="/home" className="transition-opacity hover:opacity-70">
+            <Image
+              src="/images/sparlo-logo.png"
+              alt="Sparlo"
+              width={80}
+              height={22}
+              className="h-[22px] w-auto dark:hidden"
+            />
             <Image
               src="/images/sparlo-logo-white.png"
               alt="Sparlo"
               width={80}
               height={22}
-              className="h-[22px] w-auto"
+              className="hidden h-[22px] w-auto dark:block"
             />
           </Link>
-          <button
-            onClick={closeSidebar}
-            className="group p-2 text-zinc-500 transition-colors hover:text-white"
-            aria-label="Close sidebar"
-          >
-            <svg
-              className="h-5 w-5 transition-transform duration-200 group-hover:rotate-90"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Actions - At Top - Stagger index 1 */}
-        <div className="space-y-2 px-6 pb-6" style={contentStyle(1)}>
-          <button
-            onClick={handleNewAnalysis}
-            className="block text-[17px] leading-[1.2] tracking-[-0.02em] text-white transition-colors hover:text-zinc-300"
-          >
-            + New Analysis
-          </button>
-          <Link
-            href="/home/reports"
-            onClick={closeSidebar}
-            className="block text-[17px] leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white"
-          >
-            All Reports
-          </Link>
-        </div>
-
-        {/* Reports List - Stagger index 2 */}
-        <div
-          className="flex-1 overflow-y-auto border-t border-zinc-800 px-6 py-4"
-          style={contentStyle(2)}
+        )}
+        <button
+          onClick={toggleCollapsed}
+          className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          <div className="mb-4 text-[12px] font-medium tracking-[0.05em] text-zinc-600 uppercase">
-            Recent
-          </div>
+          {collapsed ? <ExpandIcon className="h-5 w-5" /> : <CollapseIcon className="h-5 w-5" />}
+        </button>
+      </div>
 
-          {recentReports.length > 0 ? (
-            <nav className="space-y-1">
-              {recentReports.map((report, index) => (
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto py-3">
+        {/* New Analysis */}
+        <div
+          className="px-3 mb-1"
+          onMouseEnter={() => setHoveredItem('new')}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Tooltip label="New Analysis" show={collapsed && hoveredItem === 'new'}>
+            <button
+              onClick={handleNewAnalysis}
+              className={cn(
+                'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] font-medium transition-colors',
+                'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100',
+                collapsed && 'justify-center px-0',
+              )}
+            >
+              <PlusIcon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && <span>New Analysis</span>}
+            </button>
+          </Tooltip>
+        </div>
+
+        {/* All Reports */}
+        <div
+          className="px-3 mb-4"
+          onMouseEnter={() => setHoveredItem('reports')}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Tooltip label="All Reports" show={collapsed && hoveredItem === 'reports'}>
+            <Link
+              href="/home/reports"
+              className={cn(
+                'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
+                collapsed && 'justify-center px-0',
+              )}
+            >
+              <ReportsIcon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && <span>All Reports</span>}
+            </Link>
+          </Tooltip>
+        </div>
+
+        {/* Recents - only show when expanded */}
+        {!collapsed && recentReports.length > 0 && (
+          <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
+            <div className="mb-2 px-4 text-[11px] font-medium tracking-wider text-zinc-400 uppercase">
+              Recents
+            </div>
+            <div className="space-y-0.5 px-3">
+              {recentReports.slice(0, 10).map((report) => (
                 <Link
                   key={report.id}
                   href={`/home/reports/${report.id}`}
-                  onClick={closeSidebar}
-                  className="group flex items-start gap-3 rounded py-2 transition-colors hover:bg-zinc-900"
-                  style={{
-                    opacity: open ? 1 : 0,
-                    transform: open ? 'translateX(0)' : 'translateX(-8px)',
-                    transition: open
-                      ? `opacity 250ms ${EASE_OUT_EXPO} ${200 + index * 30}ms, transform 250ms ${EASE_OUT_EXPO} ${200 + index * 30}ms`
-                      : `opacity 150ms ${EASE_OUT_EXPO}, transform 150ms ${EASE_OUT_EXPO}`,
-                  }}
+                  className="block truncate rounded px-3 py-1.5 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
                 >
-                  {/* Number */}
-                  <span className="w-5 flex-shrink-0 text-right text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-600">
-                    {(index + 1).toString().padStart(2, '0')}
-                  </span>
-
-                  {/* Title + Time */}
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors group-hover:text-white">
-                      {report.title || 'Untitled Report'}
-                    </div>
-                    <div className="mt-1 text-[12px] leading-[1.2] tracking-[-0.02em] text-zinc-600">
-                      {formatMinimalTime(report.created_at)}
-                    </div>
-                  </div>
+                  {report.title || 'Untitled Report'}
                 </Link>
               ))}
-            </nav>
-          ) : (
-            <p className="text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-600">
-              No reports yet
-            </p>
-          )}
-        </div>
-
-        {/* User Section - Stagger index 3 */}
-        <div className="border-t border-zinc-800 px-6 py-4" style={contentStyle(3)}>
-          <div className="mb-3 text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
-            {workspace.name || user.email || 'Account'}
+            </div>
           </div>
-          <div className="space-y-2">
-            <Link
-              href={pathsConfig.app.personalAccountSettings}
-              onClick={closeSidebar}
-              className="block text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-600 transition-colors hover:text-zinc-400"
-            >
-              Settings
-            </Link>
-            <Link
-              href={pathsConfig.app.personalAccountBilling}
-              onClick={closeSidebar}
-              className="block text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-600 transition-colors hover:text-zinc-400"
-            >
-              Billing
-            </Link>
-            <button
-              onClick={handleSignOut}
-              className="block text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-600 transition-colors hover:text-zinc-400"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
+        )}
+      </nav>
 
-        {/* Resize Handle */}
-        <div
-          onMouseDown={handleMouseDown}
-          className={cn(
-            'absolute top-0 right-0 h-full w-1 cursor-ew-resize transition-colors',
-            isResizing ? 'bg-zinc-600' : 'bg-transparent hover:bg-zinc-700',
-          )}
-          aria-label="Resize sidebar"
+      {/* Bottom: Settings */}
+      <div className="relative border-t border-zinc-200 py-3 dark:border-zinc-800">
+        <SettingsDropdown
+          isOpen={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          onSignOut={handleSignOut}
+          collapsed={collapsed}
         />
+
+        <div
+          className="px-3"
+          onMouseEnter={() => setHoveredItem('settings')}
+          onMouseLeave={() => setHoveredItem(null)}
+        >
+          <Tooltip label="Settings" show={collapsed && hoveredItem === 'settings' && !settingsOpen}>
+            <button
+              onClick={() => setSettingsOpen(!settingsOpen)}
+              className={cn(
+                'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
+                collapsed && 'justify-center px-0',
+                settingsOpen && 'bg-zinc-100 dark:bg-zinc-800',
+              )}
+            >
+              <SettingsIcon className="h-5 w-5 flex-shrink-0" />
+              {!collapsed && (
+                <span className="flex-1 truncate text-left">
+                  {workspace.name || user.email || 'Settings'}
+                </span>
+              )}
+            </button>
+          </Tooltip>
+        </div>
       </div>
-    </>
+    </aside>
   );
 });
 
