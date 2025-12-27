@@ -568,7 +568,7 @@ export default function NewReportPage() {
         <div className="flex flex-1 items-center justify-center px-8 py-16">
           <div className="w-full max-w-3xl">
             {/* Page title - anchor element */}
-            <h1 className="mb-12 text-[42px] font-semibold tracking-tight text-zinc-900">
+            <h1 className="mb-12 font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
               New Analysis
             </h1>
 

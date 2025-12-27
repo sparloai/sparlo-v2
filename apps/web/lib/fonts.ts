@@ -69,9 +69,31 @@ const mono = localFont({
 
 /**
  * @heading
- * @description Heading font (same as sans for brand consistency).
+ * @description Suisse Intl for page titles and headings.
+ * Using Regular weight (400) with -0.02em tracking.
  */
-const heading = sans;
+const heading = localFont({
+  src: [
+    {
+      path: '../public/fonts/Suisse/WOFF2/SuisseIntlTrial-Regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/Suisse/WOFF2/SuisseIntlTrial-Medium.woff2',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/Suisse/WOFF2/SuisseIntlTrial-Semibold.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-heading',
+  display: 'swap',
+  fallback: ['-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+});
 
 // we export these fonts into the root layout
 export { sans, heading, mono };
