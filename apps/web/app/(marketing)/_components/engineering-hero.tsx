@@ -1,117 +1,64 @@
 'use client';
 
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
 
 /**
  * Engineering Intelligence Hero Section
  *
- * Air Company Aesthetic - Full viewport, image-driven
+ * Air Company Aesthetic - Full viewport video background
  *
  * Features:
- * - Rotating background images with crossfade
- * - Typography-driven hierarchy
+ * - Autoplay muted video background
+ * - Centered typography hierarchy
  * - Minimal, confident copy
- * - Domain indicator synced with images
+ * - Single prominent CTA
  */
 
-const domains = [
-  {
-    image: '/images/hero/desalination.jpg',
-    label: 'Water & Desalination',
-  },
-  {
-    image: '/images/hero/biotech-lab.jpg',
-    label: 'Biotechnology',
-  },
-  {
-    image: '/images/hero/energy-infrastructure.jpg',
-    label: 'Energy Systems',
-  },
-  {
-    image: '/images/hero/materials-testing.jpg',
-    label: 'Materials Science',
-  },
-  {
-    image: '/images/hero/manufacturing.jpg',
-    label: 'Advanced Manufacturing',
-  },
-];
-
-// Fallback gradients when images aren't available
-const fallbackGradients = [
-  'from-zinc-900 via-zinc-800 to-zinc-950',
-  'from-slate-900 via-slate-800 to-zinc-950',
-  'from-neutral-900 via-neutral-800 to-zinc-950',
-  'from-stone-900 via-stone-800 to-zinc-950',
-  'from-gray-900 via-gray-800 to-zinc-950',
+// High-quality royalty-free video sources (Pexels)
+const VIDEO_SOURCES = [
+  'https://videos.pexels.com/video-files/3129671/3129671-uhd_2560_1440_30fps.mp4', // Technology/circuit
+  'https://videos.pexels.com/video-files/3141207/3141207-uhd_2560_1440_30fps.mp4', // Laboratory
+  'https://videos.pexels.com/video-files/4065385/4065385-uhd_2560_1440_30fps.mp4', // Data center
 ];
 
 export const EngineeringHero = memo(function EngineeringHero() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(
-    new Array(domains.length).fill(false),
-  );
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
-  // Rotate images every 10 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % domains.length);
-    }, 10000);
-    return () => clearInterval(interval);
+    const video = videoRef.current;
+    if (video) {
+      video.playbackRate = 0.75; // Slightly slower for dramatic effect
+    }
   }, []);
-
-  // Preload images
-  useEffect(() => {
-    domains.forEach((domain, index) => {
-      const img = new Image();
-      img.onload = () => {
-        setImagesLoaded((prev) => {
-          const next = [...prev];
-          next[index] = true;
-          return next;
-        });
-      };
-      img.src = domain.image;
-    });
-  }, []);
-
-  const currentDomain = domains[currentIndex];
 
   return (
-    <section className="font-sans relative h-screen w-full overflow-hidden bg-black">
-      {/* Background Image Layer */}
+    <section className="relative h-screen w-full overflow-hidden bg-zinc-950">
+      {/* Video Background */}
       <div className="absolute inset-0">
-        {/* Images with crossfade */}
-        {domains.map((domain, index) => (
-          <div
-            key={domain.label}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            {imagesLoaded[index] ? (
-              <img
-                src={domain.image}
-                alt=""
-                className="h-full w-full object-cover opacity-50"
-                style={{ filter: 'grayscale(20%)' }}
-              />
-            ) : (
-              <div
-                className={`h-full w-full bg-gradient-to-br ${fallbackGradients[index % fallbackGradients.length]}`}
-              />
-            )}
-          </div>
-        ))}
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          onCanPlay={() => setVideoLoaded(true)}
+          className={`h-full w-full object-cover transition-opacity duration-1000 ${
+            videoLoaded ? 'opacity-60' : 'opacity-0'
+          }`}
+          style={{ filter: 'grayscale(30%)' }}
+        >
+          <source src={VIDEO_SOURCES[0]} type="video/mp4" />
+        </video>
 
         {/* Gradient overlay for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30" />
       </div>
 
       {/* Navigation */}
-      <nav className="absolute top-0 right-0 left-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
+      <nav className="absolute left-0 right-0 top-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
         {/* Logo */}
         <Link
           href="/"
@@ -123,72 +70,39 @@ export const EngineeringHero = memo(function EngineeringHero() {
         {/* Links */}
         <div className="flex items-center gap-8">
           <Link
-            href="/how-it-works"
-            className="hidden text-[14px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white sm:block"
-          >
-            How It Works
-          </Link>
-          <Link
             href="/pricing"
             className="hidden text-[14px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white sm:block"
           >
             Pricing
           </Link>
-          <Link href="/auth/sign-in" className="text-[14px] tracking-[-0.02em] text-white">
+          <Link
+            href="/auth/sign-in"
+            className="text-[14px] tracking-[-0.02em] text-white"
+          >
             Sign In
           </Link>
         </div>
       </nav>
 
-      {/* Content Layer */}
-      <div className="relative z-10 flex h-full flex-col justify-center px-8 md:px-16 lg:px-24">
+      {/* Content Layer - Centered */}
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center">
         {/* Headline */}
-        <h1 className="text-[36px] font-semibold leading-[1.2] tracking-[-0.02em] text-white md:text-[56px] lg:text-[72px]">
-          Engineering Intelligence
+        <h1 className="text-[40px] font-medium leading-[1.1] tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
+          Engineering Intelligence Model
         </h1>
 
         {/* Subtitle */}
-        <p className="mt-6 max-w-[50ch] text-[18px] leading-[1.2] tracking-[-0.02em] text-zinc-300 md:text-[20px]">
-          Research infrastructure for problems that span disciplines.
+        <p className="mt-6 max-w-[45ch] text-[18px] leading-[1.4] tracking-[-0.01em] text-zinc-300/90 md:text-[22px]">
+          Innovative solutions to complex technical challenges.
         </p>
 
-        {/* Domain indicator */}
-        <div className="mt-8 flex items-center gap-3">
-          <span className="text-[13px] uppercase tracking-[0.1em] text-zinc-500">
-            {currentDomain?.label}
-          </span>
-          {/* Progress dots */}
-          <div className="ml-4 flex items-center gap-2">
-            {domains.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
-                  index === currentIndex
-                    ? 'w-4 bg-zinc-400'
-                    : 'bg-zinc-600 hover:bg-zinc-500'
-                }`}
-                aria-label={`View ${domains[index]?.label}`}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* CTAs */}
-        <div className="mt-12 flex items-center gap-6">
-          <Link
-            href="/auth/sign-up"
-            className="rounded bg-white px-6 py-3 text-[15px] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:bg-zinc-100"
-          >
-            See Sample Report
-          </Link>
-          <Link
-            href="/how-it-works"
-            className="text-[15px] tracking-[-0.02em] text-zinc-300 transition-colors hover:text-white"
-          >
-            How It Works
-          </Link>
-        </div>
+        {/* CTA */}
+        <Link
+          href="/home"
+          className="mt-10 rounded-full bg-white/95 px-8 py-3.5 text-[15px] font-medium tracking-[-0.01em] text-zinc-900 backdrop-blur-sm transition-all hover:bg-white hover:shadow-lg"
+        >
+          Run Analysis
+        </Link>
       </div>
 
       {/* Scroll indicator */}
