@@ -3,11 +3,11 @@ import { memo } from 'react';
 /**
  * Process & Methodology Section
  *
- * Air Company Aesthetic - Two-column layout with superscript citations
+ * Air Company Aesthetic - Right-aligned body text layout
  *
  * Features:
- * - Left: Section title
- * - Right: Content with numbered steps as superscripts
+ * - Left: Large section title
+ * - Right: Content pushed far right with superscript numbers
  * - Typography: -0.02em tracking, 1.2 line-height
  * - Near-monochrome palette
  */
@@ -33,23 +33,23 @@ export const MethodologySection = memo(function MethodologySection() {
       <div className="mx-auto max-w-[1400px]">
         {/* The Process */}
         <div className="border-t border-zinc-200 pt-16">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-12">
-            {/* Left column - Title */}
-            <div className="md:col-span-3">
-              <h2 className="text-[18px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[20px]">
+          <div className="flex flex-col gap-8 md:flex-row md:justify-between">
+            {/* Left - Title */}
+            <div className="md:w-1/3">
+              <h2 className="text-[28px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[36px]">
                 The Process
               </h2>
             </div>
 
-            {/* Right column - Steps (starts at column 5) */}
-            <div className="md:col-span-8 md:col-start-5">
+            {/* Right - Steps (pushed far right) */}
+            <div className="md:w-1/2 md:text-right">
               <div className="space-y-6">
                 {processSteps.map((step, idx) => (
                   <p
                     key={idx}
-                    className="max-w-[55ch] text-[22px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[26px]"
+                    className="text-[20px] leading-[1.3] font-normal tracking-[-0.02em] text-zinc-900 md:text-[24px]"
                   >
-                    <sup className="mr-0.5 text-[14px] font-normal text-zinc-400 md:text-[16px]">
+                    <sup className="mr-1 text-[12px] font-normal text-zinc-400 md:text-[14px]">
                       {idx + 1}
                     </sup>
                     {step}
@@ -62,23 +62,23 @@ export const MethodologySection = memo(function MethodologySection() {
 
         {/* The Methodology */}
         <div className="mt-24 border-t border-zinc-200 pt-16">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-12">
-            {/* Left column - Title */}
-            <div className="md:col-span-3">
-              <h2 className="text-[18px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[20px]">
+          <div className="flex flex-col gap-8 md:flex-row md:justify-between">
+            {/* Left - Title */}
+            <div className="md:w-1/3">
+              <h2 className="text-[28px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[36px]">
                 The Methodology
               </h2>
             </div>
 
-            {/* Right column - Steps (starts at column 5) */}
-            <div className="md:col-span-8 md:col-start-5">
+            {/* Right - Steps (pushed far right) */}
+            <div className="md:w-1/2 md:text-right">
               <div className="space-y-6">
                 {methodologySteps.map((step, idx) => (
                   <p
                     key={idx}
-                    className="text-[22px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[26px]"
+                    className="text-[20px] leading-[1.3] font-normal tracking-[-0.02em] text-zinc-900 md:text-[24px]"
                   >
-                    <sup className="mr-0.5 text-[14px] font-normal text-zinc-400 md:text-[16px]">
+                    <sup className="mr-1 text-[12px] font-normal text-zinc-400 md:text-[14px]">
                       {idx + 1}
                     </sup>
                     {step}

@@ -1,19 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { FileText, List, Lock, Target, X } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
 import { CardWithHeader, SectionHeader } from '@kit/ui/aura';
-import { Button } from '@kit/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@kit/ui/sheet';
 import { cn } from '@kit/ui/utils';
 
 import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybrid-report-display';
@@ -25,77 +16,20 @@ import { FOOD_HYBRID_REPORT } from './food-hybrid-data';
 import { FOODTECH_HYBRID_REPORT } from './foodtech-hybrid-data';
 import { MATERIALS_SCIENCE_HYBRID_REPORT } from './materials-science-hybrid-data';
 
-interface TocItem {
-  id: string;
-  title: string;
-  level: number;
-}
-
-// TOC items for hybrid report (Climate tab)
-const HYBRID_TOC_ITEMS: TocItem[] = [
-  { id: 'brief', title: 'The Brief', level: 2 },
-  { id: 'executive-summary', title: 'Executive Summary', level: 2 },
-  { id: 'problem-analysis', title: 'Problem Analysis', level: 2 },
-  { id: 'constraints', title: 'Constraints', level: 2 },
-  { id: 'challenge-the-frame', title: 'Challenge the Frame', level: 2 },
-  { id: 'innovation-analysis', title: 'Innovation Analysis', level: 2 },
-  { id: 'solution-concepts', title: 'Solution Concepts', level: 2 },
-  { id: 'innovation-concepts', title: 'Innovation Concepts', level: 2 },
-  { id: 'frontier-watch', title: 'Frontier Technologies', level: 2 },
-  { id: 'self-critique', title: 'Self-Critique', level: 2 },
-  { id: 'risks', title: 'Risks & Watchouts', level: 2 },
-  { id: 'recommendation', title: 'Recommendation', level: 2 },
-];
+/**
+ * Example Reports Section
+ *
+ * Air Company Aesthetic - Clean report display without sidebar TOC
+ *
+ * Features:
+ * - Tab navigation for different reports
+ * - Full-width report content (no sidebar)
+ * - showToc={false} to hide brand system TOC
+ */
 
 export function ExampleReportsSection() {
   const [activeTab, setActiveTab] = useState(0);
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [showToc, setShowToc] = useState(true);
-  const [sheetOpen, setSheetOpen] = useState(false);
   const report = EXAMPLE_REPORTS[activeTab]!;
-
-  // Use standardized TOC for all reports
-  const tocItems: TocItem[] = HYBRID_TOC_ITEMS;
-
-  // Track active section on scroll
-  useEffect(() => {
-    let rafId: number | null = null;
-
-    const handleScroll = () => {
-      if (rafId !== null) return;
-
-      rafId = requestAnimationFrame(() => {
-        const scrollPosition = window.scrollY + 200;
-        for (let i = tocItems.length - 1; i >= 0; i--) {
-          const item = tocItems[i];
-          if (!item) continue;
-          const element = document.getElementById(item.id);
-          if (element && element.offsetTop <= scrollPosition) {
-            setActiveSection(item.id);
-            break;
-          }
-        }
-        rafId = null;
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafId !== null) cancelAnimationFrame(rafId);
-    };
-  }, [tocItems]);
-
-  const scrollToSection = useCallback((sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offset = 180;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-      setActiveSection(sectionId);
-    }
-  }, []);
 
   return (
     <section
@@ -111,7 +45,6 @@ export function ExampleReportsSection() {
                 key={r.id}
                 onClick={() => {
                   setActiveTab(i);
-                  setActiveSection(null);
                   window.scrollTo({
                     top:
                       document.getElementById('example-reports')?.offsetTop ??
@@ -134,199 +67,63 @@ export function ExampleReportsSection() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex">
-        {/* Sticky TOC Sidebar */}
-        <AnimatePresence>
-          {showToc && !report.locked && (
-            <motion.aside
-              className="hidden w-64 flex-shrink-0 lg:block"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="sticky top-36 h-[calc(100vh-150px)] overflow-y-auto border-r border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
-                <div className="p-5">
-                  <div className="mb-5 flex items-center justify-between">
-                    <span className="font-mono text-[11px] leading-[1.2] font-medium tracking-wider text-zinc-500 uppercase dark:text-zinc-400">
-                      Contents
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-6 w-6 text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100"
-                      onClick={() => setShowToc(false)}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                  <nav className="space-y-0.5">
-                    {tocItems.map((item, index) => (
-                      <button
-                        key={`${item.id}-${index}`}
-                        onClick={() => scrollToSection(item.id)}
-                        className={cn(
-                          'group flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] leading-[1.2] tracking-[-0.02em] transition-all',
-                          activeSection === item.id
-                            ? 'bg-violet-100 font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
-                            : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
-                        )}
-                      >
-                        <span className="font-mono text-xs text-zinc-400 dark:text-zinc-600">
-                          {String(index + 1).padStart(2, '0')}
-                        </span>
-                        <span className="truncate">{item.title}</span>
-                      </button>
-                    ))}
-                  </nav>
-                </div>
-              </div>
-            </motion.aside>
+      {/* Report Content - Full Width */}
+      <div className="px-4 py-10 md:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl">
+          {/* Report Content */}
+          {report.locked ? (
+            <LockedOverlay report={report} />
+          ) : report.id === 'climate-tech' ? (
+            <HybridReportDisplay
+              reportData={{
+                mode: 'hybrid',
+                report: CLIMATE_HYBRID_REPORT,
+              }}
+              useBrandSystem={true}
+              showToc={false}
+            />
+          ) : report.id === 'food-waste' ? (
+            <HybridReportDisplay
+              reportData={{
+                mode: 'hybrid',
+                report: FOOD_HYBRID_REPORT,
+              }}
+              useBrandSystem={true}
+              showToc={false}
+            />
+          ) : report.id === 'food-tech' ? (
+            <HybridReportDisplay
+              reportData={{
+                mode: 'hybrid',
+                report: FOODTECH_HYBRID_REPORT,
+              }}
+              useBrandSystem={true}
+              showToc={false}
+            />
+          ) : report.id === 'materials-science' ? (
+            <HybridReportDisplay
+              reportData={{
+                mode: 'hybrid',
+                report: MATERIALS_SCIENCE_HYBRID_REPORT,
+              }}
+              useBrandSystem={true}
+              showToc={false}
+            />
+          ) : report.id === 'energy' ? (
+            <HybridReportDisplay
+              reportData={{
+                mode: 'hybrid',
+                report: ENERGY_HYBRID_REPORT,
+              }}
+              useBrandSystem={true}
+              showToc={false}
+            />
+          ) : (
+            <ReportContent report={report} />
           )}
-        </AnimatePresence>
 
-        {/* TOC Toggle */}
-        {!showToc && !report.locked && (
-          <motion.button
-            className="fixed top-36 left-4 z-40 hidden items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] text-zinc-700 shadow-sm hover:bg-zinc-50 lg:flex dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
-            onClick={() => setShowToc(true)}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <List className="h-4 w-4" />
-            <span className="text-[12px] leading-[1.2] tracking-[-0.02em]">
-              Contents
-            </span>
-          </motion.button>
-        )}
-
-        {/* Report Content */}
-        <div
-          className={cn(
-            'min-w-0 flex-1 px-4 py-10 transition-all md:px-6 lg:px-8',
-          )}
-        >
-          <div className="mx-auto max-w-4xl">
-            {/* Report Header - hidden for hybrid reports which have their own structure */}
-            {report.id !== 'climate-tech' &&
-              report.id !== 'food-waste' &&
-              report.id !== 'food-tech' &&
-              report.id !== 'materials-science' &&
-              report.id !== 'energy' && (
-                <header className="mb-12">
-                  <div className="space-y-4">
-                    <h1 className="text-[36px] leading-[1.2] font-semibold tracking-[-0.02em] text-zinc-900 lg:text-[48px] dark:text-white">
-                      {report.title}
-                    </h1>
-                    <p className="text-[18px] leading-[1.2] tracking-[-0.02em] text-zinc-600 dark:text-zinc-400">
-                      {report.subtitle}
-                    </p>
-                    <div className="flex items-center gap-3 font-mono text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-500 dark:text-zinc-500">
-                      <span>{report.metadata.readTime}</span>
-                      <span className="text-zinc-300 dark:text-zinc-700">
-                        •
-                      </span>
-                      <span>{report.metadata.dataPoints}</span>
-                    </div>
-                  </div>
-                </header>
-              )}
-
-            {/* Report Content */}
-            {report.locked ? (
-              <LockedOverlay report={report} />
-            ) : report.id === 'climate-tech' ? (
-              <HybridReportDisplay
-                reportData={{
-                  mode: 'hybrid',
-                  report: CLIMATE_HYBRID_REPORT,
-                }}
-                useBrandSystem={true}
-                showToc={false}
-              />
-            ) : report.id === 'food-waste' ? (
-              <HybridReportDisplay
-                reportData={{
-                  mode: 'hybrid',
-                  report: FOOD_HYBRID_REPORT,
-                }}
-                useBrandSystem={true}
-                showToc={false}
-              />
-            ) : report.id === 'food-tech' ? (
-              <HybridReportDisplay
-                reportData={{
-                  mode: 'hybrid',
-                  report: FOODTECH_HYBRID_REPORT,
-                }}
-                useBrandSystem={true}
-                showToc={false}
-              />
-            ) : report.id === 'materials-science' ? (
-              <HybridReportDisplay
-                reportData={{
-                  mode: 'hybrid',
-                  report: MATERIALS_SCIENCE_HYBRID_REPORT,
-                }}
-                useBrandSystem={true}
-                showToc={false}
-              />
-            ) : report.id === 'energy' ? (
-              <HybridReportDisplay
-                reportData={{
-                  mode: 'hybrid',
-                  report: ENERGY_HYBRID_REPORT,
-                }}
-                useBrandSystem={true}
-                showToc={false}
-              />
-            ) : (
-              <ReportContent report={report} activeSection={activeSection} />
-            )}
-
-            <div className="h-32" />
-          </div>
+          <div className="h-32" />
         </div>
-      </div>
-
-      {/* Mobile TOC Button */}
-      <div className="fixed right-6 bottom-6 z-50 lg:hidden">
-        {!report.locked && (
-          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-            <SheetTrigger className="flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-2.5 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] text-white shadow-lg transition-transform hover:scale-105 active:scale-95 dark:bg-zinc-100 dark:text-zinc-900">
-              <List className="h-4 w-4" />
-              Contents
-            </SheetTrigger>
-            <SheetContent side="bottom" className="h-[60vh]">
-              <SheetHeader>
-                <SheetTitle>Report Contents</SheetTitle>
-              </SheetHeader>
-              <nav className="mt-6 space-y-1">
-                {tocItems.map((item, index) => (
-                  <button
-                    key={`mobile-${item.id}`}
-                    onClick={() => {
-                      scrollToSection(item.id);
-                      setSheetOpen(false);
-                    }}
-                    className={cn(
-                      'flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-[14px] leading-[1.2] tracking-[-0.02em] transition-all',
-                      activeSection === item.id
-                        ? 'bg-violet-100 font-medium text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
-                        : 'text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800',
-                    )}
-                  >
-                    <span className="font-mono text-xs text-zinc-400">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    {item.title}
-                  </button>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
-        )}
       </div>
     </section>
   );
@@ -354,7 +151,7 @@ function LockedOverlay({ report }: { report: Report }) {
     <div className="relative min-h-[500px]">
       <div className="pointer-events-none opacity-40 blur-sm">
         <SectionHeader title="Executive Summary" subtitle="The bottom line" />
-        <CardWithHeader icon={Target} label="Executive Summary">
+        <CardWithHeader label="Executive Summary">
           <div className="space-y-4">
             <div className="h-4 w-3/4 rounded bg-zinc-200 dark:bg-zinc-800" />
             <div className="h-4 w-full rounded bg-zinc-200 dark:bg-zinc-800" />
@@ -377,7 +174,7 @@ function LockedOverlay({ report }: { report: Report }) {
           </p>
           <a
             href="/auth/sign-up"
-            className="mt-6 inline-block rounded-md bg-violet-600 px-6 py-3 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] text-white transition-colors hover:bg-violet-700"
+            className="mt-6 inline-block rounded-md bg-zinc-900 px-6 py-3 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] text-white transition-colors hover:bg-zinc-800"
           >
             Get Started Free
           </a>
@@ -387,24 +184,33 @@ function LockedOverlay({ report }: { report: Report }) {
   );
 }
 
-function ReportContent({
-  report,
-}: {
-  report: Report;
-  activeSection: string | null;
-}) {
+function ReportContent({ report }: { report: Report }) {
   return (
     <div className="space-y-16">
-      {report.sections.map((section, index) => (
+      {/* Report Header */}
+      <header className="mb-12">
+        <div className="space-y-4">
+          <h1 className="text-[36px] leading-[1.2] font-semibold tracking-[-0.02em] text-zinc-900 lg:text-[48px] dark:text-white">
+            {report.title}
+          </h1>
+          <p className="text-[18px] leading-[1.2] tracking-[-0.02em] text-zinc-600 dark:text-zinc-400">
+            {report.subtitle}
+          </p>
+          <div className="flex items-center gap-3 text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-500 dark:text-zinc-500">
+            <span>{report.metadata.readTime}</span>
+            <span className="text-zinc-300 dark:text-zinc-700">•</span>
+            <span>{report.metadata.dataPoints}</span>
+          </div>
+        </div>
+      </header>
+
+      {report.sections.map((section) => (
         <section key={section.id} id={section.id} className="scroll-mt-48">
           <SectionHeader
             title={section.title}
             subtitle={getSectionSubtitle(section.id)}
           />
-          <CardWithHeader
-            icon={getSectionIcon(section.id)}
-            label={section.title}
-          >
+          <CardWithHeader label={section.title}>
             <div className="prose prose-zinc dark:prose-invert prose-p:text-base prose-p:leading-relaxed prose-p:text-zinc-700 dark:prose-p:text-zinc-300 max-w-none">
               {section.content}
             </div>
@@ -426,19 +232,4 @@ function getSectionSubtitle(sectionId: string): string {
     'next-steps': 'Actionable recommendations',
   };
   return subtitles[sectionId] ?? '';
-}
-
-function getSectionIcon(
-  sectionId: string,
-): React.ComponentType<{ className?: string }> {
-  const icons: Record<string, React.ComponentType<{ className?: string }>> = {
-    brief: FileText,
-    'executive-summary': Target,
-    'challenge-the-frame': FileText,
-    'primary-solution': Target,
-    'innovation-concept': Target,
-    risks: FileText,
-    'next-steps': FileText,
-  };
-  return icons[sectionId] ?? FileText;
 }
