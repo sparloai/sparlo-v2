@@ -739,6 +739,199 @@ export function ReportDisplay({
     );
   }
 
+  // Hybrid reports use brand system with full-page layout control
+  // Render them separately to avoid layout conflicts
+  if (isHybrid) {
+    return (
+      <div className="report-page relative min-h-screen">
+        {/* Full-width hybrid report with brand system */}
+        <HybridReportDisplay
+          reportData={
+            report.report_data as Parameters<
+              typeof HybridReportDisplay
+            >[0]['reportData']
+          }
+        />
+
+        {/* Chat Toggle Button */}
+        {!isChatOpen && (
+          <motion.button
+            className="fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-2xl bg-zinc-900 px-6 py-4 text-white shadow-[0_8px_30px_rgba(0,0,0,0.12),0_4px_10px_rgba(0,0,0,0.08)] transition-all hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:hover:bg-zinc-100"
+            onClick={() => setIsChatOpen(true)}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            whileHover={{ scale: 1.02, y: -2 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+          >
+            <MessageSquare className="h-5 w-5" strokeWidth={1.5} />
+            <span className="text-[15px] font-medium">Ask about this report</span>
+            <span className="rounded-md bg-white/15 px-2 py-1 text-[11px] font-medium dark:bg-zinc-900/20">
+              ⌘/
+            </span>
+          </motion.button>
+        )}
+
+        {/* Chat Drawer */}
+        <AnimatePresence>
+          {isChatOpen && (
+            <motion.aside
+              role="complementary"
+              aria-label="Chat with report"
+              className="fixed top-0 right-0 z-50 flex h-screen w-[420px] flex-col border-l border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900"
+              initial={{ x: 420 }}
+              animate={{ x: 0 }}
+              exit={{ x: 420 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            >
+              {/* Chat Header */}
+              <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4 dark:border-neutral-800">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                    <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                      Chat with Report
+                    </span>
+                    <p className="text-[10px] text-gray-500 dark:text-neutral-400">
+                      Ask follow-up questions
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsChatOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-neutral-300"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Chat Messages */}
+              <div
+                ref={chatContainerRef}
+                className="flex-1 space-y-4 overflow-y-auto p-5"
+                role="log"
+                aria-live="polite"
+                aria-label="Chat messages"
+              >
+                {chatMessages.length === 0 ? (
+                  <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100 dark:bg-neutral-800">
+                      <MessageSquare className="h-7 w-7 text-gray-400 dark:text-neutral-500" />
+                    </div>
+                    <p className="text-base font-semibold text-gray-900 dark:text-white">
+                      Ask anything about this report
+                    </p>
+                    <p className="mt-2 max-w-[280px] text-sm text-gray-500 dark:text-neutral-400">
+                      Get clarification, explore alternatives, or dive deeper
+                      into specific concepts.
+                    </p>
+                  </div>
+                ) : (
+                  chatMessages.map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        'flex',
+                        msg.role === 'user' ? 'justify-end' : 'justify-start',
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'max-w-[85%] rounded-2xl px-4 py-3',
+                          msg.role === 'user'
+                            ? 'rounded-tr-sm bg-purple-600 text-white'
+                            : 'rounded-tl-sm bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-neutral-100',
+                          msg.cancelled && 'opacity-60',
+                          msg.error && 'border border-red-500/30',
+                        )}
+                      >
+                        {msg.role === 'user' ? (
+                          <p className="text-sm whitespace-pre-wrap">
+                            {msg.content}
+                          </p>
+                        ) : (
+                          <div className="prose prose-sm prose-gray dark:prose-invert max-w-none">
+                            <ReactMarkdown>
+                              {msg.content}
+                            </ReactMarkdown>
+                          </div>
+                        )}
+                        {msg.isStreaming && (
+                          <span className="inline-block animate-pulse text-purple-500">
+                            ▋
+                          </span>
+                        )}
+                        {msg.cancelled && (
+                          <span className="mt-1 block text-xs text-gray-500 italic dark:text-neutral-400">
+                            Generation stopped
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Chat Input */}
+              <form
+                onSubmit={handleChatSubmit}
+                className="border-t border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
+              >
+                <div className="flex gap-2">
+                  <Textarea
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="Ask a question..."
+                    className="max-h-[100px] min-h-[44px] resize-none rounded-lg border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                    disabled={isChatLoading}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleChatSubmit(e);
+                      }
+                    }}
+                  />
+                  {isChatLoading ? (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="h-[44px] w-[44px] flex-shrink-0 border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400"
+                      onClick={cancelStream}
+                      aria-label="Stop generating"
+                    >
+                      <Square className="h-4 w-4 fill-current" />
+                    </Button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      size="icon"
+                      disabled={!chatInput.trim()}
+                      className="h-[44px] w-[44px] flex-shrink-0 bg-purple-600 text-white hover:bg-purple-700"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </form>
+            </motion.aside>
+          )}
+        </AnimatePresence>
+
+        {/* Share Modal */}
+        <ShareModal
+          open={isShareModalOpen}
+          onOpenChange={setIsShareModalOpen}
+          reportId={report.id}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="report-page relative min-h-screen">
       <div className="report-content">
@@ -917,7 +1110,7 @@ export function ReportDisplay({
                 </motion.section>
               )}
 
-              {/* Full Report - Discovery, Hybrid, Structured, or Markdown fallback */}
+              {/* Full Report - Discovery, Structured, or Markdown fallback */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -928,14 +1121,6 @@ export function ReportDisplay({
                     reportData={
                       report.report_data as Parameters<
                         typeof DiscoveryReportDisplay
-                      >[0]['reportData']
-                    }
-                  />
-                ) : isHybrid ? (
-                  <HybridReportDisplay
-                    reportData={
-                      report.report_data as Parameters<
-                        typeof HybridReportDisplay
                       >[0]['reportData']
                     }
                   />
