@@ -13,13 +13,14 @@ import { startReportGeneration } from '../../_lib/server/sparlo-reports-server-a
 import { useReportProgress } from '../../_lib/use-report-progress';
 
 /**
- * New Analysis Page - Air Company Aesthetic (Light)
+ * New Analysis Page - Bold Typography + Live Detection
  *
  * Features:
- * - White background with minimal chrome
- * - Left border accent (connects to report style)
- * - Larger, more substantial form presence
- * - No icons, text only
+ * - Bold headline creates visual anchor
+ * - Large input text feels confident
+ * - Left border provides structure
+ * - Live detection adds visual activity as you type
+ * - Monochrome indicators stay on-brand
  */
 
 // Attachment types and constants
@@ -61,6 +62,107 @@ const initialFormState: FormState = {
   showUpgradeModal: false,
   upgradeReason: 'subscription_required',
 };
+
+// Detection logic - Simple pattern matching
+function hasProblemStatement(text: string): boolean {
+  const patterns = [
+    /need to/i,
+    /trying to/i,
+    /want to/i,
+    /how to/i,
+    /reduce/i,
+    /increase/i,
+    /improve/i,
+    /solve/i,
+    /challenge/i,
+    /problem/i,
+    /issue/i,
+    /develop/i,
+    /create/i,
+    /build/i,
+    /design/i,
+    /optimize/i,
+  ];
+  return patterns.some((p) => p.test(text));
+}
+
+function hasConstraints(text: string): boolean {
+  const patterns = [
+    /budget/i,
+    /cost/i,
+    /\$/i,
+    /under/i,
+    /less than/i,
+    /must/i,
+    /cannot/i,
+    /can't/i,
+    /without/i,
+    /maximum/i,
+    /minimum/i,
+    /limit/i,
+    /kg/i,
+    /mm/i,
+    /hours/i,
+    /days/i,
+    /weeks/i,
+    /months/i,
+    /deadline/i,
+    /timeline/i,
+    /constraint/i,
+    /requirement/i,
+    /specification/i,
+  ];
+  return patterns.some((p) => p.test(text));
+}
+
+function hasSuccessCriteria(text: string): boolean {
+  const patterns = [
+    /target/i,
+    /goal/i,
+    /achieve/i,
+    /\d+%/i,
+    /by \d/i,
+    /success/i,
+    /metric/i,
+    /kpi/i,
+    /while maintaining/i,
+    /without sacrificing/i,
+    /measure/i,
+    /benchmark/i,
+    /outcome/i,
+    /result/i,
+    /performance/i,
+  ];
+  return patterns.some((p) => p.test(text));
+}
+
+// Detection Indicator Component
+function DetectionIndicator({
+  label,
+  detected,
+}: {
+  label: string;
+  detected: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <div
+        className={cn(
+          'h-1.5 w-1.5 rounded-full transition-colors duration-300',
+          detected ? 'bg-zinc-900' : 'bg-zinc-300',
+        )}
+      />
+      <span
+        className={cn(
+          'text-[13px] tracking-[-0.02em] transition-colors duration-300',
+          detected ? 'text-zinc-700' : 'text-zinc-400',
+        )}
+      >
+        {label}
+      </span>
+    </div>
+  );
+}
 
 export default function NewReportPage() {
   const router = useRouter();
@@ -169,7 +271,7 @@ export default function NewReportPage() {
   // Track progress once we have a report ID
   const { progress } = useReportProgress(reportId);
 
-  const canSubmit = problemText.trim().length >= 50;
+  const canSubmit = problemText.trim().length >= 20;
 
   const handleContinue = useCallback(async () => {
     if (!canSubmit || isSubmitting) return;
@@ -353,16 +455,10 @@ export default function NewReportPage() {
           }
           reason={upgradeReason}
         />
-        <main
-          className="flex min-h-screen flex-col bg-white"
-          style={{
-            fontFamily:
-              "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
-          }}
-        >
+        <main className="flex min-h-screen flex-col bg-white">
           {/* Header */}
           <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-5">
-            <h1 className="text-[15px] leading-[1.2] tracking-[-0.02em] text-zinc-500">
+            <h1 className="text-[15px] tracking-[-0.02em] text-zinc-500">
               Clarification
             </h1>
           </header>
@@ -370,12 +466,17 @@ export default function NewReportPage() {
           {/* Main content */}
           <div className="flex flex-1 items-center justify-center px-8 py-12">
             <div className="w-full max-w-2xl">
+              {/* Bold headline */}
+              <h2 className="mb-10 text-[32px] font-semibold tracking-tight text-zinc-900">
+                One more thing
+              </h2>
+
               {/* Left border accent */}
               <div className="border-l-2 border-zinc-900 pl-8">
                 {/* Original problem shown */}
                 <div className="mb-8">
-                  <p className="mb-2 text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
-                    Your problem
+                  <p className="mb-2 text-[13px] tracking-[-0.02em] text-zinc-400">
+                    Your challenge
                   </p>
                   <p className="text-[16px] leading-relaxed tracking-[-0.02em] text-zinc-700">
                     {problemText}
@@ -383,7 +484,7 @@ export default function NewReportPage() {
                 </div>
 
                 {/* System's clarifying question */}
-                <p className="mb-6 text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-900">
+                <p className="mb-6 text-[20px] leading-relaxed text-zinc-900">
                   {clarifyingQuestion}
                 </p>
 
@@ -397,24 +498,25 @@ export default function NewReportPage() {
                   }
                   onKeyDown={handleKeyDown}
                   placeholder="Your response..."
-                  className="h-40 w-full resize-none border-none bg-transparent p-0 text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
+                  className="h-32 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
                 />
               </div>
 
-              <div className="mt-8 flex items-end justify-between pl-8">
+              {/* Footer */}
+              <div className="mt-10 flex items-center justify-between pl-8">
                 <button
                   onClick={goBackToInput}
-                  className="text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-500 transition-colors hover:text-zinc-700"
+                  className="text-[14px] tracking-[-0.02em] text-zinc-500 transition-colors hover:text-zinc-700"
                 >
-                  ← Edit problem
+                  ← Edit challenge
                 </button>
                 <button
                   onClick={handleRunAnalysis}
                   disabled={isSubmitting}
                   className={cn(
-                    'px-8 py-4 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
+                    'px-8 py-4 text-[15px] font-medium transition-colors',
                     isSubmitting
-                      ? 'cursor-not-allowed bg-zinc-300 text-zinc-500'
+                      ? 'cursor-not-allowed bg-zinc-200 text-zinc-400'
                       : 'bg-zinc-900 text-white hover:bg-zinc-800',
                   )}
                 >
@@ -423,7 +525,7 @@ export default function NewReportPage() {
               </div>
 
               {error && (
-                <p className="mt-4 pl-8 text-[14px] leading-[1.2] tracking-[-0.02em] text-red-600">
+                <p className="mt-4 pl-8 text-[14px] tracking-[-0.02em] text-red-600">
                   {error}
                 </p>
               )}
@@ -444,16 +546,10 @@ export default function NewReportPage() {
         }
         reason={upgradeReason}
       />
-      <main
-        className="flex min-h-screen flex-col bg-white"
-        style={{
-          fontFamily:
-            "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
-        }}
-      >
+      <main className="flex min-h-screen flex-col bg-white">
         {/* Header */}
         <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-5">
-          <h1 className="text-[15px] leading-[1.2] tracking-[-0.02em] text-zinc-500">
+          <h1 className="text-[15px] tracking-[-0.02em] text-zinc-500">
             New Analysis
           </h1>
           <div className="flex items-center gap-4">
@@ -469,7 +565,7 @@ export default function NewReportPage() {
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={attachments.length >= MAX_ATTACHMENTS}
-              className="text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="text-[14px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Attach file
               {attachments.length > 0 && ` (${attachments.length})`}
@@ -480,10 +576,13 @@ export default function NewReportPage() {
         {/* Refusal warning */}
         {showRefusalWarning && (
           <div className="border-b border-red-200 bg-red-50 px-8 py-4">
-            <p className="text-[14px] leading-[1.4] tracking-[-0.02em] text-red-800">
-              <strong>Your previous query was flagged by our AI safety filters.</strong>{' '}
-              This is often a false positive for legitimate engineering problems.
-              Please rephrase your challenge, focusing on the engineering aspects.
+            <p className="text-[14px] leading-relaxed tracking-[-0.02em] text-red-800">
+              <strong>
+                Your previous query was flagged by our AI safety filters.
+              </strong>{' '}
+              This is often a false positive for legitimate engineering
+              problems. Please rephrase your challenge, focusing on the
+              engineering aspects.
             </p>
           </div>
         )}
@@ -491,7 +590,12 @@ export default function NewReportPage() {
         {/* Main content */}
         <div className="flex flex-1 items-center justify-center px-8 py-12">
           <div className="w-full max-w-2xl">
-            {/* Left border accent - connects to report style */}
+            {/* Bold headline */}
+            <h2 className="mb-10 text-[32px] font-semibold tracking-tight text-zinc-900">
+              Describe your challenge
+            </h2>
+
+            {/* Textarea with left border */}
             <div className="border-l-2 border-zinc-900 pl-8">
               <textarea
                 value={problemText}
@@ -506,10 +610,28 @@ export default function NewReportPage() {
                 disabled={isSubmitting}
                 autoFocus
                 data-test="challenge-input"
-                placeholder="What engineering problem are you solving?"
-                className="h-56 w-full resize-none border-none bg-transparent p-0 text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 disabled:opacity-40"
+                placeholder="What are you trying to solve?"
+                className="h-48 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 disabled:opacity-40"
               />
             </div>
+
+            {/* Live detection - appears after typing starts */}
+            {problemText.length > 20 && (
+              <div className="mt-8 flex items-center gap-6 pl-8">
+                <DetectionIndicator
+                  label="Problem"
+                  detected={hasProblemStatement(problemText)}
+                />
+                <DetectionIndicator
+                  label="Constraints"
+                  detected={hasConstraints(problemText)}
+                />
+                <DetectionIndicator
+                  label="Success criteria"
+                  detected={hasSuccessCriteria(problemText)}
+                />
+              </div>
+            )}
 
             {/* Attachment Previews */}
             {attachments.length > 0 && (
@@ -538,9 +660,10 @@ export default function NewReportPage() {
               </div>
             )}
 
-            <div className="mt-8 flex items-end justify-between pl-8">
-              <p className="text-[13px] leading-[1.2] tracking-[-0.02em] text-zinc-400">
-                ~25 min · Include constraints and success criteria
+            {/* Footer */}
+            <div className="mt-10 flex items-center justify-between pl-8">
+              <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
+                ~10 min analysis
               </p>
 
               <button
@@ -548,7 +671,7 @@ export default function NewReportPage() {
                 disabled={!canSubmit || isSubmitting}
                 data-test="challenge-submit"
                 className={cn(
-                  'px-8 py-4 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
+                  'px-8 py-4 text-[15px] font-medium transition-colors',
                   canSubmit && !isSubmitting
                     ? 'bg-zinc-900 text-white hover:bg-zinc-800'
                     : 'cursor-not-allowed bg-zinc-200 text-zinc-400',
@@ -559,7 +682,7 @@ export default function NewReportPage() {
             </div>
 
             {error && (
-              <p className="mt-4 pl-8 text-[14px] leading-[1.2] tracking-[-0.02em] text-red-600">
+              <p className="mt-4 pl-8 text-[14px] tracking-[-0.02em] text-red-600">
                 {error}
               </p>
             )}
