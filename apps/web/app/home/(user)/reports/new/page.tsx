@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { cn } from '@kit/ui/utils';
@@ -565,8 +566,29 @@ export default function NewReportPage() {
         )}
 
         {/* Main content */}
-        <div className="flex flex-1 items-center justify-center px-8 py-16">
-          <div className="w-full max-w-3xl">
+        <div className="px-8 pt-24 pb-16">
+          <div className="mx-auto w-full max-w-3xl">
+            {/* Back link */}
+            <Link
+              href="/home"
+              className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
+            >
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+                />
+              </svg>
+              Dashboard
+            </Link>
+
             {/* Page title - anchor element */}
             <h1 className="mb-12 font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
               New Analysis
