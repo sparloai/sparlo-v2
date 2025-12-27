@@ -1,12 +1,12 @@
 import { withI18n } from '~/lib/i18n/with-i18n';
 
+import { EngineeringHero } from './_components/engineering-hero';
 import { ExampleReportsSection } from './_components/example-reports/example-reports-section';
-import { SparloHero } from './_components/sparlo-hero';
 
 function Home() {
   return (
     <>
-      <SparloHero />
+      <EngineeringHero />
       <ExampleReportsSection />
     </>
   );
