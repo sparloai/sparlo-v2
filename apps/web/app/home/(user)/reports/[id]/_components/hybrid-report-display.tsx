@@ -1,5 +1,7 @@
 'use client';
 
+import { memo } from 'react';
+
 import {
   AlertTriangle,
   ArrowRight,
@@ -24,7 +26,6 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import { memo } from 'react';
 
 // Jobs Standard: Typography does the work. No decorative icons.
 // Only functional icons retained (none needed in report content)
@@ -1301,7 +1302,9 @@ const ExecutionTrackSection = memo(function ExecutionTrackSection({
                   {concept.when_to_use_instead && (
                     <div className="mt-3 border-l-2 border-l-zinc-300 py-1 pl-3 text-xs text-zinc-600 dark:border-l-zinc-600 dark:text-zinc-400">
                       <span className="font-medium">When to use instead: </span>
-                      <span className="italic">{concept.when_to_use_instead}</span>
+                      <span className="italic">
+                        {concept.when_to_use_instead}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -2427,6 +2430,7 @@ function StrategicIntegrationSection({
 export function HybridReportDisplay({
   reportData,
   useBrandSystem = true,
+  showToc = true,
 }: HybridReportDisplayProps) {
   const report = reportData.report;
 
@@ -2440,7 +2444,13 @@ export function HybridReportDisplay({
 
   // Use the new brand system styling if requested
   if (useBrandSystem) {
-    return <BrandSystemReport reportData={report} title={report.title} />;
+    return (
+      <BrandSystemReport
+        reportData={report}
+        title={report.title}
+        showToc={showToc}
+      />
+    );
   }
 
   const { decision_architecture, self_critique } = report;

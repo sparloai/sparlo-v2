@@ -17,6 +17,8 @@
 
 import { memo } from 'react';
 
+import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+
 import { Section, SectionTitle, UnknownFieldRenderer } from './primitives';
 import {
   ChallengeFrameSection,
@@ -35,11 +37,11 @@ import {
 } from './sections';
 import { TableOfContents, generateTocSections } from './table-of-contents';
 
-import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
-
 interface BrandSystemReportProps {
   reportData: HybridReportData;
   title?: string;
+  /** Whether to show the fixed sidebar TOC. Set to false when embedding in a page with its own TOC. */
+  showToc?: boolean;
 }
 
 // Known fields that we handle explicitly (both old and new names)
@@ -84,110 +86,162 @@ function normalizeReportData(data: HybridReportData): HybridReportData {
   if (data.execution_track || data.innovation_portfolio) {
     return {
       ...data,
-      constraints_and_metrics: data.constraints_and_metrics ?? raw.constraints as HybridReportData['constraints_and_metrics'],
+      constraints_and_metrics:
+        data.constraints_and_metrics ??
+        (raw.constraints as HybridReportData['constraints_and_metrics']),
     };
   }
 
   // Normalize solution_concepts → execution_track
-  const solutionConcepts = raw.solution_concepts as {
-    intro?: string;
-    primary?: {
-      id?: string;
-      title?: string;
-      confidence_percent?: number;
-      source_type?: string;
-      what_it_is?: string;
-      why_it_works?: string;
-      economics?: {
-        expected_outcome?: { value?: string };
-        investment?: { value?: string };
-        timeline?: { value?: string };
-      };
-      the_insight?: unknown;
-      first_validation_step?: {
-        test?: string;
-        cost?: string;
-        go_criteria?: string;
-      };
-    };
-    supporting?: Array<{
-      id?: string;
-      title?: string;
-      relationship?: string;
-      what_it_is?: string;
-      why_it_works?: string;
-      when_to_use_instead?: string;
-      confidence_percent?: number;
-      key_risk?: string;
-    }>;
-  } | undefined;
+  const solutionConcepts = raw.solution_concepts as
+    | {
+        intro?: string;
+        primary?: {
+          id?: string;
+          title?: string;
+          confidence_percent?: number;
+          source_type?: string;
+          what_it_is?: string;
+          why_it_works?: string;
+          economics?: {
+            expected_outcome?: { value?: string };
+            investment?: { value?: string };
+            timeline?: { value?: string };
+          };
+          the_insight?: unknown;
+          first_validation_step?: {
+            test?: string;
+            cost?: string;
+            go_criteria?: string;
+          };
+        };
+        supporting?: Array<{
+          id?: string;
+          title?: string;
+          relationship?: string;
+          what_it_is?: string;
+          why_it_works?: string;
+          when_to_use_instead?: string;
+          confidence_percent?: number;
+          key_risk?: string;
+        }>;
+      }
+    | undefined;
 
-  const executionTrack: HybridReportData['execution_track'] = solutionConcepts ? {
-    intro: solutionConcepts.intro,
-    primary: solutionConcepts.primary ? {
-      id: solutionConcepts.primary.id,
-      title: solutionConcepts.primary.title,
-      confidence: solutionConcepts.primary.confidence_percent,
-      source_type: solutionConcepts.primary.source_type as 'CATALOG' | 'TRANSFER' | 'OPTIMIZATION' | 'FIRST_PRINCIPLES' | undefined,
-      what_it_is: solutionConcepts.primary.what_it_is,
-      why_it_works: solutionConcepts.primary.why_it_works,
-      expected_improvement: solutionConcepts.primary.economics?.expected_outcome?.value,
-      investment: solutionConcepts.primary.economics?.investment?.value,
-      timeline: solutionConcepts.primary.economics?.timeline?.value,
-      the_insight: solutionConcepts.primary.the_insight as HybridReportData['execution_track'] extends { primary?: { the_insight?: infer T } } ? T : never,
-      validation_gates: solutionConcepts.primary.first_validation_step ? [{
-        test: solutionConcepts.primary.first_validation_step.test,
-        cost: solutionConcepts.primary.first_validation_step.cost,
-        success_criteria: solutionConcepts.primary.first_validation_step.go_criteria,
-      }] : undefined,
-    } : undefined,
-    supporting_concepts: solutionConcepts.supporting?.map(s => ({
-      id: s.id,
-      title: s.title,
-      relationship: s.relationship as 'COMPLEMENTARY' | 'FALLBACK' | 'PREREQUISITE' | undefined,
-      one_liner: s.key_risk,
-      what_it_is: s.what_it_is,
-      why_it_works: s.why_it_works,
-      when_to_use_instead: s.when_to_use_instead,
-      confidence: s.confidence_percent,
-    })),
-  } : undefined;
+  const executionTrack: HybridReportData['execution_track'] = solutionConcepts
+    ? {
+        intro: solutionConcepts.intro,
+        primary: solutionConcepts.primary
+          ? {
+              id: solutionConcepts.primary.id,
+              title: solutionConcepts.primary.title,
+              confidence: solutionConcepts.primary.confidence_percent,
+              source_type: solutionConcepts.primary.source_type as
+                | 'CATALOG'
+                | 'TRANSFER'
+                | 'OPTIMIZATION'
+                | 'FIRST_PRINCIPLES'
+                | undefined,
+              what_it_is: solutionConcepts.primary.what_it_is,
+              why_it_works: solutionConcepts.primary.why_it_works,
+              expected_improvement:
+                solutionConcepts.primary.economics?.expected_outcome?.value,
+              investment: solutionConcepts.primary.economics?.investment?.value,
+              timeline: solutionConcepts.primary.economics?.timeline?.value,
+              the_insight: solutionConcepts.primary
+                .the_insight as HybridReportData['execution_track'] extends {
+                primary?: { the_insight?: infer T };
+              }
+                ? T
+                : never,
+              validation_gates: solutionConcepts.primary.first_validation_step
+                ? [
+                    {
+                      test: solutionConcepts.primary.first_validation_step.test,
+                      cost: solutionConcepts.primary.first_validation_step.cost,
+                      success_criteria:
+                        solutionConcepts.primary.first_validation_step
+                          .go_criteria,
+                    },
+                  ]
+                : undefined,
+            }
+          : undefined,
+        supporting_concepts: solutionConcepts.supporting?.map((s) => ({
+          id: s.id,
+          title: s.title,
+          relationship: s.relationship as
+            | 'COMPLEMENTARY'
+            | 'FALLBACK'
+            | 'PREREQUISITE'
+            | undefined,
+          one_liner: s.key_risk,
+          what_it_is: s.what_it_is,
+          why_it_works: s.why_it_works,
+          when_to_use_instead: s.when_to_use_instead,
+          confidence: s.confidence_percent,
+        })),
+      }
+    : undefined;
 
   // Normalize innovation_concepts → innovation_portfolio
-  const innovationConcepts = raw.innovation_concepts as {
-    intro?: string;
-    recommended?: {
-      id?: string;
-      title?: string;
-      confidence_percent?: number;
-      confidence?: number;
-      [key: string]: unknown;
-    };
-    parallel?: Array<{
-      id?: string;
-      title?: string;
-      confidence_percent?: number;
-      confidence?: number;
-      [key: string]: unknown;
-    }>;
-    frontier_watch?: HybridReportData['innovation_portfolio'] extends { frontier_watch?: infer T } ? T : never;
-  } | undefined;
+  const innovationConcepts = raw.innovation_concepts as
+    | {
+        intro?: string;
+        recommended?: {
+          id?: string;
+          title?: string;
+          confidence_percent?: number;
+          confidence?: number;
+          [key: string]: unknown;
+        };
+        parallel?: Array<{
+          id?: string;
+          title?: string;
+          confidence_percent?: number;
+          confidence?: number;
+          [key: string]: unknown;
+        }>;
+        frontier_watch?: HybridReportData['innovation_portfolio'] extends {
+          frontier_watch?: infer T;
+        }
+          ? T
+          : never;
+      }
+    | undefined;
 
-  const innovationPortfolio: HybridReportData['innovation_portfolio'] = innovationConcepts ? {
-    intro: innovationConcepts.intro,
-    recommended_innovation: innovationConcepts.recommended ? {
-      ...innovationConcepts.recommended,
-      confidence: innovationConcepts.recommended.confidence_percent ?? innovationConcepts.recommended.confidence,
-    } as HybridReportData['innovation_portfolio'] extends { recommended_innovation?: infer T } ? T : never : undefined,
-    parallel_investigations: innovationConcepts.parallel?.map(p => ({
-      ...p,
-      confidence: p.confidence_percent ?? p.confidence,
-    })) as HybridReportData['innovation_portfolio'] extends { parallel_investigations?: infer T } ? T : never,
-    frontier_watch: innovationConcepts.frontier_watch,
-  } : undefined;
+  const innovationPortfolio: HybridReportData['innovation_portfolio'] =
+    innovationConcepts
+      ? {
+          intro: innovationConcepts.intro,
+          recommended_innovation: innovationConcepts.recommended
+            ? ({
+                ...innovationConcepts.recommended,
+                confidence:
+                  innovationConcepts.recommended.confidence_percent ??
+                  innovationConcepts.recommended.confidence,
+              } as HybridReportData['innovation_portfolio'] extends {
+                recommended_innovation?: infer T;
+              }
+                ? T
+                : never)
+            : undefined,
+          parallel_investigations: innovationConcepts.parallel?.map((p) => ({
+            ...p,
+            confidence: p.confidence_percent ?? p.confidence,
+          })) as HybridReportData['innovation_portfolio'] extends {
+            parallel_investigations?: infer T;
+          }
+            ? T
+            : never,
+          frontier_watch: innovationConcepts.frontier_watch,
+        }
+      : undefined;
 
   // Normalize constraints → constraints_and_metrics
-  const constraintsAndMetrics = data.constraints_and_metrics ?? raw.constraints as HybridReportData['constraints_and_metrics'];
+  const constraintsAndMetrics =
+    data.constraints_and_metrics ??
+    (raw.constraints as HybridReportData['constraints_and_metrics']);
 
   return {
     ...data,
@@ -200,27 +254,33 @@ function normalizeReportData(data: HybridReportData): HybridReportData {
 export const BrandSystemReport = memo(function BrandSystemReport({
   reportData,
   title,
+  showToc = true,
 }: BrandSystemReportProps) {
   // Normalize field names for backward compatibility
   const normalizedData = normalizeReportData(reportData);
-  const tocSections = generateTocSections(normalizedData as Record<string, unknown>);
+  const tocSections = generateTocSections(
+    normalizedData as Record<string, unknown>,
+  );
 
   // Find unknown fields for graceful rendering
   const unknownFields = Object.entries(reportData).filter(
-    ([key, value]) => !KNOWN_FIELDS.has(key) && value !== null && value !== undefined,
+    ([key, value]) =>
+      !KNOWN_FIELDS.has(key) && value !== null && value !== undefined,
   );
 
   return (
     <div className="relative min-h-screen bg-white">
-      {/* Table of Contents */}
-      <TableOfContents sections={tocSections} />
+      {/* Table of Contents - only show when showToc is true */}
+      {showToc && <TableOfContents sections={tocSections} />}
 
-      {/* Main Content */}
-      <main className="max-w-3xl px-6 py-16 lg:ml-72 lg:pr-8">
+      {/* Main Content - adjust margin when TOC is hidden */}
+      <main
+        className={`max-w-3xl px-6 py-16 ${showToc ? 'lg:ml-72 lg:pr-8' : 'mx-auto'}`}
+      >
         {/* Report Title */}
         {(title || normalizedData.title) && (
           <header className="mb-16">
-            <h1 className="text-[36px] font-semibold leading-[1.1] tracking-[-0.03em] text-zinc-900 md:text-[48px]">
+            <h1 className="text-[36px] leading-[1.1] font-semibold tracking-[-0.03em] text-zinc-900 md:text-[48px]">
               {title || normalizedData.title}
             </h1>
           </header>
@@ -254,10 +314,14 @@ export const BrandSystemReport = memo(function BrandSystemReport({
         <InnovationConceptsSection data={normalizedData.innovation_portfolio} />
 
         {/* Frontier Watch */}
-        <FrontierTechnologiesSection data={normalizedData.innovation_portfolio?.frontier_watch} />
+        <FrontierTechnologiesSection
+          data={normalizedData.innovation_portfolio?.frontier_watch}
+        />
 
         {/* Strategic Integration */}
-        <StrategicIntegrationSection data={normalizedData.strategic_integration} />
+        <StrategicIntegrationSection
+          data={normalizedData.strategic_integration}
+        />
 
         {/* Risks & Watchouts */}
         <RisksWatchoutsSection data={normalizedData.risks_and_watchouts} />
@@ -268,13 +332,16 @@ export const BrandSystemReport = memo(function BrandSystemReport({
         {/* Recommendation */}
         <RecommendationSection
           content={normalizedData.what_id_actually_do}
-          personalRecommendation={normalizedData.strategic_integration?.personal_recommendation}
+          personalRecommendation={
+            normalizedData.strategic_integration?.personal_recommendation
+          }
         />
 
         {/* Key Insights (if present as separate field) */}
-        {normalizedData.key_insights && normalizedData.key_insights.length > 0 && (
-          <KeyInsightsSection insights={normalizedData.key_insights} />
-        )}
+        {normalizedData.key_insights &&
+          normalizedData.key_insights.length > 0 && (
+            <KeyInsightsSection insights={normalizedData.key_insights} />
+          )}
 
         {/* Next Steps (if present as separate field) */}
         {normalizedData.next_steps && normalizedData.next_steps.length > 0 && (
@@ -282,9 +349,12 @@ export const BrandSystemReport = memo(function BrandSystemReport({
         )}
 
         {/* Follow-up Prompts */}
-        {normalizedData.follow_up_prompts && normalizedData.follow_up_prompts.length > 0 && (
-          <FollowUpPromptsSection prompts={normalizedData.follow_up_prompts} />
-        )}
+        {normalizedData.follow_up_prompts &&
+          normalizedData.follow_up_prompts.length > 0 && (
+            <FollowUpPromptsSection
+              prompts={normalizedData.follow_up_prompts}
+            />
+          )}
 
         {/* Unknown Fields - Graceful Handling */}
         {unknownFields.length > 0 && (
@@ -363,7 +433,10 @@ const FollowUpPromptsSection = memo(function FollowUpPromptsSection({
   prompts: string[];
 }) {
   return (
-    <Section id="follow-up-prompts" className="mt-20 border-t border-zinc-200 pt-16">
+    <Section
+      id="follow-up-prompts"
+      className="mt-20 border-t border-zinc-200 pt-16"
+    >
       <SectionTitle size="md">Continue the Conversation</SectionTitle>
       <div className="mt-6 space-y-3">
         {prompts.map((prompt, idx) => (

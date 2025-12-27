@@ -71,12 +71,73 @@
   font-display: swap;
 }
 
+/* ============================================
+   SUISSE INTL FONT FACE DEFINITIONS
+   Primary brand typeface
+   ============================================ */
+
+@font-face {
+  font-family: 'Suisse Intl';
+  src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suisse Intl';
+  src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suisse Intl';
+  src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Book.woff2') format('woff2');
+  font-weight: 450;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suisse Intl';
+  src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suisse Intl';
+  src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Semibold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suisse Intl';
+  src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Suisse Intl';
+  src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     /* ============================================
        TYPOGRAPHY
        ============================================ */
-    --font-primary: var(--font-sans), 'Söhne', -apple-system, BlinkMacSystemFont,
+    --font-primary: 'Suisse Intl', var(--font-sans), -apple-system, BlinkMacSystemFont,
       sans-serif;
     --font-mono: 'Söhne Mono', 'JetBrains Mono', 'SF Mono', ui-monospace,
       monospace;

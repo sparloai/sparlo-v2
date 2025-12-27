@@ -502,4 +502,10 @@ export interface HybridReportDisplayProps {
    * @default true
    */
   useBrandSystem?: boolean;
+  /**
+   * Whether to show the fixed sidebar TOC when using brand system.
+   * Set to false when embedding in a page with its own TOC.
+   * @default true
+   */
+  showToc?: boolean;
 }

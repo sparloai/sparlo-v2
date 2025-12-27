@@ -58,7 +58,7 @@ export const EngineeringHero = memo(function EngineeringHero() {
       </div>
 
       {/* Navigation */}
-      <nav className="absolute left-0 right-0 top-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
+      <nav className="absolute top-0 right-0 left-0 z-20 flex items-center justify-between px-8 py-6 md:px-16">
         {/* Logo */}
         <Link
           href="/"
@@ -87,10 +87,13 @@ export const EngineeringHero = memo(function EngineeringHero() {
       {/* Content Layer - Centered */}
       <div
         className="relative z-10 flex h-full flex-col items-center justify-center px-8 text-center"
-        style={{ fontFamily: 'var(--font-sans), system-ui, sans-serif' }}
+        style={{
+          fontFamily:
+            "'Suisse Intl', 'Suisse', 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif",
+        }}
       >
         {/* Headline */}
-        <h1 className="text-[40px] font-medium leading-[1.2] tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
+        <h1 className="text-[40px] leading-[1.2] font-medium tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
           Engineering Intelligence Model
         </h1>
 

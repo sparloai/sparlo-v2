@@ -36,7 +36,7 @@ export const MethodologySection = memo(function MethodologySection() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-12">
             {/* Left column - Title */}
             <div className="md:col-span-3">
-              <h2 className="text-[18px] font-normal leading-[1.2] tracking-[-0.02em] text-zinc-900 md:text-[20px]">
+              <h2 className="text-[18px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[20px]">
                 The Process
               </h2>
             </div>
@@ -47,7 +47,7 @@ export const MethodologySection = memo(function MethodologySection() {
                 {processSteps.map((step, idx) => (
                   <p
                     key={idx}
-                    className="max-w-[55ch] text-[22px] font-normal leading-[1.2] tracking-[-0.02em] text-zinc-900 md:text-[26px]"
+                    className="max-w-[55ch] text-[22px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[26px]"
                   >
                     <sup className="mr-0.5 text-[14px] font-normal text-zinc-400 md:text-[16px]">
                       {idx + 1}
@@ -65,7 +65,7 @@ export const MethodologySection = memo(function MethodologySection() {
           <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-12">
             {/* Left column - Title */}
             <div className="md:col-span-3">
-              <h2 className="text-[18px] font-normal leading-[1.2] tracking-[-0.02em] text-zinc-900 md:text-[20px]">
+              <h2 className="text-[18px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[20px]">
                 The Methodology
               </h2>
             </div>
@@ -76,7 +76,7 @@ export const MethodologySection = memo(function MethodologySection() {
                 {methodologySteps.map((step, idx) => (
                   <p
                     key={idx}
-                    className="text-[22px] font-normal leading-[1.2] tracking-[-0.02em] text-zinc-900 md:text-[26px]"
+                    className="text-[22px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[26px]"
                   >
                     <sup className="mr-0.5 text-[14px] font-normal text-zinc-400 md:text-[16px]">
                       {idx + 1}
