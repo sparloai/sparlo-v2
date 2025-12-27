@@ -456,35 +456,28 @@ export default function NewReportPage() {
           reason={upgradeReason}
         />
         <main className="flex min-h-screen flex-col bg-white">
-          {/* Header */}
-          <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-5">
-            <h1 className="text-[15px] tracking-[-0.02em] text-zinc-500">
-              Clarification
-            </h1>
-          </header>
-
           {/* Main content */}
-          <div className="flex flex-1 items-center justify-center px-8 py-12">
-            <div className="w-full max-w-2xl">
-              {/* Bold headline */}
-              <h2 className="mb-10 text-[32px] font-semibold tracking-tight text-zinc-900">
-                One more thing
-              </h2>
+          <div className="flex flex-1 items-center justify-center px-8 py-16">
+            <div className="w-full max-w-3xl">
+              {/* Page title - anchor element */}
+              <h1 className="mb-12 text-[42px] font-semibold tracking-tight text-zinc-900">
+                Clarification
+              </h1>
 
               {/* Left border accent */}
-              <div className="border-l-2 border-zinc-900 pl-8">
+              <div className="border-l-2 border-zinc-900 pl-10">
                 {/* Original problem shown */}
-                <div className="mb-8">
-                  <p className="mb-2 text-[13px] tracking-[-0.02em] text-zinc-400">
+                <div className="mb-10">
+                  <p className="mb-3 text-[14px] tracking-[-0.02em] text-zinc-400">
                     Your challenge
                   </p>
-                  <p className="text-[16px] leading-relaxed tracking-[-0.02em] text-zinc-700">
+                  <p className="text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-700">
                     {problemText}
                   </p>
                 </div>
 
                 {/* System's clarifying question */}
-                <p className="mb-6 text-[20px] leading-relaxed text-zinc-900">
+                <p className="mb-8 text-[22px] leading-relaxed text-zinc-900">
                   {clarifyingQuestion}
                 </p>
 
@@ -498,12 +491,12 @@ export default function NewReportPage() {
                   }
                   onKeyDown={handleKeyDown}
                   placeholder="Your response..."
-                  className="h-32 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
+                  className="h-40 w-full resize-none border-none bg-transparent p-0 text-[22px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
                 />
               </div>
 
               {/* Footer */}
-              <div className="mt-10 flex items-center justify-between pl-8">
+              <div className="mt-12 flex items-center justify-between pl-10">
                 <button
                   onClick={goBackToInput}
                   className="text-[14px] tracking-[-0.02em] text-zinc-500 transition-colors hover:text-zinc-700"
@@ -525,7 +518,7 @@ export default function NewReportPage() {
               </div>
 
               {error && (
-                <p className="mt-4 pl-8 text-[14px] tracking-[-0.02em] text-red-600">
+                <p className="mt-6 pl-10 text-[14px] tracking-[-0.02em] text-red-600">
                   {error}
                 </p>
               )}
@@ -547,30 +540,25 @@ export default function NewReportPage() {
         reason={upgradeReason}
       />
       <main className="flex min-h-screen flex-col bg-white">
-        {/* Header */}
-        <header className="flex items-center justify-between border-b border-zinc-200 px-8 py-5">
-          <h1 className="text-[15px] tracking-[-0.02em] text-zinc-500">
-            New Analysis
-          </h1>
-          <div className="flex items-center gap-4">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp"
-              multiple
-              onChange={handleFileSelect}
-              className="hidden"
-            />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={attachments.length >= MAX_ATTACHMENTS}
-              className="text-[14px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Attach file
-              {attachments.length > 0 && ` (${attachments.length})`}
-            </button>
-          </div>
+        {/* Header - minimal, just file attachment */}
+        <header className="flex items-center justify-end border-b border-zinc-200 px-8 py-4">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            multiple
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={attachments.length >= MAX_ATTACHMENTS}
+            className="text-[14px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Attach file
+            {attachments.length > 0 && ` (${attachments.length})`}
+          </button>
         </header>
 
         {/* Refusal warning */}
@@ -588,15 +576,15 @@ export default function NewReportPage() {
         )}
 
         {/* Main content */}
-        <div className="flex flex-1 items-center justify-center px-8 py-12">
-          <div className="w-full max-w-2xl">
-            {/* Bold headline */}
-            <h2 className="mb-10 text-[32px] font-semibold tracking-tight text-zinc-900">
-              Describe your challenge
-            </h2>
+        <div className="flex flex-1 items-center justify-center px-8 py-16">
+          <div className="w-full max-w-3xl">
+            {/* Page title - anchor element */}
+            <h1 className="mb-12 text-[42px] font-semibold tracking-tight text-zinc-900">
+              New Analysis
+            </h1>
 
             {/* Textarea with left border */}
-            <div className="border-l-2 border-zinc-900 pl-8">
+            <div className="border-l-2 border-zinc-900 pl-10">
               <textarea
                 value={problemText}
                 onChange={(e) => {
@@ -610,14 +598,14 @@ export default function NewReportPage() {
                 disabled={isSubmitting}
                 autoFocus
                 data-test="challenge-input"
-                placeholder="What are you trying to solve?"
-                className="h-48 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 disabled:opacity-40"
+                placeholder="What engineering problem are you solving?"
+                className="h-64 w-full resize-none border-none bg-transparent p-0 text-[22px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 disabled:opacity-40"
               />
             </div>
 
             {/* Live detection - appears after typing starts */}
             {problemText.length > 20 && (
-              <div className="mt-8 flex items-center gap-6 pl-8">
+              <div className="mt-10 flex items-center gap-8 pl-10">
                 <DetectionIndicator
                   label="Problem"
                   detected={hasProblemStatement(problemText)}
@@ -635,12 +623,12 @@ export default function NewReportPage() {
 
             {/* Attachment Previews */}
             {attachments.length > 0 && (
-              <div className="mt-6 border-t border-zinc-200 pt-4 pl-8">
-                <div className="flex flex-wrap gap-3">
+              <div className="mt-8 border-t border-zinc-200 pt-6 pl-10">
+                <div className="flex flex-wrap gap-4">
                   {attachments.map((attachment) => (
                     <div
                       key={attachment.id}
-                      className="group relative h-16 w-16 overflow-hidden border border-zinc-200"
+                      className="group relative h-20 w-20 overflow-hidden border border-zinc-200"
                     >
                       <Image
                         src={attachment.preview}
@@ -661,7 +649,7 @@ export default function NewReportPage() {
             )}
 
             {/* Footer */}
-            <div className="mt-10 flex items-center justify-between pl-8">
+            <div className="mt-12 flex items-center justify-between pl-10">
               <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
                 ~10 min analysis
               </p>
@@ -682,7 +670,7 @@ export default function NewReportPage() {
             </div>
 
             {error && (
-              <p className="mt-4 pl-8 text-[14px] tracking-[-0.02em] text-red-600">
+              <p className="mt-6 pl-10 text-[14px] tracking-[-0.02em] text-red-600">
                 {error}
               </p>
             )}
