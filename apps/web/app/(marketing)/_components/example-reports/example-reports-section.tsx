@@ -139,6 +139,8 @@ export function ExampleReportsSection() {
                   }}
                   useBrandSystem={true}
                   showToc={false}
+                  brief={reportData.brief}
+                  hasAppSidebar={false}
                 />
               ) : (
                 <ReportContent report={report} />

@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { cn } from '@kit/ui/utils';
@@ -53,7 +54,25 @@ export const NavHeader = memo(function NavHeader({
           'left-16', // collapsed sidebar width (64px = 16 * 4)
         )}
       >
-        <nav className="flex h-14 items-center justify-end px-4 sm:px-6">
+        <nav className="flex h-14 items-center justify-between px-4 sm:px-6">
+          {/* Left: Logo */}
+          <Link href="/home" className="transition-opacity hover:opacity-70">
+            <Image
+              src="/images/sparlo-logo.png"
+              alt="Sparlo"
+              width={80}
+              height={22}
+              className="h-[22px] w-auto dark:hidden"
+            />
+            <Image
+              src="/images/sparlo-logo-white.png"
+              alt="Sparlo"
+              width={80}
+              height={22}
+              className="hidden h-[22px] w-auto dark:block"
+            />
+          </Link>
+
           {/* Right: Usage indicator */}
           <div className="flex items-center gap-4">
             {/* Usage indicator - only shows when >= 25% used */}

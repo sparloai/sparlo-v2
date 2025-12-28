@@ -47,6 +47,12 @@ export function extractStructuredReport(
 /**
  * Extract user input from report data for display.
  * Accepts unknown type to avoid unsafe type assertions at call sites.
+ *
+ * Priority order:
+ * 1. report.brief (hybrid report user input)
+ * 2. chainState.userInput (legacy)
+ * 3. messages[0].content (chat format)
+ * 4. fallbackTitle
  */
 export function extractUserInput(
   reportData: unknown,
@@ -56,6 +62,16 @@ export function extractUserInput(
     return fallbackTitle.slice(0, MAX_INPUT_LENGTH);
   }
 
+  // Check for hybrid report brief field (report.brief)
+  const report = isRecord(reportData.report) ? reportData.report : undefined;
+  const reportBrief =
+    typeof report?.brief === 'string' ? report.brief : undefined;
+
+  if (reportBrief?.trim()) {
+    return reportBrief.trim().slice(0, MAX_INPUT_LENGTH);
+  }
+
+  // Check for chainState.userInput (legacy)
   const chainState = isRecord(reportData.chainState)
     ? reportData.chainState
     : undefined;
@@ -68,6 +84,7 @@ export function extractUserInput(
     return userInput.trim().slice(0, MAX_INPUT_LENGTH);
   }
 
+  // Check for messages[0].content (chat format)
   const messages = Array.isArray(reportData.messages)
     ? (reportData.messages as Array<{ content?: string }>)
     : undefined;

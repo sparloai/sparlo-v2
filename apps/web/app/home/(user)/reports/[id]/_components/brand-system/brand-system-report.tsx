@@ -15,9 +15,11 @@
 
 'use client';
 
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+
+import { cn } from '@kit/ui/utils';
 
 import { Section, SectionTitle, UnknownFieldRenderer } from './primitives';
 import {
@@ -35,7 +37,11 @@ import {
   SolutionConceptsSection,
   StrategicIntegrationSection,
 } from './sections';
-import { TableOfContents, generateTocSections } from './table-of-contents';
+import {
+  TableOfContents,
+  generateTocSections,
+  type TocSection,
+} from './table-of-contents';
 
 interface BrandSystemReportProps {
   reportData: HybridReportData;
@@ -296,6 +302,220 @@ function normalizeReportData(data: HybridReportData): HybridReportData {
   };
 }
 
+// ============================================
+// TOC NAV ITEM COMPONENT
+// ============================================
+
+interface TocNavItemProps {
+  section: TocSection;
+}
+
+function TocNavItem({ section }: TocNavItemProps) {
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  // Track active section on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      const elements = document.querySelectorAll('[id]');
+      let currentActive = '';
+      elements.forEach((el) => {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= 150 && rect.bottom > 0) {
+          currentActive = el.id;
+        }
+      });
+      setActiveSection(currentActive);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial check
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleNavigate = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const top = element.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  };
+
+  const isActive = activeSection === section.id;
+
+  return (
+    <li>
+      <button
+        onClick={() => handleNavigate(section.id)}
+        className={cn(
+          'relative block w-full py-1.5 text-left text-[14px] transition-colors',
+          isActive ? 'font-medium text-zinc-900' : 'text-zinc-500 hover:text-zinc-900',
+        )}
+      >
+        {isActive && (
+          <span className="absolute -left-4 top-1/2 h-4 w-0.5 -translate-y-1/2 bg-zinc-900" />
+        )}
+        {section.title}
+      </button>
+
+      {/* Subsections */}
+      {section.subsections && section.subsections.length > 0 && (
+        <ul className="ml-3 mt-1 space-y-1">
+          {section.subsections.map((sub) => (
+            <li key={sub.id}>
+              <button
+                onClick={() => handleNavigate(sub.id)}
+                className={cn(
+                  'block w-full py-1 text-left text-[13px] transition-colors',
+                  activeSection === sub.id
+                    ? 'text-zinc-700'
+                    : 'text-zinc-400 hover:text-zinc-600',
+                )}
+              >
+                {sub.title}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
+
+// ============================================
+// REPORT CONTENT COMPONENT
+// ============================================
+
+interface ReportContentProps {
+  normalizedData: HybridReportData;
+  title?: string;
+  brief?: string;
+  createdAt?: string;
+  readTime: number;
+  unknownFields: [string, unknown][];
+}
+
+const ReportContent = memo(function ReportContent({
+  normalizedData,
+  title,
+  brief,
+  createdAt,
+  readTime,
+  unknownFields,
+}: ReportContentProps) {
+  return (
+    <>
+      {/* Report Title + Metadata */}
+      {(title || normalizedData.title) && (
+        <header className="mb-16">
+          <h1 className="font-heading text-[36px] leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900 md:text-[48px]">
+            {title || normalizedData.title}
+          </h1>
+          {/* Metadata row */}
+          <div className="mt-4 flex items-center gap-4 text-[14px] tracking-[-0.02em] text-zinc-500">
+            {createdAt && <span>{formatDate(createdAt)}</span>}
+            {createdAt && <span className="text-zinc-300">·</span>}
+            <span>{readTime} min read</span>
+          </div>
+        </header>
+      )}
+
+      {/* Brief - User's original input */}
+      {brief && (
+        <Section id="brief">
+          <SectionTitle>The Brief</SectionTitle>
+          <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-6">
+            <p className="whitespace-pre-wrap text-[16px] leading-relaxed tracking-[-0.01em] text-zinc-700">
+              {brief}
+            </p>
+          </div>
+        </Section>
+      )}
+
+      {/* Executive Summary */}
+      <ExecutiveSummarySection data={normalizedData.executive_summary} />
+
+      {/* Problem Analysis */}
+      <ProblemAnalysisSection data={normalizedData.problem_analysis} />
+
+      {/* Constraints & Metrics */}
+      <ConstraintsSection data={normalizedData.constraints_and_metrics} />
+
+      {/* Challenge the Frame */}
+      <ChallengeFrameSection
+        data={normalizedData.challenge_the_frame}
+        reframe={normalizedData.innovation_analysis?.reframe}
+      />
+
+      {/* Honest Assessment */}
+      <HonestAssessmentSection data={normalizedData.honest_assessment} />
+
+      {/* Cross-Domain Search */}
+      <CrossDomainSearchSection data={normalizedData.cross_domain_search} />
+
+      {/* Solution Concepts (Execution Track) */}
+      <SolutionConceptsSection data={normalizedData.execution_track} />
+
+      {/* Innovation Portfolio */}
+      <InnovationConceptsSection data={normalizedData.innovation_portfolio} />
+
+      {/* Frontier Watch */}
+      <FrontierTechnologiesSection
+        data={normalizedData.innovation_portfolio?.frontier_watch}
+      />
+
+      {/* Strategic Integration */}
+      <StrategicIntegrationSection data={normalizedData.strategic_integration} />
+
+      {/* Risks & Watchouts */}
+      <RisksWatchoutsSection data={normalizedData.risks_and_watchouts} />
+
+      {/* Self Critique */}
+      <SelfCritiqueSection data={normalizedData.self_critique} />
+
+      {/* Recommendation */}
+      <RecommendationSection
+        content={normalizedData.what_id_actually_do}
+        personalRecommendation={
+          normalizedData.strategic_integration?.personal_recommendation
+        }
+      />
+
+      {/* Key Insights (if present as separate field) */}
+      {normalizedData.key_insights && normalizedData.key_insights.length > 0 && (
+        <KeyInsightsSection insights={normalizedData.key_insights} />
+      )}
+
+      {/* Next Steps (if present as separate field) */}
+      {normalizedData.next_steps && normalizedData.next_steps.length > 0 && (
+        <NextStepsSection steps={normalizedData.next_steps} />
+      )}
+
+      {/* Follow-up Prompts */}
+      {normalizedData.follow_up_prompts &&
+        normalizedData.follow_up_prompts.length > 0 && (
+          <FollowUpPromptsSection prompts={normalizedData.follow_up_prompts} />
+        )}
+
+      {/* Unknown Fields - Graceful Handling */}
+      {unknownFields.length > 0 && (
+        <Section id="additional-information" className="mt-20">
+          <SectionTitle size="lg">Additional Information</SectionTitle>
+          <div className="mt-10 space-y-8">
+            {unknownFields.map(([key, value]) => (
+              <div key={key} className="max-w-[70ch]">
+                <UnknownFieldRenderer
+                  data={value}
+                  label={key.replace(/_/g, ' ')}
+                />
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+    </>
+  );
+});
+
 export const BrandSystemReport = memo(function BrandSystemReport({
   reportData,
   title,
@@ -320,9 +540,51 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   // Calculate read time
   const readTime = calculateReadTime(normalizedData);
 
+  // When there's an app sidebar, use two-column flex layout with sticky TOC
+  // This avoids fixed positioning conflicts with the expandable sidebar
+  if (hasAppSidebar && showToc) {
+    return (
+      <div className="relative min-h-screen bg-white">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+          <div className="flex gap-8 py-10">
+            {/* Sticky TOC Sidebar */}
+            {tocSections.length > 0 && (
+              <aside className="hidden w-56 shrink-0 lg:block">
+                <nav className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                  <p className="mb-4 text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                    Contents
+                  </p>
+                  <ul className="space-y-1 border-l border-zinc-200 pl-4">
+                    {tocSections.map((section) => (
+                      <TocNavItem key={section.id} section={section} />
+                    ))}
+                  </ul>
+                </nav>
+              </aside>
+            )}
+
+            {/* Main Content */}
+            <main className="min-w-0 flex-1">
+              <div className="max-w-3xl">
+                <ReportContent
+                  normalizedData={normalizedData}
+                  title={title}
+                  brief={brief}
+                  createdAt={createdAt}
+                  readTime={readTime}
+                  unknownFields={unknownFields}
+                />
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative min-h-screen bg-white">
-      {/* Table of Contents - only show when showToc is true */}
+      {/* Table of Contents - fixed sidebar for pages without app sidebar */}
       {showToc && (
         <TableOfContents sections={tocSections} hasAppSidebar={hasAppSidebar} />
       )}
@@ -331,121 +593,14 @@ export const BrandSystemReport = memo(function BrandSystemReport({
       <main
         className={`max-w-3xl px-6 py-16 ${showToc ? 'lg:ml-56 lg:pr-8' : 'mx-auto'}`}
       >
-        {/* Report Title + Metadata */}
-        {(title || normalizedData.title) && (
-          <header className="mb-16">
-            <h1 className="font-heading text-[36px] leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900 md:text-[48px]">
-              {title || normalizedData.title}
-            </h1>
-            {/* Metadata row */}
-            <div className="mt-4 flex items-center gap-4 text-[14px] tracking-[-0.02em] text-zinc-500">
-              {createdAt && (
-                <span>{formatDate(createdAt)}</span>
-              )}
-              {createdAt && <span className="text-zinc-300">·</span>}
-              <span>{readTime} min read</span>
-            </div>
-          </header>
-        )}
-
-        {/* Brief - User's original input */}
-        {brief && (
-          <Section id="brief">
-            <SectionTitle>The Brief</SectionTitle>
-            <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-6">
-              <p className="whitespace-pre-wrap text-[16px] leading-relaxed tracking-[-0.01em] text-zinc-700">
-                {brief}
-              </p>
-            </div>
-          </Section>
-        )}
-
-        {/* Executive Summary */}
-        <ExecutiveSummarySection data={normalizedData.executive_summary} />
-
-        {/* Problem Analysis */}
-        <ProblemAnalysisSection data={normalizedData.problem_analysis} />
-
-        {/* Constraints & Metrics */}
-        <ConstraintsSection data={normalizedData.constraints_and_metrics} />
-
-        {/* Challenge the Frame */}
-        <ChallengeFrameSection
-          data={normalizedData.challenge_the_frame}
-          reframe={normalizedData.innovation_analysis?.reframe}
+        <ReportContent
+          normalizedData={normalizedData}
+          title={title}
+          brief={brief}
+          createdAt={createdAt}
+          readTime={readTime}
+          unknownFields={unknownFields}
         />
-
-        {/* Honest Assessment */}
-        <HonestAssessmentSection data={normalizedData.honest_assessment} />
-
-        {/* Cross-Domain Search */}
-        <CrossDomainSearchSection data={normalizedData.cross_domain_search} />
-
-        {/* Solution Concepts (Execution Track) */}
-        <SolutionConceptsSection data={normalizedData.execution_track} />
-
-        {/* Innovation Portfolio */}
-        <InnovationConceptsSection data={normalizedData.innovation_portfolio} />
-
-        {/* Frontier Watch */}
-        <FrontierTechnologiesSection
-          data={normalizedData.innovation_portfolio?.frontier_watch}
-        />
-
-        {/* Strategic Integration */}
-        <StrategicIntegrationSection
-          data={normalizedData.strategic_integration}
-        />
-
-        {/* Risks & Watchouts */}
-        <RisksWatchoutsSection data={normalizedData.risks_and_watchouts} />
-
-        {/* Self Critique */}
-        <SelfCritiqueSection data={normalizedData.self_critique} />
-
-        {/* Recommendation */}
-        <RecommendationSection
-          content={normalizedData.what_id_actually_do}
-          personalRecommendation={
-            normalizedData.strategic_integration?.personal_recommendation
-          }
-        />
-
-        {/* Key Insights (if present as separate field) */}
-        {normalizedData.key_insights &&
-          normalizedData.key_insights.length > 0 && (
-            <KeyInsightsSection insights={normalizedData.key_insights} />
-          )}
-
-        {/* Next Steps (if present as separate field) */}
-        {normalizedData.next_steps && normalizedData.next_steps.length > 0 && (
-          <NextStepsSection steps={normalizedData.next_steps} />
-        )}
-
-        {/* Follow-up Prompts */}
-        {normalizedData.follow_up_prompts &&
-          normalizedData.follow_up_prompts.length > 0 && (
-            <FollowUpPromptsSection
-              prompts={normalizedData.follow_up_prompts}
-            />
-          )}
-
-        {/* Unknown Fields - Graceful Handling */}
-        {unknownFields.length > 0 && (
-          <Section id="additional-information" className="mt-20">
-            <SectionTitle size="lg">Additional Information</SectionTitle>
-            <div className="mt-10 space-y-8">
-              {unknownFields.map(([key, value]) => (
-                <div key={key} className="max-w-[70ch]">
-                  <UnknownFieldRenderer
-                    data={value}
-                    label={key.replace(/_/g, ' ')}
-                  />
-                </div>
-              ))}
-            </div>
-          </Section>
-        )}
       </main>
     </div>
   );
