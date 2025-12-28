@@ -80,8 +80,7 @@ export function ExampleReportsSection() {
                 report: CLIMATE_HYBRID_REPORT,
               }}
               useBrandSystem={true}
-              showToc={true}
-              hasAppSidebar={false}
+              showToc={false}
             />
           ) : report.id === 'food-waste' ? (
             <HybridReportDisplay
@@ -90,8 +89,7 @@ export function ExampleReportsSection() {
                 report: FOOD_HYBRID_REPORT,
               }}
               useBrandSystem={true}
-              showToc={true}
-              hasAppSidebar={false}
+              showToc={false}
             />
           ) : report.id === 'food-tech' ? (
             <HybridReportDisplay
@@ -100,8 +98,7 @@ export function ExampleReportsSection() {
                 report: FOODTECH_HYBRID_REPORT,
               }}
               useBrandSystem={true}
-              showToc={true}
-              hasAppSidebar={false}
+              showToc={false}
             />
           ) : report.id === 'materials-science' ? (
             <HybridReportDisplay
@@ -110,8 +107,7 @@ export function ExampleReportsSection() {
                 report: MATERIALS_SCIENCE_HYBRID_REPORT,
               }}
               useBrandSystem={true}
-              showToc={true}
-              hasAppSidebar={false}
+              showToc={false}
             />
           ) : report.id === 'energy' ? (
             <HybridReportDisplay
@@ -120,8 +116,7 @@ export function ExampleReportsSection() {
                 report: ENERGY_HYBRID_REPORT,
               }}
               useBrandSystem={true}
-              showToc={true}
-              hasAppSidebar={false}
+              showToc={false}
             />
           ) : (
             <ReportContent report={report} />
