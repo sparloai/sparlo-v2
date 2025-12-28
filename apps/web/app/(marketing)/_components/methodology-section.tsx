@@ -12,11 +12,8 @@ import { memo } from 'react';
  * - Near-monochrome palette
  */
 
-const processSteps = [
-  'Input detailed technical challenge.',
-  'Model runs systematic innovation methodology to generate solutions.',
-  'Report delivered in 30 minutes.',
-];
+const processDescription =
+  'Input a detailed technical challenge. Sparlo runs a systematic innovation methodology to generate a thorough problem analysis with solution pathways, and delivers the report in 30 minutes.';
 
 const methodologySteps = [
   'Root Cause Analysis',
@@ -41,21 +38,11 @@ export const MethodologySection = memo(function MethodologySection() {
               </h2>
             </div>
 
-            {/* Right - Steps (in right column, left-aligned text) */}
-            <div className="md:w-1/2">
-              <div className="space-y-6">
-                {processSteps.map((step, idx) => (
-                  <p
-                    key={idx}
-                    className="text-[20px] leading-[1.3] font-normal tracking-[-0.02em] text-zinc-900 md:text-[24px]"
-                  >
-                    <sup className="mr-1 text-[12px] font-normal text-zinc-400 md:text-[14px]">
-                      {idx + 1}
-                    </sup>
-                    {step}
-                  </p>
-                ))}
-              </div>
+            {/* Right - Description */}
+            <div className="md:w-2/3">
+              <p className="text-[32px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[40px]">
+                {processDescription}
+              </p>
             </div>
           </div>
         </div>
