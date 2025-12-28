@@ -70,10 +70,22 @@ export function ExampleReportsSection() {
       id="example-reports"
       className="relative min-h-screen bg-white dark:bg-zinc-950"
     >
+      {/* Section Header */}
+      <div className="border-t border-zinc-200 px-8 pt-24 pb-12 md:px-16 lg:px-24 dark:border-zinc-800">
+        <div className="mx-auto max-w-[1400px]">
+          <h2 className="text-[28px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[36px] dark:text-white">
+            Example Reports
+          </h2>
+          <p className="mt-4 max-w-[50ch] text-[18px] leading-[1.4] font-normal tracking-[-0.02em] text-zinc-500 dark:text-zinc-400">
+            Explore real innovation intelligence reports across industries.
+          </p>
+        </div>
+      </div>
+
       {/* Tab Navigation - Sticky below main nav */}
-      <div className="sticky top-16 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
+      <div className="sticky top-16 z-40 border-y border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="no-scrollbar flex gap-1 overflow-x-auto py-1">
+          <div className="no-scrollbar flex gap-1 overflow-x-auto py-2">
             {EXAMPLE_REPORTS.map((r, i) => (
               <button
                 key={r.id}
