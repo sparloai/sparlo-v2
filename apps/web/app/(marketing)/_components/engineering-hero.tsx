@@ -20,13 +20,13 @@ import Link from 'next/link';
 export const EngineeringHero = memo(function EngineeringHero() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Loop only the first 8 seconds
+  // Loop only the first 7.5 seconds
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const handleTimeUpdate = () => {
-      if (video.currentTime >= 8) {
+      if (video.currentTime >= 7.5) {
         video.currentTime = 0;
       }
     };

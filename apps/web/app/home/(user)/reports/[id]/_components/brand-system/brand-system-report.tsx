@@ -550,7 +550,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
             {/* Sticky TOC Sidebar */}
             {tocSections.length > 0 && (
               <aside className="hidden w-56 shrink-0 lg:block">
-                <nav className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
+                <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
                   <p className="mb-4 text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
                     Contents
                   </p>
