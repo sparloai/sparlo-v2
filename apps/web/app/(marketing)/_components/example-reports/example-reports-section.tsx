@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import { Lock } from 'lucide-react';
 
@@ -8,6 +8,11 @@ import { CardWithHeader, SectionHeader } from '@kit/ui/aura';
 import { cn } from '@kit/ui/utils';
 
 import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybrid-report-display';
+import {
+  generateTocSections,
+  type TocSection,
+} from '~/home/(user)/reports/[id]/_components/brand-system/table-of-contents';
+import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
 import { ENERGY_HYBRID_REPORT } from './energy-hybrid-data';
@@ -19,17 +24,46 @@ import { MATERIALS_SCIENCE_HYBRID_REPORT } from './materials-science-hybrid-data
 /**
  * Example Reports Section
  *
- * Air Company Aesthetic - Clean report display without sidebar TOC
+ * Air Company Aesthetic - Clean report display with sticky TOC
  *
  * Features:
  * - Tab navigation for different reports
- * - Full-width report content (no sidebar)
- * - showToc={false} to hide brand system TOC
+ * - Sticky TOC sidebar (within section only)
+ * - Two-column layout on desktop
  */
+
+// Map report IDs to their data
+const REPORT_DATA_MAP: Record<string, HybridReportData> = {
+  'climate-tech': CLIMATE_HYBRID_REPORT,
+  'food-waste': FOOD_HYBRID_REPORT,
+  'food-tech': FOODTECH_HYBRID_REPORT,
+  'materials-science': MATERIALS_SCIENCE_HYBRID_REPORT,
+  energy: ENERGY_HYBRID_REPORT,
+};
 
 export function ExampleReportsSection() {
   const [activeTab, setActiveTab] = useState(0);
+  const [activeSection, setActiveSection] = useState('executive-summary');
   const report = EXAMPLE_REPORTS[activeTab]!;
+
+  // Get the hybrid report data for current tab
+  const reportData = REPORT_DATA_MAP[report.id];
+
+  // Generate TOC sections from report data
+  const tocSections = useMemo(() => {
+    if (!reportData) return [];
+    return generateTocSections(reportData as Record<string, unknown>, false);
+  }, [reportData]);
+
+  // Handle TOC navigation
+  const handleNavigate = useCallback((id: string) => {
+    setActiveSection(id);
+    const element = document.getElementById(id);
+    if (element) {
+      const top = element.getBoundingClientRect().top + window.scrollY - 120;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }
+  }, []);
 
   return (
     <section
@@ -45,6 +79,7 @@ export function ExampleReportsSection() {
                 key={r.id}
                 onClick={() => {
                   setActiveTab(i);
+                  setActiveSection('executive-summary');
                   window.scrollTo({
                     top:
                       document.getElementById('example-reports')?.offsetTop ??
@@ -67,67 +102,110 @@ export function ExampleReportsSection() {
         </div>
       </div>
 
-      {/* Report Content - Full Width */}
-      <div className="px-4 py-10 md:px-6 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          {/* Report Content */}
-          {report.locked ? (
-            <LockedOverlay report={report} />
-          ) : report.id === 'climate-tech' ? (
-            <HybridReportDisplay
-              reportData={{
-                mode: 'hybrid',
-                report: CLIMATE_HYBRID_REPORT,
-              }}
-              useBrandSystem={true}
-              showToc={false}
+      {/* Two-column layout: Sticky TOC + Report Content */}
+      <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
+        <div className="flex gap-8 py-10">
+          {/* Sticky TOC Sidebar - Hidden on mobile, visible on lg+ */}
+          {tocSections.length > 0 && !report.locked && (
+            <StickyTocSidebar
+              sections={tocSections}
+              activeSection={activeSection}
+              onNavigate={handleNavigate}
             />
-          ) : report.id === 'food-waste' ? (
-            <HybridReportDisplay
-              reportData={{
-                mode: 'hybrid',
-                report: FOOD_HYBRID_REPORT,
-              }}
-              useBrandSystem={true}
-              showToc={false}
-            />
-          ) : report.id === 'food-tech' ? (
-            <HybridReportDisplay
-              reportData={{
-                mode: 'hybrid',
-                report: FOODTECH_HYBRID_REPORT,
-              }}
-              useBrandSystem={true}
-              showToc={false}
-            />
-          ) : report.id === 'materials-science' ? (
-            <HybridReportDisplay
-              reportData={{
-                mode: 'hybrid',
-                report: MATERIALS_SCIENCE_HYBRID_REPORT,
-              }}
-              useBrandSystem={true}
-              showToc={false}
-            />
-          ) : report.id === 'energy' ? (
-            <HybridReportDisplay
-              reportData={{
-                mode: 'hybrid',
-                report: ENERGY_HYBRID_REPORT,
-              }}
-              useBrandSystem={true}
-              showToc={false}
-            />
-          ) : (
-            <ReportContent report={report} />
           )}
 
-          <div className="h-32" />
+          {/* Report Content */}
+          <div className="min-w-0 flex-1">
+            <div className="mx-auto max-w-3xl">
+              {report.locked ? (
+                <LockedOverlay report={report} />
+              ) : reportData ? (
+                <HybridReportDisplay
+                  reportData={{
+                    mode: 'hybrid',
+                    report: reportData,
+                  }}
+                  useBrandSystem={true}
+                  showToc={false}
+                />
+              ) : (
+                <ReportContent report={report} />
+              )}
+              <div className="h-32" />
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
+/**
+ * Sticky TOC Sidebar - Only visible within the example reports section
+ */
+const StickyTocSidebar = memo(function StickyTocSidebar({
+  sections,
+  activeSection,
+  onNavigate,
+}: {
+  sections: TocSection[];
+  activeSection: string;
+  onNavigate: (id: string) => void;
+}) {
+  return (
+    <aside className="hidden w-56 shrink-0 lg:block">
+      <nav className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto">
+        {/* Contents label */}
+        <p className="mb-4 text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+          Contents
+        </p>
+
+        <ul className="space-y-1 border-l border-zinc-200 pl-4">
+          {sections.map((section) => (
+            <li key={section.id}>
+              <button
+                onClick={() => onNavigate(section.id)}
+                className={cn(
+                  'relative block w-full py-1.5 text-left text-[14px] transition-colors',
+                  activeSection === section.id
+                    ? 'font-medium text-zinc-900'
+                    : 'text-zinc-500 hover:text-zinc-900',
+                )}
+              >
+                {/* Active indicator */}
+                {activeSection === section.id && (
+                  <span className="absolute -left-4 top-1/2 h-4 w-0.5 -translate-y-1/2 bg-zinc-900" />
+                )}
+                {section.title}
+              </button>
+
+              {/* Subsections */}
+              {section.subsections && section.subsections.length > 0 && (
+                <ul className="ml-3 mt-1 space-y-1">
+                  {section.subsections.map((sub) => (
+                    <li key={sub.id}>
+                      <button
+                        onClick={() => onNavigate(sub.id)}
+                        className={cn(
+                          'block w-full py-1 text-left text-[13px] transition-colors',
+                          activeSection === sub.id
+                            ? 'text-zinc-700'
+                            : 'text-zinc-400 hover:text-zinc-600',
+                        )}
+                      >
+                        {sub.title}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+  );
+});
 
 interface Report {
   id: string;
