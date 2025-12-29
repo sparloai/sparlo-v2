@@ -154,11 +154,9 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
     );
   }, [search, reports]);
 
-  // Check if report is in a processing state (not complete)
+  // Check if report is in a processing state (not complete, not clarifying)
   const isProcessing = (status: ConversationStatus) =>
-    status === 'processing' ||
-    status === 'clarifying' ||
-    status === 'confirm_rerun';
+    status === 'processing' || status === 'confirm_rerun';
 
   return (
     <div
@@ -218,6 +216,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
               const isComplete = report.status === 'complete';
               const isFailed = report.status === 'failed';
               const isCancelled = report.status === 'cancelled';
+              const isClarifying = report.status === 'clarifying';
               const isClickable = isComplete;
 
               // Use headline if available, otherwise truncate title
@@ -276,6 +275,62 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                       </div>
                     </div>
                   </div>
+                );
+              }
+
+              if (isClarifying) {
+                // Clarifying state - amber theme, clickable to answer question
+                return (
+                  <Link
+                    key={report.id}
+                    href={`/home/reports/${report.id}`}
+                    data-test={`report-card-${report.id}`}
+                    className={cn(
+                      'group relative flex items-start gap-4 p-5 transition-all duration-200',
+                      'cursor-pointer hover:-translate-y-0.5 hover:bg-amber-100 hover:shadow-[0_4px_12px_rgba(251,191,36,0.15)] dark:hover:bg-amber-900/20',
+                      'bg-amber-50/50 dark:bg-amber-900/10',
+                      !isLast && 'border-b border-[--border-subtle]',
+                    )}
+                  >
+                    {/* Status Dot (Amber, pulsing) */}
+                    <div className="relative mt-1.5 flex-shrink-0">
+                      <div className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+                      <div className="absolute inset-0 h-2 w-2 animate-ping rounded-full bg-amber-500 opacity-75" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="min-w-0 flex-1">
+                      <ModeLabel mode={report.mode} />
+                      <h3
+                        className="truncate pr-8 text-sm font-medium text-[--text-secondary]"
+                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                      >
+                        {displayTitle}
+                      </h3>
+                      <div className="mt-2 flex items-center gap-3">
+                        <span
+                          className="font-mono text-xs tracking-wider text-amber-600 uppercase dark:text-amber-400"
+                          style={{
+                            fontFamily:
+                              'Soehne Mono, JetBrains Mono, monospace',
+                          }}
+                        >
+                          Needs Clarification
+                        </span>
+                        <span className="h-3 w-px bg-[--border-default]" />
+                        <ElapsedTime createdAt={report.created_at} />
+                      </div>
+                      <p className="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                        We need more information to continue
+                      </p>
+                    </div>
+
+                    {/* Action indicator */}
+                    <div className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-1">
+                      <AlertCircle className="h-4 w-4 text-amber-500" />
+                      <ChevronRight className="h-4 w-4 -translate-x-2 text-amber-600 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 dark:text-amber-400" />
+                    </div>
+                  </Link>
                 );
               }
 
@@ -473,7 +528,10 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                   </div>
 
                   {/* Actions */}
-                  <div className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-1">
+                  <div
+                    className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-1"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <ArchiveToggleButton
                       reportId={report.id}
                       isArchived={false}
