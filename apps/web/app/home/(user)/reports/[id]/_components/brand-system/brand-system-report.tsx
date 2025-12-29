@@ -15,12 +15,20 @@
 
 'use client';
 
-import { memo, useEffect, useState } from 'react';
+import { memo, useMemo } from 'react';
 
-import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+import { Download, Share2 } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
 
+import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+
+import {
+  TOC_SCROLL_OFFSET,
+  TOC_STICKY_TOP,
+  flattenSectionIds,
+  useTocScroll,
+} from '../../_lib/hooks/use-toc-scroll';
 import { Section, SectionTitle, UnknownFieldRenderer } from './primitives';
 import {
   ChallengeFrameSection,
@@ -39,8 +47,8 @@ import {
 } from './sections';
 import {
   TableOfContents,
-  generateTocSections,
   type TocSection,
+  generateTocSections,
 } from './table-of-contents';
 
 interface BrandSystemReportProps {
@@ -308,62 +316,41 @@ function normalizeReportData(data: HybridReportData): HybridReportData {
 
 interface TocNavItemProps {
   section: TocSection;
+  activeSection: string;
+  onNavigate: (id: string) => void;
 }
 
-function TocNavItem({ section }: TocNavItemProps) {
-  const [activeSection, setActiveSection] = useState<string | null>(null);
-
-  // Track active section on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      const elements = document.querySelectorAll('[id]');
-      let currentActive = '';
-      elements.forEach((el) => {
-        const rect = el.getBoundingClientRect();
-        if (rect.top <= 150 && rect.bottom > 0) {
-          currentActive = el.id;
-        }
-      });
-      setActiveSection(currentActive);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Initial check
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleNavigate = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-  };
-
+const TocNavItem = memo(function TocNavItem({
+  section,
+  activeSection,
+  onNavigate,
+}: TocNavItemProps) {
   const isActive = activeSection === section.id;
 
   return (
     <li>
       <button
-        onClick={() => handleNavigate(section.id)}
+        onClick={() => onNavigate(section.id)}
         className={cn(
           'relative block w-full py-1.5 text-left text-[14px] transition-colors',
-          isActive ? 'font-medium text-zinc-900' : 'text-zinc-500 hover:text-zinc-900',
+          isActive
+            ? 'font-medium text-zinc-900'
+            : 'text-zinc-500 hover:text-zinc-900',
         )}
       >
         {isActive && (
-          <span className="absolute -left-4 top-1/2 h-4 w-0.5 -translate-y-1/2 bg-zinc-900" />
+          <span className="absolute top-1/2 -left-4 h-4 w-0.5 -translate-y-1/2 bg-zinc-900" />
         )}
         {section.title}
       </button>
 
       {/* Subsections */}
       {section.subsections && section.subsections.length > 0 && (
-        <ul className="ml-3 mt-1 space-y-1">
+        <ul className="mt-1 ml-3 space-y-1">
           {section.subsections.map((sub) => (
             <li key={sub.id}>
               <button
-                onClick={() => handleNavigate(sub.id)}
+                onClick={() => onNavigate(sub.id)}
                 className={cn(
                   'block w-full py-1 text-left text-[13px] transition-colors',
                   activeSection === sub.id
@@ -379,7 +366,7 @@ function TocNavItem({ section }: TocNavItemProps) {
       )}
     </li>
   );
-}
+});
 
 // ============================================
 // REPORT CONTENT COMPONENT
@@ -404,12 +391,43 @@ const ReportContent = memo(function ReportContent({
 }: ReportContentProps) {
   return (
     <>
-      {/* Report Title + Metadata */}
+      {/* Report Title + Metadata + Actions */}
       {(title || normalizedData.title) && (
         <header className="mb-16">
-          <h1 className="font-heading text-[36px] leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900 md:text-[48px]">
-            {title || normalizedData.title}
-          </h1>
+          {/* Title and Actions Row */}
+          <div className="flex items-start justify-between gap-6">
+            <h1 className="font-heading text-[36px] leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900 md:text-[48px]">
+              {title || normalizedData.title}
+            </h1>
+            {/* Action Buttons */}
+            <div className="flex shrink-0 items-center gap-2 pt-2">
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: title || normalizedData.title || 'Report',
+                      url: window.location.href,
+                    });
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                  }
+                }}
+                className="flex items-center gap-2 rounded border border-zinc-200 px-3 py-2 text-[13px] tracking-[-0.01em] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900"
+                aria-label="Share report"
+              >
+                <Share2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Share</span>
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="flex items-center gap-2 rounded border border-zinc-200 px-3 py-2 text-[13px] tracking-[-0.01em] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900"
+                aria-label="Export report"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Export</span>
+              </button>
+            </div>
+          </div>
           {/* Metadata row */}
           <div className="mt-4 flex items-center gap-4 text-[14px] tracking-[-0.02em] text-zinc-500">
             {createdAt && <span>{formatDate(createdAt)}</span>}
@@ -424,7 +442,7 @@ const ReportContent = memo(function ReportContent({
         <Section id="brief">
           <SectionTitle>The Brief</SectionTitle>
           <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-6">
-            <p className="whitespace-pre-wrap text-[16px] leading-relaxed tracking-[-0.01em] text-zinc-700">
+            <p className="text-[16px] leading-relaxed tracking-[-0.01em] whitespace-pre-wrap text-zinc-700">
               {brief}
             </p>
           </div>
@@ -464,7 +482,9 @@ const ReportContent = memo(function ReportContent({
       />
 
       {/* Strategic Integration */}
-      <StrategicIntegrationSection data={normalizedData.strategic_integration} />
+      <StrategicIntegrationSection
+        data={normalizedData.strategic_integration}
+      />
 
       {/* Risks & Watchouts */}
       <RisksWatchoutsSection data={normalizedData.risks_and_watchouts} />
@@ -481,9 +501,10 @@ const ReportContent = memo(function ReportContent({
       />
 
       {/* Key Insights (if present as separate field) */}
-      {normalizedData.key_insights && normalizedData.key_insights.length > 0 && (
-        <KeyInsightsSection insights={normalizedData.key_insights} />
-      )}
+      {normalizedData.key_insights &&
+        normalizedData.key_insights.length > 0 && (
+          <KeyInsightsSection insights={normalizedData.key_insights} />
+        )}
 
       {/* Next Steps (if present as separate field) */}
       {normalizedData.next_steps && normalizedData.next_steps.length > 0 && (
@@ -531,6 +552,18 @@ export const BrandSystemReport = memo(function BrandSystemReport({
     !!brief, // Include Brief in TOC if we have it
   );
 
+  // Flatten section IDs for scroll tracking
+  const sectionIds = useMemo(
+    () => flattenSectionIds(tocSections),
+    [tocSections],
+  );
+
+  // Use shared scroll tracking hook
+  const { activeSection, navigateToSection } = useTocScroll({
+    sectionIds,
+    scrollOffset: TOC_SCROLL_OFFSET,
+  });
+
   // Find unknown fields for graceful rendering
   const unknownFields = Object.entries(reportData).filter(
     ([key, value]) =>
@@ -550,13 +583,21 @@ export const BrandSystemReport = memo(function BrandSystemReport({
             {/* Sticky TOC Sidebar */}
             {tocSections.length > 0 && (
               <aside className="hidden w-56 shrink-0 lg:block">
-                <nav className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
+                <nav
+                  className="sticky max-h-[calc(100vh-7rem)] overflow-y-auto"
+                  style={{ top: `${TOC_STICKY_TOP}px` }}
+                >
                   <p className="mb-4 text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
                     Contents
                   </p>
                   <ul className="space-y-1 border-l border-zinc-200 pl-4">
                     {tocSections.map((section) => (
-                      <TocNavItem key={section.id} section={section} />
+                      <TocNavItem
+                        key={section.id}
+                        section={section}
+                        activeSection={activeSection}
+                        onNavigate={navigateToSection}
+                      />
                     ))}
                   </ul>
                 </nav>

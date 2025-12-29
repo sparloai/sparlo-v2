@@ -7,11 +7,11 @@ import { Lock } from 'lucide-react';
 import { CardWithHeader, SectionHeader } from '@kit/ui/aura';
 import { cn } from '@kit/ui/utils';
 
-import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybrid-report-display';
 import {
-  generateTocSections,
   type TocSection,
+  generateTocSections,
 } from '~/home/(user)/reports/[id]/_components/brand-system/table-of-contents';
+import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybrid-report-display';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
@@ -140,6 +140,7 @@ export function ExampleReportsSection() {
                   useBrandSystem={true}
                   showToc={false}
                   brief={reportData.brief}
+                  createdAt={new Date().toISOString()}
                   hasAppSidebar={false}
                 />
               ) : (
@@ -188,14 +189,14 @@ const StickyTocSidebar = memo(function StickyTocSidebar({
               >
                 {/* Active indicator */}
                 {activeSection === section.id && (
-                  <span className="absolute -left-4 top-1/2 h-4 w-0.5 -translate-y-1/2 bg-zinc-900" />
+                  <span className="absolute top-1/2 -left-4 h-4 w-0.5 -translate-y-1/2 bg-zinc-900" />
                 )}
                 {section.title}
               </button>
 
               {/* Subsections */}
               {section.subsections && section.subsections.length > 0 && (
-                <ul className="ml-3 mt-1 space-y-1">
+                <ul className="mt-1 ml-3 space-y-1">
                   {section.subsections.map((sub) => (
                     <li key={sub.id}>
                       <button
