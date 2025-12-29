@@ -6,12 +6,18 @@ import { useRouter } from 'next/navigation';
 
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Brain, Check, Loader2, Send } from 'lucide-react';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Check,
+  Loader2,
+  Send,
+} from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
-import { cn } from '@kit/ui/utils';
 import { usePrefersReducedMotion } from '@kit/ui/hooks';
 import { Textarea } from '@kit/ui/textarea';
+import { cn } from '@kit/ui/utils';
 
 import { DURATION, EASING } from '../_lib/animation-constants';
 import { answerClarification } from '../_lib/server/sparlo-reports-server-actions';
@@ -25,31 +31,7 @@ interface ProcessingScreenProps {
   designChallenge?: string;
 }
 
-// Animation variants - defined outside component for performance
-const pulseVariants: Variants = {
-  initial: { scale: 1, opacity: 0.8 },
-  animate: {
-    scale: [1, 1.05, 1],
-    opacity: [0.8, 1, 0.8],
-    transition: {
-      duration: DURATION.pulse,
-      repeat: Infinity,
-      ease: EASING.easeInOut,
-    },
-  },
-};
-
-const spinVariants: Variants = {
-  animate: {
-    rotate: 360,
-    transition: {
-      duration: DURATION.spin,
-      repeat: Infinity,
-      ease: 'linear',
-    },
-  },
-};
-
+// Animation variants for text transitions
 const textVariants: Variants = {
   initial: { opacity: 0, y: 8 },
   animate: {
@@ -347,7 +329,7 @@ export function ProcessingScreen({
 
           {/* Main Question */}
           <motion.h1
-            className="mb-12 text-center text-2xl font-medium leading-relaxed tracking-tight text-[--text-primary] md:text-3xl"
+            className="mb-12 text-center text-2xl leading-relaxed font-medium tracking-tight text-[--text-primary] md:text-3xl"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15 }}
@@ -373,7 +355,7 @@ export function ProcessingScreen({
                     'group relative w-full rounded-xl border px-6 py-4 text-left transition-all duration-200',
                     'border-[--border-default] bg-[--surface-elevated]',
                     'hover:border-[--text-muted] hover:bg-[--surface-overlay]',
-                    'focus:outline-none focus:ring-2 focus:ring-[--accent] focus:ring-offset-2 focus:ring-offset-[--surface-base]',
+                    'focus:ring-2 focus:ring-[--accent] focus:ring-offset-2 focus:ring-offset-[--surface-base] focus:outline-none',
                     'disabled:cursor-not-allowed disabled:opacity-50',
                   )}
                 >
@@ -470,128 +452,120 @@ export function ProcessingScreen({
     !progress.currentStep || progress.currentStep.startsWith('an0');
 
   // Default: Processing status - two states based on current phase
+  // Air Company inspired: clean, bold, minimal
+  if (isInitialReview) {
+    return (
+      <motion.div
+        className="flex min-h-screen flex-col items-center justify-center bg-white px-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+      >
+        <div className="flex flex-col items-center">
+          {/* Minimal animated indicator - three dots */}
+          <div className="mb-12 flex items-center gap-2">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="h-2 w-2 rounded-full bg-zinc-900"
+                animate={{
+                  scale: [1, 1.4, 1],
+                  opacity: [0.3, 1, 0.3],
+                }}
+                transition={{
+                  duration: 1.2,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                  ease: 'easeInOut',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Bold headline */}
+          <h1 className="mb-4 text-center text-[32px] font-medium tracking-[-0.02em] text-zinc-900 md:text-[40px]">
+            Reviewing your challenge
+          </h1>
+
+          {/* Simple subtext */}
+          <p className="mb-8 max-w-md text-center text-[15px] leading-relaxed text-zinc-500">
+            We may ask a clarifying question, or proceed directly to analysis.
+          </p>
+
+          {/* Elapsed time - subtle */}
+          <p className="text-[13px] tracking-wide text-zinc-400 tabular-nums">
+            {formatElapsed(elapsedSeconds)}
+          </p>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div
-      className="flex min-h-[60vh] flex-col items-center justify-center bg-[--surface-base] p-6"
+      className="flex min-h-screen flex-col items-center justify-center bg-white px-6"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >
-      <div className="flex flex-col items-center gap-6">
-        {/* Animated logo with pulse and spin */}
-        <motion.div
-          className="text-[--accent]"
-          variants={prefersReducedMotion ? undefined : pulseVariants}
-          initial="initial"
-          animate="animate"
-        >
-          <motion.div
-            variants={prefersReducedMotion ? undefined : spinVariants}
-            animate="animate"
-          >
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M12 2L22 12L12 22L2 12L12 2Z"
-                stroke="currentColor"
-                strokeWidth="2"
-                fill="none"
-              />
-              <motion.path
-                d="M12 6L18 12L12 18L6 12L12 6Z"
-                fill="currentColor"
-                animate={
-                  prefersReducedMotion ? undefined : { scale: [0.8, 1, 0.8] }
-                }
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </svg>
-          </motion.div>
-        </motion.div>
-
-        {isInitialReview ? (
-          <>
-            {/* Initial review phase - analyzing for clarification */}
-            <div className="relative mx-auto mb-2 h-20 w-20">
-              <div className="absolute inset-0 rounded-full border-4 border-[--border-subtle]" />
-              <motion.div
-                className="absolute inset-0 rounded-full border-4 border-t-[--accent] border-r-transparent border-b-transparent border-l-transparent"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
-              />
-              <Brain className="absolute inset-0 m-auto h-8 w-8 text-[--accent]" />
-            </div>
-            <p className="text-lg font-medium text-[--text-primary]">
-              Analyzing Your Problem
-            </p>
-
-            <p className="max-w-sm text-center text-sm text-[--text-muted]">
-              We&apos;re reviewing your challenge to see if we need any
-              clarification before proceeding with the full analysis.
-            </p>
-
-            <div className="mt-2 space-y-1 text-center text-sm text-[--text-muted]">
-              <p>This usually takes about a minute.</p>
-              <p className="text-xs opacity-70">
-                We&apos;ll either ask a clarifying question or start the full
-                analysis.
-              </p>
-            </div>
-
-            {/* Elapsed time */}
-            <p className="mt-2 text-sm text-[--text-muted] tabular-nums">
-              {formatElapsed(elapsedSeconds)} elapsed
-            </p>
-          </>
-        ) : (
-          <>
-            {/* Main analysis phase - animated status messages */}
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={messageIndex}
-                variants={textVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                className="text-lg font-light text-[--text-primary]"
-              >
-                {STATUS_MESSAGES[messageIndex]}
-              </motion.p>
-            </AnimatePresence>
-
-            {/* Progress bar */}
-            <motion.div className="mt-2 h-1 w-64 overflow-hidden rounded-full bg-[--border-subtle]">
-              <motion.div
-                className="h-full bg-[--accent]"
-                initial={{ width: '0%' }}
-                animate={{ width: '100%' }}
-                transition={{ duration: 900, ease: 'linear' }}
-              />
-            </motion.div>
-
-            {/* Elapsed time */}
-            <p className="text-sm text-[--text-muted] tabular-nums">
-              {formatElapsed(elapsedSeconds)} elapsed
-            </p>
-
-            {/* Duration estimate */}
-            <p className="text-sm text-[--text-muted]">
-              Analyses typically take ~15 minutes
-            </p>
-
-            {/* Safe to leave notice */}
+      <div className="flex flex-col items-center">
+        {/* Animated dots for main analysis */}
+        <div className="mb-8 flex items-center gap-2">
+          {[0, 1, 2].map((i) => (
             <motion.div
-              className="mt-4 text-center text-sm text-[--text-muted]"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              <p className="flex items-center justify-center gap-1">
-                <Check className="h-4 w-4 text-[--status-success]" />
-                Safe to close this page
-              </p>
-              <p className="mt-1">We&apos;ll email you when complete.</p>
-            </motion.div>
-          </>
-        )}
+              key={i}
+              className="h-2 w-2 rounded-full bg-zinc-900"
+              animate={{
+                scale: [1, 1.4, 1],
+                opacity: [0.3, 1, 0.3],
+              }}
+              transition={{
+                duration: 1.2,
+                repeat: Infinity,
+                delay: i * 0.2,
+                ease: 'easeInOut',
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Main analysis phase - animated status messages */}
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={messageIndex}
+            variants={textVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="text-[18px] font-normal tracking-[-0.01em] text-zinc-600"
+          >
+            {STATUS_MESSAGES[messageIndex]}
+          </motion.p>
+        </AnimatePresence>
+
+        {/* Elapsed time */}
+        <p className="mt-6 text-[13px] tracking-wide text-zinc-400 tabular-nums">
+          {formatElapsed(elapsedSeconds)}
+        </p>
+
+        {/* Duration estimate */}
+        <p className="mt-2 text-[13px] text-zinc-400">
+          Analyses typically take ~15 minutes
+        </p>
+
+        {/* Safe to leave notice */}
+        <motion.div
+          className="mt-8 text-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          <p className="flex items-center justify-center gap-1.5 text-[13px] text-zinc-500">
+            <Check className="h-3.5 w-3.5 text-emerald-500" />
+            Safe to close this page
+          </p>
+          <p className="mt-1 text-[13px] text-zinc-400">
+            We&apos;ll email you when complete.
+          </p>
+        </motion.div>
       </div>
     </motion.div>
   );
