@@ -178,7 +178,7 @@ function extractDiscoveryContext(reportData: Record<string, unknown>): string {
 
 /**
  * Extract text context from hybrid report for chat
- * Converts structured JSON to readable markdown to reduce tokens and improve AI understanding
+ * Converts structured JSON to readable markdown - includes ALL sections for complete context
  */
 function extractHybridContext(reportData: Record<string, unknown>): string {
   const report = reportData.report as Record<string, unknown> | undefined;
@@ -193,115 +193,450 @@ function extractHybridContext(reportData: Record<string, unknown>): string {
     if (header.tagline) sections.push(`*${header.tagline}*`);
   }
 
+  // The Brief
+  const brief = report.brief as string | undefined;
+  if (brief) {
+    sections.push('\n## The Brief');
+    sections.push(brief);
+  }
+
   // Executive Summary
-  const exec = report.executive_summary as Record<string, unknown> | undefined;
+  const exec = report.executive_summary;
   if (exec) {
     sections.push('\n## Executive Summary');
-    if (exec.one_liner) sections.push(exec.one_liner as string);
-    if (exec.primary_recommendation)
-      sections.push(`**Recommendation:** ${exec.primary_recommendation}`);
-    if (exec.key_insight) sections.push(`**Key Insight:** ${exec.key_insight}`);
+    if (typeof exec === 'string') {
+      sections.push(exec);
+    } else if (typeof exec === 'object' && exec !== null) {
+      const es = exec as Record<string, unknown>;
+      if (es.narrative_lead) sections.push(es.narrative_lead as string);
+      if (es.the_problem) sections.push(`**The Problem:** ${es.the_problem}`);
+      const coreInsight = es.core_insight as Record<string, unknown> | undefined;
+      if (coreInsight) {
+        if (coreInsight.headline) sections.push(`**Core Insight:** ${coreInsight.headline}`);
+        if (coreInsight.explanation) sections.push(coreInsight.explanation as string);
+      }
+      if (es.primary_recommendation)
+        sections.push(`**Primary Recommendation:** ${es.primary_recommendation}`);
+      if (es.viability) sections.push(`**Viability:** ${es.viability} (${es.viability_label || ''})`);
+      const recommendedPath = es.recommended_path as Array<Record<string, unknown>> | undefined;
+      if (recommendedPath?.length) {
+        sections.push('\n**Recommended Path:**');
+        recommendedPath.forEach((step) => {
+          sections.push(`${step.step}. ${step.action}${step.rationale ? ` - ${step.rationale}` : ''}`);
+        });
+      }
+    }
   }
 
   // Problem Analysis
-  const problem = report.problem_analysis as
-    | Record<string, unknown>
-    | undefined;
+  const problem = report.problem_analysis as Record<string, unknown> | undefined;
   if (problem) {
     sections.push('\n## Problem Analysis');
-    if (problem.core_challenge)
-      sections.push(`**Core Challenge:** ${problem.core_challenge}`);
-    if (problem.why_hard) sections.push(`**Why Hard:** ${problem.why_hard}`);
-    const constraints = problem.key_constraints as string[] | undefined;
-    if (constraints?.length) {
-      sections.push('**Key Constraints:**');
-      constraints.forEach((c) => sections.push(`- ${c}`));
+    const whatsWrong = problem.whats_wrong as Record<string, unknown> | undefined;
+    if (whatsWrong?.prose) sections.push(`**What's Wrong:** ${whatsWrong.prose}`);
+
+    const currentState = problem.current_state_of_art as Record<string, unknown> | undefined;
+    if (currentState?.benchmarks) {
+      const benchmarks = currentState.benchmarks as Array<Record<string, unknown>>;
+      if (benchmarks.length) {
+        sections.push('\n**Current State of the Art:**');
+        benchmarks.forEach((b) => {
+          sections.push(`- ${b.entity}: ${b.approach} (${b.current_performance})`);
+        });
+      }
     }
-  }
 
-  // Solution Concepts
-  const concepts = report.solution_concepts as
-    | Record<string, unknown>
-    | undefined;
-  if (concepts) {
-    sections.push('\n## Solution Concepts');
-
-    // Lead concepts
-    const leadConcepts = concepts.lead_concepts as
-      | Array<Record<string, unknown>>
-      | undefined;
-    if (leadConcepts?.length) {
-      sections.push('\n### Lead Concepts');
-      leadConcepts.forEach((concept, i) => {
-        sections.push(`\n#### ${i + 1}. ${concept.title || 'Concept'}`);
-        if (concept.one_liner) sections.push(concept.one_liner as string);
-        if (concept.how_it_works)
-          sections.push(`**How it works:** ${concept.how_it_works}`);
-        if (concept.why_promising)
-          sections.push(`**Why promising:** ${concept.why_promising}`);
+    const industryApproaches = problem.what_industry_does_today as Array<Record<string, unknown>> | undefined;
+    if (industryApproaches?.length) {
+      sections.push('\n**What Industry Does Today:**');
+      industryApproaches.forEach((a) => {
+        sections.push(`- ${a.approach}: ${a.limitation}`);
       });
     }
 
-    // Spark concept
-    const spark = concepts.spark_concept as
-      | Record<string, unknown>
-      | undefined;
-    if (spark) {
-      sections.push(`\n### Spark Concept: ${spark.title || 'Unconventional Idea'}`);
-      if (spark.one_liner) sections.push(spark.one_liner as string);
-      if (spark.why_unconventional)
-        sections.push(`**Why unconventional:** ${spark.why_unconventional}`);
+    const whyHard = problem.why_its_hard as Record<string, unknown> | undefined;
+    if (whyHard) {
+      if (whyHard.prose) sections.push(`\n**Why It's Hard:** ${whyHard.prose}`);
+      const govEq = whyHard.governing_equation as Record<string, unknown> | undefined;
+      if (govEq?.equation) sections.push(`Governing Equation: ${govEq.equation}`);
+      const factors = whyHard.factors as Array<Record<string, unknown>> | undefined;
+      if (factors?.length) {
+        factors.forEach((f) => sections.push(`- ${f.factor}: ${f.explanation}`));
+      }
+    }
+
+    const fpInsight = problem.first_principles_insight as Record<string, unknown> | undefined;
+    if (fpInsight) {
+      sections.push(`\n**First Principles Insight:** ${fpInsight.headline}`);
+      if (fpInsight.explanation) sections.push(fpInsight.explanation as string);
+    }
+
+    const rootCauses = problem.root_cause_hypotheses as Array<Record<string, unknown>> | undefined;
+    if (rootCauses?.length) {
+      sections.push('\n**Root Cause Hypotheses:**');
+      rootCauses.forEach((h) => {
+        sections.push(`- ${h.name} (${h.confidence_percent || h.confidence}% confidence): ${h.explanation || h.hypothesis}`);
+      });
+    }
+
+    const metrics = problem.success_metrics as Array<Record<string, unknown>> | undefined;
+    if (metrics?.length) {
+      sections.push('\n**Success Metrics:**');
+      metrics.forEach((m) => {
+        sections.push(`- ${m.metric}: Target ${m.target}${m.unit ? ` ${m.unit}` : ''}`);
+      });
+    }
+  }
+
+  // Constraints
+  const constraints = report.constraints_and_metrics as Record<string, unknown> | undefined;
+  if (constraints) {
+    sections.push('\n## Constraints');
+    const hard = constraints.hard_constraints as string[] | undefined;
+    if (hard?.length) {
+      sections.push('**Hard Constraints (Must Meet):**');
+      hard.forEach((c) => sections.push(`- ${c}`));
+    }
+    const soft = constraints.soft_constraints as string[] | undefined;
+    if (soft?.length) {
+      sections.push('**Soft Constraints (Prefer):**');
+      soft.forEach((c) => sections.push(`- ${c}`));
+    }
+    const assumptions = constraints.assumptions as string[] | undefined;
+    if (assumptions?.length) {
+      sections.push('**Assumptions:**');
+      assumptions.forEach((a) => sections.push(`- ${a}`));
     }
   }
 
   // Challenge the Frame
-  const challenges = report.challenge_the_frame as
-    | Array<Record<string, unknown>>
-    | undefined;
+  const challenges = report.challenge_the_frame as Array<Record<string, unknown>> | undefined;
   if (challenges?.length) {
     sections.push('\n## Challenge the Frame');
-    challenges.forEach((challenge) => {
-      if (challenge.assumption)
-        sections.push(`**Assumption:** ${challenge.assumption}`);
-      if (challenge.reframe) sections.push(`**Reframe:** ${challenge.reframe}`);
+    challenges.forEach((c) => {
+      sections.push(`\n**Assumption:** ${c.assumption}`);
+      if (c.challenge) sections.push(`**Challenge:** ${c.challenge}`);
+      if (c.implication) sections.push(`**Implication:** ${c.implication}`);
     });
   }
 
-  // Risks and Watchouts
-  const risks = report.risks_and_watchouts as
-    | Record<string, unknown>
-    | undefined;
-  if (risks) {
-    sections.push('\n## Risks and Watchouts');
-    const technical = risks.technical_risks as
-      | Array<Record<string, unknown>>
-      | undefined;
-    if (technical?.length) {
-      sections.push('**Technical Risks:**');
-      technical.forEach((r) => {
-        if (r.risk) sections.push(`- ${r.risk}`);
+  // Innovation Analysis
+  const innovationAnalysis = report.innovation_analysis as Record<string, unknown> | undefined;
+  if (innovationAnalysis) {
+    sections.push('\n## Innovation Analysis');
+    if (innovationAnalysis.reframe) sections.push(`**Reframe:** ${innovationAnalysis.reframe}`);
+    const domains = innovationAnalysis.domains_searched as string[] | undefined;
+    if (domains?.length) {
+      sections.push('**Domains Searched:**');
+      domains.forEach((d) => sections.push(`- ${d}`));
+    }
+  }
+
+  // Cross-Domain Search
+  const crossDomain = report.cross_domain_search as Record<string, unknown> | undefined;
+  if (crossDomain) {
+    const enhanced = crossDomain.enhanced_challenge_frame as Record<string, unknown> | undefined;
+    if (enhanced?.reframing) {
+      sections.push('\n## Cross-Domain Search');
+      sections.push(`**Reframing:** ${enhanced.reframing}`);
+    }
+    const domainsSearched = crossDomain.domains_searched as Array<Record<string, unknown>> | undefined;
+    if (domainsSearched?.length) {
+      sections.push('**Domains Explored:**');
+      domainsSearched.forEach((d) => {
+        sections.push(`- ${d.domain}: ${d.mechanism_found} (${d.relevance})`);
       });
     }
-    const market = risks.market_risks as
-      | Array<Record<string, unknown>>
-      | undefined;
-    if (market?.length) {
-      sections.push('**Market Risks:**');
-      market.forEach((r) => {
-        if (r.risk) sections.push(`- ${r.risk}`);
+    const revelations = crossDomain.from_scratch_revelations as Array<Record<string, unknown>> | undefined;
+    if (revelations?.length) {
+      sections.push('**Key Revelations:**');
+      revelations.forEach((r) => {
+        sections.push(`- ${r.discovery}: ${r.implication}`);
       });
     }
   }
 
-  // Next Steps
-  const nextSteps = report.next_steps as Record<string, unknown> | undefined;
-  if (nextSteps) {
-    sections.push('\n## Next Steps');
-    const immediate = nextSteps.immediate_actions as string[] | undefined;
-    if (immediate?.length) {
-      sections.push('**Immediate Actions:**');
-      immediate.forEach((a) => sections.push(`- ${a}`));
+  // Execution Track (Solution Concepts)
+  const execTrack = report.execution_track as Record<string, unknown> | undefined;
+  if (execTrack) {
+    sections.push('\n## Solution Concepts (Execution Track)');
+    if (execTrack.intro) sections.push(execTrack.intro as string);
+
+    const primary = execTrack.primary as Record<string, unknown> | undefined;
+    if (primary) {
+      sections.push(`\n### Primary Recommendation: ${primary.title}`);
+      if (primary.bottom_line) sections.push(`**Bottom Line:** ${primary.bottom_line}`);
+      if (primary.what_it_is) sections.push(`**What It Is:** ${primary.what_it_is}`);
+      if (primary.why_it_works) sections.push(`**Why It Works:** ${primary.why_it_works}`);
+      if (primary.expected_improvement) sections.push(`**Expected Improvement:** ${primary.expected_improvement}`);
+      if (primary.timeline) sections.push(`**Timeline:** ${primary.timeline}`);
+      if (primary.investment) sections.push(`**Investment:** ${primary.investment}`);
+      if (primary.confidence) sections.push(`**Confidence:** ${primary.confidence}%`);
+
+      const insight = primary.the_insight as Record<string, unknown> | undefined;
+      if (insight) {
+        sections.push('\n**The Insight:**');
+        if (insight.what) sections.push(`- What: ${insight.what}`);
+        if (insight.physics) sections.push(`- Physics: ${insight.physics}`);
+        if (insight.why_industry_missed_it) sections.push(`- Why Industry Missed It: ${insight.why_industry_missed_it}`);
+        const whereFound = insight.where_we_found_it as Record<string, unknown> | undefined;
+        if (whereFound) {
+          sections.push(`- Source Domain: ${whereFound.domain}`);
+          if (whereFound.how_they_use_it) sections.push(`- How They Use It: ${whereFound.how_they_use_it}`);
+          if (whereFound.why_it_transfers) sections.push(`- Why It Transfers: ${whereFound.why_it_transfers}`);
+        }
+      }
+
+      const whySafe = primary.why_safe as Record<string, unknown> | undefined;
+      if (whySafe) {
+        sections.push('\n**Why This Is Safe:**');
+        if (whySafe.track_record) sections.push(`- Track Record: ${whySafe.track_record}`);
+        const precedents = whySafe.precedent as string[] | undefined;
+        if (precedents?.length) {
+          sections.push('- Precedents:');
+          precedents.forEach((p) => sections.push(`  - ${p}`));
+        }
+      }
+
+      const failModes = primary.why_it_might_fail as string[] | undefined;
+      if (failModes?.length) {
+        sections.push('\n**Potential Failure Modes:**');
+        failModes.forEach((f) => sections.push(`- ${f}`));
+      }
+
+      const gates = primary.validation_gates as Array<Record<string, unknown>> | undefined;
+      if (gates?.length) {
+        sections.push('\n**Validation Gates:**');
+        gates.forEach((g) => {
+          sections.push(`- ${g.week}: ${g.test}`);
+          if (g.method) sections.push(`  Method: ${g.method}`);
+          if (g.success_criteria) sections.push(`  Success Criteria: ${g.success_criteria}`);
+          if (g.cost) sections.push(`  Cost: ${g.cost}`);
+        });
+      }
     }
+
+    const supporting = execTrack.supporting_concepts as Array<Record<string, unknown>> | undefined;
+    if (supporting?.length) {
+      sections.push('\n### Supporting Concepts');
+      supporting.forEach((s) => {
+        sections.push(`\n**${s.title}** (${s.relationship})`);
+        if (s.one_liner) sections.push(s.one_liner as string);
+        if (s.what_it_is) sections.push(`What It Is: ${s.what_it_is}`);
+        if (s.why_it_works) sections.push(`Why It Works: ${s.why_it_works}`);
+        if (s.when_to_use_instead) sections.push(`When to Use: ${s.when_to_use_instead}`);
+      });
+    }
+
+    const whyNotObvious = execTrack.why_not_obvious as Record<string, unknown> | undefined;
+    if (whyNotObvious) {
+      sections.push('\n**Why Not Obvious:**');
+      if (whyNotObvious.industry_gap) sections.push(`- Industry Gap: ${whyNotObvious.industry_gap}`);
+      if (whyNotObvious.knowledge_barrier) sections.push(`- Knowledge Barrier: ${whyNotObvious.knowledge_barrier}`);
+      if (whyNotObvious.our_contribution) sections.push(`- Our Contribution: ${whyNotObvious.our_contribution}`);
+    }
+  }
+
+  // Innovation Portfolio (Innovation Concepts)
+  const innovPortfolio = report.innovation_portfolio as Record<string, unknown> | undefined;
+  if (innovPortfolio) {
+    sections.push('\n## Innovation Concepts (Innovation Portfolio)');
+    if (innovPortfolio.intro) sections.push(innovPortfolio.intro as string);
+
+    const recommended = innovPortfolio.recommended_innovation as Record<string, unknown> | undefined;
+    if (recommended) {
+      sections.push(`\n### Recommended Innovation: ${recommended.title}`);
+      if (recommended.what_it_is) sections.push(`**What It Is:** ${recommended.what_it_is}`);
+      if (recommended.why_it_works) sections.push(`**Why It Works:** ${recommended.why_it_works}`);
+      if (recommended.innovation_type) sections.push(`**Type:** ${recommended.innovation_type}`);
+      if (recommended.source_domain) sections.push(`**Source Domain:** ${recommended.source_domain}`);
+
+      const selRationale = recommended.selection_rationale as Record<string, unknown> | undefined;
+      if (selRationale) {
+        sections.push('\n**Selection Rationale:**');
+        if (selRationale.why_this_one) sections.push(`- Why This One: ${selRationale.why_this_one}`);
+        if (selRationale.ceiling_if_works) sections.push(`- Ceiling If Works: ${selRationale.ceiling_if_works}`);
+        if (selRationale.vs_execution_track) sections.push(`- vs Execution Track: ${selRationale.vs_execution_track}`);
+      }
+
+      const breakthrough = recommended.breakthrough_potential as Record<string, unknown> | undefined;
+      if (breakthrough) {
+        sections.push('\n**Breakthrough Potential:**');
+        if (breakthrough.if_it_works) sections.push(`- If It Works: ${breakthrough.if_it_works}`);
+        if (breakthrough.estimated_improvement) sections.push(`- Estimated Improvement: ${breakthrough.estimated_improvement}`);
+        if (breakthrough.industry_impact) sections.push(`- Industry Impact: ${breakthrough.industry_impact}`);
+      }
+
+      const rRisks = recommended.risks as Record<string, unknown> | undefined;
+      if (rRisks) {
+        const physicsRisks = rRisks.physics_risks as string[] | undefined;
+        if (physicsRisks?.length) {
+          sections.push('\n**Physics Risks:**');
+          physicsRisks.forEach((r) => sections.push(`- ${r}`));
+        }
+        const implChallenges = rRisks.implementation_challenges as string[] | undefined;
+        if (implChallenges?.length) {
+          sections.push('**Implementation Challenges:**');
+          implChallenges.forEach((r) => sections.push(`- ${r}`));
+        }
+      }
+
+      const valPath = recommended.validation_path as Record<string, unknown> | undefined;
+      if (valPath) {
+        sections.push('\n**Validation Path:**');
+        if (valPath.gating_question) sections.push(`- Gating Question: ${valPath.gating_question}`);
+        if (valPath.first_test) sections.push(`- First Test: ${valPath.first_test}`);
+        if (valPath.cost) sections.push(`- Cost: ${valPath.cost}`);
+        if (valPath.timeline) sections.push(`- Timeline: ${valPath.timeline}`);
+        if (valPath.go_no_go) sections.push(`- Go/No-Go: ${valPath.go_no_go}`);
+      }
+    }
+
+    const parallel = innovPortfolio.parallel_investigations as Array<Record<string, unknown>> | undefined;
+    if (parallel?.length) {
+      sections.push('\n### Parallel Investigations');
+      parallel.forEach((p) => {
+        sections.push(`\n**${p.title}**`);
+        if (p.one_liner) sections.push(p.one_liner as string);
+        if (p.what_it_is) sections.push(`What It Is: ${p.what_it_is}`);
+        if (p.why_it_works) sections.push(`Why It Works: ${p.why_it_works}`);
+        if (p.ceiling) sections.push(`Ceiling: ${p.ceiling}`);
+        if (p.key_uncertainty) sections.push(`Key Uncertainty: ${p.key_uncertainty}`);
+        if (p.when_to_elevate) sections.push(`When to Elevate: ${p.when_to_elevate}`);
+      });
+    }
+
+    const frontier = innovPortfolio.frontier_watch as Array<Record<string, unknown>> | undefined;
+    if (frontier?.length) {
+      sections.push('\n### Frontier Technologies');
+      frontier.forEach((f) => {
+        sections.push(`\n**${f.title}**`);
+        if (f.one_liner) sections.push(f.one_liner as string);
+        if (f.why_interesting) sections.push(`Why Interesting: ${f.why_interesting}`);
+        if (f.why_not_now) sections.push(`Why Not Now: ${f.why_not_now}`);
+        if (f.trigger_to_revisit) sections.push(`Trigger to Revisit: ${f.trigger_to_revisit}`);
+        if (f.earliest_viability) sections.push(`Earliest Viability: ${f.earliest_viability}`);
+        if (f.who_to_monitor) sections.push(`Who to Monitor: ${f.who_to_monitor}`);
+      });
+    }
+  }
+
+  // Honest Assessment
+  const honest = report.honest_assessment as Record<string, unknown> | undefined;
+  if (honest) {
+    sections.push('\n## Honest Assessment');
+    if (honest.problem_type) sections.push(`**Problem Type:** ${honest.problem_type}`);
+    if (honest.candid_assessment) sections.push(`**Candid Assessment:** ${honest.candid_assessment}`);
+    const evRange = honest.expected_value_range as Record<string, unknown> | undefined;
+    if (evRange) {
+      sections.push(`**Expected Value Range:** Floor: ${evRange.floor}, Ceiling: ${evRange.ceiling}, Most Likely: ${evRange.most_likely}`);
+    }
+    if (honest.if_value_is_limited) sections.push(`**If Value Is Limited:** ${honest.if_value_is_limited}`);
+  }
+
+  // Risks and Watchouts
+  const risks = report.risks_and_watchouts as Array<Record<string, unknown>> | undefined;
+  if (risks?.length) {
+    sections.push('\n## Risks & Watchouts');
+    risks.forEach((r) => {
+      sections.push(`\n**${r.risk}** (${r.severity} severity, ${r.category})`);
+      if (r.mitigation) sections.push(`Mitigation: ${r.mitigation}`);
+    });
+  }
+
+  // Self-Critique
+  const selfCritique = report.self_critique as Record<string, unknown> | undefined;
+  if (selfCritique) {
+    sections.push('\n## Self-Critique');
+    if (selfCritique.overall_confidence || selfCritique.confidence_level) {
+      sections.push(`**Confidence Level:** ${selfCritique.overall_confidence || selfCritique.confidence_level}`);
+    }
+    if (selfCritique.confidence_rationale) sections.push(`**Rationale:** ${selfCritique.confidence_rationale}`);
+    const wrongAbout = selfCritique.what_we_might_be_wrong_about as string[] | undefined;
+    if (wrongAbout?.length) {
+      sections.push('\n**What We Might Be Wrong About:**');
+      wrongAbout.forEach((w) => sections.push(`- ${w}`));
+    }
+    const unexplored = selfCritique.unexplored_directions as string[] | undefined;
+    if (unexplored?.length) {
+      sections.push('\n**Unexplored Directions:**');
+      unexplored.forEach((u) => sections.push(`- ${u}`));
+    }
+    const valGaps = selfCritique.validation_gaps as Array<Record<string, unknown>> | undefined;
+    if (valGaps?.length) {
+      sections.push('\n**Validation Gaps:**');
+      valGaps.forEach((v) => {
+        sections.push(`- ${v.concern} (${v.status}): ${v.rationale}`);
+      });
+    }
+  }
+
+  // Strategic Integration / Recommendation
+  const strategic = report.strategic_integration as Record<string, unknown> | undefined;
+  if (strategic) {
+    sections.push('\n## Recommendation');
+
+    const portfolio = strategic.portfolio_view as Record<string, unknown> | undefined;
+    if (portfolio) {
+      sections.push('\n**Portfolio View:**');
+      if (portfolio.execution_track_role) sections.push(`- Execution Track Role: ${portfolio.execution_track_role}`);
+      if (portfolio.innovation_portfolio_role) sections.push(`- Innovation Portfolio Role: ${portfolio.innovation_portfolio_role}`);
+      if (portfolio.combined_strategy) sections.push(`- Combined Strategy: ${portfolio.combined_strategy}`);
+    }
+
+    const allocation = strategic.resource_allocation as Record<string, unknown> | undefined;
+    if (allocation) {
+      sections.push('\n**Resource Allocation:**');
+      if (allocation.execution_track_percent) sections.push(`- Execution Track: ${allocation.execution_track_percent}%`);
+      if (allocation.recommended_innovation_percent) sections.push(`- Recommended Innovation: ${allocation.recommended_innovation_percent}%`);
+      if (allocation.parallel_investigations_percent) sections.push(`- Parallel Investigations: ${allocation.parallel_investigations_percent}%`);
+      if (allocation.frontier_watch_percent) sections.push(`- Frontier Watch: ${allocation.frontier_watch_percent}%`);
+      if (allocation.rationale) sections.push(`- Rationale: ${allocation.rationale}`);
+    }
+
+    const decision = strategic.decision_architecture as Record<string, unknown> | undefined;
+    if (decision) {
+      const tradeoff = decision.primary_tradeoff as Record<string, unknown> | undefined;
+      if (tradeoff?.question) {
+        sections.push(`\n**Primary Tradeoff:** ${tradeoff.question}`);
+        const optA = tradeoff.option_a as Record<string, unknown> | undefined;
+        if (optA) {
+          sections.push(`Option A: ${optA.path} - ${optA.what_you_get} (give up: ${optA.what_you_give_up})`);
+        }
+        const optB = tradeoff.option_b as Record<string, unknown> | undefined;
+        if (optB) {
+          sections.push(`Option B: ${optB.path} - ${optB.what_you_get} (give up: ${optB.what_you_give_up})`);
+        }
+        if (tradeoff.if_uncertain) sections.push(`If Uncertain: ${tradeoff.if_uncertain}`);
+      }
+      if (decision.summary) sections.push(`\n**Decision Summary:** ${decision.summary}`);
+    }
+
+    const actionPlan = strategic.action_plan as Array<Record<string, unknown>> | undefined;
+    if (actionPlan?.length) {
+      sections.push('\n**Action Plan:**');
+      actionPlan.forEach((a) => {
+        sections.push(`\n${a.timeframe}:`);
+        const actions = a.actions as string[] | undefined;
+        actions?.forEach((act) => sections.push(`- ${act}`));
+        if (a.rationale) sections.push(`Rationale: ${a.rationale}`);
+        if (a.decision_gate) sections.push(`Decision Gate: ${a.decision_gate}`);
+      });
+    }
+
+    const personal = strategic.personal_recommendation as Record<string, unknown> | undefined;
+    if (personal) {
+      sections.push('\n**Personal Recommendation:**');
+      if (personal.intro) sections.push(personal.intro as string);
+      if (personal.key_insight) sections.push(`Key Insight: ${personal.key_insight}`);
+    }
+  }
+
+  // What I'd Actually Do
+  const whatIdDo = report.what_id_actually_do as string | undefined;
+  if (whatIdDo) {
+    sections.push('\n## What I\'d Actually Do');
+    sections.push(whatIdDo);
   }
 
   return sections.join('\n');
