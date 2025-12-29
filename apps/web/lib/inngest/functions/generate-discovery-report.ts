@@ -257,18 +257,24 @@ export const generateDiscoveryReport = inngest.createFunction(
             };
           }
 
-          // Re-run AN0-D with clarification
+          // Re-run AN0-D with clarification (include original attachments)
           const clarifiedResult = await step.run(
             'an0-d-with-clarification',
             async () => {
-              const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+              // Build message with clarification + original attachments
+              let clarifiedMessage = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+              if (imageAttachments.length > 0) {
+                clarifiedMessage += `\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`;
+              }
 
               const { content, usage } = await callClaude({
                 model: MODELS.OPUS,
                 system: AN0_D_PROMPT,
-                userMessage: clarifiedChallenge,
+                userMessage: clarifiedMessage,
                 maxTokens: DISCOVERY_CHAIN_CONFIG.maxTokensByPhase['an0-d'],
                 temperature: DISCOVERY_CHAIN_CONFIG.temperatureByPhase['an0-d'],
+                images:
+                  imageAttachments.length > 0 ? imageAttachments : undefined,
               });
 
               const parsed = parseJsonResponse<AN0DOutput>(content, 'AN0-D');

@@ -288,17 +288,23 @@ export const generateReport = inngest.createFunction(
               });
             });
 
-            // Re-run AN0 with clarification answer
+            // Re-run AN0 with clarification answer (include original attachments)
             const an0RetryResult = await step.run(
               'an0-with-clarification',
               async () => {
-                const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+                // Build message with clarification + original attachments
+                let clarifiedMessage = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+                if (imageAttachments.length > 0) {
+                  clarifiedMessage += `\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`;
+                }
 
                 const { content, usage } = await callClaude({
                   model: MODELS.OPUS,
                   system: AN0_PROMPT,
-                  userMessage: clarifiedChallenge,
+                  userMessage: clarifiedMessage,
                   maxTokens: 8000,
+                  images:
+                    imageAttachments.length > 0 ? imageAttachments : undefined,
                 });
 
                 const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
