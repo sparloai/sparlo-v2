@@ -65,7 +65,7 @@ export const generateDiscoveryReport = inngest.createFunction(
     cancelOn: [
       {
         event: 'report/cancel.requested',
-        match: 'data.reportId',
+        if: 'async.data.reportId == event.data.reportId',
       },
     ],
     onFailure: async ({ error, event, step }) => {
