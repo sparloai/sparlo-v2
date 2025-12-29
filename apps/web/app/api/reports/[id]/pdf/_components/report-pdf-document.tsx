@@ -27,7 +27,9 @@ import type {
 } from '../_lib/types';
 
 // ============================================
-// Aura-Inspired PDF Styles
+// Brand System PDF Styles
+// Air Company Aesthetic - Technical Monograph
+// Typography-driven, near-monochrome (zinc palette only)
 // ============================================
 
 const colors = {
@@ -43,250 +45,245 @@ const colors = {
   zinc100: '#f4f4f5',
   zinc50: '#fafafa',
   white: '#ffffff',
-  green700: '#15803d',
-  green100: '#dcfce7',
-  amber700: '#b45309',
-  amber500: '#f59e0b',
-  amber100: '#fef3c7',
-  red700: '#b91c1c',
-  red500: '#ef4444',
-  red100: '#fee2e2',
-  blue700: '#1d4ed8',
-  blue100: '#dbeafe',
-  violet700: '#6d28d9',
-  violet500: '#8b5cf6',
-  violet100: '#ede9fe',
-  orange500: '#f97316',
 };
 
 const styles = StyleSheet.create({
+  // Page setup
   page: {
-    padding: 40,
-    paddingBottom: 60, // Extra bottom padding for footer
+    padding: 48,
+    paddingBottom: 64,
     fontSize: 10,
     fontFamily: 'Helvetica',
     backgroundColor: colors.white,
   },
-  // Header
+  // Header - minimal, typography-driven
   header: {
-    marginBottom: 24,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.zinc200,
+    marginBottom: 32,
   },
   logo: {
-    fontSize: 14,
+    fontSize: 11,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc950,
-    letterSpacing: 2,
-    marginBottom: 8,
+    color: colors.zinc400,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginBottom: 16,
   },
   title: {
-    fontSize: 22,
+    fontSize: 28,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc950,
-    marginBottom: 6,
-    lineHeight: 1.2,
+    color: colors.zinc900,
+    marginBottom: 8,
+    lineHeight: 1.1,
+    letterSpacing: -0.5,
   },
   headline: {
     fontSize: 12,
-    color: colors.zinc600,
+    color: colors.zinc500,
     lineHeight: 1.4,
+    letterSpacing: -0.2,
   },
-  // Sections
+  // Sections - clean spacing
   section: {
-    marginBottom: 20,
+    marginBottom: 28,
   },
   sectionHeader: {
-    marginBottom: 12,
-    paddingBottom: 8,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.zinc950,
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 18,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc950,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    color: colors.zinc900,
+    letterSpacing: -0.3,
+    marginBottom: 4,
   },
   sectionSubtitle: {
-    fontSize: 9,
+    fontSize: 10,
     color: colors.zinc500,
-    marginTop: 2,
+    letterSpacing: -0.2,
   },
   subsectionTitle: {
-    fontSize: 11,
+    fontSize: 13,
     fontFamily: 'Helvetica-Bold',
     color: colors.zinc800,
-    marginBottom: 6,
-    marginTop: 12,
+    marginBottom: 8,
+    marginTop: 16,
+    letterSpacing: -0.2,
   },
-  // Content
+  // Content - typography baseline
   paragraph: {
     fontSize: 10,
-    lineHeight: 1.6,
+    lineHeight: 1.5,
     color: colors.zinc700,
     marginBottom: 8,
+    letterSpacing: -0.1,
   },
-  // Cards
+  // Article block - left border accent (brand system pattern)
+  articleBlock: {
+    borderLeftWidth: 2,
+    borderLeftColor: colors.zinc900,
+    paddingLeft: 16,
+    marginBottom: 16,
+  },
+  // Cards - minimal, no rounded corners (brand system)
   card: {
-    backgroundColor: colors.zinc50,
+    backgroundColor: colors.white,
     borderWidth: 1,
     borderColor: colors.zinc200,
-    borderRadius: 8,
     padding: 16,
     marginBottom: 12,
   },
   cardHighlight: {
-    backgroundColor: colors.zinc50,
-    borderWidth: 1,
-    borderColor: colors.zinc200,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.zinc950,
-    borderRadius: 8,
-    padding: 16,
+    backgroundColor: colors.white,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.zinc900,
+    paddingLeft: 16,
+    paddingVertical: 12,
     marginBottom: 12,
   },
   cardTitle: {
     fontSize: 12,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc950,
+    color: colors.zinc900,
     marginBottom: 6,
+    letterSpacing: -0.2,
   },
   cardLabel: {
-    fontSize: 8,
+    fontSize: 9,
     fontFamily: 'Helvetica-Bold',
     color: colors.zinc500,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 0.8,
     marginBottom: 4,
   },
   cardContent: {
     fontSize: 10,
     lineHeight: 1.5,
     color: colors.zinc600,
+    letterSpacing: -0.1,
   },
-  // Mono Label (matches HTML MonoLabel component)
+  // Mono Label (matches web MonoLabel - 13px uppercase tracking wide)
   monoLabel: {
     fontSize: 9,
     fontFamily: 'Helvetica-Bold',
     color: colors.zinc500,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 4,
+    letterSpacing: 0.8,
+    marginBottom: 6,
   },
-  // Badges
-  badge: {
+  // Tags - minimal monochrome only (no colored badges)
+  tag: {
+    backgroundColor: colors.zinc100,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 4,
     marginRight: 6,
     marginBottom: 6,
   },
-  badgeText: {
+  tagText: {
     fontSize: 8,
     fontFamily: 'Helvetica-Bold',
+    color: colors.zinc600,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  badgeRow: {
+  tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginBottom: 8,
   },
-  // Badge variants
-  badgeSuccess: { backgroundColor: colors.green100 },
-  badgeSuccessText: { color: colors.green700 },
-  badgeWarning: { backgroundColor: colors.amber100 },
-  badgeWarningText: { color: colors.amber700 },
-  badgeDanger: { backgroundColor: colors.red100 },
-  badgeDangerText: { color: colors.red700 },
-  badgeInfo: { backgroundColor: colors.blue100 },
-  badgeInfoText: { color: colors.blue700 },
-  badgePrimary: { backgroundColor: colors.violet100 },
-  badgePrimaryText: { color: colors.violet700 },
-  badgeNeutral: { backgroundColor: colors.zinc100 },
-  badgeNeutralText: { color: colors.zinc700 },
-  // Lists
+  // Strong tag variant
+  tagStrong: {
+    backgroundColor: colors.zinc900,
+  },
+  tagStrongText: {
+    color: colors.white,
+  },
+  // Muted tag variant
+  tagMuted: {
+    backgroundColor: colors.zinc50,
+    borderWidth: 1,
+    borderColor: colors.zinc200,
+  },
+  tagMutedText: {
+    color: colors.zinc500,
+  },
+  // Lists - clean typography
   listItem: {
     flexDirection: 'row',
-    marginBottom: 6,
-    paddingLeft: 4,
+    marginBottom: 8,
   },
   listBullet: {
-    width: 16,
+    width: 12,
     fontSize: 10,
-    color: colors.zinc950,
+    color: colors.zinc400,
   },
   listNumber: {
-    width: 20,
+    width: 24,
     fontSize: 10,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc950,
+    color: colors.zinc300,
   },
   listContent: {
     flex: 1,
     fontSize: 10,
     lineHeight: 1.5,
-    color: colors.zinc700,
+    color: colors.zinc600,
+    letterSpacing: -0.1,
   },
-  // Colored dots for constraints
-  dotRed: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.red500,
-    marginRight: 8,
-    marginTop: 4,
+  // Constraint dots - monochrome only
+  dotHard: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.zinc900,
+    marginRight: 10,
+    marginTop: 5,
   },
-  dotAmber: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.amber500,
-    marginRight: 8,
-    marginTop: 4,
-  },
-  dotGray: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+  dotSoft: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
     backgroundColor: colors.zinc400,
-    marginRight: 8,
-    marginTop: 4,
+    marginRight: 10,
+    marginTop: 5,
   },
-  // Tables
+  dotAssumption: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.zinc300,
+    marginRight: 10,
+    marginTop: 5,
+  },
+  // Tables - minimal borders
   table: {
-    borderWidth: 1,
-    borderColor: colors.zinc200,
-    borderRadius: 4,
+    borderTopWidth: 1,
+    borderTopColor: colors.zinc200,
     marginBottom: 12,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: colors.zinc50,
     borderBottomWidth: 1,
     borderBottomColor: colors.zinc200,
-    padding: 8,
+    paddingVertical: 8,
   },
   tableHeaderCell: {
     flex: 1,
-    fontSize: 8,
+    fontSize: 9,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc600,
+    color: colors.zinc500,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: colors.zinc100,
-    padding: 8,
+    paddingVertical: 8,
   },
   tableCell: {
     flex: 1,
     fontSize: 9,
-    color: colors.zinc700,
+    color: colors.zinc600,
   },
   tableCellBold: {
     flex: 1,
@@ -298,7 +295,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 9,
     fontFamily: 'Helvetica-Bold',
-    color: colors.green700,
+    color: colors.zinc700,
   },
   // Grid
   row: {
@@ -307,75 +304,77 @@ const styles = StyleSheet.create({
   },
   col2: {
     width: '50%',
-    paddingRight: 8,
+    paddingRight: 12,
   },
   col3: {
     width: '33%',
-    paddingRight: 8,
+    paddingRight: 12,
   },
   // Metadata
   metaItem: {
     marginBottom: 4,
   },
   metaLabel: {
-    fontSize: 8,
+    fontSize: 9,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc500,
+    color: colors.zinc400,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   metaValue: {
     fontSize: 10,
     color: colors.zinc700,
+    marginTop: 2,
   },
-  // Insight box
+  // Insight box - left border accent
   insightBox: {
-    backgroundColor: colors.zinc100,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.zinc950,
-    borderRadius: 4,
-    padding: 12,
-    marginTop: 8,
-    marginBottom: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.zinc900,
+    paddingLeft: 16,
+    paddingVertical: 8,
+    marginTop: 12,
+    marginBottom: 12,
   },
   insightLabel: {
-    fontSize: 8,
+    fontSize: 9,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc500,
+    color: colors.zinc400,
     textTransform: 'uppercase',
+    letterSpacing: 0.8,
     marginBottom: 4,
   },
   insightText: {
     fontSize: 11,
     fontFamily: 'Helvetica-Bold',
-    color: colors.zinc950,
+    color: colors.zinc900,
     lineHeight: 1.4,
+    letterSpacing: -0.2,
   },
-  // Warning box
+  // Warning/note box - lighter border
   warningBox: {
-    backgroundColor: colors.zinc50,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.orange500,
-    borderRadius: 4,
-    padding: 12,
-    marginTop: 8,
-    marginBottom: 8,
+    borderLeftWidth: 2,
+    borderLeftColor: colors.zinc300,
+    paddingLeft: 16,
+    paddingVertical: 8,
+    marginTop: 12,
+    marginBottom: 12,
   },
   // Footer
   footer: {
     position: 'absolute',
-    bottom: 30,
-    left: 40,
-    right: 40,
+    bottom: 32,
+    left: 48,
+    right: 48,
     flexDirection: 'row',
     justifyContent: 'space-between',
     borderTopWidth: 1,
     borderTopColor: colors.zinc200,
-    paddingTop: 8,
+    paddingTop: 12,
   },
   footerText: {
     fontSize: 8,
     color: colors.zinc400,
+    letterSpacing: 0.3,
   },
   pageNumber: {
     fontSize: 8,
@@ -406,55 +405,37 @@ function MonoLabel({ children }: { children: string }) {
   return <Text style={styles.monoLabel}>{children}</Text>;
 }
 
-function ConfidenceBadge({ level }: { level?: number | string }) {
+// Confidence displayed as text, not colored badge (brand system)
+function ConfidenceTag({ level }: { level?: number | string }) {
   let label: string;
-  let isHigh = false;
-  let isLow = false;
 
   if (typeof level === 'number') {
-    label = `${level}%`;
-    isHigh = level >= 70;
-    isLow = level < 40;
+    label = `${level}% confidence`;
   } else {
-    const normalized = level?.toLowerCase() ?? 'medium';
-    label = level ?? 'Medium';
-    isHigh = normalized === 'high' || normalized.includes('high');
-    isLow = normalized === 'low' || normalized.includes('low');
+    label = `${level ?? 'Medium'} confidence`;
   }
 
   return (
-    <View
-      style={[
-        styles.badge,
-        isHigh
-          ? styles.badgeSuccess
-          : isLow
-            ? styles.badgeDanger
-            : styles.badgeWarning,
-      ]}
-    >
-      <Text
-        style={[
-          styles.badgeText,
-          isHigh
-            ? styles.badgeSuccessText
-            : isLow
-              ? styles.badgeDangerText
-              : styles.badgeWarningText,
-        ]}
-      >
-        {label} Confidence
-      </Text>
+    <View style={styles.tag}>
+      <Text style={styles.tagText}>{label}</Text>
     </View>
   );
 }
 
-function SourceTypeBadge({ type }: { type?: string }) {
+function SourceTypeTag({ type }: { type?: string }) {
   if (!type) return null;
   const label = type.replace(/_/g, ' ');
   return (
-    <View style={[styles.badge, styles.badgeInfo]}>
-      <Text style={[styles.badgeText, styles.badgeInfoText]}>{label}</Text>
+    <View style={styles.tag}>
+      <Text style={styles.tagText}>{label}</Text>
+    </View>
+  );
+}
+
+function PrimaryTag() {
+  return (
+    <View style={[styles.tag, styles.tagStrong]}>
+      <Text style={[styles.tagText, styles.tagStrongText]}>Primary</Text>
     </View>
   );
 }
@@ -662,8 +643,8 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                   </Text>
                 </View>
                 {(h.confidence_percent || h.confidence) && (
-                  <View style={styles.badgeRow}>
-                    <ConfidenceBadge
+                  <View style={styles.tagRow}>
+                    <ConfidenceTag
                       level={h.confidence_percent ?? h.confidence}
                     />
                   </View>
@@ -851,7 +832,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
       {/* Primary Solution */}
       {primary && (
         <View style={styles.cardHighlight} wrap={false}>
-          <View style={styles.badgeRow}>
+          <View style={styles.tagRow}>
             <View style={[styles.badge, styles.badgePrimary]}>
               <Text style={[styles.badgeText, styles.badgePrimaryText]}>
                 Primary
@@ -859,7 +840,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
             </View>
             <SourceTypeBadge type={primary.source_type} />
             {primary.confidence !== undefined && (
-              <ConfidenceBadge level={primary.confidence} />
+              <ConfidenceTag level={primary.confidence} />
             )}
           </View>
 
@@ -971,7 +952,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
           <Text style={styles.subsectionTitle}>Supporting Concepts</Text>
           {supporting.map((concept: SupportingConcept, i: number) => (
             <View key={concept.id ?? i} style={styles.card}>
-              <View style={styles.badgeRow}>
+              <View style={styles.tagRow}>
                 {concept.relationship && (
                   <View style={[styles.badge, styles.badgeInfo]}>
                     <Text style={[styles.badgeText, styles.badgeInfoText]}>
@@ -980,7 +961,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
                   </View>
                 )}
                 {concept.confidence !== undefined && (
-                  <ConfidenceBadge level={concept.confidence} />
+                  <ConfidenceTag level={concept.confidence} />
                 )}
               </View>
 
@@ -1068,7 +1049,7 @@ function InnovationConceptsSection({
       {/* Recommended Innovation */}
       {recommended && (
         <View style={styles.cardHighlight} wrap={false}>
-          <View style={styles.badgeRow}>
+          <View style={styles.tagRow}>
             <View style={[styles.badge, styles.badgePrimary]}>
               <Text style={[styles.badgeText, styles.badgePrimaryText]}>
                 Recommended
@@ -1082,7 +1063,7 @@ function InnovationConceptsSection({
               </View>
             )}
             {recommended.confidence !== undefined && (
-              <ConfidenceBadge level={recommended.confidence} />
+              <ConfidenceTag level={recommended.confidence} />
             )}
           </View>
 
@@ -1172,7 +1153,7 @@ function InnovationConceptsSection({
           <Text style={styles.subsectionTitle}>Parallel Investigations</Text>
           {parallel.map((inv: ParallelInvestigation, i: number) => (
             <View key={inv.id ?? i} style={styles.card}>
-              <View style={styles.badgeRow}>
+              <View style={styles.tagRow}>
                 {inv.innovation_type && (
                   <View style={[styles.badge, styles.badgeInfo]}>
                     <Text style={[styles.badgeText, styles.badgeInfoText]}>
@@ -1181,7 +1162,7 @@ function InnovationConceptsSection({
                   </View>
                 )}
                 {inv.confidence !== undefined && (
-                  <ConfidenceBadge level={inv.confidence} />
+                  <ConfidenceTag level={inv.confidence} />
                 )}
               </View>
 
@@ -1237,7 +1218,7 @@ function FrontierWatchSection({ items }: { items?: FrontierWatch[] }) {
 
       {items.map((item: FrontierWatch, i: number) => (
         <View key={item.id ?? i} style={styles.card}>
-          <View style={styles.badgeRow}>
+          <View style={styles.tagRow}>
             {item.innovation_type && (
               <View style={[styles.badge, styles.badgeNeutral]}>
                 <Text style={[styles.badgeText, styles.badgeNeutralText]}>
@@ -1321,7 +1302,7 @@ function ConstraintsSection({
                 key={i}
                 style={[styles.listItem, { alignItems: 'flex-start' }]}
               >
-                <View style={styles.dotRed} />
+                <View style={styles.dotHard} />
                 <Text style={styles.listContent}>{c}</Text>
               </View>
             ))}
@@ -1338,7 +1319,7 @@ function ConstraintsSection({
                 key={i}
                 style={[styles.listItem, { alignItems: 'flex-start' }]}
               >
-                <View style={styles.dotAmber} />
+                <View style={styles.dotSoft} />
                 <Text style={styles.listContent}>{c}</Text>
               </View>
             ))}
@@ -1354,7 +1335,7 @@ function ConstraintsSection({
               key={i}
               style={[styles.listItem, { alignItems: 'flex-start' }]}
             >
-              <View style={styles.dotGray} />
+              <View style={styles.dotAssumption} />
               <Text style={styles.listContent}>{a}</Text>
             </View>
           ))}
@@ -1471,7 +1452,7 @@ function InnovationAnalysisSection({
         {analysis.domains_searched && analysis.domains_searched.length > 0 && (
           <View>
             <MonoLabel>Domains Searched</MonoLabel>
-            <View style={styles.badgeRow}>
+            <View style={styles.tagRow}>
               {analysis.domains_searched.map((d, i) => (
                 <View key={i} style={[styles.badge, styles.badgeNeutral]}>
                   <Text style={[styles.badgeText, styles.badgeNeutralText]}>
@@ -1571,11 +1552,7 @@ function HonestAssessmentSection({
 // 11. Cross-Domain Search Section
 // ============================================
 
-function CrossDomainSearchSection({
-  search,
-}: {
-  search?: CrossDomainSearch;
-}) {
+function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
   if (!search) return null;
 
   return (
@@ -1618,9 +1595,7 @@ function CrossDomainSearchSection({
           <Text style={styles.subsectionTitle}>Domains Explored</Text>
           {search.domains_searched.map((d, i) => (
             <View key={i} style={styles.card} wrap={false}>
-              {d.domain && (
-                <Text style={styles.cardTitle}>{d.domain}</Text>
-              )}
+              {d.domain && <Text style={styles.cardTitle}>{d.domain}</Text>}
               {d.mechanism_found && (
                 <View style={{ marginTop: 4 }}>
                   <MonoLabel>Mechanism Found</MonoLabel>
@@ -1690,7 +1665,9 @@ function StrategicIntegrationSection({
           <MonoLabel>Portfolio View</MonoLabel>
           {integration.portfolio_view.execution_track_role && (
             <View style={{ marginTop: 4 }}>
-              <Text style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}>
+              <Text
+                style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}
+              >
                 Execution Track:
               </Text>
               <Text style={styles.cardContent}>
@@ -1700,7 +1677,9 @@ function StrategicIntegrationSection({
           )}
           {integration.portfolio_view.innovation_portfolio_role && (
             <View style={{ marginTop: 4 }}>
-              <Text style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}>
+              <Text
+                style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}
+              >
                 Innovation Portfolio:
               </Text>
               <Text style={styles.cardContent}>
@@ -1738,7 +1717,11 @@ function StrategicIntegrationSection({
               <View style={styles.col3}>
                 <Text style={styles.metaLabel}>Innovation</Text>
                 <Text style={styles.metaValue}>
-                  {integration.resource_allocation.recommended_innovation_percent}%
+                  {
+                    integration.resource_allocation
+                      .recommended_innovation_percent
+                  }
+                  %
                 </Text>
               </View>
             )}
@@ -1747,7 +1730,11 @@ function StrategicIntegrationSection({
               <View style={styles.col3}>
                 <Text style={styles.metaLabel}>Parallel</Text>
                 <Text style={styles.metaValue}>
-                  {integration.resource_allocation.parallel_investigations_percent}%
+                  {
+                    integration.resource_allocation
+                      .parallel_investigations_percent
+                  }
+                  %
                 </Text>
               </View>
             )}
@@ -1779,7 +1766,10 @@ function StrategicIntegrationSection({
                 <View
                   style={[
                     styles.card,
-                    { backgroundColor: colors.green100, borderColor: colors.green700 },
+                    {
+                      backgroundColor: colors.green100,
+                      borderColor: colors.green700,
+                    },
                   ]}
                   wrap={false}
                 >
@@ -1814,7 +1804,10 @@ function StrategicIntegrationSection({
                 <View
                   style={[
                     styles.card,
-                    { backgroundColor: colors.blue100, borderColor: colors.blue700 },
+                    {
+                      backgroundColor: colors.blue100,
+                      borderColor: colors.blue700,
+                    },
                   ]}
                   wrap={false}
                 >
@@ -1850,7 +1843,10 @@ function StrategicIntegrationSection({
             <View style={[styles.warningBox, { marginTop: 8 }]} wrap={false}>
               <MonoLabel>If Uncertain</MonoLabel>
               <Text style={styles.cardContent}>
-                {integration.decision_architecture.primary_tradeoff.if_uncertain}
+                {
+                  integration.decision_architecture.primary_tradeoff
+                    .if_uncertain
+                }
               </Text>
             </View>
           )}
@@ -1887,7 +1883,7 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
 
         return (
           <View key={i} style={styles.card}>
-            <View style={styles.badgeRow}>
+            <View style={styles.tagRow}>
               {risk.category && (
                 <View style={[styles.badge, styles.badgeNeutral]}>
                   <Text style={[styles.badgeText, styles.badgeNeutralText]}>
@@ -2029,7 +2025,7 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
         {(critique.overall_confidence || critique.confidence_level) && (
           <View style={[styles.row, { marginBottom: 8 }]}>
             <MonoLabel>Overall Confidence</MonoLabel>
-            <ConfidenceBadge
+            <ConfidenceTag
               level={critique.overall_confidence ?? critique.confidence_level}
             />
           </View>
@@ -2310,6 +2306,8 @@ export function ReportPDFDocument({ report }: Props) {
           )}
         </View>
 
+        {/* Section order matches brand-system-report.tsx web display */}
+
         {/* 1. The Brief */}
         <BriefSection brief={hybridData.brief} />
 
@@ -2319,32 +2317,39 @@ export function ReportPDFDocument({ report }: Props) {
         {/* 3. Problem Analysis */}
         <ProblemAnalysisSection analysis={hybridData.problem_analysis} />
 
-        {/* 4. Constraints */}
+        {/* 4. Constraints & Metrics */}
         <ConstraintsSection constraints={hybridData.constraints_and_metrics} />
 
-        {/* 5. Challenge the Frame */}
+        {/* 5. Challenge the Frame (with reframe from innovation_analysis) */}
         <ChallengeTheFrameSection challenges={hybridData.challenge_the_frame} />
-
-        {/* 6. Innovation Analysis */}
         <InnovationAnalysisSection analysis={hybridData.innovation_analysis} />
 
-        {/* 7. Solution Concepts */}
+        {/* 6. Cross-Domain Search */}
+        <CrossDomainSearchSection search={hybridData.cross_domain_search} />
+
+        {/* 8. Solution Concepts (Execution Track) */}
         <SolutionConceptsSection track={executionTrack} />
 
-        {/* 8. Innovation Concepts */}
+        {/* 9. Innovation Concepts (Innovation Portfolio) */}
         <InnovationConceptsSection portfolio={innovationPortfolio} />
 
-        {/* 9. Frontier Technologies */}
+        {/* 10. Frontier Technologies */}
         <FrontierWatchSection items={innovationPortfolio?.frontier_watch} />
 
-        {/* 10. Risks & Watchouts */}
+        {/* 11. Risks & Watchouts */}
         <RisksSection risks={hybridData.risks_and_watchouts} />
 
-        {/* 11. Self-Critique */}
+        {/* 13. Self-Critique */}
         <SelfCritiqueSection critique={hybridData.self_critique} />
 
-        {/* 12. Recommendation */}
+        {/* 14. Recommendation */}
         <WhatIdActuallyDoSection content={hybridData.what_id_actually_do} />
+
+        {/* 15. Key Insights (optional) */}
+        <KeyInsightsSection insights={hybridData.key_insights} />
+
+        {/* 16. Next Steps (optional) */}
+        <NextStepsSection steps={hybridData.next_steps} />
 
         {/* Footer */}
         <View style={styles.footer} fixed>

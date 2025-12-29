@@ -103,13 +103,17 @@ export function ExampleReportsSection() {
                 key={r.id}
                 onClick={() => {
                   setActiveTab(i);
-                  // Scroll to top of tabs (not section header) - account for sticky nav height (64px)
-                  const tabsElement =
-                    document.getElementById('example-reports-tabs');
-                  if (tabsElement) {
-                    const navHeight = 64;
+                  // Scroll to the report content area, right below the sticky tabs
+                  const contentElement = document.getElementById(
+                    'example-reports-content',
+                  );
+                  if (contentElement) {
+                    // nav (64px) + tabs (~48px) = ~112px offset
+                    const navAndTabsHeight = 112;
+                    const rect = contentElement.getBoundingClientRect();
+                    const absoluteTop = rect.top + window.scrollY;
                     window.scrollTo({
-                      top: tabsElement.offsetTop - navHeight,
+                      top: absoluteTop - navAndTabsHeight,
                       behavior: 'smooth',
                     });
                   }
@@ -131,7 +135,7 @@ export function ExampleReportsSection() {
 
       {/* Two-column layout: Sticky TOC + Report Content */}
       <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
-        <div className="flex gap-8 py-10">
+        <div id="example-reports-content" className="flex gap-8 py-10">
           {/* Sticky TOC Sidebar - Hidden on mobile, visible on lg+ */}
           {tocSections.length > 0 && !report.locked && (
             <StickyTocSidebar
@@ -157,7 +161,7 @@ export function ExampleReportsSection() {
                   brief={reportData.brief}
                   createdAt={new Date().toISOString()}
                   hasAppSidebar={false}
-                  showActions={false}
+                  showActions={true}
                   compactTitle={true}
                 />
               ) : (

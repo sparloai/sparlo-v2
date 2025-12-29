@@ -438,9 +438,9 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
         content: (
           <>
             <p className="text-xl leading-relaxed font-light text-zinc-950">
-              The CAR-T industry has been solving three separate
-              problems—viral vector cost, manufacturing time, and
-              automation—as if they were unrelated. They&apos;re not.
+              The CAR-T industry has been solving three separate problems—viral
+              vector cost, manufacturing time, and automation—as if they were
+              unrelated. They&apos;re not.
             </p>
             <p className="mt-6">
               Novartis proved 2-day manufacturing works (T-Charge), academic
@@ -449,8 +449,7 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
               has combined them because different companies own different
               pieces. The integration is the innovation, and it&apos;s
               achievable in 18-24 months for $2-5M investment, delivering
-              $25-35K COGS—a 10x cost reduction using only validated
-              components.
+              $25-35K COGS—a 10x cost reduction using only validated components.
             </p>
             <div className="mt-8 rounded-xl border border-l-4 border-zinc-200 border-l-zinc-900 bg-zinc-50/30 p-6">
               <span className="font-mono text-xs font-bold tracking-widest text-zinc-600 uppercase">
@@ -459,11 +458,11 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
               <p className="mt-3 text-base leading-relaxed font-medium text-zinc-900">
                 Pursue integrated rapid manufacturing combining Prodigy
                 automation + Sleeping Beauty non-viral transduction +
-                T-Charge-style minimal expansion with in vivo expansion
-                support. This eliminates the $50-100K viral vector cost,
-                reduces cleanroom time from 14 days to 2-3 days, and uses
-                existing FDA-accepted automation. Investment of $2-5M over
-                18-24 months to IND.
+                T-Charge-style minimal expansion with in vivo expansion support.
+                This eliminates the $50-100K viral vector cost, reduces
+                cleanroom time from 14 days to 2-3 days, and uses existing
+                FDA-accepted automation. Investment of $2-5M over 18-24 months
+                to IND.
               </p>
             </div>
           </>
@@ -502,9 +501,9 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
               <div className="rounded-xl border border-zinc-200 bg-white p-5">
                 <p className="font-medium text-zinc-900">Batch-of-One Model</p>
                 <p className="mt-2 text-zinc-600">
-                  Each patient requires dedicated manufacturing with fixed
-                  costs (cleanroom, personnel, QC) that cannot be amortized
-                  across patients.
+                  Each patient requires dedicated manufacturing with fixed costs
+                  (cleanroom, personnel, QC) that cannot be amortized across
+                  patients.
                 </p>
               </div>
             </div>
@@ -512,9 +511,9 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
               <span className="font-mono text-xs font-bold tracking-widest text-emerald-700 uppercase">
                 First Principles Insight
               </span>
-              <p className="mt-3 text-emerald-900 font-medium">
-                The expansion doesn&apos;t need to happen in the factory—it
-                can happen in the patient
+              <p className="mt-3 font-medium text-emerald-900">
+                The expansion doesn&apos;t need to happen in the factory—it can
+                happen in the patient
               </p>
               <p className="mt-2 text-emerald-800">
                 Lymph nodes achieve 10,000-fold T-cell expansion in 5-7 days
@@ -535,9 +534,9 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
           <>
             <p className="mb-6">
               Instead of asking &quot;how do we make ex vivo manufacturing
-              cheaper,&quot; we asked &quot;which parts of ex vivo
-              manufacturing are actually necessary, and what can the
-              patient&apos;s biology do better?&quot;
+              cheaper,&quot; we asked &quot;which parts of ex vivo manufacturing
+              are actually necessary, and what can the patient&apos;s biology do
+              better?&quot;
             </p>
             <div className="space-y-6">
               <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
@@ -596,8 +595,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
               Combine three individually validated technologies into a single
               optimized workflow: Miltenyi Prodigy automated closed system for
               cell processing, Sleeping Beauty transposon system for non-viral
-              CAR delivery, and T-Charge-style minimal expansion (2-3 days)
-              with IL-7/IL-15 cytokine support for in vivo expansion.
+              CAR delivery, and T-Charge-style minimal expansion (2-3 days) with
+              IL-7/IL-15 cytokine support for in vivo expansion.
             </p>
             <div className="my-8 grid gap-4 md:grid-cols-3">
               <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center">
@@ -632,9 +631,9 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
             </div>
             <p className="mt-6">
               This eliminates the $50-100K viral vector cost entirely (Sleeping
-              Beauty reagents cost &lt;$1K), reduces cleanroom time from 14
-              days to 2-3 days, and uses existing FDA-accepted automation. No
-              new technology required—the innovation is integration across
+              Beauty reagents cost &lt;$1K), reduces cleanroom time from 14 days
+              to 2-3 days, and uses existing FDA-accepted automation. No new
+              technology required—the innovation is integration across
               commercial silos.
             </p>
           </>
@@ -659,11 +658,11 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
               </span>
               <p className="mt-3 text-violet-900">
                 If it works: Complete elimination of ex vivo manufacturing.
-                CAR-T becomes an injectable drug rather than a manufactured
-                cell product. Same-day treatment becomes possible.
-                Manufacturing scales like vaccines, not like cell therapy.
+                CAR-T becomes an injectable drug rather than a manufactured cell
+                product. Same-day treatment becomes possible. Manufacturing
+                scales like vaccines, not like cell therapy.
               </p>
-              <p className="mt-2 text-violet-800 font-medium">
+              <p className="mt-2 font-medium text-violet-800">
                 100-1000x cost reduction (from $275K to $3-12K per treatment
                 course)
               </p>
@@ -713,10 +712,10 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
                     than standalone
                   </p>
                   <p className="mt-2 text-sm text-zinc-600">
-                    First validation step specifically tests this. If
-                    efficiency is &lt;10%, troubleshoot electroporation
-                    parameters. If still failing, CRISPR knock-in is
-                    alternative non-viral approach.
+                    First validation step specifically tests this. If efficiency
+                    is &lt;10%, troubleshoot electroporation parameters. If
+                    still failing, CRISPR knock-in is alternative non-viral
+                    approach.
                   </p>
                 </div>
               </div>
@@ -796,8 +795,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
                   </p>
                   <p className="mt-2 text-zinc-600">
                     Start with a single site partnership rather than building a
-                    network. Find one academic medical center with both a
-                    strong blood bank and CAR-T program.
+                    network. Find one academic medical center with both a strong
+                    blood bank and CAR-T program.
                   </p>
                 </div>
               </li>

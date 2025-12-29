@@ -440,8 +440,8 @@ const ReportContent = memo(function ReportContent({
       reportTitle: displayTitle || 'Report',
     });
 
-  // Disable actions if no reportId
-  const actionsEnabled = showActions && !!reportId;
+  // Actions require a valid reportId to work
+  const hasReportId = !!reportId;
 
   return (
     <>
@@ -460,8 +460,8 @@ const ReportContent = memo(function ReportContent({
             >
               {displayTitle}
             </h1>
-            {/* Action Buttons */}
-            {actionsEnabled && (
+            {/* Action Buttons - show when showActions=true, disabled when no reportId */}
+            {showActions && (
               <div className="flex shrink-0 items-center gap-2 pt-2">
                 <ActionButton
                   onClick={handleShare}
@@ -471,6 +471,7 @@ const ReportContent = memo(function ReportContent({
                   loadingLabel="Sharing..."
                   ariaLabel="Share report"
                   isLoading={isGeneratingShare}
+                  disabled={!hasReportId}
                 />
                 <ActionButton
                   onClick={handleExport}
@@ -480,6 +481,7 @@ const ReportContent = memo(function ReportContent({
                   loadingLabel="Exporting..."
                   ariaLabel="Export report"
                   isLoading={isExporting}
+                  disabled={!hasReportId}
                 />
               </div>
             )}
