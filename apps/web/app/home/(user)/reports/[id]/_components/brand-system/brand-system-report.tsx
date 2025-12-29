@@ -15,18 +15,17 @@
 
 'use client';
 
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 
 import { Download, Loader2, Share2 } from 'lucide-react';
 
-import { toast } from '@kit/ui/sonner';
 import { cn } from '@kit/ui/utils';
 
 import { useSidebarState } from '~/home/(user)/_lib/sidebar-context';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { CHAT_DRAWER_WIDTH } from '../../_lib/constants';
-import { generateShareLink } from '../../_lib/server/share-actions';
+import { useReportActions } from '../../_lib/hooks/use-report-actions';
 import {
   TOC_SCROLL_OFFSET,
   TOC_STICKY_TOP,
@@ -361,16 +360,6 @@ const TocNavItem = memo(function TocNavItem({
 // ACTION BUTTON COMPONENT
 // ============================================
 
-/**
- * Get a clean URL for sharing (removes query params and hash fragments)
- * Prevents accidental leakage of session tokens, debug params, etc.
- */
-function getCleanShareUrl(): string {
-  if (typeof window === 'undefined') return '';
-  const url = new URL(window.location.href);
-  return `${url.origin}${url.pathname}`;
-}
-
 interface ActionButtonProps {
   onClick: () => void;
   icon: React.ReactNode;
@@ -434,91 +423,17 @@ const ReportContent = memo(function ReportContent({
   reportId,
 }: ReportContentProps) {
   const displayTitle = title || normalizedData.title;
-  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
 
-  const handleShare = useCallback(async () => {
-    if (!reportId) {
-      // Fallback to copying current URL if no reportId
-      const shareUrl = getCleanShareUrl();
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success('Link copied to clipboard');
-      return;
-    }
+  // Share and export functionality via shared hook
+  // Only initialize if we have a reportId (required for these actions)
+  const { handleShare, handleExport, isGeneratingShare, isExporting } =
+    useReportActions({
+      reportId: reportId || '',
+      reportTitle: displayTitle || 'Report',
+    });
 
-    const shareTitle = displayTitle || 'Report';
-
-    // Try Web Share API first (works on mobile and some desktop browsers)
-    if (navigator.share) {
-      setIsGeneratingShare(true);
-      try {
-        // Generate share link first
-        const result = await generateShareLink({ reportId });
-        if (result.success && result.shareUrl) {
-          await navigator.share({
-            title: shareTitle,
-            url: result.shareUrl,
-          });
-          return; // Success - native share handled it
-        }
-      } catch (err) {
-        // User cancelled or share failed - fall through to clipboard
-        if (err instanceof DOMException && err.name === 'AbortError') {
-          return; // User cancelled - no error needed
-        }
-        console.error('[Share] Error sharing report:', err);
-      } finally {
-        setIsGeneratingShare(false);
-      }
-    }
-
-    // Fallback: generate link and copy to clipboard
-    setIsGeneratingShare(true);
-    try {
-      const result = await generateShareLink({ reportId });
-      if (result.success && result.shareUrl) {
-        await navigator.clipboard.writeText(result.shareUrl);
-        toast.success('Share link copied to clipboard');
-      } else {
-        toast.error('Failed to generate share link');
-      }
-    } catch (error) {
-      console.error('[Share] Error generating share link:', error);
-      toast.error('Failed to share report');
-    } finally {
-      setIsGeneratingShare(false);
-    }
-  }, [displayTitle, reportId]);
-
-  const handleExport = useCallback(async () => {
-    if (!reportId) {
-      window.print();
-      return;
-    }
-
-    setIsExporting(true);
-    try {
-      const response = await fetch(`/api/reports/${reportId}/pdf`);
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${displayTitle || 'report'}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      toast.success('PDF downloaded');
-    } catch (error) {
-      console.error('[Export] Error exporting PDF:', error);
-      toast.error('Failed to export PDF');
-    } finally {
-      setIsExporting(false);
-    }
-  }, [reportId, displayTitle]);
+  // Disable actions if no reportId
+  const actionsEnabled = showActions && !!reportId;
 
   return (
     <>
@@ -531,7 +446,7 @@ const ReportContent = memo(function ReportContent({
               {displayTitle}
             </h1>
             {/* Action Buttons */}
-            {showActions && (
+            {actionsEnabled && (
               <div className="flex shrink-0 items-center gap-2 pt-2">
                 <ActionButton
                   onClick={handleShare}

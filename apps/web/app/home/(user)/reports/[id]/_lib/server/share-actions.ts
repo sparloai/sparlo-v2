@@ -17,9 +17,61 @@ const GetShareInfoSchema = z.object({
   reportId: z.string().uuid(),
 });
 
+// Rate limit configuration for share link generation
+// Lower limits since generating share links is less frequent
+const SHARE_RATE_LIMITS = {
+  HOURLY: 10,
+  DAILY: 50,
+};
+
+interface RateLimitResult {
+  allowed: boolean;
+  hourCount: number;
+  dayCount: number;
+  hourlyLimit: number;
+  dailyLimit: number;
+  retryAfter: number | null;
+}
+
 export const generateShareLink = enhanceAction(
   async (data) => {
     const client = getSupabaseServerClient();
+
+    // Get current user for rate limiting and audit
+    const {
+      data: { user },
+    } = await client.auth.getUser();
+
+    // Check rate limit before generating share link
+    if (user) {
+      try {
+        const { data: rateLimitData, error: rateLimitError } = await client.rpc(
+          'check_rate_limit' as 'count_completed_reports',
+          {
+            p_user_id: user.id,
+            p_endpoint: 'share_link',
+            p_hourly_limit: SHARE_RATE_LIMITS.HOURLY,
+            p_daily_limit: SHARE_RATE_LIMITS.DAILY,
+          } as unknown as { target_account_id: string },
+        );
+
+        if (!rateLimitError) {
+          const result = rateLimitData as unknown as RateLimitResult;
+          if (!result.allowed) {
+            throw new Error(
+              `Rate limit exceeded. Try again in ${Math.ceil((result.retryAfter ?? 60) / 60)} minutes.`,
+            );
+          }
+        }
+      } catch (err) {
+        // If it's our rate limit error, rethrow it
+        if (err instanceof Error && err.message.includes('Rate limit')) {
+          throw err;
+        }
+        // Otherwise fail open - log and continue
+        console.error('[Share Link] Rate limit check error:', err);
+      }
+    }
 
     // Verify ownership via RLS (will fail if not owner)
     const { data: report, error: reportError } = await client
@@ -31,11 +83,6 @@ export const generateShareLink = enhanceAction(
     if (reportError || !report) {
       throw new Error('Report not found or access denied');
     }
-
-    // Get current user for audit
-    const {
-      data: { user },
-    } = await client.auth.getUser();
 
     // Atomic upsert: insert or return existing (prevents race condition)
     // expires_at is required (NOT NULL) per migration 20251223114425

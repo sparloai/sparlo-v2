@@ -31,8 +31,8 @@ import {
   extractUserInput,
 } from '../_lib/extract-report';
 import { useChat } from '../_lib/hooks/use-chat';
+import { useReportActions } from '../_lib/hooks/use-report-actions';
 import type { ChatMessage } from '../_lib/schemas/chat.schema';
-import { generateShareLink } from '../_lib/server/share-actions';
 import { ChatDrawer, ChatHeader, ChatInput, ChatMessages } from './chat';
 import { DiscoveryReportDisplay } from './discovery-report-display';
 import { HybridReportDisplay } from './hybrid-report-display';
@@ -100,7 +100,6 @@ export function ReportDisplay({
   const [showToc, setShowToc] = useState(true);
   const [activeSection, setActiveSection] = useState('executive-summary');
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
 
   // Chat functionality via custom hook
   const {
@@ -119,70 +118,18 @@ export function ReportDisplay({
   // Track progress for processing reports
   const { progress } = useReportProgress(isProcessing ? report.id : null);
 
+  // Share and export functionality via shared hook
+  const { handleShare, handleExport, isGeneratingShare, isExporting } =
+    useReportActions({
+      reportId: report.id,
+      reportTitle: report.title,
+      onShareFallback: () => setIsShareModalOpen(true),
+    });
+
   // Handle completion - refresh to get updated server data
   const handleComplete = useCallback(() => {
     router.refresh();
   }, [router]);
-
-  // Handle PDF export
-  const handleExport = useCallback(async () => {
-    setIsExporting(true);
-    try {
-      const response = await fetch(`/api/reports/${report.id}/pdf`);
-      if (!response.ok) {
-        throw new Error('Failed to generate PDF');
-      }
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${report.title
-        .replace(/[^a-z0-9]/gi, '-')
-        .toLowerCase()
-        .substring(0, 50)}-report.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      toast.success('PDF exported successfully');
-    } catch (error) {
-      console.error('[ReportDisplay] Export error:', error);
-      toast.error('Failed to export PDF');
-    } finally {
-      setIsExporting(false);
-    }
-  }, [report.id, report.title]);
-
-  // Handle share - Web Share API on mobile, fallback to modal
-  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
-  const handleShare = useCallback(async () => {
-    // Try Web Share API first (works on mobile and some desktop browsers)
-    if (navigator.share) {
-      setIsGeneratingShare(true);
-      try {
-        // Generate share link first
-        const result = await generateShareLink({ reportId: report.id });
-        if (result.success && result.shareUrl) {
-          await navigator.share({
-            title: report.title,
-            url: result.shareUrl,
-          });
-          return; // Success - native share handled it
-        }
-      } catch (err) {
-        // User cancelled or share failed - fall through to modal
-        if (err instanceof DOMException && err.name === 'AbortError') {
-          return; // User cancelled - no error needed
-        }
-        console.error('[ReportDisplay] Share error:', err);
-      } finally {
-        setIsGeneratingShare(false);
-      }
-    }
-
-    // Fallback: open share modal
-    setIsShareModalOpen(true);
-  }, [report.id, report.title]);
 
   // Extract markdown from report data
   const reportMarkdown = report.report_data?.markdown ?? '';

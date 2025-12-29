@@ -10,8 +10,26 @@ import type { ReportForPDF } from './_lib/types';
 
 const PDF_GENERATION_TIMEOUT_MS = 30000; // 30 seconds
 
+// Rate limit configuration for PDF export
+// PDF generation is resource-intensive, so limits are moderate
+const PDF_RATE_LIMITS = {
+  HOURLY: 20,
+  DAILY: 100,
+};
+
+interface RateLimitResult {
+  allowed: boolean;
+  hourCount: number;
+  dayCount: number;
+  hourlyLimit: number;
+  dailyLimit: number;
+  hourReset: number;
+  dayReset: number;
+  retryAfter: number | null;
+}
+
 export const GET = enhanceRouteHandler(
-  async function ({ params }) {
+  async function ({ params, user }) {
     const { id } = params as { id: string };
 
     if (!id) {
@@ -22,6 +40,47 @@ export const GET = enhanceRouteHandler(
     }
 
     const client = getSupabaseServerClient();
+
+    // Check rate limit before generating PDF
+    try {
+      const { data: rateLimitData, error: rateLimitError } = await client.rpc(
+        'check_rate_limit' as 'count_completed_reports',
+        {
+          p_user_id: user.id,
+          p_endpoint: 'pdf_export',
+          p_hourly_limit: PDF_RATE_LIMITS.HOURLY,
+          p_daily_limit: PDF_RATE_LIMITS.DAILY,
+        } as unknown as { target_account_id: string },
+      );
+
+      if (!rateLimitError) {
+        const result = rateLimitData as unknown as RateLimitResult;
+        if (!result.allowed) {
+          return NextResponse.json(
+            { error: 'Rate limit exceeded', code: 'RATE_LIMITED' },
+            {
+              status: 429,
+              headers: {
+                'Retry-After': String(result.retryAfter ?? 60),
+                'X-RateLimit-Limit-Hour': String(result.hourlyLimit),
+                'X-RateLimit-Remaining-Hour': String(
+                  Math.max(0, result.hourlyLimit - result.hourCount),
+                ),
+                'X-RateLimit-Reset-Hour': String(result.hourReset),
+                'X-RateLimit-Limit-Day': String(result.dailyLimit),
+                'X-RateLimit-Remaining-Day': String(
+                  Math.max(0, result.dailyLimit - result.dayCount),
+                ),
+                'X-RateLimit-Reset-Day': String(result.dayReset),
+              },
+            },
+          );
+        }
+      }
+    } catch (err) {
+      // Fail open - log and continue if rate limit check fails
+      console.error('[PDF Export] Rate limit check error:', err);
+    }
 
     // Fetch report with updated_at for cache validation
     const { data: report, error } = await client
