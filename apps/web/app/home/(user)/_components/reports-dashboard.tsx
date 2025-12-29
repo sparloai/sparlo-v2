@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 
 import {
   AlertCircle,
+  Archive,
   ChevronRight,
   FileText,
   Loader2,
@@ -149,7 +150,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
   const filteredReports = useMemo(() => {
     // First filter out optimistically hidden reports
-    let filtered = reports.filter((r) => !optimisticallyHidden.has(r.id));
+    const filtered = reports.filter((r) => !optimisticallyHidden.has(r.id));
 
     if (!search.trim()) return filtered;
 
@@ -185,12 +186,22 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
     >
       {/* Header Actions */}
       <div className="mb-6 flex items-end justify-between">
-        <h1
-          className="font-mono text-xs font-medium tracking-[0.2em] text-[--text-muted] uppercase"
-          style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
-        >
-          REPORTS
-        </h1>
+        <div className="flex items-center gap-4">
+          <h1
+            className="font-mono text-xs font-medium tracking-[0.2em] text-[--text-muted] uppercase"
+            style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+          >
+            REPORTS
+          </h1>
+          <Link
+            href="/home/archived"
+            className="flex items-center gap-1.5 font-mono text-xs text-[--text-muted] transition-colors hover:text-[--text-secondary]"
+            style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+          >
+            <Archive className="h-3.5 w-3.5" />
+            ARCHIVED
+          </Link>
+        </div>
 
         <Link href="/home/reports/new" className="group">
           <button
@@ -575,6 +586,10 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                     <ArchiveToggleButton
                       reportId={report.id}
                       isArchived={false}
+                      onOptimisticStart={() =>
+                        handleOptimisticArchive(report.id)
+                      }
+                      onOptimisticError={() => handleArchiveError(report.id)}
                       onComplete={() => router.refresh()}
                     />
                     {isClickable && (
