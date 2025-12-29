@@ -212,7 +212,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       id: 'sol-primary',
       title: 'Integrated Rapid Manufacturing: T-Charge + Sleeping Beauty + Prodigy',
       confidence: 85,
-      source_type: 'EMERGING',
+      source_type: 'TRANSFER',
       bottom_line:
         'Combine three individually validated technologies into a single optimized workflow: Miltenyi Prodigy automated closed system for cell processing, Sleeping Beauty transposon system for non-viral CAR delivery, and T-Charge-style minimal expansion (2-3 days) with IL-7/IL-15 cytokine support for in vivo expansion.',
       expected_improvement: '$25-35K COGS per patient',

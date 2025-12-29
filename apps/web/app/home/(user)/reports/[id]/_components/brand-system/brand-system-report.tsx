@@ -95,15 +95,80 @@ interface BrandSystemReportProps {
 
 /**
  * Calculate estimated read time based on word count
- * Average reading speed: 200-250 words per minute for technical content
+ * Average reading speed: 200 words per minute for technical content
+ *
+ * Filters out non-content strings like IDs, enum values, and short labels
+ * to provide more accurate reading time estimates.
  */
 function calculateReadTime(data: HybridReportData): number {
-  // Recursively extract all text from the report
-  const extractText = (obj: unknown): string => {
-    if (typeof obj === 'string') return obj;
-    if (Array.isArray(obj)) return obj.map(extractText).join(' ');
+  // Content-bearing field names to prioritize
+  const contentFields = new Set([
+    'title',
+    'brief',
+    'narrative_lead',
+    'primary_recommendation',
+    'prose',
+    'explanation',
+    'headline',
+    'what_it_is',
+    'why_it_works',
+    'when_to_use_instead',
+    'the_insight',
+    'one_liner',
+    'description',
+    'approach',
+    'limitation',
+    'current_performance',
+    'target_roadmap',
+    'test',
+    'success_criteria',
+    'cost',
+    'expected_improvement',
+    'investment',
+    'timeline',
+    'rationale',
+    'summary',
+    'content',
+    'text',
+    'details',
+    'notes',
+    'signal',
+    'implication',
+    'what_id_actually_do',
+    'personal_recommendation',
+    'self_critique',
+  ]);
+
+  // Check if a string looks like readable content (not an ID or enum)
+  const isReadableContent = (str: string): boolean => {
+    // Skip very short strings (IDs, enum values)
+    if (str.length < 20) return false;
+    // Skip strings that are all uppercase (enum values)
+    if (str === str.toUpperCase() && str.length < 30) return false;
+    // Skip strings that look like IDs (contain only alphanumeric, hyphens, underscores)
+    if (/^[a-zA-Z0-9_-]+$/.test(str) && str.length < 30) return false;
+    // Skip URLs
+    if (str.startsWith('http://') || str.startsWith('https://')) return false;
+    return true;
+  };
+
+  // Recursively extract readable text from the report
+  const extractText = (obj: unknown, key?: string): string => {
+    if (typeof obj === 'string') {
+      // Always include strings from known content fields
+      if (key && contentFields.has(key)) {
+        return obj;
+      }
+      // For other fields, filter based on content characteristics
+      return isReadableContent(obj) ? obj : '';
+    }
+    if (Array.isArray(obj)) {
+      return obj.map((item) => extractText(item, key)).join(' ');
+    }
     if (typeof obj === 'object' && obj !== null) {
-      return Object.values(obj).map(extractText).join(' ');
+      return Object.entries(obj)
+        .map(([k, v]) => extractText(v, k))
+        .join(' ');
     }
     return '';
   };
