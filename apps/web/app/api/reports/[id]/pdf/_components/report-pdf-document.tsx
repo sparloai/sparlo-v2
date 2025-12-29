@@ -2310,7 +2310,7 @@ export function ReportPDFDocument({ report }: Props) {
           )}
         </View>
 
-        {/* 1. Brief */}
+        {/* 1. The Brief */}
         <BriefSection brief={hybridData.brief} />
 
         {/* 2. Executive Summary */}
@@ -2319,41 +2319,31 @@ export function ReportPDFDocument({ report }: Props) {
         {/* 3. Problem Analysis */}
         <ProblemAnalysisSection analysis={hybridData.problem_analysis} />
 
-        {/* 4. Constraints & Metrics */}
+        {/* 4. Constraints */}
         <ConstraintsSection constraints={hybridData.constraints_and_metrics} />
 
         {/* 5. Challenge the Frame */}
         <ChallengeTheFrameSection challenges={hybridData.challenge_the_frame} />
 
-        {/* 6. Honest Assessment */}
-        <HonestAssessmentSection assessment={hybridData.honest_assessment} />
+        {/* 6. Innovation Analysis */}
+        <InnovationAnalysisSection analysis={hybridData.innovation_analysis} />
 
-        {/* 7. Cross-Domain Search */}
-        <CrossDomainSearchSection search={hybridData.cross_domain_search} />
-
-        {/* 8. Solution Concepts */}
+        {/* 7. Solution Concepts */}
         <SolutionConceptsSection track={executionTrack} />
 
-        {/* 9. Innovation Concepts */}
+        {/* 8. Innovation Concepts */}
         <InnovationConceptsSection portfolio={innovationPortfolio} />
 
-        {/* 10. Frontier Technologies */}
+        {/* 9. Frontier Technologies */}
         <FrontierWatchSection items={innovationPortfolio?.frontier_watch} />
 
-        {/* 11. Strategic Integration */}
-        <StrategicIntegrationSection
-          integration={hybridData.strategic_integration}
-        />
-
-        {/* 12. Risks & Watchouts */}
+        {/* 10. Risks & Watchouts */}
         <RisksSection risks={hybridData.risks_and_watchouts} />
 
-        {/* 13. Self-Critique */}
+        {/* 11. Self-Critique */}
         <SelfCritiqueSection critique={hybridData.self_critique} />
 
-        {/* 14. Recommendation (Key Insights, Next Steps, What I'd Actually Do) */}
-        <KeyInsightsSection insights={hybridData.key_insights} />
-        <NextStepsSection steps={hybridData.next_steps} />
+        {/* 12. Recommendation */}
         <WhatIdActuallyDoSection content={hybridData.what_id_actually_do} />
 
         {/* Footer */}
