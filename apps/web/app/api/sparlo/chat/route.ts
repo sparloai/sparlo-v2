@@ -176,6 +176,137 @@ function extractDiscoveryContext(reportData: Record<string, unknown>): string {
   return sections.join('\n');
 }
 
+/**
+ * Extract text context from hybrid report for chat
+ * Converts structured JSON to readable markdown to reduce tokens and improve AI understanding
+ */
+function extractHybridContext(reportData: Record<string, unknown>): string {
+  const report = reportData.report as Record<string, unknown> | undefined;
+  if (!report) return JSON.stringify(reportData, null, 2);
+
+  const sections: string[] = [];
+
+  // Header
+  const header = report.header as Record<string, unknown> | undefined;
+  if (header) {
+    sections.push(`# ${header.title || 'Innovation Report'}`);
+    if (header.tagline) sections.push(`*${header.tagline}*`);
+  }
+
+  // Executive Summary
+  const exec = report.executive_summary as Record<string, unknown> | undefined;
+  if (exec) {
+    sections.push('\n## Executive Summary');
+    if (exec.one_liner) sections.push(exec.one_liner as string);
+    if (exec.primary_recommendation)
+      sections.push(`**Recommendation:** ${exec.primary_recommendation}`);
+    if (exec.key_insight) sections.push(`**Key Insight:** ${exec.key_insight}`);
+  }
+
+  // Problem Analysis
+  const problem = report.problem_analysis as
+    | Record<string, unknown>
+    | undefined;
+  if (problem) {
+    sections.push('\n## Problem Analysis');
+    if (problem.core_challenge)
+      sections.push(`**Core Challenge:** ${problem.core_challenge}`);
+    if (problem.why_hard) sections.push(`**Why Hard:** ${problem.why_hard}`);
+    const constraints = problem.key_constraints as string[] | undefined;
+    if (constraints?.length) {
+      sections.push('**Key Constraints:**');
+      constraints.forEach((c) => sections.push(`- ${c}`));
+    }
+  }
+
+  // Solution Concepts
+  const concepts = report.solution_concepts as
+    | Record<string, unknown>
+    | undefined;
+  if (concepts) {
+    sections.push('\n## Solution Concepts');
+
+    // Lead concepts
+    const leadConcepts = concepts.lead_concepts as
+      | Array<Record<string, unknown>>
+      | undefined;
+    if (leadConcepts?.length) {
+      sections.push('\n### Lead Concepts');
+      leadConcepts.forEach((concept, i) => {
+        sections.push(`\n#### ${i + 1}. ${concept.title || 'Concept'}`);
+        if (concept.one_liner) sections.push(concept.one_liner as string);
+        if (concept.how_it_works)
+          sections.push(`**How it works:** ${concept.how_it_works}`);
+        if (concept.why_promising)
+          sections.push(`**Why promising:** ${concept.why_promising}`);
+      });
+    }
+
+    // Spark concept
+    const spark = concepts.spark_concept as
+      | Record<string, unknown>
+      | undefined;
+    if (spark) {
+      sections.push(`\n### Spark Concept: ${spark.title || 'Unconventional Idea'}`);
+      if (spark.one_liner) sections.push(spark.one_liner as string);
+      if (spark.why_unconventional)
+        sections.push(`**Why unconventional:** ${spark.why_unconventional}`);
+    }
+  }
+
+  // Challenge the Frame
+  const challenges = report.challenge_the_frame as
+    | Array<Record<string, unknown>>
+    | undefined;
+  if (challenges?.length) {
+    sections.push('\n## Challenge the Frame');
+    challenges.forEach((challenge) => {
+      if (challenge.assumption)
+        sections.push(`**Assumption:** ${challenge.assumption}`);
+      if (challenge.reframe) sections.push(`**Reframe:** ${challenge.reframe}`);
+    });
+  }
+
+  // Risks and Watchouts
+  const risks = report.risks_and_watchouts as
+    | Record<string, unknown>
+    | undefined;
+  if (risks) {
+    sections.push('\n## Risks and Watchouts');
+    const technical = risks.technical_risks as
+      | Array<Record<string, unknown>>
+      | undefined;
+    if (technical?.length) {
+      sections.push('**Technical Risks:**');
+      technical.forEach((r) => {
+        if (r.risk) sections.push(`- ${r.risk}`);
+      });
+    }
+    const market = risks.market_risks as
+      | Array<Record<string, unknown>>
+      | undefined;
+    if (market?.length) {
+      sections.push('**Market Risks:**');
+      market.forEach((r) => {
+        if (r.risk) sections.push(`- ${r.risk}`);
+      });
+    }
+  }
+
+  // Next Steps
+  const nextSteps = report.next_steps as Record<string, unknown> | undefined;
+  if (nextSteps) {
+    sections.push('\n## Next Steps');
+    const immediate = nextSteps.immediate_actions as string[] | undefined;
+    if (immediate?.length) {
+      sections.push('**Immediate Actions:**');
+      immediate.forEach((a) => sections.push(`- ${a}`));
+    }
+  }
+
+  return sections.join('\n');
+}
+
 // P1-045: Structured system prompt with clear boundaries
 const SYSTEM_PROMPT = `You are an expert AI assistant helping users understand their Sparlo innovation report.
 
@@ -306,6 +437,9 @@ export const POST = enhanceRouteHandler(
     } else if (reportData?.mode === 'discovery') {
       // Discovery report - convert structured data to text context
       reportContext = extractDiscoveryContext(reportData);
+    } else if (reportData?.mode === 'hybrid') {
+      // Hybrid report - convert structured data to markdown
+      reportContext = extractHybridContext(reportData);
     } else if (reportData) {
       // Fallback: stringify the report data
       reportContext = JSON.stringify(reportData, null, 2);
