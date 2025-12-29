@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -25,12 +25,14 @@ import { cn } from '@kit/ui/utils';
 
 import { ProcessingScreen } from '../../../_components/processing-screen';
 import { useReportProgress } from '../../../_lib/use-report-progress';
+import { CHAT_DRAWER_WIDTH } from '../_lib/constants';
 import {
   extractStructuredReport,
   extractUserInput,
 } from '../_lib/extract-report';
-import { CHAT_DRAWER_WIDTH } from '../_lib/constants';
+import { useChat } from '../_lib/hooks/use-chat';
 import type { ChatMessage } from '../_lib/schemas/chat.schema';
+import { generateShareLink } from '../_lib/server/share-actions';
 import { ChatDrawer, ChatHeader, ChatInput, ChatMessages } from './chat';
 import { DiscoveryReportDisplay } from './discovery-report-display';
 import { HybridReportDisplay } from './hybrid-report-display';
@@ -97,31 +99,22 @@ export function ReportDisplay({
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showToc, setShowToc] = useState(true);
   const [activeSection, setActiveSection] = useState('executive-summary');
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] =
-    useState<ChatMessage[]>(initialChatHistory);
-  const [isChatLoading, setIsChatLoading] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatContainerRef = useRef<HTMLDivElement>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const isUserScrolledUpRef = useRef(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  // Cancel the current streaming response
-  const cancelStream = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-      abortControllerRef.current = null;
-    }
-    // Mark the current streaming message as cancelled
-    setChatMessages((prev) =>
-      prev.map((msg) =>
-        msg.isStreaming ? { ...msg, isStreaming: false, cancelled: true } : msg,
-      ),
-    );
-    setIsChatLoading(false);
-  }, []);
+  // Chat functionality via custom hook
+  const {
+    messages: chatMessages,
+    input: chatInput,
+    setInput: setChatInput,
+    isLoading: isChatLoading,
+    submitMessage: submitChatMessage,
+    handleSubmit: handleChatSubmit,
+    cancelStream,
+  } = useChat({
+    reportId: report.id,
+    initialMessages: initialChatHistory,
+  });
 
   // Track progress for processing reports
   const { progress } = useReportProgress(isProcessing ? report.id : null);
@@ -158,6 +151,37 @@ export function ReportDisplay({
     } finally {
       setIsExporting(false);
     }
+  }, [report.id, report.title]);
+
+  // Handle share - Web Share API on mobile, fallback to modal
+  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+  const handleShare = useCallback(async () => {
+    // Try Web Share API first (works on mobile and some desktop browsers)
+    if (navigator.share) {
+      setIsGeneratingShare(true);
+      try {
+        // Generate share link first
+        const result = await generateShareLink({ reportId: report.id });
+        if (result.success && result.shareUrl) {
+          await navigator.share({
+            title: report.title,
+            url: result.shareUrl,
+          });
+          return; // Success - native share handled it
+        }
+      } catch (err) {
+        // User cancelled or share failed - fall through to modal
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return; // User cancelled - no error needed
+        }
+        console.error('[ReportDisplay] Share error:', err);
+      } finally {
+        setIsGeneratingShare(false);
+      }
+    }
+
+    // Fallback: open share modal
+    setIsShareModalOpen(true);
   }, [report.id, report.title]);
 
   // Extract markdown from report data
@@ -454,29 +478,6 @@ export function ReportDisplay({
     report.report_data,
   ]);
 
-  // Smart scroll: only auto-scroll if user is near bottom
-  useEffect(() => {
-    if (!isUserScrolledUpRef.current && chatEndRef.current) {
-      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [chatMessages]);
-
-  // Track user scroll position in chat
-  useEffect(() => {
-    const container = chatContainerRef.current;
-    if (!container) return;
-
-    const handleScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = container;
-      // Consider "near bottom" if within 100px of the bottom
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
-      isUserScrolledUpRef.current = !isNearBottom;
-    };
-
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // Track active section on scroll (throttled with rAF)
   useEffect(() => {
     let rafId: number | null = null;
@@ -538,162 +539,6 @@ export function ReportDisplay({
       setActiveSection(sectionId);
     }
   }, []);
-
-  const handleChatSubmit = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!chatInput.trim() || isChatLoading) return;
-
-      const userMessage: ChatMessage = {
-        id: Date.now().toString(),
-        role: 'user',
-        content: chatInput.trim(),
-      };
-
-      const savedInput = chatInput.trim();
-      setChatMessages((prev) => [...prev, userMessage]);
-      setChatInput('');
-      setIsChatLoading(true);
-
-      const assistantId = (Date.now() + 1).toString();
-      setChatMessages((prev) => [
-        ...prev,
-        { id: assistantId, role: 'assistant', content: '', isStreaming: true },
-      ]);
-
-      // Create AbortController for this request
-      abortControllerRef.current = new AbortController();
-
-      try {
-        const response = await fetch('/api/sparlo/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            reportId: report.id,
-            message: savedInput,
-          }),
-          signal: abortControllerRef.current.signal,
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          // Handle rate limit with specific message
-          if (response.status === 429) {
-            const retryAfter = response.headers.get('Retry-After');
-            const waitTime = retryAfter
-              ? `Please wait ${Math.ceil(parseInt(retryAfter) / 60)} minutes.`
-              : 'Please wait a few minutes.';
-            throw new Error(`Rate limit exceeded. ${waitTime}`);
-          }
-          throw new Error(
-            errorData.error || `Failed to get response (${response.status})`,
-          );
-        }
-
-        // Handle streaming response
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let assistantContent = '';
-
-        if (!reader) {
-          throw new Error('No response body');
-        }
-
-        let streamDone = false;
-        while (!streamDone) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n');
-
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              const data = line.slice(6);
-
-              try {
-                const parsed = JSON.parse(data);
-
-                // Handle text chunks
-                if (parsed.text) {
-                  assistantContent += parsed.text;
-                  setChatMessages((prev) =>
-                    prev.map((msg) =>
-                      msg.id === assistantId
-                        ? { ...msg, content: assistantContent }
-                        : msg,
-                    ),
-                  );
-                }
-
-                // Handle completion signal with save status
-                if (parsed.done) {
-                  streamDone = true;
-                  if (parsed.saved === false) {
-                    toast.warning('Message may not be saved', {
-                      description:
-                        'Your conversation might not persist. Please copy important responses.',
-                      duration: 8000,
-                    });
-                  }
-                }
-
-                if (parsed.error) {
-                  throw new Error(parsed.error);
-                }
-              } catch (parseError) {
-                // Skip invalid JSON lines (may be partial chunks)
-                if (
-                  parseError instanceof Error &&
-                  parseError.message !== 'AI service error'
-                ) {
-                  continue;
-                }
-                throw parseError;
-              }
-            }
-          }
-        }
-
-        // Mark streaming as complete
-        setChatMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === assistantId ? { ...msg, isStreaming: false } : msg,
-          ),
-        );
-      } catch (error) {
-        // Handle abort separately - don't show error for user-initiated cancellation
-        if (error instanceof Error && error.name === 'AbortError') {
-          return;
-        }
-
-        console.error('Chat error:', error);
-        setChatMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === assistantId
-              ? {
-                  ...msg,
-                  content:
-                    msg.content ||
-                    (error instanceof Error
-                      ? error.message
-                      : 'Sorry, I encountered an error. Please try again.'),
-                  isStreaming: false,
-                  error:
-                    error instanceof Error
-                      ? error.message
-                      : 'An error occurred',
-                }
-              : msg,
-          ),
-        );
-      } finally {
-        abortControllerRef.current = null;
-        setIsChatLoading(false);
-      }
-    },
-    [chatInput, isChatLoading, report.id],
-  );
 
   // Show processing screen if still in progress
   if (isProcessing && progress) {
@@ -788,9 +633,7 @@ export function ReportDisplay({
           <ChatInput
             value={chatInput}
             onChange={setChatInput}
-            onSubmit={() =>
-              handleChatSubmit({ preventDefault: () => {} } as React.FormEvent)
-            }
+            onSubmit={() => void submitChatMessage()}
             onCancel={cancelStream}
             isStreaming={isChatLoading}
           />
@@ -874,7 +717,9 @@ export function ReportDisplay({
           <div
             className="min-w-0 flex-1 px-6 py-10 transition-transform duration-300 ease-out md:px-8 lg:px-10"
             style={{
-              transform: isChatOpen ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)` : undefined,
+              transform: isChatOpen
+                ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)`
+                : undefined,
             }}
           >
             <div className="mx-auto max-w-[680px]">
@@ -927,9 +772,9 @@ export function ReportDisplay({
                 </div>
 
                 <div className="flex items-center justify-end">
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     <button
-                      className="btn"
+                      className="btn w-full sm:w-auto"
                       onClick={handleExport}
                       disabled={isExporting}
                     >
@@ -938,14 +783,19 @@ export function ReportDisplay({
                       ) : (
                         <Download className="btn-icon" />
                       )}
-                      {isExporting ? 'Exporting...' : 'Export'}
+                      {isExporting ? 'Exporting...' : 'Export PDF'}
                     </button>
                     <button
-                      className="btn"
-                      onClick={() => setIsShareModalOpen(true)}
+                      className="btn w-full sm:w-auto"
+                      onClick={handleShare}
+                      disabled={isGeneratingShare}
                     >
-                      <Share2 className="btn-icon" />
-                      Share
+                      {isGeneratingShare ? (
+                        <Loader2 className="btn-icon animate-spin" />
+                      ) : (
+                        <Share2 className="btn-icon" />
+                      )}
+                      {isGeneratingShare ? 'Sharing...' : 'Share'}
                     </button>
                   </div>
                 </div>
@@ -1039,9 +889,7 @@ export function ReportDisplay({
           <ChatInput
             value={chatInput}
             onChange={setChatInput}
-            onSubmit={() =>
-              handleChatSubmit({ preventDefault: () => {} } as React.FormEvent)
-            }
+            onSubmit={() => void submitChatMessage()}
             onCancel={cancelStream}
             isStreaming={isChatLoading}
           />
