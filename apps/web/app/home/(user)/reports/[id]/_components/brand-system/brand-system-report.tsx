@@ -15,10 +15,11 @@
 
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 
 import { Download, Share2 } from 'lucide-react';
 
+import { toast } from '@kit/ui/sonner';
 import { cn } from '@kit/ui/utils';
 
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
@@ -369,6 +370,40 @@ const TocNavItem = memo(function TocNavItem({
 });
 
 // ============================================
+// ACTION BUTTON COMPONENT
+// ============================================
+
+/**
+ * Get a clean URL for sharing (removes query params and hash fragments)
+ * Prevents accidental leakage of session tokens, debug params, etc.
+ */
+function getCleanShareUrl(): string {
+  if (typeof window === 'undefined') return '';
+  const url = new URL(window.location.href);
+  return `${url.origin}${url.pathname}`;
+}
+
+interface ActionButtonProps {
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+  ariaLabel: string;
+}
+
+function ActionButton({ onClick, icon, label, ariaLabel }: ActionButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex items-center gap-2 rounded border border-zinc-200 px-3 py-2 text-[13px] tracking-[-0.01em] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900"
+      aria-label={ariaLabel}
+    >
+      {icon}
+      <span className="hidden sm:inline">{label}</span>
+    </button>
+  );
+}
+
+// ============================================
 // REPORT CONTENT COMPONENT
 // ============================================
 
@@ -389,43 +424,57 @@ const ReportContent = memo(function ReportContent({
   readTime,
   unknownFields,
 }: ReportContentProps) {
+  const displayTitle = title || normalizedData.title;
+
+  const handleShare = useCallback(async () => {
+    const shareUrl = getCleanShareUrl();
+    const shareTitle = displayTitle || 'Report';
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: shareTitle, url: shareUrl });
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        toast.success('Link copied to clipboard');
+      }
+    } catch (error) {
+      // AbortError means user cancelled the share dialog - no error needed
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+      console.error('[Share] Error sharing report:', error);
+      toast.error('Failed to share report');
+    }
+  }, [displayTitle]);
+
+  const handleExport = useCallback(() => {
+    window.print();
+  }, []);
+
   return (
     <>
       {/* Report Title + Metadata + Actions */}
-      {(title || normalizedData.title) && (
+      {displayTitle && (
         <header className="mb-16">
           {/* Title and Actions Row */}
           <div className="flex items-start justify-between gap-6">
             <h1 className="font-heading text-[36px] leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900 md:text-[48px]">
-              {title || normalizedData.title}
+              {displayTitle}
             </h1>
             {/* Action Buttons */}
             <div className="flex shrink-0 items-center gap-2 pt-2">
-              <button
-                onClick={() => {
-                  if (navigator.share) {
-                    navigator.share({
-                      title: title || normalizedData.title || 'Report',
-                      url: window.location.href,
-                    });
-                  } else {
-                    navigator.clipboard.writeText(window.location.href);
-                  }
-                }}
-                className="flex items-center gap-2 rounded border border-zinc-200 px-3 py-2 text-[13px] tracking-[-0.01em] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900"
-                aria-label="Share report"
-              >
-                <Share2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Share</span>
-              </button>
-              <button
-                onClick={() => window.print()}
-                className="flex items-center gap-2 rounded border border-zinc-200 px-3 py-2 text-[13px] tracking-[-0.01em] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900"
-                aria-label="Export report"
-              >
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Export</span>
-              </button>
+              <ActionButton
+                onClick={handleShare}
+                icon={<Share2 className="h-4 w-4" />}
+                label="Share"
+                ariaLabel="Share report"
+              />
+              <ActionButton
+                onClick={handleExport}
+                icon={<Download className="h-4 w-4" />}
+                label="Export"
+                ariaLabel="Export report"
+              />
             </div>
           </div>
           {/* Metadata row */}
