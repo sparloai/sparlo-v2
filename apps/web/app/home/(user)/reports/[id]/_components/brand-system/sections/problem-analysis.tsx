@@ -6,8 +6,9 @@
  * Deep analysis of the problem space. Structured breakdown with
  * governing equations, root causes, and industry benchmarks.
  */
-
 import { memo } from 'react';
+
+import type { ProblemAnalysis } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,
@@ -20,8 +21,6 @@ import {
   SectionTitle,
   UnknownFieldRenderer,
 } from '../primitives';
-
-import type { ProblemAnalysis } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface ProblemAnalysisSectionProps {
   data?: ProblemAnalysis;
@@ -58,22 +57,26 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
             )}
 
             {/* Factors */}
-            {data.why_its_hard.factors && data.why_its_hard.factors.length > 0 && (
-              <div className="mt-6 space-y-3">
-                {data.why_its_hard.factors.map((factor, idx) => (
-                  <div key={idx} className="border-l-2 border-zinc-200 py-2 pl-4">
-                    <p className="font-medium text-[18px] text-zinc-900">
-                      {factor.factor}
-                    </p>
-                    {factor.explanation && (
-                      <p className="mt-1 text-[16px] leading-[1.3] text-zinc-600">
-                        {factor.explanation}
+            {data.why_its_hard.factors &&
+              data.why_its_hard.factors.length > 0 && (
+                <div className="mt-6 space-y-3">
+                  {data.why_its_hard.factors.map((factor, idx) => (
+                    <div
+                      key={idx}
+                      className="border-l-2 border-zinc-200 py-2 pl-4"
+                    >
+                      <p className="text-[18px] font-medium text-zinc-900">
+                        {factor.factor}
                       </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+                      {factor.explanation && (
+                        <p className="mt-1 text-[16px] leading-[1.3] text-zinc-600">
+                          {factor.explanation}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
           </ContentBlock>
         )}
 
@@ -90,7 +93,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
 
               {/* Explanation */}
               {data.why_its_hard.governing_equation.explanation && (
-                <p className="mt-2 text-[18px] italic text-zinc-500">
+                <p className="mt-2 text-[18px] text-zinc-500 italic">
                   {data.why_its_hard.governing_equation.explanation}
                 </p>
               )}
@@ -102,7 +105,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
         {data.first_principles_insight && (
           <ContentBlock withBorder className="max-w-[60ch]">
             <MonoLabel variant="muted">First Principles Insight</MonoLabel>
-            <h3 className="mt-4 text-[28px] font-medium leading-[1.25] text-zinc-900">
+            <h3 className="mt-4 text-[28px] leading-[1.25] font-medium text-zinc-900">
               {data.first_principles_insight.headline}
             </h3>
             {data.first_principles_insight.explanation && (
@@ -197,7 +200,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
                 </table>
               </div>
               {data.current_state_of_art.no_competitors_note && (
-                <p className="mt-4 text-[16px] italic text-zinc-500">
+                <p className="mt-4 text-[16px] text-zinc-500 italic">
                   {data.current_state_of_art.no_competitors_note}
                 </p>
               )}
@@ -205,42 +208,43 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
           )}
 
         {/* ROOT CAUSE HYPOTHESES */}
-        {data.root_cause_hypotheses && data.root_cause_hypotheses.length > 0 && (
-          <ContentBlock withBorder className="max-w-[80ch]">
-            <MonoLabel>Root Cause Hypotheses</MonoLabel>
-            <div className="mt-6 space-y-6">
-              {data.root_cause_hypotheses.map((hypothesis, idx) => (
-                <AccentBorder
-                  key={hypothesis.id ?? idx}
-                  weight={
-                    (hypothesis.confidence_percent ?? 50) >= 70
-                      ? 'heavy'
-                      : 'medium'
-                  }
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <p className="text-[18px] font-medium text-zinc-900">
-                      {hypothesis.name ?? hypothesis.hypothesis}
+        {data.root_cause_hypotheses &&
+          data.root_cause_hypotheses.length > 0 && (
+            <ContentBlock withBorder className="max-w-[80ch]">
+              <MonoLabel>Root Cause Hypotheses</MonoLabel>
+              <div className="mt-6 space-y-6">
+                {data.root_cause_hypotheses.map((hypothesis, idx) => (
+                  <AccentBorder
+                    key={hypothesis.id ?? idx}
+                    weight={
+                      (hypothesis.confidence_percent ?? 50) >= 70
+                        ? 'heavy'
+                        : 'medium'
+                    }
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <p className="text-[18px] font-medium text-zinc-900">
+                        {hypothesis.name ?? hypothesis.hypothesis}
+                      </p>
+                      {(hypothesis.confidence_percent !== undefined ||
+                        hypothesis.confidence) && (
+                        <span className="flex-shrink-0 text-[13px] text-zinc-500">
+                          {hypothesis.confidence_percent !== undefined
+                            ? `${hypothesis.confidence_percent}% confidence`
+                            : hypothesis.confidence}
+                        </span>
+                      )}
+                    </div>
+                    <p className="mt-2 text-[18px] leading-[1.3] text-zinc-600">
+                      {hypothesis.explanation ??
+                        hypothesis.evidence ??
+                        hypothesis.implication}
                     </p>
-                    {(hypothesis.confidence_percent !== undefined ||
-                      hypothesis.confidence) && (
-                      <span className="flex-shrink-0 text-[13px] text-zinc-500">
-                        {hypothesis.confidence_percent !== undefined
-                          ? `${hypothesis.confidence_percent}% confidence`
-                          : hypothesis.confidence}
-                      </span>
-                    )}
-                  </div>
-                  <p className="mt-2 text-[18px] leading-[1.3] text-zinc-600">
-                    {hypothesis.explanation ??
-                      hypothesis.evidence ??
-                      hypothesis.implication}
-                  </p>
-                </AccentBorder>
-              ))}
-            </div>
-          </ContentBlock>
-        )}
+                  </AccentBorder>
+                ))}
+              </div>
+            </ContentBlock>
+          )}
 
         {/* SUCCESS METRICS */}
         {data.success_metrics && data.success_metrics.length > 0 && (

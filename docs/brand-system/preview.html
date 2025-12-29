@@ -9,6 +9,13 @@
     /* Suisse Int'l Font - Trial versions */
     @font-face {
       font-family: 'Suisse Intl';
+      src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Light.woff2') format('woff2');
+      font-weight: 300;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: 'Suisse Intl';
       src: url('/fonts/Suisse/WOFF2/SuisseIntlTrial-Regular.woff2') format('woff2');
       font-weight: 400;
       font-style: normal;
@@ -50,7 +57,130 @@
 
     /* Prose width utility */
     .prose-width {
-      max-width: 65ch;
+      max-width: 80ch;
+    }
+
+    /* Body text treatment - Air Company match */
+    .body-text {
+      max-width: 80ch;
+      color: #1e1e1e;
+      font-weight: 400;
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    /* Smooth scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* TOC Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .toc-item {
+      animation: slideInLeft 0.4s ease-out forwards;
+      opacity: 0;
+    }
+
+    .toc-item:nth-child(1) { animation-delay: 0.1s; }
+    .toc-item:nth-child(2) { animation-delay: 0.15s; }
+    .toc-item:nth-child(3) { animation-delay: 0.2s; }
+    .toc-item:nth-child(4) { animation-delay: 0.25s; }
+    .toc-item:nth-child(5) { animation-delay: 0.3s; }
+    .toc-item:nth-child(6) { animation-delay: 0.35s; }
+    .toc-item:nth-child(7) { animation-delay: 0.4s; }
+    .toc-item:nth-child(8) { animation-delay: 0.45s; }
+    .toc-item:nth-child(9) { animation-delay: 0.5s; }
+    .toc-item:nth-child(10) { animation-delay: 0.55s; }
+
+    /* Floating TOC dot animation */
+    .toc-dot {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toc-dot.active {
+      transform: scale(1.3);
+    }
+
+    /* Sidebar hover effect */
+    .toc-link {
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .toc-link::before {
+      content: '';
+      position: absolute;
+      left: -16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2px;
+      height: 0;
+      background: #18181b;
+      transition: height 0.2s ease;
+    }
+
+    .toc-link:hover::before,
+    .toc-link.active::before {
+      height: 100%;
+    }
+
+    /* Mobile dropdown animation */
+    .toc-dropdown {
+      animation: fadeInUp 0.2s ease-out;
+    }
+
+    /* Floating nav fade */
+    .floating-toc {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .floating-toc.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+    }
+
+    .floating-toc.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    /* Progress line for sidebar */
+    .toc-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, #18181b var(--progress, 0%), #e4e4e7 var(--progress, 0%));
+      height: 100%;
+      transition: --progress 0.1s linear;
     }
   </style>
   <script>
@@ -68,11 +198,727 @@
 </head>
 <body class="min-h-screen bg-white">
 
-  <!-- Report Container -->
-  <div class="max-w-[900px] mx-auto px-10 py-20">
+  <!-- ============================================
+       MOBILE TABLE OF CONTENTS (Dropdown)
+       ============================================ -->
+  <div id="mobile-toc" class="lg:hidden sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-zinc-100">
+    <button
+      id="mobile-toc-toggle"
+      class="flex items-center justify-between w-full px-6 py-4 text-left"
+    >
+      <span class="text-[14px] text-zinc-600" id="mobile-toc-current">Contents</span>
+      <svg class="h-4 w-4 text-zinc-400 transition-transform duration-200" id="mobile-toc-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
 
-    <!-- Section Header - Main section title -->
+    <div id="mobile-toc-dropdown" class="hidden absolute left-0 right-0 bg-white border-b border-zinc-200 shadow-lg toc-dropdown">
+      <nav class="px-6 py-4">
+        <ul class="space-y-1">
+          <li class="toc-item"><a href="#executive-summary" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Executive Summary</a></li>
+          <li class="toc-item"><a href="#problem-analysis" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Problem Analysis</a></li>
+          <li class="toc-item"><a href="#challenge-the-frame" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Challenge the Frame</a></li>
+          <li class="toc-item"><a href="#constraints-metrics" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Constraints & Metrics</a></li>
+          <li class="toc-item"><a href="#innovation-analysis" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Innovation Analysis</a></li>
+          <li class="toc-item"><a href="#solution-concepts" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Solution Concepts</a></li>
+          <li class="toc-item"><a href="#innovation-concepts" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Innovation Concepts</a></li>
+          <li class="toc-item"><a href="#frontier-technologies" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Frontier Technologies</a></li>
+          <li class="toc-item"><a href="#risks-watchouts" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Risks & Watchouts</a></li>
+          <li class="toc-item"><a href="#recommendation" class="block py-2 text-[14px] text-zinc-600 hover:text-zinc-900 transition-colors">Recommendation</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ============================================
+       DESKTOP SIDEBAR TABLE OF CONTENTS
+       ============================================ -->
+  <aside id="sidebar-toc" class="fixed left-0 top-0 h-screen w-64 border-r border-zinc-100 bg-white/95 backdrop-blur-sm p-8 overflow-y-auto hidden lg:block z-40">
+
+    <!-- Contents label -->
+    <p class="text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+      Contents
+    </p>
+
+    <!-- Navigation -->
+    <nav class="mt-6 relative pl-4">
+      <div class="toc-progress" id="toc-progress"></div>
+      <ul class="space-y-1">
+        <li class="toc-item">
+          <a href="#executive-summary" data-section="executive-summary" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Executive Summary
+          </a>
+        </li>
+        <li class="toc-item">
+          <a href="#problem-analysis" data-section="problem-analysis" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Problem Analysis
+          </a>
+        </li>
+        <li class="toc-item">
+          <a href="#challenge-the-frame" data-section="challenge-the-frame" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Challenge the Frame
+          </a>
+        </li>
+        <li class="toc-item">
+          <a href="#constraints-metrics" data-section="constraints-metrics" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Constraints & Metrics
+          </a>
+        </li>
+        <li class="toc-item">
+          <a href="#innovation-analysis" data-section="innovation-analysis" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Innovation Analysis
+          </a>
+        </li>
+        <li class="toc-item">
+          <a href="#solution-concepts" data-section="solution-concepts" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Solution Concepts
+          </a>
+          <!-- Subsections -->
+          <ul class="ml-4 mt-1 space-y-1">
+            <li>
+              <a href="#supporting-concepts" data-section="supporting-concepts" class="toc-link block py-1 text-[13px] text-zinc-400 hover:text-zinc-600">
+                Supporting Concepts
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="toc-item">
+          <a href="#innovation-concepts" data-section="innovation-concepts" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Innovation Concepts
+          </a>
+          <!-- Subsections -->
+          <ul class="ml-4 mt-1 space-y-1">
+            <li>
+              <a href="#parallel-investigations" data-section="parallel-investigations" class="toc-link block py-1 text-[13px] text-zinc-400 hover:text-zinc-600">
+                Parallel Investigations
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li class="toc-item">
+          <a href="#frontier-technologies" data-section="frontier-technologies" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Frontier Technologies
+          </a>
+        </li>
+        <li class="toc-item">
+          <a href="#risks-watchouts" data-section="risks-watchouts" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Risks & Watchouts
+          </a>
+        </li>
+        <li class="toc-item">
+          <a href="#recommendation" data-section="recommendation" class="toc-link block py-2 text-[14px] text-zinc-500 hover:text-zinc-900">
+            Recommendation
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ============================================
+       FLOATING MINIMAL TOC (Right side, appears on scroll)
+       ============================================ -->
+  <nav id="floating-toc" class="floating-toc hidden fixed right-8 top-1/2 -translate-y-1/2 z-40 xl:block">
+    <ul class="space-y-3">
+      <li>
+        <a href="#executive-summary" data-section="executive-summary" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Executive Summary</span>
+        </a>
+      </li>
+      <li>
+        <a href="#problem-analysis" data-section="problem-analysis" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Problem Analysis</span>
+        </a>
+      </li>
+      <li>
+        <a href="#challenge-the-frame" data-section="challenge-the-frame" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Challenge the Frame</span>
+        </a>
+      </li>
+      <li>
+        <a href="#constraints-metrics" data-section="constraints-metrics" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Constraints & Metrics</span>
+        </a>
+      </li>
+      <li>
+        <a href="#innovation-analysis" data-section="innovation-analysis" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Innovation Analysis</span>
+        </a>
+      </li>
+      <li>
+        <a href="#solution-concepts" data-section="solution-concepts" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Solution Concepts</span>
+        </a>
+      </li>
+      <li>
+        <a href="#innovation-concepts" data-section="innovation-concepts" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Innovation Concepts</span>
+        </a>
+      </li>
+      <li>
+        <a href="#frontier-technologies" data-section="frontier-technologies" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Frontier Technologies</span>
+        </a>
+      </li>
+      <li>
+        <a href="#risks-watchouts" data-section="risks-watchouts" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Risks & Watchouts</span>
+        </a>
+      </li>
+      <li>
+        <a href="#recommendation" data-section="recommendation" class="group flex items-center gap-3">
+          <span class="toc-dot h-2 w-2 rounded-full bg-zinc-300 group-hover:bg-zinc-400"></span>
+          <span class="text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-zinc-500 whitespace-nowrap">Recommendation</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Report Container - offset for sidebar on desktop -->
+  <div class="max-w-[900px] mx-auto px-10 py-20 lg:ml-64 xl:mr-24">
+
+    <!-- ============================================
+         EXECUTIVE SUMMARY
+         ============================================ -->
+    <section id="executive-summary">
     <h1 class="text-[36px] font-semibold tracking-tight text-zinc-900 mb-12">
+      Executive Summary
+    </h1>
+
+    <!-- ExecutiveSummary Component -->
+    <article class="border-l-2 border-zinc-900 bg-white pl-10">
+      <!-- THE ASSESSMENT -->
+      <section>
+        <h2 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          The Assessment
+        </h2>
+        <p class="mt-8 text-[22px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[80ch]">
+          Sleep Number sells BCG mattresses. Google ships Nest Hub with Soli radar. Origin Wireless commercializes WiFi respiration sensing. The sensing physics for non-contact vital signs is solved—the remaining challenge is motion artifact rejection and multi-person separation. Your choice isn't which technology works, but which deployment context you're optimizing for: furniture-integrated BCG for sleep and seated monitoring, 60GHz radar for general room sensing, or WiFi CSI for zero-hardware respiration detection.
+        </p>
+      </section>
+
+      <!-- VIABILITY -->
+      <section class="mt-16">
+        <h3 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          Viability
+        </h3>
+        <p class="mt-8 text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900 max-w-[80ch]">
+          Viable with high confidence for respiration; moderate confidence for heart rate with motion
+        </p>
+      </section>
+
+      <!-- PRIMARY RECOMMENDATION -->
+      <section class="mt-16">
+        <h3 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          Primary Recommendation
+        </h3>
+        <p class="mt-8 text-[20px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[80ch]">
+          Start with furniture-integrated BCG using commodity piezoelectric films—it's the lowest-risk path with proven accuracy (±2-3 BPM) already deployed in automotive and sleep products. For true air-coupled sensing at 1-3m, 60GHz FMCW radar with transformer-based ML is the state-of-art, but expect $500K-2M in ML development to match Google's motion rejection capability. The paradigm-level opportunity is smartphone ultrasonic sensing—if device variability is manageable, it commoditizes vital signs to any phone at zero hardware cost.
+        </p>
+      </section>
+    </article>
+    </section>
+
+    <!-- ============================================
+         PROBLEM ANALYSIS
+         ============================================ -->
+    <section id="problem-analysis">
+    <h1 class="text-[36px] font-semibold tracking-tight text-zinc-900 mt-24 mb-12">
+      Problem Analysis
+    </h1>
+
+    <!-- ProblemAnalysis Component -->
+    <article class="border-l-2 border-zinc-900 bg-white pl-10">
+
+      <!-- WHAT'S WRONG -->
+      <section>
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          What's Wrong
+        </span>
+        <p class="mt-4 text-[20px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[80ch]">
+          Current non-contact vital sign sensing fails at the 'last mile': detection works in controlled conditions but degrades catastrophically with subject motion, multi-person environments, or varying distances. Commercial products either require stillness (Nest Hub sleep tracking), contact (Sleep Number mattress), or produce unreliable readings that physicians won't trust for clinical decisions.
+        </p>
+      </section>
+
+      <!-- WHY IT'S HARD -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          Why It's Hard
+        </span>
+        <p class="mt-4 text-[20px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[80ch]">
+          The fundamental challenge is signal-to-noise ratio at physiological scales. Cardiac motion is 0.1-0.5mm; respiratory motion is 5-12mm. Ambient motion from walking, gesturing, or even shifting weight can exceed 100mm. The sensing physics must extract sub-millimeter periodic signals from a background 100-1000x larger in amplitude.
+        </p>
+      </section>
+
+      <!-- GOVERNING EQUATION -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <div class="bg-zinc-50 border border-zinc-200 p-8 max-w-[80ch]">
+          <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+            Governing Equation
+          </span>
+
+          <!-- The equation itself - monospace, larger -->
+          <p class="mt-6 font-mono text-[22px] text-zinc-900">
+            Δφ = 4πd/λ
+          </p>
+          <p class="mt-2 text-[18px] text-zinc-500 italic">
+            Phase shift from displacement d at wavelength λ
+          </p>
+
+          <!-- Supporting explanation -->
+          <p class="mt-6 text-[18px] leading-[1.4] text-zinc-600">
+            At 60GHz (λ=5mm), 0.1mm cardiac displacement creates 7.2° phase shift. Respiration (10mm) creates 720°. Motion rejection requires separating signals differing by 100:1 in amplitude.
+          </p>
+        </div>
+      </section>
+
+      <!-- FIRST PRINCIPLES INSIGHT -->
+      <section class="mt-16 mb-16 pt-8 border-t border-zinc-200 max-w-[60ch]">
+        <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+          First Principles Insight
+        </span>
+        <h3 class="mt-4 text-[28px] font-medium leading-[1.25] text-zinc-900">
+          The sensing physics is solved—motion rejection is the remaining problem
+        </h3>
+        <p class="mt-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">
+          Every major sensing modality (radar, camera, acoustic, BCG) can detect the physiological signals in controlled conditions. The gap is robustness to real-world motion. Google's Nest Hub works because it assumes a stationary sleeping subject. The breakthrough needed isn't better sensors—it's better algorithms for separating physiological signals from motion artifacts.
+        </p>
+      </section>
+
+      <!-- WHAT INDUSTRY DOES TODAY -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          What Industry Does Today
+        </span>
+
+        <div class="mt-6 space-y-6 max-w-[80ch]">
+          <div>
+            <h4 class="text-[18px] font-medium text-zinc-900">Google Nest Hub (Soli radar)</h4>
+            <p class="mt-1 text-[18px] text-zinc-600">
+              <span class="text-zinc-400">Limitation:</span> Requires subject to be stationary and within 1m; sleep tracking only
+            </p>
+          </div>
+          <div>
+            <h4 class="text-[18px] font-medium text-zinc-900">Sleep Number SleepIQ</h4>
+            <p class="mt-1 text-[18px] text-zinc-600">
+              <span class="text-zinc-400">Limitation:</span> Contact-based BCG; only works in bed
+            </p>
+          </div>
+          <div>
+            <h4 class="text-[18px] font-medium text-zinc-900">Vayyar (4D imaging radar)</h4>
+            <p class="mt-1 text-[18px] text-zinc-600">
+              <span class="text-zinc-400">Limitation:</span> Focused on presence detection; vital signs secondary
+            </p>
+          </div>
+          <div>
+            <h4 class="text-[18px] font-medium text-zinc-900">Origin Wireless (WiFi CSI)</h4>
+            <p class="mt-1 text-[18px] text-zinc-600">
+              <span class="text-zinc-400">Limitation:</span> Respiration only; heart rate unreliable
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CURRENT STATE OF THE ART - Table -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          Current State of the Art
+        </span>
+
+        <div class="mt-6 overflow-x-auto">
+          <table class="w-full text-[18px]">
+            <thead>
+              <tr class="border-b border-zinc-300">
+                <th class="text-left py-4 pr-8 font-medium text-zinc-500">Entity</th>
+                <th class="text-left py-4 pr-8 font-medium text-zinc-500">Approach</th>
+                <th class="text-left py-4 pr-8 font-medium text-zinc-500">Performance</th>
+                <th class="text-left py-4 font-medium text-zinc-500">Roadmap</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-100">
+              <tr>
+                <td class="py-4 pr-8 font-medium text-zinc-900">Google Nest Hub</td>
+                <td class="py-4 pr-8 text-zinc-600">60GHz FMCW with ML</td>
+                <td class="py-4 pr-8 text-zinc-600">±3 BPM HR</td>
+                <td class="py-4 text-zinc-500 text-[18px]">FDA clearance pending</td>
+              </tr>
+              <tr>
+                <td class="py-4 pr-8 font-medium text-zinc-900">Sleep Number</td>
+                <td class="py-4 pr-8 text-zinc-600">BCG piezoelectric</td>
+                <td class="py-4 pr-8 text-zinc-600">±2 BPM HR</td>
+                <td class="py-4 text-zinc-500 text-[18px]">Expanding to chairs</td>
+              </tr>
+              <tr>
+                <td class="py-4 pr-8 font-medium text-zinc-900">Vayyar</td>
+                <td class="py-4 pr-8 text-zinc-600">4D imaging radar</td>
+                <td class="py-4 pr-8 text-zinc-600">Presence + RR</td>
+                <td class="py-4 text-zinc-500 text-[18px]">B2B smart home</td>
+              </tr>
+              <tr>
+                <td class="py-4 pr-8 font-medium text-zinc-900">Origin Wireless</td>
+                <td class="py-4 pr-8 text-zinc-600">WiFi channel state</td>
+                <td class="py-4 pr-8 text-zinc-600">±1 BPM RR</td>
+                <td class="py-4 text-zinc-500 text-[18px]">Elder care focus</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </article>
+    </section>
+
+    <!-- ============================================
+         CHALLENGE THE FRAME
+         ============================================ -->
+    <section id="challenge-the-frame">
+    <h1 class="text-[36px] font-semibold tracking-tight text-zinc-900 mt-24 mb-12">
+      Challenge the Frame
+    </h1>
+
+    <!-- ChallengeTheFrame Component -->
+    <article class="border-l-2 border-zinc-900 bg-white pl-10">
+
+      <!-- THE REFRAME - Key insight, light treatment -->
+      <section class="max-w-[60ch]">
+        <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+          The Reframe
+        </span>
+        <h3 class="mt-4 text-[28px] font-medium leading-[1.25] text-zinc-900">
+          Non-contact sensing isn't about removing hardware—it's about removing friction
+        </h3>
+        <p class="mt-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">
+          The industry frames non-contact vital signs as a hardware problem: how do we sense without touching? But the real opportunity is a UX problem: how do we make health monitoring disappear into daily life? Contact-based solutions that require zero user action (like a mattress) beat non-contact solutions that require positioning, stillness, or attention.
+        </p>
+      </section>
+
+      <!-- CONVENTIONAL THINKING -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          Conventional Thinking
+        </span>
+
+        <div class="mt-6 space-y-6 max-w-[80ch]">
+          <div>
+            <p class="text-[20px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              "Non-contact sensing is technically superior because it doesn't require any device on the body"
+            </p>
+            <p class="mt-2 text-[18px] text-zinc-500">
+              — Common framing in radar/camera sensing research
+            </p>
+          </div>
+          <div>
+            <p class="text-[20px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              "Wearables will always be more accurate because direct contact provides better signal quality"
+            </p>
+            <p class="mt-2 text-[18px] text-zinc-500">
+              — Medical device industry perspective
+            </p>
+          </div>
+          <div>
+            <p class="text-[20px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              "Consumers won't accept furniture-integrated sensors due to privacy concerns"
+            </p>
+            <p class="mt-2 text-[18px] text-zinc-500">
+              — Market research assumption
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- THE ACTUAL SITUATION -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          The Actual Situation
+        </span>
+
+        <div class="mt-6 space-y-8 max-w-[80ch]">
+          <div>
+            <h4 class="text-[18px] font-medium text-zinc-900">
+              Sleep Number's contact-based BCG outsells all non-contact competitors combined
+            </h4>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Sleep Number has 650+ retail locations and $2B+ annual revenue. Their SleepIQ technology is contact-based (you sleep on the mattress) but requires zero user action—it's truly invisible. Meanwhile, Nest Hub's non-contact Soli radar requires deliberate bedside placement and sleep tracking mode activation.
+            </p>
+          </div>
+          <div>
+            <h4 class="text-[18px] font-medium text-zinc-900">
+              The most successful 'non-contact' sensing is actually zero-friction contact
+            </h4>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Automotive BCG (Bosch, Continental) embeds sensors in seats you're already sitting in. No user action, no awareness, no friction. The 'contact' is invisible because it's the furniture you already use.
+            </p>
+          </div>
+          <div>
+            <h4 class="text-[18px] font-medium text-zinc-900">
+              True air-coupled sensing is solving a problem users don't actually have
+            </h4>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Focus groups show users don't object to sitting in a chair or lying in a bed. They object to charging wearables, remembering to put them on, and skin irritation. 'Non-contact' addresses the wrong friction point.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- WHY THIS MATTERS -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          Why This Matters
+        </span>
+        <p class="mt-4 text-[20px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[80ch]">
+          This reframe redirects R&D investment from solving hard physics problems (air-coupled sensing at distance) toward solving easier integration problems (furniture-embedded sensors). It suggests the winning strategy isn't better sensing technology—it's better furniture partnerships and invisible integration.
+        </p>
+      </section>
+
+      <!-- QUESTIONS THIS RAISES -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          Questions This Raises
+        </span>
+
+        <ul class="mt-6 space-y-4 max-w-[80ch]">
+          <li class="flex items-start gap-3">
+            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+            <div>
+              <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-800">
+                Should we partner with furniture manufacturers rather than develop standalone devices?
+              </p>
+              <p class="mt-1 text-[18px] text-zinc-500">
+                Sleep Number, Tempur-Pedic, Herman Miller all have distribution and brand trust
+              </p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+            <div>
+              <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-800">
+                What other 'invisible contact' surfaces exist in daily life?
+              </p>
+              <p class="mt-1 text-[18px] text-zinc-500">
+                Car seats, office chairs, toilet seats, yoga mats, standing desk mats
+              </p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+            <div>
+              <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-800">
+                Is the 1-3m air sensing use case actually valuable, or is it a research artifact?
+              </p>
+              <p class="mt-1 text-[18px] text-zinc-500">
+                What real scenario requires sensing someone from across the room?
+              </p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3">
+            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+            <div>
+              <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-800">
+                How do we position BCG-based sensing when the market expects 'contactless'?
+              </p>
+            </div>
+          </li>
+        </ul>
+      </section>
+
+    </article>
+    </section>
+
+    <!-- ============================================
+         CONSTRAINTS
+         ============================================ -->
+    <section id="constraints-metrics">
+    <h1 class="text-[36px] font-semibold tracking-tight text-zinc-900 mt-24 mb-12">
+      Constraints
+    </h1>
+
+    <!-- Constraints Component -->
+    <article class="border-l-2 border-zinc-900 bg-white pl-10">
+
+      <!-- Three-column constraint lists -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+        <!-- HARD CONSTRAINTS - Strongest visual weight -->
+        <div>
+          <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-900 uppercase">
+            Hard Constraints
+          </span>
+          <ul class="mt-4 space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-900 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-800">No contact with user required</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-900 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-800">Works in ambient lighting conditions</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-900 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-800">Consumer-grade hardware (&lt;$100 BOM)</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-900 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-800">Privacy-preserving (no video storage)</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- SOFT CONSTRAINTS - Medium weight -->
+        <div>
+          <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-500 uppercase">
+            Soft Constraints
+          </span>
+          <ul class="mt-4 space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">Range of 1-3 meters preferred</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">Multi-person separation capability</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">Works through light clothing</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-400 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">Battery-powered option available</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- ASSUMPTIONS - Lightest weight -->
+        <div>
+          <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+            Assumptions
+          </span>
+          <ul class="mt-4 space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-300 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">Indoor use only initially</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-300 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">Stationary subject for first version</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-300 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">Adult users (not infants/children)</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-2 h-1.5 w-1.5 rounded-full bg-zinc-300 flex-shrink-0"></span>
+              <span class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">No FDA clearance required for v1</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- SUCCESS METRICS TABLE -->
+      <div class="mt-16">
+        <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+          Success Metrics
+        </span>
+
+        <div class="mt-6 overflow-x-auto">
+          <table class="w-full text-[18px]">
+            <thead>
+              <tr class="border-b border-zinc-300">
+                <th class="text-left py-3 pr-8 font-medium text-zinc-900">Metric</th>
+                <th class="text-left py-3 pr-8 font-medium text-zinc-900">Target</th>
+                <th class="text-left py-3 pr-8 font-medium text-zinc-500">Minimum Viable</th>
+                <th class="text-left py-3 font-medium text-zinc-500">Stretch</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-zinc-100">
+              <tr>
+                <td class="py-4 pr-8 text-zinc-800">Heart rate accuracy</td>
+                <td class="py-4 pr-8 text-zinc-900 font-medium">±3 BPM</td>
+                <td class="py-4 pr-8 text-zinc-500">±5 BPM</td>
+                <td class="py-4 text-zinc-500">±2 BPM</td>
+              </tr>
+              <tr>
+                <td class="py-4 pr-8 text-zinc-800">Respiration rate accuracy</td>
+                <td class="py-4 pr-8 text-zinc-900 font-medium">±1 BPM</td>
+                <td class="py-4 pr-8 text-zinc-500">±2 BPM</td>
+                <td class="py-4 text-zinc-500">±0.5 BPM</td>
+              </tr>
+              <tr>
+                <td class="py-4 pr-8 text-zinc-800">Time to first reading</td>
+                <td class="py-4 pr-8 text-zinc-900 font-medium">&lt;30 sec</td>
+                <td class="py-4 pr-8 text-zinc-500">&lt;60 sec</td>
+                <td class="py-4 text-zinc-500">&lt;15 sec</td>
+              </tr>
+              <tr>
+                <td class="py-4 pr-8 text-zinc-800">Valid reading availability</td>
+                <td class="py-4 pr-8 text-zinc-900 font-medium">&gt;90%</td>
+                <td class="py-4 pr-8 text-zinc-500">&gt;80%</td>
+                <td class="py-4 text-zinc-500">&gt;95%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </article>
+    </section>
+
+    <!-- ============================================
+         INNOVATION ANALYSIS
+         ============================================ -->
+    <section id="innovation-analysis">
+    <h1 class="text-[36px] font-semibold tracking-tight text-zinc-900 mt-24 mb-12">
+      Innovation Analysis
+    </h1>
+
+    <!-- InnovationAnalysis Component -->
+    <article class="border-l-2 border-zinc-900 bg-white pl-10">
+
+      <!-- THE REFRAME - Pull quote style -->
+      <section class="max-w-[60ch]">
+        <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+          The Reframe
+        </span>
+        <p class="mt-4 text-[22px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+          Instead of asking 'which sensor can detect vital signs at range,' we asked 'which approach has the most tractable motion rejection problem and the best SNR physics.'
+        </p>
+      </section>
+
+      <!-- DOMAINS SEARCHED -->
+      <section class="mt-12 pt-8 border-t border-zinc-200">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+          Domains Searched
+        </span>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          <span class="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-[14px] rounded">Automotive BCG</span>
+          <span class="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-[14px] rounded">Bat echolocation</span>
+          <span class="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-[14px] rounded">Electric fish electrolocation</span>
+          <span class="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-[14px] rounded">Submarine sonar</span>
+          <span class="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-[14px] rounded">Volcano seismology</span>
+          <span class="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-[14px] rounded">Weather radar polarimetry</span>
+          <span class="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-[14px] rounded">LIGO interferometry</span>
+          <span class="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-[14px] rounded">NASA astronaut monitoring</span>
+        </div>
+      </section>
+
+    </article>
+    </section>
+
+    <!-- ============================================
+         SOLUTION CONCEPTS
+         ============================================ -->
+    <section id="solution-concepts">
+    <h1 class="text-[36px] font-semibold tracking-tight text-zinc-900 mt-24 mb-12">
       Solution Concepts
     </h1>
 
@@ -83,7 +929,7 @@
       <!-- HEADER -->
       <header class="space-y-4">
         <!-- Subsection label -->
-        <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+        <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           Primary Recommendation
         </span>
 
@@ -93,128 +939,109 @@
         </h2>
 
         <!-- Meta line - NO PILLS, just text -->
-        <p class="text-[15px] tracking-wide text-zinc-500">
+        <p class="text-[18px] tracking-wide text-zinc-500">
           Catalog solution · High confidence
         </p>
       </header>
 
       <!-- WHAT IT IS -->
-      <section class="space-y-4">
-        <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+      <section class="mt-12 pt-8 border-t border-zinc-200 space-y-4">
+        <h3 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           What it is
         </h3>
-        <p class="text-[18px] leading-relaxed text-zinc-600 prose-width">
+        <p class="text-[20px] body-text">
           Embed low-cost piezoelectric polymer films (PVDF or EMFi) in chair seats, bed mattresses, or floor mats to detect ballistocardiographic signals from heartbeat mechanical recoil. This redefines 'non-contact' as 'no worn device' rather than 'no physical coupling.' The approach is already commercial: Sleep Number's SleepIQ mattresses, Bosch and Toyota's driver drowsiness detection, and Murata's BCG sensor modules. The innovation opportunity isn't the sensing—it's extending to chairs, floors, and other furniture at consumer price points. PVDF films cost $5-20 per sensor, electronics are simple charge amplifiers plus microcontroller ($10-30), and the signal processing algorithms exist from automotive applications. Total BOM under $50 for a complete system.
         </p>
       </section>
 
       <!-- WHY IT WORKS -->
-      <section class="space-y-4">
-        <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+      <section class="mt-12 pt-8 border-t border-zinc-200 space-y-4">
+        <h3 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           Why it works
         </h3>
-        <p class="text-[18px] leading-relaxed text-zinc-600 prose-width">
+        <p class="text-[20px] body-text">
           Each heartbeat ejects ~70mL of blood into the aorta, creating a mechanical impulse of 0.1-0.3 N·s that propagates through the body and into contact surfaces. The body's center of mass shifts 0.1-0.5mm with each beat, producing forces of 1-5 mN detectable by piezoelectric films. Respiration creates 10-100x larger signals (chest expansion 5-12mm). PVDF piezoelectric coefficient is 23 pC/N; EMFi is 10-20x more sensitive at 200-400 pC/N. The signal transmits through furniture padding with minimal attenuation because the mechanical coupling is direct.
         </p>
       </section>
 
       <!-- ECONOMICS GRID - zinc-50, no visible borders, spacing only -->
-      <section class="grid grid-cols-3 gap-10 bg-zinc-50 p-8 -ml-10 pl-10">
+      <section class="mt-12 pt-8 border-t border-zinc-200 grid grid-cols-3 gap-10 bg-zinc-50 p-8 -ml-10 pl-10">
         <div>
-          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+          <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase block mb-3">
             Expected improvement
           </span>
-          <p class="text-[18px] font-medium text-zinc-900">±2-3 BPM HR, ±1 BPM RR</p>
+          <p class="text-[20px] font-medium text-zinc-900">±2-3 BPM HR, ±1 BPM RR</p>
         </div>
         <div>
-          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+          <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase block mb-3">
             Timeline
           </span>
-          <p class="text-[18px] font-medium text-zinc-900">3-6 months to prototype</p>
+          <p class="text-[20px] font-medium text-zinc-900">3-6 months to prototype</p>
         </div>
         <div>
-          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+          <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase block mb-3">
             Investment
           </span>
-          <p class="text-[18px] font-medium text-zinc-900">$50-200K pilot</p>
+          <p class="text-[20px] font-medium text-zinc-900">$50-200K pilot</p>
         </div>
       </section>
 
-      <!-- THE INSIGHT - Dark Block -->
-      <section class="bg-zinc-900 p-10 -ml-10 pl-10 space-y-8">
-        <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase">
-          The insight
+      <!-- THE INSIGHT -->
+      <section class="mt-16 mb-16 pt-8 border-t border-zinc-200 max-w-[60ch]">
+        <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+          The Insight
         </span>
-        <p class="text-[22px] font-semibold leading-snug text-white prose-width">
+        <h3 class="mt-4 text-[28px] font-medium leading-[1.25] text-zinc-900">
           Direct mechanical coupling provides 40-60dB better SNR than air-coupled sensing
+        </h3>
+        <p class="mt-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">
+          <span class="font-medium text-zinc-700">Automotive driver monitoring (Bosch, Continental, Ford, Toyota):</span> BCG sensors in car seats detect driver heart rate and drowsiness despite engine vibration. Home environment is actually easier—no engine vibration, more stable seating.
         </p>
-
-        <!-- Nested section - border separation instead of background -->
-        <div class="mt-8 pt-8 border-t border-zinc-800 space-y-6">
-          <div>
-            <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase block mb-3">
-              Where we found it
-            </span>
-            <p class="text-[15px] text-zinc-300 prose-width">
-              <span class="text-zinc-100 font-medium">Automotive driver monitoring (Bosch, Continental, Ford, Toyota):</span>
-              BCG sensors in car seats detect driver heart rate and drowsiness despite engine vibration
-            </p>
-            <p class="text-[15px] text-zinc-300 mt-3">
-              → Home environment is actually easier—no engine vibration, more stable seating
-            </p>
-          </div>
-        </div>
-
-        <div class="pt-6">
-          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase block mb-3">
-            Why industry missed it
-          </span>
-          <p class="text-[15px] text-zinc-400 prose-width">
-            Industry didn't miss it—it's already commercial. The gap is that 'non-contact vital signs' research focused on air-coupled sensing as the differentiator, while BCG was siloed in automotive and sleep monitoring.
-          </p>
-        </div>
+        <p class="mt-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">
+          <span class="font-medium text-zinc-700">Why industry missed it:</span> Industry didn't miss it—it's already commercial. The gap is that 'non-contact vital signs' research focused on air-coupled sensing as the differentiator, while BCG was siloed in automotive and sleep monitoring.
+        </p>
       </section>
 
       <!-- VALIDATION GATE -->
-      <section class="space-y-5">
-        <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+      <section class="mt-12 pt-8 border-t border-zinc-200 space-y-5">
+        <h3 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           First validation step
         </h3>
         <div class="space-y-4">
-          <p class="text-[18px] font-medium text-zinc-900 prose-width">
+          <p class="text-[20px] font-medium text-zinc-900 leading-[1.3] tracking-[-0.02em] max-w-[80ch]">
             Validate HR detection accuracy through standard office chair cushion
           </p>
-          <p class="text-[15px] text-zinc-500">
+          <p class="text-[18px] text-zinc-500">
             $5-10K · Sensors, ECG reference, 10-subject pilot
           </p>
-          <p class="text-[15px] text-zinc-600 prose-width">
-            <span class="text-zinc-900 font-medium">Success criteria:</span>
+          <p class="text-[18px] body-text">
+            <span class="text-zinc-700 font-normal">Success criteria:</span>
             HR accuracy ±3 BPM vs. ECG across 10 subjects, >90% valid reading rate while seated
           </p>
         </div>
       </section>
 
       <!-- COUPLED EFFECTS - Inline text, no pill badges -->
-      <section class="space-y-8">
-        <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+      <section class="mt-12 pt-8 border-t border-zinc-200 space-y-4">
+        <h3 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           Coupled effects
         </h3>
 
-        <div class="space-y-8">
+        <div class="space-y-6">
           <!-- Neutral Effect -->
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <h4 class="text-[18px] font-medium text-zinc-900">Furniture design</h4>
-              <span class="text-[15px]">
+              <h4 class="text-[20px] font-medium text-zinc-900">Furniture design</h4>
+              <span class="text-[18px]">
                 <span class="text-zinc-500">Neutral</span>
                 <span class="mx-2 text-zinc-300">·</span>
-                <span class="text-zinc-400">Minor</span>
+                <span class="text-white">Minor</span>
               </span>
             </div>
-            <p class="text-[15px] text-zinc-600 prose-width">
+            <p class="text-[18px] text-zinc-500 leading-[1.3] tracking-[-0.02em] max-w-[80ch]">
               Sensor integration affects furniture compliance and feel
             </p>
-            <p class="text-[15px] text-zinc-500 prose-width">
+            <p class="text-[18px] body-text">
               PVDF films are 28-110µm thick; imperceptible under fabric. Use thin films; place under existing padding.
             </p>
           </div>
@@ -222,17 +1049,17 @@
           <!-- Worse Effect -->
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <h4 class="text-[18px] font-medium text-zinc-900">Multi-occupancy</h4>
-              <span class="text-[15px]">
+              <h4 class="text-[20px] font-medium text-zinc-900">Multi-occupancy</h4>
+              <span class="text-[18px]">
                 <span class="text-red-600">Worse</span>
                 <span class="mx-2 text-zinc-300">·</span>
-                <span class="text-zinc-400">Major</span>
+                <span class="text-white">Major</span>
               </span>
             </div>
-            <p class="text-[15px] text-zinc-600 prose-width">
+            <p class="text-[18px] text-zinc-500 leading-[1.3] tracking-[-0.02em] max-w-[80ch]">
               Cannot separate signals from multiple people on same surface
             </p>
-            <p class="text-[15px] text-zinc-500 prose-width">
+            <p class="text-[18px] body-text">
               Fails completely for shared surfaces like couches. Use individual seating; array of sensors for spatial separation; accept single-person limitation.
             </p>
           </div>
@@ -240,41 +1067,41 @@
       </section>
 
       <!-- SUSTAINABILITY - No colored background, just text -->
-      <section class="space-y-4">
+      <section class="mt-12 pt-8 border-t border-zinc-200 space-y-4">
         <div class="flex items-baseline gap-4">
-          <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          <h3 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
             Sustainability
           </h3>
-          <span class="text-[15px] text-emerald-600">Benefit</span>
+          <span class="text-[18px] text-emerald-600">Benefit</span>
         </div>
-        <p class="text-[18px] text-zinc-600 prose-width">
+        <p class="text-[20px] text-zinc-600 leading-[1.3] tracking-[-0.02em] max-w-[80ch]">
           Minimal materials, no RF emissions, extremely low power consumption
         </p>
-        <p class="text-[15px] text-zinc-500 prose-width">
+        <p class="text-[18px] body-text">
           PVDF films require minimal raw materials. System runs on milliwatts. No electromagnetic emissions. 10-20 year sensor lifetime. Significantly lower environmental impact than wearables requiring batteries and periodic replacement.
         </p>
       </section>
 
       <!-- IP CONSIDERATIONS - Inline text for FTO/Patentability -->
-      <section class="space-y-5">
+      <section class="mt-12 pt-8 border-t border-zinc-200 space-y-5">
         <div class="flex items-baseline justify-between">
-          <h3 class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          <h3 class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
             IP considerations
           </h3>
-          <span class="text-[15px]">
+          <span class="text-[18px]">
             <span class="text-amber-600">FTO: Yellow</span>
             <span class="mx-2 text-zinc-300">·</span>
             <span class="text-zinc-500">Patentability: Medium</span>
           </span>
         </div>
-        <p class="text-[15px] text-zinc-600 prose-width">
+        <p class="text-[18px] body-text">
           Search for 'ballistocardiography furniture patent' returned multiple relevant filings: US 10,123,xxx (Sleep Number, mattress BCG), US 9,xxx,xxx (Bosch, automotive seat sensing). Core BCG physics is not patentable, but specific implementations may require licensing or design-around.
         </p>
         <div class="pt-2">
-          <span class="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+          <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase block mb-3">
             Key patents to review
           </span>
-          <ul class="text-[15px] text-zinc-600 space-y-2">
+          <ul class="text-[18px] text-[#3a3a3a] space-y-2">
             <li>Sleep Number mattress sensing patents</li>
             <li>Bosch/Continental automotive BCG patents</li>
             <li>Murata sensor module patents</li>
@@ -284,13 +1111,1009 @@
 
     </article>
 
+    <!-- ============================================
+         SUPPORTING CONCEPTS
+         ============================================ -->
+    <section id="supporting-concepts" class="mt-20">
+      <h2 class="text-[28px] font-semibold tracking-tight text-zinc-900">
+        Supporting Concepts
+      </h2>
+
+      <div class="mt-10 space-y-16">
+
+        <!-- CONCEPT 1: 60GHz Radar -->
+        <div class="max-w-[70ch]">
+          <!-- Title + Type -->
+          <div class="flex items-baseline justify-between gap-4">
+            <h3 class="text-[20px] font-semibold tracking-tight text-zinc-900">
+              60GHz FMCW Radar with Transformer-Based ML
+            </h3>
+            <span class="text-[13px] text-zinc-400 uppercase tracking-wide flex-shrink-0">
+              complementary
+            </span>
+          </div>
+
+          <!-- Risk/Limitation callout -->
+          <p class="mt-3 text-[18px] text-zinc-500 italic">
+            ML models require extensive labeled training data; motion rejection may hit fundamental limits
+          </p>
+
+          <!-- What it is -->
+          <div class="mt-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              What It Is
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              Use commodity 60GHz radar modules (Infineon BGT60LTR11, Texas Instruments IWR6843) with modern deep learning for vital sign extraction. The radar provides raw I/Q phase data; the ML model learns to separate physiological signals from motion artifacts. This is Google's Nest Hub approach, now commoditized.
+            </p>
+          </div>
+
+          <!-- Why it works -->
+          <div class="mt-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Why It Works
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              At 60GHz, chest displacement from breathing (5-12mm) creates measurable phase shifts (720°+). Heart displacement (0.1-0.5mm) creates smaller but detectable shifts (7-36°). Transformer architectures can learn temporal patterns that distinguish periodic physiological signals from aperiodic motion noise.
+            </p>
+          </div>
+
+          <!-- When to use instead -->
+          <div class="mt-6 border-l-2 border-zinc-200 pl-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              When To Use Instead
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              When you need true air-coupled sensing at 1-3m range and can invest in ML development. Best for standalone devices (smart speakers, wall-mounted monitors) where furniture integration isn't possible.
+            </p>
+          </div>
+        </div>
+
+        <!-- CONCEPT 2: Smartphone Ultrasonic -->
+        <div class="max-w-[70ch]">
+          <!-- Title + Type -->
+          <div class="flex items-baseline justify-between gap-4">
+            <h3 class="text-[20px] font-semibold tracking-tight text-zinc-900">
+              Smartphone Ultrasonic Sensing
+            </h3>
+            <span class="text-[13px] text-zinc-400 uppercase tracking-wide flex-shrink-0">
+              fallback
+            </span>
+          </div>
+
+          <!-- Risk/Limitation callout -->
+          <p class="mt-3 text-[18px] text-zinc-500 italic">
+            Device variability is high; may only work reliably on specific phone models
+          </p>
+
+          <!-- What it is -->
+          <div class="mt-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              What It Is
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              Use the phone's existing speaker and microphone to emit and receive ultrasonic pulses (18-22kHz). Chest motion from breathing modulates the reflected signal. No additional hardware required—works on any smartphone with appropriate app.
+            </p>
+          </div>
+
+          <!-- Why it works -->
+          <div class="mt-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Why It Works
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              Ultrasonic wavelength at 20kHz is ~17mm, similar to respiratory displacement. The phone's audio hardware is designed for precise timing. Research from University of Washington (ApneaApp, BreathJunior) demonstrates feasibility.
+            </p>
+          </div>
+
+          <!-- When to use instead -->
+          <div class="mt-6 border-l-2 border-zinc-200 pl-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              When To Use Instead
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              When zero hardware cost is paramount and you can accept device-specific limitations. Best for screening applications where false negatives are acceptable, or as a supplement to other methods.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+    </section>
+
+    <!-- ============================================
+         INNOVATION CONCEPTS
+         ============================================ -->
+    <section id="innovation-concepts" class="mt-24">
+      <h2 class="text-[36px] font-semibold tracking-tight text-zinc-900">
+        Innovation Concepts
+      </h2>
+
+      <p class="mt-6 max-w-[70ch] text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+        Higher-risk bets with breakthrough potential. These concepts could fundamentally change the economics or capabilities of vital signs sensing—but require validation of novel approaches.
+      </p>
+
+      <div class="mt-12 space-y-20">
+
+        <!-- INNOVATION CONCEPT 1 -->
+        <div class="border-l-2 border-zinc-300 pl-8 max-w-[80ch]">
+
+          <!-- Label + Title -->
+          <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+            Recommended Innovation
+          </span>
+          <h3 class="mt-3 text-[24px] font-semibold tracking-tight text-zinc-900 leading-tight">
+            Ultrasonic FMCW Using Smartphone Hardware
+          </h3>
+
+          <!-- Confidence -->
+          <p class="mt-2 text-[18px] text-zinc-500">
+            Medium confidence
+          </p>
+
+          <!-- What it is -->
+          <section class="mt-10">
+            <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+              What It Is
+            </span>
+            <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[70ch]">
+              Use the phone's existing speaker and microphone to emit continuous frequency-modulated ultrasonic chirps (18-22kHz) and detect phase shifts from chest motion. This applies FMCW radar principles to acoustic sensing, using commodity audio hardware instead of RF components.
+            </p>
+          </section>
+
+          <!-- Why it works -->
+          <section class="mt-8">
+            <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+              Why It Works
+            </span>
+            <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[70ch]">
+              Ultrasonic wavelength at 20kHz is ~17mm, well-matched to respiratory displacement (5-12mm). Modern smartphone audio hardware has sufficient bandwidth and timing precision. The FMCW approach provides range discrimination to separate the target from background reflections.
+            </p>
+          </section>
+
+          <!-- The Insight - elevated treatment -->
+          <section class="mt-10 bg-zinc-50 border border-zinc-200 p-8 max-w-[70ch]">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              The Insight
+            </span>
+            <p class="mt-4 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+              Ultrasonic Doppler sensing using commodity smartphone audio hardware
+            </p>
+
+            <!-- Where we found it -->
+            <div class="mt-6 pt-6 border-t border-zinc-200">
+              <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                Where We Found It
+              </span>
+              <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+                <span class="font-medium text-zinc-700">Bat echolocation (Rhinolophus ferrumequinum):</span>
+                CF-FM waveforms detect insect wingbeats (1mm motion) at 10m range using acoustic frequencies similar to smartphone ultrasound
+              </p>
+              <p class="mt-3 text-[18px] text-zinc-500 flex items-start gap-2">
+                <span class="text-zinc-400">→</span>
+                <span>The physics is identical—acoustic waves reflecting off moving surfaces create Doppler shifts. Bats achieve sub-millimeter motion detection at ranges far exceeding our requirements.</span>
+              </p>
+            </div>
+          </section>
+
+          <!-- Why industry missed it -->
+          <section class="mt-8">
+            <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+              Why Industry Missed It
+            </span>
+            <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 max-w-[70ch]">
+              Audio hardware wasn't considered for sensing because it's 'meant for music.' The ultrasonic sensing research community focused on dedicated hardware (Chirp, UltraSense) rather than commodity devices. Cross-pollination from bioacoustics research didn't occur.
+            </p>
+          </section>
+
+          <!-- Breakthrough potential -->
+          <section class="mt-10 border-l-4 border-zinc-900 pl-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Breakthrough Potential
+            </span>
+            <p class="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+              Vital signs monitoring becomes a software feature on 3 billion smartphones
+            </p>
+            <p class="mt-2 text-[18px] text-zinc-600">
+              Zero marginal hardware cost vs. $30-200 for dedicated sensors. Every smartphone becomes a contactless vital signs monitor.
+            </p>
+          </section>
+
+        </div>
+
+        <!-- ----------------------------------------
+             PARALLEL INVESTIGATIONS
+             ---------------------------------------- -->
+        <section id="parallel-investigations" class="mt-16">
+          <h2 class="text-[28px] font-semibold tracking-tight text-zinc-900">
+            Parallel Investigations
+          </h2>
+
+          <div class="mt-12 space-y-20">
+
+            <!-- PARALLEL INVESTIGATION 1 -->
+            <div class="border-l-2 border-zinc-300 pl-8 max-w-[80ch]">
+
+              <!-- Label + Title -->
+              <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                Parallel Investigation
+              </span>
+              <h3 class="mt-3 text-[24px] font-semibold tracking-tight text-zinc-900 leading-tight">
+                Motion-Invariant Morphological Features
+              </h3>
+
+              <!-- What it is -->
+              <section class="mt-10">
+                <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+                  What It Is
+                </span>
+                <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[70ch]">
+                  Investigate whether certain cardiac waveform characteristics (e.g., J-wave amplitude ratios, inter-beat interval patterns) remain stable across different body positions and motion states. If such features exist, they could enable motion-robust vital sign extraction without requiring motion cancellation.
+                </p>
+              </section>
+
+              <!-- Why it works -->
+              <section class="mt-8">
+                <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+                  Why It Works
+                </span>
+                <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[70ch]">
+                  ECG morphology research shows some waveform features are position-independent. If similar invariants exist in BCG or radar signals, they could be extracted even when the overall signal is corrupted by motion.
+                </p>
+              </section>
+
+              <!-- Key Uncertainty -->
+              <section class="mt-8">
+                <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                  Key Uncertainty
+                </span>
+                <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic max-w-[70ch]">
+                  Whether motion-invariant features exist at all—the core hypothesis is unproven. This requires fundamental signal analysis before any product relevance.
+                </p>
+              </section>
+
+              <!-- Breakthrough Potential -->
+              <section class="mt-10 border-l-4 border-zinc-900 pl-6">
+                <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                  Breakthrough Potential
+                </span>
+                <p class="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+                  Solve motion rejection at the algorithm level, making any sensing modality viable for moving subjects
+                </p>
+                <p class="mt-2 text-[18px] text-zinc-600">
+                  Would eliminate the single biggest technical barrier in the field. Every existing sensor becomes dramatically more useful.
+                </p>
+              </section>
+
+              <!-- When to Elevate -->
+              <section class="mt-8 border-l-2 border-zinc-200 pl-4">
+                <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                  When to Elevate
+                </span>
+                <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 max-w-[70ch]">
+                  If initial feature analysis shows promising invariants, this becomes the highest-priority research investment. Fund a 6-month PhD-level investigation.
+                </p>
+              </section>
+
+            </div>
+
+            <!-- PARALLEL INVESTIGATION 2 -->
+            <div class="border-l-2 border-zinc-300 pl-8 max-w-[80ch]">
+
+              <!-- Label + Title -->
+              <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                Parallel Investigation
+              </span>
+              <h3 class="mt-3 text-[24px] font-semibold tracking-tight text-zinc-900 leading-tight">
+                WiFi Channel State Information (CSI) Sensing
+              </h3>
+
+              <!-- What it is -->
+              <section class="mt-10">
+                <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+                  What It Is
+                </span>
+                <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[70ch]">
+                  Use existing WiFi infrastructure to detect respiration through channel state perturbations. Requires no additional hardware—works with standard routers and devices. Multiple research groups (Origin Wireless, MIT, UIUC) have demonstrated feasibility.
+                </p>
+              </section>
+
+              <!-- Why it works -->
+              <section class="mt-8">
+                <span class="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+                  Why It Works
+                </span>
+                <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] max-w-[70ch]">
+                  WiFi signals at 2.4/5GHz have wavelengths (12.5cm/6cm) that interact with chest motion. CSI provides fine-grained channel measurements that can detect sub-centimeter displacement.
+                </p>
+              </section>
+
+              <!-- Key Uncertainty -->
+              <section class="mt-8">
+                <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                  Key Uncertainty
+                </span>
+                <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic max-w-[70ch]">
+                  Heart rate extraction remains unreliable—most published results focus on respiration only. Multi-path interference in real environments degrades accuracy significantly.
+                </p>
+              </section>
+
+              <!-- Breakthrough Potential -->
+              <section class="mt-10 border-l-4 border-zinc-900 pl-6">
+                <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                  Breakthrough Potential
+                </span>
+                <p class="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+                  Zero hardware cost for basic respiration monitoring across any WiFi-enabled space
+                </p>
+                <p class="mt-2 text-[18px] text-zinc-600">
+                  Every WiFi-enabled space becomes a sensing environment. Ideal for elder care fall detection + breathing monitoring.
+                </p>
+              </section>
+
+              <!-- When to Elevate -->
+              <section class="mt-8 border-l-2 border-zinc-200 pl-4">
+                <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+                  When to Elevate
+                </span>
+                <p class="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 max-w-[70ch]">
+                  If a peer demonstrates reliable heart rate from WiFi CSI, immediately prioritize. Currently best positioned as respiration-only complement to other methods.
+                </p>
+              </section>
+
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </section>
+
+    <!-- ============================================
+         FRONTIER TECHNOLOGIES
+         ============================================ -->
+    <section id="frontier-technologies" class="mt-24">
+      <h2 class="text-[36px] font-semibold tracking-tight text-zinc-900">
+        Frontier Technologies
+      </h2>
+      <p class="mt-3 text-[18px] text-zinc-500">
+        Emerging technologies and innovations to monitor
+      </p>
+
+      <div class="mt-12 space-y-16">
+
+        <!-- FRONTIER TECHNOLOGY 1 -->
+        <div class="max-w-[75ch]">
+
+          <!-- Header Row: Number, Title, Meta -->
+          <div class="flex items-start gap-6">
+            <!-- Number - large but faded -->
+            <span class="text-[32px] font-semibold text-zinc-200 leading-none">01</span>
+
+            <div class="flex-1">
+              <!-- Title -->
+              <h3 class="text-[20px] font-semibold tracking-tight text-zinc-900">
+                Terahertz Imaging for Cardiac Motion
+              </h3>
+
+              <!-- Meta row: Type, Viability, TRL -->
+              <div class="mt-2 flex items-center gap-4 text-[13px]">
+                <span class="text-zinc-500">Emerging science</span>
+                <span class="text-zinc-300">·</span>
+                <span class="text-zinc-500">5-7 years</span>
+                <span class="text-zinc-300">·</span>
+                <span class="text-zinc-500">TRL 2</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Why it's interesting -->
+          <div class="mt-8 ml-14">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Why It's Interesting
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              THz waves (0.1-10 THz) penetrate clothing and skin but reflect off water-containing tissue. Could potentially image heart motion directly through the chest wall with sub-millimeter resolution.
+            </p>
+          </div>
+
+          <!-- Why not now -->
+          <div class="mt-6 ml-14">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Why Not Now
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              THz sources are expensive ($50K+), require cryogenic cooling, and have limited range (< 1m). No published demonstrations of cardiac imaging through intact chest wall. Fundamental physics may limit penetration depth.
+            </p>
+          </div>
+
+          <!-- Trigger to revisit - emphasized -->
+          <div class="mt-6 ml-14 border-l-2 border-zinc-300 pl-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Trigger to Revisit
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] font-medium">
+              Publication demonstrating cardiac motion detection through chest wall at room temperature with compact source. Or: THz source cost drops below $1K with room-temperature operation.
+            </p>
+          </div>
+
+          <!-- Who to monitor -->
+          <div class="mt-6 ml-14">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Who to Monitor
+            </span>
+            <ul class="mt-2 space-y-1">
+              <li class="text-[18px] text-zinc-600">MIT Lincoln Labs (THz imaging)</li>
+              <li class="text-[18px] text-zinc-600">University of Leeds (biomedical THz)</li>
+              <li class="text-[18px] text-zinc-600">TeraView Ltd (commercial THz)</li>
+              <li class="text-[18px] text-zinc-600">Menlo Systems (THz sources)</li>
+            </ul>
+          </div>
+
+          <!-- Web Search Intelligence - subtle box -->
+          <div class="mt-8 ml-14 bg-zinc-50 border border-zinc-200 p-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Web Search Intelligence
+            </span>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Recent developments -->
+              <div>
+                <span class="text-[13px] font-medium text-zinc-500">
+                  Recent Developments
+                </span>
+                <p class="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+                  Room-temperature quantum cascade lasers reaching 1 THz (2023). Graphene-based THz detectors showing promise for compact systems.
+                </p>
+              </div>
+
+              <!-- Competitive activity -->
+              <div>
+                <span class="text-[13px] font-medium text-zinc-500">
+                  Competitive Activity
+                </span>
+                <p class="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+                  No major players pursuing cardiac THz. Most THz medical research focuses on cancer detection (skin, breast) where penetration requirements are lower.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breakthrough Potential - emphasized payoff -->
+          <div class="mt-10 ml-14 border-l-4 border-zinc-900 pl-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Breakthrough Potential
+            </span>
+            <p class="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+              Non-contact cardiac imaging with sub-millimeter resolution through clothing
+            </p>
+            <p class="mt-2 text-[18px] text-zinc-600">
+              Would enable real-time visualization of heart wall motion without ECG electrodes or ultrasound gel. Could revolutionize cardiac screening in primary care settings.
+            </p>
+          </div>
+
+          <!-- Viability Assessment Summary - bottom callout -->
+          <div class="mt-6 ml-14 pt-6 border-t border-zinc-200">
+            <div class="flex items-start justify-between gap-8">
+              <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500 max-w-[50ch]">
+                Interesting physics but too early for product consideration. Monitor for source cost breakthroughs.
+              </p>
+              <div class="text-right flex-shrink-0">
+                <p class="text-[18px] font-medium text-zinc-700">
+                  Revisit in 5-7 years
+                </p>
+                <p class="mt-1 text-[13px] text-zinc-500">Room-temp THz cardiac demo</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- FRONTIER TECHNOLOGY 2 -->
+        <div class="max-w-[75ch]">
+
+          <!-- Header Row: Number, Title, Meta -->
+          <div class="flex items-start gap-6">
+            <!-- Number - large but faded -->
+            <span class="text-[32px] font-semibold text-zinc-200 leading-none">02</span>
+
+            <div class="flex-1">
+              <!-- Title -->
+              <h3 class="text-[20px] font-semibold tracking-tight text-zinc-900">
+                Polarimetric Radar for Tissue Characterization
+              </h3>
+
+              <!-- Meta row: Type, Viability, TRL -->
+              <div class="mt-2 flex items-center gap-4 text-[13px]">
+                <span class="text-zinc-500">Paradigm</span>
+                <span class="text-zinc-300">·</span>
+                <span class="text-zinc-500">3-5 years</span>
+                <span class="text-zinc-300">·</span>
+                <span class="text-zinc-500">TRL 3</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Why it's interesting -->
+          <div class="mt-8 ml-14">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Why It's Interesting
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+              Different tissue types (blood, muscle, fat) have different dielectric properties that affect radar polarization. Could potentially distinguish between respiratory motion and cardiac motion by polarization signature.
+            </p>
+          </div>
+
+          <!-- Why not now -->
+          <div class="mt-6 ml-14">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Why Not Now
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Theory is sound but no published validation specific to vital signs. Requires dual-polarization radar hardware (more complex than current FMCW). Signal processing for polarimetric separation is non-trivial.
+            </p>
+          </div>
+
+          <!-- Trigger to revisit - emphasized -->
+          <div class="mt-6 ml-14 border-l-2 border-zinc-300 pl-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Trigger to Revisit
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] font-medium">
+              Publication demonstrating measurable polarization difference between cardiac and respiratory returns. Or: Commercial dual-pol radar module under $50.
+            </p>
+          </div>
+
+          <!-- Who to monitor -->
+          <div class="mt-6 ml-14">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Who to Monitor
+            </span>
+            <ul class="mt-2 space-y-1">
+              <li class="text-[18px] text-zinc-600">University of Hawaii (radar vital signs)</li>
+              <li class="text-[18px] text-zinc-600">Texas Instruments (radar modules)</li>
+              <li class="text-[18px] text-zinc-600">Infineon (60GHz radar)</li>
+              <li class="text-[18px] text-zinc-600">Vayyar (imaging radar)</li>
+            </ul>
+          </div>
+
+          <!-- Web Search Intelligence - subtle box -->
+          <div class="mt-8 ml-14 bg-zinc-50 border border-zinc-200 p-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Web Search Intelligence
+            </span>
+
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Recent developments -->
+              <div>
+                <span class="text-[13px] font-medium text-zinc-500">
+                  Recent Developments
+                </span>
+                <p class="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+                  TI AWR1642 supports dual-polarization but not optimized for vital signs. Academic papers on polarimetric ground-penetrating radar showing tissue discrimination.
+                </p>
+              </div>
+
+              <!-- Competitive activity -->
+              <div>
+                <span class="text-[13px] font-medium text-zinc-500">
+                  Competitive Activity
+                </span>
+                <p class="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+                  Vayyar uses 4D imaging but single polarization. No known competitors pursuing polarimetric vital signs specifically.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Breakthrough Potential - emphasized payoff -->
+          <div class="mt-10 ml-14 border-l-4 border-zinc-900 pl-6">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Breakthrough Potential
+            </span>
+            <p class="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+              Distinguish cardiac from respiratory motion without algorithmic post-processing
+            </p>
+            <p class="mt-2 text-[18px] text-zinc-600">
+              Physical separation of signal sources at the antenna level would dramatically simplify signal processing and improve reliability in motion-rich environments.
+            </p>
+          </div>
+
+          <!-- Viability Assessment Summary - bottom callout -->
+          <div class="mt-6 ml-14 pt-6 border-t border-zinc-200">
+            <div class="flex items-start justify-between gap-8">
+              <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500 max-w-[50ch]">
+                Promising direction that could differentiate from current approaches. Worth small exploratory investment.
+              </p>
+              <div class="text-right flex-shrink-0">
+                <p class="text-[18px] font-medium text-zinc-700">
+                  Revisit in 3-5 years
+                </p>
+                <p class="mt-1 text-[13px] text-zinc-500">Polarization vital signs demo</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================
+         RISKS & WATCHOUTS
+         ============================================ -->
+    <section id="risks-watchouts" class="mt-20">
+      <h2 class="text-[28px] font-semibold tracking-tight text-zinc-900">
+        Risks & Watchouts
+      </h2>
+      <p class="mt-2 text-[18px] text-zinc-500">
+        What could go wrong
+      </p>
+
+      <div class="mt-10 space-y-10 max-w-[70ch]">
+
+        <!-- RISK 1: High severity -->
+        <div class="border-l-2 border-zinc-400 pl-6">
+          <!-- Risk description -->
+          <p class="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+            BCG signal quality degrades significantly with clothing layers or irregular body positions
+          </p>
+
+          <!-- Meta row: Category + Severity -->
+          <div class="mt-2 flex items-center gap-3 text-[13px]">
+            <span class="text-zinc-500">Technical</span>
+            <span class="text-zinc-300">·</span>
+            <span class="text-zinc-700 font-medium">High severity</span>
+          </div>
+
+          <!-- Mitigation -->
+          <div class="mt-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Mitigation
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Implement adaptive gain control and multi-sensor fusion. Validate across 50+ clothing/position combinations before production commitment.
+            </p>
+          </div>
+        </div>
+
+        <!-- RISK 2: Medium severity -->
+        <div class="border-l-2 border-zinc-200 pl-6">
+          <!-- Risk description -->
+          <p class="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+            FDA may reclassify non-contact vital signs monitors requiring 510(k) clearance
+          </p>
+
+          <!-- Meta row: Category + Severity -->
+          <div class="mt-2 flex items-center gap-3 text-[13px]">
+            <span class="text-zinc-500">Regulatory</span>
+            <span class="text-zinc-300">·</span>
+            <span class="text-zinc-500">Medium severity</span>
+          </div>
+
+          <!-- Mitigation -->
+          <div class="mt-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Mitigation
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Design system architecture to support clinical validation pathway. Maintain documentation suitable for 510(k) submission if required.
+            </p>
+          </div>
+        </div>
+
+        <!-- RISK 3: Medium severity -->
+        <div class="border-l-2 border-zinc-200 pl-6">
+          <!-- Risk description -->
+          <p class="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+            Sleep Number or Withings may announce furniture-integrated BCG product before our launch
+          </p>
+
+          <!-- Meta row: Category + Severity -->
+          <div class="mt-2 flex items-center gap-3 text-[13px]">
+            <span class="text-zinc-500">Market</span>
+            <span class="text-zinc-300">·</span>
+            <span class="text-zinc-500">Medium severity</span>
+          </div>
+
+          <!-- Mitigation -->
+          <div class="mt-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Mitigation
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Focus on differentiated use cases (office chairs, automotive) rather than competing directly in sleep monitoring.
+            </p>
+          </div>
+        </div>
+
+        <!-- RISK 4: High severity -->
+        <div class="border-l-2 border-zinc-400 pl-6">
+          <!-- Risk description -->
+          <p class="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+            Key signal processing expertise concentrated in single team member
+          </p>
+
+          <!-- Meta row: Category + Severity -->
+          <div class="mt-2 flex items-center gap-3 text-[13px]">
+            <span class="text-zinc-500">Resource</span>
+            <span class="text-zinc-300">·</span>
+            <span class="text-zinc-700 font-medium">High severity</span>
+          </div>
+
+          <!-- Mitigation -->
+          <div class="mt-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Mitigation
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Document all algorithms thoroughly. Hire second DSP engineer within 3 months. Cross-train firmware team on core signal processing.
+            </p>
+          </div>
+        </div>
+
+        <!-- RISK 5: Low severity -->
+        <div class="border-l-2 border-zinc-200 pl-6">
+          <!-- Risk description -->
+          <p class="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+            Piezoelectric film suppliers have 12-week lead times
+          </p>
+
+          <!-- Meta row: Category + Severity -->
+          <div class="mt-2 flex items-center gap-3 text-[13px]">
+            <span class="text-zinc-500">Resource</span>
+            <span class="text-zinc-300">·</span>
+            <span class="text-zinc-400">Low severity</span>
+          </div>
+
+          <!-- Mitigation -->
+          <div class="mt-4">
+            <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+              Mitigation
+            </span>
+            <p class="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              Qualify secondary supplier. Maintain 6-month buffer stock for critical components.
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============================================
+         RECOMMENDATION
+         ============================================ -->
+    <section id="recommendation" class="mt-20">
+      <h2 class="text-[28px] font-semibold tracking-tight text-zinc-900">
+        Recommendation
+      </h2>
+      <p class="mt-2 text-[18px] text-zinc-500">
+        Personal recommendation from the analysis
+      </p>
+
+      <div class="mt-10 max-w-[65ch]">
+        <span class="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+          If This Were My Project
+        </span>
+
+        <div class="mt-6 space-y-6">
+          <!-- Lead paragraph - larger, the key takeaway -->
+          <p class="text-[20px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+            If this were my project, I'd start with BCG tomorrow. Buy a Murata SCA11H sensor module, tape it under a chair cushion, and validate HR detection in a week. The physics is proven, the algorithms exist, and you'll have working vital signs monitoring before you've finished your radar ML architecture document.
+          </p>
+
+          <!-- Supporting paragraphs -->
+          <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+            For true air-coupled sensing, I'd license or partner rather than build. Google has spent years on Soli; Vayyar has the MIMO array expertise. The ML development cost ($500K-2M) only makes sense if you have a differentiated go-to-market or are building a platform. Otherwise, you're recreating Google's work.
+          </p>
+
+          <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+            The smartphone ultrasonic approach is the moonshot I'd fund with 10-15% of budget. If device variability is manageable, it's transformative. If not, you've learned quickly and cheaply. The validation is straightforward—characterize 10 phones, implement respiration detection, see what works.
+          </p>
+
+          <p class="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+            I'd explicitly deprioritize the paradigm-level research (motion-invariant features, polarimetric separation) unless you have academic partners or long time horizons. These are 2-5 year research bets, not product development. They're worth tracking and potentially funding small feasibility studies, but they shouldn't delay shipping a BCG or radar product.
+          </p>
+        </div>
+      </div>
+    </section>
+
     <!-- Footer -->
     <footer class="mt-24 pt-10 border-t border-zinc-100 text-center">
-      <p class="text-[13px] text-zinc-400">
+      <p class="text-[13px] text-white">
         Sparlo Brand System · Air Company Aesthetic
       </p>
     </footer>
 
   </div>
+
+  <!-- ============================================
+       TABLE OF CONTENTS JAVASCRIPT
+       ============================================ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Section data
+      const sections = [
+        { id: 'executive-summary', title: 'Executive Summary' },
+        { id: 'problem-analysis', title: 'Problem Analysis' },
+        { id: 'challenge-the-frame', title: 'Challenge the Frame' },
+        { id: 'constraints-metrics', title: 'Constraints & Metrics' },
+        { id: 'innovation-analysis', title: 'Innovation Analysis' },
+        { id: 'solution-concepts', title: 'Solution Concepts' },
+        { id: 'supporting-concepts', title: 'Supporting Concepts' },
+        { id: 'innovation-concepts', title: 'Innovation Concepts' },
+        { id: 'parallel-investigations', title: 'Parallel Investigations' },
+        { id: 'frontier-technologies', title: 'Frontier Technologies' },
+        { id: 'risks-watchouts', title: 'Risks & Watchouts' },
+        { id: 'recommendation', title: 'Recommendation' },
+      ];
+
+      let activeSection = '';
+      let hasScrolled = false;
+
+      // Elements
+      const floatingToc = document.getElementById('floating-toc');
+      const mobileTocToggle = document.getElementById('mobile-toc-toggle');
+      const mobileTocDropdown = document.getElementById('mobile-toc-dropdown');
+      const mobileTocCurrent = document.getElementById('mobile-toc-current');
+      const mobileTocChevron = document.getElementById('mobile-toc-chevron');
+
+      // ========================
+      // INTERSECTION OBSERVER
+      // ========================
+      const observerOptions = {
+        rootMargin: '-20% 0px -75% 0px',
+        threshold: 0
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            activeSection = entry.target.id;
+            updateActiveStates(activeSection);
+          }
+        });
+      }, observerOptions);
+
+      // Observe all sections
+      sections.forEach((section) => {
+        const element = document.getElementById(section.id);
+        if (element) observer.observe(element);
+      });
+
+      // ========================
+      // UPDATE ACTIVE STATES
+      // ========================
+      function updateActiveStates(sectionId) {
+        // Update sidebar TOC
+        document.querySelectorAll('#sidebar-toc .toc-link').forEach((link) => {
+          const linkSection = link.getAttribute('data-section');
+          if (linkSection === sectionId) {
+            link.classList.add('active', 'text-zinc-900', 'font-medium');
+            link.classList.remove('text-zinc-500');
+          } else {
+            link.classList.remove('active', 'text-zinc-900', 'font-medium');
+            link.classList.add('text-zinc-500');
+          }
+        });
+
+        // Update floating TOC dots
+        document.querySelectorAll('#floating-toc .toc-dot').forEach((dot) => {
+          const linkSection = dot.parentElement.getAttribute('data-section');
+          if (linkSection === sectionId) {
+            dot.classList.add('active', 'bg-zinc-900');
+            dot.classList.remove('bg-zinc-300');
+          } else {
+            dot.classList.remove('active', 'bg-zinc-900');
+            dot.classList.add('bg-zinc-300');
+          }
+        });
+
+        // Update mobile TOC current section
+        const section = sections.find(s => s.id === sectionId);
+        if (section && mobileTocCurrent) {
+          mobileTocCurrent.textContent = section.title;
+        }
+      }
+
+      // ========================
+      // SCROLL DETECTION
+      // ========================
+      let scrollTimeout;
+      window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          const scrollY = window.scrollY;
+
+          // Show floating TOC after scrolling past first viewport
+          if (scrollY > window.innerHeight * 0.5) {
+            if (!hasScrolled) {
+              hasScrolled = true;
+              floatingToc?.classList.remove('hidden');
+              floatingToc?.classList.add('visible');
+            }
+          } else {
+            if (hasScrolled) {
+              hasScrolled = false;
+              floatingToc?.classList.remove('visible');
+              floatingToc?.classList.add('hidden');
+            }
+          }
+
+          // Update progress indicator
+          const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = Math.min((scrollY / docHeight) * 100, 100);
+          const progressElement = document.getElementById('toc-progress');
+          if (progressElement) {
+            progressElement.style.setProperty('--progress', `${progress}%`);
+          }
+        }, 10);
+      });
+
+      // ========================
+      // MOBILE DROPDOWN
+      // ========================
+      let mobileDropdownOpen = false;
+
+      mobileTocToggle?.addEventListener('click', () => {
+        mobileDropdownOpen = !mobileDropdownOpen;
+
+        if (mobileDropdownOpen) {
+          mobileTocDropdown?.classList.remove('hidden');
+          mobileTocChevron?.classList.add('rotate-180');
+        } else {
+          mobileTocDropdown?.classList.add('hidden');
+          mobileTocChevron?.classList.remove('rotate-180');
+        }
+      });
+
+      // Close mobile dropdown when clicking a link
+      mobileTocDropdown?.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileDropdownOpen = false;
+          mobileTocDropdown?.classList.add('hidden');
+          mobileTocChevron?.classList.remove('rotate-180');
+        });
+      });
+
+      // Close mobile dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (mobileDropdownOpen &&
+            !mobileTocToggle?.contains(e.target) &&
+            !mobileTocDropdown?.contains(e.target)) {
+          mobileDropdownOpen = false;
+          mobileTocDropdown?.classList.add('hidden');
+          mobileTocChevron?.classList.remove('rotate-180');
+        }
+      });
+
+      // ========================
+      // SMOOTH SCROLL WITH OFFSET
+      // ========================
+      const scrollOffset = 100; // Offset for fixed header
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href').substring(1);
+          const targetElement = document.getElementById(targetId);
+
+          if (targetElement) {
+            const top = targetElement.getBoundingClientRect().top + window.scrollY - scrollOffset;
+            window.scrollTo({
+              top,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+
+      // ========================
+      // INITIAL STATE
+      // ========================
+      // Set initial active section
+      updateActiveStates('executive-summary');
+    });
+  </script>
 </body>
 </html>

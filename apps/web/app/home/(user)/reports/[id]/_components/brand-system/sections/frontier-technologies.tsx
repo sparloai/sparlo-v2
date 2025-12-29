@@ -6,8 +6,9 @@
  * Technologies to watch - not ready for prime time,
  * but worth monitoring for future potential.
  */
-
 import { memo } from 'react';
+
+import type { FrontierWatch } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,
@@ -19,14 +20,14 @@ import {
   SectionTitle,
 } from '../primitives';
 
-import type { FrontierWatch } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
-
 interface FrontierTechnologiesSectionProps {
   data?: FrontierWatch[];
 }
 
 export const FrontierTechnologiesSection = memo(
-  function FrontierTechnologiesSection({ data }: FrontierTechnologiesSectionProps) {
+  function FrontierTechnologiesSection({
+    data,
+  }: FrontierTechnologiesSectionProps) {
     if (!data || data.length === 0) return null;
 
     return (
@@ -46,16 +47,20 @@ export const FrontierTechnologiesSection = memo(
   },
 );
 
-const FrontierCard = memo(function FrontierCard({ tech }: { tech: FrontierWatch }) {
+const FrontierCard = memo(function FrontierCard({
+  tech,
+}: {
+  tech: FrontierWatch;
+}) {
   return (
     <ContentBlock className="border border-zinc-200 p-6">
       <div className="flex items-start justify-between">
         <div>
-          <h4 className="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+          <h4 className="text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
             {tech.title}
           </h4>
           {tech.innovation_type && (
-            <span className="mt-1 inline-block text-[12px] font-medium uppercase tracking-wider text-zinc-400">
+            <span className="mt-1 inline-block text-[12px] font-medium tracking-wider text-zinc-400 uppercase">
               {tech.innovation_type}
             </span>
           )}
@@ -63,13 +68,17 @@ const FrontierCard = memo(function FrontierCard({ tech }: { tech: FrontierWatch 
         {tech.trl_estimate && (
           <div className="text-right">
             <span className="text-[12px] text-zinc-400">TRL</span>
-            <p className="text-[18px] font-semibold text-zinc-700">{tech.trl_estimate}</p>
+            <p className="text-[18px] font-semibold text-zinc-700">
+              {tech.trl_estimate}
+            </p>
           </div>
         )}
       </div>
 
       {tech.one_liner && (
-        <p className="mt-3 text-[16px] leading-[1.3] text-zinc-600">{tech.one_liner}</p>
+        <p className="mt-3 text-[16px] leading-[1.3] text-zinc-600">
+          {tech.one_liner}
+        </p>
       )}
 
       {tech.why_interesting && (
@@ -93,12 +102,14 @@ const FrontierCard = memo(function FrontierCard({ tech }: { tech: FrontierWatch 
       <div className="mt-4 space-y-2 border-t border-zinc-100 pt-4 text-[14px]">
         {tech.trigger_to_revisit && (
           <p className="text-zinc-600">
-            <span className="font-medium text-zinc-700">Trigger:</span> {tech.trigger_to_revisit}
+            <span className="font-medium text-zinc-700">Trigger:</span>{' '}
+            {tech.trigger_to_revisit}
           </p>
         )}
         {tech.earliest_viability && (
           <p className="text-zinc-500">
-            <span className="font-medium">Earliest viability:</span> {tech.earliest_viability}
+            <span className="font-medium">Earliest viability:</span>{' '}
+            {tech.earliest_viability}
           </p>
         )}
         {tech.who_to_monitor && (

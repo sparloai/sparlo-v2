@@ -11,9 +11,9 @@
  * - Labels: 13px, uppercase, tracking wide
  * - Headings: font-semibold, tracking-tight
  */
+import { type ReactNode, memo } from 'react';
 
 import { cn } from '@kit/ui/utils';
-import { memo, type ReactNode } from 'react';
 
 // ============================================
 // TYPOGRAPHY PRIMITIVES
@@ -85,7 +85,7 @@ export const MonoLabel = memo(function MonoLabel({
   return (
     <span
       className={cn(
-        'text-[13px] font-semibold uppercase tracking-[0.06em]',
+        'text-[13px] font-semibold tracking-[0.06em] uppercase',
         variantClasses[variant],
         className,
       )}
@@ -326,7 +326,7 @@ export const ConstraintList = memo(function ConstraintList({
     <div className={className}>
       <span
         className={cn(
-          'text-[13px] font-medium uppercase tracking-[0.08em]',
+          'text-[13px] font-medium tracking-[0.08em] uppercase',
           style.labelClass,
         )}
       >
@@ -370,7 +370,7 @@ export const NumberedItem = memo(function NumberedItem({
 }: NumberedItemProps) {
   return (
     <div className={cn('flex items-start gap-6', className)}>
-      <span className="text-[32px] font-semibold leading-none text-zinc-200">
+      <span className="text-[32px] leading-none font-semibold text-zinc-200">
         {String(index + 1).padStart(2, '0')}
       </span>
       <div className="flex-1">{children}</div>

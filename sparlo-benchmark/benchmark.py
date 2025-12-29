@@ -4,6 +4,7 @@
 import csv
 import json
 import os
+import sys
 import time
 import uuid
 from datetime import datetime
@@ -15,6 +16,9 @@ from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
+
+# Increase CSV field size limit for large report outputs
+csv.field_size_limit(sys.maxsize)
 
 # Config
 SPARLO_URL = os.getenv("SPARLO_API_URL", "https://sparlo-production.up.railway.app")
@@ -849,6 +853,105 @@ def batch(problems_file, start, count):
     click.echo(f"Total time: {(time.time() - poll_start + 60):.0f}s")
     click.echo(f"Run 'python benchmark.py evaluate' to score all outputs")
     click.echo(f"{'='*60}")
+
+
+@cli.command()
+@click.option('--reports-dir', default=REPORTS_DIR, help='Directory containing report files')
+def import_reports(reports_dir):
+    """Import saved report pairs (Sparlo + Claude) from the reports directory into the CSV.
+
+    This is useful when the batch command was interrupted before saving results.
+    Only imports pairs where both Sparlo and Claude reports exist.
+    """
+    import os
+
+    # Find all pairs
+    files = os.listdir(reports_dir)
+    sparlo_ids = {f.replace('_sparlo.json', '') for f in files if f.endswith('_sparlo.json')}
+    claude_ids = {f.replace('_claude.json', '') for f in files if f.endswith('_claude.json')}
+    pairs = sparlo_ids & claude_ids
+
+    click.echo(f"Found {len(pairs)} complete report pairs")
+    if not pairs:
+        return
+
+    # Load existing problem_ids from CSV to avoid duplicates
+    existing_ids = set()
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, 'r') as f:
+            reader = csv.DictReader(f)
+            existing_ids = {row['problem_id'] for row in reader}
+
+    imported = 0
+    skipped = 0
+
+    for problem_id in pairs:
+        sparlo_path = os.path.join(reports_dir, f"{problem_id}_sparlo.json")
+        claude_path = os.path.join(reports_dir, f"{problem_id}_claude.json")
+
+        # Load reports
+        with open(sparlo_path, 'r') as f:
+            sparlo = json.load(f)
+        with open(claude_path, 'r') as f:
+            claude = json.load(f)
+
+        # Check if already in CSV
+        if problem_id in existing_ids:
+            click.echo(f"  SKIP: {problem_id[:8]}... (already in CSV)")
+            skipped += 1
+            continue
+
+        # Extract data
+        metadata = claude.get('metadata', {})
+        problem_text = sparlo.get('problem_text', claude.get('problem_text', ''))
+
+        # Get Sparlo output (extract research content from report_data)
+        sparlo_output = ""
+        report_data = sparlo.get('report_data')
+        if report_data:
+            if isinstance(report_data, str):
+                sparlo_output = report_data
+            elif isinstance(report_data, dict):
+                # Extract the main research content sections
+                sections = []
+                for key in ['executive_summary', 'problem_analysis', 'solution_approaches',
+                           'research_synthesis', 'recommendations', 'conclusion']:
+                    if key in report_data:
+                        sections.append(f"## {key.replace('_', ' ').title()}\n{report_data[key]}")
+                sparlo_output = "\n\n".join(sections) if sections else json.dumps(report_data, indent=2)
+
+        claude_output = claude.get('output', '')
+
+        row = {
+            "problem_id": problem_id,
+            "created_at": sparlo.get('generated_at', datetime.now().isoformat()),
+            "problem_text": problem_text,
+            "segment": metadata.get('segment', 'Unknown'),
+            "problem_summary": metadata.get('problem_summary', problem_text[:50]),
+            "prior_art": metadata.get('prior_art', 'Unknown'),
+            "domain_spec": metadata.get('domain_spec', 'Unknown'),
+            "contradiction": metadata.get('contradiction', 'Unknown'),
+            "sweetspot_pred": metadata.get('sweetspot_pred', 0),
+            "expected_grade": metadata.get('expected_grade', 'Unknown'),
+            "sparlo_output": sparlo_output,
+            "claude_output": claude_output,
+            "sparlo_status": sparlo.get('status', 'complete'),
+            "claude_status": claude.get('status', 'complete'),
+            "sparlo_time_sec": 0,  # Not tracked in file
+            "claude_time_sec": claude.get('duration_seconds', 0),
+            "evaluated": "false"
+        }
+
+        # Append to CSV
+        with open(CSV_FILE, 'a', newline='') as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
+            writer.writerow(row)
+
+        click.echo(f"  IMPORTED: {problem_id[:8]}... - {row['problem_summary'][:40]}")
+        imported += 1
+
+    click.echo(f"\nImported: {imported}, Skipped: {skipped}")
+    click.echo(f"Run 'python benchmark.py evaluate' to score all outputs")
 
 
 if __name__ == '__main__':

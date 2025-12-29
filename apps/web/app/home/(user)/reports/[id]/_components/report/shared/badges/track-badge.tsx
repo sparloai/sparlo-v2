@@ -12,13 +12,15 @@ interface TrackBadgeProps {
 // Per Jobs Standard: muted colors, no borders
 const trackConfig = {
   best_fit: {
-    styles: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+    styles:
+      'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
   },
   simpler_path: {
     styles: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
   },
   spark: {
-    styles: 'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400',
+    styles:
+      'bg-violet-50 text-violet-700 dark:bg-violet-950/30 dark:text-violet-400',
   },
 } as const satisfies Record<ConceptTrackType, { styles: string }>;
 

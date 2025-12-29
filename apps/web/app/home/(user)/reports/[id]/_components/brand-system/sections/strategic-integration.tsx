@@ -6,8 +6,9 @@
  * How execution track and innovation portfolio work together.
  * Resource allocation, decision architecture, and action plan.
  */
-
 import { memo } from 'react';
+
+import type { StrategicIntegration } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,
@@ -20,14 +21,14 @@ import {
   SectionTitle,
 } from '../primitives';
 
-import type { StrategicIntegration } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
-
 interface StrategicIntegrationSectionProps {
   data?: StrategicIntegration;
 }
 
 export const StrategicIntegrationSection = memo(
-  function StrategicIntegrationSection({ data }: StrategicIntegrationSectionProps) {
+  function StrategicIntegrationSection({
+    data,
+  }: StrategicIntegrationSectionProps) {
     if (!data) return null;
 
     const hasContent =
@@ -51,7 +52,9 @@ export const StrategicIntegrationSection = memo(
               <div className="mt-4 space-y-4">
                 {data.portfolio_view.execution_track_role && (
                   <div>
-                    <span className="text-[14px] font-medium text-zinc-500">Execution Track</span>
+                    <span className="text-[14px] font-medium text-zinc-500">
+                      Execution Track
+                    </span>
                     <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
                       {data.portfolio_view.execution_track_role}
                     </p>
@@ -59,7 +62,9 @@ export const StrategicIntegrationSection = memo(
                 )}
                 {data.portfolio_view.innovation_portfolio_role && (
                   <div>
-                    <span className="text-[14px] font-medium text-zinc-500">Innovation Portfolio</span>
+                    <span className="text-[14px] font-medium text-zinc-500">
+                      Innovation Portfolio
+                    </span>
                     <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
                       {data.portfolio_view.innovation_portfolio_role}
                     </p>
@@ -67,7 +72,7 @@ export const StrategicIntegrationSection = memo(
                 )}
                 {data.portfolio_view.combined_strategy && (
                   <AccentBorder className="mt-4">
-                    <p className="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+                    <p className="text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
                       {data.portfolio_view.combined_strategy}
                     </p>
                   </AccentBorder>
@@ -88,11 +93,15 @@ export const StrategicIntegrationSection = memo(
                 />
                 <AllocationBar
                   label="Recommended Innovation"
-                  percent={data.resource_allocation.recommended_innovation_percent}
+                  percent={
+                    data.resource_allocation.recommended_innovation_percent
+                  }
                 />
                 <AllocationBar
                   label="Parallel Investigations"
-                  percent={data.resource_allocation.parallel_investigations_percent}
+                  percent={
+                    data.resource_allocation.parallel_investigations_percent
+                  }
                 />
                 <AllocationBar
                   label="Frontier Watch"
@@ -112,7 +121,7 @@ export const StrategicIntegrationSection = memo(
             <ContentBlock withBorder className="max-w-[70ch]">
               <MonoLabel variant="muted">Key Decision</MonoLabel>
               {data.decision_architecture.primary_tradeoff.question && (
-                <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+                <p className="mt-3 text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
                   {data.decision_architecture.primary_tradeoff.question}
                 </p>
               )}
@@ -121,20 +130,26 @@ export const StrategicIntegrationSection = memo(
                 {data.decision_architecture.primary_tradeoff.option_a && (
                   <TradeoffOption
                     label="Option A"
-                    option={data.decision_architecture.primary_tradeoff.option_a}
+                    option={
+                      data.decision_architecture.primary_tradeoff.option_a
+                    }
                   />
                 )}
                 {data.decision_architecture.primary_tradeoff.option_b && (
                   <TradeoffOption
                     label="Option B"
-                    option={data.decision_architecture.primary_tradeoff.option_b}
+                    option={
+                      data.decision_architecture.primary_tradeoff.option_b
+                    }
                   />
                 )}
               </div>
 
               {data.decision_architecture.primary_tradeoff.if_uncertain && (
                 <div className="mt-4 border-t border-zinc-200 pt-4">
-                  <span className="text-[14px] font-medium text-zinc-500">If Uncertain</span>
+                  <span className="text-[14px] font-medium text-zinc-500">
+                    If Uncertain
+                  </span>
                   <p className="mt-1 text-[16px] leading-[1.3] text-zinc-600">
                     {data.decision_architecture.primary_tradeoff.if_uncertain}
                   </p>
@@ -156,7 +171,7 @@ export const StrategicIntegrationSection = memo(
               <div className="mt-6 space-y-6">
                 {data.action_plan.map((phase, idx) => (
                   <div key={idx} className="border-l-2 border-zinc-200 pl-6">
-                    <span className="text-[14px] font-medium uppercase tracking-wider text-zinc-500">
+                    <span className="text-[14px] font-medium tracking-wider text-zinc-500 uppercase">
                       {phase.timeframe}
                     </span>
                     {phase.actions && phase.actions.length > 0 && (
@@ -174,7 +189,8 @@ export const StrategicIntegrationSection = memo(
                     )}
                     {phase.decision_gate && (
                       <p className="mt-2 text-[14px] text-zinc-500">
-                        <span className="font-medium">Gate:</span> {phase.decision_gate}
+                        <span className="font-medium">Gate:</span>{' '}
+                        {phase.decision_gate}
                       </p>
                     )}
                   </div>
@@ -202,8 +218,16 @@ const AllocationBar = memo(function AllocationBar({
   return (
     <div>
       <div className="flex items-center justify-between text-[14px]">
-        <span className={primary ? 'font-medium text-zinc-900' : 'text-zinc-600'}>{label}</span>
-        <span className={primary ? 'font-semibold text-zinc-900' : 'text-zinc-500'}>{percent}%</span>
+        <span
+          className={primary ? 'font-medium text-zinc-900' : 'text-zinc-600'}
+        >
+          {label}
+        </span>
+        <span
+          className={primary ? 'font-semibold text-zinc-900' : 'text-zinc-500'}
+        >
+          {percent}%
+        </span>
       </div>
       <div className="mt-1 h-2 w-full bg-zinc-100">
         <div
@@ -229,22 +253,30 @@ const TradeoffOption = memo(function TradeoffOption({
 }) {
   return (
     <div className="border border-zinc-200 p-4">
-      <span className="text-[12px] font-medium uppercase tracking-wider text-zinc-400">{label}</span>
+      <span className="text-[12px] font-medium tracking-wider text-zinc-400 uppercase">
+        {label}
+      </span>
       {option.condition && (
-        <p className="mt-2 text-[14px] font-medium text-zinc-700">{option.condition}</p>
+        <p className="mt-2 text-[14px] font-medium text-zinc-700">
+          {option.condition}
+        </p>
       )}
       {option.path && (
-        <p className="mt-1 text-[16px] leading-[1.3] text-[#1e1e1e]">{option.path}</p>
+        <p className="mt-1 text-[16px] leading-[1.3] text-[#1e1e1e]">
+          {option.path}
+        </p>
       )}
       <div className="mt-3 space-y-1 text-[14px]">
         {option.what_you_get && (
           <p className="text-zinc-600">
-            <span className="font-medium text-zinc-700">Get:</span> {option.what_you_get}
+            <span className="font-medium text-zinc-700">Get:</span>{' '}
+            {option.what_you_get}
           </p>
         )}
         {option.what_you_give_up && (
           <p className="text-zinc-500">
-            <span className="font-medium">Give up:</span> {option.what_you_give_up}
+            <span className="font-medium">Give up:</span>{' '}
+            {option.what_you_give_up}
           </p>
         )}
       </div>

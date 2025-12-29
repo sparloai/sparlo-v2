@@ -85,10 +85,14 @@ export function extractUserInput(
   }
 
   // Check for messages[0].content (chat format)
-  const messages = Array.isArray(reportData.messages)
-    ? (reportData.messages as Array<{ content?: string }>)
-    : undefined;
-  const firstMessage = messages?.[0]?.content;
+  const messagesRaw = reportData.messages;
+  const firstMessage =
+    Array.isArray(messagesRaw) &&
+    messagesRaw.length > 0 &&
+    isRecord(messagesRaw[0]) &&
+    typeof messagesRaw[0].content === 'string'
+      ? messagesRaw[0].content
+      : undefined;
 
   if (typeof firstMessage === 'string' && firstMessage.trim()) {
     return firstMessage.trim().slice(0, MAX_INPUT_LENGTH);

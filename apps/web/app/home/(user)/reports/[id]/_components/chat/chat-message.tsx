@@ -59,7 +59,7 @@ const MARKDOWN_COMPONENTS = {
   pre: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
   blockquote: ({ children }: { children?: React.ReactNode }) => (
     <blockquote
-      className="my-3 border-l-2 border-zinc-300 py-1 pl-4 text-[13px] italic text-zinc-600"
+      className="my-3 border-l-2 border-zinc-300 py-1 pl-4 text-[13px] text-zinc-600 italic"
       style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
     >
       {children}
@@ -155,14 +155,12 @@ export const ChatMessage = memo(function ChatMessage({
         </div>
 
         {cancelled && (
-          <p className="mt-2 text-[11px] italic text-zinc-400">
+          <p className="mt-2 text-[11px] text-zinc-400 italic">
             Response interrupted
           </p>
         )}
 
-        {error && (
-          <p className="mt-2 text-[11px] text-red-500">{error}</p>
-        )}
+        {error && <p className="mt-2 text-[11px] text-red-500">{error}</p>}
       </div>
     </div>
   );

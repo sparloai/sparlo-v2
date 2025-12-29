@@ -98,6 +98,27 @@ const heading = localFont({
 // we export these fonts into the root layout
 export { sans, heading, mono };
 
+// ============================================
+// FONT FAMILY STRING CONSTANTS
+// ============================================
+
+/** Suisse Intl (heading/display) with system fallbacks */
+export const FONT_HEADING =
+  "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif";
+
+/** Soehne (body) with system fallbacks */
+export const FONT_BODY = "'Soehne', 'Inter', sans-serif";
+
+/** Soehne Mono with system fallbacks */
+export const FONT_MONO = "'Soehne Mono', 'JetBrains Mono', monospace";
+
+/** CSS style objects for direct use in style props */
+export const fontStyles = {
+  heading: { fontFamily: FONT_HEADING } as const,
+  body: { fontFamily: FONT_BODY } as const,
+  mono: { fontFamily: FONT_MONO } as const,
+} as const;
+
 /**
  * @name getFontsClassName
  * @description Get the class name for the root layout.

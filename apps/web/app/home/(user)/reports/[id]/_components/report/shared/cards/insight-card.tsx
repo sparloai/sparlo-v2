@@ -18,7 +18,7 @@ export function InsightCard({
         <span className="text-xs font-medium tracking-wide text-zinc-500 dark:text-zinc-400">
           First principles insight
         </span>
-        <p className="text-xl font-semibold leading-snug text-zinc-900 dark:text-zinc-100">
+        <p className="text-xl leading-snug font-semibold text-zinc-900 dark:text-zinc-100">
           {headline}
         </p>
         <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">

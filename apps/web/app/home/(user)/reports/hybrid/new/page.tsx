@@ -22,24 +22,22 @@ import { cn } from '@kit/ui/utils';
 import { ProcessingScreen } from '../../../_components/processing-screen';
 import { startHybridReportGeneration } from '../../../_lib/server/hybrid-reports-server-actions';
 import { useReportProgress } from '../../../_lib/use-report-progress';
+import {
+  ALLOWED_ATTACHMENT_TYPES,
+  CONTEXT_DETECTION_DEBOUNCE_MS,
+  MAX_ATTACHMENTS,
+  MAX_ATTACHMENT_SIZE_BYTES,
+  MIN_CHALLENGE_LENGTH,
+} from '../../_lib/constants';
+import { useDebouncedValue } from '../../_lib/hooks/use-debounced-value';
 
-// Attachment types and constants
+// Attachment types
 interface Attachment {
   id: string;
   file: File;
   preview: string;
   base64?: string;
 }
-
-const MAX_ATTACHMENTS = 5;
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_TYPES = [
-  'image/jpeg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'application/pdf',
-];
 
 type PagePhase = 'input' | 'processing';
 
@@ -130,7 +128,11 @@ export default function HybridNewReportPage() {
           break;
         }
 
-        if (!ALLOWED_TYPES.includes(file.type)) {
+        if (
+          !ALLOWED_ATTACHMENT_TYPES.includes(
+            file.type as (typeof ALLOWED_ATTACHMENT_TYPES)[number],
+          )
+        ) {
           setFormState((prev) => ({
             ...prev,
             error: `File type ${file.type} not supported. Use images or PDF.`,
@@ -138,7 +140,7 @@ export default function HybridNewReportPage() {
           continue;
         }
 
-        if (file.size > MAX_FILE_SIZE) {
+        if (file.size > MAX_ATTACHMENT_SIZE_BYTES) {
           setFormState((prev) => ({
             ...prev,
             error: `File ${file.name} exceeds 10MB limit`,
@@ -200,21 +202,27 @@ export default function HybridNewReportPage() {
   // Track progress once we have a report ID
   const { progress } = useReportProgress(reportId);
 
-  const canSubmit = challengeText.trim().length >= 50;
+  const canSubmit = challengeText.trim().length >= MIN_CHALLENGE_LENGTH;
 
-  // Detect context from input text
+  // Debounce text for context detection to reduce computation
+  const debouncedText = useDebouncedValue(
+    challengeText,
+    CONTEXT_DETECTION_DEBOUNCE_MS,
+  );
+
+  // Detect context from debounced input text
   const detectedContexts = useMemo(() => {
     const detected = new Set<string>();
     for (const context of CONTEXT_DETECTIONS) {
       for (const pattern of context.patterns) {
-        if (pattern.test(challengeText)) {
+        if (pattern.test(debouncedText)) {
           detected.add(context.id);
           break;
         }
       }
     }
     return detected;
-  }, [challengeText]);
+  }, [debouncedText]);
 
   const handleSubmit = useCallback(async () => {
     if (!canSubmit || isSubmitting) return;

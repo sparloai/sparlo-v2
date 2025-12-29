@@ -6,9 +6,17 @@
  * Primary recommendation with supporting concepts.
  * The "do this first" with fallback options.
  */
+import { memo } from 'react';
 
 import { cn } from '@kit/ui/utils';
-import { memo } from 'react';
+
+import type {
+  ExecutionTrack,
+  ExecutionTrackPrimary,
+  InsightBlock,
+  SupportingConcept,
+  ValidationGate,
+} from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,
@@ -21,14 +29,6 @@ import {
   SectionTitle,
   UnknownFieldRenderer,
 } from '../primitives';
-
-import type {
-  ExecutionTrack,
-  ExecutionTrackPrimary,
-  InsightBlock,
-  SupportingConcept,
-  ValidationGate,
-} from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 // ============================================
 // INSIGHT BLOCK
@@ -48,7 +48,7 @@ const InsightBlockComponent = memo(function InsightBlockComponent({
       <MonoLabel variant="muted">The Insight</MonoLabel>
 
       {insight.what && (
-        <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+        <p className="mt-3 text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
           {insight.what}
         </p>
       )}
@@ -63,13 +63,17 @@ const InsightBlockComponent = memo(function InsightBlockComponent({
           )}
           {insight.where_we_found_it.how_they_use_it && (
             <p>
-              <span className="font-medium text-zinc-500">How they use it:</span>{' '}
+              <span className="font-medium text-zinc-500">
+                How they use it:
+              </span>{' '}
               {insight.where_we_found_it.how_they_use_it}
             </p>
           )}
           {insight.where_we_found_it.why_it_transfers && (
             <p>
-              <span className="font-medium text-zinc-500">Why it transfers:</span>{' '}
+              <span className="font-medium text-zinc-500">
+                Why it transfers:
+              </span>{' '}
               {insight.where_we_found_it.why_it_transfers}
             </p>
           )}
@@ -77,7 +81,7 @@ const InsightBlockComponent = memo(function InsightBlockComponent({
       )}
 
       {insight.why_industry_missed_it && (
-        <p className="mt-4 text-[18px] italic leading-[1.3] tracking-[-0.02em] text-zinc-600">
+        <p className="mt-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic">
           Why industry missed it: {insight.why_industry_missed_it}
         </p>
       )}
@@ -112,16 +116,13 @@ const ValidationGates = memo(function ValidationGates({
       <MonoLabel>Validation Gates</MonoLabel>
       <div className="mt-6 space-y-6">
         {gates.map((gate, idx) => (
-          <div
-            key={idx}
-            className="border-l-2 border-zinc-300 py-2 pl-6"
-          >
+          <div key={idx} className="border-l-2 border-zinc-300 py-2 pl-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <span className="text-[13px] font-medium text-zinc-400">
                   {gate.week}
                 </span>
-                <p className="mt-1 text-[18px] font-medium leading-[1.3] text-[#1e1e1e]">
+                <p className="mt-1 text-[18px] leading-[1.3] font-medium text-[#1e1e1e]">
                   {gate.test}
                 </p>
               </div>
@@ -147,7 +148,7 @@ const ValidationGates = memo(function ValidationGates({
             )}
 
             {gate.decision_point && (
-              <p className="mt-2 text-[16px] italic leading-[1.3] text-zinc-500">
+              <p className="mt-2 text-[16px] leading-[1.3] text-zinc-500 italic">
                 {gate.decision_point}
               </p>
             )}
@@ -178,7 +179,7 @@ const PrimaryRecommendationCard = memo(function PrimaryRecommendationCard({
         <MonoLabel>Primary Recommendation</MonoLabel>
 
         {/* Title */}
-        <h2 className="text-[28px] font-semibold leading-tight tracking-tight text-zinc-900">
+        <h2 className="text-[28px] leading-tight font-semibold tracking-tight text-zinc-900">
           {data.title}
         </h2>
 
@@ -362,7 +363,7 @@ const SupportingConceptsSection = memo(function SupportingConceptsSection({
                 {concept.title}
               </h3>
               {concept.relationship && (
-                <span className="text-[13px] uppercase tracking-wide text-zinc-400">
+                <span className="text-[13px] tracking-wide text-zinc-400 uppercase">
                   {concept.relationship}
                 </span>
               )}
@@ -370,7 +371,7 @@ const SupportingConceptsSection = memo(function SupportingConceptsSection({
 
             {/* One-liner */}
             {concept.one_liner && (
-              <p className="mt-3 text-[18px] italic leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              <p className="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic">
                 {concept.one_liner}
               </p>
             )}

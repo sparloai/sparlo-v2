@@ -1,0 +1,29 @@
+[
+  {
+    "page": "Pricing Page",
+    "url": "https://sparlo.ai/pricing",
+    "screenshots": [
+      "pricing-first-impression-viewport-2025-12-25T18-11-11.png"
+    ],
+    "findings": [
+      {
+        "dimension": "1. First Impression - Pricing",
+        "observation": "Found 21 price elements. Plans: Core, Pro, Max. Monthly/Annual toggle: false.",
+        "evokes": "Clear pricing visibility",
+        "gap": "Evaluate whether $199/month value is clearly communicated",
+        "severity": "none"
+      }
+    ],
+    "metrics": {
+      "pricingPresentation": {
+        "priceCount": 21,
+        "planNames": [
+          "Core",
+          "Pro",
+          "Max"
+        ],
+        "hasMonthlyAnnualToggle": false
+      }
+    }
+  }
+]

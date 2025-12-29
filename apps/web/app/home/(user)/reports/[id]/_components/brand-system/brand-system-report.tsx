@@ -85,6 +85,12 @@ interface BrandSystemReportProps {
    * Required when showActions is true.
    */
   reportId?: string;
+  /**
+   * Use compact/smaller title styling.
+   * Set to true for landing page examples.
+   * @default false
+   */
+  compactTitle?: boolean;
 }
 
 /**
@@ -411,6 +417,7 @@ interface ReportContentProps {
   readTime: number;
   showActions?: boolean;
   reportId?: string;
+  compactTitle?: boolean;
 }
 
 const ReportContent = memo(function ReportContent({
@@ -421,6 +428,7 @@ const ReportContent = memo(function ReportContent({
   readTime,
   showActions = true,
   reportId,
+  compactTitle = false,
 }: ReportContentProps) {
   const displayTitle = title || normalizedData.title;
 
@@ -442,7 +450,14 @@ const ReportContent = memo(function ReportContent({
         <header className="mb-16">
           {/* Title and Actions Row */}
           <div className="flex items-start justify-between gap-6">
-            <h1 className="font-heading text-[36px] leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900 md:text-[48px]">
+            <h1
+              className={cn(
+                'font-heading leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900',
+                compactTitle
+                  ? 'text-[28px] md:text-[32px]'
+                  : 'text-[36px] md:text-[48px]',
+              )}
+            >
               {displayTitle}
             </h1>
             {/* Action Buttons */}
@@ -565,6 +580,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   isChatOpen = false,
   showActions = true,
   reportId,
+  compactTitle = false,
 }: BrandSystemReportProps) {
   // Normalize field names for backward compatibility
   const normalizedData = normalizeReportData(reportData);
@@ -637,6 +653,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
                   readTime={readTime}
                   showActions={showActions}
                   reportId={reportId}
+                  compactTitle={compactTitle}
                 />
               </div>
             </main>
@@ -672,6 +689,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
           readTime={readTime}
           showActions={showActions}
           reportId={reportId}
+          compactTitle={compactTitle}
         />
       </main>
     </div>

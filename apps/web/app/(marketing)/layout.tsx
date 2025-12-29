@@ -9,13 +9,7 @@ async function SiteLayout(props: React.PropsWithChildren) {
   const user = await requireUser(client, { verifyMfa: false });
 
   return (
-    <div
-      className={'flex min-h-[100vh] flex-col'}
-      style={{
-        fontFamily:
-          "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
-      }}
-    >
+    <div className="font-heading flex min-h-[100vh] flex-col">
       <Navigation user={user.data} variant="dark" />
 
       {/* No padding-top - hero is full viewport with nav overlay */}

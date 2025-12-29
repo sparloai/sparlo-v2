@@ -6,8 +6,9 @@
  * Clear hierarchy: Hard constraints > Soft constraints > Assumptions
  * All communicated through typographic weight, no color coding.
  */
-
 import { memo } from 'react';
+
+import type { ConstraintsAndMetrics } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,
@@ -18,8 +19,6 @@ import {
   SectionTitle,
   UnknownFieldRenderer,
 } from '../primitives';
-
-import type { ConstraintsAndMetrics } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface ConstraintsSectionProps {
   data?: ConstraintsAndMetrics;

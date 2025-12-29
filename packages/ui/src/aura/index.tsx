@@ -126,7 +126,7 @@ export function AuraTable({
             {headers.map((header) => (
               <th
                 key={header}
-                className="px-6 py-5 font-sans text-xs font-semibold tracking-wide text-left"
+                className="px-6 py-5 text-left font-sans text-xs font-semibold tracking-wide"
                 style={{ color: 'var(--text-tertiary, rgba(0,0,0,0.55))' }}
               >
                 {header}

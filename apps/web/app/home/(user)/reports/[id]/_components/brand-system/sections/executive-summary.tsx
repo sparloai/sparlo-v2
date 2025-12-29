@@ -6,8 +6,9 @@
  * The definitive assessment up front. Should feel like reading the abstract
  * of a Nature paper—dense with information, zero padding.
  */
-
 import { memo } from 'react';
+
+import type { StructuredExecutiveSummary } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,
@@ -18,8 +19,6 @@ import {
   SectionTitle,
   UnknownFieldRenderer,
 } from '../primitives';
-
-import type { StructuredExecutiveSummary } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface ExecutiveSummarySectionProps {
   data?: string | StructuredExecutiveSummary;
@@ -68,7 +67,7 @@ export const ExecutiveSummarySection = memo(function ExecutiveSummarySection({
         {structured?.viability && (
           <ContentBlock withBorder className="max-w-[80ch]">
             <MonoLabel>Viability</MonoLabel>
-            <p className="mt-8 max-w-[80ch] text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+            <p className="mt-8 max-w-[80ch] text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
               {structured.viability_label || structured.viability}
             </p>
           </ContentBlock>
@@ -88,7 +87,7 @@ export const ExecutiveSummarySection = memo(function ExecutiveSummarySection({
         {structured?.core_insight && (
           <ContentBlock withBorder className="max-w-[80ch]">
             <MonoLabel>Core Insight</MonoLabel>
-            <p className="mt-8 max-w-[80ch] text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+            <p className="mt-8 max-w-[80ch] text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
               {structured.core_insight.headline}
             </p>
             {structured.core_insight.explanation && (

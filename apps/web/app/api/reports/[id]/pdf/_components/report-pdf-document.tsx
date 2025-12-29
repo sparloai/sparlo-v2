@@ -4,9 +4,11 @@ import type { ReportForPDF } from '../_lib/types';
 import type {
   ChallengeTheFrame,
   ConstraintsAndMetrics,
+  CrossDomainSearch,
   ExecutionTrack,
   ExecutionTrackPrimary,
   FrontierWatch,
+  HonestAssessment,
   HybridReportData,
   InnovationAnalysis,
   InnovationPortfolio,
@@ -17,6 +19,7 @@ import type {
   RecommendedInnovation,
   RiskAndWatchout,
   SelfCritique,
+  StrategicIntegration,
   StructuredExecutiveSummary,
   SupportingConcept,
   ValidationGap,
@@ -1485,7 +1488,380 @@ function InnovationAnalysisSection({
 }
 
 // ============================================
-// 10. Risks & Watchouts Section
+// 10. Honest Assessment Section
+// ============================================
+
+function HonestAssessmentSection({
+  assessment,
+}: {
+  assessment?: HonestAssessment;
+}) {
+  if (!assessment) return null;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader
+        title="Honest Assessment"
+        subtitle="Candid evaluation of the opportunity"
+      />
+
+      <View style={styles.card} wrap={false}>
+        {assessment.problem_type && (
+          <View style={{ marginBottom: 8 }}>
+            <MonoLabel>Problem Type</MonoLabel>
+            <Text style={styles.cardContent}>{assessment.problem_type}</Text>
+          </View>
+        )}
+
+        {assessment.expected_value_range && (
+          <View style={{ marginBottom: 8 }}>
+            <MonoLabel>Expected Value Range</MonoLabel>
+            <View style={styles.row}>
+              {assessment.expected_value_range.floor && (
+                <View style={styles.col3}>
+                  <Text style={styles.metaLabel}>Floor</Text>
+                  <Text style={styles.metaValue}>
+                    {assessment.expected_value_range.floor}
+                  </Text>
+                </View>
+              )}
+              {assessment.expected_value_range.most_likely && (
+                <View style={styles.col3}>
+                  <Text style={styles.metaLabel}>Most Likely</Text>
+                  <Text style={styles.metaValue}>
+                    {assessment.expected_value_range.most_likely}
+                  </Text>
+                </View>
+              )}
+              {assessment.expected_value_range.ceiling && (
+                <View style={styles.col3}>
+                  <Text style={styles.metaLabel}>Ceiling</Text>
+                  <Text style={styles.metaValue}>
+                    {assessment.expected_value_range.ceiling}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        )}
+
+        {assessment.candid_assessment && (
+          <View style={{ marginBottom: 8 }}>
+            <MonoLabel>Candid Assessment</MonoLabel>
+            <Text style={styles.cardContent}>
+              {assessment.candid_assessment}
+            </Text>
+          </View>
+        )}
+
+        {assessment.if_value_is_limited && (
+          <View style={styles.warningBox} wrap={false}>
+            <MonoLabel>If Value Is Limited</MonoLabel>
+            <Text style={styles.cardContent}>
+              {assessment.if_value_is_limited}
+            </Text>
+          </View>
+        )}
+      </View>
+    </View>
+  );
+}
+
+// ============================================
+// 11. Cross-Domain Search Section
+// ============================================
+
+function CrossDomainSearchSection({
+  search,
+}: {
+  search?: CrossDomainSearch;
+}) {
+  if (!search) return null;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader
+        title="Cross-Domain Search"
+        subtitle="Insights from analogous fields"
+      />
+
+      {/* Enhanced Challenge Frame */}
+      {search.enhanced_challenge_frame && (
+        <View style={styles.card} wrap={false}>
+          {search.enhanced_challenge_frame.reframing && (
+            <View style={{ marginBottom: 8 }}>
+              <MonoLabel>Reframing</MonoLabel>
+              <Text style={styles.cardContent}>
+                {search.enhanced_challenge_frame.reframing}
+              </Text>
+            </View>
+          )}
+
+          {search.enhanced_challenge_frame.search_queries &&
+            search.enhanced_challenge_frame.search_queries.length > 0 && (
+              <View>
+                <MonoLabel>Search Queries</MonoLabel>
+                {search.enhanced_challenge_frame.search_queries.map((q, i) => (
+                  <View key={i} style={styles.listItem}>
+                    <Text style={styles.listBullet}>•</Text>
+                    <Text style={styles.listContent}>{q}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+        </View>
+      )}
+
+      {/* Domains Searched */}
+      {search.domains_searched && search.domains_searched.length > 0 && (
+        <View style={{ marginTop: 12 }}>
+          <Text style={styles.subsectionTitle}>Domains Explored</Text>
+          {search.domains_searched.map((d, i) => (
+            <View key={i} style={styles.card} wrap={false}>
+              {d.domain && (
+                <Text style={styles.cardTitle}>{d.domain}</Text>
+              )}
+              {d.mechanism_found && (
+                <View style={{ marginTop: 4 }}>
+                  <MonoLabel>Mechanism Found</MonoLabel>
+                  <Text style={styles.cardContent}>{d.mechanism_found}</Text>
+                </View>
+              )}
+              {d.relevance && (
+                <View style={{ marginTop: 4 }}>
+                  <MonoLabel>Relevance</MonoLabel>
+                  <Text style={styles.cardContent}>{d.relevance}</Text>
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* From Scratch Revelations */}
+      {search.from_scratch_revelations &&
+        search.from_scratch_revelations.length > 0 && (
+          <View style={{ marginTop: 12 }}>
+            <Text style={styles.subsectionTitle}>Key Discoveries</Text>
+            {search.from_scratch_revelations.map((r, i) => (
+              <View key={i} style={styles.insightBox} wrap={false}>
+                {r.discovery && (
+                  <Text style={styles.insightText}>{r.discovery}</Text>
+                )}
+                {r.source && (
+                  <Text style={[styles.cardContent, { marginTop: 4 }]}>
+                    Source: {r.source}
+                  </Text>
+                )}
+                {r.implication && (
+                  <Text style={[styles.cardContent, { marginTop: 4 }]}>
+                    Implication: {r.implication}
+                  </Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+    </View>
+  );
+}
+
+// ============================================
+// 12. Strategic Integration Section
+// ============================================
+
+function StrategicIntegrationSection({
+  integration,
+}: {
+  integration?: StrategicIntegration;
+}) {
+  if (!integration) return null;
+
+  return (
+    <View style={styles.section}>
+      <SectionHeader
+        title="Strategic Integration"
+        subtitle="Portfolio strategy and resource allocation"
+      />
+
+      {/* Portfolio View */}
+      {integration.portfolio_view && (
+        <View style={styles.card} wrap={false}>
+          <MonoLabel>Portfolio View</MonoLabel>
+          {integration.portfolio_view.execution_track_role && (
+            <View style={{ marginTop: 4 }}>
+              <Text style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}>
+                Execution Track:
+              </Text>
+              <Text style={styles.cardContent}>
+                {integration.portfolio_view.execution_track_role}
+              </Text>
+            </View>
+          )}
+          {integration.portfolio_view.innovation_portfolio_role && (
+            <View style={{ marginTop: 4 }}>
+              <Text style={[styles.cardContent, { fontFamily: 'Helvetica-Bold' }]}>
+                Innovation Portfolio:
+              </Text>
+              <Text style={styles.cardContent}>
+                {integration.portfolio_view.innovation_portfolio_role}
+              </Text>
+            </View>
+          )}
+          {integration.portfolio_view.combined_strategy && (
+            <View style={[styles.insightBox, { marginTop: 8 }]} wrap={false}>
+              <MonoLabel>Combined Strategy</MonoLabel>
+              <Text style={styles.insightText}>
+                {integration.portfolio_view.combined_strategy}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Resource Allocation */}
+      {integration.resource_allocation && (
+        <View style={[styles.card, { marginTop: 12 }]} wrap={false}>
+          <MonoLabel>Resource Allocation</MonoLabel>
+          <View style={[styles.row, { marginTop: 8 }]}>
+            {integration.resource_allocation.execution_track_percent !==
+              undefined && (
+              <View style={styles.col3}>
+                <Text style={styles.metaLabel}>Execution</Text>
+                <Text style={styles.metaValue}>
+                  {integration.resource_allocation.execution_track_percent}%
+                </Text>
+              </View>
+            )}
+            {integration.resource_allocation.recommended_innovation_percent !==
+              undefined && (
+              <View style={styles.col3}>
+                <Text style={styles.metaLabel}>Innovation</Text>
+                <Text style={styles.metaValue}>
+                  {integration.resource_allocation.recommended_innovation_percent}%
+                </Text>
+              </View>
+            )}
+            {integration.resource_allocation.parallel_investigations_percent !==
+              undefined && (
+              <View style={styles.col3}>
+                <Text style={styles.metaLabel}>Parallel</Text>
+                <Text style={styles.metaValue}>
+                  {integration.resource_allocation.parallel_investigations_percent}%
+                </Text>
+              </View>
+            )}
+          </View>
+          {integration.resource_allocation.rationale && (
+            <View style={{ marginTop: 8 }}>
+              <MonoLabel>Rationale</MonoLabel>
+              <Text style={styles.cardContent}>
+                {integration.resource_allocation.rationale}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* Decision Architecture */}
+      {integration.decision_architecture?.primary_tradeoff && (
+        <View style={[styles.card, { marginTop: 12 }]} wrap={false}>
+          <MonoLabel>Primary Tradeoff</MonoLabel>
+          {integration.decision_architecture.primary_tradeoff.question && (
+            <Text style={[styles.cardTitle, { marginTop: 4 }]}>
+              {integration.decision_architecture.primary_tradeoff.question}
+            </Text>
+          )}
+
+          <View style={[styles.row, { marginTop: 8 }]}>
+            {integration.decision_architecture.primary_tradeoff.option_a && (
+              <View style={[styles.col2, { paddingRight: 8 }]}>
+                <View
+                  style={[
+                    styles.card,
+                    { backgroundColor: colors.green100, borderColor: colors.green700 },
+                  ]}
+                  wrap={false}
+                >
+                  <Text style={[styles.cardTitle, { color: colors.green700 }]}>
+                    Option A
+                  </Text>
+                  {integration.decision_architecture.primary_tradeoff.option_a
+                    .condition && (
+                    <Text style={styles.cardContent}>
+                      If:{' '}
+                      {
+                        integration.decision_architecture.primary_tradeoff
+                          .option_a.condition
+                      }
+                    </Text>
+                  )}
+                  {integration.decision_architecture.primary_tradeoff.option_a
+                    .path && (
+                    <Text style={styles.cardContent}>
+                      Path:{' '}
+                      {
+                        integration.decision_architecture.primary_tradeoff
+                          .option_a.path
+                      }
+                    </Text>
+                  )}
+                </View>
+              </View>
+            )}
+            {integration.decision_architecture.primary_tradeoff.option_b && (
+              <View style={styles.col2}>
+                <View
+                  style={[
+                    styles.card,
+                    { backgroundColor: colors.blue100, borderColor: colors.blue700 },
+                  ]}
+                  wrap={false}
+                >
+                  <Text style={[styles.cardTitle, { color: colors.blue700 }]}>
+                    Option B
+                  </Text>
+                  {integration.decision_architecture.primary_tradeoff.option_b
+                    .condition && (
+                    <Text style={styles.cardContent}>
+                      If:{' '}
+                      {
+                        integration.decision_architecture.primary_tradeoff
+                          .option_b.condition
+                      }
+                    </Text>
+                  )}
+                  {integration.decision_architecture.primary_tradeoff.option_b
+                    .path && (
+                    <Text style={styles.cardContent}>
+                      Path:{' '}
+                      {
+                        integration.decision_architecture.primary_tradeoff
+                          .option_b.path
+                      }
+                    </Text>
+                  )}
+                </View>
+              </View>
+            )}
+          </View>
+
+          {integration.decision_architecture.primary_tradeoff.if_uncertain && (
+            <View style={[styles.warningBox, { marginTop: 8 }]} wrap={false}>
+              <MonoLabel>If Uncertain</MonoLabel>
+              <Text style={styles.cardContent}>
+                {integration.decision_architecture.primary_tradeoff.if_uncertain}
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+    </View>
+  );
+}
+
+// ============================================
+// 13. Risks & Watchouts Section
 // ============================================
 
 function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
@@ -1937,43 +2313,47 @@ export function ReportPDFDocument({ report }: Props) {
         {/* 1. Brief */}
         <BriefSection brief={hybridData.brief} />
 
-        {/* 2. Problem Analysis */}
-        <ProblemAnalysisSection analysis={hybridData.problem_analysis} />
-
-        {/* 3. Executive Summary */}
+        {/* 2. Executive Summary */}
         <ExecutiveSummarySection summary={hybridData.executive_summary} />
 
-        {/* 4. Solution Concepts (formerly Execution Track) */}
-        <SolutionConceptsSection track={executionTrack} />
+        {/* 3. Problem Analysis */}
+        <ProblemAnalysisSection analysis={hybridData.problem_analysis} />
 
-        {/* 5. Innovation Concepts (formerly Innovation Portfolio) */}
-        <InnovationConceptsSection portfolio={innovationPortfolio} />
-
-        {/* 6. Frontier Watch */}
-        <FrontierWatchSection items={innovationPortfolio?.frontier_watch} />
-
-        {/* 7. Constraints & Metrics */}
+        {/* 4. Constraints & Metrics */}
         <ConstraintsSection constraints={hybridData.constraints_and_metrics} />
 
-        {/* 8. Challenge the Frame */}
+        {/* 5. Challenge the Frame */}
         <ChallengeTheFrameSection challenges={hybridData.challenge_the_frame} />
 
-        {/* 9. Innovation Analysis */}
-        <InnovationAnalysisSection analysis={hybridData.innovation_analysis} />
+        {/* 6. Honest Assessment */}
+        <HonestAssessmentSection assessment={hybridData.honest_assessment} />
 
-        {/* 10. Self-Critique */}
-        <SelfCritiqueSection critique={hybridData.self_critique} />
+        {/* 7. Cross-Domain Search */}
+        <CrossDomainSearchSection search={hybridData.cross_domain_search} />
 
-        {/* 11. Risks & Watchouts */}
+        {/* 8. Solution Concepts */}
+        <SolutionConceptsSection track={executionTrack} />
+
+        {/* 9. Innovation Concepts */}
+        <InnovationConceptsSection portfolio={innovationPortfolio} />
+
+        {/* 10. Frontier Technologies */}
+        <FrontierWatchSection items={innovationPortfolio?.frontier_watch} />
+
+        {/* 11. Strategic Integration */}
+        <StrategicIntegrationSection
+          integration={hybridData.strategic_integration}
+        />
+
+        {/* 12. Risks & Watchouts */}
         <RisksSection risks={hybridData.risks_and_watchouts} />
 
-        {/* 12. Key Insights */}
+        {/* 13. Self-Critique */}
+        <SelfCritiqueSection critique={hybridData.self_critique} />
+
+        {/* 14. Recommendation (Key Insights, Next Steps, What I'd Actually Do) */}
         <KeyInsightsSection insights={hybridData.key_insights} />
-
-        {/* 13. Next Steps */}
         <NextStepsSection steps={hybridData.next_steps} />
-
-        {/* 14. What I'd Actually Do */}
         <WhatIdActuallyDoSection content={hybridData.what_id_actually_do} />
 
         {/* Footer */}

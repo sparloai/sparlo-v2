@@ -18,7 +18,8 @@ const impactConfig = {
     label: 'High Impact',
   },
   medium: {
-    styles: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+    styles:
+      'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
     icon: AlertCircle,
     label: 'Medium Impact',
   },

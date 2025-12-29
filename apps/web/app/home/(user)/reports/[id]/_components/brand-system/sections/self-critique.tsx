@@ -6,8 +6,9 @@
  * Honest assessment of what we might be wrong about.
  * Shows intellectual honesty and builds trust.
  */
-
 import { memo } from 'react';
+
+import type { SelfCritique } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,
@@ -19,8 +20,6 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from '../primitives';
-
-import type { SelfCritique } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface SelfCritiqueSectionProps {
   data?: SelfCritique;
@@ -34,7 +33,8 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
   const hasContent =
     data.confidence_level ||
     data.overall_confidence ||
-    (data.what_we_might_be_wrong_about && data.what_we_might_be_wrong_about.length > 0) ||
+    (data.what_we_might_be_wrong_about &&
+      data.what_we_might_be_wrong_about.length > 0) ||
     (data.unexplored_directions && data.unexplored_directions.length > 0) ||
     (data.validation_gaps && data.validation_gaps.length > 0);
 
@@ -50,7 +50,7 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
         {(data.confidence_level || data.overall_confidence) && (
           <div className="max-w-[60ch]">
             <MonoLabel variant="muted">Overall Confidence</MonoLabel>
-            <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+            <p className="mt-3 text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
               {data.overall_confidence || data.confidence_level}
             </p>
             {data.confidence_rationale && (
@@ -62,40 +62,44 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
         )}
 
         {/* What we might be wrong about */}
-        {data.what_we_might_be_wrong_about && data.what_we_might_be_wrong_about.length > 0 && (
-          <ContentBlock withBorder className="max-w-[65ch]">
-            <AccentBorder>
-              <MonoLabel variant="muted">What We Might Be Wrong About</MonoLabel>
+        {data.what_we_might_be_wrong_about &&
+          data.what_we_might_be_wrong_about.length > 0 && (
+            <ContentBlock withBorder className="max-w-[65ch]">
+              <AccentBorder>
+                <MonoLabel variant="muted">
+                  What We Might Be Wrong About
+                </MonoLabel>
+                <ul className="mt-4 space-y-3">
+                  {data.what_we_might_be_wrong_about.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-400" />
+                      <p className="text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+                        {item}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </AccentBorder>
+            </ContentBlock>
+          )}
+
+        {/* Unexplored directions */}
+        {data.unexplored_directions &&
+          data.unexplored_directions.length > 0 && (
+            <ContentBlock withBorder className="max-w-[65ch]">
+              <MonoLabel variant="muted">Unexplored Directions</MonoLabel>
               <ul className="mt-4 space-y-3">
-                {data.what_we_might_be_wrong_about.map((item, idx) => (
+                {data.unexplored_directions.map((item, idx) => (
                   <li key={idx} className="flex items-start gap-3">
-                    <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-400" />
-                    <p className="text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+                    <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-300" />
+                    <p className="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
                       {item}
                     </p>
                   </li>
                 ))}
               </ul>
-            </AccentBorder>
-          </ContentBlock>
-        )}
-
-        {/* Unexplored directions */}
-        {data.unexplored_directions && data.unexplored_directions.length > 0 && (
-          <ContentBlock withBorder className="max-w-[65ch]">
-            <MonoLabel variant="muted">Unexplored Directions</MonoLabel>
-            <ul className="mt-4 space-y-3">
-              {data.unexplored_directions.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-3">
-                  <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-300" />
-                  <p className="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
-                    {item}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </ContentBlock>
-        )}
+            </ContentBlock>
+          )}
 
         {/* Validation gaps */}
         {data.validation_gaps && data.validation_gaps.length > 0 && (
@@ -105,9 +109,15 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
               <table className="w-full text-[16px]">
                 <thead>
                   <tr className="border-b border-zinc-300">
-                    <th className="py-3 pr-6 text-left font-medium text-zinc-900">Concern</th>
-                    <th className="w-40 py-3 pr-6 text-left font-medium text-zinc-500">Status</th>
-                    <th className="py-3 text-left font-medium text-zinc-500">Rationale</th>
+                    <th className="py-3 pr-6 text-left font-medium text-zinc-900">
+                      Concern
+                    </th>
+                    <th className="w-40 py-3 pr-6 text-left font-medium text-zinc-500">
+                      Status
+                    </th>
+                    <th className="py-3 text-left font-medium text-zinc-500">
+                      Rationale
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
@@ -119,7 +129,9 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
                       <td className="py-3 pr-6 align-top">
                         <ValidationStatus status={gap.status} />
                       </td>
-                      <td className="py-3 align-top text-zinc-600">{gap.rationale}</td>
+                      <td className="py-3 align-top text-zinc-600">
+                        {gap.rationale}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

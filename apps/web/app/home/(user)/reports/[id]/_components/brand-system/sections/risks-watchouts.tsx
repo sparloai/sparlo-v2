@@ -12,8 +12,9 @@
  * - Border weight differentiates high severity
  * - Mitigation directly beneath each risk shows "we have a plan"
  */
-
 import { memo } from 'react';
+
+import type { RiskAndWatchout } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   BodyText,
@@ -23,8 +24,6 @@ import {
   SectionTitle,
   SeverityIndicator,
 } from '../primitives';
-
-import type { RiskAndWatchout } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface RisksWatchoutsSectionProps {
   data?: RiskAndWatchout[];
@@ -69,7 +68,7 @@ const RiskCard = memo(function RiskCard({
       }`}
     >
       {/* Risk description */}
-      <p className="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+      <p className="text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-[#1e1e1e]">
         {risk}
       </p>
 

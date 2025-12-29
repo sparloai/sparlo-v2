@@ -6,8 +6,9 @@
  * Questioning assumptions and reframing the problem.
  * Emphasis on provocative reframes that unlock new solution spaces.
  */
-
 import { memo } from 'react';
+
+import type { ChallengeTheFrame } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,
@@ -18,8 +19,6 @@ import {
   Section,
   SectionTitle,
 } from '../primitives';
-
-import type { ChallengeTheFrame } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface ChallengeFrameSectionProps {
   data?: ChallengeTheFrame[];
@@ -48,7 +47,7 @@ export const ChallengeFrameSection = memo(function ChallengeFrameSection({
         {reframe && (
           <div className="max-w-[60ch]">
             <MonoLabel variant="muted">The Reframe</MonoLabel>
-            <p className="mt-4 text-[22px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+            <p className="mt-4 text-[22px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
               {reframe}
             </p>
           </div>
@@ -67,7 +66,7 @@ export const ChallengeFrameSection = memo(function ChallengeFrameSection({
           <ContentBlock withBorder className="max-w-[60ch]">
             <AccentBorder weight="heavy">
               <MonoLabel variant="muted">The Insight</MonoLabel>
-              <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+              <p className="mt-3 text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
                 {insight}
               </p>
             </AccentBorder>
@@ -85,7 +84,7 @@ export const ChallengeFrameSection = memo(function ChallengeFrameSection({
                   <div className="flex items-start gap-3">
                     <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-zinc-900" />
                     <div>
-                      <p className="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+                      <p className="text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-[#1e1e1e]">
                         {item.assumption}
                       </p>
 
@@ -101,7 +100,7 @@ export const ChallengeFrameSection = memo(function ChallengeFrameSection({
 
                       {/* Implication */}
                       {item.implication && (
-                        <p className="mt-2 border-l-2 border-zinc-300 pl-4 text-[18px] italic leading-[1.3] tracking-[-0.02em] text-zinc-600">
+                        <p className="mt-2 border-l-2 border-zinc-300 pl-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic">
                           {item.implication}
                         </p>
                       )}

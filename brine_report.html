@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Desalination Brine Valorization Report</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900">
+  <div class="max-w-5xl mx-auto px-6 py-12 space-y-12">
+
+    <!-- The Brief -->
+    <section id="brief">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">The Brief</h2>
+        <p class="text-sm text-zinc-500">Original problem statement</p>
+      </div>
+      <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Brief</span>
+        </div>
+        <p class="text-base leading-relaxed text-zinc-700">
+          Reverse osmosis desalination produces 1.5-2 gallons of concentrated brine for every gallon of freshwater. Brine disposal into oceans faces tightening regulation (Mediterranean, Persian Gulf, California). Evaporation ponds require massive land area. Zero-liquid-discharge systems exist but double the energy cost. Need economically viable path to either eliminate liquid discharge or valorize brine components (salt, magnesium, lithium). Plant capacity is 50-100 million gallons/day. Must integrate with existing RO infrastructure without major plant redesign.
+        </p>
+      </div>
+    </section>
+
+    <!-- Executive Summary -->
+    <section id="executive-summary">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">Executive Summary</h2>
+        <p class="text-sm text-zinc-500">The bottom line</p>
+      </div>
+      <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-3">
+          <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Executive Summary</span>
+        </div>
+        <div class="space-y-6">
+          <p class="text-xl leading-relaxed font-light text-zinc-950">
+            The desalination industry has been solving brine as a disposal problem when it should be solving it as a feedstock problem. While operators invest millions in ZLD systems that consume 12-18 kWh/m³, the chlor-alkali industry, drilling fluid suppliers, and mineral extractors all purchase concentrated brines as raw materials—often at prices that exceed disposal costs. The highest-merit path forward isn't technological innovation; it's industrial symbiosis that matches brine composition to existing demand.
+          </p>
+          <div class="rounded-xl border-l-4 border-zinc-950 bg-zinc-50/50 py-2 pl-8">
+            <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Primary Recommendation</span>
+            <p class="mt-3 text-base leading-relaxed font-medium text-zinc-900">
+              Start with high-recovery RO retrofit ($5-15M, 12-18 months) to reduce brine volume 30-50% immediately. Simultaneously pursue industrial brine sales where drilling or chemical markets exist within 100 miles. For remaining volume requiring ZLD, implement membrane concentration + MVR as the proven benchmark, while piloting waste heat integration (spray-dry into industrial exhaust) or LNG cold energy (EFC) where co-location opportunities exist.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Problem Analysis -->
+    <section id="problem-analysis">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">Problem Analysis</h2>
+        <p class="text-sm text-zinc-500">Understanding the landscape</p>
+      </div>
+      <div class="space-y-8">
+
+        <!-- What's Wrong -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">What's Wrong</span>
+          </div>
+          <p class="text-base leading-relaxed text-zinc-700">
+            Desalination plants are paying $0.50-2.00/m³ to dispose of brine that contains valuable minerals and serves industrial purposes. The industry treats this as a waste stream when it should be treated as a co-product.
+          </p>
+        </div>
+
+        <!-- Why It's Hard - Not shown in this JSON sample -->
+
+        <!-- First Principles Insight -->
+        <div class="rounded-xl bg-zinc-900 p-8">
+          <span class="font-mono text-xs font-bold tracking-widest text-zinc-200 uppercase">First Principles Insight</span>
+          <p class="mt-4 text-xl leading-relaxed font-medium text-white">
+            The problem isn't 'how to dispose of brine' but 'who needs concentrated salt solutions'
+          </p>
+          <p class="mt-4 text-base leading-relaxed text-zinc-200">
+            Reframing from disposal to feedstock opens entirely different solution spaces. Drilling fluids, chlor-alkali production, dust suppression, de-icing, and industrial processes all consume concentrated brines. The question becomes matching brine composition to buyer specifications rather than treating it to meet discharge limits.
+          </p>
+        </div>
+
+        <!-- What Industry Does Today -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">What Industry Does Today</span>
+          </div>
+          <div class="space-y-3">
+            <div class="rounded-lg border border-zinc-200 p-4">
+              <p class="font-medium text-zinc-900">Ocean outfall with diffusers</p>
+              <p class="mt-1 text-sm text-orange-700">Limitation: Facing permit restrictions in Mediterranean, Gulf, California; regulatory trajectory is toward prohibition</p>
+            </div>
+            <div class="rounded-lg border border-zinc-200 p-4">
+              <p class="font-medium text-zinc-900">Evaporation ponds</p>
+              <p class="mt-1 text-sm text-orange-700">Limitation: Requires 1-2 acres per MGD—500-1,000 hectares for 100 MGD plant; only viable inland where land is cheap</p>
+            </div>
+            <div class="rounded-lg border border-zinc-200 p-4">
+              <p class="font-medium text-zinc-900">Thermal ZLD (brine concentrators + crystallizers)</p>
+              <p class="mt-1 text-sm text-orange-700">Limitation: Adds 20-40 kWh/m³, doubling energy costs; $80-150M capital for 100 MGD</p>
+            </div>
+            <div class="rounded-lg border border-zinc-200 p-4">
+              <p class="font-medium text-zinc-900">Deep well injection</p>
+              <p class="mt-1 text-sm text-orange-700">Limitation: Geology-dependent, seismic concerns, limited capacity in most locations</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current State of the Art -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Current State of the Art</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-zinc-200">
+                  <th class="px-4 py-3 text-left font-medium text-zinc-600">Entity</th>
+                  <th class="px-4 py-3 text-left font-medium text-zinc-600">Approach</th>
+                  <th class="px-4 py-3 text-left font-medium text-zinc-600">Current Performance</th>
+                  <th class="px-4 py-3 text-left font-medium text-zinc-600">Target/Roadmap</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-4 py-3 font-medium text-zinc-900">IDE Technologies (Sorek B, Israel)</td>
+                  <td class="px-4 py-3 text-zinc-700">High-recovery RO with brine recirculation</td>
+                  <td class="px-4 py-3 text-zinc-700">85% recovery, reducing brine volume ~45%</td>
+                  <td class="px-4 py-3 text-zinc-700">Exploring 90%+ recovery with advanced antiscalants</td>
+                </tr>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-4 py-3 font-medium text-zinc-900">Saltworks Technologies</td>
+                  <td class="px-4 py-3 text-zinc-700">Membrane brine concentration + thermal finishing</td>
+                  <td class="px-4 py-3 text-zinc-700">Concentration to 250,000+ ppm, reducing thermal load 60-70%</td>
+                  <td class="px-4 py-3 text-zinc-700">Targeting 10-12 kWh/m³ total ZLD energy</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 font-medium text-zinc-900">Veolia EVALED</td>
+                  <td class="px-4 py-3 text-zinc-700">MVR evaporators for industrial ZLD</td>
+                  <td class="px-4 py-3 text-zinc-700">15-25 kWh/m³ for evaporation, GOR 15-25</td>
+                  <td class="px-4 py-3 text-zinc-700">Integration with waste heat sources</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Constraints & Metrics -->
+    <section id="constraints">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">Constraints & Metrics</h2>
+        <p class="text-sm text-zinc-500">Requirements and success criteria</p>
+      </div>
+      <div class="space-y-6">
+        <!-- Hard Constraints -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Hard Constraints</span>
+          </div>
+          <ul class="space-y-2">
+            <li class="flex items-start gap-3 text-sm">
+              <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500"></span>
+              <span class="text-zinc-700">Must retrofit to existing RO infrastructure without major plant redesign</span>
+            </li>
+            <li class="flex items-start gap-3 text-sm">
+              <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500"></span>
+              <span class="text-zinc-700">Regulatory compliance in tightening Mediterranean/Gulf/California frameworks</span>
+            </li>
+            <li class="flex items-start gap-3 text-sm">
+              <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500"></span>
+              <span class="text-zinc-700">Scale: 75-200 MGD brine stream (massive throughput)</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Soft Constraints -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Soft Constraints</span>
+          </div>
+          <ul class="space-y-2">
+            <li class="flex items-start gap-3 text-sm">
+              <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500"></span>
+              <span class="text-zinc-700">Energy cost increase should stay well below 2× baseline (ZLD benchmark to beat)</span>
+            </li>
+            <li class="flex items-start gap-3 text-sm">
+              <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500"></span>
+              <span class="text-zinc-700">Capital investment should achieve positive NPV within 10 years</span>
+            </li>
+            <li class="flex items-start gap-3 text-sm">
+              <span class="mt-1 h-2 w-2 shrink-0 rounded-full bg-amber-500"></span>
+              <span class="text-zinc-700">Prefer solutions that generate revenue rather than just reduce disposal costs</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Success Metrics -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Success Metrics</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-zinc-200">
+                  <th class="px-4 py-3 text-left font-medium text-zinc-600">Metric</th>
+                  <th class="px-4 py-3 text-left font-medium text-zinc-600">Target</th>
+                  <th class="px-4 py-3 text-left font-medium text-zinc-600">Minimum Viable</th>
+                  <th class="px-4 py-3 text-left font-medium text-zinc-600">Stretch</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-4 py-3 font-medium text-zinc-900">Liquid discharge reduction</td>
+                  <td class="px-4 py-3 font-semibold text-green-700">>90%</td>
+                  <td class="px-4 py-3 text-zinc-700">>50%</td>
+                  <td class="px-4 py-3 text-zinc-700">Zero liquid discharge</td>
+                </tr>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-4 py-3 font-medium text-zinc-900">LCOW increase vs. current disposal</td>
+                  <td class="px-4 py-3 font-semibold text-green-700"><30%</td>
+                  <td class="px-4 py-3 text-zinc-700"><50%</td>
+                  <td class="px-4 py-3 text-zinc-700">Net revenue generation</td>
+                </tr>
+                <tr class="border-b border-zinc-100">
+                  <td class="px-4 py-3 font-medium text-zinc-900">NPV including avoided disposal costs</td>
+                  <td class="px-4 py-3 font-semibold text-green-700">Positive within 10 years</td>
+                  <td class="px-4 py-3 text-zinc-700">Positive within 15 years</td>
+                  <td class="px-4 py-3 text-zinc-700">Positive within 5 years</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-3 font-medium text-zinc-900">Permittability under tightening regulations</td>
+                  <td class="px-4 py-3 font-semibold text-green-700">Compliant through 2040</td>
+                  <td class="px-4 py-3 text-zinc-700">Compliant through 2030</td>
+                  <td class="px-4 py-3 text-zinc-700">Exceeds requirements with margin</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Challenge the Frame -->
+    <section id="challenge-the-frame">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">Challenge the Frame</h2>
+        <p class="text-sm text-zinc-500">Questioning key assumptions</p>
+      </div>
+      <div class="space-y-4">
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <p class="font-medium text-zinc-900">Assumption: Brine composition is relatively standard (seawater source)</p>
+          <p class="mt-2 text-sm text-zinc-600"><strong class="text-zinc-700">Challenge:</strong> Brackish water sources vary wildly in composition. Some have valuable minerals (lithium, boron); others have problematic contaminants (arsenic, selenium).</p>
+          <p class="mt-2 text-sm text-blue-600">→ If source is brackish rather than seawater, mineral extraction economics change dramatically. Some brackish brines may have 10-100× higher lithium than seawater.</p>
+        </div>
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <p class="font-medium text-zinc-900">Assumption: 50-100 MGD is freshwater output</p>
+          <p class="mt-2 text-sm text-zinc-600"><strong class="text-zinc-700">Challenge:</strong> If this is total intake rather than output, brine volume is lower and some solutions become more viable.</p>
+          <p class="mt-2 text-sm text-blue-600">→ At 50 MGD intake with 45% recovery, brine is only 27.5 MGD—half the assumed volume. This makes industrial sales and smaller-scale innovations more feasible.</p>
+        </div>
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <p class="font-medium text-zinc-900">Assumption: Regulations will continue tightening toward ZLD</p>
+          <p class="mt-2 text-sm text-zinc-600"><strong class="text-zinc-700">Challenge:</strong> Regulators care about ecological impact, not liquid volume per se. Beneficial use permits, dilution credits, and impact offsets may satisfy regulators without ZLD.</p>
+          <p class="mt-2 text-sm text-blue-600">→ If beneficial use permits are achievable, the entire framing shifts from 'how to achieve ZLD' to 'how to demonstrate beneficial use.' This is a regulatory strategy question, not a technology question.</p>
+        </div>
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <p class="font-medium text-zinc-900">Assumption: Industrial brine sales require proximity to drilling operations</p>
+          <p class="mt-2 text-sm text-zinc-600"><strong class="text-zinc-700">Challenge:</strong> De-icing, dust suppression, and chemical manufacturing also consume concentrated brines and may be closer to coastal desal plants.</p>
+          <p class="mt-2 text-sm text-blue-600">→ Expand market analysis beyond drilling to include all industrial brine consumers. Northern coastal cities have both desal plants and de-icing demand.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Solution Concepts -->
+    <section id="solution-concepts">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">Solution Concepts</h2>
+        <p class="text-sm text-zinc-500">Proven approaches using validated technologies</p>
+      </div>
+      <div class="space-y-6">
+        <p class="text-sm leading-relaxed text-zinc-600">
+          Solution concepts use proven technologies requiring integration, not invention. These represent the lowest-risk paths forward and should be evaluated first before pursuing higher-uncertainty innovations.
+        </p>
+
+        <!-- Primary Recommendation -->
+        <div class="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-white p-6">
+          <div class="mb-4 flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="text-xs font-medium tracking-wider text-green-600 uppercase">Primary Recommendation</span>
+              </div>
+              <h3 class="text-lg font-semibold text-zinc-900">High-Recovery RO Retrofit with Industrial Brine Sales Pipeline</h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">CATALOG</span>
+              <span class="inline-flex items-center rounded-full border border-zinc-300 px-2.5 py-0.5 text-xs font-medium text-zinc-700">85% confidence</span>
+            </div>
+          </div>
+
+          <!-- What It Is -->
+          <div class="mb-4">
+            <span class="text-xs font-medium tracking-wider text-zinc-500 uppercase">What It Is</span>
+            <p class="mt-1 text-sm leading-relaxed text-zinc-700">
+              This is a two-pronged approach that attacks brine volume from both ends. First, retrofit existing RO trains to achieve 60-70% recovery (vs. typical 45%) through optimized antiscalant dosing, interstage pumping, and staged operation. This reduces brine volume by 30-50% with minimal capital investment. Second, condition the remaining brine minimally and sell directly to industrial users who need concentrated salt solutions.
+            </p>
+          </div>
+
+          <!-- Why It Works -->
+          <div class="mb-4">
+            <span class="text-xs font-medium tracking-wider text-zinc-500 uppercase">Why It Works</span>
+            <p class="mt-1 text-sm leading-relaxed text-zinc-700">
+              High-recovery RO exploits the non-linear relationship between recovery and brine volume. Increasing recovery from 45% to 65% reduces brine from 55% to 35% of intake—a 36% reduction—while energy increases only 20-25%. Drilling fluids function through hydrostatic pressure control—dense brines prevent wellbore collapse and gas kicks.
+            </p>
+          </div>
+
+          <!-- Economics Grid -->
+          <div class="mb-4 grid gap-3 sm:grid-cols-3">
+            <div class="rounded-lg bg-white/60 p-3">
+              <span class="text-xs font-medium text-zinc-500">Expected Improvement</span>
+              <p class="text-sm font-medium text-green-700">30-50% brine volume reduction + $50-200/1000 gallons revenue</p>
+            </div>
+            <div class="flex items-start gap-2 rounded-lg bg-white/60 p-3">
+              <svg class="mt-0.5 h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <div>
+                <span class="text-xs font-medium text-zinc-500">Timeline</span>
+                <p class="text-sm text-zinc-700">12-18 months for retrofit</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-2 rounded-lg bg-white/60 p-3">
+              <svg class="mt-0.5 h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <div>
+                <span class="text-xs font-medium text-zinc-500">Investment</span>
+                <p class="text-sm text-zinc-700">$5-15M for high-recovery retrofit</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- The Insight -->
+          <div class="space-y-3 rounded-lg border-l-4 border-zinc-300 bg-zinc-50 p-4 mb-4">
+            <div class="flex items-start gap-2">
+              <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+              <div>
+                <span class="text-xs font-medium tracking-wider text-zinc-600 uppercase">The Insight</span>
+                <p class="mt-1 text-sm text-zinc-700">Brine volume reduction and industrial sales are complementary, not competing strategies</p>
+              </div>
+            </div>
+            <div class="ml-6 rounded-lg bg-white/60 p-3">
+              <span class="text-xs font-medium text-zinc-500">Where We Found It</span>
+              <p class="text-sm text-zinc-700"><strong>Oil & gas drilling operations + advanced desalination practice:</strong> Drilling operations purchase concentrated brines at premium prices for wellbore stability. Advanced desal plants push recovery limits to reduce downstream treatment costs.</p>
+              <p class="mt-1 text-xs text-zinc-500">→ The same brine that's a disposal problem for desal operators is a feedstock for drilling operations.</p>
+            </div>
+            <div class="ml-6">
+              <span class="text-xs font-medium text-zinc-500">Why Industry Missed It</span>
+              <p class="text-sm text-zinc-600">Desalination and oil/gas operate in completely separate industry silos. Water utilities don't have sales relationships with drilling fluid suppliers.</p>
+            </div>
+          </div>
+
+          <!-- Coupled Effects - NEW -->
+          <div class="mt-4">
+            <div class="mb-3 flex items-center gap-2">
+              <svg class="h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <span class="text-sm font-medium text-zinc-900">Coupled Effects</span>
+            </div>
+            <div class="space-y-2">
+              <div class="rounded-lg border border-red-200 bg-red-50/50 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-medium text-zinc-900">Membrane operations</span>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">WORSE</span>
+                    <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700">MODERATE</span>
+                  </div>
+                </div>
+                <p class="mt-1 text-sm text-zinc-600">Higher recovery increases membrane fouling risk</p>
+                <p class="mt-1 text-xs text-zinc-500">Quantified: Membrane replacement frequency may increase 20-30%</p>
+                <p class="mt-2 text-xs text-blue-600">Mitigation: Enhanced monitoring, optimized cleaning protocols, membrane warranty negotiation</p>
+              </div>
+              <div class="rounded-lg border border-red-200 bg-red-50/50 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-medium text-zinc-900">Energy consumption</span>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">WORSE</span>
+                    <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700">MINOR</span>
+                  </div>
+                </div>
+                <p class="mt-1 text-sm text-zinc-600">Higher osmotic pressure requires more pumping energy</p>
+                <p class="mt-1 text-xs text-zinc-500">Quantified: 15-25% increase in specific energy consumption</p>
+                <p class="mt-2 text-xs text-blue-600">Mitigation: Offset by reduced brine treatment costs; consider energy recovery devices</p>
+              </div>
+              <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-medium text-zinc-900">Product quality (drilling fluids)</span>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700">NEUTRAL</span>
+                    <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700">MODERATE</span>
+                  </div>
+                </div>
+                <p class="mt-1 text-sm text-zinc-600">Brine composition must meet buyer specifications</p>
+                <p class="mt-1 text-xs text-zinc-500">Quantified: May require pH adjustment, filtration, or density modification</p>
+                <p class="mt-2 text-xs text-blue-600">Mitigation: Develop conditioning protocols for specific buyer requirements</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sustainability Flag - NEW -->
+          <div class="mt-4 rounded-lg border border-orange-200 bg-orange-50/50 p-3">
+            <div class="mb-2 flex items-center gap-2">
+              <svg class="h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+              <span class="text-sm font-medium text-zinc-900">Sustainability</span>
+              <span class="inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">LIFECYCLE TRADEOFF</span>
+            </div>
+            <p class="text-sm text-zinc-700">Reduces marine discharge but may support fossil fuel extraction</p>
+            <p class="mt-1 text-xs text-zinc-500">Selling brine to drilling operations solves desal waste problem but supports oil/gas industry. Net environmental benefit depends on whether drilling would occur anyway with virgin brine.</p>
+            <p class="mt-2 text-xs text-blue-600">Alternative: Prioritize non-fossil applications (de-icing, dust suppression, chemical manufacturing) where available.</p>
+          </div>
+
+          <!-- IP Considerations - NEW -->
+          <div class="mt-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-3">
+            <div class="mb-2 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="text-sm font-medium text-zinc-900">IP Considerations</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">FTO: GREEN</span>
+                <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700">Patentability: LOW</span>
+              </div>
+            </div>
+            <p class="text-sm text-zinc-600">High-recovery RO is standard practice with no blocking patents. Drilling fluid formulation from desal brine is novel application but uses commodity materials and standard processing.</p>
+            <div class="mt-2">
+              <span class="text-xs font-medium text-zinc-500">Key Patents to Review</span>
+              <ul class="mt-1 space-y-1">
+                <li class="text-xs text-zinc-600">• US 8,999,171 (Schlumberger) - drilling fluid formulations, but uses different base brines</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Validation Gates -->
+          <div class="mt-4">
+            <div class="mb-3 flex items-center gap-2">
+              <svg class="h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+              <span class="text-sm font-medium text-zinc-900">First Validation Step</span>
+            </div>
+            <div class="rounded-lg border border-zinc-200 bg-white p-3">
+              <p class="font-medium text-zinc-900">Pilot high-recovery operation on single RO train; contact 3-5 drilling fluid suppliers</p>
+              <p class="mt-1 text-sm text-zinc-600">Timeline: 8-12 weeks | Cost: $50-100K</p>
+              <p class="mt-1 flex items-start gap-2 text-sm text-zinc-600">
+                <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <strong>Go:</strong> Achieve 60%+ recovery without membrane damage; identify at least one buyer
+              </p>
+              <p class="mt-1 text-xs text-amber-600">
+                <strong>No-Go:</strong> Membrane fouling at &lt;55% recovery despite optimized antiscalants → focus on membrane concentration + thermal finishing instead
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Supporting Concepts -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="mb-4 flex items-center gap-2">
+            <svg class="h-5 w-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <span class="text-sm font-medium text-zinc-900">Supporting Concepts</span>
+          </div>
+          <div class="space-y-3">
+            <!-- Fallback: ZLD Benchmark -->
+            <div class="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+              <div class="flex items-start justify-between gap-2">
+                <h5 class="font-medium text-zinc-900">Membrane Brine Concentration + MVR Thermal Finishing (Proven ZLD Benchmark)</h5>
+                <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700 capitalize">fallback</span>
+              </div>
+              <p class="mt-1 text-sm text-zinc-600">Current industry standard for ZLD. Stage 1: ED or OARO concentrates brine from 70,000 ppm to 180,000-250,000 ppm. Stage 2: MVR evaporator/crystallizer processes concentrated brine.</p>
+              <p class="mt-2 text-sm text-zinc-600"><span class="font-medium">Why it works:</span> ED energy consumption is proportional to salt removed, not water volume. MVR achieves GOR of 15-25 by compressing vapor.</p>
+              <div class="mt-3 rounded bg-white border-l-4 border-l-orange-600 border border-zinc-200 p-2 text-xs text-zinc-700">
+                <strong>When to use instead:</strong> When industrial sales markets don't exist, when regulations require true ZLD, or when high-recovery retrofit alone doesn't achieve sufficient volume reduction.
+              </div>
+            </div>
+            <!-- Complementary: Chlor-Alkali -->
+            <div class="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+              <div class="flex items-start justify-between gap-2">
+                <h5 class="font-medium text-zinc-900">Chlor-Alkali Integration with Concentrated Brine Feed</h5>
+                <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700 capitalize">complementary</span>
+              </div>
+              <p class="mt-1 text-sm text-zinc-600">Partner with or co-locate chlor-alkali production that uses concentrated brine as feedstock. Products are worth 10-50× raw salt value.</p>
+              <p class="mt-2 text-sm text-zinc-500"><span class="font-medium">Key Risk:</span> Brine purification requirements are stringent. Desal brine has ~2,500 ppm Mg that must be removed to &lt;10 ppm.</p>
+              <div class="mt-3 rounded bg-white border-l-4 border-l-orange-600 border border-zinc-200 p-2 text-xs text-zinc-700">
+                <strong>When to use instead:</strong> When chlor-alkali plant exists within reasonable distance and has capacity for additional brine feedstock.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Innovation Concepts -->
+    <section id="innovation-concepts">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">Innovation Concepts</h2>
+        <p class="text-sm text-zinc-500">Higher-risk bets with breakthrough potential</p>
+      </div>
+      <div class="space-y-6">
+        <p class="text-sm leading-relaxed text-zinc-600">
+          Innovation concepts offer higher ceilings with higher uncertainty. These are parallel bets on breakthrough outcomes that could fundamentally change brine treatment economics if successful.
+        </p>
+
+        <!-- Recommended Innovation -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="mb-4 flex items-start justify-between gap-4">
+            <div class="flex-1">
+              <div class="mb-2 flex items-center gap-2">
+                <svg class="h-5 w-5 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+                <span class="text-xs font-medium tracking-wider text-zinc-600 uppercase">Recommended Innovation</span>
+              </div>
+              <h3 class="text-lg font-semibold text-zinc-900">LNG Cold Energy Eutectic Freeze Crystallization</h3>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">CROSS DOMAIN</span>
+              <span class="inline-flex items-center rounded-full border border-zinc-300 px-2.5 py-0.5 text-xs font-medium text-zinc-700">55% confidence</span>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <span class="text-xs font-medium tracking-wider text-zinc-500 uppercase">What It Is</span>
+            <p class="mt-1 text-sm leading-relaxed text-zinc-700">
+              Co-locate brine treatment with LNG regasification terminals to exploit waste cold energy (-162°C to ambient) for eutectic freeze crystallization. LNG regasification releases ~830 kJ/kg of cold energy that is currently dumped to seawater. This cold can drive freeze crystallization at 6.8× lower energy than evaporation.
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <span class="text-xs font-medium tracking-wider text-zinc-500 uppercase">Why It Works</span>
+            <p class="mt-1 text-sm leading-relaxed text-zinc-700">
+              At the eutectic point (-21.1°C, 23.3 wt% NaCl), the solution is saturated with respect to both ice and salt. Cooling below this point precipitates both phases simultaneously. The density difference enables gravity separation.
+            </p>
+          </div>
+
+          <!-- Breakthrough Potential -->
+          <div class="mb-4 rounded-lg border border-green-200 bg-green-50/50 p-4">
+            <div class="mb-2 flex items-center gap-2">
+              <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+              <span class="text-sm font-medium text-zinc-900">Breakthrough Potential</span>
+            </div>
+            <p class="text-sm text-green-700 font-medium">Near-zero marginal energy cost for brine concentration and crystallization. Produces two saleable products: pure water (from ice) and high-purity salt.</p>
+            <p class="mt-2 text-xs text-zinc-600">Estimated improvement: 2-4 kWh/m³ total energy vs. 12-18 kWh/m³ for membrane + MVR—70-85% reduction</p>
+          </div>
+
+          <!-- Coupled Effects for Innovation -->
+          <div class="mt-4">
+            <div class="mb-3 flex items-center gap-2">
+              <svg class="h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              <span class="text-sm font-medium text-zinc-900">Coupled Effects</span>
+            </div>
+            <div class="space-y-2">
+              <div class="rounded-lg border border-green-200 bg-green-50/50 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-medium text-zinc-900">LNG terminal operations</span>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">BETTER</span>
+                    <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700">MINOR</span>
+                  </div>
+                </div>
+                <p class="mt-1 text-sm text-zinc-600">Brine provides heat sink for regasification</p>
+              </div>
+              <div class="rounded-lg border border-red-200 bg-red-50/50 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-medium text-zinc-900">Product quality</span>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">WORSE</span>
+                    <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700">MODERATE</span>
+                  </div>
+                </div>
+                <p class="mt-1 text-sm text-zinc-600">Salt crystals (hydrohalite) contain 2 waters of hydration</p>
+                <p class="mt-2 text-xs text-blue-600">Mitigation: Accept hydrated product for some markets; use waste heat for final drying</p>
+              </div>
+              <div class="rounded-lg border border-red-200 bg-red-50/50 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="font-medium text-zinc-900">Safety systems</span>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">WORSE</span>
+                    <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700">MODERATE</span>
+                  </div>
+                </div>
+                <p class="mt-1 text-sm text-zinc-600">Cryogenic systems require specialized protocols</p>
+                <p class="mt-2 text-xs text-blue-600">Mitigation: Adopt LNG industry safety standards; indirect heat exchange via glycol loop</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sustainability Flag -->
+          <div class="mt-4 rounded-lg border border-orange-200 bg-orange-50/50 p-3">
+            <div class="mb-2 flex items-center gap-2">
+              <svg class="h-4 w-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+              <span class="text-sm font-medium text-zinc-900">Sustainability</span>
+              <span class="inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700">IRONY</span>
+            </div>
+            <p class="text-sm text-zinc-700">Uses fossil fuel infrastructure to solve environmental problem</p>
+            <p class="mt-1 text-xs text-zinc-500">LNG is a fossil fuel, and this approach ties brine treatment to LNG import infrastructure. However, LNG cold energy is currently wasted regardless of whether we use it.</p>
+            <p class="mt-2 text-xs text-blue-600">Alternative: Develop EFC with dedicated refrigeration powered by solar PV in regions without LNG terminals.</p>
+          </div>
+
+          <!-- IP Considerations -->
+          <div class="mt-4 rounded-lg border border-zinc-200 bg-zinc-50/50 p-3">
+            <div class="mb-2 flex items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <svg class="h-4 w-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="text-sm font-medium text-zinc-900">IP Considerations</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">FTO: YELLOW</span>
+                <span class="inline-flex items-center rounded-full border border-zinc-300 px-2 py-0.5 text-xs font-medium text-zinc-700">Patentability: MEDIUM</span>
+              </div>
+            </div>
+            <p class="text-sm text-zinc-600">Pureflow Inc. holds patents on EFC process improvements. TU Delft has foundational patents. LNG integration appears novel but freedom to operate requires professional clearance.</p>
+            <div class="mt-2">
+              <span class="text-xs font-medium text-zinc-500">Key Patents to Review</span>
+              <ul class="mt-1 space-y-1">
+                <li class="text-xs text-zinc-600">• WO 2015/189384 (Pureflow) - EFC process improvements</li>
+                <li class="text-xs text-zinc-600">• NL 2010471 (TU Delft) - Eutectic freeze crystallization apparatus</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parallel Investigations -->
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="mb-4 flex items-center gap-2">
+            <svg class="h-5 w-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+            <span class="text-sm font-medium text-zinc-900">Parallel Investigations</span>
+          </div>
+          <div class="space-y-3">
+            <div class="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+              <div class="mb-2 flex items-start justify-between gap-2">
+                <h5 class="font-medium text-zinc-900">Spray-Dry Brine into Industrial Waste Heat Streams</h5>
+                <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800">CROSS DOMAIN</span>
+              </div>
+              <p class="mb-2 text-sm text-zinc-600">Atomize brine into hot industrial exhaust streams for near-zero marginal energy cost evaporation.</p>
+              <div class="grid gap-2 text-sm sm:grid-cols-2">
+                <div>
+                  <span class="text-xs text-zinc-500">Ceiling:</span>
+                  <p class="text-green-700">1-3 kWh/m³ marginal energy</p>
+                </div>
+                <div>
+                  <span class="text-xs text-zinc-500">Key Uncertainty:</span>
+                  <p class="text-amber-700">Chloride stress corrosion in downstream equipment</p>
+                </div>
+              </div>
+              <div class="mt-3 rounded bg-zinc-100/50 border border-zinc-200 p-2 text-xs">
+                <strong>When to elevate:</strong> If LNG co-location is not available but industrial exhaust sources exist within 10 miles of desal plant.
+              </div>
+            </div>
+            <div class="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+              <div class="mb-2 flex items-start justify-between gap-2">
+                <h5 class="font-medium text-zinc-900">Selective Magnesium Hydroxide Precipitation with Carbon Capture</h5>
+                <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-medium text-purple-800">CROSS DOMAIN</span>
+              </div>
+              <p class="mb-2 text-sm text-zinc-600">Precipitate magnesium from brine as Mg(OH)₂ using lime, then carbonate to MgCO₃ using captured CO₂.</p>
+              <div class="grid gap-2 text-sm sm:grid-cols-2">
+                <div>
+                  <span class="text-xs text-zinc-500">Ceiling:</span>
+                  <p class="text-green-700">~1,000 tons Mg/day + 1,800 tons CO₂/day sequestered</p>
+                </div>
+                <div>
+                  <span class="text-xs text-zinc-500">Key Uncertainty:</span>
+                  <p class="text-amber-700">Lime costs (~$100/ton) are significant</p>
+                </div>
+              </div>
+              <div class="mt-3 rounded bg-zinc-100/50 border border-zinc-200 p-2 text-xs">
+                <strong>When to elevate:</strong> When carbon credits exceed $75/ton CO₂ or when CO₂ source is co-located with desal plant.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Frontier Technologies -->
+    <section id="frontier-watch">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">Frontier Technologies</h2>
+        <p class="text-sm text-zinc-500">Emerging technologies and innovations to monitor</p>
+      </div>
+      <div class="space-y-6">
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="mb-4 flex items-start justify-between">
+            <div>
+              <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 mb-2">1</span>
+              <h4 class="text-lg font-semibold text-zinc-900">Supercritical Water Brine Separation</h4>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700">TRL 3</span>
+              <span class="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">PARADIGM</span>
+            </div>
+          </div>
+          <p class="text-sm leading-relaxed text-zinc-700">
+            Heat brine above water's critical point (374°C, 218 atm) where salt becomes essentially insoluble and precipitates instantly. Produces pure supercritical water vapor and dry salt in a single step.
+          </p>
+          <div class="mt-4 grid gap-6 md:grid-cols-2">
+            <div class="rounded-lg border border-zinc-200 p-4">
+              <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Trigger to Revisit</span>
+              <p class="mt-2 text-sm text-zinc-700">Publication demonstrating >1,000 hours continuous operation with brine feed without heat exchanger replacement</p>
+            </div>
+            <div class="rounded-lg border border-zinc-200 p-4">
+              <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Earliest Viability</span>
+              <p class="mt-2 text-sm text-zinc-700">8-12 years</p>
+            </div>
+          </div>
+          <div class="mt-4 rounded-xl bg-zinc-900 p-6">
+            <div class="space-y-4 text-sm">
+              <div>
+                <span class="mb-2 block font-mono text-xs font-bold text-zinc-200">RECENT DEVELOPMENTS</span>
+                <p class="leading-relaxed text-zinc-100">Sandia National Labs published 2023 results on supercritical salt precipitation kinetics. No commercial development announced.</p>
+              </div>
+              <div>
+                <span class="mb-2 block font-mono text-xs font-bold text-zinc-200">COMPETITIVE ACTIVITY</span>
+                <p class="leading-relaxed text-zinc-100">Limited. Academic research continues but no commercial players pursuing brine treatment specifically.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="mb-4 flex items-start justify-between">
+            <div>
+              <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800 mb-2">2</span>
+              <h4 class="text-lg font-semibold text-zinc-900">Bipolar Membrane Electrodialysis Direct Acid/Base Production</h4>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700">TRL 5</span>
+              <span class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">EMERGING SCIENCE</span>
+            </div>
+          </div>
+          <p class="text-sm leading-relaxed text-zinc-700">
+            Convert brine directly to hydrochloric acid (HCl) and sodium hydroxide (NaOH) using bipolar membrane electrodialysis. Products are 10-50× more valuable than salt.
+          </p>
+          <div class="mt-4 grid gap-6 md:grid-cols-2">
+            <div class="rounded-lg border border-zinc-200 p-4">
+              <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Trigger to Revisit</span>
+              <p class="mt-2 text-sm text-zinc-700">Membrane cost below $200/m² with >5 year lifetime demonstrated</p>
+            </div>
+            <div class="rounded-lg border border-zinc-200 p-4">
+              <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Earliest Viability</span>
+              <p class="mt-2 text-sm text-zinc-700">3-5 years</p>
+            </div>
+          </div>
+          <div class="mt-4 rounded-xl bg-zinc-900 p-6">
+            <div class="space-y-4 text-sm">
+              <div>
+                <span class="mb-2 block font-mono text-xs font-bold text-zinc-200">RECENT DEVELOPMENTS</span>
+                <p class="leading-relaxed text-zinc-100">Saltworks announced 2024 pilot results showing improved membrane lifetime. Astom launched new bipolar membrane product line with 30% cost reduction.</p>
+              </div>
+              <div>
+                <span class="mb-2 block font-mono text-xs font-bold text-zinc-200">COMPETITIVE ACTIVITY</span>
+                <p class="leading-relaxed text-zinc-100">Active. Saltworks, Eurodia, and Astom all investing in scale-up. Several pilot installations at industrial sites.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Innovation Analysis -->
+    <section id="innovation-analysis">
+      <div class="mb-4">
+        <h2 class="text-2xl font-semibold text-zinc-950">Innovation Analysis</h2>
+        <p class="text-sm text-zinc-500">Cross-domain search methodology</p>
+      </div>
+      <div class="space-y-6">
+        <div class="rounded-xl bg-zinc-900 p-8">
+          <span class="font-mono text-xs font-bold tracking-widest text-zinc-200 uppercase">The Reframe</span>
+          <p class="mt-4 text-lg leading-relaxed text-zinc-100">
+            Instead of asking 'how do we treat brine to meet discharge limits,' we asked 'who needs concentrated salt solutions as feedstock and what would they pay for them.'
+          </p>
+        </div>
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <div class="flex items-center gap-2 mb-3">
+            <svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            <span class="font-mono text-xs font-bold tracking-widest text-zinc-500 uppercase">Domains Searched</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <span class="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">Chlor-alkali electrochemistry</span>
+            <span class="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">Oil & gas drilling fluids</span>
+            <span class="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">LNG regasification thermodynamics</span>
+            <span class="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">Flue gas desulfurization</span>
+            <span class="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">Halophilic biology</span>
+            <span class="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">Mineral carbonation</span>
+            <span class="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">Eutectic freeze crystallization</span>
+            <span class="rounded-full bg-zinc-100 px-3 py-1 text-sm text-zinc-700">Salinity gradient power</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-zinc-200 pt-8 text-center text-sm text-zinc-500">
+      <p>Report Version 4.0.0 | Generated 2025-01-13</p>
+      <p class="mt-1">Powered by Sparlo AI</p>
+    </footer>
+
+  </div>
+</body>
+</html>

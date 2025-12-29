@@ -6,8 +6,9 @@
  * Candid evaluation of the problem type and expected value range.
  * No sugar-coating - straight talk about what's realistic.
  */
-
 import { memo } from 'react';
+
+import type { HonestAssessment } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,
@@ -19,8 +20,6 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from '../primitives';
-
-import type { HonestAssessment } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface HonestAssessmentSectionProps {
   data?: HonestAssessment;
@@ -49,7 +48,7 @@ export const HonestAssessmentSection = memo(function HonestAssessmentSection({
         {data.problem_type && (
           <div className="max-w-[60ch]">
             <MonoLabel variant="muted">Problem Type</MonoLabel>
-            <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+            <p className="mt-3 text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
               {data.problem_type}
             </p>
           </div>
@@ -61,13 +60,25 @@ export const HonestAssessmentSection = memo(function HonestAssessmentSection({
             <MonoLabel variant="muted">Expected Value Range</MonoLabel>
             <div className="mt-4 space-y-3">
               {data.expected_value_range.ceiling && (
-                <ValueRangeItem label="Ceiling" value={data.expected_value_range.ceiling} variant="high" />
+                <ValueRangeItem
+                  label="Ceiling"
+                  value={data.expected_value_range.ceiling}
+                  variant="high"
+                />
               )}
               {data.expected_value_range.most_likely && (
-                <ValueRangeItem label="Most Likely" value={data.expected_value_range.most_likely} variant="primary" />
+                <ValueRangeItem
+                  label="Most Likely"
+                  value={data.expected_value_range.most_likely}
+                  variant="primary"
+                />
               )}
               {data.expected_value_range.floor && (
-                <ValueRangeItem label="Floor" value={data.expected_value_range.floor} variant="low" />
+                <ValueRangeItem
+                  label="Floor"
+                  value={data.expected_value_range.floor}
+                  variant="low"
+                />
               )}
             </div>
           </ContentBlock>
@@ -114,10 +125,12 @@ const ValueRangeItem = memo(function ValueRangeItem({
 
   return (
     <div className={`pl-4 ${styles[variant]}`}>
-      <span className="text-[12px] font-medium uppercase tracking-wider text-zinc-400">
+      <span className="text-[12px] font-medium tracking-wider text-zinc-400 uppercase">
         {label}
       </span>
-      <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em]">{value}</p>
+      <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em]">
+        {value}
+      </p>
     </div>
   );
 });

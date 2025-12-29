@@ -6,13 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  AlertTriangle,
-  ArrowRight,
-  Check,
-  Loader2,
-  Send,
-} from 'lucide-react';
+import { AlertTriangle, ArrowRight, Check, Loader2, Send } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
 import { usePrefersReducedMotion } from '@kit/ui/hooks';
@@ -362,7 +356,7 @@ export function ProcessingScreen({
                     'border-zinc-200 bg-white',
                     'transition-all duration-200 ease-out',
                     'hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)]',
-                    'focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2',
+                    'focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 focus:outline-none',
                     'active:bg-zinc-100',
                     'disabled:cursor-not-allowed disabled:opacity-40',
                   )}
@@ -430,7 +424,7 @@ export function ProcessingScreen({
                     'min-h-[100px] w-full resize-none rounded-lg border px-4 py-3.5',
                     'border-zinc-200 bg-white text-[15px] text-zinc-800 placeholder-zinc-400',
                     'transition-all duration-200',
-                    'focus:border-zinc-400 focus:outline-none focus:ring-0',
+                    'focus:border-zinc-400 focus:ring-0 focus:outline-none',
                     'disabled:opacity-40',
                   )}
                   disabled={isSubmitting}

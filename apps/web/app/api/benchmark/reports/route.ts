@@ -50,7 +50,8 @@ export async function POST(request: Request) {
   if (!BENCHMARK_ACCOUNT_ID) {
     return NextResponse.json(
       {
-        error: 'Benchmark account not configured. Set BENCHMARK_ACCOUNT_ID env var.',
+        error:
+          'Benchmark account not configured. Set BENCHMARK_ACCOUNT_ID env var.',
       },
       { status: 503 },
     );

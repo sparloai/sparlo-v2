@@ -547,4 +547,10 @@ export interface HybridReportDisplayProps {
    * Required when showActions is true.
    */
   reportId?: string;
+  /**
+   * Use compact/smaller title styling.
+   * Set to true for landing page examples.
+   * @default false
+   */
+  compactTitle?: boolean;
 }

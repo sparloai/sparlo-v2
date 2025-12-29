@@ -2438,6 +2438,7 @@ export function HybridReportDisplay({
   isChatOpen = false,
   showActions = true,
   reportId,
+  compactTitle = false,
 }: HybridReportDisplayProps) {
   const report = reportData.report;
 
@@ -2462,6 +2463,7 @@ export function HybridReportDisplay({
         isChatOpen={isChatOpen}
         showActions={showActions}
         reportId={reportId}
+        compactTitle={compactTitle}
       />
     );
   }

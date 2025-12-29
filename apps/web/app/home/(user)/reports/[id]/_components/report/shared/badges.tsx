@@ -84,12 +84,7 @@ export function ViabilityBadge({
       )}
     >
       <span className={cn('h-1.5 w-1.5 rounded-full', style.dot)} />
-      <span
-        className={cn(
-          'text-[10px] font-semibold',
-          style.text,
-        )}
-      >
+      <span className={cn('text-[10px] font-semibold', style.text)}>
         {label || `Viability: ${viability.toLowerCase()}`}
       </span>
     </div>

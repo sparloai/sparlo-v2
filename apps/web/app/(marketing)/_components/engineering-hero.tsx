@@ -1,6 +1,4 @@
-'use client';
-
-import { memo, useEffect, useRef } from 'react';
+import { memo } from 'react';
 
 import Link from 'next/link';
 
@@ -10,7 +8,7 @@ import Link from 'next/link';
  * Air Company Aesthetic - Pure, minimal, confident
  *
  * Features:
- * - Looping background video (first 8 seconds)
+ * - Looping background video (7.5 seconds, pre-trimmed)
  * - Dark overlay for text legibility
  * - Light font weight typography
  * - Centered layout
@@ -18,33 +16,15 @@ import Link from 'next/link';
  */
 
 export const EngineeringHero = memo(function EngineeringHero() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  // Loop only the first 7.5 seconds
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleTimeUpdate = () => {
-      if (video.currentTime >= 7.5) {
-        video.currentTime = 0;
-      }
-    };
-
-    video.addEventListener('timeupdate', handleTimeUpdate);
-    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
-  }, []);
-
   return (
     <section className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-zinc-950">
-      {/* Background Video */}
+      {/* Background Video - pre-trimmed to 7.5s, uses native loop */}
       <video
-        ref={videoRef}
         autoPlay
         muted
+        loop
         playsInline
         className="absolute inset-0 h-full w-full object-cover"
-        poster=""
       >
         <source src="/videos/hero-bg.mp4" type="video/mp4" />
       </video>
@@ -55,35 +35,19 @@ export const EngineeringHero = memo(function EngineeringHero() {
       {/* Content Layer - Centered */}
       <div className="relative z-10 flex flex-col items-center px-8 text-center">
         {/* Headline */}
-        <h1
-          className="text-[40px] leading-[1.2] font-light tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]"
-          style={{
-            fontFamily:
-              "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
-          }}
-        >
+        <h1 className="font-heading text-[40px] leading-[1.2] font-light tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
           Engineering Intelligence Model
         </h1>
 
         {/* Subtitle */}
-        <p
-          className="mt-6 max-w-[45ch] text-[18px] leading-[1.2] font-light tracking-[-0.02em] text-white/70 md:text-[22px]"
-          style={{
-            fontFamily:
-              "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
-          }}
-        >
+        <p className="font-heading mt-6 max-w-[45ch] text-[18px] leading-[1.2] font-light tracking-[-0.02em] text-white/70 md:text-[22px]">
           Innovative solutions to complex technical challenges.
         </p>
 
         {/* CTA */}
         <Link
           href="/home"
-          className="mt-10 bg-white px-8 py-3.5 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:bg-zinc-100"
-          style={{
-            fontFamily:
-              "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif",
-          }}
+          className="font-heading mt-10 bg-white px-8 py-3.5 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:bg-zinc-100"
         >
           Run Analysis
         </Link>

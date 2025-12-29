@@ -11,11 +11,13 @@ interface ConfidenceBadgeProps {
 // Per Jobs Standard: muted colors, no alarm tones, no borders
 const confidenceConfig = {
   HIGH: {
-    styles: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+    styles:
+      'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
     label: 'High',
   },
   MEDIUM: {
-    styles: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+    styles:
+      'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
     label: 'Medium',
   },
   LOW: {

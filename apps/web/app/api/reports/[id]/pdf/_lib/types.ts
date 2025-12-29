@@ -32,4 +32,7 @@ export type {
   CoupledEffect,
   SustainabilityFlag,
   IPConsiderations,
+  HonestAssessment,
+  CrossDomainSearch,
+  StrategicIntegration,
 } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';

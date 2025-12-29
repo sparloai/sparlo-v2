@@ -368,7 +368,9 @@ export const generateHybridReport = inngest.createFunction(
                 attachmentNotes.push(`${imageAttachments.length} image(s)`);
               }
               if (pdfAttachments.length > 0) {
-                attachmentNotes.push(`${pdfAttachments.length} PDF document(s)`);
+                attachmentNotes.push(
+                  `${pdfAttachments.length} PDF document(s)`,
+                );
               }
               if (attachmentNotes.length > 0) {
                 clarifiedMessage += `\n\n[Note: ${attachmentNotes.join(' and ')} attached for context]`;

@@ -91,7 +91,11 @@ export const Navigation = memo(function Navigation({
           {/* Logo */}
           <Link href="/" className="transition-opacity hover:opacity-80">
             <Image
-              src={isDark ? '/images/sparlo-logo-white.png' : '/images/sparlo-logo.png'}
+              src={
+                isDark
+                  ? '/images/sparlo-logo-white.png'
+                  : '/images/sparlo-logo.png'
+              }
               alt="Sparlo"
               width={90}
               height={24}

@@ -42,9 +42,7 @@ export function KeyPatterns({ data }: KeyPatternsProps) {
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="text-xs text-zinc-400">
-                  {pattern.id}
-                </span>
+                <span className="text-xs text-zinc-400">{pattern.id}</span>
                 <h3 className="mt-1 text-lg font-semibold text-zinc-900">
                   {pattern.name}
                 </h3>

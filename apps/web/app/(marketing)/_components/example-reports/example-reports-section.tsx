@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 
 import { Lock } from 'lucide-react';
 
@@ -12,6 +12,10 @@ import {
   generateTocSections,
 } from '~/home/(user)/reports/[id]/_components/brand-system/table-of-contents';
 import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybrid-report-display';
+import {
+  flattenSectionIds,
+  useTocScroll,
+} from '~/home/(user)/reports/[id]/_lib/hooks/use-toc-scroll';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
@@ -41,9 +45,12 @@ const REPORT_DATA_MAP: Record<string, HybridReportData> = {
   energy: ENERGY_HYBRID_REPORT,
 };
 
+// Scroll offset to account for sticky tab bar (top-16 = 64px + ~48px height = ~112px)
+// Plus some extra padding for visual breathing room
+const LP_SCROLL_OFFSET = 140;
+
 export function ExampleReportsSection() {
   const [activeTab, setActiveTab] = useState(0);
-  const [activeSection, setActiveSection] = useState('executive-summary');
   const report = EXAMPLE_REPORTS[activeTab]!;
 
   // Get the hybrid report data for current tab
@@ -55,15 +62,17 @@ export function ExampleReportsSection() {
     return generateTocSections(reportData as Record<string, unknown>, false);
   }, [reportData]);
 
-  // Handle TOC navigation
-  const handleNavigate = useCallback((id: string) => {
-    setActiveSection(id);
-    const element = document.getElementById(id);
-    if (element) {
-      const top = element.getBoundingClientRect().top + window.scrollY - 120;
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
-  }, []);
+  // Flatten section IDs for scroll tracking
+  const sectionIds = useMemo(
+    () => flattenSectionIds(tocSections),
+    [tocSections],
+  );
+
+  // Use shared scroll tracking hook for active section detection
+  const { activeSection, navigateToSection } = useTocScroll({
+    sectionIds,
+    scrollOffset: LP_SCROLL_OFFSET,
+  });
 
   return (
     <section
@@ -91,7 +100,7 @@ export function ExampleReportsSection() {
                 key={r.id}
                 onClick={() => {
                   setActiveTab(i);
-                  setActiveSection('executive-summary');
+                  // Scroll to top of section - activeSection will update via IntersectionObserver
                   window.scrollTo({
                     top:
                       document.getElementById('example-reports')?.offsetTop ??
@@ -122,7 +131,7 @@ export function ExampleReportsSection() {
             <StickyTocSidebar
               sections={tocSections}
               activeSection={activeSection}
-              onNavigate={handleNavigate}
+              onNavigate={navigateToSection}
             />
           )}
 
@@ -143,6 +152,7 @@ export function ExampleReportsSection() {
                   createdAt={new Date().toISOString()}
                   hasAppSidebar={false}
                   showActions={false}
+                  compactTitle={true}
                 />
               ) : (
                 <ReportContent report={report} />
@@ -170,7 +180,8 @@ const StickyTocSidebar = memo(function StickyTocSidebar({
 }) {
   return (
     <aside className="hidden w-56 shrink-0 lg:block">
-      <nav className="sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto">
+      {/* top-36 = 144px to clear the sticky tab bar (top-16 + ~48px height + padding) */}
+      <nav className="sticky top-36 max-h-[calc(100vh-10rem)] overflow-y-auto">
         {/* Contents label */}
         <p className="mb-4 text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
           Contents

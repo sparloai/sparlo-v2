@@ -31,7 +31,7 @@ export function LeadConceptCard({ concept }: LeadConceptCardProps) {
       </div>
 
       <div className="rounded-xl bg-white/60 p-5 dark:bg-zinc-800/40">
-        <p className="text-base font-medium leading-relaxed text-zinc-800 dark:text-zinc-200">
+        <p className="text-base leading-relaxed font-medium text-zinc-800 dark:text-zinc-200">
           {concept.bottom_line}
         </p>
       </div>

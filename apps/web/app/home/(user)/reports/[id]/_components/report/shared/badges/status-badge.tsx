@@ -12,11 +12,13 @@ interface StatusBadgeProps {
 // Per Jobs Standard: muted colors, no alarm tones, no borders
 const statusConfig = {
   success: {
-    styles: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+    styles:
+      'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
     defaultLabel: 'Complete',
   },
   warning: {
-    styles: 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+    styles:
+      'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
     defaultLabel: 'Warning',
   },
   error: {

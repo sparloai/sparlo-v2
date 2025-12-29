@@ -6,8 +6,9 @@
  * Shows how we searched across domains for relevant mechanisms
  * and what we discovered from first principles.
  */
-
 import { memo } from 'react';
+
+import type { CrossDomainSearch } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,
@@ -18,8 +19,6 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from '../primitives';
-
-import type { CrossDomainSearch } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface CrossDomainSearchSectionProps {
   data?: CrossDomainSearch;
@@ -49,7 +48,7 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
             {data.enhanced_challenge_frame.reframing && (
               <>
                 <MonoLabel variant="muted">Reframing</MonoLabel>
-                <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+                <p className="mt-3 text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
                   {data.enhanced_challenge_frame.reframing}
                 </p>
               </>
@@ -57,13 +56,20 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
             {data.enhanced_challenge_frame.search_queries &&
               data.enhanced_challenge_frame.search_queries.length > 0 && (
                 <div className="mt-4">
-                  <span className="text-[13px] font-medium text-zinc-500">Search Queries</span>
+                  <span className="text-[13px] font-medium text-zinc-500">
+                    Search Queries
+                  </span>
                   <ul className="mt-2 space-y-1">
-                    {data.enhanced_challenge_frame.search_queries.map((query, idx) => (
-                      <li key={idx} className="text-[14px] font-mono text-zinc-600">
-                        "{query}"
-                      </li>
-                    ))}
+                    {data.enhanced_challenge_frame.search_queries.map(
+                      (query, idx) => (
+                        <li
+                          key={idx}
+                          className="font-mono text-[14px] text-zinc-600"
+                        >
+                          "{query}"
+                        </li>
+                      ),
+                    )}
                   </ul>
                 </div>
               )}
@@ -78,9 +84,15 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
               <table className="w-full text-[16px]">
                 <thead>
                   <tr className="border-b border-zinc-300">
-                    <th className="py-3 pr-6 text-left font-medium text-zinc-900">Domain</th>
-                    <th className="py-3 pr-6 text-left font-medium text-zinc-500">Mechanism Found</th>
-                    <th className="py-3 text-left font-medium text-zinc-500">Relevance</th>
+                    <th className="py-3 pr-6 text-left font-medium text-zinc-900">
+                      Domain
+                    </th>
+                    <th className="py-3 pr-6 text-left font-medium text-zinc-500">
+                      Mechanism Found
+                    </th>
+                    <th className="py-3 text-left font-medium text-zinc-500">
+                      Relevance
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100">
@@ -92,7 +104,9 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
                       <td className="py-3 pr-6 align-top text-zinc-700">
                         {domain.mechanism_found}
                       </td>
-                      <td className="py-3 align-top text-zinc-600">{domain.relevance}</td>
+                      <td className="py-3 align-top text-zinc-600">
+                        {domain.relevance}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -102,32 +116,35 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
         )}
 
         {/* From scratch revelations */}
-        {data.from_scratch_revelations && data.from_scratch_revelations.length > 0 && (
-          <ContentBlock withBorder className="max-w-[70ch]">
-            <MonoLabel variant="muted">First Principles Revelations</MonoLabel>
-            <div className="mt-6 space-y-6">
-              {data.from_scratch_revelations.map((revelation, idx) => (
-                <div key={idx} className="border-l-2 border-zinc-200 pl-4">
-                  {revelation.discovery && (
-                    <p className="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
-                      {revelation.discovery}
-                    </p>
-                  )}
-                  {revelation.source && (
-                    <p className="mt-1 text-[14px] text-zinc-500">
-                      Source: {revelation.source}
-                    </p>
-                  )}
-                  {revelation.implication && (
-                    <BodyText className="mt-2" variant="secondary">
-                      {revelation.implication}
-                    </BodyText>
-                  )}
-                </div>
-              ))}
-            </div>
-          </ContentBlock>
-        )}
+        {data.from_scratch_revelations &&
+          data.from_scratch_revelations.length > 0 && (
+            <ContentBlock withBorder className="max-w-[70ch]">
+              <MonoLabel variant="muted">
+                First Principles Revelations
+              </MonoLabel>
+              <div className="mt-6 space-y-6">
+                {data.from_scratch_revelations.map((revelation, idx) => (
+                  <div key={idx} className="border-l-2 border-zinc-200 pl-4">
+                    {revelation.discovery && (
+                      <p className="text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-[#1e1e1e]">
+                        {revelation.discovery}
+                      </p>
+                    )}
+                    {revelation.source && (
+                      <p className="mt-1 text-[14px] text-zinc-500">
+                        Source: {revelation.source}
+                      </p>
+                    )}
+                    {revelation.implication && (
+                      <BodyText className="mt-2" variant="secondary">
+                        {revelation.implication}
+                      </BodyText>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </ContentBlock>
+          )}
       </ArticleBlock>
     </Section>
   );

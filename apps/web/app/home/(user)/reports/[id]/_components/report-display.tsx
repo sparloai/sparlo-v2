@@ -561,9 +561,7 @@ export function ReportDisplay({
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           >
             <MessageSquare className="h-5 w-5" strokeWidth={1.5} />
-            <span className="text-[15px] font-medium">
-              Ask about this report
-            </span>
+            <span className="text-[15px] font-medium">Go Deeper</span>
             <span className="rounded-md bg-white/15 px-2 py-1 text-[11px] font-medium dark:bg-zinc-900/20">
               ⌘/
             </span>
@@ -821,9 +819,7 @@ export function ReportDisplay({
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
           >
             <MessageSquare className="h-5 w-5" strokeWidth={1.5} />
-            <span className="text-[15px] font-medium">
-              Ask about this report
-            </span>
+            <span className="text-[15px] font-medium">Go Deeper</span>
             <span className="rounded-md bg-white/15 px-2 py-1 text-[11px] font-medium dark:bg-zinc-900/20">
               ⌘/
             </span>

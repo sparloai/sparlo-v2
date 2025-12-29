@@ -9,7 +9,7 @@
  * - NO badge pills, NO colored backgrounds, NO icons
  * - Badges become inline text
  * - Only visual distinction: 2px left border in zinc-900
- * - Prose width constrained to 65ch for optimal readability
+ * - Prose width constrained to 65ch for wider text flow
  * - Premium typography scale: larger, more confident
  * - Font: Suisse Int'l (Regular for body, Medium for emphasis, Semibold for titles)
  */
@@ -140,7 +140,7 @@ export function PrimaryRecommendationCard({
           ---------------------------------------- */}
       <header className="space-y-4">
         {/* Subsection label */}
-        <span className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+        <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           {subsectionLabel}
         </span>
 
@@ -150,7 +150,7 @@ export function PrimaryRecommendationCard({
         </h2>
 
         {/* Meta line */}
-        <p className="text-[15px] tracking-wide text-zinc-500">
+        <p className="text-[18px] tracking-wide text-zinc-500">
           {category} · {confidence} confidence
         </p>
       </header>
@@ -158,11 +158,11 @@ export function PrimaryRecommendationCard({
       {/* ----------------------------------------
           WHAT IT IS
           ---------------------------------------- */}
-      <section className="space-y-4">
-        <h3 className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+      <section className="mt-12 pt-8 border-t border-zinc-200 space-y-4">
+        <h3 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           What it is
         </h3>
-        <p className="text-[18px] leading-relaxed text-zinc-600 max-w-[65ch]">
+        <p className="text-[20px] leading-[1.3] tracking-[-0.02em] text-zinc-600 max-w-[80ch]">
           {whatItIs}
         </p>
       </section>
@@ -170,11 +170,11 @@ export function PrimaryRecommendationCard({
       {/* ----------------------------------------
           WHY IT WORKS
           ---------------------------------------- */}
-      <section className="space-y-4">
-        <h3 className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+      <section className="mt-12 pt-8 border-t border-zinc-200 space-y-4">
+        <h3 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           Why it works
         </h3>
-        <p className="text-[18px] leading-relaxed text-zinc-600 max-w-[65ch]">
+        <p className="text-[20px] leading-[1.3] tracking-[-0.02em] text-zinc-600 max-w-[80ch]">
           {whyItWorks}
         </p>
       </section>
@@ -182,74 +182,61 @@ export function PrimaryRecommendationCard({
       {/* ----------------------------------------
           ECONOMICS GRID - zinc-50, no borders
           ---------------------------------------- */}
-      <section className="grid grid-cols-3 gap-10 bg-zinc-50 p-8 -ml-10 pl-10">
+      <section className="mt-12 pt-8 border-t border-zinc-200 grid grid-cols-3 gap-10 bg-zinc-50 p-8 -ml-10 pl-10">
         <div>
-          <span className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+          <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase block mb-3">
             Expected improvement
           </span>
-          <p className="text-[18px] font-medium text-zinc-900">{expectedImprovement}</p>
+          <p className="text-[20px] font-medium text-zinc-900">{expectedImprovement}</p>
         </div>
         <div>
-          <span className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+          <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase block mb-3">
             Timeline
           </span>
-          <p className="text-[18px] font-medium text-zinc-900">{timeline}</p>
+          <p className="text-[20px] font-medium text-zinc-900">{timeline}</p>
         </div>
         <div>
-          <span className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+          <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase block mb-3">
             Investment
           </span>
-          <p className="text-[18px] font-medium text-zinc-900">{investment}</p>
+          <p className="text-[20px] font-medium text-zinc-900">{investment}</p>
         </div>
       </section>
 
       {/* ----------------------------------------
-          THE INSIGHT - Dark Block
+          THE INSIGHT
           ---------------------------------------- */}
-      <section className="bg-zinc-900 p-10 -ml-10 pl-10 space-y-8">
-        <span className="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase">
-          The insight
+      <section className="mt-16 mb-16 pt-8 border-t border-zinc-200 max-w-[60ch]">
+        <span className="text-[13px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+          The Insight
         </span>
-        <p className="text-[22px] font-semibold leading-snug text-white max-w-[65ch]">
+        <h3 className="mt-4 text-[28px] font-medium leading-[1.25] text-zinc-900">
           {insight.headline}
+        </h3>
+        <p className="mt-4 text-[18px] leading-[1.6] text-zinc-500">
+          <span className="font-medium text-zinc-700">{insight.source}:</span>{' '}
+          {insight.sourceDetail} {insight.implication}
         </p>
-
-        {/* Nested section - border separation */}
-        <div className="mt-8 pt-8 border-t border-zinc-800 space-y-6">
-          <div>
-            <span className="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase block mb-3">
-              Where we found it
-            </span>
-            <p className="text-[15px] text-zinc-300 max-w-[65ch]">
-              <span className="text-zinc-100 font-medium">{insight.source}:</span>{' '}
-              {insight.sourceDetail}
-            </p>
-            <p className="text-[15px] text-zinc-300 mt-3">{insight.implication}</p>
-          </div>
-        </div>
-
-        <div className="pt-6">
-          <span className="text-[11px] font-medium tracking-[0.06em] text-zinc-500 uppercase block mb-3">
-            Why industry missed it
-          </span>
-          <p className="text-[15px] text-zinc-400 max-w-[65ch]">{insight.whyMissed}</p>
-        </div>
+        <p className="mt-4 text-[18px] leading-[1.6] text-zinc-500">
+          <span className="font-medium text-zinc-700">Why industry missed it:</span>{' '}
+          {insight.whyMissed}
+        </p>
       </section>
 
       {/* ----------------------------------------
           VALIDATION GATE
           ---------------------------------------- */}
-      <section className="space-y-5">
-        <h3 className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+      <section className="mt-12 pt-8 border-t border-zinc-200 space-y-5">
+        <h3 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           First validation step
         </h3>
         <div className="space-y-4">
-          <p className="text-[18px] font-medium text-zinc-900 max-w-[65ch]">
+          <p className="text-[20px] font-medium text-zinc-900 max-w-[80ch]">
             {validationGate.description}
           </p>
-          <p className="text-[15px] text-zinc-500">{validationGate.cost}</p>
-          <p className="text-[15px] text-zinc-600 max-w-[65ch]">
-            <span className="text-zinc-900 font-medium">Success criteria:</span>{' '}
+          <p className="text-[18px] text-zinc-500">{validationGate.cost}</p>
+          <p className="text-[18px] text-zinc-600 max-w-[80ch]">
+            <span className="text-zinc-700 font-normal">Success criteria:</span>{' '}
             {validationGate.successCriteria}
           </p>
         </div>
@@ -258,28 +245,28 @@ export function PrimaryRecommendationCard({
       {/* ----------------------------------------
           COUPLED EFFECTS - Inline text, no pills
           ---------------------------------------- */}
-      <section className="space-y-8">
-        <h3 className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+      <section className="mt-12 pt-8 border-t border-zinc-200 space-y-4">
+        <h3 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
           Coupled effects
         </h3>
 
-        <div className="space-y-8">
+        <div className="space-y-6">
           {coupledEffects.map((effect, index) => (
             <div key={index} className="space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-[18px] font-medium text-zinc-900">{effect.system}</h4>
-                <span className="text-[15px]">
+                <h4 className="text-[20px] font-medium text-zinc-900">{effect.system}</h4>
+                <span className="text-[18px]">
                   <span className={getImpactColor(effect.impact)}>
                     {capitalize(effect.impact)}
                   </span>
                   <span className="mx-2 text-zinc-300">·</span>
-                  <span className="text-zinc-400">
+                  <span className="text-white">
                     {capitalize(effect.severity)}
                   </span>
                 </span>
               </div>
-              <p className="text-[15px] text-zinc-600 max-w-[65ch]">{effect.description}</p>
-              <p className="text-[15px] text-zinc-500 max-w-[65ch]">{effect.details}</p>
+              <p className="text-[18px] text-zinc-500 max-w-[80ch]">{effect.description}</p>
+              <p className="text-[18px] text-zinc-600 max-w-[80ch]">{effect.details}</p>
             </div>
           ))}
         </div>
@@ -288,28 +275,28 @@ export function PrimaryRecommendationCard({
       {/* ----------------------------------------
           SUSTAINABILITY - No colored background
           ---------------------------------------- */}
-      <section className="space-y-4">
+      <section className="mt-12 pt-8 border-t border-zinc-200 space-y-4">
         <div className="flex items-baseline gap-4">
-          <h3 className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          <h3 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
             Sustainability
           </h3>
-          <span className={`text-[15px] ${getSustainabilityColor(sustainability.type)}`}>
+          <span className={`text-[18px] ${getSustainabilityColor(sustainability.type)}`}>
             {capitalize(sustainability.type)}
           </span>
         </div>
-        <p className="text-[18px] text-zinc-600 max-w-[65ch]">{sustainability.headline}</p>
-        <p className="text-[15px] text-zinc-500 max-w-[65ch]">{sustainability.details}</p>
+        <p className="text-[20px] text-zinc-600 max-w-[80ch]">{sustainability.headline}</p>
+        <p className="text-[18px] text-zinc-600 max-w-[80ch]">{sustainability.details}</p>
       </section>
 
       {/* ----------------------------------------
           IP CONSIDERATIONS - Inline text
           ---------------------------------------- */}
-      <section className="space-y-5">
+      <section className="mt-12 pt-8 border-t border-zinc-200 space-y-5">
         <div className="flex items-baseline justify-between">
-          <h3 className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+          <h3 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
             IP considerations
           </h3>
-          <span className="text-[15px]">
+          <span className="text-[18px]">
             <span className={getFtoColor(ipConsiderations.ftoStatus)}>
               FTO: {capitalize(ipConsiderations.ftoStatus)}
             </span>
@@ -319,12 +306,12 @@ export function PrimaryRecommendationCard({
             </span>
           </span>
         </div>
-        <p className="text-[15px] text-zinc-600 max-w-[65ch]">{ipConsiderations.summary}</p>
+        <p className="text-[18px] text-zinc-600 max-w-[80ch]">{ipConsiderations.summary}</p>
         <div className="pt-2">
-          <span className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase block mb-3">
+          <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase block mb-3">
             Key patents to review
           </span>
-          <ul className="text-[15px] text-zinc-600 space-y-2">
+          <ul className="text-[18px] text-[#1e1e1e] space-y-2">
             {ipConsiderations.keyPatents.map((patent, index) => (
               <li key={index}>{patent}</li>
             ))}

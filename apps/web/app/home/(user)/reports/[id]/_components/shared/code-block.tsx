@@ -116,13 +116,13 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
   // Code block
   return (
     <div className="group relative my-3">
-      <div className="absolute top-2 left-3 z-10 rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-zinc-400">
+      <div className="absolute top-2 left-3 z-10 rounded px-1.5 py-0.5 text-[10px] font-medium tracking-wider text-zinc-400 uppercase">
         {language}
       </div>
 
       <button
         onClick={handleCopy}
-        className="absolute top-2 right-2 z-10 flex h-6 w-6 items-center justify-center rounded text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-200 hover:text-zinc-600 group-hover:opacity-100 focus:opacity-100"
+        className="absolute top-2 right-2 z-10 flex h-6 w-6 items-center justify-center rounded text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-zinc-200 hover:text-zinc-600 focus:opacity-100"
         aria-label={copied ? 'Copied!' : 'Copy code'}
         type="button"
       >

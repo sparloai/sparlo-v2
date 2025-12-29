@@ -75,7 +75,7 @@ export function ArchivedReportsDashboard({
 
   const filteredReports = useMemo(() => {
     // First filter out optimistically hidden reports
-    let filtered = reports.filter((r) => !optimisticallyHidden.has(r.id));
+    const filtered = reports.filter((r) => !optimisticallyHidden.has(r.id));
 
     if (!search.trim()) return filtered;
 

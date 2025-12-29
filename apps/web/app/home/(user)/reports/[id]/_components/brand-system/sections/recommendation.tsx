@@ -12,8 +12,9 @@
  * - Generous line height for conversational pacing
  * - "If This Were My Project" label signals personal voice
  */
-
 import { memo } from 'react';
+
+import type { StrategicIntegration } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,
@@ -23,8 +24,6 @@ import {
   SectionSubtitle,
   SectionTitle,
 } from '../primitives';
-
-import type { StrategicIntegration } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface RecommendationSectionProps {
   content?: string;
@@ -45,7 +44,9 @@ export const RecommendationSection = memo(function RecommendationSection({
   return (
     <Section id="recommendation" className="mt-20">
       <SectionTitle size="lg">Recommendation</SectionTitle>
-      <SectionSubtitle>Personal recommendation from the analysis</SectionSubtitle>
+      <SectionSubtitle>
+        Personal recommendation from the analysis
+      </SectionSubtitle>
 
       <div className="mt-10 max-w-[65ch]">
         <MonoLabel variant="muted">If This Were My Project</MonoLabel>
@@ -60,7 +61,7 @@ export const RecommendationSection = memo(function RecommendationSection({
             )}
             {personalRecommendation.key_insight && (
               <AccentBorder weight="heavy">
-                <p className="text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+                <p className="text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
                   {personalRecommendation.key_insight}
                 </p>
               </AccentBorder>
@@ -118,7 +119,7 @@ export const RecommendationWithCallout = memo(
 
           {/* Lead advice - emphasized with border */}
           <div className="mt-6 border-l-2 border-zinc-900 pl-6">
-            <p className="text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
+            <p className="text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
               {leadAdvice}
             </p>
             {leadDetail && (
