@@ -1,12 +1,10 @@
 'use client';
 
 import type { KeyboardEvent } from 'react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
-import { Send, Square } from 'lucide-react';
-
-import { Button } from '@kit/ui/button';
-import { Textarea } from '@kit/ui/textarea';
+import { motion } from 'framer-motion';
+import { ArrowUp, Square } from 'lucide-react';
 
 interface ChatInputProps {
   value: string;
@@ -26,6 +24,7 @@ export function ChatInput({
   disabled,
 }: ChatInputProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -36,51 +35,148 @@ export function ChatInput({
     }
   };
 
+  const canSubmit = value.trim() && !isStreaming && !disabled;
+
   return (
-    <div className="border-t border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/50">
+    <div
+      className="relative p-4"
+      style={{
+        background:
+          'linear-gradient(180deg, rgba(13, 17, 23, 0.6) 0%, rgba(13, 17, 23, 0.95) 100%)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+      }}
+    >
+      {/* Top gradient accent */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent 10%, rgba(100, 181, 246, 0.1) 50%, transparent 90%)',
+        }}
+      />
+
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (value.trim() && !isStreaming) {
+          if (canSubmit) {
             onSubmit();
           }
         }}
-        className="flex gap-2"
+        className="relative flex items-end gap-3"
       >
-        <Textarea
-          ref={inputRef}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask a question..."
-          className="max-h-[100px] min-h-[44px] flex-1 resize-none rounded-lg border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-          style={{ fontSize: '16px' }} // Prevent iOS zoom
-          disabled={disabled || isStreaming}
-          rows={1}
-        />
+        {/* Input container */}
+        <div
+          className="relative flex-1 rounded-xl transition-all duration-200"
+          style={{
+            background: 'rgba(21, 27, 38, 0.8)',
+            border: isFocused
+              ? '1px solid rgba(100, 181, 246, 0.3)'
+              : '1px solid rgba(255, 255, 255, 0.06)',
+            boxShadow: isFocused
+              ? '0 0 0 3px rgba(100, 181, 246, 0.08), 0 4px 12px -4px rgba(0, 0, 0, 0.3)'
+              : '0 2px 8px -2px rgba(0, 0, 0, 0.2)',
+          }}
+        >
+          <textarea
+            ref={inputRef}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder="Ask a question..."
+            className="max-h-[120px] min-h-[48px] w-full resize-none bg-transparent px-4 py-3 text-[14px] leading-relaxed outline-none placeholder:text-[#5a6b8c]"
+            style={{
+              color: '#e8f0f8',
+              caretColor: '#64b5f6',
+              fontFamily: 'var(--font-heading), system-ui, sans-serif',
+            }}
+            disabled={disabled || isStreaming}
+            rows={1}
+          />
+        </div>
+
+        {/* Action button */}
         {isStreaming ? (
-          <Button
+          <motion.button
             type="button"
-            size="icon"
-            variant="outline"
-            className="h-[44px] w-[44px] flex-shrink-0 border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400"
             onClick={onCancel}
+            className="flex h-[48px] w-[48px] flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.1) 100%)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+            }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             aria-label="Stop generating"
           >
-            <Square className="h-4 w-4 fill-current" />
-          </Button>
+            <Square
+              className="h-4 w-4"
+              style={{ color: '#ef4444', fill: '#ef4444' }}
+            />
+          </motion.button>
         ) : (
-          <Button
+          <motion.button
             type="submit"
-            size="icon"
-            className="h-[44px] w-[44px] flex-shrink-0 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:bg-gray-300 disabled:text-gray-500 dark:bg-purple-600 dark:hover:bg-purple-700 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-500"
-            disabled={!value.trim() || disabled}
+            disabled={!canSubmit}
+            className="flex h-[48px] w-[48px] flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
+            style={{
+              background: canSubmit
+                ? 'linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(100, 181, 246, 0.1) 100%)'
+                : 'rgba(21, 27, 38, 0.5)',
+              border: canSubmit
+                ? '1px solid rgba(100, 181, 246, 0.3)'
+                : '1px solid rgba(255, 255, 255, 0.04)',
+              boxShadow: canSubmit
+                ? '0 0 20px -5px rgba(100, 181, 246, 0.2)'
+                : 'none',
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
+            }}
+            whileHover={canSubmit ? { scale: 1.02 } : {}}
+            whileTap={canSubmit ? { scale: 0.98 } : {}}
             aria-label="Send message"
           >
-            <Send className="h-4 w-4" />
-          </Button>
+            <ArrowUp
+              className="h-5 w-5"
+              style={{
+                color: canSubmit ? '#64b5f6' : '#3d4a63',
+              }}
+            />
+          </motion.button>
         )}
       </form>
+
+      {/* Keyboard hint */}
+      <div
+        className="mt-2 flex items-center justify-center gap-1.5 text-[10px]"
+        style={{
+          color: '#3d4a63',
+          fontFamily: 'var(--font-heading), system-ui, sans-serif',
+        }}
+      >
+        <kbd
+          className="rounded px-1.5 py-0.5"
+          style={{
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+          }}
+        >
+          Enter
+        </kbd>
+        <span>to send</span>
+        <span className="mx-1">·</span>
+        <kbd
+          className="rounded px-1.5 py-0.5"
+          style={{
+            background: 'rgba(255, 255, 255, 0.03)',
+            border: '1px solid rgba(255, 255, 255, 0.06)',
+          }}
+        >
+          Shift + Enter
+        </kbd>
+        <span>for new line</span>
+      </div>
     </div>
   );
 }

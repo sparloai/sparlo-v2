@@ -1,0 +1,66 @@
+/**
+ * Chat Theme
+ *
+ * Premium dark aesthetic with:
+ * - Deep atmospheric color palette
+ * - Glass morphism surfaces
+ * - SuisseIntl typography
+ * - Subtle luminous accents
+ */
+
+/* ============================================
+   CSS CUSTOM PROPERTIES
+   ============================================ */
+
+.chat-altitude {
+  /* Base colors - Deep palette */
+  --chat-bg-deep: #080b12;
+  --chat-bg-base: #0d1117;
+  --chat-bg-elevated: #151b26;
+  --chat-bg-surface: #1a2233;
+
+  /* Glass morphism */
+  --chat-glass-bg: rgba(26, 34, 51, 0.72);
+  --chat-glass-border: rgba(255, 255, 255, 0.06);
+  --chat-glass-highlight: rgba(255, 255, 255, 0.03);
+
+  /* Accent colors */
+  --chat-accent-primary: #64b5f6;
+  --chat-accent-primary-dim: rgba(100, 181, 246, 0.15);
+  --chat-accent-primary-glow: rgba(100, 181, 246, 0.25);
+
+  /* Text hierarchy */
+  --chat-text-primary: #f0f4f8;
+  --chat-text-secondary: #8b9dc3;
+  --chat-text-tertiary: #5a6b8c;
+  --chat-text-muted: #3d4a63;
+
+  /* Borders & Dividers */
+  --chat-border-subtle: rgba(255, 255, 255, 0.04);
+  --chat-border-medium: rgba(255, 255, 255, 0.08);
+
+  /* Shadows */
+  --chat-shadow-ambient: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+  --chat-shadow-elevated: 0 16px 48px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* ============================================
+   SCROLLBAR STYLING
+   ============================================ */
+
+.chat-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--chat-border-medium);
+  border-radius: 3px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--chat-text-muted);
+}
