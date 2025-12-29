@@ -142,6 +142,7 @@ export function ExampleReportsSection() {
                   brief={reportData.brief}
                   createdAt={new Date().toISOString()}
                   hasAppSidebar={false}
+                  showActions={false}
                 />
               ) : (
                 <ReportContent report={report} />

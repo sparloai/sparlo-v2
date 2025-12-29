@@ -514,6 +514,11 @@ export interface HybridReportDisplayProps {
    */
   brief?: string;
   /**
+   * The report title from the database.
+   * Takes precedence over any title in the report data.
+   */
+  title?: string;
+  /**
    * When the report was created (ISO string).
    * Used to display the report date in metadata.
    */
@@ -525,4 +530,16 @@ export interface HybridReportDisplayProps {
    * @default true
    */
   hasAppSidebar?: boolean;
+  /**
+   * Whether the chat drawer is open.
+   * When true, TOC is hidden and content shifts right to make room.
+   * @default false
+   */
+  isChatOpen?: boolean;
+  /**
+   * Whether to show action buttons (Share, Export).
+   * Set to false for landing page examples.
+   * @default true
+   */
+  showActions?: boolean;
 }

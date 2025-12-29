@@ -67,6 +67,17 @@ interface BrandSystemReportProps {
    * When false (landing page), TOC is at left-0 and content has lg:ml-56.
    */
   hasAppSidebar?: boolean;
+  /**
+   * Whether the chat drawer is open.
+   * When true, content shifts right to make room for the 420px chat panel.
+   */
+  isChatOpen?: boolean;
+  /**
+   * Whether to show action buttons (Share, Export).
+   * Set to false for landing page examples.
+   * @default true
+   */
+  showActions?: boolean;
 }
 
 /**
@@ -414,6 +425,7 @@ interface ReportContentProps {
   createdAt?: string;
   readTime: number;
   unknownFields: [string, unknown][];
+  showActions?: boolean;
 }
 
 const ReportContent = memo(function ReportContent({
@@ -423,6 +435,7 @@ const ReportContent = memo(function ReportContent({
   createdAt,
   readTime,
   unknownFields,
+  showActions = true,
 }: ReportContentProps) {
   const displayTitle = title || normalizedData.title;
 
@@ -462,20 +475,22 @@ const ReportContent = memo(function ReportContent({
               {displayTitle}
             </h1>
             {/* Action Buttons */}
-            <div className="flex shrink-0 items-center gap-2 pt-2">
-              <ActionButton
-                onClick={handleShare}
-                icon={<Share2 className="h-4 w-4" />}
-                label="Share"
-                ariaLabel="Share report"
-              />
-              <ActionButton
-                onClick={handleExport}
-                icon={<Download className="h-4 w-4" />}
-                label="Export"
-                ariaLabel="Export report"
-              />
-            </div>
+            {showActions && (
+              <div className="flex shrink-0 items-center gap-2 pt-2">
+                <ActionButton
+                  onClick={handleShare}
+                  icon={<Share2 className="h-4 w-4" />}
+                  label="Share"
+                  ariaLabel="Share report"
+                />
+                <ActionButton
+                  onClick={handleExport}
+                  icon={<Download className="h-4 w-4" />}
+                  label="Export"
+                  ariaLabel="Export report"
+                />
+              </div>
+            )}
           </div>
           {/* Metadata row */}
           <div className="mt-4 flex items-center gap-4 text-[14px] tracking-[-0.02em] text-zinc-500">
@@ -593,6 +608,8 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   brief,
   createdAt,
   hasAppSidebar = true,
+  isChatOpen = false,
+  showActions = true,
 }: BrandSystemReportProps) {
   // Normalize field names for backward compatibility
   const normalizedData = normalizeReportData(reportData);
@@ -626,7 +643,12 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   // This avoids fixed positioning conflicts with the expandable sidebar
   if (hasAppSidebar && showToc) {
     return (
-      <div className="relative min-h-screen bg-white">
+      <div
+        className={cn(
+          'relative min-h-screen bg-white transition-[margin] duration-300',
+          isChatOpen && 'lg:mr-[420px]',
+        )}
+      >
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
           <div className="flex gap-8 py-10">
             {/* Sticky TOC Sidebar */}
@@ -663,6 +685,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
                   createdAt={createdAt}
                   readTime={readTime}
                   unknownFields={unknownFields}
+                  showActions={showActions}
                 />
               </div>
             </main>
@@ -673,7 +696,12 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   }
 
   return (
-    <div className="relative min-h-screen bg-white">
+    <div
+      className={cn(
+        'relative min-h-screen bg-white transition-[margin] duration-300',
+        isChatOpen && 'lg:mr-[420px]',
+      )}
+    >
       {/* Table of Contents - fixed sidebar for pages without app sidebar */}
       {showToc && (
         <TableOfContents sections={tocSections} hasAppSidebar={hasAppSidebar} />
@@ -690,6 +718,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
           createdAt={createdAt}
           readTime={readTime}
           unknownFields={unknownFields}
+          showActions={showActions}
         />
       </main>
     </div>

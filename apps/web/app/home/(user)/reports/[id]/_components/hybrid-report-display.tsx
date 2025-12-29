@@ -2432,8 +2432,11 @@ export function HybridReportDisplay({
   useBrandSystem = true,
   showToc = true,
   brief,
+  title,
   createdAt,
   hasAppSidebar = true,
+  isChatOpen = false,
+  showActions = true,
 }: HybridReportDisplayProps) {
   const report = reportData.report;
 
@@ -2450,11 +2453,13 @@ export function HybridReportDisplay({
     return (
       <BrandSystemReport
         reportData={report}
-        title={report.title}
-        showToc={showToc}
+        title={title || report.title}
+        showToc={showToc && !isChatOpen}
         brief={brief}
         createdAt={createdAt}
         hasAppSidebar={hasAppSidebar}
+        isChatOpen={isChatOpen}
+        showActions={showActions}
       />
     );
   }
