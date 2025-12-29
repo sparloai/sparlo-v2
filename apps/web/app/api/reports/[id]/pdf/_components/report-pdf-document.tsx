@@ -620,7 +620,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 </Text>
                 {item.limitation && (
                   <Text
-                    style={[styles.cardContent, { color: colors.amber700 }]}
+                    style={[styles.cardContent, { color: colors.zinc600 }]}
                   >
                     Limitation: {item.limitation}
                   </Text>
@@ -758,10 +758,8 @@ function ExecutiveSummarySection({
         {summary.viability && (
           <View style={[styles.row, { marginTop: 8 }]}>
             <MonoLabel>Viability</MonoLabel>
-            <View
-              style={[styles.badge, styles.badgeNeutral, { marginLeft: 8 }]}
-            >
-              <Text style={[styles.badgeText, styles.badgeNeutralText]}>
+            <View style={[styles.tag, { marginLeft: 8 }]}>
+              <Text style={styles.tagText}>
                 {summary.viability_label ?? summary.viability}
               </Text>
             </View>
@@ -833,12 +831,12 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
       {primary && (
         <View style={styles.cardHighlight} wrap={false}>
           <View style={styles.tagRow}>
-            <View style={[styles.badge, styles.badgePrimary]}>
-              <Text style={[styles.badgeText, styles.badgePrimaryText]}>
+            <View style={[styles.tag, styles.tagStrong]}>
+              <Text style={[styles.tagText, styles.tagStrongText]}>
                 Primary
               </Text>
             </View>
-            <SourceTypeBadge type={primary.source_type} />
+            <SourceTypeTag type={primary.source_type} />
             {primary.confidence !== undefined && (
               <ConfidenceTag level={primary.confidence} />
             )}
@@ -919,7 +917,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
                     )}
                     {gate.success_criteria && (
                       <Text
-                        style={[styles.cardContent, { color: colors.green700 }]}
+                        style={[styles.cardContent, { color: colors.zinc700 }]}
                       >
                         Success: {gate.success_criteria}
                       </Text>
@@ -954,8 +952,8 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
             <View key={concept.id ?? i} style={styles.card}>
               <View style={styles.tagRow}>
                 {concept.relationship && (
-                  <View style={[styles.badge, styles.badgeInfo]}>
-                    <Text style={[styles.badgeText, styles.badgeInfoText]}>
+                  <View style={styles.tag}>
+                    <Text style={styles.tagText}>
                       {concept.relationship}
                     </Text>
                   </View>
@@ -1050,14 +1048,14 @@ function InnovationConceptsSection({
       {recommended && (
         <View style={styles.cardHighlight} wrap={false}>
           <View style={styles.tagRow}>
-            <View style={[styles.badge, styles.badgePrimary]}>
-              <Text style={[styles.badgeText, styles.badgePrimaryText]}>
+            <View style={[styles.tag, styles.tagStrong]}>
+              <Text style={[styles.tagText, styles.tagStrongText]}>
                 Recommended
               </Text>
             </View>
             {recommended.innovation_type && (
-              <View style={[styles.badge, styles.badgeInfo]}>
-                <Text style={[styles.badgeText, styles.badgeInfoText]}>
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>
                   {recommended.innovation_type.replace(/_/g, ' ')}
                 </Text>
               </View>
@@ -1155,8 +1153,8 @@ function InnovationConceptsSection({
             <View key={inv.id ?? i} style={styles.card}>
               <View style={styles.tagRow}>
                 {inv.innovation_type && (
-                  <View style={[styles.badge, styles.badgeInfo]}>
-                    <Text style={[styles.badgeText, styles.badgeInfoText]}>
+                  <View style={styles.tag}>
+                    <Text style={styles.tagText}>
                       {inv.innovation_type.replace(/_/g, ' ')}
                     </Text>
                   </View>
@@ -1220,15 +1218,15 @@ function FrontierWatchSection({ items }: { items?: FrontierWatch[] }) {
         <View key={item.id ?? i} style={styles.card}>
           <View style={styles.tagRow}>
             {item.innovation_type && (
-              <View style={[styles.badge, styles.badgeNeutral]}>
-                <Text style={[styles.badgeText, styles.badgeNeutralText]}>
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>
                   {item.innovation_type.replace(/_/g, ' ')}
                 </Text>
               </View>
             )}
             {item.trl_estimate !== undefined && (
-              <View style={[styles.badge, styles.badgeInfo]}>
-                <Text style={[styles.badgeText, styles.badgeInfoText]}>
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>
                   TRL {item.trl_estimate}
                 </Text>
               </View>
@@ -1406,13 +1404,12 @@ function ChallengeTheFrameSection({
           {c.implication && (
             <View
               style={{
-                backgroundColor: colors.amber100,
-                borderRadius: 4,
+                backgroundColor: colors.zinc100,
                 padding: 8,
               }}
             >
               <MonoLabel>Implication</MonoLabel>
-              <Text style={[styles.cardContent, { color: colors.amber700 }]}>
+              <Text style={[styles.cardContent, { color: colors.zinc600 }]}>
                 {c.implication}
               </Text>
             </View>
@@ -1454,8 +1451,8 @@ function InnovationAnalysisSection({
             <MonoLabel>Domains Searched</MonoLabel>
             <View style={styles.tagRow}>
               {analysis.domains_searched.map((d, i) => (
-                <View key={i} style={[styles.badge, styles.badgeNeutral]}>
-                  <Text style={[styles.badgeText, styles.badgeNeutralText]}>
+                <View key={i} style={styles.tag}>
+                  <Text style={styles.tagText}>
                     {d}
                   </Text>
                 </View>
@@ -1767,13 +1764,13 @@ function StrategicIntegrationSection({
                   style={[
                     styles.card,
                     {
-                      backgroundColor: colors.green100,
-                      borderColor: colors.green700,
+                      backgroundColor: colors.zinc100,
+                      borderColor: colors.zinc700,
                     },
                   ]}
                   wrap={false}
                 >
-                  <Text style={[styles.cardTitle, { color: colors.green700 }]}>
+                  <Text style={[styles.cardTitle, { color: colors.zinc700 }]}>
                     Option A
                   </Text>
                   {integration.decision_architecture.primary_tradeoff.option_a
@@ -1805,13 +1802,13 @@ function StrategicIntegrationSection({
                   style={[
                     styles.card,
                     {
-                      backgroundColor: colors.blue100,
-                      borderColor: colors.blue700,
+                      backgroundColor: colors.zinc50,
+                      borderColor: colors.zinc600,
                     },
                   ]}
                   wrap={false}
                 >
-                  <Text style={[styles.cardTitle, { color: colors.blue700 }]}>
+                  <Text style={[styles.cardTitle, { color: colors.zinc600 }]}>
                     Option B
                   </Text>
                   {integration.decision_architecture.primary_tradeoff.option_b
@@ -1866,11 +1863,11 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
   const getSeverityStyle = (severity?: string) => {
     switch (severity?.toLowerCase()) {
       case 'high':
-        return { badge: styles.badgeDanger, text: styles.badgeDangerText };
+        return { badge: styles.tagStrong, text: styles.tagStrongText };
       case 'medium':
-        return { badge: styles.badgeWarning, text: styles.badgeWarningText };
+        return { badge: styles.tag, text: styles.tagText };
       default:
-        return { badge: styles.badgeSuccess, text: styles.badgeSuccessText };
+        return { badge: styles.tagMuted, text: styles.tagMutedText };
     }
   };
 
@@ -1885,15 +1882,15 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
           <View key={i} style={styles.card}>
             <View style={styles.tagRow}>
               {risk.category && (
-                <View style={[styles.badge, styles.badgeNeutral]}>
-                  <Text style={[styles.badgeText, styles.badgeNeutralText]}>
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>
                     {risk.category}
                   </Text>
                 </View>
               )}
               {risk.severity && (
-                <View style={[styles.badge, severityStyles.badge]}>
-                  <Text style={[styles.badgeText, severityStyles.text]}>
+                <View style={[styles.tag, severityStyles.badge]}>
+                  <Text style={[styles.tagText, severityStyles.text]}>
                     {risk.severity.toUpperCase()}
                   </Text>
                 </View>
@@ -1937,7 +1934,7 @@ function KeyInsightsSection({ insights }: { insights?: string[] }) {
                 width: 20,
                 height: 20,
                 borderRadius: 10,
-                backgroundColor: colors.violet100,
+                backgroundColor: colors.zinc100,
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginRight: 8,
@@ -1947,7 +1944,7 @@ function KeyInsightsSection({ insights }: { insights?: string[] }) {
                 style={{
                   fontSize: 10,
                   fontFamily: 'Helvetica-Bold',
-                  color: colors.violet700,
+                  color: colors.zinc700,
                 }}
               >
                 {i + 1}
@@ -2044,7 +2041,7 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
               <MonoLabel>What We Might Be Wrong About</MonoLabel>
               {critique.what_we_might_be_wrong_about.map((item, i) => (
                 <View key={i} style={styles.listItem}>
-                  <Text style={[styles.listBullet, { color: colors.amber700 }]}>
+                  <Text style={[styles.listBullet, { color: colors.zinc600 }]}>
                     ⚠
                   </Text>
                   <Text style={styles.listContent}>{item}</Text>
@@ -2084,22 +2081,22 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
                   </Text>
                   <View
                     style={[
-                      styles.badge,
+                      styles.tag,
                       gap.status === 'ADDRESSED'
-                        ? styles.badgeSuccess
+                        ? styles.tagMuted
                         : gap.status === 'EXTENDED_NEEDED'
-                          ? styles.badgeWarning
-                          : styles.badgeDanger,
+                          ? styles.tag
+                          : styles.tagStrong,
                     ]}
                   >
                     <Text
                       style={[
-                        styles.badgeText,
+                        styles.tagText,
                         gap.status === 'ADDRESSED'
-                          ? styles.badgeSuccessText
+                          ? styles.tagMutedText
                           : gap.status === 'EXTENDED_NEEDED'
-                            ? styles.badgeWarningText
-                            : styles.badgeDangerText,
+                            ? styles.tagText
+                            : styles.tagStrongText,
                       ]}
                     >
                       {gap.status?.replace(/_/g, ' ')}
