@@ -59,6 +59,7 @@ const colors = {
 const styles = StyleSheet.create({
   page: {
     padding: 40,
+    paddingBottom: 60, // Extra bottom padding for footer
     fontSize: 10,
     fontFamily: 'Helvetica',
     backgroundColor: colors.white,
@@ -391,7 +392,7 @@ function SectionHeader({
   subtitle?: string;
 }) {
   return (
-    <View style={styles.sectionHeader}>
+    <View style={styles.sectionHeader} wrap={false}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {subtitle && <Text style={styles.sectionSubtitle}>{subtitle}</Text>}
     </View>
@@ -459,7 +460,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
   if (!insight) return null;
 
   return (
-    <View style={styles.insightBox}>
+    <View style={styles.insightBox} wrap={false}>
       <MonoLabel>The Insight</MonoLabel>
       {insight.what && <Text style={styles.insightText}>{insight.what}</Text>}
       {insight.where_we_found_it && (
@@ -510,7 +511,7 @@ function BriefSection({ brief }: { brief?: string }) {
   return (
     <View style={styles.section}>
       <SectionHeader title="The Brief" subtitle="Original problem statement" />
-      <View style={styles.card}>
+      <View style={styles.card} wrap={false}>
         <Text style={styles.paragraph}>{brief}</Text>
       </View>
     </View>
@@ -533,7 +534,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
 
       {/* What's Wrong */}
       {analysis.whats_wrong?.prose && (
-        <View style={styles.card}>
+        <View style={styles.card} wrap={false}>
           <MonoLabel>What&apos;s Wrong</MonoLabel>
           <Text style={styles.paragraph}>{analysis.whats_wrong.prose}</Text>
         </View>
@@ -541,7 +542,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
 
       {/* Why It's Hard */}
       {analysis.why_its_hard && (
-        <View style={styles.card}>
+        <View style={styles.card} wrap={false}>
           <MonoLabel>Why It&apos;s Hard</MonoLabel>
           {analysis.why_its_hard.prose && (
             <Text style={styles.paragraph}>{analysis.why_its_hard.prose}</Text>
@@ -580,7 +581,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
 
       {/* First Principles Insight */}
       {analysis.first_principles_insight && (
-        <View style={styles.insightBox}>
+        <View style={styles.insightBox} wrap={false}>
           <MonoLabel>First Principles Insight</MonoLabel>
           {analysis.first_principles_insight.headline && (
             <Text style={styles.insightText}>
@@ -600,7 +601,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
         analysis.current_state_of_art.benchmarks.length > 0 && (
           <View style={{ marginTop: 12 }}>
             <Text style={styles.subsectionTitle}>Current State of Art</Text>
-            <View style={styles.table}>
+            <View style={styles.table} wrap={false}>
               <View style={styles.tableHeader}>
                 <Text style={styles.tableHeaderCell}>Entity</Text>
                 <Text style={styles.tableHeaderCell}>Approach</Text>
@@ -692,7 +693,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
       {analysis.success_metrics && analysis.success_metrics.length > 0 && (
         <View style={{ marginTop: 12 }}>
           <Text style={styles.subsectionTitle}>Success Metrics</Text>
-          <View style={styles.table}>
+          <View style={styles.table} wrap={false}>
             <View style={styles.tableHeader}>
               <Text style={styles.tableHeaderCell}>Metric</Text>
               <Text style={styles.tableHeaderCell}>Target</Text>
@@ -729,7 +730,7 @@ function ExecutiveSummarySection({
     return (
       <View style={styles.section}>
         <SectionHeader title="Executive Summary" subtitle="The bottom line" />
-        <View style={styles.card}>
+        <View style={styles.card} wrap={false}>
           <Text style={[styles.paragraph, { fontSize: 12 }]}>{summary}</Text>
         </View>
       </View>
@@ -739,7 +740,7 @@ function ExecutiveSummarySection({
   return (
     <View style={styles.section}>
       <SectionHeader title="Executive Summary" subtitle="The bottom line" />
-      <View style={styles.card}>
+      <View style={styles.card} wrap={false}>
         {/* Narrative Lead */}
         {summary.narrative_lead && (
           <Text
@@ -754,7 +755,7 @@ function ExecutiveSummarySection({
 
         {/* Core Insight */}
         {summary.core_insight && (
-          <View style={styles.insightBox}>
+          <View style={styles.insightBox} wrap={false}>
             <MonoLabel>Core Insight</MonoLabel>
             {summary.core_insight.headline && (
               <Text style={styles.insightText}>
@@ -846,7 +847,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
 
       {/* Primary Solution */}
       {primary && (
-        <View style={styles.cardHighlight}>
+        <View style={styles.cardHighlight} wrap={false}>
           <View style={styles.badgeRow}>
             <View style={[styles.badge, styles.badgePrimary]}>
               <Text style={[styles.badgeText, styles.badgePrimaryText]}>
@@ -1063,7 +1064,7 @@ function InnovationConceptsSection({
 
       {/* Recommended Innovation */}
       {recommended && (
-        <View style={styles.cardHighlight}>
+        <View style={styles.cardHighlight} wrap={false}>
           <View style={styles.badgeRow}>
             <View style={[styles.badge, styles.badgePrimary]}>
               <Text style={[styles.badgeText, styles.badgePrimaryText]}>
@@ -1310,7 +1311,7 @@ function ConstraintsSection({
       {/* Hard Constraints */}
       {constraints.hard_constraints &&
         constraints.hard_constraints.length > 0 && (
-          <View style={styles.card}>
+          <View style={styles.card} wrap={false}>
             <MonoLabel>Hard Constraints</MonoLabel>
             {constraints.hard_constraints.map((c, i) => (
               <View
@@ -1327,7 +1328,7 @@ function ConstraintsSection({
       {/* Soft Constraints */}
       {constraints.soft_constraints &&
         constraints.soft_constraints.length > 0 && (
-          <View style={styles.card}>
+          <View style={styles.card} wrap={false}>
             <MonoLabel>Soft Constraints</MonoLabel>
             {constraints.soft_constraints.map((c, i) => (
               <View
@@ -1343,7 +1344,7 @@ function ConstraintsSection({
 
       {/* Assumptions */}
       {constraints.assumptions && constraints.assumptions.length > 0 && (
-        <View style={styles.card}>
+        <View style={styles.card} wrap={false}>
           <MonoLabel>Assumptions</MonoLabel>
           {constraints.assumptions.map((a, i) => (
             <View
@@ -1456,7 +1457,7 @@ function InnovationAnalysisSection({
         subtitle="Cross-domain search strategy"
       />
 
-      <View style={styles.card}>
+      <View style={styles.card} wrap={false}>
         {analysis.reframe && (
           <View style={{ marginBottom: 8 }}>
             <MonoLabel>Reframe</MonoLabel>
@@ -1626,7 +1627,7 @@ function WhatIdActuallyDoSection({ content }: { content?: string }) {
         subtitle="Personal recommendation"
       />
 
-      <View style={styles.cardHighlight}>
+      <View style={styles.cardHighlight} wrap={false}>
         <Text style={styles.paragraph}>{content}</Text>
       </View>
     </View>
@@ -1647,7 +1648,7 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
         subtitle="Honest assessment of this analysis"
       />
 
-      <View style={styles.warningBox}>
+      <View style={styles.warningBox} wrap={false}>
         {/* Confidence Level */}
         {(critique.overall_confidence || critique.confidence_level) && (
           <View style={[styles.row, { marginBottom: 8 }]}>
