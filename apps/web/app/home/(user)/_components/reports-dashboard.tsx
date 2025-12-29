@@ -302,9 +302,8 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
               if (isClarifying) {
                 // Clarifying state - amber theme, clickable to answer question
                 return (
-                  <Link
+                  <div
                     key={report.id}
-                    href={`/home/reports/${report.id}`}
                     data-test={`report-card-${report.id}`}
                     className={cn(
                       'group relative flex items-start gap-4 p-5 transition-all duration-200',
@@ -312,6 +311,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                       'bg-amber-50/50 dark:bg-amber-900/10',
                       !isLast && 'border-b border-[--border-subtle]',
                     )}
+                    onClick={() => router.push(`/home/reports/${report.id}`)}
                   >
                     {/* Status Dot (Amber, pulsing) */}
                     <div className="relative mt-1.5 flex-shrink-0">
@@ -346,12 +346,19 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                       </p>
                     </div>
 
-                    {/* Action indicator */}
-                    <div className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-1">
+                    {/* Actions */}
+                    <div
+                      className="absolute top-1/2 right-5 flex -translate-y-1/2 items-center gap-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <CancelButton
+                        reportId={report.id}
+                        onComplete={() => router.refresh()}
+                      />
                       <AlertCircle className="h-4 w-4 text-amber-500" />
                       <ChevronRight className="h-4 w-4 -translate-x-2 text-amber-600 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 dark:text-amber-400" />
                     </div>
-                  </Link>
+                  </div>
                 );
               }
 
