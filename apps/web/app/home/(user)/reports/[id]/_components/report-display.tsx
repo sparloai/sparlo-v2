@@ -600,6 +600,7 @@ export function ReportDisplay({
           brief={userBrief}
           createdAt={report.created_at}
           isChatOpen={isChatOpen}
+          reportId={report.id}
         />
 
         {/* Chat Toggle Button */}

@@ -542,4 +542,9 @@ export interface HybridReportDisplayProps {
    * @default true
    */
   showActions?: boolean;
+  /**
+   * The report ID for share/export functionality.
+   * Required when showActions is true.
+   */
+  reportId?: string;
 }

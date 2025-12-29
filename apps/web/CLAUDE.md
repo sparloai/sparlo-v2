@@ -327,3 +327,35 @@ app: {
 - **Never pass sensitive data** to Client Components
 - **Never expose server environment variables** to client (unless prefixed with NEXT_PUBLIC)
 - Always validate user input
+
+## Report Display Architecture 📊
+
+**IMPORTANT**: The report display system has multiple component layers. When modifying share/export functionality, you must update ALL relevant components.
+
+### Component Hierarchy
+
+```
+report-display.tsx (wrapper - handles chat, non-hybrid reports)
+├── HybridReportDisplay (hybrid-report-display.tsx)
+│   └── BrandSystemReport (brand-system/brand-system-report.tsx)
+│       └── ReportContent (contains Share/Export buttons for hybrid reports)
+└── DiscoveryReportDisplay (for discovery mode reports)
+```
+
+### Key Files for Share/Export
+
+| Component | File | Used For |
+|-----------|------|----------|
+| `ReportDisplay` | `reports/[id]/_components/report-display.tsx` | Non-hybrid reports (discovery, standard) |
+| `BrandSystemReport` | `reports/[id]/_components/brand-system/brand-system-report.tsx` | **Hybrid reports** - main display |
+| `HybridReportDisplay` | `reports/[id]/_components/hybrid-report-display.tsx` | Wrapper that selects brand system |
+
+### Share/Export Implementation
+
+Both `ReportDisplay` and `BrandSystemReport` have their own share/export implementations:
+
+1. **Share**: Uses `generateShareLink()` from `_lib/server/share-actions.ts` to generate a public share token URL, then uses Web Share API with fallback to clipboard
+2. **Export PDF**: Calls `/api/reports/${reportId}/pdf` endpoint (uses @react-pdf/renderer)
+
+**Critical**: Always pass `reportId` through the component chain for share/export to work:
+- `report-display.tsx` → `HybridReportDisplay` → `BrandSystemReport` → `ReportContent`

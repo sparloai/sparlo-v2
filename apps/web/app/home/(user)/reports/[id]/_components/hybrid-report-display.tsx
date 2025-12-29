@@ -2437,6 +2437,7 @@ export function HybridReportDisplay({
   hasAppSidebar = true,
   isChatOpen = false,
   showActions = true,
+  reportId,
 }: HybridReportDisplayProps) {
   const report = reportData.report;
 
@@ -2460,6 +2461,7 @@ export function HybridReportDisplay({
         hasAppSidebar={hasAppSidebar}
         isChatOpen={isChatOpen}
         showActions={showActions}
+        reportId={reportId}
       />
     );
   }

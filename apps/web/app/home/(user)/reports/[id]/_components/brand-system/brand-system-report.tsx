@@ -15,9 +15,9 @@
 
 'use client';
 
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
-import { Download, Share2 } from 'lucide-react';
+import { Download, Loader2, Share2 } from 'lucide-react';
 
 import { toast } from '@kit/ui/sonner';
 import { cn } from '@kit/ui/utils';
@@ -26,6 +26,7 @@ import { useSidebarState } from '~/home/(user)/_lib/sidebar-context';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { CHAT_DRAWER_WIDTH } from '../../_lib/constants';
+import { generateShareLink } from '../../_lib/server/share-actions';
 import {
   TOC_SCROLL_OFFSET,
   TOC_STICKY_TOP,
@@ -80,6 +81,11 @@ interface BrandSystemReportProps {
    * @default true
    */
   showActions?: boolean;
+  /**
+   * The report ID for share/export functionality.
+   * Required when showActions is true.
+   */
+  reportId?: string;
 }
 
 /**
@@ -368,19 +374,38 @@ function getCleanShareUrl(): string {
 interface ActionButtonProps {
   onClick: () => void;
   icon: React.ReactNode;
+  loadingIcon?: React.ReactNode;
   label: string;
+  loadingLabel?: string;
   ariaLabel: string;
+  disabled?: boolean;
+  isLoading?: boolean;
 }
 
-function ActionButton({ onClick, icon, label, ariaLabel }: ActionButtonProps) {
+function ActionButton({
+  onClick,
+  icon,
+  loadingIcon,
+  label,
+  loadingLabel,
+  ariaLabel,
+  disabled,
+  isLoading,
+}: ActionButtonProps) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 rounded border border-zinc-200 px-3 py-2 text-[13px] tracking-[-0.01em] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900"
+      disabled={disabled || isLoading}
+      className={cn(
+        'flex items-center gap-2 rounded border border-zinc-200 px-3 py-2 text-[13px] tracking-[-0.01em] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900',
+        (disabled || isLoading) && 'cursor-not-allowed opacity-50',
+      )}
       aria-label={ariaLabel}
     >
-      {icon}
-      <span className="hidden sm:inline">{label}</span>
+      {isLoading ? loadingIcon || icon : icon}
+      <span className="hidden sm:inline">
+        {isLoading ? loadingLabel || label : label}
+      </span>
     </button>
   );
 }
@@ -396,6 +421,7 @@ interface ReportContentProps {
   createdAt?: string;
   readTime: number;
   showActions?: boolean;
+  reportId?: string;
 }
 
 const ReportContent = memo(function ReportContent({
@@ -405,33 +431,94 @@ const ReportContent = memo(function ReportContent({
   createdAt,
   readTime,
   showActions = true,
+  reportId,
 }: ReportContentProps) {
   const displayTitle = title || normalizedData.title;
+  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleShare = useCallback(async () => {
-    const shareUrl = getCleanShareUrl();
+    if (!reportId) {
+      // Fallback to copying current URL if no reportId
+      const shareUrl = getCleanShareUrl();
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied to clipboard');
+      return;
+    }
+
     const shareTitle = displayTitle || 'Report';
 
+    // Try Web Share API first (works on mobile and some desktop browsers)
+    if (navigator.share) {
+      setIsGeneratingShare(true);
+      try {
+        // Generate share link first
+        const result = await generateShareLink({ reportId });
+        if (result.success && result.shareUrl) {
+          await navigator.share({
+            title: shareTitle,
+            url: result.shareUrl,
+          });
+          return; // Success - native share handled it
+        }
+      } catch (err) {
+        // User cancelled or share failed - fall through to clipboard
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return; // User cancelled - no error needed
+        }
+        console.error('[Share] Error sharing report:', err);
+      } finally {
+        setIsGeneratingShare(false);
+      }
+    }
+
+    // Fallback: generate link and copy to clipboard
+    setIsGeneratingShare(true);
     try {
-      if (navigator.share) {
-        await navigator.share({ title: shareTitle, url: shareUrl });
+      const result = await generateShareLink({ reportId });
+      if (result.success && result.shareUrl) {
+        await navigator.clipboard.writeText(result.shareUrl);
+        toast.success('Share link copied to clipboard');
       } else {
-        await navigator.clipboard.writeText(shareUrl);
-        toast.success('Link copied to clipboard');
+        toast.error('Failed to generate share link');
       }
     } catch (error) {
-      // AbortError means user cancelled the share dialog - no error needed
-      if (error instanceof Error && error.name === 'AbortError') {
-        return;
-      }
-      console.error('[Share] Error sharing report:', error);
+      console.error('[Share] Error generating share link:', error);
       toast.error('Failed to share report');
+    } finally {
+      setIsGeneratingShare(false);
     }
-  }, [displayTitle]);
+  }, [displayTitle, reportId]);
 
-  const handleExport = useCallback(() => {
-    window.print();
-  }, []);
+  const handleExport = useCallback(async () => {
+    if (!reportId) {
+      window.print();
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const response = await fetch(`/api/reports/${reportId}/pdf`);
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${displayTitle || 'report'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('PDF downloaded');
+    } catch (error) {
+      console.error('[Export] Error exporting PDF:', error);
+      toast.error('Failed to export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [reportId, displayTitle]);
 
   return (
     <>
@@ -449,14 +536,20 @@ const ReportContent = memo(function ReportContent({
                 <ActionButton
                   onClick={handleShare}
                   icon={<Share2 className="h-4 w-4" />}
+                  loadingIcon={<Loader2 className="h-4 w-4 animate-spin" />}
                   label="Share"
+                  loadingLabel="Sharing..."
                   ariaLabel="Share report"
+                  isLoading={isGeneratingShare}
                 />
                 <ActionButton
                   onClick={handleExport}
                   icon={<Download className="h-4 w-4" />}
+                  loadingIcon={<Loader2 className="h-4 w-4 animate-spin" />}
                   label="Export"
+                  loadingLabel="Exporting..."
                   ariaLabel="Export report"
+                  isLoading={isExporting}
                 />
               </div>
             )}
@@ -556,6 +649,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   hasAppSidebar = true,
   isChatOpen = false,
   showActions = true,
+  reportId,
 }: BrandSystemReportProps) {
   // Normalize field names for backward compatibility
   const normalizedData = normalizeReportData(reportData);
@@ -627,6 +721,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
                   createdAt={createdAt}
                   readTime={readTime}
                   showActions={showActions}
+                  reportId={reportId}
                 />
               </div>
             </main>
@@ -661,6 +756,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
           createdAt={createdAt}
           readTime={readTime}
           showActions={showActions}
+          reportId={reportId}
         />
       </main>
     </div>
