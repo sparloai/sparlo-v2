@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { PublicReportDisplay } from './_components/public-report-display';
+import { ShareHeader } from './_components/share-header';
 import { loadSharedReport } from './_lib/server/shared-report.loader';
 
 interface SharePageProps {
@@ -22,6 +23,7 @@ export default async function SharePage({ params }: SharePageProps) {
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
+      <ShareHeader />
       <PublicReportDisplay report={report} />
     </div>
   );
