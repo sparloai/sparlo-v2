@@ -73,7 +73,7 @@ export const generateHybridReport = inngest.createFunction(
     cancelOn: [
       {
         event: 'report/cancel.requested',
-        if: 'event.data.reportId == async.data.reportId',
+        match: 'data.reportId',
       },
     ],
     onFailure: async ({ error, event, step }) => {
@@ -350,18 +350,40 @@ export const generateHybridReport = inngest.createFunction(
             };
           }
 
-          // Re-run AN0-M with clarification
+          // Re-run AN0-M with clarification (include original attachments)
           const clarifiedResult = await step.run(
             'an0-m-with-clarification',
             async () => {
-              const clarifiedChallenge = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+              // Build message with clarification + original attachments
+              let clarifiedMessage = `${designChallenge}\n\nClarification: ${clarificationEvent.data.answer}`;
+
+              // Re-add DOCX content if present
+              if (docxContent) {
+                clarifiedMessage += `\n\n---\n\nAttached Documents:\n\n${docxContent}`;
+              }
+
+              // Note about attachments
+              const attachmentNotes: string[] = [];
+              if (imageAttachments.length > 0) {
+                attachmentNotes.push(`${imageAttachments.length} image(s)`);
+              }
+              if (pdfAttachments.length > 0) {
+                attachmentNotes.push(`${pdfAttachments.length} PDF document(s)`);
+              }
+              if (attachmentNotes.length > 0) {
+                clarifiedMessage += `\n\n[Note: ${attachmentNotes.join(' and ')} attached for context]`;
+              }
 
               const { content, usage } = await callClaude({
                 model: MODELS.OPUS,
                 system: AN0_M_PROMPT,
-                userMessage: clarifiedChallenge,
+                userMessage: clarifiedMessage,
                 maxTokens: HYBRID_MAX_TOKENS,
                 temperature: HYBRID_TEMPERATURES.default,
+                images:
+                  imageAttachments.length > 0 ? imageAttachments : undefined,
+                documents:
+                  pdfAttachments.length > 0 ? pdfAttachments : undefined,
                 cacheablePrefix: HYBRID_CACHED_PREFIX,
               });
 
