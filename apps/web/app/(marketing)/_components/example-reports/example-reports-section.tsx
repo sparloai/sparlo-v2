@@ -92,7 +92,10 @@ export function ExampleReportsSection() {
       </div>
 
       {/* Tab Navigation - Sticky below main nav */}
-      <div className="sticky top-16 z-40 border-y border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95">
+      <div
+        id="example-reports-tabs"
+        className="sticky top-16 z-40 border-y border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95"
+      >
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="no-scrollbar flex gap-1 overflow-x-auto py-2">
             {EXAMPLE_REPORTS.map((r, i) => (
@@ -100,13 +103,16 @@ export function ExampleReportsSection() {
                 key={r.id}
                 onClick={() => {
                   setActiveTab(i);
-                  // Scroll to top of section - activeSection will update via IntersectionObserver
-                  window.scrollTo({
-                    top:
-                      document.getElementById('example-reports')?.offsetTop ??
-                      0,
-                    behavior: 'smooth',
-                  });
+                  // Scroll to top of tabs (not section header) - account for sticky nav height (64px)
+                  const tabsElement =
+                    document.getElementById('example-reports-tabs');
+                  if (tabsElement) {
+                    const navHeight = 64;
+                    window.scrollTo({
+                      top: tabsElement.offsetTop - navHeight,
+                      behavior: 'smooth',
+                    });
+                  }
                 }}
                 className={cn(
                   'flex shrink-0 items-center gap-2 rounded-md px-4 py-2.5 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] whitespace-nowrap transition-all',
