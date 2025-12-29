@@ -8,6 +8,7 @@ import {
   ChevronsUpDown,
   CreditCard,
   HelpCircle,
+  LayoutDashboard,
   LogOut,
   Settings,
   Shield,
@@ -154,6 +155,17 @@ export function PersonalAccountDropdown({
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
+
+        <DropdownMenuItem asChild>
+          <Link
+            className={'s-full flex cursor-pointer items-center space-x-2'}
+            href={paths.home}
+          >
+            <LayoutDashboard className={'h-5'} />
+
+            <span>Dashboard</span>
+          </Link>
+        </DropdownMenuItem>
 
         <If condition={Boolean(paths.settings)}>
           <DropdownMenuItem asChild>
