@@ -68,17 +68,37 @@ export function ArchivedReportsDashboard({
 }: ArchivedReportsDashboardProps) {
   const router = useRouter();
   const [search, setSearch] = useState('');
+  // Optimistic UI: track reports being restored for instant removal
+  const [optimisticallyHidden, setOptimisticallyHidden] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const filteredReports = useMemo(() => {
-    if (!search.trim()) return reports;
+    // First filter out optimistically hidden reports
+    let filtered = reports.filter((r) => !optimisticallyHidden.has(r.id));
+
+    if (!search.trim()) return filtered;
 
     const query = search.toLowerCase();
-    return reports.filter(
+    return filtered.filter(
       (report) =>
         report.headline?.toLowerCase().includes(query) ||
         report.title.toLowerCase().includes(query),
     );
-  }, [search, reports]);
+  }, [search, reports, optimisticallyHidden]);
+
+  // Optimistic restore: hide immediately, revert on error
+  const handleOptimisticRestore = (reportId: string) => {
+    setOptimisticallyHidden((prev) => new Set(prev).add(reportId));
+  };
+
+  const handleRestoreError = (reportId: string) => {
+    setOptimisticallyHidden((prev) => {
+      const next = new Set(prev);
+      next.delete(reportId);
+      return next;
+    });
+  };
 
   return (
     <div
@@ -198,6 +218,11 @@ export function ArchivedReportsDashboard({
                     <ArchiveToggleButton
                       reportId={report.id}
                       isArchived={true}
+                      onOptimisticStart={() =>
+                        handleOptimisticRestore(report.id)
+                      }
+                      onOptimisticError={() => handleRestoreError(report.id)}
+                      onComplete={() => router.refresh()}
                     />
                     {isClickable && (
                       <ChevronRight className="h-4 w-4 -translate-x-2 text-[--text-muted] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />

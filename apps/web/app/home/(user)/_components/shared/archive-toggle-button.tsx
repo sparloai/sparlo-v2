@@ -17,6 +17,10 @@ interface ArchiveToggleButtonProps {
   isArchived: boolean;
   /** Optional callback after action completes */
   onComplete?: () => void;
+  /** Optimistic UI: called immediately when action starts */
+  onOptimisticStart?: () => void;
+  /** Optimistic UI: called if action fails to revert */
+  onOptimisticError?: () => void;
 }
 
 /**
@@ -27,6 +31,8 @@ export function ArchiveToggleButton({
   reportId,
   isArchived,
   onComplete,
+  onOptimisticStart,
+  onOptimisticError,
 }: ArchiveToggleButtonProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -36,6 +42,9 @@ export function ArchiveToggleButton({
     e.stopPropagation();
 
     if (isPending) return;
+
+    // Optimistic: hide immediately for snappy UX
+    onOptimisticStart?.();
 
     startTransition(async () => {
       try {
@@ -50,6 +59,8 @@ export function ArchiveToggleButton({
           router.refresh();
         }
       } catch (error) {
+        // Revert optimistic update on error
+        onOptimisticError?.();
         toast.error(
           error instanceof Error ? error.message : 'Failed to update report',
         );

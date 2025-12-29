@@ -142,17 +142,37 @@ function NoResultsState({ query }: { query: string }) {
 export function ReportsDashboard({ reports }: ReportsDashboardProps) {
   const router = useRouter();
   const [search, setSearch] = useState('');
+  // Optimistic UI: track reports being archived for instant removal
+  const [optimisticallyHidden, setOptimisticallyHidden] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const filteredReports = useMemo(() => {
-    if (!search.trim()) return reports;
+    // First filter out optimistically hidden reports
+    let filtered = reports.filter((r) => !optimisticallyHidden.has(r.id));
+
+    if (!search.trim()) return filtered;
 
     const query = search.toLowerCase();
-    return reports.filter(
+    return filtered.filter(
       (report) =>
         report.headline?.toLowerCase().includes(query) ||
         report.title.toLowerCase().includes(query),
     );
-  }, [search, reports]);
+  }, [search, reports, optimisticallyHidden]);
+
+  // Optimistic archive: hide immediately, revert on error
+  const handleOptimisticArchive = (reportId: string) => {
+    setOptimisticallyHidden((prev) => new Set(prev).add(reportId));
+  };
+
+  const handleArchiveError = (reportId: string) => {
+    setOptimisticallyHidden((prev) => {
+      const next = new Set(prev);
+      next.delete(reportId);
+      return next;
+    });
+  };
 
   // Check if report is in a processing state (not complete, not clarifying)
   const isProcessing = (status: ConversationStatus) =>
@@ -389,6 +409,12 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                         <ArchiveToggleButton
                           reportId={report.id}
                           isArchived={false}
+                          onOptimisticStart={() =>
+                            handleOptimisticArchive(report.id)
+                          }
+                          onOptimisticError={() =>
+                            handleArchiveError(report.id)
+                          }
                           onComplete={() => router.refresh()}
                         />
                       </div>
@@ -445,6 +471,12 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
                         <ArchiveToggleButton
                           reportId={report.id}
                           isArchived={false}
+                          onOptimisticStart={() =>
+                            handleOptimisticArchive(report.id)
+                          }
+                          onOptimisticError={() =>
+                            handleArchiveError(report.id)
+                          }
                           onComplete={() => router.refresh()}
                         />
                         <Button
