@@ -30,8 +30,17 @@ export interface ReportProgress {
   createdAt: string | null;
 }
 
+export interface ClarificationOption {
+  id: string;
+  label: string;
+}
+
 export interface ClarificationQuestion {
   question: string;
+  context?: string;
+  options?: ClarificationOption[];
+  allows_freetext?: boolean;
+  freetext_prompt?: string;
   answer?: string;
   askedAt: string;
   answeredAt?: string;

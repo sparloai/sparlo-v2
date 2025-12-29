@@ -190,6 +190,30 @@ Identify 2-3 domains that face SIMILAR PHYSICS challenges:
 
 This seeds cross-pollination thinking in later steps.
 
+## CLARIFICATION PROTOCOL
+
+Before generating full problem analysis, evaluate the input for:
+
+**CATEGORY 1 — MUST CLARIFY:**
+- Contradictions or likely errors: Statements that conflict with physical reality, common domain usage, or internal logic (e.g., user says "paperboard feels cheap compared to molded pulp" when the reverse is physically typical)
+- Binary constraints that eliminate >30% of solution space: A single yes/no would remove entire solution classes (e.g., "home compostable" eliminates bio-resins that only work in industrial composting)
+
+**CATEGORY 2 — ASSUME AND DOCUMENT:**
+- Industry, scale, application context where reasonable defaults exist
+- Vague preferences or success metrics (explore broadly)
+- Details affecting <10% of solution space
+
+**DECISION RULE:**
+- 0 Category 1 issues → set \`needs_clarification: false\`, proceed with documented assumptions
+- 1+ Category 1 issues → set \`needs_clarification: true\`, ask ONE question (highest stakes)
+
+**MANDATORY RULES:**
+- Maximum ONE clarifying question per submission
+- "Proceed with best interpretation" option is REQUIRED — never block users
+- Always include \`preliminary_analysis\` to demonstrate understanding
+- Never ask about preferences you can explore broadly
+- Never ask about details that affect <10% of solution space
+
 ## Query Generation
 
 Generate queries for:
@@ -199,7 +223,7 @@ Generate queries for:
 ## Output Format
 
 {
-  "need_question": false,
+  "needs_clarification": false,
   "original_ask": "User's problem in their words",
   "problem_interpretation": "One sentence core problem statement",
   "ambiguities_detected": [
@@ -272,12 +296,33 @@ Generate queries for:
   "reframed_problem": "Core challenge reframed as physics/engineering problem"
 }
 
-If you need clarification:
+If you need clarification (Category 1 issue detected):
 {
-  "need_question": true,
-  "question": "Your single clarifying question",
-  "what_you_understood": "Summary of what you know so far"
+  "needs_clarification": true,
+  "clarification_request": {
+    "context": "Brief explanation of what triggered this — what seems contradictory or ambiguous",
+    "question": "Single, specific question",
+    "options": [
+      {"id": "a", "label": "Concrete choice A"},
+      {"id": "b", "label": "Concrete choice B"},
+      {"id": "c", "label": "Proceed with your best interpretation"}
+    ],
+    "allows_freetext": true,
+    "freetext_prompt": "Additional context if none of these fit (optional):"
+  },
+  "preliminary_analysis": {
+    "original_ask": "User's problem in their words",
+    "problem_interpretation": "One sentence core problem statement",
+    "user_sector": "Primary industry",
+    "physics_of_problem": {
+      "governing_principles": ["What physics dominates this problem"],
+      "key_tradeoffs": ["Fundamental physical tradeoffs"],
+      "rate_limiting_factors": ["What controls success/failure"]
+    }
+  }
 }
+
+IMPORTANT: The "Proceed with best interpretation" option (or equivalent) is REQUIRED in every clarification.
 
 REMEMBER: Output ONLY the JSON object. No markdown, no preamble.`;
 
@@ -397,7 +442,7 @@ const CorpusQueriesSchema = z.object({
 
 // Full analysis output schema
 const AN0AnalysisSchema = z.object({
-  need_question: z.literal(false),
+  needs_clarification: z.literal(false),
   original_ask: z.string(),
   problem_interpretation: z.string(),
   ambiguities_detected: z.array(AmbiguitySchema).default([]),
@@ -422,15 +467,54 @@ const AN0AnalysisSchema = z.object({
   reframed_problem: z.string(),
 });
 
-// Clarification question output schema
-const AN0ClarificationSchema = z.object({
-  need_question: z.literal(true),
+// Clarification option schema
+const ClarificationOptionSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+});
+
+// Structured clarification request schema
+const ClarificationRequestSchema = z.object({
+  context: z.string(),
   question: z.string(),
-  what_you_understood: z.string(),
+  options: z
+    .array(ClarificationOptionSchema)
+    .min(2)
+    .max(5)
+    .refine(
+      (opts) =>
+        opts.some(
+          (o) =>
+            o.label.toLowerCase().includes('proceed') ||
+            o.label.toLowerCase().includes('best interpretation') ||
+            o.label.toLowerCase().includes('continue'),
+        ),
+      {
+        message:
+          'Options must include a "proceed with best interpretation" fallback',
+      },
+    ),
+  allows_freetext: z.boolean().default(true),
+  freetext_prompt: z.string().optional(),
+});
+
+// Preliminary analysis shown during clarification
+const PreliminaryAnalysisSchema = z.object({
+  original_ask: z.string(),
+  problem_interpretation: z.string(),
+  user_sector: z.string().optional(),
+  physics_of_problem: PhysicsSchema.optional(),
+});
+
+// Clarification question output schema (structured)
+const AN0ClarificationSchema = z.object({
+  needs_clarification: z.literal(true),
+  clarification_request: ClarificationRequestSchema,
+  preliminary_analysis: PreliminaryAnalysisSchema,
 });
 
 // Combined schema using discriminated union
-export const AN0OutputSchema = z.discriminatedUnion('need_question', [
+export const AN0OutputSchema = z.discriminatedUnion('needs_clarification', [
   AN0AnalysisSchema,
   AN0ClarificationSchema,
 ]);
@@ -438,6 +522,16 @@ export const AN0OutputSchema = z.discriminatedUnion('need_question', [
 export type AN0Output = z.infer<typeof AN0OutputSchema>;
 export type AN0Analysis = z.infer<typeof AN0AnalysisSchema>;
 export type AN0Clarification = z.infer<typeof AN0ClarificationSchema>;
+export type ClarificationRequest = z.infer<typeof ClarificationRequestSchema>;
+export type ClarificationOption = z.infer<typeof ClarificationOptionSchema>;
+export type PreliminaryAnalysis = z.infer<typeof PreliminaryAnalysisSchema>;
+
+// Export schemas for use in other modules
+export {
+  ClarificationRequestSchema,
+  ClarificationOptionSchema,
+  PreliminaryAnalysisSchema,
+};
 
 /**
  * AN0 metadata for progress tracking

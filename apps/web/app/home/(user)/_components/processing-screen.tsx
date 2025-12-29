@@ -6,17 +6,10 @@ import { useRouter } from 'next/navigation';
 
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  AlertTriangle,
-  ArrowRight,
-  Brain,
-  Check,
-  Loader2,
-  MessageSquare,
-  Send,
-} from 'lucide-react';
+import { AlertTriangle, ArrowRight, Brain, Check, Loader2, Send } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
+import { cn } from '@kit/ui/utils';
 import { usePrefersReducedMotion } from '@kit/ui/hooks';
 import { Textarea } from '@kit/ui/textarea';
 
@@ -308,64 +301,117 @@ export function ProcessingScreen({
     );
   }
 
-  // Handle clarification status - Aura.build inspired design
+  // Handle option selection
+  const handleSelectOption = useCallback(
+    async (optionLabel: string) => {
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+      try {
+        await answerClarification({
+          reportId: progress.id,
+          answer: optionLabel,
+        });
+        setClarificationAnswer('');
+      } catch (error) {
+        console.error('Failed to submit clarification:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [isSubmitting, progress.id],
+  );
+
+  // Handle clarification status - Clean Air Company inspired design
   if (progress.status === 'clarifying' && pendingClarification) {
+    const hasOptions =
+      pendingClarification.options && pendingClarification.options.length > 0;
+
     return (
       <motion.div
-        className="relative flex min-h-screen flex-col items-center justify-center bg-[--surface-base] px-4 py-12 text-[--text-secondary]"
+        className="relative flex min-h-screen flex-col items-center justify-center bg-[--surface-base] px-4 py-12"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
       >
-        {/* Ambient Background Glows - only visible in dark mode */}
-        <div className="pointer-events-none absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-indigo-900/10 opacity-0 blur-[120px] dark:opacity-50" />
-        <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-emerald-900/5 opacity-0 blur-[100px] dark:opacity-50" />
+        <div className="w-full max-w-2xl">
+          {/* Context - why we're asking */}
+          {pendingClarification.context && (
+            <motion.p
+              className="mb-8 text-center text-sm text-[--text-muted]"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              {pendingClarification.context}
+            </motion.p>
+          )}
 
-        <div className="relative z-10 w-full max-w-4xl">
-          {/* Main Input Card */}
-          <div className="group relative rounded-2xl bg-[--surface-overlay] p-[1px] transition-all duration-500 dark:bg-neutral-900/40">
-            {/* Glowing border effect */}
-            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-b from-black/5 via-black/[0.02] to-transparent opacity-50 transition-opacity duration-500 group-hover:opacity-100 dark:from-white/10 dark:via-white/5" />
+          {/* Main Question */}
+          <motion.h1
+            className="mb-12 text-center text-2xl font-medium leading-relaxed tracking-tight text-[--text-primary] md:text-3xl"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            {pendingClarification.question}
+          </motion.h1>
 
-            <div className="relative flex flex-col overflow-hidden rounded-2xl bg-[--surface-elevated] shadow-lg dark:shadow-2xl dark:shadow-black/50">
-              {/* Toolbar */}
-              <div className="flex items-center justify-between border-b border-[--border-subtle] bg-[--surface-overlay] px-6 py-3 dark:bg-neutral-900/20">
-                <div className="flex items-center gap-2 font-mono text-xs tracking-wider text-[--text-muted] uppercase">
-                  <MessageSquare className="h-4 w-4 text-[--text-muted]" />
-                  <span>quick question</span>
-                </div>
-              </div>
-
-              {/* Question Display */}
-              <div className="border-b border-[--border-subtle] px-6 py-6 md:px-8">
-                <motion.p
-                  className="text-lg leading-relaxed font-medium text-[--text-primary] md:text-xl"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+          {/* Options as clean buttons */}
+          {hasOptions && (
+            <motion.div
+              className="mb-8 flex flex-col gap-3"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              {pendingClarification.options?.map((option, index) => (
+                <button
+                  key={option.id}
+                  onClick={() => handleSelectOption(option.label)}
+                  disabled={isSubmitting}
+                  data-test={`clarification-option-${option.id}`}
+                  className={cn(
+                    'group relative w-full rounded-xl border px-6 py-4 text-left transition-all duration-200',
+                    'border-[--border-default] bg-[--surface-elevated]',
+                    'hover:border-[--text-muted] hover:bg-[--surface-overlay]',
+                    'focus:outline-none focus:ring-2 focus:ring-[--accent] focus:ring-offset-2 focus:ring-offset-[--surface-base]',
+                    'disabled:cursor-not-allowed disabled:opacity-50',
+                  )}
                 >
-                  {pendingClarification.question}
-                </motion.p>
-                <p className="mt-2 text-sm text-[--text-muted]">
-                  Help us understand your challenge better
-                </p>
-              </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[--surface-overlay] font-mono text-sm text-[--text-muted] transition-colors group-hover:bg-[--accent] group-hover:text-white">
+                        {String.fromCharCode(65 + index)}
+                      </span>
+                      <span className="text-base text-[--text-primary]">
+                        {option.label}
+                      </span>
+                    </div>
+                    <ArrowRight className="h-4 w-4 -translate-x-2 text-[--text-muted] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
+                  </div>
+                </button>
+              ))}
+            </motion.div>
+          )}
 
-              {/* Text Area - Full height */}
-              <motion.div
-                className="flex min-h-[200px] flex-col p-6 md:p-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-              >
+          {/* Optional freetext input */}
+          {pendingClarification.allows_freetext && (
+            <motion.div
+              className="border-t border-[--border-subtle] pt-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <p className="mb-3 text-center text-sm text-[--text-muted]">
+                {pendingClarification.freetext_prompt ||
+                  'Or provide your own answer:'}
+              </p>
+              <div className="flex gap-3">
                 <Textarea
                   value={clarificationAnswer}
                   onChange={(e) => setClarificationAnswer(e.target.value)}
                   placeholder="Type your answer..."
                   data-test="clarification-input"
-                  className="min-h-[140px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] focus:ring-0 focus:outline-none disabled:opacity-40"
-                  style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                  className="min-h-[80px] flex-1 resize-none rounded-xl border border-[--border-default] bg-[--surface-elevated] px-4 py-3 text-base text-[--text-primary] placeholder-[--text-muted] focus:border-[--accent] focus:ring-1 focus:ring-[--accent] focus:outline-none disabled:opacity-40"
                   disabled={isSubmitting}
                   onKeyDown={(e) => {
                     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -374,65 +420,45 @@ export function ProcessingScreen({
                     }
                   }}
                 />
-              </motion.div>
-
-              {/* Footer / Action Area */}
-              <div className="border-t border-[--border-subtle] bg-[--surface-overlay] p-2 dark:bg-neutral-900/30">
-                <div className="flex flex-col items-center justify-between gap-4 px-4 py-2 md:flex-row">
-                  {/* Skip option */}
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      setClarificationAnswer('Skip this question');
-                      handleSubmitClarification();
-                    }}
-                    disabled={isSubmitting}
-                    className="text-[--text-muted] hover:bg-[--surface-overlay] hover:text-[--text-secondary]"
-                  >
-                    Skip this question
-                  </Button>
-
-                  {/* Primary Action with keyboard shortcut */}
-                  <div className="flex items-center gap-3">
-                    {/* Keyboard shortcut hint */}
-                    <div className="hidden items-center gap-1.5 md:flex">
-                      <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
-                        ⌘
-                      </kbd>
-                      <kbd className="flex h-5 items-center justify-center rounded border border-[--border-default] bg-[--surface-overlay] px-1.5 font-mono text-[10px] text-[--text-muted]">
-                        ↵
-                      </kbd>
-                    </div>
-                    <button
-                      onClick={handleSubmitClarification}
-                      disabled={!clarificationAnswer.trim() || isSubmitting}
-                      data-test="clarification-submit"
-                      className={`group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg px-6 py-3 transition-all duration-300 md:w-auto ${
-                        clarificationAnswer.trim() && !isSubmitting
-                          ? 'bg-[--text-primary] text-[--surface-base] shadow-lg hover:opacity-90 dark:bg-white dark:text-black dark:shadow-[0_0_20px_rgba(255,255,255,0.05)] dark:hover:shadow-[0_0_25px_rgba(255,255,255,0.15)]'
-                          : 'cursor-not-allowed bg-[--surface-overlay] text-[--text-muted] dark:bg-neutral-800 dark:text-neutral-500'
-                      }`}
-                    >
-                      {isSubmitting ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Send className="h-4 w-4" />
-                      )}
-                      <span
-                        className="text-sm font-semibold tracking-tight"
-                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
-                      >
-                        {isSubmitting ? 'Sending...' : 'Continue'}
-                      </span>
-                      {!isSubmitting && (
-                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      )}
-                    </button>
-                  </div>
-                </div>
               </div>
-            </div>
-          </div>
+              {clarificationAnswer.trim() && (
+                <motion.div
+                  className="mt-4 flex justify-end"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <button
+                    onClick={handleSubmitClarification}
+                    disabled={isSubmitting}
+                    data-test="clarification-submit"
+                    className={cn(
+                      'flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-200',
+                      'bg-[--text-primary] text-[--surface-base]',
+                      'hover:opacity-90',
+                      'disabled:cursor-not-allowed disabled:opacity-50',
+                    )}
+                  >
+                    {isSubmitting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                    <span>Submit</span>
+                  </button>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+
+          {/* Elapsed time indicator */}
+          <motion.p
+            className="mt-8 text-center text-xs text-[--text-muted] tabular-nums"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            {formatElapsed(elapsedSeconds)} elapsed
+          </motion.p>
         </div>
       </motion.div>
     );

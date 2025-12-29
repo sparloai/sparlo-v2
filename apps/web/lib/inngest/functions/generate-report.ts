@@ -226,9 +226,10 @@ export const generateReport = inngest.createFunction(
         });
 
         // Handle v10 AN0 output - check if clarification needed
-        if (an0Result.result.need_question === true) {
-          // Extract question with type narrowing
-          const clarificationQuestion = an0Result.result.question;
+        if (an0Result.result.needs_clarification === true) {
+          // Extract question from structured clarification request
+          const clarificationRequest = an0Result.result.clarification_request;
+          const clarificationQuestion = clarificationRequest.question;
 
           // Need clarification - store and wait
           state = {
@@ -244,6 +245,10 @@ export const generateReport = inngest.createFunction(
               clarifications: [
                 {
                   question: clarificationQuestion,
+                  context: clarificationRequest.context,
+                  options: clarificationRequest.options,
+                  allows_freetext: clarificationRequest.allows_freetext,
+                  freetext_prompt: clarificationRequest.freetext_prompt,
                   askedAt: new Date().toISOString(),
                 },
               ],
@@ -296,7 +301,7 @@ export const generateReport = inngest.createFunction(
             );
 
             // Use the retry result if it's a full analysis
-            if (an0RetryResult.result.need_question === false) {
+            if (an0RetryResult.result.needs_clarification === false) {
               // Update state with v10 AN0 analysis outputs
               state = updateStateWithAN0Analysis(state, an0RetryResult.result);
               // Merge usage
@@ -773,7 +778,7 @@ function updateStateWithAN0Analysis(
   state: ChainState,
   result: AN0Output,
 ): ChainState {
-  if (result.need_question === true) {
+  if (result.needs_clarification === true) {
     return state; // Can't update with analysis from a question response
   }
 
