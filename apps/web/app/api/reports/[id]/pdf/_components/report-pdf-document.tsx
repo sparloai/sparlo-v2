@@ -827,36 +827,39 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
 
       {/* Primary Solution */}
       {primary && (
-        <View style={styles.cardHighlight} wrap={false}>
-          <View style={styles.tagRow}>
-            <View style={[styles.tag, styles.tagStrong]}>
-              <Text style={[styles.tagText, styles.tagStrongText]}>
-                Primary
-              </Text>
+        <View style={styles.cardHighlight}>
+          {/* Header section - keep together */}
+          <View wrap={false}>
+            <View style={styles.tagRow}>
+              <View style={[styles.tag, styles.tagStrong]}>
+                <Text style={[styles.tagText, styles.tagStrongText]}>
+                  Primary
+                </Text>
+              </View>
+              <SourceTypeTag type={primary.source_type} />
+              {primary.confidence !== undefined && (
+                <ConfidenceTag level={primary.confidence} />
+              )}
             </View>
-            <SourceTypeTag type={primary.source_type} />
-            {primary.confidence !== undefined && (
-              <ConfidenceTag level={primary.confidence} />
+
+            <Text style={styles.cardTitle}>{primary.title}</Text>
+
+            {primary.bottom_line && (
+              <Text style={[styles.paragraph, { marginTop: 4 }]}>
+                {primary.bottom_line}
+              </Text>
             )}
           </View>
 
-          <Text style={styles.cardTitle}>{primary.title}</Text>
-
-          {primary.bottom_line && (
-            <Text style={[styles.paragraph, { marginTop: 4 }]}>
-              {primary.bottom_line}
-            </Text>
-          )}
-
           {primary.what_it_is && (
-            <View style={{ marginTop: 8 }}>
+            <View style={{ marginTop: 8 }} wrap={false}>
               <MonoLabel>What It Is</MonoLabel>
               <Text style={styles.cardContent}>{primary.what_it_is}</Text>
             </View>
           )}
 
           {primary.why_it_works && (
-            <View style={{ marginTop: 8 }}>
+            <View style={{ marginTop: 8 }} wrap={false}>
               <MonoLabel>Why It Works</MonoLabel>
               <Text style={styles.cardContent}>{primary.why_it_works}</Text>
             </View>
@@ -869,7 +872,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
           {(primary.expected_improvement ||
             primary.investment ||
             primary.timeline) && (
-            <View style={[styles.row, { marginTop: 12 }]}>
+            <View style={[styles.row, { marginTop: 12 }]} wrap={false}>
               {primary.expected_improvement && (
                 <View style={styles.col3}>
                   <MonoLabel>Expected Improvement</MonoLabel>
@@ -899,7 +902,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
               <MonoLabel>Validation Gates</MonoLabel>
               {primary.validation_gates.map(
                 (gate: ValidationGate, i: number) => (
-                  <View key={i} style={[styles.card, { marginTop: 6 }]}>
+                  <View key={i} style={[styles.card, { marginTop: 6 }]} wrap={false}>
                     {gate.week && (
                       <Text
                         style={[
@@ -929,7 +932,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
           {/* Why It Might Fail */}
           {primary.why_it_might_fail &&
             primary.why_it_might_fail.length > 0 && (
-              <View style={[styles.warningBox, { marginTop: 12 }]}>
+              <View style={[styles.warningBox, { marginTop: 12 }]} wrap={false}>
                 <MonoLabel>Why It Might Fail</MonoLabel>
                 {primary.why_it_might_fail.map((reason, i) => (
                   <View key={i} style={styles.listItem}>
@@ -1042,36 +1045,39 @@ function InnovationConceptsSection({
 
       {/* Recommended Innovation */}
       {recommended && (
-        <View style={styles.cardHighlight} wrap={false}>
-          <View style={styles.tagRow}>
-            <View style={[styles.tag, styles.tagStrong]}>
-              <Text style={[styles.tagText, styles.tagStrongText]}>
-                Recommended
-              </Text>
-            </View>
-            {recommended.innovation_type && (
-              <View style={styles.tag}>
-                <Text style={styles.tagText}>
-                  {recommended.innovation_type.replace(/_/g, ' ')}
+        <View style={styles.cardHighlight}>
+          {/* Header section - keep together */}
+          <View wrap={false}>
+            <View style={styles.tagRow}>
+              <View style={[styles.tag, styles.tagStrong]}>
+                <Text style={[styles.tagText, styles.tagStrongText]}>
+                  Recommended
                 </Text>
               </View>
-            )}
-            {recommended.confidence !== undefined && (
-              <ConfidenceTag level={recommended.confidence} />
-            )}
+              {recommended.innovation_type && (
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>
+                    {recommended.innovation_type.replace(/_/g, ' ')}
+                  </Text>
+                </View>
+              )}
+              {recommended.confidence !== undefined && (
+                <ConfidenceTag level={recommended.confidence} />
+              )}
+            </View>
+
+            <Text style={styles.cardTitle}>{recommended.title}</Text>
           </View>
 
-          <Text style={styles.cardTitle}>{recommended.title}</Text>
-
           {recommended.what_it_is && (
-            <View style={{ marginTop: 8 }}>
+            <View style={{ marginTop: 8 }} wrap={false}>
               <MonoLabel>What It Is</MonoLabel>
               <Text style={styles.cardContent}>{recommended.what_it_is}</Text>
             </View>
           )}
 
           {recommended.why_it_works && (
-            <View style={{ marginTop: 8 }}>
+            <View style={{ marginTop: 8 }} wrap={false}>
               <MonoLabel>Why It Works</MonoLabel>
               <Text style={styles.cardContent}>{recommended.why_it_works}</Text>
             </View>
@@ -1082,7 +1088,7 @@ function InnovationConceptsSection({
 
           {/* Breakthrough Potential */}
           {recommended.breakthrough_potential && (
-            <View style={[styles.insightBox, { marginTop: 12 }]}>
+            <View style={[styles.insightBox, { marginTop: 12 }]} wrap={false}>
               <MonoLabel>Breakthrough Potential</MonoLabel>
               {recommended.breakthrough_potential.if_it_works && (
                 <Text style={styles.insightText}>
@@ -1100,7 +1106,7 @@ function InnovationConceptsSection({
 
           {/* Validation Path */}
           {recommended.validation_path && (
-            <View style={{ marginTop: 12 }}>
+            <View style={{ marginTop: 12 }} wrap={false}>
               <MonoLabel>Validation Path</MonoLabel>
               {recommended.validation_path.first_test && (
                 <Text style={styles.cardContent}>
@@ -1122,7 +1128,7 @@ function InnovationConceptsSection({
 
           {/* Risks */}
           {recommended.risks && (
-            <View style={[styles.warningBox, { marginTop: 12 }]}>
+            <View style={[styles.warningBox, { marginTop: 12 }]} wrap={false}>
               <MonoLabel>Risks</MonoLabel>
               {recommended.risks.physics_risks?.map((r, i) => (
                 <View key={i} style={styles.listItem}>
