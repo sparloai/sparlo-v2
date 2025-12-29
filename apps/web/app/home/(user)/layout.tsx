@@ -4,11 +4,13 @@ import { UserWorkspaceContextProvider } from '@kit/accounts/components';
 
 import { withI18n } from '~/lib/i18n/with-i18n';
 
+import { MainContent } from './_components/navigation/main-content';
 import { NavHeader } from './_components/navigation/nav-header';
 import { AppWorkspaceProvider } from './_lib/app-workspace-context';
 import { loadUserWorkspace } from './_lib/server/load-user-workspace';
 import { loadRecentReports } from './_lib/server/recent-reports.loader';
 import { loadUserUsage } from './_lib/server/usage.loader';
+import { SidebarProvider } from './_lib/sidebar-context';
 
 function UserHomeLayout({ children }: React.PropsWithChildren) {
   const workspace = use(loadUserWorkspace());
@@ -19,16 +21,17 @@ function UserHomeLayout({ children }: React.PropsWithChildren) {
   return (
     <UserWorkspaceContextProvider value={workspace}>
       <AppWorkspaceProvider value={workspace}>
-        <div className="flex min-h-screen flex-col bg-[--surface-base]">
-          <NavHeader
-            usage={usage}
-            recentReports={recentReports}
-            user={workspace.user}
-            workspace={workspace.workspace}
-          />
-          {/* ml-16 accounts for sidebar (64px), pt-14 for header (56px) */}
-          <main className="ml-16 flex-1 pt-14">{children}</main>
-        </div>
+        <SidebarProvider>
+          <div className="flex min-h-screen flex-col bg-[--surface-base]">
+            <NavHeader
+              usage={usage}
+              recentReports={recentReports}
+              user={workspace.user}
+              workspace={workspace.workspace}
+            />
+            <MainContent>{children}</MainContent>
+          </div>
+        </SidebarProvider>
       </AppWorkspaceProvider>
     </UserWorkspaceContextProvider>
   );

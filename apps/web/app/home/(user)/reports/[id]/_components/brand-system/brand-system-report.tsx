@@ -22,16 +22,17 @@ import { Download, Share2 } from 'lucide-react';
 import { toast } from '@kit/ui/sonner';
 import { cn } from '@kit/ui/utils';
 
+import { useSidebarState } from '~/home/(user)/_lib/sidebar-context';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
-import { CHAT_DRAWER_WIDTH } from '../../_lib/constants';
 
+import { CHAT_DRAWER_WIDTH } from '../../_lib/constants';
 import {
   TOC_SCROLL_OFFSET,
   TOC_STICKY_TOP,
   flattenSectionIds,
   useTocScroll,
 } from '../../_lib/hooks/use-toc-scroll';
-import { Section, SectionTitle, UnknownFieldRenderer } from './primitives';
+import { Section, SectionTitle } from './primitives';
 import {
   ChallengeFrameSection,
   ConstraintsSection,
@@ -115,37 +116,6 @@ function formatDate(isoString: string): string {
     year: 'numeric',
   });
 }
-
-// Known fields that we handle explicitly (both old and new names)
-const KNOWN_FIELDS = new Set([
-  'title',
-  'executive_summary',
-  'problem_restatement',
-  'key_insights',
-  'next_steps',
-  'decision_architecture',
-  'other_concepts',
-  'self_critique',
-  'honest_assessment',
-  'cross_domain_search',
-  'execution_track',
-  'innovation_portfolio',
-  'strategic_integration',
-  'brief',
-  'problem_analysis',
-  'constraints_and_metrics',
-  'constraints',
-  'challenge_the_frame',
-  'risks_and_watchouts',
-  'what_id_actually_do',
-  'follow_up_prompts',
-  'innovation_analysis',
-  // Old field names (v3 schema)
-  'solution_concepts',
-  'innovation_concepts',
-  'header',
-  'metadata',
-]);
 
 /**
  * Normalize report data to handle both old (v3) and new (v4) schema field names.
@@ -425,7 +395,6 @@ interface ReportContentProps {
   brief?: string;
   createdAt?: string;
   readTime: number;
-  unknownFields: [string, unknown][];
   showActions?: boolean;
 }
 
@@ -435,7 +404,6 @@ const ReportContent = memo(function ReportContent({
   brief,
   createdAt,
   readTime,
-  unknownFields,
   showActions = true,
 }: ReportContentProps) {
   const displayTitle = title || normalizedData.title;
@@ -575,29 +543,6 @@ const ReportContent = memo(function ReportContent({
       {normalizedData.next_steps && normalizedData.next_steps.length > 0 && (
         <NextStepsSection steps={normalizedData.next_steps} />
       )}
-
-      {/* Follow-up Prompts */}
-      {normalizedData.follow_up_prompts &&
-        normalizedData.follow_up_prompts.length > 0 && (
-          <FollowUpPromptsSection prompts={normalizedData.follow_up_prompts} />
-        )}
-
-      {/* Unknown Fields - Graceful Handling */}
-      {unknownFields.length > 0 && (
-        <Section id="additional-information" className="mt-20">
-          <SectionTitle size="lg">Additional Information</SectionTitle>
-          <div className="mt-10 space-y-8">
-            {unknownFields.map(([key, value]) => (
-              <div key={key} className="max-w-[70ch]">
-                <UnknownFieldRenderer
-                  data={value}
-                  label={key.replace(/_/g, ' ')}
-                />
-              </div>
-            ))}
-          </div>
-        </Section>
-      )}
     </>
   );
 });
@@ -631,12 +576,6 @@ export const BrandSystemReport = memo(function BrandSystemReport({
     scrollOffset: TOC_SCROLL_OFFSET,
   });
 
-  // Find unknown fields for graceful rendering
-  const unknownFields = Object.entries(reportData).filter(
-    ([key, value]) =>
-      !KNOWN_FIELDS.has(key) && value !== null && value !== undefined,
-  );
-
   // Calculate read time
   const readTime = calculateReadTime(normalizedData);
 
@@ -647,14 +586,16 @@ export const BrandSystemReport = memo(function BrandSystemReport({
       <div
         className="relative min-h-screen bg-white transition-transform duration-300 ease-out"
         style={{
-          transform: isChatOpen ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)` : undefined,
+          transform: isChatOpen
+            ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)`
+            : undefined,
         }}
       >
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
           <div className="flex gap-8 py-10">
-            {/* Sticky TOC Sidebar */}
+            {/* Sticky TOC Sidebar - z-30 ensures it goes behind the expanded app sidebar (z-50) */}
             {tocSections.length > 0 && (
-              <aside className="hidden w-56 shrink-0 lg:block">
+              <aside className="relative z-30 hidden w-56 shrink-0 lg:block">
                 <nav
                   className="sticky max-h-[calc(100vh-7rem)] overflow-y-auto"
                   style={{ top: `${TOC_STICKY_TOP}px` }}
@@ -685,7 +626,6 @@ export const BrandSystemReport = memo(function BrandSystemReport({
                   brief={brief}
                   createdAt={createdAt}
                   readTime={readTime}
-                  unknownFields={unknownFields}
                   showActions={showActions}
                 />
               </div>
@@ -700,7 +640,9 @@ export const BrandSystemReport = memo(function BrandSystemReport({
     <div
       className="relative min-h-screen bg-white transition-transform duration-300 ease-out"
       style={{
-        transform: isChatOpen ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)` : undefined,
+        transform: isChatOpen
+          ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)`
+          : undefined,
       }}
     >
       {/* Table of Contents - fixed sidebar for pages without app sidebar */}
@@ -718,7 +660,6 @@ export const BrandSystemReport = memo(function BrandSystemReport({
           brief={brief}
           createdAt={createdAt}
           readTime={readTime}
-          unknownFields={unknownFields}
           showActions={showActions}
         />
       </main>
@@ -772,31 +713,6 @@ const NextStepsSection = memo(function NextStepsSection({
           </li>
         ))}
       </ol>
-    </Section>
-  );
-});
-
-const FollowUpPromptsSection = memo(function FollowUpPromptsSection({
-  prompts,
-}: {
-  prompts: string[];
-}) {
-  return (
-    <Section
-      id="follow-up-prompts"
-      className="mt-20 border-t border-zinc-200 pt-16"
-    >
-      <SectionTitle size="md">Continue the Conversation</SectionTitle>
-      <div className="mt-6 space-y-3">
-        {prompts.map((prompt, idx) => (
-          <button
-            key={idx}
-            className="block w-full max-w-[50ch] rounded border border-zinc-200 px-4 py-3 text-left text-[16px] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900"
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
     </Section>
   );
 });

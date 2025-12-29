@@ -7,9 +7,8 @@
  *
  * Features:
  * - Fixed sidebar (desktop lg+)
- * - Floating minimal dots (xl+)
  * - Mobile dropdown
- * - Intersection Observer for active tracking
+ * - Intersection Observer for active tracking (via shared hook)
  * - Smooth scrolling with offset
  */
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -18,19 +17,20 @@ import { ChevronDown } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
 
-// ============================================
-// TYPES
-// ============================================
+import {
+  TOC_SCROLL_OFFSET,
+  TOC_STICKY_TOP,
+  type TocSection,
+  flattenSectionIds,
+  useTocScroll,
+} from '../../_lib/hooks/use-toc-scroll';
 
-export interface TocSection {
-  id: string;
-  title: string;
-  subsections?: { id: string; title: string }[];
-}
+// Re-export for consumers
+export type { TocSection };
 
 interface TableOfContentsProps {
   sections: TocSection[];
-  variant?: 'sidebar' | 'floating' | 'both';
+  variant?: 'sidebar';
   scrollOffset?: number;
   /**
    * Whether the TOC is inside a layout with the app sidebar.
@@ -62,7 +62,7 @@ const SidebarToc = memo(function SidebarToc({
   return (
     <aside
       className={cn(
-        'fixed top-14 z-40 hidden h-[calc(100vh-3.5rem)] w-56 overflow-y-auto border-r border-zinc-100 bg-white/95 p-6 backdrop-blur-sm lg:block',
+        'fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-56 overflow-y-auto border-r border-zinc-100 bg-white/95 p-6 backdrop-blur-sm lg:block',
         hasAppSidebar ? 'left-16' : 'left-0',
       )}
     >
@@ -160,67 +160,6 @@ const SidebarToc = memo(function SidebarToc({
         }
       `}</style>
     </aside>
-  );
-});
-
-// ============================================
-// FLOATING TOC (XL screens)
-// ============================================
-
-interface FloatingTocProps {
-  sections: TocSection[];
-  activeSection: string;
-  onNavigate: (id: string) => void;
-  visible: boolean;
-}
-
-const FloatingToc = memo(function FloatingToc({
-  sections,
-  activeSection,
-  onNavigate,
-  visible,
-}: FloatingTocProps) {
-  return (
-    <nav
-      className={cn(
-        'fixed top-1/2 right-8 z-40 hidden -translate-y-1/2 xl:block',
-        'transition-all duration-300',
-        visible
-          ? 'pointer-events-auto opacity-100'
-          : 'pointer-events-none translate-y-2 opacity-0',
-      )}
-    >
-      <ul className="space-y-3">
-        {sections.map((section) => (
-          <li key={section.id}>
-            <button
-              onClick={() => onNavigate(section.id)}
-              className="group flex items-center gap-3"
-            >
-              <span
-                className={cn(
-                  'h-2 w-2 rounded-full transition-all duration-200',
-                  activeSection === section.id
-                    ? 'scale-125 bg-zinc-900'
-                    : 'bg-zinc-300 group-hover:bg-zinc-400',
-                )}
-              />
-              <span
-                className={cn(
-                  'text-[12px] whitespace-nowrap transition-opacity',
-                  'opacity-0 group-hover:opacity-100',
-                  activeSection === section.id
-                    ? 'text-zinc-900'
-                    : 'text-zinc-500',
-                )}
-              >
-                {section.title}
-              </span>
-            </button>
-          </li>
-        ))}
-      </ul>
-    </nav>
   );
 });
 
@@ -323,97 +262,18 @@ const MobileToc = memo(function MobileToc({
 
 export const TableOfContents = memo(function TableOfContents({
   sections,
-  variant = 'both',
-  scrollOffset = 100,
+  scrollOffset = TOC_SCROLL_OFFSET,
   hasAppSidebar = true,
 }: TableOfContentsProps) {
-  const [activeSection, setActiveSection] = useState<string>(
-    sections[0]?.id || '',
-  );
-  const [hasScrolled, setHasScrolled] = useState(false);
-  const [progress, setProgress] = useState(0);
+  // Flatten section IDs for tracking
+  const sectionIds = useMemo(() => flattenSectionIds(sections), [sections]);
 
-  // All section IDs including subsections
-  const allSectionIds = useMemo(() => {
-    const ids: string[] = [];
-    sections.forEach((section) => {
-      ids.push(section.id);
-      section.subsections?.forEach((sub) => ids.push(sub.id));
-    });
-    return ids;
-  }, [sections]);
-
-  // Intersection Observer for active section
-  useEffect(() => {
-    const observerOptions: IntersectionObserverInit = {
-      rootMargin: '-20% 0px -75% 0px',
-      threshold: 0,
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setActiveSection(entry.target.id);
-        }
-      });
-    }, observerOptions);
-
-    allSectionIds.forEach((id) => {
-      const element = document.getElementById(id);
-      if (element) observer.observe(element);
-    });
-
-    return () => observer.disconnect();
-  }, [allSectionIds]);
-
-  // Scroll listener for floating TOC visibility and progress
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const scrollY = window.scrollY;
-          const windowHeight = window.innerHeight;
-          const docHeight =
-            document.documentElement.scrollHeight - windowHeight;
-
-          // Show floating TOC after scrolling past 50% of viewport
-          setHasScrolled(scrollY > windowHeight * 0.5);
-
-          // Update progress
-          const newProgress = Math.min((scrollY / docHeight) * 100, 100);
-          setProgress(newProgress);
-
-          ticking = false;
-        });
-
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Navigate to section
-  const handleNavigate = useCallback(
-    (id: string) => {
-      const element = document.getElementById(id);
-      if (element) {
-        const top =
-          element.getBoundingClientRect().top + window.scrollY - scrollOffset;
-        window.scrollTo({
-          top,
-          behavior: 'smooth',
-        });
-      }
-    },
-    [scrollOffset],
-  );
-
-  const showSidebar = variant === 'sidebar' || variant === 'both';
-  const showFloating = variant === 'floating' || variant === 'both';
+  // Use shared scroll tracking hook
+  const { activeSection, navigateToSection, progress } = useTocScroll({
+    sectionIds,
+    scrollOffset,
+    trackProgress: true,
+  });
 
   return (
     <>
@@ -421,29 +281,17 @@ export const TableOfContents = memo(function TableOfContents({
       <MobileToc
         sections={sections}
         activeSection={activeSection}
-        onNavigate={handleNavigate}
+        onNavigate={navigateToSection}
       />
 
       {/* Desktop Sidebar */}
-      {showSidebar && (
-        <SidebarToc
-          sections={sections}
-          activeSection={activeSection}
-          onNavigate={handleNavigate}
-          progress={progress}
-          hasAppSidebar={hasAppSidebar}
-        />
-      )}
-
-      {/* Floating (XL only) */}
-      {showFloating && (
-        <FloatingToc
-          sections={sections}
-          activeSection={activeSection}
-          onNavigate={handleNavigate}
-          visible={hasScrolled}
-        />
-      )}
+      <SidebarToc
+        sections={sections}
+        activeSection={activeSection}
+        onNavigate={navigateToSection}
+        progress={progress}
+        hasAppSidebar={hasAppSidebar}
+      />
     </>
   );
 });
@@ -486,6 +334,14 @@ export function generateTocSections(
     });
   }
 
+  // Constraints
+  if (reportData.constraints_and_metrics) {
+    sections.push({
+      id: 'constraints-metrics',
+      title: 'Constraints',
+    });
+  }
+
   // Challenge the Frame
   if (
     reportData.challenge_the_frame &&
@@ -495,14 +351,6 @@ export function generateTocSections(
     sections.push({
       id: 'challenge-the-frame',
       title: 'Challenge the Frame',
-    });
-  }
-
-  // Constraints & Metrics
-  if (reportData.constraints_and_metrics) {
-    sections.push({
-      id: 'constraints-metrics',
-      title: 'Constraints & Metrics',
     });
   }
 

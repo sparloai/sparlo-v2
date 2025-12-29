@@ -9,6 +9,7 @@ import { cn } from '@kit/ui/utils';
 
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
 import type { UsageData } from '../../_lib/server/usage.loader';
+import { useSidebarState } from '../../_lib/sidebar-context';
 import { UsageIndicator } from '../usage-indicator';
 import { NavSidebar } from './nav-sidebar';
 
@@ -34,6 +35,8 @@ export const NavHeader = memo(function NavHeader({
   user,
   workspace,
 }: NavHeaderProps) {
+  const { sidebarWidth } = useSidebarState();
+
   return (
     <>
       {/* Persistent Sidebar */}
@@ -49,10 +52,9 @@ export const NavHeader = memo(function NavHeader({
           'fixed top-0 right-0 z-30',
           'border-b border-zinc-200 dark:border-zinc-800',
           'bg-white/90 backdrop-blur-sm dark:bg-zinc-950/90',
-          'transition-colors duration-200',
-          // Left position accounts for sidebar - use CSS variable or fixed value
-          'left-16', // collapsed sidebar width (64px = 16 * 4)
+          'transition-[left] duration-300 ease-out',
         )}
+        style={{ left: sidebarWidth }}
       >
         <nav className="flex h-14 items-center justify-between px-4 sm:px-6">
           {/* Left: Logo */}
