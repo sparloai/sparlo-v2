@@ -214,7 +214,8 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
               const isLast = index === filteredReports.length - 1;
               const processing = isProcessing(report.status);
               const isComplete = report.status === 'complete';
-              const isFailed = report.status === 'failed';
+              const isFailed =
+                report.status === 'failed' || report.status === 'error';
               const isCancelled = report.status === 'cancelled';
               const isClarifying = report.status === 'clarifying';
               const isClickable = isComplete;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -110,6 +110,12 @@ export function ProcessingScreen({
     return () => clearInterval(interval);
   }, [progress.status, progress.currentStep, prefersReducedMotion]);
 
+  // Memoize pending clarification check to avoid recalculation on every render
+  const hasPendingClarification = useMemo(
+    () => progress.clarifications?.some((c) => c.answer == null) ?? false,
+    [progress.clarifications],
+  );
+
   // Consolidated navigation effect - prevents race condition between two effects
   useEffect(() => {
     if (hasNavigatedRef.current) return;
@@ -134,8 +140,7 @@ export function ProcessingScreen({
     const isStillInAN0 =
       progress.currentStep === null || progress.currentStep.startsWith('an0');
     const movedPastAN0 = progress.status === 'processing' && !isStillInAN0;
-    const noClarificationNeeded =
-      movedPastAN0 && progress.clarifications?.length === 0;
+    const noClarificationNeeded = movedPastAN0 && !hasPendingClarification;
 
     // DEBUG: Log redirect decision
     if (movedPastAN0) {
@@ -143,6 +148,7 @@ export function ProcessingScreen({
         '[ProcessingScreen] Moved past AN0, checking clarifications:',
         {
           movedPastAN0,
+          hasPendingClarification,
           noClarificationNeeded,
           willRedirect: noClarificationNeeded,
         },
@@ -157,12 +163,16 @@ export function ProcessingScreen({
     progress.status,
     progress.currentStep,
     progress.clarifications,
+    progress.id,
+    hasPendingClarification,
     onComplete,
     router,
   ]);
 
   // Get the current clarification question (if any)
-  const pendingClarification = progress.clarifications?.find((c) => !c.answer);
+  const pendingClarification = progress.clarifications?.find(
+    (c) => c.answer == null,
+  );
 
   const handleSubmitClarification = useCallback(async () => {
     if (!clarificationAnswer.trim() || isSubmitting) return;
