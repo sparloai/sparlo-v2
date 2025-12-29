@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 
 import Link from 'next/link';
 
@@ -10,7 +10,7 @@ import Link from 'next/link';
  * Air Company Aesthetic - Pure, minimal, confident
  *
  * Features:
- * - Looping background video (6 seconds, custom JS loop)
+ * - Looping background video (6 seconds, precise RAF loop)
  * - Dark overlay for text legibility
  * - Light font weight typography
  * - Centered layout
@@ -23,23 +23,46 @@ const VIDEO_LOOP_DURATION = 6;
 export const EngineeringHero = memo(function EngineeringHero() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Custom loop handler - restart video at 6 seconds to avoid scene transition
-  const handleTimeUpdate = useCallback(() => {
+  // Use requestAnimationFrame for precise frame-accurate looping
+  useEffect(() => {
     const video = videoRef.current;
-    if (video && video.currentTime >= VIDEO_LOOP_DURATION) {
-      video.currentTime = 0;
+    if (!video) return;
+
+    let rafId: number;
+
+    const checkLoop = () => {
+      if (video.currentTime >= VIDEO_LOOP_DURATION) {
+        video.currentTime = 0;
+      }
+      rafId = requestAnimationFrame(checkLoop);
+    };
+
+    // Start the loop check when video plays
+    const handlePlay = () => {
+      rafId = requestAnimationFrame(checkLoop);
+    };
+
+    video.addEventListener('play', handlePlay);
+
+    // If video is already playing, start checking immediately
+    if (!video.paused) {
+      rafId = requestAnimationFrame(checkLoop);
     }
+
+    return () => {
+      video.removeEventListener('play', handlePlay);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   return (
     <section className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-zinc-950">
-      {/* Background Video - custom 6s loop to avoid scene transition */}
+      {/* Background Video - custom 6s loop using RAF for precision */}
       <video
         ref={videoRef}
         autoPlay
         muted
         playsInline
-        onTimeUpdate={handleTimeUpdate}
         className="absolute inset-0 h-full w-full object-cover"
       >
         <source src="/videos/hero-bg.mp4" type="video/mp4" />
