@@ -87,9 +87,18 @@ export interface ImageAttachment {
 }
 
 /**
+ * PDF attachment for document processing
+ */
+export interface PDFAttachment {
+  media_type: 'application/pdf';
+  data: string; // base64 encoded
+}
+
+/**
  * Call Claude with proper error handling and usage tracking
  * Uses streaming for large token requests to avoid timeout issues
  * Supports vision with optional image attachments
+ * Supports PDF documents with optional document attachments
  * Supports prompt caching via cacheablePrefix for cost optimization
  * (Kieran's fix: every LLM call wrapped with error handling)
  */
@@ -100,13 +109,14 @@ export async function callClaude(params: {
   maxTokens?: number;
   temperature?: number;
   images?: ImageAttachment[];
+  documents?: PDFAttachment[];
   cacheablePrefix?: string;
 }): Promise<ClaudeResult> {
   const anthropic = getAnthropicClient();
   const maxTokens = params.maxTokens ?? 8192;
   const temperature = params.temperature ?? 1;
 
-  // Build message content - supports text and images for vision
+  // Build message content - supports text, images, and PDF documents
   // Use Anthropic SDK types for proper type compatibility
   type ImageMediaType = 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
   type ContentBlock =
@@ -114,11 +124,29 @@ export async function callClaude(params: {
     | {
         type: 'image';
         source: { type: 'base64'; media_type: ImageMediaType; data: string };
+      }
+    | {
+        type: 'document';
+        source: { type: 'base64'; media_type: 'application/pdf'; data: string };
       };
 
   const messageContent: ContentBlock[] = [];
 
-  // Add images first if present (Claude processes them before text)
+  // Add PDF documents first if present (Claude processes them before images and text)
+  if (params.documents && params.documents.length > 0) {
+    for (const doc of params.documents) {
+      messageContent.push({
+        type: 'document',
+        source: {
+          type: 'base64',
+          media_type: doc.media_type,
+          data: doc.data,
+        },
+      });
+    }
+  }
+
+  // Add images if present (Claude processes them before text)
   if (params.images && params.images.length > 0) {
     for (const image of params.images) {
       messageContent.push({

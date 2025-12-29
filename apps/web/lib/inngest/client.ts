@@ -29,7 +29,7 @@ export const ClarificationAnsweredEventSchema = z.object({
   answer: z.string().min(1),
 });
 
-// Attachment schema for vision support
+// Attachment schema for vision and document support
 const AttachmentSchema = z.object({
   filename: z.string(),
   media_type: z.enum([
@@ -38,6 +38,7 @@ const AttachmentSchema = z.object({
     'image/gif',
     'image/webp',
     'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   ]),
   data: z.string(), // base64 encoded
 });

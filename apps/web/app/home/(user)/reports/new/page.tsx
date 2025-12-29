@@ -34,7 +34,14 @@ interface Attachment {
 
 const MAX_ATTACHMENTS = 5;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const ALLOWED_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+];
 
 type PageStep = 'input' | 'clarification' | 'processing';
 
@@ -205,7 +212,7 @@ export default function NewReportPage() {
         if (!ALLOWED_TYPES.includes(file.type)) {
           setFormState((prev) => ({
             ...prev,
-            error: `File type ${file.type} not supported. Use JPEG, PNG, GIF, or WebP.`,
+            error: `File type ${file.type} not supported. Use JPEG, PNG, GIF, WebP, PDF, or DOCX.`,
           }));
           continue;
         }
@@ -286,7 +293,9 @@ export default function NewReportPage() {
           | 'image/jpeg'
           | 'image/png'
           | 'image/gif'
-          | 'image/webp',
+          | 'image/webp'
+          | 'application/pdf'
+          | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         data: a.base64 || '',
       }));
 
@@ -349,7 +358,9 @@ export default function NewReportPage() {
           | 'image/jpeg'
           | 'image/png'
           | 'image/gif'
-          | 'image/webp',
+          | 'image/webp'
+          | 'application/pdf'
+          | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         data: a.base64 || '',
       }));
 
@@ -492,7 +503,7 @@ export default function NewReportPage() {
                   }
                   onKeyDown={handleKeyDown}
                   placeholder="Your response..."
-                  className="h-40 w-full resize-none border-none bg-transparent p-0 text-[22px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
+                  className="h-40 w-full resize-none border-none bg-transparent p-0 text-[22px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:ring-0 focus:outline-none"
                 />
               </div>
 
@@ -545,7 +556,7 @@ export default function NewReportPage() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/gif,image/webp"
+          accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,.docx"
           multiple
           onChange={handleFileSelect}
           className="hidden"
@@ -590,7 +601,7 @@ export default function NewReportPage() {
             </Link>
 
             {/* Page title - anchor element */}
-            <h1 className="mb-12 font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
+            <h1 className="font-heading mb-12 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
               New Analysis
             </h1>
 
@@ -610,7 +621,7 @@ export default function NewReportPage() {
                 autoFocus
                 data-test="challenge-input"
                 placeholder="What engineering problem are you solving?"
-                className="h-64 w-full resize-none border-none bg-transparent p-0 text-[22px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 disabled:opacity-40"
+                className="h-64 w-full resize-none border-none bg-transparent p-0 text-[22px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:ring-0 focus:outline-none disabled:opacity-40"
               />
             </div>
 
@@ -639,14 +650,18 @@ export default function NewReportPage() {
                       key={attachment.id}
                       className="group flex items-center gap-2 rounded border border-zinc-200 bg-zinc-50 py-1.5 pr-2 pl-1.5 transition-colors hover:border-zinc-300"
                     >
-                      {/* Small thumbnail */}
-                      <div className="relative h-6 w-6 flex-shrink-0 overflow-hidden rounded-sm">
-                        <Image
-                          src={attachment.preview}
-                          alt={attachment.file.name}
-                          fill
-                          className="object-cover"
-                        />
+                      {/* Small thumbnail or document icon */}
+                      <div className="relative flex h-6 w-6 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm">
+                        {attachment.file.type.startsWith('image/') ? (
+                          <Image
+                            src={attachment.preview}
+                            alt={attachment.file.name}
+                            fill
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="text-sm text-zinc-500">📄</span>
+                        )}
                       </div>
                       {/* Filename */}
                       <span className="max-w-[120px] truncate text-[12px] tracking-[-0.02em] text-zinc-600">

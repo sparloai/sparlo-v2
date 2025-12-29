@@ -7,6 +7,7 @@ import {
   ClaudeRefusalError,
   type ImageAttachment,
   MODELS,
+  type PDFAttachment,
   type TokenUsage,
   calculateCost,
   callClaude,
@@ -133,7 +134,7 @@ export const generateHybridReport = inngest.createFunction(
         };
       }
 
-      // Convert attachments to ImageAttachment format for Claude vision
+      // Convert attachments to appropriate formats for Claude
       const imageAttachments: ImageAttachment[] = (attachments || [])
         .filter((a: { media_type: string }) =>
           a.media_type.startsWith('image/'),
@@ -142,6 +143,28 @@ export const generateHybridReport = inngest.createFunction(
           media_type: a.media_type as ImageAttachment['media_type'],
           data: a.data,
         }));
+
+      // PDF attachments for native Claude document processing
+      const pdfAttachments: PDFAttachment[] = (attachments || [])
+        .filter(
+          (a: { media_type: string }) => a.media_type === 'application/pdf',
+        )
+        .map((a: { data: string }) => ({
+          media_type: 'application/pdf' as const,
+          data: a.data,
+        }));
+
+      // DOCX: Extract text and include in prompt context
+      const docxContent = (attachments || [])
+        .filter((a: { media_type: string }) =>
+          a.media_type.includes('wordprocessingml'),
+        )
+        .map((a: { filename: string; data: string }) => {
+          // Decode base64 and extract text - Claude will interpret the content
+          const decoded = Buffer.from(a.data, 'base64').toString('utf-8');
+          return `## Document: ${a.filename}\n\n${decoded}`;
+        })
+        .join('\n\n');
 
       // Handle ClaudeRefusalError at the top level
       try {
@@ -243,11 +266,23 @@ export const generateHybridReport = inngest.createFunction(
               phase_progress: 0,
             });
 
-            // Include images for vision processing if attachments were provided
-            const userMessageWithContext =
-              imageAttachments.length > 0
-                ? `${designChallenge}\n\n[Note: ${imageAttachments.length} image(s) attached for visual context]`
-                : designChallenge;
+            // Build context with all attachments
+            const attachmentNotes: string[] = [];
+            if (imageAttachments.length > 0) {
+              attachmentNotes.push(`${imageAttachments.length} image(s)`);
+            }
+            if (pdfAttachments.length > 0) {
+              attachmentNotes.push(`${pdfAttachments.length} PDF document(s)`);
+            }
+
+            // Include DOCX content directly in the message
+            let userMessageWithContext = designChallenge;
+            if (docxContent) {
+              userMessageWithContext += `\n\n---\n\nAttached Documents:\n\n${docxContent}`;
+            }
+            if (attachmentNotes.length > 0) {
+              userMessageWithContext += `\n\n[Note: ${attachmentNotes.join(' and ')} attached for context]`;
+            }
 
             const { content, usage } = await callClaude({
               model: MODELS.OPUS,
@@ -257,6 +292,7 @@ export const generateHybridReport = inngest.createFunction(
               temperature: HYBRID_TEMPERATURES.default,
               images:
                 imageAttachments.length > 0 ? imageAttachments : undefined,
+              documents: pdfAttachments.length > 0 ? pdfAttachments : undefined,
               cacheablePrefix: HYBRID_CACHED_PREFIX,
             });
 

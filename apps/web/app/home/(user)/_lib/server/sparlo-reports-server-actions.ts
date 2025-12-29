@@ -396,10 +396,17 @@ export const cancelReportGeneration = enhanceAction(
   },
 );
 
-// Attachment schema for vision support
+// Attachment schema for vision and document support
 const ReportAttachmentSchema = z.object({
   filename: z.string(),
-  media_type: z.enum(['image/jpeg', 'image/png', 'image/gif', 'image/webp']),
+  media_type: z.enum([
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ]),
   data: z.string(), // base64 encoded
 });
 
