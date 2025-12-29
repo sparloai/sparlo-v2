@@ -14,18 +14,13 @@ import {
   List,
   Loader2,
   MessageSquare,
-  Send,
   Share2,
-  Square,
   X,
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 import { Button } from '@kit/ui/button';
 import { toast } from '@kit/ui/sonner';
-import { Textarea } from '@kit/ui/textarea';
 import { cn } from '@kit/ui/utils';
 
 import { ProcessingScreen } from '../../../_components/processing-screen';
@@ -35,6 +30,7 @@ import {
   extractUserInput,
 } from '../_lib/extract-report';
 import type { ChatMessage } from '../_lib/schemas/chat.schema';
+import { ChatDrawer, ChatHeader, ChatInput, ChatMessages } from './chat';
 import { DiscoveryReportDisplay } from './discovery-report-display';
 import { HybridReportDisplay } from './hybrid-report-display';
 import { ReportRenderer } from './report/report-renderer';
@@ -754,8 +750,10 @@ export function ReportDisplay({
               typeof HybridReportDisplay
             >[0]['reportData']
           }
+          title={report.title}
           brief={userBrief}
           createdAt={report.created_at}
+          isChatOpen={isChatOpen}
         />
 
         {/* Chat Toggle Button */}
@@ -779,153 +777,23 @@ export function ReportDisplay({
         )}
 
         {/* Chat Drawer */}
-        <AnimatePresence>
-          {isChatOpen && (
-            <motion.aside
-              role="complementary"
-              aria-label="Chat with report"
-              className="fixed top-0 right-0 z-50 flex h-screen w-[420px] flex-col border-l border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900"
-              initial={{ x: 420 }}
-              animate={{ x: 0 }}
-              exit={{ x: 420 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            >
-              {/* Chat Header */}
-              <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4 dark:border-neutral-800">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                    <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                      Chat with Report
-                    </span>
-                    <p className="text-[10px] text-gray-500 dark:text-neutral-400">
-                      Ask follow-up questions
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsChatOpen(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:text-neutral-500 dark:hover:text-neutral-300"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-
-              {/* Chat Messages */}
-              <div
-                ref={chatContainerRef}
-                className="flex-1 space-y-4 overflow-y-auto p-5"
-                role="log"
-                aria-live="polite"
-                aria-label="Chat messages"
-              >
-                {chatMessages.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100 dark:bg-neutral-800">
-                      <MessageSquare className="h-7 w-7 text-gray-400 dark:text-neutral-500" />
-                    </div>
-                    <p className="text-base font-semibold text-gray-900 dark:text-white">
-                      Ask anything about this report
-                    </p>
-                    <p className="mt-2 max-w-[280px] text-sm text-gray-500 dark:text-neutral-400">
-                      Get clarification, explore alternatives, or dive deeper
-                      into specific concepts.
-                    </p>
-                  </div>
-                ) : (
-                  chatMessages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={cn(
-                        'flex',
-                        msg.role === 'user' ? 'justify-end' : 'justify-start',
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          'max-w-[85%] rounded-2xl px-4 py-3',
-                          msg.role === 'user'
-                            ? 'rounded-tr-sm bg-purple-600 text-white'
-                            : 'rounded-tl-sm bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-neutral-100',
-                          msg.cancelled && 'opacity-60',
-                          msg.error && 'border border-red-500/30',
-                        )}
-                      >
-                        {msg.role === 'user' ? (
-                          <p className="text-sm whitespace-pre-wrap">
-                            {msg.content}
-                          </p>
-                        ) : (
-                          <div className="prose prose-sm prose-gray dark:prose-invert max-w-none">
-                            <ReactMarkdown>{msg.content}</ReactMarkdown>
-                          </div>
-                        )}
-                        {msg.isStreaming && (
-                          <span className="inline-block animate-pulse text-purple-500">
-                            ▋
-                          </span>
-                        )}
-                        {msg.cancelled && (
-                          <span className="mt-1 block text-xs text-gray-500 italic dark:text-neutral-400">
-                            Generation stopped
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-                <div ref={chatEndRef} />
-              </div>
-
-              {/* Chat Input */}
-              <form
-                onSubmit={handleChatSubmit}
-                className="border-t border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
-              >
-                <div className="flex gap-2">
-                  <Textarea
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Ask a question..."
-                    className="max-h-[100px] min-h-[44px] resize-none rounded-lg border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-                    disabled={isChatLoading}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleChatSubmit(e);
-                      }
-                    }}
-                  />
-                  {isChatLoading ? (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="outline"
-                      className="h-[44px] w-[44px] flex-shrink-0 border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400"
-                      onClick={cancelStream}
-                      aria-label="Stop generating"
-                    >
-                      <Square className="h-4 w-4 fill-current" />
-                    </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      size="icon"
-                      disabled={!chatInput.trim()}
-                      className="h-[44px] w-[44px] flex-shrink-0 bg-purple-600 text-white hover:bg-purple-700"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </motion.aside>
-          )}
-        </AnimatePresence>
+        <ChatDrawer
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          fullHeight
+        >
+          <ChatHeader onClose={() => setIsChatOpen(false)} />
+          <ChatMessages messages={chatMessages} isStreaming={isChatLoading} />
+          <ChatInput
+            value={chatInput}
+            onChange={setChatInput}
+            onSubmit={() =>
+              handleChatSubmit({ preventDefault: () => {} } as React.FormEvent)
+            }
+            onCancel={cancelStream}
+            isStreaming={isChatLoading}
+          />
+        </ChatDrawer>
 
         {/* Share Modal */}
         <ShareModal
@@ -942,9 +810,9 @@ export function ReportDisplay({
       <div className="report-content">
         {/* Two-column layout */}
         <div className="flex">
-          {/* Sticky TOC Sidebar - uses transform for GPU-accelerated animation */}
+          {/* Sticky TOC Sidebar - hidden when chat is open */}
           <AnimatePresence>
-            {showToc && (
+            {showToc && !isChatOpen && (
               <motion.aside
                 className="hidden w-64 flex-shrink-0 lg:block"
                 initial={{ opacity: 0, x: -20 }}
@@ -988,8 +856,8 @@ export function ReportDisplay({
             )}
           </AnimatePresence>
 
-          {/* TOC Toggle */}
-          {!showToc && (
+          {/* TOC Toggle - hidden when chat is open */}
+          {!showToc && !isChatOpen && (
             <motion.button
               className="btn fixed top-24 left-4 z-40 hidden lg:flex"
               onClick={() => setShowToc(true)}
@@ -1164,157 +1032,19 @@ export function ReportDisplay({
         )}
 
         {/* Chat Drawer */}
-        <AnimatePresence>
-          {isChatOpen && (
-            <motion.aside
-              role="complementary"
-              aria-label="Chat with report"
-              className="fixed top-16 right-0 z-50 flex h-[calc(100%-4rem)] w-[420px] flex-col border-l border-gray-200 bg-white shadow-2xl dark:border-neutral-800 dark:bg-neutral-900"
-              initial={{ x: 420 }}
-              animate={{ x: 0 }}
-              exit={{ x: 420 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            >
-              {/* Chat Header */}
-              <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4 dark:border-neutral-800">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
-                    <MessageSquare className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                      Chat with Report
-                    </span>
-                    <p className="text-[10px] text-gray-500 dark:text-neutral-400">
-                      Ask follow-up questions
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-gray-500 hover:text-gray-900 dark:text-neutral-400 dark:hover:text-white"
-                  onClick={() => setIsChatOpen(false)}
-                  aria-label="Close chat"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-
-              {/* Chat Messages */}
-              <div
-                ref={chatContainerRef}
-                className="flex-1 space-y-4 overflow-y-auto p-5"
-                role="log"
-                aria-live="polite"
-                aria-label="Chat messages"
-              >
-                {chatMessages.length === 0 ? (
-                  <div className="flex h-full flex-col items-center justify-center px-4 text-center">
-                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gray-100 dark:bg-neutral-800">
-                      <MessageSquare className="h-7 w-7 text-gray-400 dark:text-neutral-500" />
-                    </div>
-                    <p className="text-base font-semibold text-gray-900 dark:text-white">
-                      Ask anything about this report
-                    </p>
-                    <p className="mt-2 max-w-[280px] text-sm text-gray-500 dark:text-neutral-400">
-                      Get clarification, explore alternatives, or dive deeper
-                      into specific concepts.
-                    </p>
-                  </div>
-                ) : (
-                  chatMessages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={cn(
-                        'flex',
-                        msg.role === 'user' ? 'justify-end' : 'justify-start',
-                      )}
-                    >
-                      <div
-                        className={cn(
-                          'max-w-[85%] rounded-2xl px-4 py-3',
-                          msg.role === 'user'
-                            ? 'rounded-tr-sm bg-purple-600 text-white'
-                            : 'rounded-tl-sm bg-gray-100 text-gray-900 dark:bg-neutral-800 dark:text-neutral-100',
-                          msg.cancelled && 'opacity-60',
-                          msg.error && 'border border-red-500/30',
-                        )}
-                      >
-                        {msg.role === 'user' ? (
-                          <p className="text-sm whitespace-pre-wrap">
-                            {msg.content}
-                          </p>
-                        ) : (
-                          <div className="prose prose-sm prose-gray dark:prose-invert max-w-none">
-                            <ReactMarkdown components={chatMarkdownComponents}>
-                              {msg.content}
-                            </ReactMarkdown>
-                          </div>
-                        )}
-                        {msg.isStreaming && (
-                          <span className="inline-block animate-pulse text-purple-500">
-                            ▋
-                          </span>
-                        )}
-                        {msg.cancelled && (
-                          <span className="mt-1 block text-xs text-gray-500 italic dark:text-neutral-400">
-                            Generation stopped
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
-                <div ref={chatEndRef} />
-              </div>
-
-              {/* Chat Input */}
-              <form
-                onSubmit={handleChatSubmit}
-                className="border-t border-gray-200 bg-gray-50 p-4 dark:border-neutral-800 dark:bg-neutral-900/50"
-              >
-                <div className="flex gap-2">
-                  <Textarea
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Ask a question..."
-                    className="max-h-[100px] min-h-[44px] resize-none rounded-lg border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500"
-                    disabled={isChatLoading}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleChatSubmit(e);
-                      }
-                    }}
-                  />
-                  {isChatLoading ? (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="outline"
-                      className="h-[44px] w-[44px] flex-shrink-0 border-red-500/50 text-red-500 hover:bg-red-500/10 hover:text-red-400"
-                      onClick={cancelStream}
-                      aria-label="Stop generating"
-                    >
-                      <Square className="h-4 w-4 fill-current" />
-                    </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      size="icon"
-                      className="h-[44px] w-[44px] flex-shrink-0 rounded-lg bg-purple-600 text-white hover:bg-purple-700 disabled:bg-gray-300 disabled:text-gray-500 dark:bg-purple-600 dark:hover:bg-purple-700 dark:disabled:bg-neutral-700 dark:disabled:text-neutral-500"
-                      disabled={!chatInput.trim()}
-                      aria-label="Send message"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </motion.aside>
-          )}
-        </AnimatePresence>
+        <ChatDrawer isOpen={isChatOpen} onClose={() => setIsChatOpen(false)}>
+          <ChatHeader onClose={() => setIsChatOpen(false)} />
+          <ChatMessages messages={chatMessages} isStreaming={isChatLoading} />
+          <ChatInput
+            value={chatInput}
+            onChange={setChatInput}
+            onSubmit={() =>
+              handleChatSubmit({ preventDefault: () => {} } as React.FormEvent)
+            }
+            onCancel={cancelStream}
+            isStreaming={isChatLoading}
+          />
+        </ChatDrawer>
 
         {/* Share Modal */}
         <ShareModal
@@ -1453,72 +1183,5 @@ const markdownComponents = {
         {children}
       </div>
     </blockquote>
-  ),
-};
-
-// Chat-specific markdown components (compact styling for sidebar)
-const chatMarkdownComponents = {
-  p: ({ children }: React.HTMLProps<HTMLParagraphElement>) => (
-    <p className="mb-2 text-sm leading-relaxed last:mb-0">{children}</p>
-  ),
-  ul: ({ children }: React.HTMLProps<HTMLUListElement>) => (
-    <ul className="mb-2 ml-4 list-disc space-y-1 text-sm">{children}</ul>
-  ),
-  ol: ({ children }: React.HTMLProps<HTMLOListElement>) => (
-    <ol className="mb-2 ml-4 list-decimal space-y-1 text-sm">{children}</ol>
-  ),
-  li: ({ children }: React.HTMLProps<HTMLLIElement>) => (
-    <li className="text-sm">{children}</li>
-  ),
-  strong: ({ children }: React.HTMLProps<HTMLElement>) => (
-    <strong className="font-semibold">{children}</strong>
-  ),
-  code: ({
-    children,
-    className,
-  }: React.HTMLProps<HTMLElement> & { inline?: boolean }) => {
-    const match = /language-(\w+)/.exec(className ?? '');
-    const language = match ? match[1] : undefined;
-
-    if (language) {
-      return (
-        <div className="my-2 overflow-hidden rounded-md">
-          <SyntaxHighlighter
-            style={oneDark}
-            language={language}
-            PreTag="div"
-            customStyle={{
-              margin: 0,
-              padding: '0.75rem',
-              fontSize: '0.75rem',
-              borderRadius: '0.375rem',
-            }}
-          >
-            {String(children).replace(/\n$/, '')}
-          </SyntaxHighlighter>
-        </div>
-      );
-    }
-
-    return (
-      <code className="rounded bg-[--void-deep] px-1 py-0.5 font-mono text-xs text-[--violet-400]">
-        {children}
-      </code>
-    );
-  },
-  pre: ({ children }: React.HTMLProps<HTMLPreElement>) => <>{children}</>,
-  blockquote: ({ children }: React.HTMLProps<HTMLQuoteElement>) => (
-    <blockquote className="my-2 border-l-2 border-[--violet-400] pl-3 text-sm italic opacity-80">
-      {children}
-    </blockquote>
-  ),
-  h1: ({ children }: React.HTMLProps<HTMLHeadingElement>) => (
-    <h1 className="mb-2 text-base font-semibold">{children}</h1>
-  ),
-  h2: ({ children }: React.HTMLProps<HTMLHeadingElement>) => (
-    <h2 className="mb-2 text-sm font-semibold">{children}</h2>
-  ),
-  h3: ({ children }: React.HTMLProps<HTMLHeadingElement>) => (
-    <h3 className="mb-1 text-sm font-medium">{children}</h3>
   ),
 };
