@@ -29,6 +29,7 @@ import {
   extractStructuredReport,
   extractUserInput,
 } from '../_lib/extract-report';
+import { CHAT_DRAWER_WIDTH } from '../_lib/constants';
 import type { ChatMessage } from '../_lib/schemas/chat.schema';
 import { ChatDrawer, ChatHeader, ChatInput, ChatMessages } from './chat';
 import { DiscoveryReportDisplay } from './discovery-report-display';
@@ -871,10 +872,10 @@ export function ReportDisplay({
 
           {/* Main Content */}
           <div
-            className={cn(
-              'min-w-0 flex-1 px-6 py-10 transition-all md:px-8 lg:px-10',
-              isChatOpen && 'lg:mr-[420px]',
-            )}
+            className="min-w-0 flex-1 px-6 py-10 transition-transform duration-300 ease-out md:px-8 lg:px-10"
+            style={{
+              transform: isChatOpen ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)` : undefined,
+            }}
           >
             <div className="mx-auto max-w-[680px]">
               {/* Back link */}

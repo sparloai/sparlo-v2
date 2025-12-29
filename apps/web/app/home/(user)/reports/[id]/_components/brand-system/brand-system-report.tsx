@@ -23,6 +23,7 @@ import { toast } from '@kit/ui/sonner';
 import { cn } from '@kit/ui/utils';
 
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+import { CHAT_DRAWER_WIDTH } from '../../_lib/constants';
 
 import {
   TOC_SCROLL_OFFSET,
@@ -644,10 +645,10 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   if (hasAppSidebar && showToc) {
     return (
       <div
-        className={cn(
-          'relative min-h-screen bg-white transition-[margin] duration-300',
-          isChatOpen && 'lg:mr-[420px]',
-        )}
+        className="relative min-h-screen bg-white transition-transform duration-300 ease-out"
+        style={{
+          transform: isChatOpen ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)` : undefined,
+        }}
       >
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-8">
           <div className="flex gap-8 py-10">
@@ -697,10 +698,10 @@ export const BrandSystemReport = memo(function BrandSystemReport({
 
   return (
     <div
-      className={cn(
-        'relative min-h-screen bg-white transition-[margin] duration-300',
-        isChatOpen && 'lg:mr-[420px]',
-      )}
+      className="relative min-h-screen bg-white transition-transform duration-300 ease-out"
+      style={{
+        transform: isChatOpen ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)` : undefined,
+      }}
     >
       {/* Table of Contents - fixed sidebar for pages without app sidebar */}
       {showToc && (
