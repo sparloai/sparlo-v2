@@ -303,97 +303,136 @@ export function ProcessingScreen({
     [isSubmitting, progress.id],
   );
 
-  // Handle clarification status - Clean Air Company inspired design
+  // Handle clarification status - Premium Air Company design
   if (progress.status === 'clarifying' && pendingClarification) {
     const hasOptions =
       pendingClarification.options && pendingClarification.options.length > 0;
 
     return (
       <motion.div
-        className="relative flex min-h-screen flex-col items-center justify-center bg-[--surface-base] px-4 py-12"
+        className="relative flex min-h-screen flex-col items-center justify-center bg-white px-6 py-16"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
       >
-        <div className="w-full max-w-2xl">
-          {/* Context - why we're asking */}
+        <div className="w-full max-w-xl">
+          {/* Context label - small, uppercase, structured */}
           {pendingClarification.context && (
             <motion.p
-              className="mb-8 text-center text-sm text-[--text-muted]"
-              initial={{ opacity: 0, y: -10 }}
+              className="mb-6 text-center text-[11px] font-medium tracking-[0.1em] text-zinc-400 uppercase"
+              initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
+              transition={{ delay: 0.1, duration: 0.3 }}
             >
               {pendingClarification.context}
             </motion.p>
           )}
 
-          {/* Main Question */}
+          {/* Main Question - Bold, commanding presence */}
           <motion.h1
-            className="mb-12 text-center text-2xl leading-relaxed font-medium tracking-tight text-[--text-primary] md:text-3xl"
-            initial={{ opacity: 0, y: 10 }}
+            className="mb-16 text-center text-[28px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900 md:text-[36px]"
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15 }}
+            transition={{ delay: 0.15, duration: 0.4 }}
           >
             {pendingClarification.question}
           </motion.h1>
 
-          {/* Options as clean buttons */}
+          {/* Options - Premium card design */}
           {hasOptions && (
             <motion.div
-              className="mb-8 flex flex-col gap-3"
-              initial={{ opacity: 0, y: 20 }}
+              className="flex flex-col gap-3"
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.25, duration: 0.4 }}
             >
               {pendingClarification.options?.map((option, index) => (
-                <button
+                <motion.button
                   key={option.id}
                   onClick={() => handleSelectOption(option.label)}
                   disabled={isSubmitting}
                   data-test={`clarification-option-${option.id}`}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.05, duration: 0.3 }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.995 }}
                   className={cn(
-                    'group relative w-full rounded-xl border px-6 py-4 text-left transition-all duration-200',
-                    'border-[--border-default] bg-[--surface-elevated]',
-                    'hover:border-[--text-muted] hover:bg-[--surface-overlay]',
-                    'focus:ring-2 focus:ring-[--accent] focus:ring-offset-2 focus:ring-offset-[--surface-base] focus:outline-none',
-                    'disabled:cursor-not-allowed disabled:opacity-50',
+                    'group relative w-full rounded-lg border px-5 py-4 text-left',
+                    'border-zinc-200 bg-white',
+                    'transition-all duration-200 ease-out',
+                    'hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)]',
+                    'focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2',
+                    'active:bg-zinc-100',
+                    'disabled:cursor-not-allowed disabled:opacity-40',
                   )}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[--surface-overlay] font-mono text-sm text-[--text-muted] transition-colors group-hover:bg-[--accent] group-hover:text-white">
-                        {String.fromCharCode(65 + index)}
-                      </span>
-                      <span className="text-base text-[--text-primary]">
-                        {option.label}
-                      </span>
-                    </div>
-                    <ArrowRight className="h-4 w-4 -translate-x-2 text-[--text-muted] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
+                  <div className="flex items-center gap-4">
+                    {/* Letter indicator - clean, visible */}
+                    <span
+                      className={cn(
+                        'flex h-7 w-7 shrink-0 items-center justify-center rounded-md',
+                        'bg-zinc-100 font-mono text-[13px] font-medium text-zinc-500',
+                        'transition-all duration-200',
+                        'group-hover:bg-zinc-900 group-hover:text-white',
+                      )}
+                    >
+                      {String.fromCharCode(65 + index)}
+                    </span>
+
+                    {/* Option text */}
+                    <span className="flex-1 text-[15px] leading-snug font-normal text-zinc-800">
+                      {option.label}
+                    </span>
+
+                    {/* Arrow indicator */}
+                    <ArrowRight
+                      className={cn(
+                        'h-4 w-4 text-zinc-300',
+                        'transition-all duration-200',
+                        'group-hover:translate-x-0.5 group-hover:text-zinc-500',
+                      )}
+                    />
                   </div>
-                </button>
+                </motion.button>
               ))}
             </motion.div>
           )}
 
-          {/* Optional freetext input */}
+          {/* Freetext section - refined design */}
           {pendingClarification.allows_freetext && (
             <motion.div
-              className="border-t border-[--border-subtle] pt-6"
+              className="mt-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.4, duration: 0.3 }}
             >
-              <p className="mb-3 text-center text-sm text-[--text-muted]">
-                {pendingClarification.freetext_prompt ||
-                  'Or provide your own answer:'}
-              </p>
-              <div className="flex gap-3">
+              {/* Divider with label */}
+              <div className="relative mb-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-zinc-100" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-4 text-[12px] font-medium tracking-wide text-zinc-400 uppercase">
+                    {pendingClarification.freetext_prompt || 'Or type your own'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Textarea - minimal, elegant */}
+              <div className="relative">
                 <Textarea
                   value={clarificationAnswer}
                   onChange={(e) => setClarificationAnswer(e.target.value)}
-                  placeholder="Type your answer..."
+                  placeholder="Describe your specific situation..."
                   data-test="clarification-input"
-                  className="min-h-[80px] flex-1 resize-none rounded-xl border border-[--border-default] bg-[--surface-elevated] px-4 py-3 text-base text-[--text-primary] placeholder-[--text-muted] focus:border-[--accent] focus:ring-1 focus:ring-[--accent] focus:outline-none disabled:opacity-40"
+                  className={cn(
+                    'min-h-[100px] w-full resize-none rounded-lg border px-4 py-3.5',
+                    'border-zinc-200 bg-white text-[15px] text-zinc-800 placeholder-zinc-400',
+                    'transition-all duration-200',
+                    'focus:border-zinc-400 focus:outline-none focus:ring-0',
+                    'disabled:opacity-40',
+                  )}
                   disabled={isSubmitting}
                   onKeyDown={(e) => {
                     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -402,44 +441,52 @@ export function ProcessingScreen({
                     }
                   }}
                 />
+
+                {/* Submit button - appears when typing */}
+                <AnimatePresence>
+                  {clarificationAnswer.trim() && (
+                    <motion.div
+                      className="mt-4 flex justify-end"
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <button
+                        onClick={handleSubmitClarification}
+                        disabled={isSubmitting}
+                        data-test="clarification-submit"
+                        className={cn(
+                          'flex items-center gap-2 rounded-md px-5 py-2.5',
+                          'bg-zinc-900 text-[14px] font-medium text-white',
+                          'transition-all duration-150',
+                          'hover:bg-zinc-800',
+                          'active:scale-[0.98]',
+                          'disabled:cursor-not-allowed disabled:opacity-50',
+                        )}
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Send className="h-3.5 w-3.5" />
+                        )}
+                        <span>Submit</span>
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-              {clarificationAnswer.trim() && (
-                <motion.div
-                  className="mt-4 flex justify-end"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <button
-                    onClick={handleSubmitClarification}
-                    disabled={isSubmitting}
-                    data-test="clarification-submit"
-                    className={cn(
-                      'flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-200',
-                      'bg-[--text-primary] text-[--surface-base]',
-                      'hover:opacity-90',
-                      'disabled:cursor-not-allowed disabled:opacity-50',
-                    )}
-                  >
-                    {isSubmitting ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                    <span>Submit</span>
-                  </button>
-                </motion.div>
-              )}
             </motion.div>
           )}
 
-          {/* Elapsed time indicator */}
+          {/* Elapsed time - subtle footer */}
           <motion.p
-            className="mt-8 text-center text-xs text-[--text-muted] tabular-nums"
+            className="mt-12 text-center text-[12px] tracking-wide text-zinc-300 tabular-nums"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.5, duration: 0.3 }}
           >
-            {formatElapsed(elapsedSeconds)} elapsed
+            {formatElapsed(elapsedSeconds)}
           </motion.p>
         </div>
       </motion.div>
