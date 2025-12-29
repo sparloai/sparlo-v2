@@ -4,18 +4,36 @@ import { cache } from 'react';
 
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
+import type { ConversationStatus } from '../types';
 import type { SparloReport } from './sparlo-reports-server-actions';
 
 /**
- * Load all reports for the current user
+ * Lightweight report type for listing - excludes large JSONB fields
+ */
+export interface SparloReportListItem {
+  id: string;
+  title: string;
+  status: ConversationStatus;
+  current_step: string | null;
+  created_at: string;
+  updated_at: string;
+  archived: boolean;
+}
+
+/**
+ * Load active (non-archived) reports for the current user (listing only)
+ * Optimized to:
+ * - Avoid loading large JSONB fields (report_data, messages, chat_history)
+ * - Filter archived=false to use the idx_sparlo_reports_active partial index
  */
 export const loadUserReports = cache(async (userId: string) => {
   const client = getSupabaseServerClient();
 
   const { data, error } = await client
     .from('sparlo_reports')
-    .select('*')
+    .select('id, title, status, current_step, created_at, updated_at, archived')
     .eq('account_id', userId)
+    .eq('archived', false)
     .order('updated_at', { ascending: false });
 
   if (error) {
@@ -23,7 +41,7 @@ export const loadUserReports = cache(async (userId: string) => {
     return [];
   }
 
-  return (data ?? []) as unknown as SparloReport[];
+  return (data ?? []) as SparloReportListItem[];
 });
 
 /**
