@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 
 import { motion } from 'framer-motion';
-import { MessageCircle } from 'lucide-react';
 
 import type { ChatMessage as ChatMessageType } from '../../_lib/schemas/chat.schema';
 import { ChatError } from './chat-error';
@@ -51,97 +50,27 @@ export function ChatMessages({
   return (
     <div
       ref={containerRef}
-      className="chat-scrollbar flex-1 space-y-5 overflow-y-auto px-5 py-6"
-      style={{ background: 'transparent' }}
+      className="flex-1 space-y-4 overflow-y-auto px-5 py-6"
       role="log"
       aria-live="polite"
       aria-label="Conversation"
     >
       {messages.length === 0 ? (
-        <motion.div
-          className="flex h-full flex-col items-center justify-center px-4 text-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Simple icon */}
-          <motion.div
-            className="flex h-16 w-16 items-center justify-center rounded-2xl"
-            style={{
-              background:
-                'linear-gradient(135deg, rgba(100, 181, 246, 0.1) 0%, rgba(100, 181, 246, 0.05) 100%)',
-              border: '1px solid rgba(100, 181, 246, 0.12)',
-            }}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+        <div className="flex h-full flex-col items-center justify-center px-4 text-center">
+          <p
+            className="text-[13px] text-zinc-400"
+            style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
           >
-            <MessageCircle className="h-7 w-7" style={{ color: '#64b5f6' }} />
-          </motion.div>
-
-          <motion.h3
-            className="mt-5 text-[15px] font-normal tracking-[-0.01em]"
-            style={{
-              color: '#f0f4f8',
-              fontFamily: 'var(--font-heading), system-ui, sans-serif',
-            }}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            Ask anything about this report
-          </motion.h3>
-
-          <motion.p
-            className="mt-2 max-w-[240px] text-[13px] leading-relaxed"
-            style={{
-              color: '#5a6b8c',
-              fontFamily: 'var(--font-heading), system-ui, sans-serif',
-            }}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            Get clarification, explore alternatives, or dive deeper into the
-            analysis.
-          </motion.p>
-
-          {/* Suggestion chips */}
-          <motion.div
-            className="mt-6 flex flex-wrap justify-center gap-2"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            {['Summarize findings', 'What are the risks?', 'Next steps'].map(
-              (suggestion, i) => (
-                <span
-                  key={i}
-                  className="cursor-default rounded-full px-3 py-1.5 text-[11px] transition-all duration-200"
-                  style={{
-                    color: '#8b9dc3',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    border: '1px solid rgba(255, 255, 255, 0.06)',
-                    fontFamily: 'var(--font-heading), system-ui, sans-serif',
-                  }}
-                >
-                  {suggestion}
-                </span>
-              ),
-            )}
-          </motion.div>
-        </motion.div>
+            Ask a question to explore this report further.
+          </p>
+        </div>
       ) : (
-        messages.map((msg, index) => (
+        messages.map((msg) => (
           <motion.div
             key={msg.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.3,
-              delay: index === messages.length - 1 ? 0 : 0,
-              ease: [0.16, 1, 0.3, 1],
-            }}
+            transition={{ duration: 0.2 }}
           >
             <ChatMessage
               content={msg.content}

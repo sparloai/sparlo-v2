@@ -3,7 +3,6 @@
 import type { KeyboardEvent } from 'react';
 import { useRef, useState } from 'react';
 
-import { motion } from 'framer-motion';
 import { ArrowUp, Square } from 'lucide-react';
 
 interface ChatInputProps {
@@ -38,23 +37,7 @@ export function ChatInput({
   const canSubmit = value.trim() && !isStreaming && !disabled;
 
   return (
-    <div
-      className="relative p-4"
-      style={{
-        background:
-          'linear-gradient(180deg, rgba(13, 17, 23, 0.6) 0%, rgba(13, 17, 23, 0.95) 100%)',
-        borderTop: '1px solid rgba(255, 255, 255, 0.04)',
-      }}
-    >
-      {/* Top gradient accent */}
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px"
-        style={{
-          background:
-            'linear-gradient(90deg, transparent 10%, rgba(100, 181, 246, 0.1) 50%, transparent 90%)',
-        }}
-      />
-
+    <div className="border-t border-zinc-200 p-4">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -62,20 +45,12 @@ export function ChatInput({
             onSubmit();
           }
         }}
-        className="relative flex items-end gap-3"
+        className="flex items-end gap-2"
       >
-        {/* Input container */}
         <div
-          className="relative flex-1 rounded-xl transition-all duration-200"
-          style={{
-            background: 'rgba(21, 27, 38, 0.8)',
-            border: isFocused
-              ? '1px solid rgba(100, 181, 246, 0.3)'
-              : '1px solid rgba(255, 255, 255, 0.06)',
-            boxShadow: isFocused
-              ? '0 0 0 3px rgba(100, 181, 246, 0.08), 0 4px 12px -4px rgba(0, 0, 0, 0.3)'
-              : '0 2px 8px -2px rgba(0, 0, 0, 0.2)',
-          }}
+          className={`flex-1 rounded-lg border bg-white transition-colors ${
+            isFocused ? 'border-zinc-400' : 'border-zinc-200'
+          }`}
         >
           <textarea
             ref={inputRef}
@@ -85,98 +60,37 @@ export function ChatInput({
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
             placeholder="Ask a question..."
-            className="max-h-[120px] min-h-[48px] w-full resize-none bg-transparent px-4 py-3 text-[14px] leading-relaxed outline-none placeholder:text-[#5a6b8c]"
-            style={{
-              color: '#e8f0f8',
-              caretColor: '#64b5f6',
-              fontFamily: 'var(--font-heading), system-ui, sans-serif',
-            }}
+            className="max-h-[120px] min-h-[44px] w-full resize-none bg-transparent px-3 py-2.5 text-[14px] leading-relaxed text-zinc-900 outline-none placeholder:text-zinc-400"
+            style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
             disabled={disabled || isStreaming}
             rows={1}
           />
         </div>
 
-        {/* Action button */}
         {isStreaming ? (
-          <motion.button
+          <button
             type="button"
             onClick={onCancel}
-            className="flex h-[48px] w-[48px] flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
-            style={{
-              background:
-                'linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.1) 100%)',
-              border: '1px solid rgba(239, 68, 68, 0.3)',
-            }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            aria-label="Stop generating"
+            className="flex h-[44px] w-[44px] flex-shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-500 transition-colors hover:bg-zinc-50"
+            aria-label="Stop"
           >
-            <Square
-              className="h-4 w-4"
-              style={{ color: '#ef4444', fill: '#ef4444' }}
-            />
-          </motion.button>
+            <Square className="h-4 w-4" />
+          </button>
         ) : (
-          <motion.button
+          <button
             type="submit"
             disabled={!canSubmit}
-            className="flex h-[48px] w-[48px] flex-shrink-0 items-center justify-center rounded-xl transition-all duration-200"
-            style={{
-              background: canSubmit
-                ? 'linear-gradient(135deg, rgba(100, 181, 246, 0.2) 0%, rgba(100, 181, 246, 0.1) 100%)'
-                : 'rgba(21, 27, 38, 0.5)',
-              border: canSubmit
-                ? '1px solid rgba(100, 181, 246, 0.3)'
-                : '1px solid rgba(255, 255, 255, 0.04)',
-              boxShadow: canSubmit
-                ? '0 0 20px -5px rgba(100, 181, 246, 0.2)'
-                : 'none',
-              cursor: canSubmit ? 'pointer' : 'not-allowed',
-            }}
-            whileHover={canSubmit ? { scale: 1.02 } : {}}
-            whileTap={canSubmit ? { scale: 0.98 } : {}}
-            aria-label="Send message"
+            className={`flex h-[44px] w-[44px] flex-shrink-0 items-center justify-center rounded-lg transition-colors ${
+              canSubmit
+                ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+                : 'bg-zinc-100 text-zinc-300'
+            }`}
+            aria-label="Send"
           >
-            <ArrowUp
-              className="h-5 w-5"
-              style={{
-                color: canSubmit ? '#64b5f6' : '#3d4a63',
-              }}
-            />
-          </motion.button>
+            <ArrowUp className="h-4 w-4" />
+          </button>
         )}
       </form>
-
-      {/* Keyboard hint */}
-      <div
-        className="mt-2 flex items-center justify-center gap-1.5 text-[10px]"
-        style={{
-          color: '#3d4a63',
-          fontFamily: 'var(--font-heading), system-ui, sans-serif',
-        }}
-      >
-        <kbd
-          className="rounded px-1.5 py-0.5"
-          style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-          }}
-        >
-          Enter
-        </kbd>
-        <span>to send</span>
-        <span className="mx-1">·</span>
-        <kbd
-          className="rounded px-1.5 py-0.5"
-          style={{
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.06)',
-          }}
-        >
-          Shift + Enter
-        </kbd>
-        <span>for new line</span>
-      </div>
     </div>
   );
 }
