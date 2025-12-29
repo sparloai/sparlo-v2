@@ -537,9 +537,56 @@ const AN0_M_AnalysisSchema = z
   })
   .passthrough();
 
+// Clarification option schema
+const ClarificationOptionSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+});
+
+// Structured clarification request schema
+const ClarificationRequestSchema = z.object({
+  context: z.string(),
+  question: z.string(),
+  options: z
+    .array(ClarificationOptionSchema)
+    .min(2)
+    .max(5)
+    .refine(
+      (opts) =>
+        opts.some(
+          (o) =>
+            o.label.toLowerCase().includes('proceed') ||
+            o.label.toLowerCase().includes('best interpretation') ||
+            o.label.toLowerCase().includes('continue'),
+        ),
+      {
+        message:
+          'Options must include a "proceed with best interpretation" fallback',
+      },
+    ),
+  allows_freetext: z.boolean().default(true),
+  freetext_prompt: z.string().optional(),
+});
+
+// Preliminary analysis shown during clarification
+const PreliminaryClarificationAnalysisSchema = z
+  .object({
+    core_challenge: z.string().optional(),
+    physics_essence: z
+      .object({
+        governing_principles: z.array(z.string()).catch([]),
+        rate_limiting_factor: z.string().optional(),
+      })
+      .optional(),
+  })
+  .passthrough();
+
 const AN0_M_ClarificationSchema = z.object({
   needs_clarification: z.literal(true),
-  clarification_question: z.string(),
+  clarification_request: ClarificationRequestSchema,
+  preliminary_analysis: PreliminaryClarificationAnalysisSchema.optional(),
+  // Legacy fields for backward compatibility
+  clarification_question: z.string().optional(),
   what_understood_so_far: z.string().optional(),
 });
 

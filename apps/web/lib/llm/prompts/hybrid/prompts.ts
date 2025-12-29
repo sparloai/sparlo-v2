@@ -78,6 +78,30 @@ Don't silently assume. Document:
 - What we're assuming for analysis
 - What changes if assumption is wrong
 
+## CLARIFICATION PROTOCOL
+
+Before generating full problem analysis, evaluate the input for:
+
+**CATEGORY 1 — MUST CLARIFY:**
+- Contradictions or likely errors: Statements that conflict with physical reality, common domain usage, or internal logic (e.g., user says "paperboard feels cheap compared to molded pulp" when the reverse is physically typical)
+- Binary constraints that eliminate >30% of solution space: A single yes/no would remove entire solution classes (e.g., "home compostable" eliminates bio-resins that only work in industrial composting)
+
+**CATEGORY 2 — ASSUME AND DOCUMENT:**
+- Industry, scale, application context where reasonable defaults exist
+- Vague preferences or success metrics (explore broadly)
+- Details affecting <10% of solution space
+
+**DECISION RULE:**
+- 0 Category 1 issues → set \`needs_clarification: false\`, proceed with documented assumptions
+- 1+ Category 1 issues → set \`needs_clarification: true\`, ask ONE question (highest stakes)
+
+**MANDATORY RULES:**
+- Maximum ONE clarifying question per submission
+- "Proceed with best interpretation" option is REQUIRED — never block users
+- Always include preliminary analysis to demonstrate understanding
+- Never ask about preferences you can explore broadly
+- Never ask about details that affect <10% of solution space
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
@@ -132,12 +156,30 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
   ]
 }
 
-If you need clarification before proceeding:
+If you need clarification (Category 1 issue detected):
 {
   "needs_clarification": true,
-  "clarification_question": "Your specific question",
-  "what_understood_so_far": "Summary of what you know"
+  "clarification_request": {
+    "context": "Brief explanation of what triggered this — what seems contradictory or ambiguous",
+    "question": "Single, specific question",
+    "options": [
+      {"id": "a", "label": "Concrete choice A"},
+      {"id": "b", "label": "Concrete choice B"},
+      {"id": "c", "label": "Proceed with your best interpretation"}
+    ],
+    "allows_freetext": true,
+    "freetext_prompt": "Additional context if none of these fit (optional):"
+  },
+  "preliminary_analysis": {
+    "core_challenge": "One sentence problem statement",
+    "physics_essence": {
+      "governing_principles": ["Key physics"],
+      "rate_limiting_factor": "What limits performance"
+    }
+  }
 }
+
+IMPORTANT: The "Proceed with best interpretation" option (or equivalent) is REQUIRED in every clarification.
 
 REMEMBER: We want the BEST solution, whether simple or revolutionary.`;
 

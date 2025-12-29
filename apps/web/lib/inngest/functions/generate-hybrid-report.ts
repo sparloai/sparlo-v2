@@ -308,9 +308,9 @@ export const generateHybridReport = inngest.createFunction(
 
         // Handle clarification if needed
         if (an0mResult.result.needs_clarification === true) {
-          // Extract question with type narrowing
-          const clarificationQuestion =
-            an0mResult.result.clarification_question;
+          // Extract question from structured clarification request
+          const clarificationRequest = an0mResult.result.clarification_request;
+          const clarificationQuestion = clarificationRequest.question;
 
           await step.run('store-hybrid-clarification', async () => {
             await updateProgress({
@@ -318,6 +318,10 @@ export const generateHybridReport = inngest.createFunction(
               clarifications: [
                 {
                   question: clarificationQuestion,
+                  context: clarificationRequest.context,
+                  options: clarificationRequest.options,
+                  allows_freetext: clarificationRequest.allows_freetext,
+                  freetext_prompt: clarificationRequest.freetext_prompt,
                   askedAt: new Date().toISOString(),
                 },
               ],
