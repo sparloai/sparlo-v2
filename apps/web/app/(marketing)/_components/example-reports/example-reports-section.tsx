@@ -99,7 +99,7 @@ export function ExampleReportsSection() {
         className="sticky top-16 z-40 border-y border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95"
       >
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <div className="no-scrollbar flex gap-1 overflow-x-auto py-2">
+          <div className="no-scrollbar flex gap-1 overflow-x-auto py-3">
             {EXAMPLE_REPORTS.map((r, i) => (
               <button
                 key={r.id}
@@ -110,8 +110,8 @@ export function ExampleReportsSection() {
                     'example-reports-content',
                   );
                   if (contentElement) {
-                    // nav (64px) + tabs (~48px) = ~112px offset
-                    const navAndTabsHeight = 112;
+                    // nav (64px) + tabs (~56px with py-3) = ~120px offset
+                    const navAndTabsHeight = 120;
                     const rect = contentElement.getBoundingClientRect();
                     const absoluteTop = rect.top + window.scrollY;
                     window.scrollTo({
