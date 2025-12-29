@@ -619,9 +619,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                   {item.approach}
                 </Text>
                 {item.limitation && (
-                  <Text
-                    style={[styles.cardContent, { color: colors.zinc600 }]}
-                  >
+                  <Text style={[styles.cardContent, { color: colors.zinc600 }]}>
                     Limitation: {item.limitation}
                   </Text>
                 )}
@@ -953,9 +951,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
               <View style={styles.tagRow}>
                 {concept.relationship && (
                   <View style={styles.tag}>
-                    <Text style={styles.tagText}>
-                      {concept.relationship}
-                    </Text>
+                    <Text style={styles.tagText}>{concept.relationship}</Text>
                   </View>
                 )}
                 {concept.confidence !== undefined && (
@@ -1226,9 +1222,7 @@ function FrontierWatchSection({ items }: { items?: FrontierWatch[] }) {
             )}
             {item.trl_estimate !== undefined && (
               <View style={styles.tag}>
-                <Text style={styles.tagText}>
-                  TRL {item.trl_estimate}
-                </Text>
+                <Text style={styles.tagText}>TRL {item.trl_estimate}</Text>
               </View>
             )}
           </View>
@@ -1452,9 +1446,7 @@ function InnovationAnalysisSection({
             <View style={styles.tagRow}>
               {analysis.domains_searched.map((d, i) => (
                 <View key={i} style={styles.tag}>
-                  <Text style={styles.tagText}>
-                    {d}
-                  </Text>
+                  <Text style={styles.tagText}>{d}</Text>
                 </View>
               ))}
             </View>
@@ -1883,9 +1875,7 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
             <View style={styles.tagRow}>
               {risk.category && (
                 <View style={styles.tag}>
-                  <Text style={styles.tagText}>
-                    {risk.category}
-                  </Text>
+                  <Text style={styles.tagText}>{risk.category}</Text>
                 </View>
               )}
               {risk.severity && (

@@ -18,6 +18,7 @@ import {
 } from '~/home/(user)/reports/[id]/_lib/hooks/use-toc-scroll';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
+import { BIOTECH_HYBRID_REPORT } from './biotech-hybrid-data';
 import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
 import { ENERGY_HYBRID_REPORT } from './energy-hybrid-data';
 import { EXAMPLE_REPORTS } from './example-reports-data';
@@ -41,6 +42,7 @@ const REPORT_DATA_MAP: Record<string, HybridReportData> = {
   'climate-tech': CLIMATE_HYBRID_REPORT,
   'food-waste': FOOD_HYBRID_REPORT,
   'food-tech': FOODTECH_HYBRID_REPORT,
+  biotech: BIOTECH_HYBRID_REPORT,
   'materials-science': MATERIALS_SCIENCE_HYBRID_REPORT,
   energy: ENERGY_HYBRID_REPORT,
 };
