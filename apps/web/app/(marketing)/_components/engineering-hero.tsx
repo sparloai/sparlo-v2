@@ -1,4 +1,6 @@
-import { memo } from 'react';
+'use client';
+
+import { memo, useCallback, useRef } from 'react';
 
 import Link from 'next/link';
 
@@ -8,22 +10,36 @@ import Link from 'next/link';
  * Air Company Aesthetic - Pure, minimal, confident
  *
  * Features:
- * - Looping background video (6.5 seconds, pre-trimmed)
+ * - Looping background video (6 seconds, custom JS loop)
  * - Dark overlay for text legibility
  * - Light font weight typography
  * - Centered layout
  * - Single prominent CTA
  */
 
+// Video loop duration in seconds - loops before scene transition
+const VIDEO_LOOP_DURATION = 6;
+
 export const EngineeringHero = memo(function EngineeringHero() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Custom loop handler - restart video at 6 seconds to avoid scene transition
+  const handleTimeUpdate = useCallback(() => {
+    const video = videoRef.current;
+    if (video && video.currentTime >= VIDEO_LOOP_DURATION) {
+      video.currentTime = 0;
+    }
+  }, []);
+
   return (
     <section className="relative flex h-screen w-full items-center justify-center overflow-hidden bg-zinc-950">
-      {/* Background Video - pre-trimmed to 7.5s, uses native loop */}
+      {/* Background Video - custom 6s loop to avoid scene transition */}
       <video
+        ref={videoRef}
         autoPlay
         muted
-        loop
         playsInline
+        onTimeUpdate={handleTimeUpdate}
         className="absolute inset-0 h-full w-full object-cover"
       >
         <source src="/videos/hero-bg.mp4" type="video/mp4" />
