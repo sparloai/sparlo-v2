@@ -8,7 +8,7 @@ import Link from 'next/link';
  * Air Company Aesthetic - Pure, minimal, confident
  *
  * Features:
- * - Looping background video (7.5 seconds, pre-trimmed)
+ * - Looping background video (6.5 seconds, pre-trimmed)
  * - Dark overlay for text legibility
  * - Light font weight typography
  * - Centered layout
