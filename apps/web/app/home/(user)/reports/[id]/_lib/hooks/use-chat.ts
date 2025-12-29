@@ -115,8 +115,9 @@ export function useChat({
 
           try {
             const parsed = JSON.parse(data);
-            if (parsed.content) {
-              assistantContent += parsed.content;
+            // API sends { text } for streaming chunks, { done, saved } for completion
+            if (parsed.text) {
+              assistantContent += parsed.text;
               setMessages((prev) =>
                 prev.map((msg) =>
                   msg.id === assistantId
@@ -124,12 +125,12 @@ export function useChat({
                     : msg,
                 ),
               );
+            } else if (parsed.done) {
+              streamDone = true;
+              break;
             }
-          } catch (parseError) {
-            if (data && data !== 'undefined' && data.trim()) {
-              console.warn('Failed to parse SSE data:', data);
-            }
-            throw parseError;
+          } catch {
+            // Ignore parse errors for incomplete chunks
           }
         }
       }
