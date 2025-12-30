@@ -130,17 +130,17 @@ function Tree({
 export function DocsNavigation({
   pages,
   prefix = '/docs',
+  hasTopPadding = false,
 }: {
   pages: Cms.ContentItem[];
   prefix?: string;
+  hasTopPadding?: boolean;
 }) {
   return (
     <>
       <Sidebar
         variant={'ghost'}
-        className={
-          'border-border/50 sticky z-1 mt-4 max-h-full overflow-y-auto pr-4'
-        }
+        className={`border-border/50 sticky z-1 max-h-full overflow-y-auto pr-4 ${hasTopPadding ? 'mt-14' : 'mt-4'}`}
       >
         <SidebarGroup className="p-0">
           <SidebarGroupContent>
