@@ -1794,13 +1794,13 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
         </View>
       )}
 
-      {/* What We Might Be Wrong About - each item separately */}
+      {/* What We Might Be Wrong About - allow page breaks between items */}
       {critique.what_we_might_be_wrong_about &&
         critique.what_we_might_be_wrong_about.length > 0 && (
-          <View style={[styles.card, { marginBottom: 12 }]} wrap={false}>
+          <View style={[styles.card, { marginBottom: 12 }]}>
             <MonoLabel>What We Might Be Wrong About</MonoLabel>
             {critique.what_we_might_be_wrong_about.map((item, i) => (
-              <View key={i} style={styles.listItem} wrap={false}>
+              <View key={i} style={styles.listItem}>
                 <Text style={[styles.listBullet, { color: colors.zinc600 }]}>
                   •
                 </Text>
@@ -1810,13 +1810,13 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
           </View>
         )}
 
-      {/* Unexplored Directions - each item separately */}
+      {/* Unexplored Directions - allow page breaks between items */}
       {critique.unexplored_directions &&
         critique.unexplored_directions.length > 0 && (
-          <View style={[styles.card, { marginBottom: 12 }]} wrap={false}>
+          <View style={[styles.card, { marginBottom: 12 }]}>
             <MonoLabel>Unexplored Directions</MonoLabel>
             {critique.unexplored_directions.map((item, i) => (
-              <View key={i} style={styles.listItem} wrap={false}>
+              <View key={i} style={styles.listItem}>
                 <Text style={styles.listBullet}>→</Text>
                 <Text style={styles.listContent}>{item}</Text>
               </View>
