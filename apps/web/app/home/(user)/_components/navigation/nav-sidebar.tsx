@@ -314,7 +314,7 @@ export const NavSidebar = memo(function NavSidebar({
   }, [collapsed, setCollapsed]);
 
   const handleNewAnalysis = useCallback(() => {
-    router.push(pathsConfig.app.home);
+    router.push('/home/reports/new');
   }, [router]);
 
   const handleSignOut = useCallback(async () => {
