@@ -9,17 +9,18 @@ import {
 
 import type { ReportForPDF } from '../_lib/types';
 
-// Register Noto Sans font which supports Greek letters and mathematical symbols
-// Using Google Fonts CDN for reliable access
+// Register Suisse Intl font - brand font with Unicode support
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+
 Font.register({
-  family: 'NotoSans',
+  family: 'SuisseIntl',
   fonts: [
     {
-      src: 'https://fonts.gstatic.com/s/notosans/v36/o-0IIpQlx3QUlC5A4PNr5TRA.woff2',
+      src: `${siteUrl}/fonts/Suisse/WOFF2/SuisseIntlTrial-Regular.woff2`,
       fontWeight: 400,
     },
     {
-      src: 'https://fonts.gstatic.com/s/notosans/v36/o-0NIpQlx3QUlC5A4PNjXhFVZNyB.woff2',
+      src: `${siteUrl}/fonts/Suisse/WOFF2/SuisseIntlTrial-Bold.woff2`,
       fontWeight: 700,
     },
   ],
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     padding: 48,
     paddingBottom: 64,
     fontSize: 10,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     backgroundColor: colors.white,
   },
   // Header - minimal, typography-driven
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 11,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc400,
     letterSpacing: 3,
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc900,
     marginBottom: 8,
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc900,
     letterSpacing: -0.3,
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
   },
   subsectionTitle: {
     fontSize: 13,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc800,
     marginBottom: 8,
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 12,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc900,
     marginBottom: 6,
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 9,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
   // Mono Label (matches web MonoLabel - 13px uppercase tracking wide)
   monoLabel: {
     fontSize: 9,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -208,7 +209,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 8,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc600,
     textTransform: 'uppercase',
@@ -248,7 +249,7 @@ const styles = StyleSheet.create({
   listNumber: {
     width: 24,
     fontSize: 10,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc300,
   },
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
   tableHeaderCell: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -319,14 +320,14 @@ const styles = StyleSheet.create({
   tableCellBold: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc900,
   },
   tableCellHighlight: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc700,
   },
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 9,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc400,
     textTransform: 'uppercase',
@@ -371,7 +372,7 @@ const styles = StyleSheet.create({
   },
   insightLabel: {
     fontSize: 9,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc400,
     textTransform: 'uppercase',
@@ -380,7 +381,7 @@ const styles = StyleSheet.create({
   },
   insightText: {
     fontSize: 11,
-    fontFamily: 'NotoSans',
+    fontFamily: 'SuisseIntl',
     fontWeight: 700,
     color: colors.zinc900,
     lineHeight: 1.4,
@@ -478,12 +479,12 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.where_we_found_it && (
         <View style={{ marginTop: 8 }}>
           <Text style={styles.cardContent}>
-            <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>Domain: </Text>
+            <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>Domain: </Text>
             {insight.where_we_found_it.domain}
           </Text>
           {insight.where_we_found_it.how_they_use_it && (
             <Text style={styles.cardContent}>
-              <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
+              <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
                 How they use it:{' '}
               </Text>
               {insight.where_we_found_it.how_they_use_it}
@@ -491,7 +492,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
           )}
           {insight.where_we_found_it.why_it_transfers && (
             <Text style={styles.cardContent}>
-              <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
+              <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
                 Why it transfers:{' '}
               </Text>
               {insight.where_we_found_it.why_it_transfers}
@@ -502,7 +503,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.why_industry_missed_it && (
         <View style={{ marginTop: 8 }}>
           <Text style={styles.cardContent}>
-            <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
+            <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
               Why industry missed it:{' '}
             </Text>
             {insight.why_industry_missed_it}
@@ -562,7 +563,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
           {analysis.why_its_hard.governing_equation && (
             <View style={[styles.insightBox, { marginTop: 8 }]}>
               <Text
-                style={[styles.cardContent, { fontFamily: 'NotoSans', fontWeight: 700 }]}
+                style={[styles.cardContent, { fontFamily: 'SuisseIntl', fontWeight: 700 }]}
               >
                 {analysis.why_its_hard.governing_equation.equation}
               </Text>
@@ -642,7 +643,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
             {analysis.what_industry_does_today.map((item, i) => (
               <View key={i} style={[styles.card, { marginBottom: 8 }]}>
                 <Text
-                  style={[styles.cardContent, { fontFamily: 'NotoSans', fontWeight: 700 }]}
+                  style={[styles.cardContent, { fontFamily: 'SuisseIntl', fontWeight: 700 }]}
                 >
                   {item.approach}
                 </Text>
@@ -680,7 +681,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 )}
                 {h.evidence && (
                   <Text style={[styles.cardContent, { marginTop: 4 }]}>
-                    <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
+                    <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
                       Evidence:{' '}
                     </Text>
                     {h.evidence}
@@ -688,7 +689,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 )}
                 {h.implication && (
                   <Text style={[styles.cardContent, { marginTop: 4 }]}>
-                    <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
+                    <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
                       Implication:{' '}
                     </Text>
                     {h.implication}
@@ -756,7 +757,7 @@ function ExecutiveSummarySection({
           <Text
             style={[
               styles.paragraph,
-              { fontSize: 12, fontFamily: 'NotoSans' },
+              { fontSize: 12, fontFamily: 'SuisseIntl' },
             ]}
           >
             {summary.narrative_lead}
@@ -796,7 +797,7 @@ function ExecutiveSummarySection({
         {summary.primary_recommendation && (
           <View style={[styles.cardHighlight, { marginTop: 12 }]}>
             <MonoLabel>Primary Recommendation</MonoLabel>
-            <Text style={[styles.paragraph, { fontFamily: 'NotoSans', fontWeight: 700 }]}>
+            <Text style={[styles.paragraph, { fontFamily: 'SuisseIntl', fontWeight: 700 }]}>
               {summary.primary_recommendation}
             </Text>
           </View>
@@ -935,7 +936,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
                       <Text
                         style={[
                           styles.cardContent,
-                          { fontFamily: 'NotoSans', fontWeight: 700 },
+                          { fontFamily: 'SuisseIntl', fontWeight: 700 },
                         ]}
                       >
                         {gate.week}
@@ -1033,7 +1034,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
             )}
           {track.fallback_trigger.pivot_to && (
             <Text style={[styles.cardContent, { marginTop: 4 }]}>
-              <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>Pivot to: </Text>
+              <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>Pivot to: </Text>
               {track.fallback_trigger.pivot_to}
             </Text>
           )}
@@ -1418,7 +1419,7 @@ function ChallengeTheFrameSection({
           <View style={{ marginBottom: 8 }}>
             <MonoLabel>Assumption</MonoLabel>
             <Text
-              style={[styles.cardContent, { fontFamily: 'NotoSans', fontWeight: 700 }]}
+              style={[styles.cardContent, { fontFamily: 'SuisseIntl', fontWeight: 700 }]}
             >
               {c.assumption}
             </Text>
@@ -1673,7 +1674,7 @@ function KeyInsightsSection({ insights }: { insights?: string[] }) {
               <Text
                 style={{
                   fontSize: 10,
-                  fontFamily: 'NotoSans',
+                  fontFamily: 'SuisseIntl',
                   fontWeight: 700,
                   color: colors.zinc700,
                 }}
@@ -1805,7 +1806,7 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
                   <Text
                     style={[
                       styles.cardContent,
-                      { fontFamily: 'NotoSans', fontWeight: 700, flex: 1 },
+                      { fontFamily: 'SuisseIntl', fontWeight: 700, flex: 1 },
                     ]}
                   >
                     {gap.concern}
