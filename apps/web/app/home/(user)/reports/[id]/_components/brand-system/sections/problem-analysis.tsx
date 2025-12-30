@@ -155,46 +155,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
           data.current_state_of_art.benchmarks.length > 0 && (
             <ContentBlock withBorder>
               <MonoLabel>Current State of the Art</MonoLabel>
-
-              {/* Mobile: Stacked cards */}
-              <div className="mt-6 space-y-6 md:hidden">
-                {data.current_state_of_art.benchmarks.map((b, idx) => (
-                  <div
-                    key={idx}
-                    className="border-b border-zinc-200 pb-5 last:border-b-0"
-                  >
-                    <p className="text-[17px] font-medium text-[#1e1e1e]">
-                      {b.entity}
-                    </p>
-                    {b.approach && (
-                      <p className="mt-2 text-[15px] text-zinc-700">
-                        <span className="text-zinc-400">Approach:</span>{' '}
-                        {b.approach}
-                      </p>
-                    )}
-                    {b.current_performance && (
-                      <p className="mt-1 text-[15px] text-zinc-700">
-                        <span className="text-zinc-400">Performance:</span>{' '}
-                        {b.current_performance}
-                      </p>
-                    )}
-                    {b.target_roadmap && (
-                      <p className="mt-1 text-[15px] text-zinc-700">
-                        <span className="text-zinc-400">Target:</span>{' '}
-                        {b.target_roadmap}
-                      </p>
-                    )}
-                    {b.source && (
-                      <p className="mt-1 text-[14px] text-zinc-500">
-                        {b.source}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Desktop: Table */}
-              <div className="mt-6 hidden md:block">
+              <div className="mt-6 overflow-x-auto">
                 <table className="w-full text-[18px]">
                   <thead>
                     <tr className="border-b border-zinc-300">
@@ -289,46 +250,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
         {data.success_metrics && data.success_metrics.length > 0 && (
           <ContentBlock withBorder>
             <MonoLabel>Success Metrics</MonoLabel>
-
-            {/* Mobile: Stacked cards */}
-            <div className="mt-6 space-y-6 md:hidden">
-              {data.success_metrics.map((m, idx) => (
-                <div
-                  key={idx}
-                  className="border-b border-zinc-200 pb-5 last:border-b-0"
-                >
-                  <p className="text-[17px] font-medium text-[#1e1e1e]">
-                    {m.metric}
-                    {m.unit && (
-                      <span className="ml-2 text-[14px] font-normal text-zinc-500">
-                        ({m.unit})
-                      </span>
-                    )}
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px]">
-                    <span className="font-medium text-emerald-700">
-                      <span className="text-zinc-400 font-normal">Target:</span>{' '}
-                      {m.target}
-                    </span>
-                    {m.minimum_viable && (
-                      <span className="text-zinc-700">
-                        <span className="text-zinc-400">Min:</span>{' '}
-                        {m.minimum_viable}
-                      </span>
-                    )}
-                    {m.stretch && (
-                      <span className="text-zinc-700">
-                        <span className="text-zinc-400">Stretch:</span>{' '}
-                        {m.stretch}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop: Table */}
-            <div className="mt-6 hidden md:block">
+            <div className="mt-6 overflow-x-auto">
               <table className="w-full text-[18px]">
                 <thead>
                   <tr className="border-b border-zinc-300">
