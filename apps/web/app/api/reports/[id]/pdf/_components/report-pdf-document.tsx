@@ -32,17 +32,19 @@ import type {
 } from '../_lib/types';
 
 // Register Noto Sans font - Google's universal font with full Unicode support
-// Using complete TTF files from notofonts.github.io via jsdelivr CDN
-// These include ALL character sets: Latin, Greek (τ, η, σ), Cyrillic, Vietnamese, etc.
+// Using LOCAL TTF files in /public/fonts/ to ensure Greek characters (τ, η, σ) render correctly
+// The CDN versions may be cached incorrectly or have network issues
+const FONT_BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sparlo.ai';
+
 Font.register({
   family: 'NotoSans',
   fonts: [
     {
-      src: 'https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSans/full/ttf/NotoSans-Regular.ttf',
+      src: `${FONT_BASE_URL}/fonts/NotoSans-Regular.ttf`,
       fontWeight: 400,
     },
     {
-      src: 'https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSans/full/ttf/NotoSans-Bold.ttf',
+      src: `${FONT_BASE_URL}/fonts/NotoSans-Bold.ttf`,
       fontWeight: 700,
     },
   ],
