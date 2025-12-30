@@ -26,7 +26,7 @@ async function BillingPage2() {
           <div className="text-center">
             <h2 className="mb-2 text-2xl font-bold">Choose Your Plan</h2>
             <p className="text-muted-foreground mx-auto max-w-lg">
-              This page uses Stripe's embedded Pricing Table component for
+              This page uses Stripe&apos;s embedded Pricing Table component for
               comparison.
             </p>
           </div>

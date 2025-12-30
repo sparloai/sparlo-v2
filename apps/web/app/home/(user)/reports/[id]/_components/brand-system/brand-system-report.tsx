@@ -21,7 +21,6 @@ import { Download, Loader2, Share2 } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
 
-import { useSidebarState } from '~/home/(user)/_lib/sidebar-context';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { CHAT_DRAWER_WIDTH } from '../../_lib/constants';
@@ -651,9 +650,15 @@ export const BrandSystemReport = memo(function BrandSystemReport({
 }: BrandSystemReportProps) {
   // Normalize field names for backward compatibility
   const normalizedData = normalizeReportData(reportData);
-  const tocSections = generateTocSections(
-    normalizedData as Record<string, unknown>,
-    !!brief, // Include Brief in TOC if we have it
+
+  // Memoize TOC sections to avoid regenerating on every render
+  const tocSections = useMemo(
+    () =>
+      generateTocSections(
+        normalizedData as Record<string, unknown>,
+        !!brief, // Include Brief in TOC if we have it
+      ),
+    [normalizedData, brief],
   );
 
   // Flatten section IDs for scroll tracking

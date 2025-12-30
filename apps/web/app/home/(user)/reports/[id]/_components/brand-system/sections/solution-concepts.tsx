@@ -443,7 +443,7 @@ export const SolutionConceptsSection = memo(function SolutionConceptsSection({
       {/* Why Not Obvious */}
       {data.why_not_obvious && (
         <ContentBlock withBorder className="mt-12 max-w-[70ch]">
-          <MonoLabel>Why This Isn't Obvious</MonoLabel>
+          <MonoLabel>Why This Isn&apos;t Obvious</MonoLabel>
           <div className="mt-4 space-y-4">
             {data.why_not_obvious.industry_gap && (
               <p className="text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">

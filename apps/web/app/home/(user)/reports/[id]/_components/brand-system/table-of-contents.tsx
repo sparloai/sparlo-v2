@@ -19,7 +19,6 @@ import { cn } from '@kit/ui/utils';
 
 import {
   TOC_SCROLL_OFFSET,
-  TOC_STICKY_TOP,
   type TocSection,
   flattenSectionIds,
   useTocScroll,

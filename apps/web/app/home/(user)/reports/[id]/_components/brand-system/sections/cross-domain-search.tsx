@@ -66,7 +66,7 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
                           key={idx}
                           className="font-mono text-[14px] text-zinc-600"
                         >
-                          "{query}"
+                          &quot;{query}&quot;
                         </li>
                       ),
                     )}

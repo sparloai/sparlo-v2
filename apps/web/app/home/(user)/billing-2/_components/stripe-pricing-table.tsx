@@ -25,7 +25,7 @@ export function StripePricingTable({
           Stripe Pricing Table Not Configured
         </h3>
         <p className="text-muted-foreground mb-4 text-sm">
-          To use Stripe's embedded pricing table:
+          To use Stripe&apos;s embedded pricing table:
         </p>
         <ol className="text-muted-foreground mx-auto max-w-md space-y-2 text-left text-sm">
           <li>

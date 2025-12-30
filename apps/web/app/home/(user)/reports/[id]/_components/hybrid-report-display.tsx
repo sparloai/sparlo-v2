@@ -58,13 +58,11 @@ import type {
   InnovationAnalysis,
   InnovationPortfolio,
   InsightBlock,
-  ParallelConcept,
   ParallelInvestigation,
   ProblemAnalysis,
   RecommendedInnovation,
   RiskAndWatchout,
   StrategicIntegration,
-  StructuredExecutiveSummary,
   SupportingConcept,
   SustainabilityFlag,
 } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
@@ -2064,36 +2062,6 @@ function RecommendationSection({ content }: { content?: string }) {
           ))}
         </div>
       </DarkSection>
-    </section>
-  );
-}
-
-// ============================================
-// Follow-up Prompts Section
-// ============================================
-
-function FollowUpPromptsSection({ prompts }: { prompts?: string[] }) {
-  if (!prompts || prompts.length === 0) return null;
-
-  return (
-    <section id="follow-up-prompts">
-      <SectionHeader
-        title="Suggested Follow-ups"
-        subtitle="Questions to explore next"
-      />
-      <div className="grid gap-3 sm:grid-cols-2">
-        {prompts.map((prompt, idx) => (
-          <div
-            key={idx}
-            className="group flex cursor-pointer items-start gap-3 rounded-lg border border-zinc-200 bg-white p-4 transition-colors hover:border-violet-300 hover:bg-violet-50/30"
-          >
-            <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" />
-            <p className="text-sm text-zinc-700 group-hover:text-zinc-900">
-              {prompt}
-            </p>
-          </div>
-        ))}
-      </div>
     </section>
   );
 }

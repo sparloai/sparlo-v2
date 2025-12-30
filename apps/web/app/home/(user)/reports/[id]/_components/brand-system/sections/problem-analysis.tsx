@@ -39,7 +39,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
         {/* WHAT'S WRONG */}
         {data.whats_wrong?.prose && (
           <div>
-            <MonoLabel>What's Wrong</MonoLabel>
+            <MonoLabel>What&apos;s Wrong</MonoLabel>
             <BodyText size="md" className="mt-4 max-w-[80ch]">
               {data.whats_wrong.prose}
             </BodyText>
@@ -49,7 +49,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
         {/* WHY IT'S HARD */}
         {data.why_its_hard && (
           <ContentBlock withBorder className="max-w-[80ch]">
-            <MonoLabel>Why It's Hard</MonoLabel>
+            <MonoLabel>Why It&apos;s Hard</MonoLabel>
             {data.why_its_hard.prose && (
               <BodyText size="md" className="mt-4 max-w-[80ch]">
                 {data.why_its_hard.prose}
