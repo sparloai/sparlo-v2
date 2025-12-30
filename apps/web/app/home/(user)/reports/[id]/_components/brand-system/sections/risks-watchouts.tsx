@@ -152,7 +152,54 @@ export const RisksWatchoutsTable = memo(function RisksWatchoutsTable({
       <SectionTitle size="lg">Risks & Watchouts</SectionTitle>
       <SectionSubtitle>What could go wrong.</SectionSubtitle>
 
-      <div className="mt-10 overflow-x-auto">
+      {/* Mobile: Stacked cards */}
+      <div className="mt-10 space-y-6 md:hidden">
+        {data.map((risk, idx) => (
+          <div
+            key={idx}
+            className="border-b border-zinc-200 pb-6 last:border-b-0"
+          >
+            <p className="text-[17px] font-medium text-[#1e1e1e]">
+              {risk.risk}
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-[14px]">
+              {risk.category && (
+                <span className="text-zinc-500">{risk.category}</span>
+              )}
+              {risk.category && risk.severity && (
+                <span className="text-zinc-300">·</span>
+              )}
+              {risk.severity && (
+                <span
+                  className={
+                    risk.severity === 'high'
+                      ? 'font-medium text-zinc-700'
+                      : risk.severity === 'medium'
+                        ? 'text-zinc-500'
+                        : 'text-zinc-400'
+                  }
+                >
+                  {risk.severity.charAt(0).toUpperCase() +
+                    risk.severity.slice(1)}
+                </span>
+              )}
+            </div>
+            {risk.mitigation && (
+              <div className="mt-3">
+                <span className="text-[13px] font-medium text-zinc-500">
+                  Mitigation
+                </span>
+                <p className="mt-1 text-[15px] leading-[1.4] text-zinc-600">
+                  {risk.mitigation}
+                </p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: Table layout */}
+      <div className="mt-10 hidden overflow-x-auto md:block">
         <table className="w-full text-[18px]">
           <thead>
             <tr className="border-b border-zinc-300">

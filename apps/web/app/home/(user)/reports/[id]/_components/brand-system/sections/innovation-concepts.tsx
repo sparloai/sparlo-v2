@@ -42,7 +42,7 @@ export const InnovationConceptsSection = memo(
 
     return (
       <Section id="innovation-concepts" className="mt-20">
-        <SectionTitle size="lg">Innovation Portfolio</SectionTitle>
+        <SectionTitle size="lg">Innovation Concepts</SectionTitle>
         <SectionSubtitle>
           Higher-risk explorations with breakthrough potential.
         </SectionSubtitle>

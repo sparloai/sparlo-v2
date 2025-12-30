@@ -64,7 +64,58 @@ export const ConstraintsSection = memo(function ConstraintsSection({
         {data.success_metrics && data.success_metrics.length > 0 && (
           <ContentBlock withBorder>
             <MonoLabel>Success Metrics</MonoLabel>
-            <div className="mt-6 overflow-x-auto">
+
+            {/* Mobile: Stacked cards */}
+            <div className="mt-6 space-y-6 md:hidden">
+              {data.success_metrics.map((m, idx) => (
+                <div
+                  key={idx}
+                  className="border-b border-zinc-200 pb-6 last:border-b-0"
+                >
+                  <p className="text-[17px] font-medium text-[#1e1e1e]">
+                    {m.metric}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2">
+                    {m.target && (
+                      <div>
+                        <span className="text-[13px] text-zinc-500">
+                          Target:{' '}
+                        </span>
+                        <span className="text-[15px] font-semibold text-emerald-700">
+                          {m.target}
+                        </span>
+                      </div>
+                    )}
+                    {m.minimum_viable && (
+                      <div>
+                        <span className="text-[13px] text-zinc-500">Min: </span>
+                        <span className="text-[15px] text-zinc-700">
+                          {m.minimum_viable}
+                        </span>
+                      </div>
+                    )}
+                    {m.stretch && (
+                      <div>
+                        <span className="text-[13px] text-zinc-500">
+                          Stretch:{' '}
+                        </span>
+                        <span className="text-[15px] text-zinc-700">
+                          {m.stretch}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {m.unit && (
+                    <p className="mt-2 text-[13px] text-zinc-500">
+                      Unit: {m.unit}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: Table layout */}
+            <div className="mt-6 hidden overflow-x-auto md:block">
               <table className="w-full text-[18px]">
                 <thead>
                   <tr className="border-b border-zinc-300">

@@ -92,87 +92,69 @@ interface BrandSystemReportProps {
 
 /**
  * Calculate estimated read time based on word count
- * Average reading speed: 200 words per minute for technical content
+ * Average reading speed: 250 words per minute for technical content
  *
- * Filters out non-content strings like IDs, enum values, and short labels
- * to provide more accurate reading time estimates.
+ * Only counts primary content fields that are actually rendered.
  */
 function calculateReadTime(data: HybridReportData): number {
-  // Content-bearing field names to prioritize
-  const contentFields = new Set([
-    'title',
-    'brief',
-    'narrative_lead',
-    'primary_recommendation',
-    'prose',
-    'explanation',
-    'headline',
-    'what_it_is',
-    'why_it_works',
-    'when_to_use_instead',
-    'the_insight',
-    'one_liner',
-    'description',
-    'approach',
-    'limitation',
-    'current_performance',
-    'target_roadmap',
-    'test',
-    'success_criteria',
-    'cost',
-    'expected_improvement',
-    'investment',
-    'timeline',
-    'rationale',
-    'summary',
-    'content',
-    'text',
-    'details',
-    'notes',
-    'signal',
-    'implication',
-    'what_id_actually_do',
-    'personal_recommendation',
-    'self_critique',
-  ]);
+  const textParts: string[] = [];
 
-  // Check if a string looks like readable content (not an ID or enum)
-  const isReadableContent = (str: string): boolean => {
-    // Skip very short strings (IDs, enum values)
-    if (str.length < 20) return false;
-    // Skip strings that are all uppercase (enum values)
-    if (str === str.toUpperCase() && str.length < 30) return false;
-    // Skip strings that look like IDs (contain only alphanumeric, hyphens, underscores)
-    if (/^[a-zA-Z0-9_-]+$/.test(str) && str.length < 30) return false;
-    // Skip URLs
-    if (str.startsWith('http://') || str.startsWith('https://')) return false;
-    return true;
+  // Helper to add text if it exists
+  const addText = (text: string | undefined | null) => {
+    if (text && typeof text === 'string' && text.length > 10) {
+      textParts.push(text);
+    }
   };
 
-  // Recursively extract readable text from the report
-  const extractText = (obj: unknown, key?: string): string => {
-    if (typeof obj === 'string') {
-      // Always include strings from known content fields
-      if (key && contentFields.has(key)) {
-        return obj;
-      }
-      // For other fields, filter based on content characteristics
-      return isReadableContent(obj) ? obj : '';
-    }
-    if (Array.isArray(obj)) {
-      return obj.map((item) => extractText(item, key)).join(' ');
-    }
-    if (typeof obj === 'object' && obj !== null) {
-      return Object.entries(obj)
-        .map(([k, v]) => extractText(v, k))
-        .join(' ');
-    }
-    return '';
-  };
+  // Executive summary
+  if (typeof data.executive_summary === 'string') {
+    addText(data.executive_summary);
+  } else if (data.executive_summary) {
+    addText(data.executive_summary.narrative_lead);
+    addText(data.executive_summary.the_problem);
+    addText(data.executive_summary.core_insight?.headline);
+    addText(data.executive_summary.core_insight?.explanation);
+    addText(data.executive_summary.primary_recommendation);
+  }
 
-  const text = extractText(data);
+  // Problem analysis
+  if (data.problem_analysis) {
+    addText(data.problem_analysis.whats_wrong?.prose);
+    addText(data.problem_analysis.why_its_hard?.prose);
+    addText(data.problem_analysis.first_principles_insight?.headline);
+    addText(data.problem_analysis.first_principles_insight?.explanation);
+  }
+
+  // Execution track / solution concepts
+  if (data.execution_track?.primary) {
+    addText(data.execution_track.primary.what_it_is);
+    addText(data.execution_track.primary.why_it_works);
+  }
+
+  // Innovation portfolio
+  if (data.innovation_portfolio?.recommended_innovation) {
+    addText(data.innovation_portfolio.recommended_innovation.what_it_is);
+    addText(data.innovation_portfolio.recommended_innovation.why_it_works);
+  }
+
+  // Risks
+  data.risks_and_watchouts?.forEach((r) => {
+    addText(r.risk);
+    addText(r.mitigation);
+  });
+
+  // Self critique
+  if (data.self_critique) {
+    addText(data.self_critique.confidence_rationale);
+    data.self_critique.what_we_might_be_wrong_about?.forEach(addText);
+  }
+
+  // Final recommendation
+  addText(data.what_id_actually_do);
+
+  const text = textParts.join(' ');
   const wordCount = text.split(/\s+/).filter(Boolean).length;
-  const minutesRaw = wordCount / 200; // 200 words per minute for technical content
+  const minutesRaw = wordCount / 250; // 250 words per minute
 
   // Round to nearest minute, minimum 1 minute
   return Math.max(1, Math.round(minutesRaw));
@@ -555,7 +537,7 @@ const ReportContent = memo(function ReportContent({
           <div className="flex items-start justify-between gap-6">
             <h1
               className={cn(
-                'font-heading leading-[1.1] font-normal tracking-[-0.02em] text-zinc-900',
+                'font-heading leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900',
                 compactTitle
                   ? 'text-[28px] md:text-[32px]'
                   : 'text-[36px] md:text-[48px]',

@@ -374,14 +374,14 @@ export function generateTocSections(
     });
   }
 
-  // Innovation Portfolio
+  // Innovation Concepts
   if (reportData.innovation_portfolio) {
     const portfolio = reportData.innovation_portfolio as {
       parallel_investigations?: unknown[];
     };
     sections.push({
       id: 'innovation-concepts',
-      title: 'Innovation Portfolio',
+      title: 'Innovation Concepts',
       subsections: portfolio?.parallel_investigations?.length
         ? [{ id: 'parallel-investigations', title: 'Parallel Investigations' }]
         : [],

@@ -80,7 +80,43 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
         {data.domains_searched && data.domains_searched.length > 0 && (
           <ContentBlock withBorder>
             <MonoLabel variant="muted">Domains Explored</MonoLabel>
-            <div className="mt-6 overflow-x-auto">
+
+            {/* Mobile: Stacked cards */}
+            <div className="mt-6 space-y-6 md:hidden">
+              {data.domains_searched.map((domain, idx) => (
+                <div
+                  key={idx}
+                  className="border-b border-zinc-200 pb-6 last:border-b-0"
+                >
+                  <p className="text-[16px] font-medium text-[#1e1e1e]">
+                    {domain.domain}
+                  </p>
+                  {domain.mechanism_found && (
+                    <div className="mt-3">
+                      <span className="text-[13px] font-medium text-zinc-500">
+                        Mechanism Found
+                      </span>
+                      <p className="mt-1 text-[15px] leading-[1.4] text-zinc-700">
+                        {domain.mechanism_found}
+                      </p>
+                    </div>
+                  )}
+                  {domain.relevance && (
+                    <div className="mt-3">
+                      <span className="text-[13px] font-medium text-zinc-500">
+                        Relevance
+                      </span>
+                      <p className="mt-1 text-[15px] leading-[1.4] text-zinc-600">
+                        {domain.relevance}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: Table layout */}
+            <div className="mt-6 hidden overflow-x-auto md:block">
               <table className="w-full text-[16px]">
                 <thead>
                   <tr className="border-b border-zinc-300">
