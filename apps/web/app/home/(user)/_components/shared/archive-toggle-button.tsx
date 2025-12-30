@@ -78,7 +78,7 @@ export function ArchiveToggleButton({
       disabled={isPending}
       aria-label={label}
       aria-busy={isPending}
-      className="rounded p-1.5 text-[--text-muted] opacity-0 transition-all group-hover:opacity-100 hover:bg-[--surface-overlay] hover:text-[--text-secondary] disabled:opacity-50"
+      className="rounded p-1.5 text-zinc-400 opacity-0 transition-all group-hover:opacity-100 hover:bg-zinc-100 hover:text-zinc-600 disabled:opacity-50"
       title={label}
     >
       <Icon className={cn('h-4 w-4', isPending && 'animate-spin')} />
