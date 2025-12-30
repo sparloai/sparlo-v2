@@ -29,6 +29,7 @@ import pathsConfig from '~/config/paths.config';
 interface NavigationProps {
   user?: JWTUserData | null;
   variant?: 'dark' | 'light';
+  leftSlot?: React.ReactNode;
 }
 
 const paths = {
@@ -42,6 +43,7 @@ const features = {
 export const Navigation = memo(function Navigation({
   user,
   variant = 'dark',
+  leftSlot,
 }: NavigationProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -88,21 +90,24 @@ export const Navigation = memo(function Navigation({
         )}
       >
         <nav className="flex items-center justify-between px-6 py-5 md:px-12 lg:px-16">
-          {/* Logo */}
-          <Link href="/" className="transition-opacity hover:opacity-80">
-            <Image
-              src={
-                isDark
-                  ? '/images/sparlo-logo-white.png'
-                  : '/images/sparlo-logo.png'
-              }
-              alt="Sparlo"
-              width={90}
-              height={24}
-              className="h-6 w-auto"
-              priority
-            />
-          </Link>
+          {/* Left side - Logo and optional slot */}
+          <div className="flex items-center gap-4">
+            {leftSlot && user && leftSlot}
+            <Link href="/" className="transition-opacity hover:opacity-80">
+              <Image
+                src={
+                  isDark
+                    ? '/images/sparlo-logo-white.png'
+                    : '/images/sparlo-logo.png'
+                }
+                alt="Sparlo"
+                width={90}
+                height={24}
+                className="h-6 w-auto"
+                priority
+              />
+            </Link>
+          </div>
 
           {/* Right side - Auth */}
           <div className="hidden items-center gap-6 md:flex">
