@@ -9,21 +9,24 @@ import {
 
 import type { ReportForPDF } from '../_lib/types';
 
-// Register Inter font - has full Unicode/Greek support and similar aesthetic to Suisse
-// Using Google Fonts CDN for reliable server-side access
+// Register Roboto font - has comprehensive Unicode support including Greek, Cyrillic, etc.
+// Using full TTF files from Google Fonts static directory which contain all character sets
 Font.register({
-  family: 'Inter',
+  family: 'Roboto',
   fonts: [
     {
-      src: 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2',
+      src: 'https://fonts.gstatic.com/s/roboto/v32/KFOmCnqEu92Fr1Me5Q.ttf',
       fontWeight: 400,
     },
     {
-      src: 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fAZ9hiJ-Ek-_EeA.woff2',
+      src: 'https://fonts.gstatic.com/s/roboto/v32/KFOlCnqEu92Fr1MmWUlvAw.ttf',
       fontWeight: 700,
     },
   ],
 });
+
+// Disable hyphenation to prevent awkward word breaks
+Font.registerHyphenationCallback((word) => [word]);
 import type {
   ChallengeTheFrame,
   ConstraintsAndMetrics,
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
     padding: 48,
     paddingBottom: 64,
     fontSize: 10,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     backgroundColor: colors.white,
   },
   // Header - minimal, typography-driven
@@ -83,7 +86,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 11,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc400,
     letterSpacing: 3,
@@ -92,7 +95,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc900,
     marginBottom: 8,
@@ -114,7 +117,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc900,
     letterSpacing: -0.3,
@@ -127,7 +130,7 @@ const styles = StyleSheet.create({
   },
   subsectionTitle: {
     fontSize: 13,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc800,
     marginBottom: 8,
@@ -167,7 +170,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 12,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc900,
     marginBottom: 6,
@@ -175,7 +178,7 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 9,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -191,7 +194,7 @@ const styles = StyleSheet.create({
   // Mono Label (matches web MonoLabel - 13px uppercase tracking wide)
   monoLabel: {
     fontSize: 9,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -208,7 +211,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 8,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc600,
     textTransform: 'uppercase',
@@ -248,7 +251,7 @@ const styles = StyleSheet.create({
   listNumber: {
     width: 24,
     fontSize: 10,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc300,
   },
@@ -299,7 +302,7 @@ const styles = StyleSheet.create({
   tableHeaderCell: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -319,14 +322,14 @@ const styles = StyleSheet.create({
   tableCellBold: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc900,
   },
   tableCellHighlight: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc700,
   },
@@ -349,7 +352,7 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 9,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc400,
     textTransform: 'uppercase',
@@ -371,7 +374,7 @@ const styles = StyleSheet.create({
   },
   insightLabel: {
     fontSize: 9,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc400,
     textTransform: 'uppercase',
@@ -380,7 +383,7 @@ const styles = StyleSheet.create({
   },
   insightText: {
     fontSize: 11,
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontWeight: 700,
     color: colors.zinc900,
     lineHeight: 1.4,
@@ -478,12 +481,12 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.where_we_found_it && (
         <View style={{ marginTop: 8 }}>
           <Text style={styles.cardContent}>
-            <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>Domain: </Text>
+            <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>Domain: </Text>
             {insight.where_we_found_it.domain}
           </Text>
           {insight.where_we_found_it.how_they_use_it && (
             <Text style={styles.cardContent}>
-              <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
+              <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
                 How they use it:{' '}
               </Text>
               {insight.where_we_found_it.how_they_use_it}
@@ -491,7 +494,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
           )}
           {insight.where_we_found_it.why_it_transfers && (
             <Text style={styles.cardContent}>
-              <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
+              <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
                 Why it transfers:{' '}
               </Text>
               {insight.where_we_found_it.why_it_transfers}
@@ -502,7 +505,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.why_industry_missed_it && (
         <View style={{ marginTop: 8 }}>
           <Text style={styles.cardContent}>
-            <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
+            <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
               Why industry missed it:{' '}
             </Text>
             {insight.why_industry_missed_it}
@@ -562,7 +565,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
           {analysis.why_its_hard.governing_equation && (
             <View style={[styles.insightBox, { marginTop: 8 }]}>
               <Text
-                style={[styles.cardContent, { fontFamily: 'Inter', fontWeight: 700 }]}
+                style={[styles.cardContent, { fontFamily: 'Roboto', fontWeight: 700 }]}
               >
                 {analysis.why_its_hard.governing_equation.equation}
               </Text>
@@ -642,7 +645,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
             {analysis.what_industry_does_today.map((item, i) => (
               <View key={i} style={[styles.card, { marginBottom: 8 }]}>
                 <Text
-                  style={[styles.cardContent, { fontFamily: 'Inter', fontWeight: 700 }]}
+                  style={[styles.cardContent, { fontFamily: 'Roboto', fontWeight: 700 }]}
                 >
                   {item.approach}
                 </Text>
@@ -680,7 +683,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 )}
                 {h.evidence && (
                   <Text style={[styles.cardContent, { marginTop: 4 }]}>
-                    <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
+                    <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
                       Evidence:{' '}
                     </Text>
                     {h.evidence}
@@ -688,7 +691,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 )}
                 {h.implication && (
                   <Text style={[styles.cardContent, { marginTop: 4 }]}>
-                    <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
+                    <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
                       Implication:{' '}
                     </Text>
                     {h.implication}
@@ -756,7 +759,7 @@ function ExecutiveSummarySection({
           <Text
             style={[
               styles.paragraph,
-              { fontSize: 12, fontFamily: 'Inter' },
+              { fontSize: 12, fontFamily: 'Roboto' },
             ]}
           >
             {summary.narrative_lead}
@@ -796,7 +799,7 @@ function ExecutiveSummarySection({
         {summary.primary_recommendation && (
           <View style={[styles.cardHighlight, { marginTop: 12 }]}>
             <MonoLabel>Primary Recommendation</MonoLabel>
-            <Text style={[styles.paragraph, { fontFamily: 'Inter', fontWeight: 700 }]}>
+            <Text style={[styles.paragraph, { fontFamily: 'Roboto', fontWeight: 700 }]}>
               {summary.primary_recommendation}
             </Text>
           </View>
@@ -935,7 +938,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
                       <Text
                         style={[
                           styles.cardContent,
-                          { fontFamily: 'Inter', fontWeight: 700 },
+                          { fontFamily: 'Roboto', fontWeight: 700 },
                         ]}
                       >
                         {gate.week}
@@ -1033,7 +1036,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
             )}
           {track.fallback_trigger.pivot_to && (
             <Text style={[styles.cardContent, { marginTop: 4 }]}>
-              <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>Pivot to: </Text>
+              <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>Pivot to: </Text>
               {track.fallback_trigger.pivot_to}
             </Text>
           )}
@@ -1418,7 +1421,7 @@ function ChallengeTheFrameSection({
           <View style={{ marginBottom: 8 }}>
             <MonoLabel>Assumption</MonoLabel>
             <Text
-              style={[styles.cardContent, { fontFamily: 'Inter', fontWeight: 700 }]}
+              style={[styles.cardContent, { fontFamily: 'Roboto', fontWeight: 700 }]}
             >
               {c.assumption}
             </Text>
@@ -1673,7 +1676,7 @@ function KeyInsightsSection({ insights }: { insights?: string[] }) {
               <Text
                 style={{
                   fontSize: 10,
-                  fontFamily: 'Inter',
+                  fontFamily: 'Roboto',
                   fontWeight: 700,
                   color: colors.zinc700,
                 }}
@@ -1805,7 +1808,7 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
                 <Text
                   style={[
                     styles.cardContent,
-                    { fontFamily: 'Inter', fontWeight: 700, flex: 1 },
+                    { fontFamily: 'Roboto', fontWeight: 700, flex: 1 },
                   ]}
                 >
                   {gap.concern}
