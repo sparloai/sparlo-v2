@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 
 import {
   Archive,
-  ArrowLeft,
   ChevronRight,
   FileText,
   Loader2,
@@ -24,7 +23,6 @@ import type { ConversationStatus, DashboardReport } from '../_lib/types';
 import { formatElapsed, useElapsedTime } from '../_lib/utils/elapsed-time';
 import { formatReportDate, truncateText } from '../_lib/utils/report-utils';
 import { ArchiveToggleButton } from './shared/archive-toggle-button';
-import { ModeLabel } from './shared/mode-label';
 
 /**
  * Reports Dashboard - Sparlo Design System
@@ -272,9 +270,7 @@ function ReportCard({
       <div className="flex items-start justify-between gap-4">
         {/* Left content */}
         <div className="min-w-0 flex-1">
-          <ModeLabel mode={report.mode} />
-
-          <h3 className="mt-2 text-[18px] font-medium tracking-[-0.02em] text-zinc-900">
+          <h3 className="text-[18px] font-medium tracking-[-0.02em] text-zinc-900">
             {displayTitle}
           </h3>
 
@@ -396,15 +392,6 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-8 pt-24 pb-16">
-      {/* Back link */}
-      <Link
-        href="/home"
-        className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
-      >
-        <ArrowLeft className="h-3.5 w-3.5" />
-        Dashboard
-      </Link>
-
       {/* Header */}
       <div className="flex items-end justify-between">
         <h1 className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
@@ -420,16 +407,13 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
             Archived
           </Link>
 
-          <Link href="/home/reports/new" className="group">
-            <button
-              data-test="new-report-button"
-              className="flex items-center gap-2 text-[13px] font-medium tracking-[-0.02em] text-zinc-600 transition-colors hover:text-zinc-900"
-            >
-              New Analysis
-              <span className="flex h-5 w-5 items-center justify-center rounded border border-zinc-300 transition-all group-hover:border-zinc-900 group-hover:bg-zinc-900 group-hover:text-white">
-                <Plus className="h-3 w-3" />
-              </span>
-            </button>
+          <Link
+            href="/home/reports/new"
+            data-test="new-report-button"
+            className="inline-flex items-center gap-2 bg-zinc-900 px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800"
+          >
+            <Plus className="h-4 w-4" />
+            New Analysis
           </Link>
         </div>
       </div>

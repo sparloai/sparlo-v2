@@ -278,7 +278,6 @@ export default function NewReportPage() {
     });
   }, []);
 
-
   // Track progress once we have a report ID
   const { progress } = useReportProgress(reportId);
 
@@ -584,7 +583,7 @@ export default function NewReportPage() {
           <div className="mx-auto w-full max-w-3xl">
             {/* Back link */}
             <Link
-              href="/home"
+              href="/home/reports"
               className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
             >
               <svg
@@ -600,7 +599,7 @@ export default function NewReportPage() {
                   d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
                 />
               </svg>
-              Dashboard
+              All Reports
             </Link>
 
             {/* Page title - anchor element */}
