@@ -537,10 +537,10 @@ const ReportContent = memo(function ReportContent({
           <div className="flex items-start justify-between gap-6">
             <h1
               className={cn(
-                'font-heading leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900',
+                'font-heading font-normal tracking-[-0.02em] text-zinc-900',
                 compactTitle
-                  ? 'text-[28px] md:text-[32px]'
-                  : 'text-[36px] md:text-[48px]',
+                  ? 'text-[28px] leading-[1.2] md:text-[32px] md:leading-[1.2]'
+                  : 'text-[36px] leading-[1.2] md:text-[48px] md:leading-[1.2]',
               )}
             >
               {displayTitle}
