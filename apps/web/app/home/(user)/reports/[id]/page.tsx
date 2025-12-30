@@ -7,8 +7,6 @@ import { notFound } from 'next/navigation';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { ReportDisplay } from './_components/report-display';
-import { ReportRenderer } from './_components/report/report-renderer';
-import { SparloReportSchema } from './_lib/schema/sparlo-report.schema';
 import { loadChatHistory } from './_lib/server/chat.loader';
 
 interface ReportPageProps {
@@ -84,92 +82,9 @@ export default async function ReportPage({ params }: ReportPageProps) {
     );
   }
 
-  // If no report data, show the legacy display
-  if (!report.report_data) {
-    return (
-      <ReportDisplay report={report} initialChatHistory={initialChatHistory} />
-    );
-  }
-
-  // Check report mode (discovery, hybrid, or standard)
-  const reportMode = report.report_data.mode as string | undefined;
-  const isDiscoveryReport = reportMode === 'discovery';
-  const isHybridReport = reportMode === 'hybrid';
-
-  // Debug logging
-  console.log('[ReportPage] Debug:', {
-    reportId: id,
-    status: report.status,
-    mode: reportMode,
-    isDiscoveryReport,
-    isHybridReport,
-    hasReportField: 'report' in report.report_data,
-    reportDataKeys: Object.keys(report.report_data),
-  });
-
-  if (isDiscoveryReport) {
-    // Discovery reports use ReportDisplay for chat functionality, with discovery flag
-    return (
-      <ReportDisplay
-        report={report}
-        initialChatHistory={initialChatHistory}
-        isDiscovery
-      />
-    );
-  }
-
-  if (isHybridReport) {
-    // Hybrid reports use ReportDisplay for chat functionality, with hybrid flag
-    return (
-      <ReportDisplay
-        report={report}
-        initialChatHistory={initialChatHistory}
-        isHybrid
-      />
-    );
-  }
-
-  // Validate the report data against SparloReportSchema
-  const result = SparloReportSchema.safeParse(report.report_data);
-
-  if (!result.success) {
-    // Log detailed validation errors for debugging schema mismatches
-    const flatErrors = result.error.flatten();
-    console.warn('[Report Rendering] SparloReportSchema validation failed:', {
-      reportId: id,
-      errorCount: result.error.errors.length,
-      fieldErrors: flatErrors.fieldErrors,
-      formErrors: flatErrors.formErrors,
-      // Log which top-level fields exist vs expected to diagnose schema drift
-      presentFields: report.report_data ? Object.keys(report.report_data) : [],
-      expectedFields: [
-        'header',
-        'brief',
-        'executive_summary',
-        'constraints',
-        'problem_analysis',
-        'key_patterns',
-        'solution_concepts',
-        'validation_summary',
-        'challenge_the_frame',
-        'risks_and_watchouts',
-        'next_steps',
-        'appendix',
-        'metadata',
-      ],
-    });
-
-    // Fall back to legacy display with markdown rendering
-    return (
-      <ReportDisplay report={report} initialChatHistory={initialChatHistory} />
-    );
-  }
-
-  // Render the validated structured report
+  // Render the report (BrandSystemReport handles all report types)
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
-      <ReportRenderer report={result.data} />
-    </div>
+    <ReportDisplay report={report} initialChatHistory={initialChatHistory} />
   );
 }
 
