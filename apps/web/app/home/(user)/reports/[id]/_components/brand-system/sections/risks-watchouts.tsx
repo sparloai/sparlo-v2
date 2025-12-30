@@ -63,8 +63,8 @@ const RiskCard = memo(function RiskCard({
 }: RiskCardProps) {
   return (
     <div
-      className={`border-l-2 pl-6 ${
-        severity === 'high' ? 'border-zinc-400' : 'border-zinc-200'
+      className={`md:border-l-2 md:pl-6 ${
+        severity === 'high' ? 'md:border-zinc-400' : 'md:border-zinc-200'
       }`}
     >
       {/* Risk description */}

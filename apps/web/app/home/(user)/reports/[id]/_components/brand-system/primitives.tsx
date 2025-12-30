@@ -170,7 +170,8 @@ export const ArticleBlock = memo(function ArticleBlock({
   return (
     <article
       className={cn(
-        variant === 'bordered' && 'border-l-2 border-zinc-900 pl-10',
+        // Mobile: no border for max reading width; Desktop: elegant left border
+        variant === 'bordered' && 'md:border-l-2 md:border-zinc-900 md:pl-10',
         'bg-white',
         className,
       )}
@@ -218,14 +219,15 @@ export const AccentBorder = memo(function AccentBorder({
   className,
   weight = 'medium',
 }: AccentBorderProps) {
+  // Mobile: minimal borders for reading width; Desktop: full accent borders
   const weightClasses = {
-    light: 'border-l-2 border-zinc-200',
-    medium: 'border-l-2 border-zinc-300',
-    heavy: 'border-l-4 border-zinc-900',
+    light: 'md:border-l-2 md:border-zinc-200',
+    medium: 'md:border-l-2 md:border-zinc-300',
+    heavy: 'md:border-l-4 md:border-zinc-900',
   };
 
   return (
-    <div className={cn(weightClasses[weight], 'pl-6', className)}>
+    <div className={cn(weightClasses[weight], 'md:pl-6', className)}>
       {children}
     </div>
   );

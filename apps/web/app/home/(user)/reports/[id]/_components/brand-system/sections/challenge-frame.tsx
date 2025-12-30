@@ -100,7 +100,7 @@ export const ChallengeFrameSection = memo(function ChallengeFrameSection({
 
                       {/* Implication */}
                       {item.implication && (
-                        <p className="mt-2 border-l-2 border-zinc-300 pl-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic">
+                        <p className="mt-2 md:border-l-2 md:border-zinc-300 md:pl-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic">
                           {item.implication}
                         </p>
                       )}

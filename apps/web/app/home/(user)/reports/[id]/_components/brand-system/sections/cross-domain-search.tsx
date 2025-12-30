@@ -124,7 +124,7 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
               </MonoLabel>
               <div className="mt-6 space-y-6">
                 {data.from_scratch_revelations.map((revelation, idx) => (
-                  <div key={idx} className="border-l-2 border-zinc-200 pl-4">
+                  <div key={idx} className="md:border-l-2 md:border-zinc-200 md:pl-4">
                     {revelation.discovery && (
                       <p className="text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-[#1e1e1e]">
                         {revelation.discovery}

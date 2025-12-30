@@ -118,7 +118,7 @@ export const RecommendationWithCallout = memo(
           <MonoLabel variant="muted">If This Were My Project</MonoLabel>
 
           {/* Lead advice - emphasized with border */}
-          <div className="mt-6 border-l-2 border-zinc-900 pl-6">
+          <div className="mt-6 md:border-l-2 md:border-zinc-900 md:pl-6">
             <p className="text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
               {leadAdvice}
             </p>

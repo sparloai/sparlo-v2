@@ -118,13 +118,13 @@ const ValueRangeItem = memo(function ValueRangeItem({
   variant: 'high' | 'primary' | 'low';
 }) {
   const styles = {
-    high: 'border-l-2 border-zinc-300 text-zinc-600',
-    primary: 'border-l-4 border-zinc-900 font-medium text-zinc-900',
-    low: 'border-l-2 border-zinc-200 text-zinc-500',
+    high: 'md:border-l-2 md:border-zinc-300 text-zinc-600',
+    primary: 'md:border-l-4 md:border-zinc-900 font-medium text-zinc-900',
+    low: 'md:border-l-2 md:border-zinc-200 text-zinc-500',
   };
 
   return (
-    <div className={`pl-4 ${styles[variant]}`}>
+    <div className={`md:pl-4 ${styles[variant]}`}>
       <span className="text-[12px] font-medium tracking-wider text-zinc-400 uppercase">
         {label}
       </span>

@@ -9,18 +9,17 @@ import {
 
 import type { ReportForPDF } from '../_lib/types';
 
-// Register Suisse Intl font - brand font with Unicode support
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
-
+// Register Inter font - has full Unicode/Greek support and similar aesthetic to Suisse
+// Using Google Fonts CDN for reliable server-side access
 Font.register({
-  family: 'SuisseIntl',
+  family: 'Inter',
   fonts: [
     {
-      src: `${siteUrl}/fonts/Suisse/WOFF2/SuisseIntlTrial-Regular.woff2`,
+      src: 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2',
       fontWeight: 400,
     },
     {
-      src: `${siteUrl}/fonts/Suisse/WOFF2/SuisseIntlTrial-Bold.woff2`,
+      src: 'https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fAZ9hiJ-Ek-_EeA.woff2',
       fontWeight: 700,
     },
   ],
@@ -75,7 +74,7 @@ const styles = StyleSheet.create({
     padding: 48,
     paddingBottom: 64,
     fontSize: 10,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     backgroundColor: colors.white,
   },
   // Header - minimal, typography-driven
@@ -84,7 +83,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 11,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc400,
     letterSpacing: 3,
@@ -93,7 +92,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc900,
     marginBottom: 8,
@@ -115,7 +114,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc900,
     letterSpacing: -0.3,
@@ -128,7 +127,7 @@ const styles = StyleSheet.create({
   },
   subsectionTitle: {
     fontSize: 13,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc800,
     marginBottom: 8,
@@ -168,7 +167,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 12,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc900,
     marginBottom: 6,
@@ -176,7 +175,7 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 9,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -192,7 +191,7 @@ const styles = StyleSheet.create({
   // Mono Label (matches web MonoLabel - 13px uppercase tracking wide)
   monoLabel: {
     fontSize: 9,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -209,7 +208,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 8,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc600,
     textTransform: 'uppercase',
@@ -249,7 +248,7 @@ const styles = StyleSheet.create({
   listNumber: {
     width: 24,
     fontSize: 10,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc300,
   },
@@ -300,7 +299,7 @@ const styles = StyleSheet.create({
   tableHeaderCell: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -320,14 +319,14 @@ const styles = StyleSheet.create({
   tableCellBold: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc900,
   },
   tableCellHighlight: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc700,
   },
@@ -350,7 +349,7 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 9,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc400,
     textTransform: 'uppercase',
@@ -372,7 +371,7 @@ const styles = StyleSheet.create({
   },
   insightLabel: {
     fontSize: 9,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc400,
     textTransform: 'uppercase',
@@ -381,7 +380,7 @@ const styles = StyleSheet.create({
   },
   insightText: {
     fontSize: 11,
-    fontFamily: 'SuisseIntl',
+    fontFamily: 'Inter',
     fontWeight: 700,
     color: colors.zinc900,
     lineHeight: 1.4,
@@ -479,12 +478,12 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.where_we_found_it && (
         <View style={{ marginTop: 8 }}>
           <Text style={styles.cardContent}>
-            <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>Domain: </Text>
+            <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>Domain: </Text>
             {insight.where_we_found_it.domain}
           </Text>
           {insight.where_we_found_it.how_they_use_it && (
             <Text style={styles.cardContent}>
-              <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
+              <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
                 How they use it:{' '}
               </Text>
               {insight.where_we_found_it.how_they_use_it}
@@ -492,7 +491,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
           )}
           {insight.where_we_found_it.why_it_transfers && (
             <Text style={styles.cardContent}>
-              <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
+              <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
                 Why it transfers:{' '}
               </Text>
               {insight.where_we_found_it.why_it_transfers}
@@ -503,7 +502,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.why_industry_missed_it && (
         <View style={{ marginTop: 8 }}>
           <Text style={styles.cardContent}>
-            <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
+            <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
               Why industry missed it:{' '}
             </Text>
             {insight.why_industry_missed_it}
@@ -563,7 +562,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
           {analysis.why_its_hard.governing_equation && (
             <View style={[styles.insightBox, { marginTop: 8 }]}>
               <Text
-                style={[styles.cardContent, { fontFamily: 'SuisseIntl', fontWeight: 700 }]}
+                style={[styles.cardContent, { fontFamily: 'Inter', fontWeight: 700 }]}
               >
                 {analysis.why_its_hard.governing_equation.equation}
               </Text>
@@ -643,7 +642,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
             {analysis.what_industry_does_today.map((item, i) => (
               <View key={i} style={[styles.card, { marginBottom: 8 }]}>
                 <Text
-                  style={[styles.cardContent, { fontFamily: 'SuisseIntl', fontWeight: 700 }]}
+                  style={[styles.cardContent, { fontFamily: 'Inter', fontWeight: 700 }]}
                 >
                   {item.approach}
                 </Text>
@@ -663,7 +662,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
           <View style={{ marginTop: 12 }}>
             <Text style={styles.subsectionTitle}>Root Cause Hypotheses</Text>
             {analysis.root_cause_hypotheses.map((h, i) => (
-              <View key={i} style={styles.card}>
+              <View key={i} style={styles.card} wrap={false}>
                 <View style={styles.row}>
                   <Text style={styles.cardTitle}>
                     {h.name ?? h.hypothesis ?? `Hypothesis ${i + 1}`}
@@ -681,7 +680,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 )}
                 {h.evidence && (
                   <Text style={[styles.cardContent, { marginTop: 4 }]}>
-                    <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
+                    <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
                       Evidence:{' '}
                     </Text>
                     {h.evidence}
@@ -689,7 +688,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 )}
                 {h.implication && (
                   <Text style={[styles.cardContent, { marginTop: 4 }]}>
-                    <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>
+                    <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>
                       Implication:{' '}
                     </Text>
                     {h.implication}
@@ -757,7 +756,7 @@ function ExecutiveSummarySection({
           <Text
             style={[
               styles.paragraph,
-              { fontSize: 12, fontFamily: 'SuisseIntl' },
+              { fontSize: 12, fontFamily: 'Inter' },
             ]}
           >
             {summary.narrative_lead}
@@ -797,7 +796,7 @@ function ExecutiveSummarySection({
         {summary.primary_recommendation && (
           <View style={[styles.cardHighlight, { marginTop: 12 }]}>
             <MonoLabel>Primary Recommendation</MonoLabel>
-            <Text style={[styles.paragraph, { fontFamily: 'SuisseIntl', fontWeight: 700 }]}>
+            <Text style={[styles.paragraph, { fontFamily: 'Inter', fontWeight: 700 }]}>
               {summary.primary_recommendation}
             </Text>
           </View>
@@ -936,7 +935,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
                       <Text
                         style={[
                           styles.cardContent,
-                          { fontFamily: 'SuisseIntl', fontWeight: 700 },
+                          { fontFamily: 'Inter', fontWeight: 700 },
                         ]}
                       >
                         {gate.week}
@@ -979,7 +978,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
         <View style={{ marginTop: 16 }}>
           <Text style={styles.subsectionTitle}>Supporting Concepts</Text>
           {supporting.map((concept: SupportingConcept, i: number) => (
-            <View key={concept.id ?? i} style={styles.card}>
+            <View key={concept.id ?? i} style={styles.card} wrap={false}>
               <View style={styles.tagRow}>
                 {concept.relationship && (
                   <View style={styles.tag}>
@@ -1034,7 +1033,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
             )}
           {track.fallback_trigger.pivot_to && (
             <Text style={[styles.cardContent, { marginTop: 4 }]}>
-              <Text style={{ fontFamily: 'SuisseIntl', fontWeight: 700 }}>Pivot to: </Text>
+              <Text style={{ fontFamily: 'Inter', fontWeight: 700 }}>Pivot to: </Text>
               {track.fallback_trigger.pivot_to}
             </Text>
           )}
@@ -1181,7 +1180,7 @@ function InnovationConceptsSection({
         <View style={{ marginTop: 16 }}>
           <Text style={styles.subsectionTitle}>Parallel Investigations</Text>
           {parallel.map((inv: ParallelInvestigation, i: number) => (
-            <View key={inv.id ?? i} style={styles.card}>
+            <View key={inv.id ?? i} style={styles.card} wrap={false}>
               <View style={styles.tagRow}>
                 {inv.innovation_type && (
                   <View style={styles.tag}>
@@ -1246,7 +1245,7 @@ function FrontierWatchSection({ items }: { items?: FrontierWatch[] }) {
       />
 
       {items.map((item: FrontierWatch, i: number) => (
-        <View key={item.id ?? i} style={styles.card}>
+        <View key={item.id ?? i} style={styles.card} wrap={false}>
           <View style={styles.tagRow}>
             {item.innovation_type && (
               <View style={styles.tag}>
@@ -1415,11 +1414,11 @@ function ChallengeTheFrameSection({
       />
 
       {challenges.map((c, i) => (
-        <View key={i} style={styles.card}>
+        <View key={i} style={styles.card} wrap={false}>
           <View style={{ marginBottom: 8 }}>
             <MonoLabel>Assumption</MonoLabel>
             <Text
-              style={[styles.cardContent, { fontFamily: 'SuisseIntl', fontWeight: 700 }]}
+              style={[styles.cardContent, { fontFamily: 'Inter', fontWeight: 700 }]}
             >
               {c.assumption}
             </Text>
@@ -1612,7 +1611,7 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
         const severityStyles = getSeverityStyle(risk.severity);
 
         return (
-          <View key={i} style={styles.card}>
+          <View key={i} style={styles.card} wrap={false}>
             <View style={styles.tagRow}>
               {risk.category && (
                 <View style={styles.tag}>
@@ -1658,7 +1657,7 @@ function KeyInsightsSection({ insights }: { insights?: string[] }) {
       />
 
       {insights.map((insight, i) => (
-        <View key={i} style={styles.card}>
+        <View key={i} style={styles.card} wrap={false}>
           <View style={styles.listItem}>
             <View
               style={{
@@ -1674,7 +1673,7 @@ function KeyInsightsSection({ insights }: { insights?: string[] }) {
               <Text
                 style={{
                   fontSize: 10,
-                  fontFamily: 'SuisseIntl',
+                  fontFamily: 'Inter',
                   fontWeight: 700,
                   color: colors.zinc700,
                 }}
@@ -1749,98 +1748,97 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
         subtitle="Honest assessment of this analysis"
       />
 
-      <View style={styles.warningBox} wrap={false}>
-        {/* Confidence Level */}
-        {(critique.overall_confidence || critique.confidence_level) && (
-          <View style={[styles.row, { marginBottom: 8 }]}>
+      {/* Confidence Level - keep together */}
+      {(critique.overall_confidence || critique.confidence_level) && (
+        <View style={[styles.warningBox, { marginBottom: 8 }]} wrap={false}>
+          <View style={styles.row}>
             <MonoLabel>Overall Confidence</MonoLabel>
             <ConfidenceTag
               level={critique.overall_confidence ?? critique.confidence_level}
             />
           </View>
-        )}
-
-        {critique.confidence_rationale && (
-          <Text style={[styles.cardContent, { marginBottom: 12 }]}>
-            {critique.confidence_rationale}
-          </Text>
-        )}
-
-        {/* What We Might Be Wrong About */}
-        {critique.what_we_might_be_wrong_about &&
-          critique.what_we_might_be_wrong_about.length > 0 && (
-            <View style={{ marginBottom: 12 }}>
-              <MonoLabel>What We Might Be Wrong About</MonoLabel>
-              {critique.what_we_might_be_wrong_about.map((item, i) => (
-                <View key={i} style={styles.listItem}>
-                  <Text style={[styles.listBullet, { color: colors.zinc600 }]}>
-                    ⚠
-                  </Text>
-                  <Text style={styles.listContent}>{item}</Text>
-                </View>
-              ))}
-            </View>
+          {critique.confidence_rationale && (
+            <Text style={[styles.cardContent, { marginTop: 8 }]}>
+              {critique.confidence_rationale}
+            </Text>
           )}
+        </View>
+      )}
 
-        {/* Unexplored Directions */}
-        {critique.unexplored_directions &&
-          critique.unexplored_directions.length > 0 && (
-            <View style={{ marginBottom: 12 }}>
-              <MonoLabel>Unexplored Directions</MonoLabel>
-              {critique.unexplored_directions.map((item, i) => (
-                <View key={i} style={styles.listItem}>
-                  <Text style={styles.listBullet}>→</Text>
-                  <Text style={styles.listContent}>{item}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-        {/* Validation Gaps */}
-        {critique.validation_gaps && critique.validation_gaps.length > 0 && (
-          <View>
-            <MonoLabel>Validation Gaps</MonoLabel>
-            {critique.validation_gaps.map((gap: ValidationGap, i: number) => (
-              <View key={i} style={[styles.card, { marginTop: 6 }]}>
-                <View style={[styles.row, { marginBottom: 4 }]}>
-                  <Text
-                    style={[
-                      styles.cardContent,
-                      { fontFamily: 'SuisseIntl', fontWeight: 700, flex: 1 },
-                    ]}
-                  >
-                    {gap.concern}
-                  </Text>
-                  <View
-                    style={[
-                      styles.tag,
-                      gap.status === 'ADDRESSED'
-                        ? styles.tagMuted
-                        : gap.status === 'EXTENDED_NEEDED'
-                          ? styles.tag
-                          : styles.tagStrong,
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.tagText,
-                        gap.status === 'ADDRESSED'
-                          ? styles.tagMutedText
-                          : gap.status === 'EXTENDED_NEEDED'
-                            ? styles.tagText
-                            : styles.tagStrongText,
-                      ]}
-                    >
-                      {gap.status?.replace(/_/g, ' ')}
-                    </Text>
-                  </View>
-                </View>
-                <Text style={styles.cardContent}>{gap.rationale}</Text>
+      {/* What We Might Be Wrong About - each item separately */}
+      {critique.what_we_might_be_wrong_about &&
+        critique.what_we_might_be_wrong_about.length > 0 && (
+          <View style={[styles.card, { marginBottom: 12 }]}>
+            <MonoLabel>What We Might Be Wrong About</MonoLabel>
+            {critique.what_we_might_be_wrong_about.map((item, i) => (
+              <View key={i} style={styles.listItem} wrap={false}>
+                <Text style={[styles.listBullet, { color: colors.zinc600 }]}>
+                  •
+                </Text>
+                <Text style={styles.listContent}>{item}</Text>
               </View>
             ))}
           </View>
         )}
-      </View>
+
+      {/* Unexplored Directions - each item separately */}
+      {critique.unexplored_directions &&
+        critique.unexplored_directions.length > 0 && (
+          <View style={[styles.card, { marginBottom: 12 }]}>
+            <MonoLabel>Unexplored Directions</MonoLabel>
+            {critique.unexplored_directions.map((item, i) => (
+              <View key={i} style={styles.listItem} wrap={false}>
+                <Text style={styles.listBullet}>→</Text>
+                <Text style={styles.listContent}>{item}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+      {/* Validation Gaps - each gap as separate card */}
+      {critique.validation_gaps && critique.validation_gaps.length > 0 && (
+        <View>
+          <MonoLabel>Validation Gaps</MonoLabel>
+          {critique.validation_gaps.map((gap: ValidationGap, i: number) => (
+            <View key={i} style={[styles.card, { marginTop: 6 }]} wrap={false}>
+              <View style={[styles.row, { marginBottom: 4 }]}>
+                <Text
+                  style={[
+                    styles.cardContent,
+                    { fontFamily: 'Inter', fontWeight: 700, flex: 1 },
+                  ]}
+                >
+                  {gap.concern}
+                </Text>
+                <View
+                  style={[
+                    styles.tag,
+                    gap.status === 'ADDRESSED'
+                      ? styles.tagMuted
+                      : gap.status === 'EXTENDED_NEEDED'
+                        ? styles.tag
+                        : styles.tagStrong,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.tagText,
+                      gap.status === 'ADDRESSED'
+                        ? styles.tagMutedText
+                        : gap.status === 'EXTENDED_NEEDED'
+                          ? styles.tagText
+                          : styles.tagStrongText,
+                    ]}
+                  >
+                    {gap.status?.replace(/_/g, ' ')}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.cardContent}>{gap.rationale}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }

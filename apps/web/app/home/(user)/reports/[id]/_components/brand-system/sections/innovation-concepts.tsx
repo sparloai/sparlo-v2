@@ -86,7 +86,7 @@ const RecommendedInnovationCard = memo(function RecommendedInnovationCard({
   innovation: RecommendedInnovation;
 }) {
   return (
-    <div className="border-l-4 border-zinc-900 pl-6">
+    <div className="md:border-l-4 md:border-zinc-900 md:pl-6">
       <MonoLabel variant="muted">Recommended Innovation</MonoLabel>
 
       <h3 className="mt-4 text-[24px] leading-[1.2] font-semibold tracking-[-0.02em] text-zinc-900">
@@ -127,7 +127,7 @@ const RecommendedInnovationCard = memo(function RecommendedInnovationCard({
       )}
 
       {innovation.selection_rationale && (
-        <div className="mt-6 border-l-2 border-zinc-200 pl-4">
+        <div className="mt-6 md:border-l-2 md:border-zinc-200 md:pl-4">
           <MonoLabel variant="muted">Why This Innovation</MonoLabel>
           {innovation.selection_rationale.why_this_one && (
             <BodyText className="mt-2">
@@ -208,7 +208,7 @@ const ParallelInvestigationCard = memo(function ParallelInvestigationCard({
   investigation: ParallelInvestigation;
 }) {
   return (
-    <div className="border-l-2 border-zinc-200 pl-6">
+    <div className="md:border-l-2 md:border-zinc-200 md:pl-6">
       <h4 className="text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
         {investigation.title}
       </h4>

@@ -63,7 +63,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
                   {data.why_its_hard.factors.map((factor, idx) => (
                     <div
                       key={idx}
-                      className="border-l-2 border-zinc-200 py-2 pl-4"
+                      className="md:border-l-2 md:border-zinc-200 py-2 md:pl-4"
                     >
                       <p className="text-[18px] font-medium text-zinc-900">
                         {factor.factor}
