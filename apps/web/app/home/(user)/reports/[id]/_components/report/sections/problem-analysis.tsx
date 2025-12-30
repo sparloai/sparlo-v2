@@ -1,7 +1,6 @@
 import { Search, Target } from 'lucide-react';
 
 import type { ProblemAnalysis as ProblemAnalysisType } from '../../../_lib/schema/sparlo-report.schema';
-import { ConfidenceBadge } from '../shared/badges/confidence-badge';
 import { InsightCard } from '../shared/cards/insight-card';
 import { RootCauseCard } from '../shared/cards/root-cause-card';
 import { BulletList } from '../shared/lists/bullet-list';

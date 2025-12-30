@@ -1,10 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import { cn } from '@kit/ui/utils';
 
@@ -70,6 +70,28 @@ const initialFormState: FormState = {
   showUpgradeModal: false,
   upgradeReason: 'subscription_required',
 };
+
+// Get initial form state from URL params (runs once on mount)
+function getInitialFormState(): FormState {
+  if (typeof window === 'undefined') return initialFormState;
+
+  const params = new URLSearchParams(window.location.search);
+  const prefill = params.get('prefill');
+  const errorType = params.get('error');
+
+  if (prefill || errorType === 'refusal') {
+    // Clear params from URL without navigation
+    window.history.replaceState({}, '', '/home/reports/new');
+
+    return {
+      ...initialFormState,
+      problemText: prefill || '',
+      showRefusalWarning: errorType === 'refusal',
+    };
+  }
+
+  return initialFormState;
+}
 
 // Detection logic - Simple pattern matching
 function hasProblemStatement(text: string): boolean {
@@ -174,8 +196,7 @@ function DetectionIndicator({
 
 export default function NewReportPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [formState, setFormState] = useState<FormState>(initialFormState);
+  const [formState, setFormState] = useState<FormState>(getInitialFormState);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -257,24 +278,6 @@ export default function NewReportPage() {
     });
   }, []);
 
-  // Handle URL params for prefill and error state
-  useEffect(() => {
-    const prefill = searchParams.get('prefill');
-    const errorType = searchParams.get('error');
-
-    if (prefill || errorType === 'refusal') {
-      setFormState((prev) => ({
-        ...prev,
-        problemText: prefill || prev.problemText,
-        showRefusalWarning: errorType === 'refusal',
-      }));
-    }
-
-    // Clear params from URL without navigation
-    if (prefill || errorType) {
-      window.history.replaceState({}, '', '/home/reports/new');
-    }
-  }, [searchParams]);
 
   // Track progress once we have a report ID
   const { progress } = useReportProgress(reportId);

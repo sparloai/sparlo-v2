@@ -296,8 +296,6 @@ export async function callClaude(params: {
  */
 function repairTruncatedJson(jsonStr: string): string {
   // Track state while parsing
-  let braces = 0;
-  let brackets = 0;
   let inString = false;
   let escapeNext = false;
   let lastCompleteKeyValueEnd = 0; // Position after complete key-value pair (after value, at comma or before closing brace)
@@ -319,16 +317,8 @@ function repairTruncatedJson(jsonStr: string): string {
     }
     if (inString) continue;
 
-    if (char === '{') {
-      braces++;
-    } else if (char === '}') {
-      braces--;
-      // A closing brace means previous key-value pairs are complete
-      lastCompleteKeyValueEnd = i;
-    } else if (char === '[') {
-      brackets++;
-    } else if (char === ']') {
-      brackets--;
+    if (char === '}' || char === ']') {
+      // A closing brace/bracket means previous key-value pairs are complete
       lastCompleteKeyValueEnd = i;
     } else if (char === ',') {
       // Comma means the previous key-value pair is complete
@@ -344,15 +334,6 @@ function repairTruncatedJson(jsonStr: string): string {
       // Truncate to just after the last complete key-value pair
       // If it ends with comma, include it (will be removed later if trailing)
       repaired = jsonStr.substring(0, lastCompleteKeyValueEnd + 1);
-      // Recount after truncation
-      braces = 0;
-      brackets = 0;
-      for (const char of repaired) {
-        if (char === '{') braces++;
-        else if (char === '}') braces--;
-        else if (char === '[') brackets++;
-        else if (char === ']') brackets--;
-      }
     } else {
       // No complete key-value found, just close the string
       repaired = repaired + '"';

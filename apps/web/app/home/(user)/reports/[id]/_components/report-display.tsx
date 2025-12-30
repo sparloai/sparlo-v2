@@ -20,7 +20,6 @@ import {
 import ReactMarkdown from 'react-markdown';
 
 import { Button } from '@kit/ui/button';
-import { toast } from '@kit/ui/sonner';
 import { cn } from '@kit/ui/utils';
 
 import { ProcessingScreen } from '../../../_components/processing-screen';
@@ -108,7 +107,6 @@ export function ReportDisplay({
     setInput: setChatInput,
     isLoading: isChatLoading,
     submitMessage: submitChatMessage,
-    handleSubmit: handleChatSubmit,
     cancelStream,
   } = useChat({
     reportId: report.id,

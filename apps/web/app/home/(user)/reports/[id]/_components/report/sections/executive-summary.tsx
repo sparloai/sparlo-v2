@@ -1,4 +1,4 @@
-import { ArrowRight, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 import type { ExecutiveSummary as ExecutiveSummaryType } from '../../../_lib/schema/sparlo-report.schema';
 import { ViabilityBadge } from '../shared/badges/viability-badge';
