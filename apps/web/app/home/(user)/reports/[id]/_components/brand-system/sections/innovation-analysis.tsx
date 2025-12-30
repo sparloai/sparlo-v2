@@ -20,15 +20,9 @@ import {
   SectionTitle,
 } from '../primitives';
 
-interface DomainSearched {
-  domain?: string;
-  mechanism_found?: string;
-  relevance?: string;
-}
-
 interface InnovationAnalysisSectionProps {
   data?: InnovationAnalysis;
-  domainsSearched?: DomainSearched[];
+  domainsSearched?: string[];
 }
 
 export const InnovationAnalysisSection = memo(
@@ -60,37 +54,15 @@ export const InnovationAnalysisSection = memo(
           {hasDomains && (
             <ContentBlock withBorder className="max-w-[80ch]">
               <MonoLabel>Domains Searched</MonoLabel>
-              <div className="mt-6 overflow-x-auto">
-                <table className="w-full text-[18px]">
-                  <thead>
-                    <tr className="border-b border-zinc-300">
-                      <th className="py-3 pr-8 text-left font-medium text-zinc-900">
-                        Domain
-                      </th>
-                      <th className="py-3 pr-8 text-left font-medium text-zinc-500">
-                        Mechanism Found
-                      </th>
-                      <th className="py-3 text-left font-medium text-zinc-500">
-                        Relevance
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-100">
-                    {domainsSearched?.map((d, idx) => (
-                      <tr key={idx}>
-                        <td className="py-4 pr-8 align-top font-medium text-[#1e1e1e]">
-                          {d.domain}
-                        </td>
-                        <td className="py-4 pr-8 align-top text-zinc-700">
-                          {d.mechanism_found}
-                        </td>
-                        <td className="py-4 align-top text-zinc-600">
-                          {d.relevance}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {domainsSearched?.map((domain, idx) => (
+                  <span
+                    key={idx}
+                    className="inline-block rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 text-[14px] font-medium tracking-[-0.01em] text-zinc-700"
+                  >
+                    {domain}
+                  </span>
+                ))}
               </div>
             </ContentBlock>
           )}

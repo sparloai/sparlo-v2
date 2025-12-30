@@ -371,36 +371,26 @@ function normalizeReportData(data: HybridReportData): HybridReportData {
 // ============================================
 
 /**
- * Extract domains searched data from multiple possible locations in the report.
- * Handles both structured format (cross_domain_search.domains_searched) and
- * simple string array format (innovation_analysis.domains_searched).
+ * Extract domains searched as simple string array from multiple possible locations.
+ * Handles both cross_domain_search.domains_searched and innovation_analysis.domains_searched.
  */
-function extractDomainsSearched(
-  data: HybridReportData,
-):
-  | Array<{ domain?: string; mechanism_found?: string; relevance?: string }>
-  | undefined {
-  // First try the structured format from cross_domain_search
+function extractDomainsSearched(data: HybridReportData): string[] | undefined {
+  // Try cross_domain_search first
   if (
     data.cross_domain_search?.domains_searched &&
     data.cross_domain_search.domains_searched.length > 0
   ) {
-    return data.cross_domain_search.domains_searched;
+    return data.cross_domain_search.domains_searched.map((d) =>
+      typeof d === 'string' ? d : (d as { domain?: string }).domain || '',
+    );
   }
 
-  // Fall back to simple string array from innovation_analysis, convert to structured format
+  // Fall back to innovation_analysis
   if (
     data.innovation_analysis?.domains_searched &&
     data.innovation_analysis.domains_searched.length > 0
   ) {
-    return data.innovation_analysis.domains_searched.map((domain) => ({
-      domain:
-        typeof domain === 'string'
-          ? domain
-          : (domain as { domain?: string }).domain,
-      mechanism_found: undefined,
-      relevance: undefined,
-    }));
+    return data.innovation_analysis.domains_searched;
   }
 
   return undefined;
