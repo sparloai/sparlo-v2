@@ -70,5 +70,5 @@ export const EXAMPLE_REPORTS_SCROLL_OFFSET = 120;
 // READING TIME
 // ============================================
 
-/** Words per minute for read time calculation (technical content) */
+/** Words per minute for read time calculation (technical content reads slower) */
 export const WORDS_PER_MINUTE = 200;

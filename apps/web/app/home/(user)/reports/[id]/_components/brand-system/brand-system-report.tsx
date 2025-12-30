@@ -91,70 +91,38 @@ interface BrandSystemReportProps {
 }
 
 /**
- * Calculate estimated read time based on word count
- * Average reading speed: 250 words per minute for technical content
+ * Calculate estimated read time based on word count.
+ * Uses 200 words per minute for technical content (slower than general reading).
  *
- * Only counts primary content fields that are actually rendered.
+ * Recursively extracts all string content from the report data
+ * to ensure accurate word count regardless of report structure.
  */
 function calculateReadTime(data: HybridReportData): number {
   const textParts: string[] = [];
 
-  // Helper to add text if it exists
-  const addText = (text: string | undefined | null) => {
-    if (text && typeof text === 'string' && text.length > 10) {
-      textParts.push(text);
+  // Recursively extract all string values from an object
+  function extractText(value: unknown): void {
+    if (value === null || value === undefined) {
+      return;
     }
-  };
 
-  // Executive summary
-  if (typeof data.executive_summary === 'string') {
-    addText(data.executive_summary);
-  } else if (data.executive_summary) {
-    addText(data.executive_summary.narrative_lead);
-    addText(data.executive_summary.the_problem);
-    addText(data.executive_summary.core_insight?.headline);
-    addText(data.executive_summary.core_insight?.explanation);
-    addText(data.executive_summary.primary_recommendation);
+    if (typeof value === 'string' && value.length > 5) {
+      textParts.push(value);
+    } else if (Array.isArray(value)) {
+      value.forEach(extractText);
+    } else if (typeof value === 'object') {
+      Object.values(value).forEach(extractText);
+    }
   }
 
-  // Problem analysis
-  if (data.problem_analysis) {
-    addText(data.problem_analysis.whats_wrong?.prose);
-    addText(data.problem_analysis.why_its_hard?.prose);
-    addText(data.problem_analysis.first_principles_insight?.headline);
-    addText(data.problem_analysis.first_principles_insight?.explanation);
-  }
-
-  // Execution track / solution concepts
-  if (data.execution_track?.primary) {
-    addText(data.execution_track.primary.what_it_is);
-    addText(data.execution_track.primary.why_it_works);
-  }
-
-  // Innovation portfolio
-  if (data.innovation_portfolio?.recommended_innovation) {
-    addText(data.innovation_portfolio.recommended_innovation.what_it_is);
-    addText(data.innovation_portfolio.recommended_innovation.why_it_works);
-  }
-
-  // Risks
-  data.risks_and_watchouts?.forEach((r) => {
-    addText(r.risk);
-    addText(r.mitigation);
-  });
-
-  // Self critique
-  if (data.self_critique) {
-    addText(data.self_critique.confidence_rationale);
-    data.self_critique.what_we_might_be_wrong_about?.forEach(addText);
-  }
-
-  // Final recommendation
-  addText(data.what_id_actually_do);
+  // Extract all text from the report data
+  extractText(data);
 
   const text = textParts.join(' ');
   const wordCount = text.split(/\s+/).filter(Boolean).length;
-  const minutesRaw = wordCount / 250; // 250 words per minute
+
+  // 200 words per minute for technical content
+  const minutesRaw = wordCount / 200;
 
   // Round to nearest minute, minimum 1 minute
   return Math.max(1, Math.round(minutesRaw));
@@ -537,10 +505,8 @@ const ReportContent = memo(function ReportContent({
           <div className="flex items-start justify-between gap-6">
             <h1
               className={cn(
-                'font-heading font-normal tracking-[-0.02em] text-zinc-900',
-                compactTitle
-                  ? 'text-[28px] leading-[1.2] md:text-[32px] md:leading-[1.2]'
-                  : 'text-[36px] leading-[1.2] md:text-[48px] md:leading-[1.2]',
+                'font-heading font-normal tracking-[-0.02em] text-zinc-900 text-[40px] leading-none',
+                compactTitle && 'text-[28px] md:text-[32px]',
               )}
             >
               {displayTitle}
