@@ -26,11 +26,11 @@ async function SignUpPage() {
     <>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-[28px] font-semibold tracking-tight text-zinc-900 dark:text-white">
-          Create your account
+          Create Account
         </h1>
 
         <p className="text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-          Run your first analysis free
+          First Analysis Free
         </p>
       </div>
 
