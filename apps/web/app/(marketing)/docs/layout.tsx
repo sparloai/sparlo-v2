@@ -46,7 +46,9 @@ async function DocsLayout({ children }: React.PropsWithChildren) {
       >
         <HideFooterStyles />
 
-        <DocsNavigation pages={tree} />
+        <div className={user ? 'pt-10' : ''}>
+          <DocsNavigation pages={tree} />
+        </div>
 
         {children}
       </SidebarProvider>
