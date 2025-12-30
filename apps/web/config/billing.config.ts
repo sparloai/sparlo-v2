@@ -10,7 +10,7 @@ export default createBillingSchema({
     {
       id: 'core',
       name: 'Core',
-      description: 'For individuals and small teams getting started',
+      description: 'For individuals and small teams.',
       currency: 'USD',
       badge: 'Starter',
       plans: [
@@ -28,15 +28,28 @@ export default createBillingSchema({
             },
           ],
         },
+        {
+          name: 'Core Annual',
+          id: 'core-annual',
+          paymentType: 'recurring',
+          interval: 'year',
+          lineItems: [
+            {
+              id: 'price_core_annual',
+              name: 'Core',
+              cost: 199000,
+              type: 'flat' as const,
+            },
+          ],
+        },
       ],
-      features: ['Standard usage', '1 seat', 'Email support'],
+      features: ['Standard usage', '1 seat'],
     },
     {
       id: 'pro',
       name: 'Pro',
-      description: 'For growing teams with higher demands',
+      description: 'For growing teams.',
       currency: 'USD',
-      badge: 'Popular',
       highlighted: true,
       plans: [
         {
@@ -53,13 +66,27 @@ export default createBillingSchema({
             },
           ],
         },
+        {
+          name: 'Pro Annual',
+          id: 'pro-annual',
+          paymentType: 'recurring',
+          interval: 'year',
+          lineItems: [
+            {
+              id: 'price_pro_annual',
+              name: 'Pro',
+              cost: 499000,
+              type: 'flat' as const,
+            },
+          ],
+        },
       ],
-      features: ['3× usage', '5 team seats', 'Priority support'],
+      features: ['3× usage', '5 team seats'],
     },
     {
       id: 'max',
       name: 'Max',
-      description: 'For organizations requiring maximum capacity',
+      description: 'For large orgs.',
       currency: 'USD',
       plans: [
         {
@@ -76,8 +103,22 @@ export default createBillingSchema({
             },
           ],
         },
+        {
+          name: 'Max Annual',
+          id: 'max-annual',
+          paymentType: 'recurring',
+          interval: 'year',
+          lineItems: [
+            {
+              id: 'price_max_annual',
+              name: 'Max',
+              cost: 999000,
+              type: 'flat' as const,
+            },
+          ],
+        },
       ],
-      features: ['7× usage', '10 team seats', 'Dedicated support'],
+      features: ['7× usage', '10 team seats'],
     },
   ],
 });

@@ -198,11 +198,6 @@ export function SparloBillingPricing({
           Plans
         </h1>
 
-        {/* Subtitle */}
-        <p className="mt-4 text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-500">
-          Engineering intelligence for professional teams.
-        </p>
-
         {/* Billing Toggle */}
         <div className="mt-10 mb-12 flex items-center gap-6">
           <button
@@ -249,7 +244,7 @@ export function SparloBillingPricing({
               Annual
             </button>
             <span className="text-[12px] font-medium tracking-[-0.02em] text-zinc-500">
-              2 months free
+              Save ~17%
             </span>
           </div>
         </div>
@@ -305,16 +300,9 @@ export function SparloBillingPricing({
                   <div className="flex items-start justify-between gap-8">
                     {/* Left: Plan info */}
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-3">
-                        <h2 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
-                          {product.name}
-                        </h2>
-                        {isHighlighted && (
-                          <span className="rounded bg-zinc-100 px-2 py-0.5 text-[11px] font-medium tracking-[0.04em] text-zinc-600 uppercase">
-                            Popular
-                          </span>
-                        )}
-                      </div>
+                      <h2 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+                        {product.name}
+                      </h2>
 
                       <p className="mt-2 line-clamp-2 text-[15px] tracking-[-0.02em] text-zinc-500">
                         {product.description}
@@ -394,9 +382,6 @@ export function SparloBillingPricing({
             >
               Contact us
             </Link>
-          </p>
-          <p className="mt-2 text-[13px] tracking-[-0.02em] text-zinc-400">
-            All plans include a 14-day free trial. Cancel anytime.
           </p>
         </footer>
       </div>
