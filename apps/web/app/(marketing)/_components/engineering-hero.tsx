@@ -17,8 +17,9 @@ import Link from 'next/link';
  * - Single prominent CTA
  */
 
-// Video loop duration in seconds - loops before scene transition
-const VIDEO_LOOP_DURATION = 6;
+// Video timing - skip first 0.5s (scene transition) and loop at 6.5s
+const VIDEO_START_TIME = 0.5;
+const VIDEO_END_TIME = 6.5;
 
 export const EngineeringHero = memo(function EngineeringHero() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -31,18 +32,29 @@ export const EngineeringHero = memo(function EngineeringHero() {
     let rafId: number;
 
     const checkLoop = () => {
-      if (video.currentTime >= VIDEO_LOOP_DURATION) {
-        video.currentTime = 0;
+      // Loop back to start time when reaching end
+      if (video.currentTime >= VIDEO_END_TIME) {
+        video.currentTime = VIDEO_START_TIME;
       }
       rafId = requestAnimationFrame(checkLoop);
     };
 
-    // Start the loop check when video plays
+    // Set initial start position and begin loop check
+    const handleLoadedData = () => {
+      video.currentTime = VIDEO_START_TIME;
+    };
+
     const handlePlay = () => {
       rafId = requestAnimationFrame(checkLoop);
     };
 
+    video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('play', handlePlay);
+
+    // If video is already loaded, set start position
+    if (video.readyState >= 2) {
+      video.currentTime = VIDEO_START_TIME;
+    }
 
     // If video is already playing, start checking immediately
     if (!video.paused) {
@@ -50,6 +62,7 @@ export const EngineeringHero = memo(function EngineeringHero() {
     }
 
     return () => {
+      video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('play', handlePlay);
       cancelAnimationFrame(rafId);
     };
