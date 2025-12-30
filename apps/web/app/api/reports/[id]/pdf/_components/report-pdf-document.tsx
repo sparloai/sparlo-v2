@@ -552,17 +552,17 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
         subtitle="Understanding the challenge"
       />
 
-      {/* What's Wrong */}
+      {/* What's Wrong - allow page breaks for long prose */}
       {analysis.whats_wrong?.prose && (
-        <View style={styles.card} wrap={false}>
+        <View style={styles.card}>
           <MonoLabel>What&apos;s Wrong</MonoLabel>
           <Text style={styles.paragraph}>{analysis.whats_wrong.prose}</Text>
         </View>
       )}
 
-      {/* Why It's Hard */}
+      {/* Why It's Hard - allow page breaks for long content */}
       {analysis.why_its_hard && (
-        <View style={styles.card} wrap={false}>
+        <View style={styles.card}>
           <MonoLabel>Why It&apos;s Hard</MonoLabel>
           {analysis.why_its_hard.prose && (
             <Text style={styles.paragraph}>{analysis.why_its_hard.prose}</Text>
@@ -651,7 +651,11 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
           <View style={{ marginTop: 12 }}>
             <Text style={styles.subsectionTitle}>What Industry Does Today</Text>
             {analysis.what_industry_does_today.map((item, i) => (
-              <View key={i} style={[styles.card, { marginBottom: 8 }]} wrap={false}>
+              <View
+                key={i}
+                style={[styles.card, { marginBottom: 8 }]}
+                wrap={false}
+              >
                 <Text
                   style={[
                     styles.cardContent,
@@ -670,13 +674,13 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
           </View>
         )}
 
-      {/* Root Cause Hypotheses */}
+      {/* Root Cause Hypotheses - allow page breaks for long content */}
       {analysis.root_cause_hypotheses &&
         analysis.root_cause_hypotheses.length > 0 && (
           <View style={{ marginTop: 12 }}>
             <Text style={styles.subsectionTitle}>Root Cause Hypotheses</Text>
             {analysis.root_cause_hypotheses.map((h, i) => (
-              <View key={i} style={styles.card} wrap={false}>
+              <View key={i} style={styles.card}>
                 <View style={styles.row}>
                   <Text style={styles.cardTitle}>
                     {h.name ?? h.hypothesis ?? `Hypothesis ${i + 1}`}
@@ -869,9 +873,9 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
         </Text>
       )}
 
-      {/* Primary Solution */}
+      {/* Primary Solution - allow page breaks within long content */}
       {primary && (
-        <View style={styles.cardHighlight} wrap={false}>
+        <View style={styles.cardHighlight}>
           {/* Header section - keep together */}
           <View wrap={false}>
             <View style={styles.tagRow}>
@@ -896,14 +900,14 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
           </View>
 
           {primary.what_it_is && (
-            <View style={{ marginTop: 8 }} wrap={false}>
+            <View style={{ marginTop: 8 }}>
               <MonoLabel>What It Is</MonoLabel>
               <Text style={styles.cardContent}>{primary.what_it_is}</Text>
             </View>
           )}
 
           {primary.why_it_works && (
-            <View style={{ marginTop: 8 }} wrap={false}>
+            <View style={{ marginTop: 8 }}>
               <MonoLabel>Why It Works</MonoLabel>
               <Text style={styles.cardContent}>{primary.why_it_works}</Text>
             </View>
@@ -993,12 +997,12 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
         </View>
       )}
 
-      {/* Supporting Concepts */}
+      {/* Supporting Concepts - allow page breaks within long content */}
       {supporting && supporting.length > 0 && (
         <View style={{ marginTop: 16 }}>
           <Text style={styles.subsectionTitle}>Supporting Concepts</Text>
           {supporting.map((concept: SupportingConcept, i: number) => (
-            <View key={concept.id ?? i} style={styles.card} wrap={false}>
+            <View key={concept.id ?? i} style={styles.card}>
               <View style={styles.tagRow}>
                 {concept.relationship && (
                   <View style={styles.tag}>
@@ -1093,11 +1097,11 @@ function InnovationConceptsSection({
         </Text>
       )}
 
-      {/* Recommended Innovation */}
+      {/* Recommended Innovation - allow page breaks within long content */}
       {recommended && (
-        <View style={styles.cardHighlight} wrap={false}>
-          {/* Header section */}
-          <View>
+        <View style={styles.cardHighlight}>
+          {/* Header section - keep together */}
+          <View wrap={false}>
             <View style={styles.tagRow}>
               <View style={[styles.tag, styles.tagStrong]}>
                 <Text style={[styles.tagText, styles.tagStrongText]}>
@@ -1120,14 +1124,14 @@ function InnovationConceptsSection({
           </View>
 
           {recommended.what_it_is && (
-            <View style={{ marginTop: 8 }} wrap={false}>
+            <View style={{ marginTop: 8 }}>
               <MonoLabel>What It Is</MonoLabel>
               <Text style={styles.cardContent}>{recommended.what_it_is}</Text>
             </View>
           )}
 
           {recommended.why_it_works && (
-            <View style={{ marginTop: 8 }} wrap={false}>
+            <View style={{ marginTop: 8 }}>
               <MonoLabel>Why It Works</MonoLabel>
               <Text style={styles.cardContent}>{recommended.why_it_works}</Text>
             </View>
@@ -1197,12 +1201,12 @@ function InnovationConceptsSection({
         </View>
       )}
 
-      {/* Parallel Investigations */}
+      {/* Parallel Investigations - allow page breaks within long content */}
       {parallel && parallel.length > 0 && (
         <View style={{ marginTop: 16 }}>
           <Text style={styles.subsectionTitle}>Parallel Investigations</Text>
           {parallel.map((inv: ParallelInvestigation, i: number) => (
-            <View key={inv.id ?? i} style={styles.card} wrap={false}>
+            <View key={inv.id ?? i} style={styles.card}>
               <View style={styles.tagRow}>
                 {inv.innovation_type && (
                   <View style={styles.tag}>
@@ -1266,8 +1270,9 @@ function FrontierWatchSection({ items }: { items?: FrontierWatch[] }) {
         subtitle="Emerging technologies to monitor"
       />
 
+      {/* Allow page breaks within long content */}
       {items.map((item: FrontierWatch, i: number) => (
-        <View key={item.id ?? i} style={styles.card} wrap={false}>
+        <View key={item.id ?? i} style={styles.card}>
           <View style={styles.tagRow}>
             {item.innovation_type && (
               <View style={styles.tag}>
@@ -1340,10 +1345,10 @@ function ConstraintsSection({
         subtitle="Requirements and success criteria"
       />
 
-      {/* Hard Constraints */}
+      {/* Hard Constraints - allow page breaks for long lists */}
       {constraints.hard_constraints &&
         constraints.hard_constraints.length > 0 && (
-          <View style={styles.card} wrap={false}>
+          <View style={styles.card}>
             <MonoLabel>Hard Constraints</MonoLabel>
             {constraints.hard_constraints.map((c, i) => (
               <View
@@ -1357,10 +1362,10 @@ function ConstraintsSection({
           </View>
         )}
 
-      {/* Soft Constraints */}
+      {/* Soft Constraints - allow page breaks for long lists */}
       {constraints.soft_constraints &&
         constraints.soft_constraints.length > 0 && (
-          <View style={styles.card} wrap={false}>
+          <View style={styles.card}>
             <MonoLabel>Soft Constraints</MonoLabel>
             {constraints.soft_constraints.map((c, i) => (
               <View
@@ -1374,9 +1379,9 @@ function ConstraintsSection({
           </View>
         )}
 
-      {/* Assumptions */}
+      {/* Assumptions - allow page breaks for long lists */}
       {constraints.assumptions && constraints.assumptions.length > 0 && (
-        <View style={styles.card} wrap={false}>
+        <View style={styles.card}>
           <MonoLabel>Assumptions</MonoLabel>
           {constraints.assumptions.map((a, i) => (
             <View
@@ -1435,8 +1440,9 @@ function ChallengeTheFrameSection({
         subtitle="Questioning key assumptions"
       />
 
+      {/* Allow page breaks for long content */}
       {challenges.map((c, i) => (
-        <View key={i} style={styles.card} wrap={false}>
+        <View key={i} style={styles.card}>
           <View style={{ marginBottom: 8 }}>
             <MonoLabel>Assumption</MonoLabel>
             <Text
@@ -1491,7 +1497,8 @@ function InnovationAnalysisSection({
         subtitle="Cross-domain search strategy"
       />
 
-      <View style={styles.card} wrap={false}>
+      {/* Allow page breaks for long content */}
+      <View style={styles.card}>
         {analysis.reframe && (
           <View style={{ marginBottom: 8 }}>
             <MonoLabel>Reframe</MonoLabel>
@@ -1530,9 +1537,9 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
         subtitle="Insights from analogous fields"
       />
 
-      {/* Enhanced Challenge Frame */}
+      {/* Enhanced Challenge Frame - allow page breaks */}
       {search.enhanced_challenge_frame && (
-        <View style={styles.card} wrap={false}>
+        <View style={styles.card}>
           {search.enhanced_challenge_frame.reframing && (
             <View style={{ marginBottom: 8 }}>
               <MonoLabel>Reframing</MonoLabel>
@@ -1561,8 +1568,9 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
       {search.domains_searched && search.domains_searched.length > 0 && (
         <View style={{ marginTop: 12 }}>
           <Text style={styles.subsectionTitle}>Domains Explored</Text>
+          {/* Allow page breaks for long content */}
           {search.domains_searched.map((d, i) => (
-            <View key={i} style={styles.card} wrap={false}>
+            <View key={i} style={styles.card}>
               {d.domain && <Text style={styles.cardTitle}>{d.domain}</Text>}
               {d.mechanism_found && (
                 <View style={{ marginTop: 4 }}>
@@ -1586,8 +1594,9 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
         search.from_scratch_revelations.length > 0 && (
           <View style={{ marginTop: 12 }}>
             <Text style={styles.subsectionTitle}>Key Discoveries</Text>
+            {/* Allow page breaks for long content */}
             {search.from_scratch_revelations.map((r, i) => (
-              <View key={i} style={styles.insightBox} wrap={false}>
+              <View key={i} style={styles.insightBox}>
                 {r.discovery && (
                   <Text style={styles.insightText}>{r.discovery}</Text>
                 )}
@@ -1634,8 +1643,9 @@ function RisksSection({ risks }: { risks?: RiskAndWatchout[] }) {
       {risks.map((risk, i) => {
         const severityStyles = getSeverityStyle(risk.severity);
 
+        // Allow page breaks for long content
         return (
-          <View key={i} style={styles.card} wrap={false}>
+          <View key={i} style={styles.card}>
             <View style={styles.tagRow}>
               {risk.category && (
                 <View style={styles.tag}>
@@ -1680,8 +1690,9 @@ function KeyInsightsSection({ insights }: { insights?: string[] }) {
         subtitle="Critical learnings from this analysis"
       />
 
+      {/* Allow page breaks for long content */}
       {insights.map((insight, i) => (
-        <View key={i} style={styles.card} wrap={false}>
+        <View key={i} style={styles.card}>
           <View style={styles.listItem}>
             <View
               style={{
@@ -1751,7 +1762,8 @@ function WhatIdActuallyDoSection({ content }: { content?: string }) {
         subtitle="Personal recommendation"
       />
 
-      <View style={styles.cardHighlight} wrap={false}>
+      {/* Allow page breaks for long recommendations */}
+      <View style={styles.cardHighlight}>
         <Text style={styles.paragraph}>{content}</Text>
       </View>
     </View>
@@ -1824,12 +1836,12 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
           </View>
         )}
 
-      {/* Validation Gaps - each gap as separate card */}
+      {/* Validation Gaps - allow page breaks for long content */}
       {critique.validation_gaps && critique.validation_gaps.length > 0 && (
         <View>
           <MonoLabel>Validation Gaps</MonoLabel>
           {critique.validation_gaps.map((gap: ValidationGap, i: number) => (
-            <View key={i} style={[styles.card, { marginTop: 6 }]} wrap={false}>
+            <View key={i} style={[styles.card, { marginTop: 6 }]}>
               <View
                 style={[
                   styles.row,
