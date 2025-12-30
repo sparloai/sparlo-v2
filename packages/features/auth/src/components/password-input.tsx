@@ -33,6 +33,8 @@ export function PasswordInput(props: React.ComponentProps<'input'>) {
           variant="ghost"
           size="sm"
           onClick={() => setShowPassword(!showPassword)}
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+          aria-pressed={showPassword}
         >
           {showPassword ? (
             <EyeOff className="h-4 w-4" />

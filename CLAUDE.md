@@ -199,6 +199,19 @@ apps/web/app/home/[account]/
 
 UI Components are placed at `packages/ui`. Call MCP tool to list components to verify they exist.
 
+## Design System
+
+**IMPORTANT**: For ALL design and styling tasks, use `docs/SPARLO-DESIGN-SYSTEM.md` as the authoritative reference.
+
+Key principles:
+- Near-monochrome palette (zinc-950, zinc-700, zinc-500, zinc-400)
+- Typography-driven hierarchy - size and weight create structure, not color
+- Left border accent as signature pattern (`border-l-2 border-zinc-900 pl-10`)
+- Card pattern: `rounded-xl border border-zinc-200 bg-white p-8 shadow-sm`
+- Primary button: `bg-zinc-900 text-white hover:bg-zinc-800`
+
+Do NOT reference archived design docs in `docs/archive/`.
+
 ## Delegate to Agents
 
 Please use the Task tool to delegate suitable tasks to specialized sub-agents for best handling the task at hand.

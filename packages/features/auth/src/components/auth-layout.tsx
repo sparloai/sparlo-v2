@@ -13,19 +13,21 @@ export function AuthLayoutShell({
   return (
     <div
       className={cn(
-        'bg-background lg:bg-muted/30 animate-in fade-in slide-in-from-top-16 zoom-in-95 flex h-screen flex-col items-center justify-center gap-y-10 duration-1000 lg:gap-y-8',
+        'flex min-h-screen flex-col items-center justify-center bg-white px-4 py-12 dark:bg-zinc-950',
         className,
       )}
     >
-      {Logo ? <Logo /> : null}
+      <div className="animate-in fade-in slide-in-from-bottom-4 flex w-full max-w-[400px] flex-col items-center gap-10 duration-500">
+        {Logo ? <Logo /> : null}
 
-      <div
-        className={cn(
-          'bg-background flex w-full max-w-[22rem] flex-col gap-y-6 rounded-lg px-6 md:w-8/12 md:px-8 md:py-6 lg:w-5/12 lg:px-8 xl:w-4/12 xl:py-8',
-          contentClassName,
-        )}
-      >
-        {children}
+        <div
+          className={cn(
+            'flex w-full flex-col gap-6 rounded-xl border border-zinc-200 bg-white p-8 shadow-sm transition-shadow duration-200 dark:border-zinc-800 dark:bg-zinc-900',
+            contentClassName,
+          )}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

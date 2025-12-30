@@ -1,8 +1,6 @@
 import Link from 'next/link';
 
 import { SignUpMethodsContainer } from '@kit/auth/sign-up';
-import { Button } from '@kit/ui/button';
-import { Heading } from '@kit/ui/heading';
 import { Trans } from '@kit/ui/trans';
 
 import authConfig from '~/config/auth.config';
@@ -26,13 +24,13 @@ const paths = {
 async function SignUpPage() {
   return (
     <>
-      <div className={'flex flex-col items-center gap-1'}>
-        <Heading level={4} className={'tracking-tight'}>
-          <Trans i18nKey={'auth:signUpHeading'} />
-        </Heading>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-[28px] font-semibold tracking-tight text-zinc-900 dark:text-white">
+          Create your account
+        </h1>
 
-        <p className={'text-muted-foreground text-sm'}>
-          <Trans i18nKey={'auth:signUpSubheading'} />
+        <p className="text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+          Run your first analysis free
         </p>
       </div>
 
@@ -43,12 +41,14 @@ async function SignUpPage() {
         captchaSiteKey={authConfig.captchaTokenSiteKey}
       />
 
-      <div className={'flex justify-center'}>
-        <Button asChild variant={'link'} size={'sm'}>
-          <Link href={pathsConfig.auth.signIn} prefetch={true}>
-            <Trans i18nKey={'auth:alreadyHaveAnAccount'} />
-          </Link>
-        </Button>
+      <div className="flex justify-center">
+        <Link
+          href={pathsConfig.auth.signIn}
+          prefetch={true}
+          className="text-[14px] text-zinc-500 transition-colors hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 dark:text-zinc-400 dark:hover:text-white dark:focus-visible:ring-white"
+        >
+          <Trans i18nKey={'auth:alreadyHaveAnAccount'} />
+        </Link>
       </div>
     </>
   );
