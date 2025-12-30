@@ -470,7 +470,7 @@ export default function NewReportPage() {
           }
           reason={upgradeReason}
         />
-        <main className="flex min-h-screen flex-col bg-white">
+        <main className="flex flex-col bg-white">
           {/* Main content */}
           <div className="flex flex-1 items-center justify-center px-8 py-16">
             <div className="w-full max-w-3xl">
@@ -554,7 +554,7 @@ export default function NewReportPage() {
         }
         reason={upgradeReason}
       />
-      <main className="flex min-h-screen flex-col bg-white">
+      <main className="flex flex-col bg-white">
         {/* Hidden file input */}
         <input
           ref={fileInputRef}
@@ -580,7 +580,7 @@ export default function NewReportPage() {
         )}
 
         {/* Main content */}
-        <div className="px-8 pt-24 pb-8">
+        <div className="px-8 pt-24 pb-4">
           <div className="mx-auto w-full max-w-3xl">
             {/* Back link */}
             <Link
