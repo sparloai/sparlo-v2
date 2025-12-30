@@ -5,12 +5,11 @@ import { useCallback, useState, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
-import { ArrowLeft, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 import type { BillingConfig } from '@kit/billing';
 import { getPrimaryLineItem } from '@kit/billing';
 import { useAppEvents } from '@kit/shared/events';
-import { Alert, AlertDescription } from '@kit/ui/alert';
 import { cn } from '@kit/ui/utils';
 
 import { createPersonalAccountCheckoutSession } from '../_lib/server/server-actions';
@@ -84,90 +83,191 @@ export function SparloBillingPricing({
   // Show embedded checkout when token is available
   if (checkout.checkoutToken) {
     return (
-      <div className="mx-auto max-w-2xl pt-8 pb-20 md:pt-12 md:pb-32">
-        <button
-          onClick={resetCheckout}
-          className="mb-6 flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-zinc-950 dark:hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to plans
-        </button>
-        <EmbeddedCheckout
-          checkoutToken={checkout.checkoutToken}
-          provider={config.provider}
-          onClose={resetCheckout}
-        />
-      </div>
+      <main className="min-h-screen bg-white">
+        <div className="mx-auto max-w-3xl px-8 pt-24 pb-16">
+          {/* Back link */}
+          <button
+            onClick={resetCheckout}
+            className="mb-6 inline-flex cursor-pointer items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 focus-visible:text-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none active:text-zinc-700"
+          >
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+              />
+            </svg>
+            Back to plans
+          </button>
+
+          {/* Page title */}
+          <h1 className="font-heading mb-12 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
+            Checkout
+          </h1>
+
+          <EmbeddedCheckout
+            checkoutToken={checkout.checkoutToken}
+            provider={config.provider}
+            onClose={resetCheckout}
+          />
+        </div>
+      </main>
     );
   }
 
   // Get visible products and build tier data
   const visibleProducts = config.products.filter((p) => !p.hidden);
 
-  return (
-    <main className="flex flex-grow flex-col items-center justify-center pt-8 pb-20 md:pt-12 md:pb-32">
-      <div className="mx-auto w-full max-w-7xl px-6">
-        {/* Section Header */}
-        <div className="mb-12 max-w-2xl">
-          <h1 className="mb-4 text-4xl font-semibold tracking-tight text-zinc-950 md:text-5xl dark:text-white">
+  // Empty state when no products configured
+  if (visibleProducts.length === 0) {
+    return (
+      <main className="min-h-screen bg-white">
+        <div className="mx-auto max-w-4xl px-8 pt-24 pb-16">
+          <Link
+            href="/home"
+            className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 focus-visible:text-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+              />
+            </svg>
+            Dashboard
+          </Link>
+
+          <h1 className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
             Plans
           </h1>
-          <p className="text-lg leading-relaxed font-normal text-zinc-500 dark:text-zinc-400">
-            Engineering intelligence for professional teams.
-          </p>
+
+          <div className="mt-16 text-center">
+            <p className="text-[18px] tracking-[-0.02em] text-zinc-500">
+              No plans available at this time.
+            </p>
+            <p className="mt-2 text-[15px] tracking-[-0.02em] text-zinc-400">
+              Please check back later or contact support.
+            </p>
+          </div>
         </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto max-w-4xl px-8 pt-24 pb-16">
+        {/* Back link */}
+        <Link
+          href="/home"
+          className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 focus-visible:text-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none active:text-zinc-700"
+        >
+          <svg
+            className="h-3.5 w-3.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+            />
+          </svg>
+          Dashboard
+        </Link>
+
+        {/* Page title */}
+        <h1 className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
+          Plans
+        </h1>
+
+        {/* Subtitle */}
+        <p className="mt-4 text-[18px] leading-relaxed tracking-[-0.02em] text-zinc-500">
+          Engineering intelligence for professional teams.
+        </p>
 
         {/* Billing Toggle */}
-        <div className="mb-12 flex items-center justify-start gap-4">
+        <div className="mt-10 mb-12 flex items-center gap-6">
           <button
             onClick={() => setBillingPeriod('monthly')}
-            className={`text-sm font-medium transition-colors ${
+            className={cn(
+              'cursor-pointer text-[15px] font-medium tracking-[-0.02em] transition-colors focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none',
               billingPeriod === 'monthly'
-                ? 'text-zinc-950 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
-            }`}
+                ? 'text-zinc-900'
+                : 'text-zinc-400 hover:text-zinc-600 active:text-zinc-700',
+            )}
           >
             Monthly
           </button>
+
           <button
             onClick={() =>
               setBillingPeriod(
                 billingPeriod === 'monthly' ? 'annual' : 'monthly',
               )
             }
-            className="relative h-6 w-11 rounded-full bg-zinc-200 transition-colors dark:bg-zinc-700"
+            className="relative h-5 w-9 cursor-pointer rounded-full bg-zinc-200 transition-colors hover:bg-zinc-300 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none active:bg-zinc-400"
             aria-label="Toggle billing period"
+            role="switch"
+            aria-checked={billingPeriod === 'annual'}
           >
             <span
-              className={`absolute top-1 h-4 w-4 rounded-full bg-zinc-950 transition-transform dark:bg-white ${
-                billingPeriod === 'annual' ? 'left-6' : 'left-1'
-              }`}
+              className={cn(
+                'absolute top-0.5 h-4 w-4 rounded-full bg-zinc-900 transition-all duration-200',
+                billingPeriod === 'annual' ? 'left-[18px]' : 'left-0.5',
+              )}
             />
           </button>
-          <button
-            onClick={() => setBillingPeriod('annual')}
-            className={`text-sm font-medium transition-colors ${
-              billingPeriod === 'annual'
-                ? 'text-zinc-950 dark:text-white'
-                : 'text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
-            }`}
-          >
-            Annual
-            <span className="ml-2 rounded bg-emerald-500/10 px-1.5 py-0.5 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setBillingPeriod('annual')}
+              className={cn(
+                'cursor-pointer text-[15px] font-medium tracking-[-0.02em] transition-colors focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none',
+                billingPeriod === 'annual'
+                  ? 'text-zinc-900'
+                  : 'text-zinc-400 hover:text-zinc-600 active:text-zinc-700',
+              )}
+            >
+              Annual
+            </button>
+            <span className="text-[12px] font-medium tracking-[-0.02em] text-zinc-500">
               2 months free
             </span>
-          </button>
+          </div>
         </div>
 
-        {/* Error Alert */}
+        {/* Error message */}
         {checkout.error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertDescription>{checkout.error}</AlertDescription>
-          </Alert>
+          <div
+            className="mb-8 border-l-2 border-zinc-400 bg-zinc-50 py-4 pr-4 pl-6"
+            role="alert"
+          >
+            <p className="text-[14px] tracking-[-0.02em] text-zinc-600">
+              {checkout.error}
+            </p>
+          </div>
         )}
 
-        {/* Pricing Grid */}
-        <div className="grid grid-cols-1 items-stretch gap-8 md:grid-cols-3 lg:gap-12">
+        {/* Pricing Cards */}
+        <div className="space-y-6">
           {visibleProducts.map((product, index) => {
             // Get monthly and annual plans
             const monthlyPlan = product.plans.find(
@@ -191,87 +291,114 @@ export function SparloBillingPricing({
             const isHighlighted = index === 1; // Middle plan highlighted
 
             return (
-              <div
+              <article
                 key={product.id}
                 className={cn(
-                  'group relative flex flex-col rounded-lg border p-8 transition-colors duration-300 md:p-10',
+                  'overflow-hidden rounded-lg border bg-white shadow-sm transition-all duration-200',
                   isHighlighted
-                    ? 'border-primary/50 dark:border-primary/30 bg-white dark:bg-zinc-900'
-                    : 'border-zinc-200 bg-white hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-zinc-700',
+                    ? 'border-l-2 border-zinc-200 border-l-zinc-900'
+                    : 'border-zinc-200 hover:border-zinc-300',
                 )}
               >
-                <div className="mb-8">
-                  <h3 className="mb-1 text-xs font-medium tracking-widest text-zinc-500 uppercase dark:text-zinc-400">
-                    {product.name}
-                  </h3>
-                  <p className="mb-6 text-sm text-zinc-400 dark:text-zinc-500">
-                    {product.description}
-                  </p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold tracking-tight text-zinc-950 dark:text-white">
-                      ${displayPrice}
-                    </span>
-                    <span className="text-base font-normal text-zinc-500 dark:text-zinc-400">
-                      /month
-                    </span>
-                  </div>
-                  {billingPeriod === 'annual' && (
-                    <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-                      Billed annually
-                    </p>
-                  )}
-                </div>
+                <div className="p-8">
+                  {/* Header row */}
+                  <div className="flex items-start justify-between gap-8">
+                    {/* Left: Plan info */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+                          {product.name}
+                        </h2>
+                        {isHighlighted && (
+                          <span className="rounded bg-zinc-100 px-2 py-0.5 text-[11px] font-medium tracking-[0.04em] text-zinc-600 uppercase">
+                            Popular
+                          </span>
+                        )}
+                      </div>
 
-                <div className="mb-10 flex-grow space-y-4 border-t border-zinc-100 pt-8 dark:border-zinc-800">
-                  {product.features.map((feature) => (
-                    <div key={feature} className="flex items-start gap-3">
-                      <Check className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                      <span className="text-base font-normal text-zinc-700 dark:text-zinc-300">
-                        {feature}
-                      </span>
+                      <p className="mt-2 line-clamp-2 text-[15px] tracking-[-0.02em] text-zinc-500">
+                        {product.description}
+                      </p>
+
+                      {/* Features */}
+                      <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+                        {product.features.map((feature) => (
+                          <li key={feature} className="flex items-center gap-2">
+                            <Check
+                              className="h-3.5 w-3.5 shrink-0 text-zinc-900"
+                              aria-hidden="true"
+                            />
+                            <span className="text-[14px] tracking-[-0.02em] text-zinc-700">
+                              {feature}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  ))}
-                </div>
 
-                <button
-                  onClick={() => handleSelectPlan(activePlan.id, product.id)}
-                  disabled={pending || isCurrent || isPending}
-                  className={cn(
-                    'block w-full rounded px-4 py-3 text-center text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-                    isCurrent
-                      ? 'cursor-not-allowed bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500'
-                      : isHighlighted
-                        ? 'bg-primary hover:bg-primary/90 focus-visible:ring-primary text-white'
-                        : 'bg-primary/20 text-primary hover:bg-primary/30 focus-visible:ring-primary dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30',
-                    (pending || isPending) && 'cursor-not-allowed opacity-50',
-                  )}
-                >
-                  {isPending
-                    ? 'Loading...'
-                    : isCurrent
-                      ? 'Current Plan'
-                      : 'Get started'}
-                </button>
-              </div>
+                    {/* Right: Price and CTA */}
+                    <div className="flex shrink-0 flex-col items-end gap-4">
+                      <div className="text-right">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-[32px] font-semibold tracking-tight text-zinc-900">
+                            ${displayPrice}
+                          </span>
+                          <span className="text-[15px] tracking-[-0.02em] text-zinc-500">
+                            /mo
+                          </span>
+                        </div>
+                        {billingPeriod === 'annual' && (
+                          <p className="mt-1 text-[13px] tracking-[-0.02em] text-zinc-400">
+                            Billed annually
+                          </p>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() =>
+                          handleSelectPlan(activePlan.id, product.id)
+                        }
+                        disabled={pending || isCurrent || isPending}
+                        className={cn(
+                          'px-6 py-2.5 text-[14px] font-medium transition-all duration-150 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none',
+                          isCurrent
+                            ? 'cursor-not-allowed bg-zinc-100 text-zinc-400'
+                            : isHighlighted
+                              ? 'cursor-pointer bg-zinc-900 text-white hover:bg-zinc-800 active:bg-zinc-950'
+                              : 'cursor-pointer border border-zinc-300 text-zinc-600 hover:border-zinc-900 hover:text-zinc-900 active:bg-zinc-50',
+                          (pending || isPending) &&
+                            'cursor-not-allowed opacity-50',
+                        )}
+                      >
+                        {isPending
+                          ? 'Loading...'
+                          : isCurrent
+                            ? 'Current Plan'
+                            : 'Get Started'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
             );
           })}
         </div>
 
-        {/* Enterprise Callout */}
-        <div className="mt-16 text-center">
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        {/* Footer */}
+        <footer className="mt-12 border-l-2 border-zinc-200 pl-6">
+          <p className="text-[14px] tracking-[-0.02em] text-zinc-500">
             Need an enterprise agreement?{' '}
             <Link
               href="/contact"
-              className="font-medium text-zinc-950 decoration-zinc-300 underline-offset-4 hover:underline dark:text-white dark:decoration-zinc-600"
+              className="font-medium text-zinc-900 transition-colors hover:text-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none active:text-zinc-700"
             >
               Contact us
             </Link>
           </p>
-          <p className="mt-4 text-xs text-zinc-400 dark:text-zinc-500">
-            Cancel anytime.
+          <p className="mt-2 text-[13px] tracking-[-0.02em] text-zinc-400">
+            All plans include a 14-day free trial. Cancel anytime.
           </p>
-        </div>
+        </footer>
       </div>
     </main>
   );
