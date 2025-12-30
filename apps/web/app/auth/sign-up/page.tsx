@@ -25,11 +25,11 @@ async function SignUpPage() {
   return (
     <>
       <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-[28px] font-semibold tracking-tight text-zinc-900 dark:text-white">
+        <h1 className="text-[28px] font-semibold tracking-tight text-zinc-900">
           Create Account
         </h1>
 
-        <p className="text-[15px] leading-relaxed text-zinc-500 dark:text-zinc-400">
+        <p className="text-[15px] leading-relaxed text-zinc-500">
           First Analysis Free
         </p>
       </div>
@@ -45,7 +45,7 @@ async function SignUpPage() {
         <Link
           href={pathsConfig.auth.signIn}
           prefetch={true}
-          className="text-[14px] text-zinc-500 transition-colors hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 dark:text-zinc-400 dark:hover:text-white dark:focus-visible:ring-white"
+          className="text-[14px] text-zinc-500 transition-colors hover:text-zinc-900 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none"
         >
           <Trans i18nKey={'auth:alreadyHaveAnAccount'} />
         </Link>

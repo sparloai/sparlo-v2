@@ -13,7 +13,7 @@ export function AuthLayoutShell({
   return (
     <div
       className={cn(
-        'flex min-h-screen flex-col items-center justify-center bg-white px-4 py-12 dark:bg-zinc-950',
+        'flex min-h-screen flex-col items-center justify-center bg-white px-4 py-12',
         className,
       )}
     >
@@ -22,7 +22,7 @@ export function AuthLayoutShell({
 
         <div
           className={cn(
-            'flex w-full flex-col gap-6 rounded-xl border border-zinc-200 bg-white p-8 shadow-sm transition-shadow duration-200 dark:border-zinc-800 dark:bg-zinc-900',
+            'flex w-full flex-col gap-6 rounded-xl border border-zinc-200 bg-white p-8 shadow-sm transition-shadow duration-200',
             contentClassName,
           )}
         >
