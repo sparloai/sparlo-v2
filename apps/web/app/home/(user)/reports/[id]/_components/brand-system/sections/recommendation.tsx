@@ -45,7 +45,7 @@ export const RecommendationSection = memo(function RecommendationSection({
     <Section id="final-recommendation" className="mt-20">
       <SectionTitle size="lg">Final Recommendation</SectionTitle>
       <SectionSubtitle>
-        Personal recommendation from the analysis
+        Personal recommendation from the analysis.
       </SectionSubtitle>
 
       <div className="mt-10 max-w-[65ch]">

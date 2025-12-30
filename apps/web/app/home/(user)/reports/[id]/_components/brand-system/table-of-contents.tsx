@@ -336,7 +336,7 @@ export function generateTocSections(
   // Constraints
   if (reportData.constraints_and_metrics) {
     sections.push({
-      id: 'constraints-metrics',
+      id: 'constraints',
       title: 'Constraints',
     });
   }
@@ -381,7 +381,7 @@ export function generateTocSections(
     };
     sections.push({
       id: 'innovation-concepts',
-      title: 'Innovation Concepts',
+      title: 'Innovation Portfolio',
       subsections: portfolio?.parallel_investigations?.length
         ? [{ id: 'parallel-investigations', title: 'Parallel Investigations' }]
         : [],

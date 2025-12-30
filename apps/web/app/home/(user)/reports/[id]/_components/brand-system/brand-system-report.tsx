@@ -367,6 +367,57 @@ function normalizeReportData(data: HybridReportData): HybridReportData {
 }
 
 // ============================================
+// DATA EXTRACTION HELPERS
+// ============================================
+
+/**
+ * Extract domains searched data from multiple possible locations in the report.
+ * Handles both structured format (cross_domain_search.domains_searched) and
+ * simple string array format (innovation_analysis.domains_searched).
+ */
+function extractDomainsSearched(
+  data: HybridReportData,
+):
+  | Array<{ domain?: string; mechanism_found?: string; relevance?: string }>
+  | undefined {
+  // First try the structured format from cross_domain_search
+  if (
+    data.cross_domain_search?.domains_searched &&
+    data.cross_domain_search.domains_searched.length > 0
+  ) {
+    return data.cross_domain_search.domains_searched;
+  }
+
+  // Fall back to simple string array from innovation_analysis, convert to structured format
+  if (
+    data.innovation_analysis?.domains_searched &&
+    data.innovation_analysis.domains_searched.length > 0
+  ) {
+    return data.innovation_analysis.domains_searched.map((domain) => ({
+      domain:
+        typeof domain === 'string'
+          ? domain
+          : (domain as { domain?: string }).domain,
+      mechanism_found: undefined,
+      relevance: undefined,
+    }));
+  }
+
+  return undefined;
+}
+
+/**
+ * Extract from-scratch revelations (First Principles Concept) from the report.
+ */
+function extractFromScratchRevelations(
+  data: HybridReportData,
+):
+  | Array<{ discovery?: string; source?: string; implication?: string }>
+  | undefined {
+  return data.cross_domain_search?.from_scratch_revelations;
+}
+
+// ============================================
 // TOC NAV ITEM COMPONENT
 // ============================================
 
@@ -559,7 +610,7 @@ const ReportContent = memo(function ReportContent({
 
       {/* Brief - User's original input */}
       {brief && (
-        <Section id="brief">
+        <Section id="brief" className="mt-0">
           <SectionTitle>The Brief</SectionTitle>
           <div className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-6">
             <p className="text-[16px] leading-relaxed tracking-[-0.01em] whitespace-pre-wrap text-zinc-700">
@@ -575,9 +626,7 @@ const ReportContent = memo(function ReportContent({
       {/* Problem Analysis */}
       <ProblemAnalysisSection
         data={normalizedData.problem_analysis}
-        fromScratchRevelations={
-          normalizedData.cross_domain_search?.from_scratch_revelations
-        }
+        fromScratchRevelations={extractFromScratchRevelations(normalizedData)}
       />
 
       {/* Constraints & Metrics */}
@@ -589,7 +638,7 @@ const ReportContent = memo(function ReportContent({
       {/* Innovation Analysis (reframe + domains searched) */}
       <InnovationAnalysisSection
         data={normalizedData.innovation_analysis}
-        domainsSearched={normalizedData.cross_domain_search?.domains_searched}
+        domainsSearched={extractDomainsSearched(normalizedData)}
       />
 
       {/* Solution Concepts (Execution Track) */}

@@ -33,7 +33,7 @@ export const FrontierTechnologiesSection = memo(
     return (
       <Section id="frontier-technologies" className="mt-20">
         <SectionTitle size="lg">Frontier Watch</SectionTitle>
-        <SectionSubtitle>Technologies worth monitoring</SectionSubtitle>
+        <SectionSubtitle>Technologies worth monitoring.</SectionSubtitle>
 
         <ArticleBlock className="mt-10">
           <div className="grid gap-8 md:grid-cols-2">

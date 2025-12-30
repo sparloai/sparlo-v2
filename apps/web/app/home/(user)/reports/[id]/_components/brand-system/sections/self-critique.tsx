@@ -21,6 +21,11 @@ import {
   SectionTitle,
 } from '../primitives';
 
+/** Title case a confidence level string (e.g., "high" -> "High") */
+function titleCase(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
 interface SelfCritiqueSectionProps {
   data?: SelfCritique;
 }
@@ -43,7 +48,7 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
   return (
     <Section id="self-critique" className="mt-20">
       <SectionTitle size="lg">Self-Critique</SectionTitle>
-      <SectionSubtitle>Where we might be wrong</SectionSubtitle>
+      <SectionSubtitle>Where we might be wrong.</SectionSubtitle>
 
       <ArticleBlock className="mt-10">
         {/* Confidence level */}
@@ -51,7 +56,9 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
           <div className="max-w-[60ch]">
             <MonoLabel variant="muted">Overall Confidence</MonoLabel>
             <p className="mt-3 text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
-              {data.overall_confidence || data.confidence_level}
+              {titleCase(
+                data.overall_confidence || data.confidence_level || '',
+              )}
             </p>
             {data.confidence_rationale && (
               <BodyText className="mt-2" variant="secondary">

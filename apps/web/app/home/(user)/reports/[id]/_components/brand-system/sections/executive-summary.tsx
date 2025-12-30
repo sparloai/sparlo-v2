@@ -34,7 +34,7 @@ export const ExecutiveSummarySection = memo(function ExecutiveSummarySection({
   // Handle string format (legacy)
   if (typeof data === 'string') {
     return (
-      <Section id="executive-summary" className="mt-0">
+      <Section id="executive-summary">
         <SectionTitle className="mb-12">Executive Summary</SectionTitle>
 
         <ArticleBlock>
@@ -51,7 +51,7 @@ export const ExecutiveSummarySection = memo(function ExecutiveSummarySection({
   const structured = data as StructuredExecutiveSummary | undefined;
 
   return (
-    <Section id="executive-summary" className="mt-0">
+    <Section id="executive-summary">
       <SectionTitle className="mb-12">Executive Summary</SectionTitle>
 
       <ArticleBlock>

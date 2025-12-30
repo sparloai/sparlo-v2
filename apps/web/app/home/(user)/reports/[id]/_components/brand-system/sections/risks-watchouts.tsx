@@ -37,7 +37,7 @@ export const RisksWatchoutsSection = memo(function RisksWatchoutsSection({
   return (
     <Section id="risks-watchouts" className="mt-20">
       <SectionTitle size="lg">Risks & Watchouts</SectionTitle>
-      <SectionSubtitle>What could go wrong</SectionSubtitle>
+      <SectionSubtitle>What could go wrong.</SectionSubtitle>
 
       <div className="mt-10 max-w-[70ch] space-y-10">
         {data.map((risk, idx) => (
@@ -110,7 +110,7 @@ export const RisksWatchoutsGrouped = memo(function RisksWatchoutsGrouped({
   return (
     <Section id="risks-watchouts" className="mt-20">
       <SectionTitle size="lg">Risks & Watchouts</SectionTitle>
-      <SectionSubtitle>What could go wrong</SectionSubtitle>
+      <SectionSubtitle>What could go wrong.</SectionSubtitle>
 
       <div className="mt-10 space-y-12">
         {categories.map((category) => {
@@ -150,7 +150,7 @@ export const RisksWatchoutsTable = memo(function RisksWatchoutsTable({
   return (
     <Section id="risks-watchouts" className="mt-20">
       <SectionTitle size="lg">Risks & Watchouts</SectionTitle>
-      <SectionSubtitle>What could go wrong</SectionSubtitle>
+      <SectionSubtitle>What could go wrong.</SectionSubtitle>
 
       <div className="mt-10 overflow-x-auto">
         <table className="w-full text-[18px]">

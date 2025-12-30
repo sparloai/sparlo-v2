@@ -135,7 +135,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
                   className="py-2 md:border-l-2 md:border-zinc-200 md:pl-4"
                 >
                   {revelation.discovery && (
-                    <p className="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+                    <p className="text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-[#1e1e1e]">
                       {revelation.discovery}
                     </p>
                   )}
