@@ -20,33 +20,38 @@ export const generateMetadata = async () => {
 async function FAQPage() {
   const { t } = await createI18nServerInstance();
 
-  // replace this content with translations
   const faqItems = [
     {
-      // or: t('marketing:faq.question1')
-      question: `Do you offer a free trial?`,
-      // or: t('marketing:faq.answer1')
-      answer: `Yes, we offer a 14-day free trial. You can cancel at any time during the trial period and you won't be charged.`,
+      question: `What is Sparlo?`,
+      answer: `Sparlo is an AI-powered engineering research platform. Describe your engineering problem, and we deliver comprehensive research including innovation concepts from across industries, technical validation, IP landscape, and strategic recommendations — all in about 25 minutes.`,
     },
     {
-      question: `Can I cancel my subscription?`,
-      answer: `You can cancel your subscription at any time. You can do this from your account settings.`,
+      question: `How long does report generation take?`,
+      answer: `Most reports complete in 20-30 minutes. This thorough research process is what makes Sparlo valuable — we're analyzing your problem, exploring cross-industry solutions, and synthesizing actionable insights.`,
     },
     {
-      question: `Where can I find my invoices?`,
-      answer: `You can find your invoices in your account settings.`,
+      question: `What's included in each pricing tier?`,
+      answer: `Core ($199/mo) includes ~10 reports/month for 1 user. Pro ($499/mo) includes ~30 reports/month for up to 5 team members. Max ($999/mo) includes ~70 reports/month for up to 10 team members. All plans include post-report chat, PDF export, and share links.`,
     },
     {
-      question: `What payment methods do you accept?`,
-      answer: `We accept all major credit cards and PayPal.`,
+      question: `Can I ask follow-up questions about my report?`,
+      answer: `Yes! Every report includes a chat feature. Ask follow-up questions, request more detail on specific concepts, or explore "what if" scenarios.`,
+    },
+    {
+      question: `Is my engineering data secure?`,
+      answer: `Yes. Your data is encrypted in transit and at rest. We use middleware encryption in our processing pipeline, and our infrastructure partners are all SOC 2 compliant. We cannot casually browse or view your reports.`,
+    },
+    {
+      question: `Do you use my data to train AI models?`,
+      answer: `No. Your engineering problems and reports are never used to train AI models. Anthropic (Claude) explicitly does not use API data for training. Your research remains your intellectual property.`,
     },
     {
       question: `Can I upgrade or downgrade my plan?`,
-      answer: `Yes, you can upgrade or downgrade your plan at any time. You can do this from your account settings.`,
+      answer: `Yes, you can change your plan at any time from Settings → Billing. Upgrades take effect immediately. Downgrades take effect at your next billing date.`,
     },
     {
-      question: `Do you offer discounts for non-profits?`,
-      answer: `Yes, we offer a 50% discount for non-profits. Please contact us to learn more.`,
+      question: `What's your refund policy?`,
+      answer: `To request a refund, email help@sparlo.ai with your account email and reason. We handle refunds on a case-by-case basis, typically responding within 2 business days.`,
     },
   ];
 

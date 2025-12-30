@@ -1,0 +1,115 @@
+---
+title: "Writing Effective Problem Statements"
+description: "How to describe your engineering challenge for the best research results."
+publishedAt: 2025-01-01
+order: 1
+status: "published"
+---
+
+The way you describe your engineering problem directly affects the quality of your research. Here's how to get better results.
+
+## What Makes a Good Problem Statement
+
+Strong problem statements share these characteristics:
+
+### 1. Quantified Details
+
+Include specific numbers, measurements, and requirements.
+
+- Cycles per year: ~2 million
+- Temperature range: -20°C to 45°C
+- Power requirement: 50W
+- Weight limit: under 200g
+- Precision needed: ±0.5mm
+
+### 2. Clear Constraints
+
+State what you can't do, not just what you need.
+
+- "Can't use fans (dust/reliability concerns)"
+- "Titanium is too expensive"
+- "Must be sealed — no active cooling"
+- "Weight-sensitive application"
+
+### 3. Context About What You've Tried
+
+Help Sparlo focus on new directions by mentioning what hasn't worked.
+
+- "Current passive heatsink isn't cutting it"
+- "Current steel design is failing at 18 months"
+- "Passive isolators I've tried either don't isolate enough or are too soft"
+
+### 4. Cross-Industry Thinking
+
+Ask explicitly for approaches from other industries — this is where the best insights often come from.
+
+- "What approaches from other marine industries could help?"
+- "How do other industries handle high-cycle fatigue?"
+- "What mechanical or thermal approaches from other industries could step-change this?"
+
+## Example Problem Statements
+
+These real examples show what effective problem statements look like:
+
+### Thermal Management
+
+> "I need to dissipate 50W of heat from a sealed electronics enclosure in an outdoor environment. Can't use fans (dust/reliability), can't add significant mass (drone application), ambient temps up to 45°C. Current passive heatsink isn't cutting it."
+
+**Why it works**: Clear power requirement, explicit constraints (no fans, weight-sensitive, sealed), environmental context, current solution baseline.
+
+### Energy & Scale
+
+> "Reverse osmosis desalination is stuck at ~3-4 kWh per cubic meter — we're approaching thermodynamic limits with membrane tech. What mechanical or thermal approaches from other industries could step-change this? Looking for concepts that could work at municipal scale (100,000+ m³/day)."
+
+**Why it works**: Quantified current state, identifies the limitation (thermodynamic limits), explicit request for cross-industry approaches, scale requirements defined.
+
+### Access & Operations
+
+> "Offshore wind turbines need maintenance but we can only access them ~60% of days due to wave height limits on crew transfer vessels. This drives up O&M costs and reduces availability. The industry is stuck between expensive solutions (helicopters, walk-to-work vessels) and accepting weather downtime. What motion compensation or access system approaches from other marine industries could expand our weather window cost-effectively?"
+
+**Why it works**: Clear problem quantification (60% access), economic impact explained, existing solutions acknowledged with limitations, specific technical direction (motion compensation).
+
+### Materials & Fatigue
+
+> "We have a linkage mechanism in a prosthetic knee joint that sees ~2 million cycles per year with highly variable loading (walking, stairs, sitting). Current steel design is failing at 18 months. Titanium is too expensive. How do other industries handle high-cycle fatigue in compact, weight-sensitive applications?"
+
+**Why it works**: Specific cycle count, failure timeline, material constraints (cost), asks for cross-industry solutions, clear design constraints (compact, weight-sensitive).
+
+### Precision & Vibration
+
+> "Mounting a sensitive optical sensor on an agricultural robot. Need to isolate it from chassis vibration (5-50 Hz) but it also needs to stay precisely positioned (±0.5mm) relative to the camera boom. Passive isolators I've tried either don't isolate enough or are too soft for the positioning requirement."
+
+**Why it works**: Specific frequency range, precision requirement quantified, describes the tradeoff problem, mentions what's been tried.
+
+## Detection Indicators
+
+As you type your problem, you'll see three indicators light up:
+
+- **Problem** — Sparlo has detected your core challenge
+- **Constraints** — Limitations and requirements identified
+- **Success Criteria** — What success looks like is clear
+
+If an indicator doesn't light up, try adding more detail in that area.
+
+## Common Mistakes
+
+### Too Vague
+
+"We need better performance" — Better at what? Under what conditions? With what constraints?
+
+### Missing Constraints
+
+"We need a faster motor" — What's the size limit? Power budget? Cost target? Environment?
+
+### No Context
+
+"Our pump is failing" — How is it failing? After how long? Under what conditions? What have you tried?
+
+### Solution-Focused
+
+"We need a titanium part" — You've already decided on the solution. Instead, describe the problem that made you think of titanium, and let Sparlo explore alternatives.
+
+## What's Next
+
+- [File Attachments](/docs/creating-reports/file-attachments) - Add supporting documents
+- [The Generation Process](/docs/creating-reports/generation-process) - What happens during research
