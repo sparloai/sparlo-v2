@@ -152,7 +152,50 @@ export const RisksWatchoutsTable = memo(function RisksWatchoutsTable({
       <SectionTitle size="lg">Risks & Watchouts</SectionTitle>
       <SectionSubtitle>What could go wrong</SectionSubtitle>
 
-      <div className="mt-10 overflow-x-auto">
+      {/* Mobile: Stacked cards for better readability */}
+      <div className="mt-10 space-y-6 md:hidden">
+        {data.map((risk, idx) => (
+          <div
+            key={idx}
+            className="border-b border-zinc-200 pb-6 last:border-b-0"
+          >
+            <p className="text-[17px] leading-[1.4] font-medium text-[#1e1e1e]">
+              {risk.risk}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[14px]">
+              {risk.category && (
+                <span className="text-zinc-500">
+                  <span className="text-zinc-400">Type:</span> {risk.category}
+                </span>
+              )}
+              <span
+                className={
+                  risk.severity === 'high'
+                    ? 'font-medium text-zinc-700'
+                    : risk.severity === 'medium'
+                      ? 'text-zinc-500'
+                      : 'text-zinc-400'
+                }
+              >
+                <span className="text-zinc-400">Severity:</span>{' '}
+                {risk.severity
+                  ? risk.severity.charAt(0).toUpperCase() +
+                    risk.severity.slice(1)
+                  : 'Medium'}
+              </span>
+            </div>
+            {risk.mitigation && (
+              <p className="mt-3 text-[15px] leading-[1.4] text-zinc-600">
+                <span className="text-zinc-400">Mitigation:</span>{' '}
+                {risk.mitigation}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Desktop: Traditional table layout */}
+      <div className="mt-10 hidden md:block">
         <table className="w-full text-[18px]">
           <thead>
             <tr className="border-b border-zinc-300">

@@ -105,7 +105,31 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
         {data.validation_gaps && data.validation_gaps.length > 0 && (
           <ContentBlock withBorder>
             <MonoLabel variant="muted">Validation Gaps</MonoLabel>
-            <div className="mt-4 overflow-x-auto">
+
+            {/* Mobile: Stacked cards */}
+            <div className="mt-4 space-y-5 md:hidden">
+              {data.validation_gaps.map((gap, idx) => (
+                <div
+                  key={idx}
+                  className="border-b border-zinc-200 pb-5 last:border-b-0"
+                >
+                  <p className="text-[16px] font-medium text-[#1e1e1e]">
+                    {gap.concern}
+                  </p>
+                  <p className="mt-2 text-[14px]">
+                    <ValidationStatus status={gap.status} />
+                  </p>
+                  {gap.rationale && (
+                    <p className="mt-2 text-[15px] text-zinc-600">
+                      {gap.rationale}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: Table */}
+            <div className="mt-4 hidden md:block">
               <table className="w-full text-[16px]">
                 <thead>
                   <tr className="border-b border-zinc-300">

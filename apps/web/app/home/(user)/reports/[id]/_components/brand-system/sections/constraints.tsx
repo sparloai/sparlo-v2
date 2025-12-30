@@ -64,7 +64,46 @@ export const ConstraintsSection = memo(function ConstraintsSection({
         {data.success_metrics && data.success_metrics.length > 0 && (
           <ContentBlock withBorder>
             <MonoLabel>Success Metrics</MonoLabel>
-            <div className="mt-6 overflow-x-auto">
+
+            {/* Mobile: Stacked cards */}
+            <div className="mt-6 space-y-6 md:hidden">
+              {data.success_metrics.map((m, idx) => (
+                <div
+                  key={idx}
+                  className="border-b border-zinc-200 pb-5 last:border-b-0"
+                >
+                  <p className="text-[17px] font-medium text-[#1e1e1e]">
+                    {m.metric}
+                    {m.unit && (
+                      <span className="ml-2 text-[14px] font-normal text-zinc-500">
+                        ({m.unit})
+                      </span>
+                    )}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px]">
+                    <span className="font-semibold text-emerald-700">
+                      <span className="text-zinc-400 font-normal">Target:</span>{' '}
+                      {m.target}
+                    </span>
+                    {m.minimum_viable && (
+                      <span className="text-zinc-700">
+                        <span className="text-zinc-400">Min:</span>{' '}
+                        {m.minimum_viable}
+                      </span>
+                    )}
+                    {m.stretch && (
+                      <span className="text-zinc-700">
+                        <span className="text-zinc-400">Stretch:</span>{' '}
+                        {m.stretch}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: Table */}
+            <div className="mt-6 hidden md:block">
               <table className="w-full text-[18px]">
                 <thead>
                   <tr className="border-b border-zinc-300">

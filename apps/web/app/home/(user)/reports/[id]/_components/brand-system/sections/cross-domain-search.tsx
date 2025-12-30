@@ -80,7 +80,35 @@ export const CrossDomainSearchSection = memo(function CrossDomainSearchSection({
         {data.domains_searched && data.domains_searched.length > 0 && (
           <ContentBlock withBorder>
             <MonoLabel variant="muted">Domains Explored</MonoLabel>
-            <div className="mt-6 overflow-x-auto">
+
+            {/* Mobile: Stacked cards */}
+            <div className="mt-6 space-y-5 md:hidden">
+              {data.domains_searched.map((domain, idx) => (
+                <div
+                  key={idx}
+                  className="border-b border-zinc-200 pb-5 last:border-b-0"
+                >
+                  <p className="text-[16px] font-medium text-[#1e1e1e]">
+                    {domain.domain}
+                  </p>
+                  {domain.mechanism_found && (
+                    <p className="mt-2 text-[15px] text-zinc-700">
+                      <span className="text-zinc-400">Mechanism:</span>{' '}
+                      {domain.mechanism_found}
+                    </p>
+                  )}
+                  {domain.relevance && (
+                    <p className="mt-1 text-[15px] text-zinc-600">
+                      <span className="text-zinc-400">Relevance:</span>{' '}
+                      {domain.relevance}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop: Table */}
+            <div className="mt-6 hidden md:block">
               <table className="w-full text-[16px]">
                 <thead>
                   <tr className="border-b border-zinc-300">
