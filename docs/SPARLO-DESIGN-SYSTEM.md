@@ -151,6 +151,14 @@ className="border-l-2 border-zinc-200 pl-6"
     {children}
   </div>
 </div>
+
+// Card with Signature Left Border (hybrid pattern)
+// Combines card containment with the signature left border accent
+<div className="overflow-hidden rounded-r-lg border border-l-2 border-zinc-200 border-l-zinc-900 bg-white shadow-sm">
+  <div className="p-8">
+    {children}
+  </div>
+</div>
 ```
 
 ### Section Header Pattern
