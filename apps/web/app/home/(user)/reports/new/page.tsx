@@ -607,8 +607,9 @@ export default function NewReportPage() {
               New Analysis
             </h1>
 
-            {/* Textarea with left border */}
-            <div className="border-l-2 border-zinc-900 pl-10">
+            {/* Input card */}
+            <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
+              {/* Textarea */}
               <textarea
                 value={problemText}
                 onChange={(e) => {
@@ -623,116 +624,116 @@ export default function NewReportPage() {
                 autoFocus
                 data-test="challenge-input"
                 placeholder="What engineering problem are you solving?"
-                className="h-64 w-full resize-none border-none bg-transparent p-0 text-[22px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:ring-0 focus:outline-none disabled:opacity-40"
+                className="h-56 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:ring-0 focus:outline-none disabled:opacity-40"
               />
-            </div>
 
-            {/* Detection indicators - always visible */}
-            <div className="mt-10 flex items-center gap-8 pl-10">
-              <DetectionIndicator
-                label="Problem"
-                detected={hasProblemStatement(problemText)}
-              />
-              <DetectionIndicator
-                label="Constraints"
-                detected={hasConstraints(problemText)}
-              />
-              <DetectionIndicator
-                label="Success criteria"
-                detected={hasSuccessCriteria(problemText)}
-              />
-            </div>
-
-            {/* Attached files - minimal inline display */}
-            {attachments.length > 0 && (
-              <div className="mt-8 pl-10">
-                <div className="flex flex-wrap items-center gap-3">
-                  {attachments.map((attachment) => (
-                    <div
-                      key={attachment.id}
-                      className="group flex items-center gap-2 rounded border border-zinc-200 bg-zinc-50 py-1.5 pr-2 pl-1.5 transition-colors hover:border-zinc-300"
-                    >
-                      {/* Small thumbnail or document icon */}
-                      <div className="relative flex h-6 w-6 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm">
-                        {attachment.file.type.startsWith('image/') ? (
-                          <Image
-                            src={attachment.preview}
-                            alt={attachment.file.name}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="text-sm text-zinc-500">📄</span>
-                        )}
-                      </div>
-                      {/* Filename */}
-                      <span className="max-w-[120px] truncate text-[12px] tracking-[-0.02em] text-zinc-600">
-                        {attachment.file.name}
-                      </span>
-                      {/* Remove button */}
-                      <button
-                        onClick={() => removeAttachment(attachment.id)}
-                        className="ml-1 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-600"
-                        aria-label={`Remove ${attachment.file.name}`}
-                      >
-                        <svg
-                          className="h-3 w-3"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M6 18L18 6M6 6l12 12"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
-                </div>
+              {/* Detection indicators */}
+              <div className="mt-6 flex items-center gap-6 border-t border-zinc-100 pt-6">
+                <DetectionIndicator
+                  label="Problem"
+                  detected={hasProblemStatement(problemText)}
+                />
+                <DetectionIndicator
+                  label="Constraints"
+                  detected={hasConstraints(problemText)}
+                />
+                <DetectionIndicator
+                  label="Success criteria"
+                  detected={hasSuccessCriteria(problemText)}
+                />
               </div>
-            )}
 
-            {/* Footer */}
-            <div className="mt-12 flex items-center justify-between pl-10">
-              <div className="flex items-center gap-6">
-                <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
-                  ~25 min analysis
-                </p>
-                <span className="text-zinc-300">·</span>
+              {/* Attached files - minimal inline display */}
+              {attachments.length > 0 && (
+                <div className="mt-6 border-t border-zinc-100 pt-6">
+                  <div className="flex flex-wrap items-center gap-3">
+                    {attachments.map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="group flex items-center gap-2 rounded border border-zinc-200 bg-zinc-50 py-1.5 pr-2 pl-1.5 transition-colors hover:border-zinc-300"
+                      >
+                        {/* Small thumbnail or document icon */}
+                        <div className="relative flex h-6 w-6 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm">
+                          {attachment.file.type.startsWith('image/') ? (
+                            <Image
+                              src={attachment.preview}
+                              alt={attachment.file.name}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <span className="text-sm text-zinc-500">📄</span>
+                          )}
+                        </div>
+                        {/* Filename */}
+                        <span className="max-w-[120px] truncate text-[12px] tracking-[-0.02em] text-zinc-600">
+                          {attachment.file.name}
+                        </span>
+                        {/* Remove button */}
+                        <button
+                          onClick={() => removeAttachment(attachment.id)}
+                          className="ml-1 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-600"
+                          aria-label={`Remove ${attachment.file.name}`}
+                        >
+                          <svg
+                            className="h-3 w-3"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6 18L18 6M6 6l12 12"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Footer inside card */}
+              <div className="mt-6 flex items-center justify-between border-t border-zinc-100 pt-6">
+                <div className="flex items-center gap-6">
+                  <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
+                    ~25 min analysis
+                  </p>
+                  <span className="text-zinc-300">·</span>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={attachments.length >= MAX_ATTACHMENTS}
+                    className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Attach file
+                    {attachments.length > 0 && ` (${attachments.length})`}
+                  </button>
+                </div>
+
                 <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={attachments.length >= MAX_ATTACHMENTS}
-                  className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  onClick={handleContinue}
+                  disabled={!canSubmit || isSubmitting}
+                  data-test="challenge-submit"
+                  className={cn(
+                    'rounded-lg px-6 py-3 text-[15px] font-medium transition-colors',
+                    canSubmit && !isSubmitting
+                      ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+                      : 'cursor-not-allowed bg-zinc-100 text-zinc-400',
+                  )}
                 >
-                  Attach file
-                  {attachments.length > 0 && ` (${attachments.length})`}
+                  {isSubmitting ? 'Starting...' : 'Run Analysis'}
                 </button>
               </div>
 
-              <button
-                onClick={handleContinue}
-                disabled={!canSubmit || isSubmitting}
-                data-test="challenge-submit"
-                className={cn(
-                  'px-8 py-4 text-[15px] font-medium transition-colors',
-                  canSubmit && !isSubmitting
-                    ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                    : 'cursor-not-allowed bg-zinc-200 text-zinc-400',
-                )}
-              >
-                {isSubmitting ? 'Starting...' : 'Run Analysis'}
-              </button>
+              {error && (
+                <p className="mt-4 text-[14px] tracking-[-0.02em] text-red-600">
+                  {error}
+                </p>
+              )}
             </div>
-
-            {error && (
-              <p className="mt-6 pl-10 text-[14px] tracking-[-0.02em] text-red-600">
-                {error}
-              </p>
-            )}
           </div>
         </div>
       </main>
