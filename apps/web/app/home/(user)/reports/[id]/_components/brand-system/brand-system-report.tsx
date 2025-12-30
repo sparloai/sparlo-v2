@@ -92,21 +92,35 @@ interface BrandSystemReportProps {
 
 /**
  * Calculate estimated read time based on word count.
- * Uses 200 words per minute for technical content (slower than general reading).
+ * Uses 200 words per minute for technical content.
  *
- * Recursively extracts all string content from the report data
- * to ensure accurate word count regardless of report structure.
+ * Filters out non-prose content (IDs, URLs, short labels, etc.)
+ * to get accurate reading time for actual content.
  */
 function calculateReadTime(data: HybridReportData): number {
   const textParts: string[] = [];
 
-  // Recursively extract all string values from an object
-  function extractText(value: unknown): void {
-    if (value === null || value === undefined) {
-      return;
-    }
+  // Check if string is actual prose content (not IDs, URLs, labels, etc.)
+  function isProseContent(str: string): boolean {
+    // Too short - likely a label or ID
+    if (str.length < 20) return false;
+    // URLs
+    if (/^https?:\/\//.test(str)) return false;
+    // UUIDs
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)) return false;
+    // Mostly numbers/special chars (likely technical data)
+    const letterRatio = (str.match(/[a-zA-Z]/g) || []).length / str.length;
+    if (letterRatio < 0.5) return false;
+    // Has multiple words (prose has spaces)
+    if (!str.includes(' ')) return false;
+    return true;
+  }
 
-    if (typeof value === 'string' && value.length > 5) {
+  // Recursively extract prose content
+  function extractText(value: unknown): void {
+    if (value === null || value === undefined) return;
+
+    if (typeof value === 'string' && isProseContent(value)) {
       textParts.push(value);
     } else if (Array.isArray(value)) {
       value.forEach(extractText);
@@ -115,7 +129,6 @@ function calculateReadTime(data: HybridReportData): number {
     }
   }
 
-  // Extract all text from the report data
   extractText(data);
 
   const text = textParts.join(' ');
@@ -124,7 +137,6 @@ function calculateReadTime(data: HybridReportData): number {
   // 200 words per minute for technical content
   const minutesRaw = wordCount / 200;
 
-  // Round to nearest minute, minimum 1 minute
   return Math.max(1, Math.round(minutesRaw));
 }
 
