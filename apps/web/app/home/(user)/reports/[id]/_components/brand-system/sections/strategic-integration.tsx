@@ -170,7 +170,10 @@ export const StrategicIntegrationSection = memo(
               <MonoLabel variant="muted">Action Plan</MonoLabel>
               <div className="mt-6 space-y-6">
                 {data.action_plan.map((phase, idx) => (
-                  <div key={idx} className="md:border-l-2 md:border-zinc-200 md:pl-6">
+                  <div
+                    key={idx}
+                    className="md:border-l-2 md:border-zinc-200 md:pl-6"
+                  >
                     <span className="text-[14px] font-medium tracking-wider text-zinc-500 uppercase">
                       {phase.timeframe}
                     </span>

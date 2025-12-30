@@ -8,10 +8,10 @@ import { CardWithHeader, SectionHeader } from '@kit/ui/aura';
 import { cn } from '@kit/ui/utils';
 
 import {
+  BrandSystemReport,
   type TocSection,
   generateTocSections,
-} from '~/home/(user)/reports/[id]/_components/brand-system/table-of-contents';
-import { HybridReportDisplay } from '~/home/(user)/reports/[id]/_components/hybrid-report-display';
+} from '~/home/(user)/reports/[id]/_components/brand-system';
 import {
   flattenSectionIds,
   useTocScroll,
@@ -153,17 +153,13 @@ export function ExampleReportsSection() {
               {report.locked ? (
                 <LockedOverlay report={report} />
               ) : reportData ? (
-                <HybridReportDisplay
-                  reportData={{
-                    mode: 'hybrid',
-                    report: reportData,
-                  }}
-                  useBrandSystem={true}
+                <BrandSystemReport
+                  reportData={reportData}
                   showToc={false}
                   brief={reportData.brief}
                   createdAt={new Date().toISOString()}
                   hasAppSidebar={false}
-                  showActions={true}
+                  showActions={false}
                   compactTitle={true}
                 />
               ) : (

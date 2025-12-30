@@ -22,12 +22,20 @@ import {
   UnknownFieldRenderer,
 } from '../primitives';
 
+interface FromScratchRevelation {
+  discovery?: string;
+  source?: string;
+  implication?: string;
+}
+
 interface ProblemAnalysisSectionProps {
   data?: ProblemAnalysis;
+  fromScratchRevelations?: FromScratchRevelation[];
 }
 
 export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
   data,
+  fromScratchRevelations,
 }: ProblemAnalysisSectionProps) {
   if (!data) return null;
 
@@ -63,7 +71,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
                   {data.why_its_hard.factors.map((factor, idx) => (
                     <div
                       key={idx}
-                      className="md:border-l-2 md:border-zinc-200 py-2 md:pl-4"
+                      className="py-2 md:border-l-2 md:border-zinc-200 md:pl-4"
                     >
                       <p className="text-[18px] font-medium text-zinc-900">
                         {factor.factor}
@@ -113,6 +121,37 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
                 {data.first_principles_insight.explanation}
               </BodyText>
             )}
+          </ContentBlock>
+        )}
+
+        {/* FIRST PRINCIPLES CONCEPT (from cross-domain revelations) */}
+        {fromScratchRevelations && fromScratchRevelations.length > 0 && (
+          <ContentBlock withBorder className="max-w-[70ch]">
+            <MonoLabel variant="muted">First Principles Concept</MonoLabel>
+            <div className="mt-6 space-y-6">
+              {fromScratchRevelations.map((revelation, idx) => (
+                <div
+                  key={idx}
+                  className="py-2 md:border-l-2 md:border-zinc-200 md:pl-4"
+                >
+                  {revelation.discovery && (
+                    <p className="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
+                      {revelation.discovery}
+                    </p>
+                  )}
+                  {revelation.source && (
+                    <p className="mt-1 text-[14px] tracking-[-0.02em] text-zinc-500">
+                      Source: {revelation.source}
+                    </p>
+                  )}
+                  {revelation.implication && (
+                    <p className="mt-2 text-[16px] leading-[1.4] tracking-[-0.02em] text-zinc-600">
+                      {revelation.implication}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
           </ContentBlock>
         )}
 

@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Loader2, MessageSquare } from 'lucide-react';
 
+import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+
 import { ProcessingScreen } from '../../../_components/processing-screen';
 import { useReportProgress } from '../../../_lib/use-report-progress';
 import { extractUserInput } from '../_lib/extract-report';
@@ -16,8 +18,6 @@ import type { ChatMessage } from '../_lib/schemas/chat.schema';
 import { BrandSystemReport } from './brand-system';
 import { ChatDrawer, ChatHeader, ChatInput, ChatMessages } from './chat';
 import { ShareModal } from './share-modal';
-
-import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 interface Report {
   id: string;

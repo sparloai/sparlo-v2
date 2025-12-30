@@ -8,25 +8,6 @@ import {
 } from '@react-pdf/renderer';
 
 import type { ReportForPDF } from '../_lib/types';
-
-// Register Roboto font - has comprehensive Unicode support including Greek, Cyrillic, etc.
-// Using full TTF files from Google Fonts static directory which contain all character sets
-Font.register({
-  family: 'Roboto',
-  fonts: [
-    {
-      src: 'https://fonts.gstatic.com/s/roboto/v32/KFOmCnqEu92Fr1Me5Q.ttf',
-      fontWeight: 400,
-    },
-    {
-      src: 'https://fonts.gstatic.com/s/roboto/v32/KFOlCnqEu92Fr1MmWUlvAw.ttf',
-      fontWeight: 700,
-    },
-  ],
-});
-
-// Disable hyphenation to prevent awkward word breaks
-Font.registerHyphenationCallback((word) => [word]);
 import type {
   ChallengeTheFrame,
   ConstraintsAndMetrics,
@@ -49,6 +30,26 @@ import type {
   ValidationGap,
   ValidationGate,
 } from '../_lib/types';
+
+// Register Noto Sans font - Google's universal font with full Unicode support
+// Using complete TTF files from notofonts.github.io via jsdelivr CDN
+// These include ALL character sets: Latin, Greek (τ, η, σ), Cyrillic, Vietnamese, etc.
+Font.register({
+  family: 'NotoSans',
+  fonts: [
+    {
+      src: 'https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSans/full/ttf/NotoSans-Regular.ttf',
+      fontWeight: 400,
+    },
+    {
+      src: 'https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSans/full/ttf/NotoSans-Bold.ttf',
+      fontWeight: 700,
+    },
+  ],
+});
+
+// Disable hyphenation to prevent awkward word breaks
+Font.registerHyphenationCallback((word) => [word]);
 
 // ============================================
 // Brand System PDF Styles
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
     padding: 48,
     paddingBottom: 64,
     fontSize: 10,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     backgroundColor: colors.white,
   },
   // Header - minimal, typography-driven
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 11,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc400,
     letterSpacing: 3,
@@ -95,7 +96,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc900,
     marginBottom: 8,
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc900,
     letterSpacing: -0.3,
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   },
   subsectionTitle: {
     fontSize: 13,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc800,
     marginBottom: 8,
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 12,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc900,
     marginBottom: 6,
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
   },
   cardLabel: {
     fontSize: 9,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
   // Mono Label (matches web MonoLabel - 13px uppercase tracking wide)
   monoLabel: {
     fontSize: 9,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -211,7 +212,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     fontSize: 8,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc600,
     textTransform: 'uppercase',
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
   listNumber: {
     width: 24,
     fontSize: 10,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc300,
   },
@@ -302,7 +303,7 @@ const styles = StyleSheet.create({
   tableHeaderCell: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc500,
     textTransform: 'uppercase',
@@ -322,14 +323,14 @@ const styles = StyleSheet.create({
   tableCellBold: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc900,
   },
   tableCellHighlight: {
     flex: 1,
     fontSize: 9,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc700,
   },
@@ -352,7 +353,7 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 9,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc400,
     textTransform: 'uppercase',
@@ -374,7 +375,7 @@ const styles = StyleSheet.create({
   },
   insightLabel: {
     fontSize: 9,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc400,
     textTransform: 'uppercase',
@@ -383,7 +384,7 @@ const styles = StyleSheet.create({
   },
   insightText: {
     fontSize: 11,
-    fontFamily: 'Roboto',
+    fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc900,
     lineHeight: 1.4,
@@ -481,12 +482,14 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.where_we_found_it && (
         <View style={{ marginTop: 8 }}>
           <Text style={styles.cardContent}>
-            <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>Domain: </Text>
+            <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
+              Domain:{' '}
+            </Text>
             {insight.where_we_found_it.domain}
           </Text>
           {insight.where_we_found_it.how_they_use_it && (
             <Text style={styles.cardContent}>
-              <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
+              <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
                 How they use it:{' '}
               </Text>
               {insight.where_we_found_it.how_they_use_it}
@@ -494,7 +497,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
           )}
           {insight.where_we_found_it.why_it_transfers && (
             <Text style={styles.cardContent}>
-              <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
+              <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
                 Why it transfers:{' '}
               </Text>
               {insight.where_we_found_it.why_it_transfers}
@@ -505,7 +508,7 @@ function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
       {insight.why_industry_missed_it && (
         <View style={{ marginTop: 8 }}>
           <Text style={styles.cardContent}>
-            <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
+            <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
               Why industry missed it:{' '}
             </Text>
             {insight.why_industry_missed_it}
@@ -565,7 +568,10 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
           {analysis.why_its_hard.governing_equation && (
             <View style={[styles.insightBox, { marginTop: 8 }]}>
               <Text
-                style={[styles.cardContent, { fontFamily: 'Roboto', fontWeight: 700 }]}
+                style={[
+                  styles.cardContent,
+                  { fontFamily: 'NotoSans', fontWeight: 700 },
+                ]}
               >
                 {analysis.why_its_hard.governing_equation.equation}
               </Text>
@@ -643,9 +649,12 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
           <View style={{ marginTop: 12 }}>
             <Text style={styles.subsectionTitle}>What Industry Does Today</Text>
             {analysis.what_industry_does_today.map((item, i) => (
-              <View key={i} style={[styles.card, { marginBottom: 8 }]}>
+              <View key={i} style={[styles.card, { marginBottom: 8 }]} wrap={false}>
                 <Text
-                  style={[styles.cardContent, { fontFamily: 'Roboto', fontWeight: 700 }]}
+                  style={[
+                    styles.cardContent,
+                    { fontFamily: 'NotoSans', fontWeight: 700 },
+                  ]}
                 >
                   {item.approach}
                 </Text>
@@ -683,7 +692,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 )}
                 {h.evidence && (
                   <Text style={[styles.cardContent, { marginTop: 4 }]}>
-                    <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
+                    <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
                       Evidence:{' '}
                     </Text>
                     {h.evidence}
@@ -691,7 +700,7 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
                 )}
                 {h.implication && (
                   <Text style={[styles.cardContent, { marginTop: 4 }]}>
-                    <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>
+                    <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
                       Implication:{' '}
                     </Text>
                     {h.implication}
@@ -757,10 +766,7 @@ function ExecutiveSummarySection({
         {/* Narrative Lead */}
         {summary.narrative_lead && (
           <Text
-            style={[
-              styles.paragraph,
-              { fontSize: 12, fontFamily: 'Roboto' },
-            ]}
+            style={[styles.paragraph, { fontSize: 12, fontFamily: 'NotoSans' }]}
           >
             {summary.narrative_lead}
           </Text>
@@ -797,9 +803,14 @@ function ExecutiveSummarySection({
 
         {/* Primary Recommendation */}
         {summary.primary_recommendation && (
-          <View style={[styles.cardHighlight, { marginTop: 12 }]}>
+          <View style={[styles.cardHighlight, { marginTop: 12 }]} wrap={false}>
             <MonoLabel>Primary Recommendation</MonoLabel>
-            <Text style={[styles.paragraph, { fontFamily: 'Roboto', fontWeight: 700 }]}>
+            <Text
+              style={[
+                styles.paragraph,
+                { fontFamily: 'NotoSans', fontWeight: 700 },
+              ]}
+            >
               {summary.primary_recommendation}
             </Text>
           </View>
@@ -858,7 +869,7 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
 
       {/* Primary Solution */}
       {primary && (
-        <View style={styles.cardHighlight}>
+        <View style={styles.cardHighlight} wrap={false}>
           {/* Header section - keep together */}
           <View wrap={false}>
             <View style={styles.tagRow}>
@@ -933,12 +944,16 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
               <MonoLabel>Validation Gates</MonoLabel>
               {primary.validation_gates.map(
                 (gate: ValidationGate, i: number) => (
-                  <View key={i} style={[styles.card, { marginTop: 6 }]} wrap={false}>
+                  <View
+                    key={i}
+                    style={[styles.card, { marginTop: 6 }]}
+                    wrap={false}
+                  >
                     {gate.week && (
                       <Text
                         style={[
                           styles.cardContent,
-                          { fontFamily: 'Roboto', fontWeight: 700 },
+                          { fontFamily: 'NotoSans', fontWeight: 700 },
                         ]}
                       >
                         {gate.week}
@@ -1036,7 +1051,9 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
             )}
           {track.fallback_trigger.pivot_to && (
             <Text style={[styles.cardContent, { marginTop: 4 }]}>
-              <Text style={{ fontFamily: 'Roboto', fontWeight: 700 }}>Pivot to: </Text>
+              <Text style={{ fontFamily: 'NotoSans', fontWeight: 700 }}>
+                Pivot to:{' '}
+              </Text>
               {track.fallback_trigger.pivot_to}
             </Text>
           )}
@@ -1076,9 +1093,9 @@ function InnovationConceptsSection({
 
       {/* Recommended Innovation */}
       {recommended && (
-        <View style={styles.cardHighlight}>
-          {/* Header section - keep together */}
-          <View wrap={false}>
+        <View style={styles.cardHighlight} wrap={false}>
+          {/* Header section */}
+          <View>
             <View style={styles.tagRow}>
               <View style={[styles.tag, styles.tagStrong]}>
                 <Text style={[styles.tagText, styles.tagStrongText]}>
@@ -1421,7 +1438,10 @@ function ChallengeTheFrameSection({
           <View style={{ marginBottom: 8 }}>
             <MonoLabel>Assumption</MonoLabel>
             <Text
-              style={[styles.cardContent, { fontFamily: 'Roboto', fontWeight: 700 }]}
+              style={[
+                styles.cardContent,
+                { fontFamily: 'NotoSans', fontWeight: 700 },
+              ]}
             >
               {c.assumption}
             </Text>
@@ -1587,7 +1607,6 @@ function CrossDomainSearchSection({ search }: { search?: CrossDomainSearch }) {
   );
 }
 
-
 // ============================================
 // 13. Risks & Watchouts Section
 // ============================================
@@ -1676,7 +1695,7 @@ function KeyInsightsSection({ insights }: { insights?: string[] }) {
               <Text
                 style={{
                   fontSize: 10,
-                  fontFamily: 'Roboto',
+                  fontFamily: 'NotoSans',
                   fontWeight: 700,
                   color: colors.zinc700,
                 }}
@@ -1754,7 +1773,12 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
       {/* Confidence Level - keep together */}
       {(critique.overall_confidence || critique.confidence_level) && (
         <View style={[styles.warningBox, { marginBottom: 8 }]} wrap={false}>
-          <View style={styles.row}>
+          <View
+            style={[
+              styles.row,
+              { justifyContent: 'space-between', alignItems: 'center' },
+            ]}
+          >
             <MonoLabel>Overall Confidence</MonoLabel>
             <ConfidenceTag
               level={critique.overall_confidence ?? critique.confidence_level}
@@ -1771,7 +1795,7 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
       {/* What We Might Be Wrong About - each item separately */}
       {critique.what_we_might_be_wrong_about &&
         critique.what_we_might_be_wrong_about.length > 0 && (
-          <View style={[styles.card, { marginBottom: 12 }]}>
+          <View style={[styles.card, { marginBottom: 12 }]} wrap={false}>
             <MonoLabel>What We Might Be Wrong About</MonoLabel>
             {critique.what_we_might_be_wrong_about.map((item, i) => (
               <View key={i} style={styles.listItem} wrap={false}>
@@ -1787,7 +1811,7 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
       {/* Unexplored Directions - each item separately */}
       {critique.unexplored_directions &&
         critique.unexplored_directions.length > 0 && (
-          <View style={[styles.card, { marginBottom: 12 }]}>
+          <View style={[styles.card, { marginBottom: 12 }]} wrap={false}>
             <MonoLabel>Unexplored Directions</MonoLabel>
             {critique.unexplored_directions.map((item, i) => (
               <View key={i} style={styles.listItem} wrap={false}>
@@ -1804,11 +1828,16 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
           <MonoLabel>Validation Gaps</MonoLabel>
           {critique.validation_gaps.map((gap: ValidationGap, i: number) => (
             <View key={i} style={[styles.card, { marginTop: 6 }]} wrap={false}>
-              <View style={[styles.row, { marginBottom: 4 }]}>
+              <View
+                style={[
+                  styles.row,
+                  { marginBottom: 4, alignItems: 'flex-start' },
+                ]}
+              >
                 <Text
                   style={[
                     styles.cardContent,
-                    { fontFamily: 'Roboto', fontWeight: 700, flex: 1 },
+                    { fontFamily: 'NotoSans', fontWeight: 700, flex: 1 },
                   ]}
                 >
                   {gap.concern}
@@ -1816,6 +1845,7 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
                 <View
                   style={[
                     styles.tag,
+                    { flexShrink: 0, marginLeft: 8 },
                     gap.status === 'ADDRESSED'
                       ? styles.tagMuted
                       : gap.status === 'EXTENDED_NEEDED'

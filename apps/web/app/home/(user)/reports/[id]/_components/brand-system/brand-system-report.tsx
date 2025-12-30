@@ -35,17 +35,15 @@ import { Section, SectionTitle } from './primitives';
 import {
   ChallengeFrameSection,
   ConstraintsSection,
-  CrossDomainSearchSection,
   ExecutiveSummarySection,
   FrontierTechnologiesSection,
-  HonestAssessmentSection,
+  InnovationAnalysisSection,
   InnovationConceptsSection,
   ProblemAnalysisSection,
   RecommendationSection,
   RisksWatchoutsSection,
   SelfCritiqueSection,
   SolutionConceptsSection,
-  StrategicIntegrationSection,
 } from './sections';
 import {
   TableOfContents,
@@ -575,22 +573,24 @@ const ReportContent = memo(function ReportContent({
       <ExecutiveSummarySection data={normalizedData.executive_summary} />
 
       {/* Problem Analysis */}
-      <ProblemAnalysisSection data={normalizedData.problem_analysis} />
+      <ProblemAnalysisSection
+        data={normalizedData.problem_analysis}
+        fromScratchRevelations={
+          normalizedData.cross_domain_search?.from_scratch_revelations
+        }
+      />
 
       {/* Constraints & Metrics */}
       <ConstraintsSection data={normalizedData.constraints_and_metrics} />
 
       {/* Challenge the Frame */}
-      <ChallengeFrameSection
-        data={normalizedData.challenge_the_frame}
-        reframe={normalizedData.innovation_analysis?.reframe}
+      <ChallengeFrameSection data={normalizedData.challenge_the_frame} />
+
+      {/* Innovation Analysis (reframe + domains searched) */}
+      <InnovationAnalysisSection
+        data={normalizedData.innovation_analysis}
+        domainsSearched={normalizedData.cross_domain_search?.domains_searched}
       />
-
-      {/* Honest Assessment */}
-      <HonestAssessmentSection data={normalizedData.honest_assessment} />
-
-      {/* Cross-Domain Search */}
-      <CrossDomainSearchSection data={normalizedData.cross_domain_search} />
 
       {/* Solution Concepts (Execution Track) */}
       <SolutionConceptsSection data={normalizedData.execution_track} />
@@ -601,11 +601,6 @@ const ReportContent = memo(function ReportContent({
       {/* Frontier Watch */}
       <FrontierTechnologiesSection
         data={normalizedData.innovation_portfolio?.frontier_watch}
-      />
-
-      {/* Strategic Integration */}
-      <StrategicIntegrationSection
-        data={normalizedData.strategic_integration}
       />
 
       {/* Risks & Watchouts */}

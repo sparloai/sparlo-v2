@@ -11,7 +11,11 @@
 export { BrandSystemReport } from './brand-system-report';
 
 // Table of Contents
-export { TableOfContents, generateTocSections } from './table-of-contents';
+export {
+  TableOfContents,
+  generateTocSections,
+  type TocSection,
+} from './table-of-contents';
 
 // Primitives
 export {
@@ -35,15 +39,13 @@ export {
 export {
   ChallengeFrameSection,
   ConstraintsSection,
-  CrossDomainSearchSection,
   ExecutiveSummarySection,
   FrontierTechnologiesSection,
-  HonestAssessmentSection,
+  InnovationAnalysisSection,
   InnovationConceptsSection,
   ProblemAnalysisSection,
   RecommendationSection,
   RisksWatchoutsSection,
   SelfCritiqueSection,
   SolutionConceptsSection,
-  StrategicIntegrationSection,
 } from './sections';

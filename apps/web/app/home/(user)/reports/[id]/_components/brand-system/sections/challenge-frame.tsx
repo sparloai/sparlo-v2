@@ -11,9 +11,7 @@ import { memo } from 'react';
 import type { ChallengeTheFrame } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import {
-  AccentBorder,
   ArticleBlock,
-  BodyText,
   ContentBlock,
   MonoLabel,
   Section,
@@ -22,59 +20,20 @@ import {
 
 interface ChallengeFrameSectionProps {
   data?: ChallengeTheFrame[];
-  reframe?: string;
-  firstPrinciples?: string;
-  insight?: string;
 }
 
 export const ChallengeFrameSection = memo(function ChallengeFrameSection({
   data,
-  reframe,
-  firstPrinciples,
-  insight,
 }: ChallengeFrameSectionProps) {
-  const hasContent =
-    (data && data.length > 0) || reframe || firstPrinciples || insight;
-
-  if (!hasContent) return null;
+  if (!data || data.length === 0) return null;
 
   return (
     <Section id="challenge-the-frame">
       <SectionTitle className="mb-12">Challenge the Frame</SectionTitle>
 
       <ArticleBlock>
-        {/* THE REFRAME - Main pull quote */}
-        {reframe && (
-          <div className="max-w-[60ch]">
-            <MonoLabel variant="muted">The Reframe</MonoLabel>
-            <p className="mt-4 text-[22px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
-              {reframe}
-            </p>
-          </div>
-        )}
-
-        {/* FIRST PRINCIPLES */}
-        {firstPrinciples && (
-          <ContentBlock withBorder className="max-w-[60ch]">
-            <MonoLabel variant="muted">First Principles</MonoLabel>
-            <BodyText className="mt-4">{firstPrinciples}</BodyText>
-          </ContentBlock>
-        )}
-
-        {/* THE INSIGHT */}
-        {insight && (
-          <ContentBlock withBorder className="max-w-[60ch]">
-            <AccentBorder weight="heavy">
-              <MonoLabel variant="muted">The Insight</MonoLabel>
-              <p className="mt-3 text-[20px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
-                {insight}
-              </p>
-            </AccentBorder>
-          </ContentBlock>
-        )}
-
         {/* CHALLENGE THE FRAME ITEMS */}
-        {data && data.length > 0 && (
+        {data.length > 0 && (
           <ContentBlock withBorder>
             <MonoLabel>Assumptions Challenged</MonoLabel>
             <ul className="mt-6 space-y-6">
@@ -100,7 +59,7 @@ export const ChallengeFrameSection = memo(function ChallengeFrameSection({
 
                       {/* Implication */}
                       {item.implication && (
-                        <p className="mt-2 md:border-l-2 md:border-zinc-300 md:pl-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic">
+                        <p className="mt-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic md:border-l-2 md:border-zinc-300 md:pl-4">
                           {item.implication}
                         </p>
                       )}

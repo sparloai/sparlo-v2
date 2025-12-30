@@ -38,7 +38,7 @@ export const ConstraintsSection = memo(function ConstraintsSection({
   if (!hasContent) return null;
 
   return (
-    <Section id="constraints-metrics">
+    <Section id="constraints">
       <SectionTitle className="mb-12">Constraints</SectionTitle>
 
       <ArticleBlock>

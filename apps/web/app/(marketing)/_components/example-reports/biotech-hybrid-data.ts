@@ -8,7 +8,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
   title:
     'CAR-T Manufacturing Cost Reduction: From $300K to $30K Through Integration, Not Invention',
   brief:
-    "CAR-T manufacturing costs $300-500K per patient, with 2-4 week vein-to-vein time during which patients often progress. The autologous model requires dedicated manufacturing per patient with no economies of scale. Allogeneic approaches solve cost but create rejection and persistence problems. Need a path to <$50K manufacturing cost while maintaining autologous-like persistence and efficacy. Process must work with variable input material quality—patient cells post-chemo are often in poor condition.",
+    'CAR-T manufacturing costs $300-500K per patient, with 2-4 week vein-to-vein time during which patients often progress. The autologous model requires dedicated manufacturing per patient with no economies of scale. Allogeneic approaches solve cost but create rejection and persistence problems. Need a path to <$50K manufacturing cost while maintaining autologous-like persistence and efficacy. Process must work with variable input material quality—patient cells post-chemo are often in poor condition.',
 
   executive_summary: {
     narrative_lead:
@@ -21,7 +21,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
   problem_analysis: {
     whats_wrong: {
       prose:
-        "CAR-T manufacturing faces three irreducible constraints that compound into the current cost structure. First, cell expansion kinetics: T-cells double every 24-48 hours under optimal stimulation, meaning reaching therapeutic dose (10^9 cells) from apheresis input (10^7 CAR+ cells after transduction) requires ~7 doublings minimum, or 7-14 days. Second, sterility requirements: biological products require contamination control, and the 14-day sterility culture adds unavoidable wait time. Third, the batch-of-one model: each patient requires dedicated manufacturing with fixed costs (cleanroom, personnel, QC) that cannot be amortized across patients. The physics of cell biology set the floor; the business model prevents economies of scale.",
+        'CAR-T manufacturing faces three irreducible constraints that compound into the current cost structure. First, cell expansion kinetics: T-cells double every 24-48 hours under optimal stimulation, meaning reaching therapeutic dose (10^9 cells) from apheresis input (10^7 CAR+ cells after transduction) requires ~7 doublings minimum, or 7-14 days. Second, sterility requirements: biological products require contamination control, and the 14-day sterility culture adds unavoidable wait time. Third, the batch-of-one model: each patient requires dedicated manufacturing with fixed costs (cleanroom, personnel, QC) that cannot be amortized across patients. The physics of cell biology set the floor; the business model prevents economies of scale.',
     },
     current_state_of_art: {
       benchmarks: [
@@ -88,7 +88,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
     ],
     why_its_hard: {
       prose:
-        "The fundamental challenge is that the same crosslink density providing high Tg and creep resistance also makes the network resistant to dissolution. CAR-T manufacturing faces three irreducible constraints: cell expansion kinetics (7-14 days minimum), sterility requirements (14-day culture), and the batch-of-one model (fixed costs per patient). The physics of cell biology set the floor; the business model prevents economies of scale.",
+        'The fundamental challenge is that the same crosslink density providing high Tg and creep resistance also makes the network resistant to dissolution. CAR-T manufacturing faces three irreducible constraints: cell expansion kinetics (7-14 days minimum), sterility requirements (14-day culture), and the batch-of-one model (fixed costs per patient). The physics of cell biology set the floor; the business model prevents economies of scale.',
       governing_equation: {
         equation:
           'COGS = (Vector Cost + Cleanroom Days × Daily Rate + QC/Release + Labor + Logistics) / Success Rate',
@@ -100,7 +100,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       headline:
         "The expansion doesn't need to happen in the factory—it can happen in the patient",
       explanation:
-        "Lymph nodes achieve 10,000-fold T-cell expansion in 5-7 days during infection. Current CAR-T manufacturing tries to replicate this in culture flasks, poorly. T-Charge proved that infusing minimally-expanded cells with cytokine support achieves therapeutic doses through in vivo expansion. This insight collapses the manufacturing timeline from 14 days to 2-3 days and eliminates most cleanroom costs.",
+        'Lymph nodes achieve 10,000-fold T-cell expansion in 5-7 days during infection. Current CAR-T manufacturing tries to replicate this in culture flasks, poorly. T-Charge proved that infusing minimally-expanded cells with cytokine support achieves therapeutic doses through in vivo expansion. This insight collapses the manufacturing timeline from 14 days to 2-3 days and eliminates most cleanroom costs.',
     },
   },
 
@@ -210,7 +210,8 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       'Solution concepts use proven technologies requiring integration, not invention. These represent the lowest-risk path to the cost target, achievable in 18-36 months with existing regulatory frameworks.',
     primary: {
       id: 'sol-primary',
-      title: 'Integrated Rapid Manufacturing: T-Charge + Sleeping Beauty + Prodigy',
+      title:
+        'Integrated Rapid Manufacturing: T-Charge + Sleeping Beauty + Prodigy',
       confidence: 85,
       source_type: 'TRANSFER',
       bottom_line:
@@ -231,7 +232,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
           "Commercial silos and IP ownership. Novartis has no incentive to adopt Sleeping Beauty (competitor technology). Sleeping Beauty developers use traditional expansion protocols. Prodigy users follow manufacturer-recommended workflows. No single company has economic incentive to combine competitors' innovations.",
       },
       what_it_is:
-        "No new technology required—the innovation is integration across commercial silos. The process flow: Day 0, leukapheresis product is loaded into Prodigy with CD3+ selection via CliniMACS beads. Same day, electroporation of Sleeping Beauty transposon (encoding CAR) plus transposase mRNA, followed by overnight recovery in IL-7/IL-15 media. Days 1-2, minimal activation with CD3/CD28 stimulation—not full expansion, just enough to confirm viability and CAR expression. Day 2-3, wash, formulate, QC sampling, and release. Infuse minimally-expanded CAR-T (10^7-10^8 cells) with IL-7/IL-15 cytokine support for in vivo expansion to therapeutic dose. This eliminates the $50-100K viral vector cost entirely (Sleeping Beauty reagents cost <$1K), reduces cleanroom time from 14 days to 2-3 days, and uses existing FDA-accepted automation.",
+        'No new technology required—the innovation is integration across commercial silos. The process flow: Day 0, leukapheresis product is loaded into Prodigy with CD3+ selection via CliniMACS beads. Same day, electroporation of Sleeping Beauty transposon (encoding CAR) plus transposase mRNA, followed by overnight recovery in IL-7/IL-15 media. Days 1-2, minimal activation with CD3/CD28 stimulation—not full expansion, just enough to confirm viability and CAR expression. Day 2-3, wash, formulate, QC sampling, and release. Infuse minimally-expanded CAR-T (10^7-10^8 cells) with IL-7/IL-15 cytokine support for in vivo expansion to therapeutic dose. This eliminates the $50-100K viral vector cost entirely (Sleeping Beauty reagents cost <$1K), reduces cleanroom time from 14 days to 2-3 days, and uses existing FDA-accepted automation.',
       why_it_works:
         "The physics of each component are well-established. Electroporation creates transient membrane pores via dielectric breakdown at ~1000 V/cm, allowing DNA entry—this is 40-year-old technology. Sleeping Beauty transposase recognizes inverted terminal repeats, excises the CAR cassette, and integrates at TA dinucleotide sites via cut-and-paste mechanism—integration efficiency of 10-30% is lower than lentivirus but sufficient when combined with in vivo expansion. T-cell expansion in vivo follows normal immunobiology: IL-7 promotes survival and homeostatic proliferation, IL-15 drives effector function and memory formation. The lymph node achieves 10,000-fold expansion in 5-7 days; we're leveraging this rather than fighting it with suboptimal flask culture.",
       why_it_might_fail: [
@@ -264,7 +265,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
         what_it_is:
           'Blood banks already perform GMP-equivalent cell processing (platelet apheresis, stem cell processing, cord blood banking) with technician-level staff under AABB/FDA 21 CFR 606 standards. The model: standardized protocol locked into Prodigy software, cloud-connected monitoring with central expert oversight, remote QC review and batch release by centralized quality team, reagent kits shipped to site with lot-traced components. Manufacturing happens locally; expertise is networked. This eliminates $15-20K logistics costs per patient.',
         why_it_works:
-          "No new physics—blood banks already do the hard parts (sterile cell processing, quality systems, chain of custody). Prodigy automation reduces operator skill requirements to the level of existing blood bank technicians. Cloud connectivity enables real-time expert oversight without physical presence. The regulatory precedent exists: hospital blood banks are already FDA-registered cell processing facilities.",
+          'No new physics—blood banks already do the hard parts (sterile cell processing, quality systems, chain of custody). Prodigy automation reduces operator skill requirements to the level of existing blood bank technicians. Cloud connectivity enables real-time expert oversight without physical presence. The regulatory precedent exists: hospital blood banks are already FDA-registered cell processing facilities.',
         when_to_use_instead:
           'Pursue in parallel with primary concept. Blood bank network becomes the deployment model once integrated manufacturing (primary concept) is validated. Particularly valuable for patients who cannot tolerate 2-4 week wait or are geographically distant from centralized facilities.',
       },
@@ -309,7 +310,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       innovation_type: 'CROSS_DOMAIN',
       source_domain: 'COVID vaccine mRNA-LNP technology',
       the_insight: {
-        what: "CAR-T manufacturing can be eliminated entirely if we can deliver CAR-encoding genetic material directly to T-cells in the patient",
+        what: 'CAR-T manufacturing can be eliminated entirely if we can deliver CAR-encoding genetic material directly to T-cells in the patient',
         where_we_found_it: {
           domain: 'mRNA vaccine technology',
           how_they_use_it:
@@ -321,7 +322,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
           'COVID vaccines focused on muscle cell transfection. T-cell-targeted delivery requires additional targeting technology. The transient expression that seems like a limitation is actually a feature: it provides an inherent safety switch.',
       },
       what_it_is:
-        "Eliminate ex vivo manufacturing entirely by injecting lipid nanoparticles loaded with CAR-encoding mRNA that selectively transfect T-cells in vivo. Manufacturing becomes LNP-mRNA production—scalable, inventoriable, and proven at billions of doses through COVID vaccines. The mechanism: Lipid nanoparticles are formulated with ionizable lipids optimized for endosomal escape and surface-decorated with T-cell targeting ligands. Upon IV injection, LNPs circulate, bind T-cells via targeting ligand, are internalized, and release CAR-encoding mRNA into cytoplasm. T-cells express functional CAR within 4-24 hours. Expression is transient (3-7 days per dose) but redosing is cheap ($500-2000 per injection). This is not theoretical—Rurik et al. (Science 2022) demonstrated functional CAR-T generation in mice using CD5-targeted LNPs. Capstan Therapeutics is pursuing clinical development with IND targeted for 2025.",
+        'Eliminate ex vivo manufacturing entirely by injecting lipid nanoparticles loaded with CAR-encoding mRNA that selectively transfect T-cells in vivo. Manufacturing becomes LNP-mRNA production—scalable, inventoriable, and proven at billions of doses through COVID vaccines. The mechanism: Lipid nanoparticles are formulated with ionizable lipids optimized for endosomal escape and surface-decorated with T-cell targeting ligands. Upon IV injection, LNPs circulate, bind T-cells via targeting ligand, are internalized, and release CAR-encoding mRNA into cytoplasm. T-cells express functional CAR within 4-24 hours. Expression is transient (3-7 days per dose) but redosing is cheap ($500-2000 per injection). This is not theoretical—Rurik et al. (Science 2022) demonstrated functional CAR-T generation in mice using CD5-targeted LNPs. Capstan Therapeutics is pursuing clinical development with IND targeted for 2025.',
       why_it_works:
         'Ionizable lipids (pKa ~6.5) remain neutral at physiological pH but become cationic in acidic endosomes (pH 5-6), disrupting endosomal membrane and releasing mRNA cargo. Targeting ligands (anti-CD3, anti-CD5, anti-CD7) provide T-cell specificity through receptor-mediated endocytosis. Released mRNA is translated by ribosomal machinery, producing functional CAR protein that traffics to cell surface within 4-12 hours. The efficiency is sufficient: 10-40% of circulating T-cells can be transfected at appropriate doses, generating 10^8-10^9 CAR+ T-cells from the normal T-cell pool of 10^11.',
       breakthrough_potential: {
@@ -362,7 +363,8 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
     parallel_investigations: [
       {
         id: 'innov-parallel-1',
-        title: 'Haploidentical CAR-T Bank with Post-Transplant Cyclophosphamide',
+        title:
+          'Haploidentical CAR-T Bank with Post-Transplant Cyclophosphamide',
         confidence: 50,
         innovation_type: 'CROSS_DOMAIN',
         source_domain: 'Bone marrow transplant tolerance protocols',
@@ -383,7 +385,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
         ceiling:
           'True off-the-shelf product with autologous-like persistence. Manufacturing cost <$10K/dose at scale. Immediate availability.',
         key_uncertainty:
-          "PTCy timing is critical—too early eliminates CAR-T cells, too late allows GvHD. The optimal window for CAR-T (vs. HSC) is not established. CAR-T cells may be more activated than HSCs, making them vulnerable to PTCy.",
+          'PTCy timing is critical—too early eliminates CAR-T cells, too late allows GvHD. The optimal window for CAR-T (vs. HSC) is not established. CAR-T cells may be more activated than HSCs, making them vulnerable to PTCy.',
         validation_approach: {
           test: 'Test PTCy timing in mouse haploidentical CAR-T model; measure CAR-T persistence and GvHD prevention',
           cost: '$75-100K for animal studies',
@@ -412,7 +414,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
               'Same electroporation physics can deliver DNA plasmids to TILs within the tumor',
           },
           why_industry_missed_it:
-            "Electrochemotherapy community focused on drug delivery, not gene therapy. CAR-T community focused on ex vivo manufacturing. No intersection.",
+            'Electrochemotherapy community focused on drug delivery, not gene therapy. CAR-T community focused on ex vivo manufacturing. No intersection.',
         },
         ceiling:
           'Same-day treatment for accessible tumors. Manufacturing cost essentially zero—just plasmid production. Could reach tumors CAR-T cannot.',
@@ -437,7 +439,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
         one_liner:
           'Eliminate $10-20K logistics costs per patient and enable distribution to regions without cryogenic infrastructure',
         why_interesting:
-          "Transformative for global access. The biology is proven—tardigrades survive complete desiccation for decades using trehalose.",
+          'Transformative for global access. The biology is proven—tardigrades survive complete desiccation for decades using trehalose.',
         why_not_now:
           "Mammalian cells don't naturally take up trehalose—loading requires membrane permeabilization which can damage cells. Viability recovery rates in T-cells not yet demonstrated at acceptable levels. Regulatory pathway for lyophilized cell therapy is undefined.",
         trigger_to_revisit:
@@ -451,7 +453,8 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       },
       {
         id: 'frontier-2',
-        title: 'Engineered Bacterial Symbiont for Continuous Bispecific Secretion',
+        title:
+          'Engineered Bacterial Symbiont for Continuous Bispecific Secretion',
         innovation_type: 'PARADIGM',
         one_liner:
           'Engineer tumor-colonizing bacteria to continuously secrete BiTE-like bispecific antibodies within the tumor microenvironment',

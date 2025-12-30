@@ -42,8 +42,8 @@ export const RecommendationSection = memo(function RecommendationSection({
   const paragraphs = content ? content.split(/\n\n+/).filter(Boolean) : [];
 
   return (
-    <Section id="recommendation" className="mt-20">
-      <SectionTitle size="lg">Recommendation</SectionTitle>
+    <Section id="final-recommendation" className="mt-20">
+      <SectionTitle size="lg">Final Recommendation</SectionTitle>
       <SectionSubtitle>
         Personal recommendation from the analysis
       </SectionSubtitle>

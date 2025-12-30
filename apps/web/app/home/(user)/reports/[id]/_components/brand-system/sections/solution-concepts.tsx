@@ -116,7 +116,10 @@ const ValidationGates = memo(function ValidationGates({
       <MonoLabel>Validation Gates</MonoLabel>
       <div className="mt-6 space-y-6">
         {gates.map((gate, idx) => (
-          <div key={idx} className="md:border-l-2 md:border-zinc-300 py-2 md:pl-6">
+          <div
+            key={idx}
+            className="py-2 md:border-l-2 md:border-zinc-300 md:pl-6"
+          >
             <div className="flex items-start justify-between gap-4">
               <div>
                 <span className="text-[13px] font-medium text-zinc-400">
