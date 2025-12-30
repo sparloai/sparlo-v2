@@ -66,6 +66,12 @@
   textarea::placeholder {
     color: theme(--color-muted-foreground);
   }
+
+  /* Remove default focus ring from textareas */
+  textarea:focus {
+    outline: none;
+    box-shadow: none;
+  }
 }
 
 @layer utilities {

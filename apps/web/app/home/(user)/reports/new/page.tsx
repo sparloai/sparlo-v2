@@ -608,133 +608,142 @@ export default function NewReportPage() {
               New Analysis
             </h1>
 
-            {/* Input card with signature left border */}
-            <div className="overflow-hidden rounded-r-lg border border-l-2 border-zinc-200 border-l-zinc-900 bg-white shadow-sm">
-              <div className="p-8">
-                <textarea
-                  value={problemText}
-                  onChange={(e) => {
-                    setFormState((prev) => ({
-                      ...prev,
-                      problemText: e.target.value,
-                      showRefusalWarning: false,
-                    }));
-                  }}
-                  onKeyDown={handleKeyDown}
-                  disabled={isSubmitting}
-                  autoFocus
-                  data-test="challenge-input"
-                  placeholder="Describe your technical challenge."
-                  className="h-48 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:ring-0 focus:outline-none disabled:opacity-40"
-                />
+            {/* Input card with inner signature border */}
+            <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+              <div className="flex">
+                {/* Signature left border */}
+                <div className="w-0.5 bg-zinc-900" />
+                {/* Content */}
+                <div className="flex-1 p-8">
+                  <textarea
+                    value={problemText}
+                    onChange={(e) => {
+                      setFormState((prev) => ({
+                        ...prev,
+                        problemText: e.target.value,
+                        showRefusalWarning: false,
+                      }));
+                    }}
+                    onKeyDown={handleKeyDown}
+                    disabled={isSubmitting}
+                    autoFocus
+                    data-test="challenge-input"
+                    placeholder="Describe your technical challenge."
+                    className="h-48 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:ring-0 focus:outline-none focus:border-none disabled:opacity-40"
+                    style={{ outline: 'none' }}
+                  />
 
-                {/* Detection indicators */}
-                <div className="mt-8 flex items-center gap-6">
-                  <DetectionIndicator
-                    label="Problem"
-                    detected={hasProblemStatement(problemText)}
-                  />
-                  <DetectionIndicator
-                    label="Constraints"
-                    detected={hasConstraints(problemText)}
-                  />
-                  <DetectionIndicator
-                    label="Success criteria"
-                    detected={hasSuccessCriteria(problemText)}
-                  />
-                </div>
+                  {/* Detection indicators */}
+                  <div className="mt-8 flex items-center gap-6">
+                    <DetectionIndicator
+                      label="Problem"
+                      detected={hasProblemStatement(problemText)}
+                    />
+                    <DetectionIndicator
+                      label="Constraints"
+                      detected={hasConstraints(problemText)}
+                    />
+                    <DetectionIndicator
+                      label="Success criteria"
+                      detected={hasSuccessCriteria(problemText)}
+                    />
+                  </div>
 
-                {/* Attached files */}
-                {attachments.length > 0 && (
-                  <div className="mt-6">
-                    <div className="flex flex-wrap items-center gap-3">
-                      {attachments.map((attachment) => (
-                        <div
-                          key={attachment.id}
-                          className="group flex items-center gap-2 rounded border border-zinc-200 bg-zinc-50 py-1.5 pr-2 pl-1.5 transition-colors hover:border-zinc-300"
-                        >
-                          <div className="relative flex h-6 w-6 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm">
-                            {attachment.file.type.startsWith('image/') ? (
-                              <Image
-                                src={attachment.preview}
-                                alt={attachment.file.name}
-                                fill
-                                className="object-cover"
-                              />
-                            ) : (
-                              <span className="text-sm text-zinc-500">📄</span>
-                            )}
-                          </div>
-                          <span className="max-w-[120px] truncate text-[12px] tracking-[-0.02em] text-zinc-600">
-                            {attachment.file.name}
-                          </span>
-                          <button
-                            onClick={() => removeAttachment(attachment.id)}
-                            className="ml-1 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-600"
-                            aria-label={`Remove ${attachment.file.name}`}
+                  {/* Attached files */}
+                  {attachments.length > 0 && (
+                    <div className="mt-6">
+                      <div className="flex flex-wrap items-center gap-3">
+                        {attachments.map((attachment) => (
+                          <div
+                            key={attachment.id}
+                            className="group flex items-center gap-2 rounded border border-zinc-200 bg-zinc-50 py-1.5 pr-2 pl-1.5 transition-colors hover:border-zinc-300"
                           >
-                            <svg
-                              className="h-3 w-3"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth={2}
+                            <div className="relative flex h-6 w-6 flex-shrink-0 items-center justify-center overflow-hidden rounded-sm">
+                              {attachment.file.type.startsWith('image/') ? (
+                                <Image
+                                  src={attachment.preview}
+                                  alt={attachment.file.name}
+                                  fill
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <span className="text-sm text-zinc-500">📄</span>
+                              )}
+                            </div>
+                            <span className="max-w-[120px] truncate text-[12px] tracking-[-0.02em] text-zinc-600">
+                              {attachment.file.name}
+                            </span>
+                            <button
+                              onClick={() => removeAttachment(attachment.id)}
+                              className="ml-1 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-600"
+                              aria-label={`Remove ${attachment.file.name}`}
                             >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      ))}
+                              <svg
+                                className="h-3 w-3"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Footer */}
+                  <div className="mt-10 flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                      <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
+                        ~25 min analysis
+                      </p>
+                      <span className="text-zinc-300">·</span>
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={attachments.length >= MAX_ATTACHMENTS}
+                        className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Attach file
+                        {attachments.length > 0 && ` (${attachments.length})`}
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col items-end gap-1">
+                      <button
+                        onClick={handleContinue}
+                        disabled={!canSubmit || isSubmitting}
+                        data-test="challenge-submit"
+                        className={cn(
+                          'px-6 py-3 text-[15px] font-medium transition-colors',
+                          canSubmit && !isSubmitting
+                            ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+                            : 'cursor-not-allowed bg-zinc-100 text-zinc-400',
+                        )}
+                      >
+                        {isSubmitting ? 'Starting...' : 'Run Analysis'}
+                      </button>
+                      {!canSubmit && !isSubmitting && (
+                        <span className="text-[12px] tracking-[-0.02em] text-zinc-400">
+                          Min 50 characters
+                        </span>
+                      )}
                     </div>
                   </div>
-                )}
 
-                {/* Footer */}
-                <div className="mt-10 flex items-center justify-between">
-                  <div className="flex items-center gap-6">
-                    <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
-                      ~25 min analysis
+                  {error && (
+                    <p className="mt-4 text-[14px] tracking-[-0.02em] text-red-600">
+                      {error}
                     </p>
-                    <span className="text-zinc-300">·</span>
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={attachments.length >= MAX_ATTACHMENTS}
-                      className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      Attach file
-                      {attachments.length > 0 && ` (${attachments.length})`}
-                    </button>
-                  </div>
-
-                  <button
-                    onClick={handleContinue}
-                    disabled={!canSubmit || isSubmitting}
-                    data-test="challenge-submit"
-                    className={cn(
-                      'px-6 py-3 text-[15px] font-medium transition-colors',
-                      canSubmit && !isSubmitting
-                        ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                        : 'cursor-not-allowed bg-zinc-100 text-zinc-400',
-                    )}
-                  >
-                    {isSubmitting
-                      ? 'Starting...'
-                      : canSubmit
-                        ? 'Run Analysis'
-                        : 'Min 50 Characters'}
-                  </button>
+                  )}
                 </div>
-
-                {error && (
-                  <p className="mt-4 text-[14px] tracking-[-0.02em] text-red-600">
-                    {error}
-                  </p>
-                )}
               </div>
             </div>
           </div>
