@@ -4,45 +4,42 @@ import { useState } from 'react';
 
 import { Eye, EyeOff, Lock } from 'lucide-react';
 
-import { Button } from '@kit/ui/button';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from '@kit/ui/input-group';
+import { cn } from '@kit/ui/utils';
 
-export function PasswordInput(props: React.ComponentProps<'input'>) {
+export function PasswordInput({
+  className,
+  ...props
+}: React.ComponentProps<'input'>) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <InputGroup className="dark:bg-background">
-      <InputGroupAddon>
-        <Lock className="h-4 w-4" />
-      </InputGroupAddon>
-
-      <InputGroupInput
+    <div
+      className={cn(
+        'group flex h-11 w-full items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 transition-all focus-within:border-zinc-400 focus-within:ring-2 focus-within:ring-zinc-100',
+        className,
+      )}
+    >
+      <Lock className="h-4 w-4 shrink-0 text-zinc-400" />
+      <input
         data-test="password-input"
         type={showPassword ? 'text' : 'password'}
-        placeholder={'************'}
+        placeholder="************"
+        className="h-full flex-1 bg-transparent text-[15px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
         {...props}
       />
-
-      <InputGroupAddon align="inline-end">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowPassword(!showPassword)}
-          aria-label={showPassword ? 'Hide password' : 'Show password'}
-          aria-pressed={showPassword}
-        >
-          {showPassword ? (
-            <EyeOff className="h-4 w-4" />
-          ) : (
-            <Eye className="h-4 w-4" />
-          )}
-        </Button>
-      </InputGroupAddon>
-    </InputGroup>
+      <button
+        type="button"
+        onClick={() => setShowPassword(!showPassword)}
+        aria-label={showPassword ? 'Hide password' : 'Show password'}
+        aria-pressed={showPassword}
+        className="shrink-0 rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400"
+      >
+        {showPassword ? (
+          <EyeOff className="h-4 w-4" />
+        ) : (
+          <Eye className="h-4 w-4" />
+        )}
+      </button>
+    </div>
   );
 }

@@ -4,7 +4,6 @@ import type { Provider } from '@supabase/supabase-js';
 
 import { isBrowser, isSafeRedirectPath } from '@kit/shared/utils';
 import { If } from '@kit/ui/if';
-import { Separator } from '@kit/ui/separator';
 import { Trans } from '@kit/ui/trans';
 
 import { ExistingAccountHint } from './existing-account-hint';
@@ -73,11 +72,11 @@ export function SignUpMethodsContainer(props: {
         >
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <Separator />
+              <div className="w-full border-t border-zinc-200" />
             </div>
 
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background text-muted-foreground px-2">
+            <div className="relative flex justify-center text-[12px] uppercase tracking-wide">
+              <span className="bg-white px-3 text-zinc-400">
                 <Trans i18nKey="auth:orContinueWith" />
               </span>
             </div>

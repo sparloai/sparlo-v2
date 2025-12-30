@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
-import { Button } from '@kit/ui/button';
 import {
   Form,
   FormControl,
@@ -101,7 +100,7 @@ export function PasswordSignUpForm({
                   />
                 </FormControl>
 
-                <FormDescription>
+                <FormDescription className="text-zinc-500">
                   <Trans i18nKey={'auth:repeatPasswordDescription'} />
                 </FormDescription>
 
@@ -115,40 +114,31 @@ export function PasswordSignUpForm({
           <TermsAndConditionsFormField />
         </If>
 
-        <Button
-          data-test={'auth-submit-button'}
-          className={'w-full'}
+        <button
+          data-test="auth-submit-button"
           type="submit"
           disabled={loading || captchaLoading}
+          className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-zinc-900 text-[15px] font-medium text-white transition-all hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
         >
           <If condition={captchaLoading}>
-            <span className={'animate-in fade-in slide-in-from-bottom-24'}>
-              <Trans i18nKey={'auth:verifyingCaptcha'} />
+            <span className="animate-in fade-in slide-in-from-bottom-24">
+              <Trans i18nKey="auth:verifyingCaptcha" />
             </span>
           </If>
 
           <If condition={loading && !captchaLoading}>
-            <span className={'animate-in fade-in slide-in-from-bottom-24'}>
-              <Trans i18nKey={'auth:signingUp'} />
+            <span className="animate-in fade-in slide-in-from-bottom-24">
+              <Trans i18nKey="auth:signingUp" />
             </span>
           </If>
 
           <If condition={!loading && !captchaLoading}>
-            <span
-              className={
-                'animate-in fade-in slide-in-from-bottom-24 flex items-center'
-              }
-            >
-              <Trans i18nKey={'auth:signUpWithEmail'} />
-
-              <ArrowRight
-                className={
-                  'zoom-in animate-in slide-in-from-left-2 fill-mode-both h-4 delay-500 duration-500'
-                }
-              />
+            <span className="animate-in fade-in slide-in-from-bottom-24 flex items-center gap-1.5">
+              <Trans i18nKey="auth:signUpWithEmail" />
+              <ArrowRight className="zoom-in animate-in slide-in-from-left-2 fill-mode-both h-4 w-4 delay-500 duration-500" />
             </span>
           </If>
-        </Button>
+        </button>
       </form>
     </Form>
   );
