@@ -160,6 +160,26 @@ export function ProcessingScreen({
     }
   }, [clarificationAnswer, isSubmitting, progress.id]);
 
+  // Handle option selection (must be before early returns per React hooks rules)
+  const handleSelectOption = useCallback(
+    async (optionLabel: string) => {
+      if (isSubmitting) return;
+      setIsSubmitting(true);
+      try {
+        await answerClarification({
+          reportId: progress.id,
+          answer: optionLabel,
+        });
+        setClarificationAnswer('');
+      } catch (error) {
+        console.error('Failed to submit clarification:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [isSubmitting, progress.id],
+  );
+
   // Handle complete status
   if (progress.status === 'complete') {
     return (
@@ -276,26 +296,6 @@ export function ProcessingScreen({
       </motion.div>
     );
   }
-
-  // Handle option selection
-  const handleSelectOption = useCallback(
-    async (optionLabel: string) => {
-      if (isSubmitting) return;
-      setIsSubmitting(true);
-      try {
-        await answerClarification({
-          reportId: progress.id,
-          answer: optionLabel,
-        });
-        setClarificationAnswer('');
-      } catch (error) {
-        console.error('Failed to submit clarification:', error);
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [isSubmitting, progress.id],
-  );
 
   // Handle clarification status - Premium Air Company design
   if (progress.status === 'clarifying' && pendingClarification) {
