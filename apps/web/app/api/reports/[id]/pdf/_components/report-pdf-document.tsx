@@ -477,8 +477,9 @@ function SourceTypeTag({ type }: { type?: string }) {
 function InsightBlockDisplay({ insight }: { insight?: InsightBlock }) {
   if (!insight) return null;
 
+  // Allow page breaks for long insights
   return (
-    <View style={styles.insightBox} wrap={false}>
+    <View style={styles.insightBox}>
       <MonoLabel>The Insight</MonoLabel>
       {insight.what && <Text style={styles.insightText}>{insight.what}</Text>}
       {insight.where_we_found_it && (
@@ -531,7 +532,8 @@ function BriefSection({ brief }: { brief?: string }) {
   return (
     <View style={styles.section}>
       <SectionHeader title="The Brief" subtitle="Original problem statement" />
-      <View style={styles.card} wrap={false}>
+      {/* Allow page breaks for long briefs */}
+      <View style={styles.card}>
         <Text style={styles.paragraph}>{brief}</Text>
       </View>
     </View>
@@ -602,9 +604,9 @@ function ProblemAnalysisSection({ analysis }: { analysis?: ProblemAnalysis }) {
         </View>
       )}
 
-      {/* First Principles Insight */}
+      {/* First Principles Insight - allow page breaks */}
       {analysis.first_principles_insight && (
-        <View style={styles.insightBox} wrap={false}>
+        <View style={styles.insightBox}>
           <MonoLabel>First Principles Insight</MonoLabel>
           {analysis.first_principles_insight.headline && (
             <Text style={styles.insightText}>
@@ -758,7 +760,8 @@ function ExecutiveSummarySection({
     return (
       <View style={styles.section}>
         <SectionHeader title="Executive Summary" subtitle="The bottom line" />
-        <View style={styles.card} wrap={false}>
+        {/* Allow page breaks for long summaries */}
+        <View style={styles.card}>
           <Text style={[styles.paragraph, { fontSize: 12 }]}>{summary}</Text>
         </View>
       </View>
@@ -768,7 +771,8 @@ function ExecutiveSummarySection({
   return (
     <View style={styles.section}>
       <SectionHeader title="Executive Summary" subtitle="The bottom line" />
-      <View style={styles.card} wrap={false}>
+      {/* Allow page breaks for long content */}
+      <View style={styles.card}>
         {/* Narrative Lead */}
         {summary.narrative_lead && (
           <Text
@@ -780,7 +784,7 @@ function ExecutiveSummarySection({
 
         {/* Core Insight */}
         {summary.core_insight && (
-          <View style={styles.insightBox} wrap={false}>
+          <View style={styles.insightBox}>
             <MonoLabel>Core Insight</MonoLabel>
             {summary.core_insight.headline && (
               <Text style={styles.insightText}>
@@ -809,7 +813,7 @@ function ExecutiveSummarySection({
 
         {/* Primary Recommendation */}
         {summary.primary_recommendation && (
-          <View style={[styles.cardHighlight, { marginTop: 12 }]} wrap={false}>
+          <View style={[styles.cardHighlight, { marginTop: 12 }]}>
             <MonoLabel>Primary Recommendation</MonoLabel>
             <Text
               style={[
@@ -981,10 +985,10 @@ function SolutionConceptsSection({ track }: { track?: ExecutionTrack }) {
             </View>
           )}
 
-          {/* Why It Might Fail */}
+          {/* Why It Might Fail - allow page breaks for long lists */}
           {primary.why_it_might_fail &&
             primary.why_it_might_fail.length > 0 && (
-              <View style={[styles.warningBox, { marginTop: 12 }]} wrap={false}>
+              <View style={[styles.warningBox, { marginTop: 12 }]}>
                 <MonoLabel>Why It Might Fail</MonoLabel>
                 {primary.why_it_might_fail.map((reason, i) => (
                   <View key={i} style={styles.listItem}>
@@ -1140,9 +1144,9 @@ function InnovationConceptsSection({
           {/* The Insight */}
           <InsightBlockDisplay insight={recommended.the_insight} />
 
-          {/* Breakthrough Potential */}
+          {/* Breakthrough Potential - allow page breaks */}
           {recommended.breakthrough_potential && (
-            <View style={[styles.insightBox, { marginTop: 12 }]} wrap={false}>
+            <View style={[styles.insightBox, { marginTop: 12 }]}>
               <MonoLabel>Breakthrough Potential</MonoLabel>
               {recommended.breakthrough_potential.if_it_works && (
                 <Text style={styles.insightText}>
@@ -1158,9 +1162,9 @@ function InnovationConceptsSection({
             </View>
           )}
 
-          {/* Validation Path */}
+          {/* Validation Path - allow page breaks */}
           {recommended.validation_path && (
-            <View style={{ marginTop: 12 }} wrap={false}>
+            <View style={{ marginTop: 12 }}>
               <MonoLabel>Validation Path</MonoLabel>
               {recommended.validation_path.first_test && (
                 <Text style={styles.cardContent}>
@@ -1180,9 +1184,9 @@ function InnovationConceptsSection({
             </View>
           )}
 
-          {/* Risks */}
+          {/* Risks - allow page breaks for long lists */}
           {recommended.risks && (
-            <View style={[styles.warningBox, { marginTop: 12 }]} wrap={false}>
+            <View style={[styles.warningBox, { marginTop: 12 }]}>
               <MonoLabel>Risks</MonoLabel>
               {recommended.risks.physics_risks?.map((r, i) => (
                 <View key={i} style={styles.listItem}>
@@ -1784,9 +1788,9 @@ function SelfCritiqueSection({ critique }: { critique?: SelfCritique }) {
         subtitle="Honest assessment of this analysis"
       />
 
-      {/* Confidence Level - keep together */}
+      {/* Confidence Level - allow page breaks if rationale is long */}
       {(critique.overall_confidence || critique.confidence_level) && (
-        <View style={[styles.warningBox, { marginBottom: 8 }]} wrap={false}>
+        <View style={[styles.warningBox, { marginBottom: 8 }]}>
           <View
             style={[
               styles.row,
