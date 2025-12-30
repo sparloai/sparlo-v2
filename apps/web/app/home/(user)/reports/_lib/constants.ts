@@ -68,7 +68,20 @@ export const EXAMPLE_REPORTS_SCROLL_OFFSET = 120;
 
 // ============================================
 // READING TIME
+// Content-type specific reading speeds for accurate estimation
 // ============================================
 
-/** Words per minute for read time calculation (technical content reads slower) */
+/** Words per minute for technical prose (dense, requires comprehension) */
+export const WPM_PROSE = 150;
+
+/** Words per minute for headlines (scanned quickly) */
+export const WPM_HEADLINE = 300;
+
+/** Words per minute for list items (structured, easier to parse) */
+export const WPM_LIST_ITEM = 220;
+
+/** Fixed seconds per table/data row */
+export const SECONDS_PER_TABLE_ROW = 3;
+
+/** @deprecated Use content-type specific constants instead */
 export const WORDS_PER_MINUTE = 200;
