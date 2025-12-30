@@ -108,7 +108,17 @@ export function ReportDisplay({
   }
 
   // Check if we have valid report content
-  const reportData = report.report_data?.report;
+  // Try both nested (.report) and direct storage patterns
+  const rawReportData = report.report_data;
+  const reportData =
+    (rawReportData?.report as HybridReportData | undefined) ??
+    (rawReportData as HybridReportData | null);
+
+  // Debug logging for production issues
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[ReportDisplay] report_data:', rawReportData);
+    console.log('[ReportDisplay] extracted reportData:', reportData);
+  }
 
   if (!reportData) {
     return (
@@ -116,6 +126,11 @@ export function ReportDisplay({
         <div className="text-center">
           <Loader2 className="mx-auto h-8 w-8 animate-spin text-[#7C3AED]" />
           <p className="mt-4 text-[#6A6A6A]">Loading report...</p>
+          {process.env.NODE_ENV !== 'production' && (
+            <p className="mt-2 text-xs text-red-500">
+              Debug: report_data is {JSON.stringify(rawReportData, null, 2)}
+            </p>
+          )}
         </div>
       </div>
     );
