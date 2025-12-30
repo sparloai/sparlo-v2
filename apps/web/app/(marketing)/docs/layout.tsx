@@ -22,10 +22,16 @@ async function DocsLayout({ children }: React.PropsWithChildren) {
   const recentReports = user ? await loadRecentReports(user.id) : [];
 
   return (
-    <div className={'container h-[calc(100vh-56px)] overflow-y-hidden'}>
-      {/* App sidebar toggle for logged-in users */}
+    <div
+      className={'container h-[calc(100vh-56px)] overflow-y-hidden'}
+      data-docs-page="true"
+    >
+      {/* Hide the PersonalAccountDropdown on docs pages for logged-in users */}
+      {user && <HideAccountDropdownStyles />}
+
+      {/* App sidebar toggle - positioned in nav header area (left side) */}
       {user && (
-        <div className="fixed top-[18px] left-4 z-50 md:left-6 lg:left-8">
+        <div className="fixed top-[14px] left-3 z-[60] md:left-5">
           <DocsAppSidebar
             user={user}
             workspace={{ name: null }}
@@ -55,6 +61,21 @@ function HideFooterStyles() {
         __html: `
           .site-footer {
             display: none;
+          }
+        `,
+      }}
+    />
+  );
+}
+
+function HideAccountDropdownStyles() {
+  return (
+    <style
+      dangerouslySetInnerHTML={{
+        __html: `
+          /* Hide the PersonalAccountDropdown on docs pages when user is logged in */
+          body:has([data-docs-page="true"]) header nav > div.hidden.md\\:flex {
+            visibility: hidden;
           }
         `,
       }}

@@ -30,6 +30,7 @@ interface NavigationProps {
   user?: JWTUserData | null;
   variant?: 'dark' | 'light';
   leftSlot?: React.ReactNode;
+  hideUserDropdown?: boolean;
 }
 
 const paths = {
@@ -44,6 +45,7 @@ export const Navigation = memo(function Navigation({
   user,
   variant = 'dark',
   leftSlot,
+  hideUserDropdown = false,
 }: NavigationProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -111,7 +113,7 @@ export const Navigation = memo(function Navigation({
 
           {/* Right side - Auth */}
           <div className="hidden items-center gap-6 md:flex">
-            {user ? (
+            {user && !hideUserDropdown ? (
               <PersonalAccountDropdown
                 showProfileName={false}
                 paths={paths}
@@ -119,7 +121,7 @@ export const Navigation = memo(function Navigation({
                 user={user}
                 signOutRequested={() => signOut.mutateAsync()}
               />
-            ) : (
+            ) : !user ? (
               <>
                 <Link
                   href={pathsConfig.auth.signIn}
@@ -144,7 +146,7 @@ export const Navigation = memo(function Navigation({
                   Get Started
                 </Link>
               </>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile Menu Button */}
