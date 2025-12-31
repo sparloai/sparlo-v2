@@ -963,6 +963,29 @@ export const POST = enhanceRouteHandler(
     console.log('[Chat] Report mode:', reportData?.mode);
     console.log('[Chat] Has markdown:', !!reportData?.markdown);
 
+    // Debug: Check where frontier_watch actually lives
+    const debugReport = reportData?.report as Record<string, unknown> | undefined;
+    console.log('[Chat] report keys:', debugReport ? Object.keys(debugReport) : 'null');
+    console.log('[Chat] report.innovation_portfolio exists:', !!(debugReport?.innovation_portfolio));
+    const debugInnovPortfolio = debugReport?.innovation_portfolio as Record<string, unknown> | undefined;
+    console.log('[Chat] innovation_portfolio keys:', debugInnovPortfolio ? Object.keys(debugInnovPortfolio) : 'null');
+    console.log('[Chat] frontier_watch exists:', !!(debugInnovPortfolio?.frontier_watch));
+
+    // Check if frontier_watch is somewhere else in the data
+    const checkForFrontier = (obj: unknown, path: string): void => {
+      if (obj && typeof obj === 'object') {
+        for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+          if (key.toLowerCase().includes('frontier')) {
+            console.log(`[Chat] Found frontier at: ${path}.${key}`);
+          }
+          if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            checkForFrontier(value, `${path}.${key}`);
+          }
+        }
+      }
+    };
+    checkForFrontier(reportData, 'reportData');
+
     if (reportData?.markdown) {
       // Standard report with markdown
       reportContext = reportData.markdown as string;
