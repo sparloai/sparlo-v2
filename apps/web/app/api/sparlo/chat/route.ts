@@ -414,8 +414,8 @@ function extractHybridContext(reportData: Record<string, unknown>): string {
     }
   }
 
-  // Execution Track (Solution Concepts)
-  const execTrack = report.execution_track as
+  // Execution Track (Solution Concepts) - check both old and new schema names
+  const execTrack = (report.execution_track ?? report.solution_concepts) as
     | Record<string, unknown>
     | undefined;
   if (execTrack) {
@@ -528,17 +528,16 @@ function extractHybridContext(reportData: Record<string, unknown>): string {
     }
   }
 
-  // Innovation Portfolio (Innovation Concepts)
-  const innovPortfolio = report.innovation_portfolio as
-    | Record<string, unknown>
-    | undefined;
+  // Innovation Portfolio (Innovation Concepts) - check both old and new schema names
+  const innovPortfolio = (report.innovation_portfolio ??
+    report.innovation_concepts) as Record<string, unknown> | undefined;
   if (innovPortfolio) {
     sections.push('\n## Innovation Concepts (Innovation Portfolio)');
     if (innovPortfolio.intro) sections.push(innovPortfolio.intro as string);
 
-    const recommended = innovPortfolio.recommended_innovation as
-      | Record<string, unknown>
-      | undefined;
+    // Check both old schema (recommended) and new schema (recommended_innovation)
+    const recommended = (innovPortfolio.recommended_innovation ??
+      innovPortfolio.recommended) as Record<string, unknown> | undefined;
     if (recommended) {
       sections.push(`\n### Recommended Innovation: ${recommended.title}`);
       if (recommended.what_it_is)
@@ -611,9 +610,9 @@ function extractHybridContext(reportData: Record<string, unknown>): string {
       }
     }
 
-    const parallel = innovPortfolio.parallel_investigations as
-      | Array<Record<string, unknown>>
-      | undefined;
+    // Check both old schema (parallel) and new schema (parallel_investigations)
+    const parallel = (innovPortfolio.parallel_investigations ??
+      innovPortfolio.parallel) as Array<Record<string, unknown>> | undefined;
     if (parallel?.length) {
       sections.push('\n### Parallel Investigations');
       parallel.forEach((p) => {
@@ -958,34 +957,6 @@ export const POST = enhanceRouteHandler(
     const reportData = report.report_data as Record<string, unknown> | null;
     let reportContext = '';
 
-    // Debug: Log report data structure
-    console.log('[Chat] Report data keys:', reportData ? Object.keys(reportData) : 'null');
-    console.log('[Chat] Report mode:', reportData?.mode);
-    console.log('[Chat] Has markdown:', !!reportData?.markdown);
-
-    // Debug: Check where frontier_watch actually lives
-    const debugReport = reportData?.report as Record<string, unknown> | undefined;
-    console.log('[Chat] report keys:', debugReport ? Object.keys(debugReport) : 'null');
-    console.log('[Chat] report.innovation_portfolio exists:', !!(debugReport?.innovation_portfolio));
-    const debugInnovPortfolio = debugReport?.innovation_portfolio as Record<string, unknown> | undefined;
-    console.log('[Chat] innovation_portfolio keys:', debugInnovPortfolio ? Object.keys(debugInnovPortfolio) : 'null');
-    console.log('[Chat] frontier_watch exists:', !!(debugInnovPortfolio?.frontier_watch));
-
-    // Check if frontier_watch is somewhere else in the data
-    const checkForFrontier = (obj: unknown, path: string): void => {
-      if (obj && typeof obj === 'object') {
-        for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-          if (key.toLowerCase().includes('frontier')) {
-            console.log(`[Chat] Found frontier at: ${path}.${key}`);
-          }
-          if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-            checkForFrontier(value, `${path}.${key}`);
-          }
-        }
-      }
-    };
-    checkForFrontier(reportData, 'reportData');
-
     if (reportData?.markdown) {
       // Standard report with markdown
       reportContext = reportData.markdown as string;
@@ -993,17 +964,16 @@ export const POST = enhanceRouteHandler(
       // Discovery report - convert structured data to text context
       reportContext = extractDiscoveryContext(reportData);
     } else if (reportData?.mode === 'hybrid') {
-      // Hybrid report - convert structured data to markdown
-      reportContext = extractHybridContext(reportData);
+      // Hybrid report - use full JSON to ensure ALL data is included
+      // The extractHybridContext function may miss fields due to schema changes
+      reportContext = JSON.stringify(reportData.report ?? reportData, null, 2);
     } else if (reportData) {
       // Fallback: stringify the report data
       reportContext = JSON.stringify(reportData, null, 2);
     }
 
-    // Debug: Log extracted context info
-    console.log('[Chat] Report context length:', reportContext.length);
-    console.log('[Chat] Report context preview (first 500 chars):', reportContext.slice(0, 500));
-    console.log('[Chat] Report context contains frontier_watch:', reportContext.includes('frontier') || reportContext.includes('Frontier'));
+    // Log context size for monitoring
+    console.log('[Chat] Report context length:', reportContext.length, 'chars');
 
     // Build messages for Anthropic
     const anthropic = new Anthropic({
