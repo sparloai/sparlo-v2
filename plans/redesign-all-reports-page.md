@@ -1,14 +1,16 @@
 # Redesign All Reports Page
 
+> **Design System Reference:** [Sparlo Design System](../docs/SPARLO-DESIGN-SYSTEM.md)
+
 ## Overview
 
-Redesign the All Reports page (`/home/reports`) to align with the Aura brand system established across New Analysis, report pages, landing page, and sidebar navigation. The goal is to create visual consistency while preserving all existing UX functionality.
+Redesign the All Reports page (`/home/reports`) to align with the Sparlo design system established across New Analysis, report pages, landing page, and sidebar navigation. The goal is to create visual consistency while preserving all existing UX functionality.
 
 **Current File:** `apps/web/app/home/(user)/_components/reports-dashboard.tsx`
 
 ## Problem Statement
 
-The current All Reports page uses a visual language that doesn't match the refined Aura design system implemented elsewhere:
+The current All Reports page uses a visual language that doesn't match the refined Sparlo design system implemented elsewhere:
 - Card styling uses vivid status colors (violet-500, amber-50) instead of the subtle near-monochrome palette
 - Typography doesn't leverage the established hierarchy (SectionTitle, MonoLabel, BodyText primitives)
 - Page title style differs from the "New Analysis" page pattern
@@ -17,7 +19,7 @@ The current All Reports page uses a visual language that doesn't match the refin
 
 ## Proposed Solution
 
-Transform the All Reports page to use the Aura design system while maintaining all current functionality:
+Transform the All Reports page to use the Sparlo design system while maintaining all current functionality:
 
 1. **Page Title**: Match New Analysis style (42px, font-normal, tracking-[-0.02em])
 2. **Report Cards**: Larger cards with left border accent and proper typography hierarchy

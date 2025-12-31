@@ -629,7 +629,7 @@ export default function NewReportPage() {
                     autoFocus
                     data-test="challenge-input"
                     placeholder="Describe your technical challenge."
-                    className="h-48 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:ring-0 focus:outline-none focus:border-none disabled:opacity-40"
+                    className="h-48 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:border-none focus:ring-0 focus:outline-none disabled:opacity-40"
                     style={{ outline: 'none' }}
                   />
 
@@ -667,7 +667,9 @@ export default function NewReportPage() {
                                   className="object-cover"
                                 />
                               ) : (
-                                <span className="text-sm text-zinc-500">📄</span>
+                                <span className="text-sm text-zinc-500">
+                                  📄
+                                </span>
                               )}
                             </div>
                             <span className="max-w-[120px] truncate text-[12px] tracking-[-0.02em] text-zinc-600">

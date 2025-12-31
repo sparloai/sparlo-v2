@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { encryptionMiddleware } from '@inngest/middleware-encryption';
 import { EventSchemas, Inngest } from 'inngest';
 import { z } from 'zod';
 
@@ -120,8 +121,20 @@ type Events = {
 
 /**
  * Inngest client with typed events
+ *
+ * Encryption middleware is conditionally enabled:
+ * - Production: Set INNGEST_ENCRYPTION_KEY to encrypt event data (shows as blobs in dashboard)
+ * - Development: Don't set the key to see full JSON in Inngest dashboard for debugging
  */
-export const inngest = new Inngest({
-  id: 'sparlo-v2',
-  schemas: new EventSchemas().fromRecord<Events>(),
-});
+export const inngest = process.env.INNGEST_ENCRYPTION_KEY
+  ? new Inngest({
+      id: 'sparlo-v2',
+      schemas: new EventSchemas().fromRecord<Events>(),
+      middleware: [
+        encryptionMiddleware({ key: process.env.INNGEST_ENCRYPTION_KEY }),
+      ],
+    })
+  : new Inngest({
+      id: 'sparlo-v2',
+      schemas: new EventSchemas().fromRecord<Events>(),
+    });

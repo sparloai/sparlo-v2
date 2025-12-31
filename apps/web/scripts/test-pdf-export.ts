@@ -8,10 +8,9 @@
  *
  * Usage: npx tsx scripts/test-pdf-export.ts
  */
-
-import { chromium } from 'playwright';
 import * as fs from 'fs';
 import * as path from 'path';
+import { chromium } from 'playwright';
 
 const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 const TEST_REPORT_ID = process.env.TEST_REPORT_ID || ''; // Will find one dynamically
@@ -22,7 +21,9 @@ interface TestResult {
   screenshots: string[];
 }
 
-async function findReportWithGreekChars(page: import('playwright').Page): Promise<string | null> {
+async function findReportWithGreekChars(
+  page: import('playwright').Page,
+): Promise<string | null> {
   // Navigate to reports list to find a report
   await page.goto(`${BASE_URL}/home/reports`, { waitUntil: 'networkidle' });
 
@@ -36,7 +37,10 @@ async function findReportWithGreekChars(page: import('playwright').Page): Promis
   return null;
 }
 
-async function exportPdfAndAnalyze(page: import('playwright').Page, reportId: string): Promise<TestResult> {
+async function exportPdfAndAnalyze(
+  page: import('playwright').Page,
+  reportId: string,
+): Promise<TestResult> {
   const result: TestResult = {
     success: true,
     issues: [],
@@ -56,10 +60,16 @@ async function exportPdfAndAnalyze(page: import('playwright').Page, reportId: st
 
   try {
     // First, let's check the report page itself
-    await page.goto(`${BASE_URL}/home/reports/${reportId}`, { waitUntil: 'networkidle', timeout: 30000 });
+    await page.goto(`${BASE_URL}/home/reports/${reportId}`, {
+      waitUntil: 'networkidle',
+      timeout: 30000,
+    });
 
     // Take a screenshot of the report page
-    const reportScreenshot = path.join(screenshotDir, `report-${reportId}-page.png`);
+    const reportScreenshot = path.join(
+      screenshotDir,
+      `report-${reportId}-page.png`,
+    );
     await page.screenshot({ path: reportScreenshot, fullPage: true });
     result.screenshots.push(reportScreenshot);
     console.log(`  📸 Report page screenshot: ${reportScreenshot}`);
@@ -121,7 +131,6 @@ async function exportPdfAndAnalyze(page: import('playwright').Page, reportId: st
       // Only flag if the PDF is substantial but has no Greek
       console.log('  ⚠️ No Greek characters found in PDF text extraction');
     }
-
   } catch (error) {
     result.success = false;
     result.issues.push(`Error during PDF export: ${error}`);
@@ -147,7 +156,7 @@ async function main() {
 
     if (!reportId) {
       console.log('\n🔍 No report ID provided, searching for a report...');
-      reportId = await findReportWithGreekChars(page) || '';
+      reportId = (await findReportWithGreekChars(page)) || '';
 
       if (!reportId) {
         // Use a known report ID from the biotech example
@@ -164,7 +173,9 @@ async function main() {
     }
 
     if (!reportId) {
-      console.log('\n❌ Could not find a report to test. Please provide TEST_REPORT_ID env var.');
+      console.log(
+        '\n❌ Could not find a report to test. Please provide TEST_REPORT_ID env var.',
+      );
       await browser.close();
       process.exit(1);
     }
@@ -194,7 +205,6 @@ async function main() {
     }
 
     console.log('\n');
-
   } catch (error) {
     console.error('Test failed with error:', error);
   } finally {

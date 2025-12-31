@@ -75,7 +75,7 @@ export function SignUpMethodsContainer(props: {
               <div className="w-full border-t border-zinc-200" />
             </div>
 
-            <div className="relative flex justify-center text-[12px] uppercase tracking-wide">
+            <div className="relative flex justify-center text-[12px] tracking-wide uppercase">
               <span className="bg-white px-3 text-zinc-400">
                 <Trans i18nKey="auth:orContinueWith" />
               </span>

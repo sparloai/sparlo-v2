@@ -148,44 +148,52 @@ function releaseSlot(): void {
 /**
  * Generate PDF from HTML using Puppeteer.
  * Optimized for Railway container environment with embedded base64 fonts.
+ *
+ * Font loading strategy:
+ * - Keep JavaScript enabled (required for CSS font parsing)
+ * - Use networkidle0 to wait for all resources including inline fonts
+ * - Explicitly wait for document.fonts.ready API
+ * - Block only external network requests, not inline resources
  */
 async function generatePdfFromHtml(html: string): Promise<Buffer> {
   const browser = await getBrowser();
   const page = await browser.newPage();
 
   try {
-    // Disable JavaScript - not needed for static HTML with embedded fonts
-    await page.setJavaScriptEnabled(false);
-
-    // Block external requests - all assets are embedded
+    // Block external network requests only (not needed, all assets are base64 embedded)
+    // This prevents potential tracking/analytics but allows inline resource parsing
     await page.setRequestInterception(true);
     page.on('request', (request) => {
-      const resourceType = request.resourceType();
-      // Only allow document (the HTML itself)
-      if (resourceType === 'document') {
+      const url = request.url();
+      // Allow data: URIs (our base64 fonts) and about: URLs
+      // Block any actual network requests to external hosts
+      if (
+        url.startsWith('data:') ||
+        url.startsWith('about:') ||
+        request.resourceType() === 'document'
+      ) {
         request.continue();
       } else {
-        // Block fonts, images, stylesheets from external sources
-        // Our fonts are base64 embedded in the HTML, so no external requests needed
         request.abort();
       }
     });
 
-    // Set content and wait for DOM to be ready
+    // Set content and wait for network to be idle
+    // This ensures CSS is fully parsed including @font-face rules
     await page.setContent(html, {
-      waitUntil: 'domcontentloaded',
+      waitUntil: 'networkidle0',
       timeout: 30000,
     });
 
-    // Re-enable JavaScript temporarily for font loading check
-    await page.setJavaScriptEnabled(true);
-
-    // Wait for fonts to load before generating PDF (with timeout)
-    // This is critical for proper Suisse Intl font rendering in the PDF
+    // Wait for fonts to be fully loaded (critical for Suisse Intl rendering)
+    // The document.fonts.ready promise resolves when all @font-face fonts are loaded
     await Promise.race([
       page.evaluate(() => document.fonts.ready),
       new Promise((resolve) => setTimeout(resolve, 5000)), // 5s max font wait
     ]);
+
+    // Additional small delay to ensure font rendering is complete
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Generate PDF with A4 format
     const pdfBuffer = await page.pdf({

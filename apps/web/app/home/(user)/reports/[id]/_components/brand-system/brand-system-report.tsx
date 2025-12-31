@@ -132,8 +132,12 @@ function calculateReadTime(data: HybridReportData): number {
   if (data.problem_analysis) {
     proseWords += countWords(data.problem_analysis.whats_wrong?.prose);
     proseWords += countWords(data.problem_analysis.why_its_hard?.prose);
-    proseWords += countWords(data.problem_analysis.first_principles_insight?.explanation);
-    headlineWords += countWords(data.problem_analysis.first_principles_insight?.headline);
+    proseWords += countWords(
+      data.problem_analysis.first_principles_insight?.explanation,
+    );
+    headlineWords += countWords(
+      data.problem_analysis.first_principles_insight?.headline,
+    );
 
     // Root cause hypotheses
     data.problem_analysis.root_cause_hypotheses?.forEach((h) => {
@@ -250,9 +254,15 @@ function calculateReadTime(data: HybridReportData): number {
 
   // Strategic Integration
   if (data.strategic_integration) {
-    proseWords += countWords(data.strategic_integration.portfolio_view?.combined_strategy);
-    proseWords += countWords(data.strategic_integration.personal_recommendation?.intro);
-    proseWords += countWords(data.strategic_integration.personal_recommendation?.key_insight);
+    proseWords += countWords(
+      data.strategic_integration.portfolio_view?.combined_strategy,
+    );
+    proseWords += countWords(
+      data.strategic_integration.personal_recommendation?.intro,
+    );
+    proseWords += countWords(
+      data.strategic_integration.personal_recommendation?.key_insight,
+    );
 
     data.strategic_integration.action_plan?.forEach((action) => {
       listItemWords += countWords(action.rationale);
@@ -658,7 +668,7 @@ const ReportContent = memo(function ReportContent({
           <div className="flex items-start justify-between gap-6">
             <h1
               className={cn(
-                'font-heading font-normal tracking-[-0.02em] text-zinc-900 text-[40px] leading-none',
+                'font-heading text-[40px] leading-none font-normal tracking-[-0.02em] text-zinc-900',
                 compactTitle && 'text-[28px] md:text-[32px]',
               )}
             >
