@@ -181,23 +181,53 @@ function extractDiscoveryContext(reportData: Record<string, unknown>): string {
  * Converts structured JSON to readable markdown - includes ALL sections for complete context
  */
 function extractHybridContext(reportData: Record<string, unknown>): string {
-  const report = reportData.report as Record<string, unknown> | undefined;
-  if (!report) return JSON.stringify(reportData, null, 2);
+  // Handle both nested (reportData.report) and direct storage patterns
+  const report = (reportData.report ?? reportData) as Record<string, unknown>;
+  if (!report || Object.keys(report).length === 0) {
+    return JSON.stringify(reportData, null, 2);
+  }
 
   const sections: string[] = [];
 
-  // Header
-  const header = report.header as Record<string, unknown> | undefined;
-  if (header) {
-    sections.push(`# ${header.title || 'Innovation Report'}`);
-    if (header.tagline) sections.push(`*${header.tagline}*`);
-  }
+  // Helper to get nested value
+  const get = (obj: unknown, ...paths: string[]): unknown => {
+    for (const path of paths) {
+      const keys = path.split('.');
+      let val: unknown = obj;
+      for (const key of keys) {
+        if (val && typeof val === 'object' && key in val) {
+          val = (val as Record<string, unknown>)[key];
+        } else {
+          val = undefined;
+          break;
+        }
+      }
+      if (val !== undefined) return val;
+    }
+    return undefined;
+  };
+
+  // Helper to stringify any value cleanly
+  const stringify = (val: unknown): string => {
+    if (typeof val === 'string') return val;
+    if (Array.isArray(val)) return val.map(stringify).join('\n');
+    if (typeof val === 'object' && val !== null) {
+      return Object.entries(val as Record<string, unknown>)
+        .map(([k, v]) => `${k}: ${stringify(v)}`)
+        .join('\n');
+    }
+    return String(val);
+  };
+
+  // Header/Title
+  const title = get(report, 'header.title', 'title') as string | undefined;
+  if (title) sections.push(`# ${title}`);
 
   // The Brief
-  const brief = report.brief as string | undefined;
+  const brief = get(report, 'brief.original_problem', 'brief') as string | Record<string, unknown> | undefined;
   if (brief) {
     sections.push('\n## The Brief');
-    sections.push(brief);
+    sections.push(typeof brief === 'string' ? brief : stringify(brief));
   }
 
   // Executive Summary
@@ -830,6 +860,73 @@ function extractHybridContext(reportData: Record<string, unknown>): string {
     sections.push(whatIdDo);
   }
 
+  // v12 Schema: Handle solution_concepts.lead_concepts if not already handled
+  const solutionConcepts = report.solution_concepts as Record<string, unknown> | undefined;
+  if (solutionConcepts && !report.execution_track) {
+    const leadConcepts = solutionConcepts.lead_concepts as Array<Record<string, unknown>> | undefined;
+    if (leadConcepts?.length) {
+      sections.push('\n## Solution Concepts');
+      leadConcepts.forEach((c, idx) => {
+        sections.push(`\n### ${idx === 0 ? 'Primary' : 'Alternative'}: ${c.title}`);
+        if (c.track_label) sections.push(`**Track:** ${c.track_label}`);
+        if (c.bottom_line) sections.push(`**Bottom Line:** ${c.bottom_line}`);
+        if (c.what_it_is) sections.push(`**What It Is:** ${c.what_it_is}`);
+        if (c.why_it_works) sections.push(`**Why It Works:** ${c.why_it_works}`);
+        if (c.confidence) sections.push(`**Confidence:** ${c.confidence}`);
+        if (c.confidence_rationale) sections.push(`**Rationale:** ${c.confidence_rationale}`);
+      });
+    }
+    const otherConcepts = solutionConcepts.other_concepts as Array<Record<string, unknown>> | undefined;
+    if (otherConcepts?.length) {
+      sections.push('\n### Other Concepts');
+      otherConcepts.forEach((c) => {
+        sections.push(`\n**${c.title}** (${c.track_label})`);
+        if (c.bottom_line) sections.push(c.bottom_line as string);
+        if (c.confidence) sections.push(`Confidence: ${c.confidence}`);
+      });
+    }
+    const innovationConcept = solutionConcepts.innovation_concept as Record<string, unknown> | undefined;
+    if (innovationConcept) {
+      sections.push('\n### Innovation Concept');
+      sections.push(`**${innovationConcept.title}**`);
+      if (innovationConcept.why_interesting) sections.push(`Why Interesting: ${innovationConcept.why_interesting}`);
+      if (innovationConcept.why_uncertain) sections.push(`Why Uncertain: ${innovationConcept.why_uncertain}`);
+      if (innovationConcept.when_to_pursue) sections.push(`When to Pursue: ${innovationConcept.when_to_pursue}`);
+    }
+  }
+
+  // Fallback: Check for any top-level data we might have missed
+  // This ensures frontier_watch or other sections stored at unexpected paths are captured
+  const handledKeys = new Set([
+    'mode', 'report', 'header', 'brief', 'executive_summary', 'problem_analysis',
+    'constraints_and_metrics', 'constraints', 'challenge_the_frame', 'innovation_analysis',
+    'cross_domain_search', 'execution_track', 'solution_concepts', 'innovation_portfolio',
+    'innovation_concepts', 'honest_assessment', 'risks_and_watchouts', 'self_critique',
+    'strategic_integration', 'what_id_actually_do', 'key_insights', 'next_steps',
+    'validation_summary', 'key_patterns', 'appendix', 'metadata', 'additional_content',
+    'tokenUsage', 'concepts', 'evaluation', 'literature', 'methodology', 'problem_framing',
+    'teaching_examples',
+  ]);
+
+  // Check reportData for any unhandled sections containing frontier
+  const checkForMissedData = (obj: unknown, prefix: string): void => {
+    if (!obj || typeof obj !== 'object') return;
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      if (key.toLowerCase().includes('frontier') && Array.isArray(value) && value.length > 0) {
+        sections.push('\n## Frontier Technologies');
+        (value as Array<Record<string, unknown>>).forEach((f) => {
+          sections.push(`\n**${f.title || 'Untitled'}**`);
+          if (f.one_liner) sections.push(f.one_liner as string);
+          if (f.why_interesting) sections.push(`Why Interesting: ${f.why_interesting}`);
+          if (f.why_not_now) sections.push(`Why Not Now: ${f.why_not_now}`);
+          if (f.trigger_to_revisit) sections.push(`Trigger to Revisit: ${f.trigger_to_revisit}`);
+        });
+      }
+    }
+  };
+  checkForMissedData(report, 'report');
+  checkForMissedData(reportData, 'reportData');
+
   return sections.join('\n');
 }
 
@@ -963,13 +1060,13 @@ export const POST = enhanceRouteHandler(
     } else if (reportData?.mode === 'discovery') {
       // Discovery report - convert structured data to text context
       reportContext = extractDiscoveryContext(reportData);
-    } else if (reportData?.mode === 'hybrid') {
-      // Hybrid report - use full JSON to ensure ALL data is included
-      // The extractHybridContext function may miss fields due to schema changes
-      reportContext = JSON.stringify(reportData.report ?? reportData, null, 2);
-    } else if (reportData) {
-      // Fallback: stringify the report data
-      reportContext = JSON.stringify(reportData, null, 2);
+    } else if (reportData?.mode === 'hybrid' || reportData?.report) {
+      // Hybrid report - extract structured data to markdown
+      reportContext = extractHybridContext(reportData);
+    } else {
+      // Fallback: try to extract as hybrid, then stringify if that fails
+      const extracted = extractHybridContext(reportData as Record<string, unknown>);
+      reportContext = extracted.length > 500 ? extracted : JSON.stringify(reportData, null, 2);
     }
 
     // Log context size for monitoring
