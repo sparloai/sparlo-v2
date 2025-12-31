@@ -59,6 +59,28 @@ let browserLock = false;
 const BROWSER_IDLE_TIMEOUT = 300000; // Close browser after 5 minutes of inactivity
 
 /**
+ * Optimized Chromium args for Railway container environment.
+ * These reduce memory usage and improve stability in containerized environments.
+ */
+const OPTIMIZED_CHROMIUM_ARGS = [
+  ...chromium.args,
+  '--disable-dev-shm-usage', // Use /tmp instead of /dev/shm (Railway has limited shared memory)
+  '--disable-accelerated-2d-canvas', // Disable GPU acceleration for canvas
+  '--disable-gpu', // Disable GPU hardware acceleration
+  '--no-first-run', // Skip first run wizards
+  '--no-zygote', // Disable zygote process (reduces memory)
+  '--single-process', // Run in single process mode (more stable in containers)
+  '--disable-background-networking', // Disable background network requests
+  '--disable-default-apps', // Disable default apps
+  '--disable-extensions', // Disable extensions
+  '--disable-sync', // Disable sync
+  '--disable-translate', // Disable translation
+  '--mute-audio', // Mute audio
+  '--hide-scrollbars', // Hide scrollbars in screenshots
+  '--font-render-hinting=none', // Disable font hinting for consistent rendering
+];
+
+/**
  * Get or create a browser instance for PDF generation.
  * Uses connection pooling to avoid cold start penalty on subsequent requests.
  *
@@ -90,8 +112,8 @@ async function getBrowser(): Promise<Browser> {
     browserLock = true;
     try {
       browserInstance = await puppeteer.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
+        args: OPTIMIZED_CHROMIUM_ARGS,
+        defaultViewport: { width: 794, height: 1123 }, // A4 at 96 DPI
         executablePath: await chromium.executablePath(),
         headless: chromium.headless,
       });
@@ -125,20 +147,41 @@ function releaseSlot(): void {
 
 /**
  * Generate PDF from HTML using Puppeteer.
+ * Optimized for Railway container environment with embedded base64 fonts.
  */
 async function generatePdfFromHtml(html: string): Promise<Buffer> {
   const browser = await getBrowser();
   const page = await browser.newPage();
 
   try {
+    // Disable JavaScript - not needed for static HTML with embedded fonts
+    await page.setJavaScriptEnabled(false);
+
+    // Block external requests - all assets are embedded
+    await page.setRequestInterception(true);
+    page.on('request', (request) => {
+      const resourceType = request.resourceType();
+      // Only allow document (the HTML itself)
+      if (resourceType === 'document') {
+        request.continue();
+      } else {
+        // Block fonts, images, stylesheets from external sources
+        // Our fonts are base64 embedded in the HTML, so no external requests needed
+        request.abort();
+      }
+    });
+
     // Set content and wait for DOM to be ready
     await page.setContent(html, {
       waitUntil: 'domcontentloaded',
       timeout: 30000,
     });
 
+    // Re-enable JavaScript temporarily for font loading check
+    await page.setJavaScriptEnabled(true);
+
     // Wait for fonts to load before generating PDF (with timeout)
-    // This is critical for proper font rendering in the PDF
+    // This is critical for proper Suisse Intl font rendering in the PDF
     await Promise.race([
       page.evaluate(() => document.fonts.ready),
       new Promise((resolve) => setTimeout(resolve, 5000)), // 5s max font wait
@@ -166,6 +209,8 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
 
     return Buffer.from(pdfBuffer);
   } finally {
+    // Clean up event listeners before closing to prevent memory leaks
+    page.removeAllListeners('request');
     await page.close();
   }
 }
