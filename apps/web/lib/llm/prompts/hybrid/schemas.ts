@@ -2828,6 +2828,19 @@ export const AN5_M_OutputSchema = z
     // v4.0: follow_up_prompts - suggested next questions
     follow_up_prompts: z.array(z.string()).default([]),
 
+    // v4.0: references - inline citations used in report
+    references: z
+      .array(
+        z
+          .object({
+            id: z.number(),
+            citation: z.string(),
+            url: z.string().optional(),
+          })
+          .passthrough(),
+      )
+      .default([]),
+
     metadata: z
       .object({
         generated_at: z.string(),

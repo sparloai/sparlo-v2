@@ -1109,6 +1109,51 @@ Example: "Dr. Sarah Chen, MIT Media Lab - Published 2024 Nature paper on biogeni
 
 Write like a senior engineer briefing a project lead. Direct, confident, insightful.
 
+## CITATION REQUIREMENTS
+
+Include inline citations for claims that readers would want to verify. Focus on credibility-critical statements, not exhaustive sourcing.
+
+### Format
+- Superscript numbered citations after the claim: \`claim text<sup>[1]</sup>\`
+- Number sequentially as they appear in the report
+- Hyperlink to source where possible
+
+### What Requires Citation
+- **Academic/research claims**: "X et al. demonstrated Y" or "studies show Z"
+- **Entity achievements**: "Company X achieved Y performance" or "Entity X operates system at Z"
+- **Specific data from sources**: performance figures, costs, timelines attributed to specific work
+- **Patents referenced**: when discussing patented approaches
+
+### What Does NOT Require Citation
+- General physics, thermodynamics, engineering principles
+- Your own analysis, synthesis, and recommendations
+- Widely-known industry context
+- Ballpark estimates clearly framed as estimates
+
+### Critical Rules
+1. **NEVER fabricate citations** — no made-up DOIs, papers, or URLs
+2. If uncertain a source exists, flag as \`[verification needed]\` rather than guessing
+3. Prefer primary sources (the actual paper) over secondary (news article about it)
+4. Draw from prior_art and key_papers captured in earlier analysis phases
+
+### References Section
+Include at end of report in the \`references\` array:
+
+\`\`\`json
+"references": [
+  {
+    "id": 1,
+    "citation": "Mikhaylin, S. & Bazinet, L. (2016). Fouling on ion-exchange membranes. Advances in Colloid and Interface Science, 229, 34-56.",
+    "url": "https://doi.org/10.1016/j.cis.2015.12.006"
+  },
+  {
+    "id": 2,
+    "citation": "US Patent 9,073,003 B2. Inventys Thermal Technologies.",
+    "url": "https://patents.google.com/patent/US9073003B2"
+  }
+]
+\`\`\`
+
 ## NARRATIVE LEAD TEMPLATES (Required - Select Based on framing_validation.recommended_narrative_type)
 
 The narrative_lead MUST match the solution classification from AN4. Using paradigm framing for catalog solutions destroys credibility.
@@ -1571,6 +1616,14 @@ Before writing the narrative_lead, verify:
     "What operational changes should I try before investing capital?"
   ],
 
+  "references": [
+    {
+      "id": 1,
+      "citation": "Full citation in academic format",
+      "url": "https://doi.org/... or patent URL (optional)"
+    }
+  ],
+
   "metadata": {
     "generated_at": "ISO timestamp",
     "model_version": "claude-sonnet-4-20250514",
@@ -1847,6 +1900,9 @@ Empty arrays for these fields indicate incomplete synthesis. Revisit source mate
 - No decision tree flowcharts
 - Report reads like senior engineer advice, not consultant deliverable
 - All required arrays are populated (not empty)
+- Citations use superscript format \`<sup>[N]</sup>\` for verifiable claims
+- References array populated with all cited sources (no fabricated citations)
+- Uncertain sources flagged as \`[verification needed]\` rather than guessed
 `;
 
 export const AN5_M_METADATA = {
