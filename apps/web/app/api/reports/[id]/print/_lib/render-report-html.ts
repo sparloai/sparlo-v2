@@ -5,7 +5,9 @@ import type {
   ConstraintsAndMetrics,
   ExecutionTrack,
   ExecutionTrackPrimary,
+  FrontierWatch,
   HybridReportData,
+  InnovationAnalysis,
   InnovationPortfolio,
   InsightBlock,
   ParallelInvestigation,
@@ -19,6 +21,207 @@ import type {
 } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { LOGO_BASE64, PRINT_STYLES } from './print-styles';
+
+// ============================================
+// DATA NORMALIZATION
+// ============================================
+
+/**
+ * Normalize report data to handle both old (v3) and new (v4) schema field names.
+ * Maps: solution_concepts → execution_track, innovation_concepts → innovation_portfolio
+ *
+ * This function mirrors the normalization in brand-system-report.tsx to ensure
+ * PDF export renders the same sections as the web view.
+ */
+function normalizeReportData(data: HybridReportData): HybridReportData {
+  const raw = data as Record<string, unknown>;
+
+  // Check if data already has the expected field names
+  const hasExecutionTrack = Boolean(data.execution_track);
+  const hasInnovationPortfolio = Boolean(data.innovation_portfolio);
+  // Check for v12 schema field names that need normalization
+  const hasSolutionConcepts = Boolean(raw.solution_concepts);
+  const hasInnovationConcepts = Boolean(raw.innovation_concepts);
+
+  // If using old schema field names AND doesn't have new names, skip normalization
+  if (hasExecutionTrack && hasInnovationPortfolio) {
+    return {
+      ...data,
+      constraints_and_metrics:
+        data.constraints_and_metrics ??
+        (raw.constraints as HybridReportData['constraints_and_metrics']),
+    };
+  }
+
+  // If no solution/innovation concepts at all, return as-is
+  if (!hasSolutionConcepts && !hasInnovationConcepts && !hasExecutionTrack && !hasInnovationPortfolio) {
+    return {
+      ...data,
+      constraints_and_metrics:
+        data.constraints_and_metrics ??
+        (raw.constraints as HybridReportData['constraints_and_metrics']),
+    };
+  }
+
+  // Normalize solution_concepts → execution_track
+  const solutionConcepts = raw.solution_concepts as
+    | {
+        intro?: string;
+        primary?: {
+          id?: string;
+          title?: string;
+          confidence_percent?: number;
+          source_type?: string;
+          what_it_is?: string;
+          why_it_works?: string;
+          economics?: {
+            expected_outcome?: { value?: string };
+            investment?: { value?: string };
+            timeline?: { value?: string };
+          };
+          the_insight?: unknown;
+          first_validation_step?: {
+            test?: string;
+            cost?: string;
+            go_criteria?: string;
+          };
+        };
+        supporting?: Array<{
+          id?: string;
+          title?: string;
+          relationship?: string;
+          what_it_is?: string;
+          why_it_works?: string;
+          when_to_use_instead?: string;
+          confidence_percent?: number;
+          key_risk?: string;
+        }>;
+      }
+    | undefined;
+
+  const executionTrack: HybridReportData['execution_track'] = solutionConcepts
+    ? {
+        intro: solutionConcepts.intro,
+        primary: solutionConcepts.primary
+          ? {
+              id: solutionConcepts.primary.id,
+              title: solutionConcepts.primary.title,
+              confidence: solutionConcepts.primary.confidence_percent,
+              source_type: solutionConcepts.primary.source_type as
+                | 'CATALOG'
+                | 'TRANSFER'
+                | 'OPTIMIZATION'
+                | 'FIRST_PRINCIPLES'
+                | undefined,
+              what_it_is: solutionConcepts.primary.what_it_is,
+              why_it_works: solutionConcepts.primary.why_it_works,
+              expected_improvement:
+                solutionConcepts.primary.economics?.expected_outcome?.value,
+              investment: solutionConcepts.primary.economics?.investment?.value,
+              timeline: solutionConcepts.primary.economics?.timeline?.value,
+              the_insight: solutionConcepts.primary
+                .the_insight as HybridReportData['execution_track'] extends {
+                primary?: { the_insight?: infer T };
+              }
+                ? T
+                : never,
+              validation_gates: solutionConcepts.primary.first_validation_step
+                ? [
+                    {
+                      test: solutionConcepts.primary.first_validation_step.test,
+                      cost: solutionConcepts.primary.first_validation_step.cost,
+                      success_criteria:
+                        solutionConcepts.primary.first_validation_step
+                          .go_criteria,
+                    },
+                  ]
+                : undefined,
+            }
+          : undefined,
+        supporting_concepts: solutionConcepts.supporting?.map((s) => ({
+          id: s.id,
+          title: s.title,
+          relationship: s.relationship as
+            | 'COMPLEMENTARY'
+            | 'FALLBACK'
+            | 'PREREQUISITE'
+            | undefined,
+          one_liner: s.key_risk,
+          what_it_is: s.what_it_is,
+          why_it_works: s.why_it_works,
+          when_to_use_instead: s.when_to_use_instead,
+          confidence: s.confidence_percent,
+        })),
+      }
+    : undefined;
+
+  // Normalize innovation_concepts → innovation_portfolio
+  const innovationConcepts = raw.innovation_concepts as
+    | {
+        intro?: string;
+        recommended?: {
+          id?: string;
+          title?: string;
+          confidence_percent?: number;
+          confidence?: number;
+          [key: string]: unknown;
+        };
+        parallel?: Array<{
+          id?: string;
+          title?: string;
+          confidence_percent?: number;
+          confidence?: number;
+          [key: string]: unknown;
+        }>;
+        frontier_watch?: HybridReportData['innovation_portfolio'] extends {
+          frontier_watch?: infer T;
+        }
+          ? T
+          : never;
+      }
+    | undefined;
+
+  const innovationPortfolio: HybridReportData['innovation_portfolio'] =
+    innovationConcepts
+      ? {
+          intro: innovationConcepts.intro,
+          recommended_innovation: innovationConcepts.recommended
+            ? ({
+                ...innovationConcepts.recommended,
+                confidence:
+                  innovationConcepts.recommended.confidence_percent ??
+                  innovationConcepts.recommended.confidence,
+              } as HybridReportData['innovation_portfolio'] extends {
+                recommended_innovation?: infer T;
+              }
+                ? T
+                : never)
+            : undefined,
+          parallel_investigations: innovationConcepts.parallel?.map((p) => ({
+            ...p,
+            confidence: p.confidence_percent ?? p.confidence,
+          })) as HybridReportData['innovation_portfolio'] extends {
+            parallel_investigations?: infer T;
+          }
+            ? T
+            : never,
+          frontier_watch: innovationConcepts.frontier_watch,
+        }
+      : undefined;
+
+  // Normalize constraints → constraints_and_metrics
+  const constraintsAndMetrics =
+    data.constraints_and_metrics ??
+    (raw.constraints as HybridReportData['constraints_and_metrics']);
+
+  // Use normalized data if available, otherwise preserve original
+  return {
+    ...data,
+    execution_track: executionTrack ?? data.execution_track,
+    innovation_portfolio: innovationPortfolio ?? data.innovation_portfolio,
+    constraints_and_metrics: constraintsAndMetrics,
+  };
+}
 
 interface RenderOptions {
   reportData: HybridReportData;
@@ -114,6 +317,32 @@ function sanitizeGapStatus(status: string | undefined | null): string {
   )
     ? normalized
     : 'open';
+}
+
+/**
+ * Extract domains searched as simple string array from multiple possible locations.
+ * Handles both cross_domain_search.domains_searched and innovation_analysis.domains_searched.
+ */
+function extractDomainsSearched(data: HybridReportData): string[] | undefined {
+  // Try cross_domain_search first
+  if (
+    data.cross_domain_search?.domains_searched &&
+    data.cross_domain_search.domains_searched.length > 0
+  ) {
+    return data.cross_domain_search.domains_searched.map((d) =>
+      typeof d === 'string' ? d : (d as { domain?: string }).domain || '',
+    );
+  }
+
+  // Fall back to innovation_analysis
+  if (
+    data.innovation_analysis?.domains_searched &&
+    data.innovation_analysis.domains_searched.length > 0
+  ) {
+    return data.innovation_analysis.domains_searched;
+  }
+
+  return undefined;
 }
 
 // ============================================
@@ -410,6 +639,46 @@ function renderChallengeFrame(data?: ChallengeTheFrame[]): string {
   `;
 }
 
+function renderInnovationAnalysis(
+  data?: InnovationAnalysis,
+  domainsSearched?: string[],
+): string {
+  const hasReframe = data?.reframe && data.reframe.trim().length > 0;
+  const hasDomains = domainsSearched && domainsSearched.length > 0;
+
+  if (!hasReframe && !hasDomains) return '';
+
+  return `
+    <section class="section" id="innovation-analysis">
+      <h2 class="section-title">Innovation Analysis</h2>
+
+      ${
+        hasReframe
+          ? `
+        <div class="content-block border-left">
+          <span class="mono-label-muted">Reframe</span>
+          <p class="body-text-lg">${escapeHtml(data?.reframe)}</p>
+        </div>
+      `
+          : ''
+      }
+
+      ${
+        hasDomains
+          ? `
+        <div class="content-block">
+          <span class="mono-label">Domains Searched</span>
+          <div class="domains-list">
+            ${domainsSearched?.map((domain) => `<span class="domain-tag">${escapeHtml(domain)}</span>`).join('')}
+          </div>
+        </div>
+      `
+          : ''
+      }
+    </section>
+  `;
+}
+
 function renderInsightBlock(insight?: InsightBlock): string {
   if (!insight) return '';
 
@@ -690,6 +959,56 @@ function renderInnovationPortfolio(data?: InnovationPortfolio): string {
   `;
 }
 
+function renderFrontierTechnologies(data?: FrontierWatch[]): string {
+  if (!data || data.length === 0) return '';
+
+  return `
+    <section class="section" id="frontier-technologies">
+      <h2 class="section-title">Frontier Watch</h2>
+      <p class="section-subtitle">Technologies worth monitoring.</p>
+
+      <div class="frontier-grid">
+        ${data
+          .map(
+            (tech) => `
+          <div class="frontier-card">
+            <div class="frontier-header">
+              <div>
+                <h4 class="frontier-title">${escapeHtml(tech.title)}</h4>
+                ${tech.innovation_type ? `<span class="frontier-type">${escapeHtml(tech.innovation_type)}</span>` : ''}
+              </div>
+              ${
+                tech.trl_estimate
+                  ? `
+                <div class="frontier-trl">
+                  <span class="trl-label">TRL</span>
+                  <span class="trl-value">${tech.trl_estimate}</span>
+                </div>
+              `
+                  : ''
+              }
+            </div>
+
+            ${tech.one_liner ? `<p class="frontier-oneliner">${escapeHtml(tech.one_liner)}</p>` : ''}
+
+            ${tech.why_interesting ? `<div class="frontier-detail"><span class="mono-label-muted">Why Interesting</span><p class="body-text-secondary">${escapeHtml(tech.why_interesting)}</p></div>` : ''}
+
+            ${tech.why_not_now ? `<div class="frontier-detail"><span class="mono-label-muted">Why Not Now</span><p class="body-text-secondary">${escapeHtml(tech.why_not_now)}</p></div>` : ''}
+
+            <div class="frontier-meta">
+              ${tech.trigger_to_revisit ? `<p><strong>Trigger:</strong> ${escapeHtml(tech.trigger_to_revisit)}</p>` : ''}
+              ${tech.earliest_viability ? `<p><strong>Earliest viability:</strong> ${escapeHtml(tech.earliest_viability)}</p>` : ''}
+              ${tech.who_to_monitor ? `<p><strong>Monitor:</strong> ${escapeHtml(tech.who_to_monitor)}</p>` : ''}
+            </div>
+          </div>
+        `,
+          )
+          .join('')}
+      </div>
+    </section>
+  `;
+}
+
 function renderRisksWatchouts(data?: RiskAndWatchout[]): string {
   if (!data || data.length === 0) return '';
 
@@ -826,20 +1145,27 @@ export function renderReportToHtml({
   brief,
   createdAt,
 }: RenderOptions): string {
-  const readTime = calculateReadTime(reportData);
+  // Normalize field names for backward compatibility with v3 schema
+  const normalizedData = normalizeReportData(reportData);
+  const readTime = calculateReadTime(normalizedData);
+
+  // Extract domains searched from multiple possible locations
+  const domainsSearched = extractDomainsSearched(normalizedData);
 
   const bodyContent = `
     ${renderHeader(title, createdAt, readTime)}
     ${renderBrief(brief)}
-    ${renderExecutiveSummary(reportData.executive_summary)}
-    ${renderProblemAnalysis(reportData.problem_analysis)}
-    ${renderConstraints(reportData.constraints_and_metrics)}
-    ${renderChallengeFrame(reportData.challenge_the_frame)}
-    ${renderSolutionConcepts(reportData.execution_track)}
-    ${renderInnovationPortfolio(reportData.innovation_portfolio)}
-    ${renderRisksWatchouts(reportData.risks_and_watchouts)}
-    ${renderSelfCritique(reportData.self_critique)}
-    ${renderRecommendation(reportData.what_id_actually_do, reportData.strategic_integration?.personal_recommendation)}
+    ${renderExecutiveSummary(normalizedData.executive_summary)}
+    ${renderProblemAnalysis(normalizedData.problem_analysis)}
+    ${renderConstraints(normalizedData.constraints_and_metrics)}
+    ${renderChallengeFrame(normalizedData.challenge_the_frame)}
+    ${renderInnovationAnalysis(normalizedData.innovation_analysis, domainsSearched)}
+    ${renderSolutionConcepts(normalizedData.execution_track)}
+    ${renderInnovationPortfolio(normalizedData.innovation_portfolio)}
+    ${renderFrontierTechnologies(normalizedData.innovation_portfolio?.frontier_watch)}
+    ${renderRisksWatchouts(normalizedData.risks_and_watchouts)}
+    ${renderSelfCritique(normalizedData.self_critique)}
+    ${renderRecommendation(normalizedData.what_id_actually_do, normalizedData.strategic_integration?.personal_recommendation)}
   `;
 
   return `<!DOCTYPE html>
