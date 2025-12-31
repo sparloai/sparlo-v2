@@ -11,9 +11,75 @@
  * - Labels: 13px, uppercase, tracking wide
  * - Headings: font-semibold, tracking-tight
  */
-import { type ReactNode, memo } from 'react';
+import { type ReactNode, memo, useMemo } from 'react';
 
 import { cn } from '@kit/ui/utils';
+
+// ============================================
+// CITATION PARSING UTILITY
+// ============================================
+
+/**
+ * Parse text containing inline citations like `<sup>[1]</sup>` and render as React elements.
+ * Returns an array of strings and React elements that can be rendered.
+ */
+export function parseCitations(text: string): (string | ReactNode)[] {
+  if (!text) return [];
+
+  // Match <sup>[N]</sup> pattern (case-insensitive, handles whitespace)
+  const citationRegex = /<sup>\s*\[(\d+)\]\s*<\/sup>/gi;
+
+  const parts: (string | ReactNode)[] = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = citationRegex.exec(text)) !== null) {
+    // Add text before the citation
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    // Add the citation as a superscript element
+    const citationNumber = match[1];
+    parts.push(
+      <sup
+        key={`citation-${match.index}`}
+        className="text-[11px] font-medium text-zinc-500 ml-0.5"
+      >
+        [{citationNumber}]
+      </sup>,
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text after last citation
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : [text];
+}
+
+/**
+ * CitedText component - renders text with inline citations parsed.
+ * Use this for any prose text that might contain <sup>[N]</sup> citations.
+ */
+interface CitedTextProps {
+  children: string;
+  className?: string;
+  as?: 'p' | 'span' | 'div';
+}
+
+export const CitedText = memo(function CitedText({
+  children,
+  className,
+  as: Component = 'p',
+}: CitedTextProps) {
+  const parsedContent = useMemo(() => parseCitations(children), [children]);
+
+  return <Component className={className}>{parsedContent}</Component>;
+});
 
 // ============================================
 // TYPOGRAPHY PRIMITIVES
@@ -100,6 +166,8 @@ interface BodyTextProps {
   className?: string;
   size?: 'lg' | 'md' | 'sm';
   variant?: 'primary' | 'secondary' | 'muted';
+  /** When true, parses <sup>[N]</sup> patterns and renders as proper superscript elements */
+  parseCited?: boolean;
 }
 
 export const BodyText = memo(function BodyText({
@@ -107,6 +175,7 @@ export const BodyText = memo(function BodyText({
   className,
   size = 'md',
   variant = 'primary',
+  parseCited = true,
 }: BodyTextProps) {
   const sizeClasses = {
     lg: 'text-[22px]',
@@ -120,6 +189,14 @@ export const BodyText = memo(function BodyText({
     muted: 'text-zinc-500',
   };
 
+  // Parse citations if children is a string and parseCited is true
+  const content = useMemo(() => {
+    if (parseCited && typeof children === 'string') {
+      return parseCitations(children);
+    }
+    return children;
+  }, [children, parseCited]);
+
   return (
     <p
       className={cn(
@@ -129,7 +206,7 @@ export const BodyText = memo(function BodyText({
         className,
       )}
     >
-      {children}
+      {content}
     </p>
   );
 });
