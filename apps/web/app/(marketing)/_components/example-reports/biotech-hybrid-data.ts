@@ -6,13 +6,13 @@ import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-r
  */
 export const BIOTECH_HYBRID_REPORT: HybridReportData = {
   title:
-    'CAR-T Manufacturing Cost Reduction: From $300K to $30K Through Integration, Not Invention',
+    '$30K CAR-T Manufacturing Using Only Validated Components',
   brief:
     'CAR-T manufacturing costs $300-500K per patient, with 2-4 week vein-to-vein time during which patients often progress. The autologous model requires dedicated manufacturing per patient with no economies of scale. Allogeneic approaches solve cost but create rejection and persistence problems. Need a path to <$50K manufacturing cost while maintaining autologous-like persistence and efficacy. Process must work with variable input material quality—patient cells post-chemo are often in poor condition.',
 
   executive_summary: {
     narrative_lead:
-      "The CAR-T industry has been solving three separate problems—viral vector cost, manufacturing time, and automation—as if they were unrelated. They're not. Novartis proved 2-day manufacturing works (T-Charge), academic groups proved non-viral transduction works (Sleeping Beauty), and Miltenyi proved automated closed systems work (Prodigy). No one has combined them because different companies own different pieces. The integration is the innovation, and it's achievable in 18-24 months for $2-5M investment, delivering $25-35K COGS—a 10x cost reduction using only validated components.",
+      "Three validated approaches already exist: Novartis proved 2-day manufacturing works (T-Charge), academic groups proved non-viral transduction works (Sleeping Beauty), and Miltenyi proved automated closed systems work (Prodigy). Combining them eliminates the $50-100K viral vector cost, reduces cleanroom time from 14 days to 2-3 days, and uses existing FDA-accepted automation. Investment of $2-5M over 18-24 months to IND delivers $25-35K COGS—a 10x cost reduction using only components with clinical validation history.",
     primary_recommendation:
       'Pursue integrated rapid manufacturing combining Prodigy automation + Sleeping Beauty non-viral transduction + T-Charge-style minimal expansion with in vivo expansion support. This eliminates the $50-100K viral vector cost, reduces cleanroom time from 14 days to 2-3 days, and uses existing FDA-accepted automation. Investment of $2-5M over 18-24 months to IND. Parallel track: begin hospital blood bank pilot to validate decentralized manufacturing model.',
     viability: 'uncertain',

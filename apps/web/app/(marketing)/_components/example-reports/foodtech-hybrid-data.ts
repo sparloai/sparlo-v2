@@ -2,13 +2,13 @@ import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-r
 
 export const FOODTECH_HYBRID_REPORT: HybridReportData = {
   title:
-    'Breaking the Cold Chain Assumption: Multi-Mechanism Preservation for Smallholder Farmers',
+    '14-Day Mango Shelf Life at 40°C for $0.005/kg',
   brief:
     "30-40% of fruits and vegetables in sub-Saharan Africa and South Asia rot before reaching consumers—$15B+ annual loss for smallholder farmers. Cold chain doesn't exist (no grid, no roads). Current solutions are evaporative coolers (limited cooling, high humidity promotes mold) or solar-powered refrigeration (too expensive for <$5/day income farmers). Need preservation approach that extends shelf life of tomatoes, mangoes, and leafy greens from 3-5 days to 14-21 days without refrigeration, at <$0.01/kg cost. Must work at ambient 30-40°C, be farmer-operable without training, and use locally available or very cheap materials.",
 
   executive_summary: {
     narrative_lead:
-      "The produce preservation industry has been solving the wrong problem for decades. While billions flow into cold chain infrastructure, the 1-MCP literature proves that for climacteric fruits like tomatoes and mangoes, ethylene control alone achieves 3-5x shelf life extension at ambient temperature—no cooling required. The breakthrough insight is that charcoal from agricultural waste (coconut shells, rice husks) adsorbs ethylene at 40-60% the efficacy of commercial systems at 1/10th the cost, while lime whitewash chemically oxidizes any remaining ethylene. Combined with simple oil coatings that decouple produce from Zeer pot humidity, we can achieve the 14-21 day target using materials that cost essentially nothing because they're already waste products.",
+      "For climacteric fruits like tomatoes and mangoes, ethylene control alone achieves 3-5x shelf life extension at ambient temperature—demonstrated repeatedly in 1-MCP literature since the 1990s. Charcoal from agricultural waste (coconut shells, rice husks) adsorbs ethylene at 40-60% the efficacy of commercial systems. Lime whitewash oxidizes residual ethylene. Simple oil coatings protect produce from humidity damage in Zeer pots. Combined, these materials—already waste products—achieve 14-21 day preservation at <$0.005/kg operating cost. Investment: $2-10 per household.",
     primary_recommendation:
       'Deploy the Ethylene-First Preservation System immediately: charcoal sachets + lime-washed containers for tomatoes and mangoes, with oil-coated produce in Zeer pots for leafy greens. Investment is $2-10 per household using waste materials. Validate with 2-week side-by-side trial (<$50) before scaling. This approach achieves 2-4x shelf life extension at <$0.005/kg operating cost—half the target budget—while eliminating dependency on electricity, supply chains, or technical expertise.',
     viability: 'conditionally_viable',

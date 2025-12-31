@@ -133,9 +133,9 @@ export function SparloHero() {
           </div>
           <div className="space-y-4">
             {[
-              'CAR-T Manufacturing Cost Reduction: From $300K to $30K Through Integration, Not Invention',
-              'On-Site Food Waste Processing: Mechanical-First Architecture for 80% Energy Reduction',
-              'Breaking the Cold Chain Assumption: Multi-Mechanism Preservation for Smallholder Farmers',
+              '$30K CAR-T Manufacturing Using Only Validated Components',
+              '15 kWh/ton Food Waste Processing with Off-the-Shelf Equipment',
+              '14-Day Mango Shelf Life at 40°C for $0.005/kg',
               'Recyclable High-Performance Composites: Repurposing Polyurethane Glycolysis at Industrial Scale',
             ].map((title, i) => (
               <div

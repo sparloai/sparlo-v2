@@ -173,19 +173,19 @@ function CancelButton({
  */
 function EmptyState() {
   return (
-    <div className="mt-16 text-center" data-test="reports-empty-state">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-xl bg-zinc-100">
-        <FileText className="h-8 w-8 text-zinc-400" />
+    <div className="mt-12 text-center sm:mt-16" data-test="reports-empty-state">
+      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-zinc-100 sm:h-16 sm:w-16">
+        <FileText className="h-7 w-7 text-zinc-400 sm:h-8 sm:w-8" />
       </div>
-      <p className="mt-6 text-[18px] tracking-[-0.02em] text-zinc-500">
+      <p className="mt-5 text-[16px] tracking-[-0.02em] text-zinc-500 sm:mt-6 sm:text-[18px]">
         No reports yet
       </p>
-      <p className="mt-2 text-[15px] tracking-[-0.02em] text-zinc-400">
+      <p className="mt-2 text-[14px] tracking-[-0.02em] text-zinc-400 sm:text-[15px]">
         Get started by creating your first analysis
       </p>
       <Link
         href="/home/reports/new"
-        className="mt-8 inline-flex items-center gap-2 bg-zinc-900 px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-zinc-800"
+        className="mt-6 inline-flex items-center gap-2 bg-zinc-900 px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800 active:bg-zinc-700 sm:mt-8 sm:px-6 sm:text-[15px]"
       >
         <Plus className="h-4 w-4" />
         New Analysis
@@ -205,13 +205,13 @@ function NoResultsState({
   onClear: () => void;
 }) {
   return (
-    <div className="mt-12 text-center">
-      <p className="text-[16px] tracking-[-0.02em] text-zinc-500">
+    <div className="mt-10 text-center sm:mt-12">
+      <p className="text-[15px] tracking-[-0.02em] text-zinc-500 sm:text-[16px]">
         No reports match &ldquo;{query}&rdquo;
       </p>
       <button
         onClick={onClear}
-        className="mt-4 text-[14px] tracking-[-0.02em] text-zinc-400 underline transition-colors hover:text-zinc-600"
+        className="mt-3 text-[13px] tracking-[-0.02em] text-zinc-400 underline transition-colors hover:text-zinc-600 active:text-zinc-700 sm:mt-4 sm:text-[14px]"
       >
         Clear search
       </button>
@@ -259,30 +259,30 @@ function ReportCard({
       data-test={`report-card-${report.id}`}
       className={cn(
         'group relative transition-all duration-200',
-        'border-l-2 py-6 pr-6 pl-8',
+        'border-l-2 px-4 py-5 sm:py-6 sm:pr-6 sm:pl-8',
         config.borderClass,
         config.bgClass,
-        isClickable && 'cursor-pointer hover:bg-zinc-50',
+        isClickable && 'cursor-pointer hover:bg-zinc-50 active:bg-zinc-100',
         !isLast && 'border-b border-zinc-100',
       )}
       onClick={handleClick}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         {/* Left content */}
         <div className="min-w-0 flex-1">
-          <h3 className="text-[18px] font-medium tracking-[-0.02em] text-zinc-900">
+          <h3 className="text-[16px] font-medium tracking-[-0.02em] text-zinc-900 sm:text-[18px]">
             {displayTitle}
           </h3>
 
           {/* Status row */}
-          <div className="mt-4 flex items-center gap-4">
+          <div className="mt-3 flex flex-wrap items-center gap-2 sm:mt-4 sm:gap-4">
             <div className="flex items-center gap-2">
               <div
                 className={cn('h-1.5 w-1.5 rounded-full', config.dotClass)}
               />
               <span
                 className={cn(
-                  'text-[13px] font-medium tracking-[0.06em] uppercase',
+                  'text-[12px] font-medium tracking-[0.06em] uppercase sm:text-[13px]',
                   config.textClass,
                 )}
               >
@@ -290,12 +290,12 @@ function ReportCard({
               </span>
             </div>
 
-            <span className="text-zinc-300">·</span>
+            <span className="hidden text-zinc-300 sm:inline">·</span>
 
             {isProcessing ? (
               <ElapsedTime createdAt={report.created_at} />
             ) : (
-              <span className="text-[13px] tracking-[-0.02em] text-zinc-500">
+              <span className="text-[12px] tracking-[-0.02em] text-zinc-500 sm:text-[13px]">
                 {report.concept_count > 0
                   ? `${report.concept_count} ${report.concept_count === 1 ? 'concept' : 'concepts'}`
                   : formatReportDate(report.created_at)}
@@ -305,24 +305,24 @@ function ReportCard({
 
           {/* Additional messages */}
           {isClarifying && (
-            <p className="mt-3 text-[14px] tracking-[-0.02em] text-zinc-500">
+            <p className="mt-2 text-[13px] tracking-[-0.02em] text-zinc-500 sm:mt-3 sm:text-[14px]">
               We need more information to continue
             </p>
           )}
           {isFailed && (
-            <p className="mt-3 text-[14px] tracking-[-0.02em] text-zinc-500">
+            <p className="mt-2 text-[13px] tracking-[-0.02em] text-zinc-500 sm:mt-3 sm:text-[14px]">
               {report.error_message ||
                 'Report generation failed. Please try again.'}
             </p>
           )}
         </div>
 
-        {/* Right content */}
+        {/* Right content - date and actions */}
         <div
-          className="flex flex-col items-end gap-3"
+          className="flex items-center justify-between gap-3 border-t border-zinc-100 pt-3 sm:flex-col sm:items-end sm:border-t-0 sm:pt-0"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="text-[13px] tracking-[-0.02em] text-zinc-400">
+          <span className="text-[12px] tracking-[-0.02em] text-zinc-400 sm:text-[13px]">
             {formatReportDate(report.created_at)}
           </span>
 
@@ -343,9 +343,9 @@ function ReportCard({
         </div>
       </div>
 
-      {/* Navigation chevron */}
+      {/* Navigation chevron - hidden on mobile */}
       {isClickable && (
-        <ChevronRight className="absolute top-1/2 right-6 h-4 w-4 -translate-y-1/2 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100" />
+        <ChevronRight className="absolute top-1/2 right-4 hidden h-4 w-4 -translate-y-1/2 text-zinc-300 opacity-0 transition-opacity group-hover:opacity-100 sm:right-6 sm:block" />
       )}
     </div>
   );
@@ -391,14 +391,14 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-8 pt-24 pb-16">
+    <div className="mx-auto w-full max-w-3xl px-4 pt-20 pb-16 sm:px-8 sm:pt-24">
       {/* Header */}
-      <div className="flex items-end justify-between">
-        <h1 className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <h1 className="font-heading text-[32px] font-normal tracking-[-0.02em] text-zinc-900 sm:text-[42px]">
           Reports
         </h1>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center justify-between gap-4 sm:gap-6">
           <Link
             href="/home/archived"
             className="flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
@@ -410,16 +410,16 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
           <Link
             href="/home/reports/new"
             data-test="new-report-button"
-            className="inline-flex items-center gap-2 bg-zinc-900 px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800"
+            className="inline-flex items-center gap-2 bg-zinc-900 px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800 sm:px-5"
           >
             <Plus className="h-4 w-4" />
-            New Analysis
+            <span className="hidden xs:inline">New</span> Analysis
           </Link>
         </div>
       </div>
 
       {/* Search */}
-      <div className="mt-10 mb-8">
+      <div className="mt-6 mb-6 sm:mt-10 sm:mb-8">
         <div className="group relative">
           <Search className="absolute top-1/2 left-0 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-zinc-600" />
           <input
@@ -427,7 +427,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search reports..."
-            className="w-full border-b border-zinc-200 bg-transparent py-3 pr-4 pl-7 text-[16px] text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none"
+            className="w-full border-b border-zinc-200 bg-transparent py-3 pr-4 pl-7 text-[15px] text-zinc-900 transition-colors placeholder:text-zinc-400 focus:border-zinc-900 focus:outline-none sm:text-[16px]"
             data-test="search-reports-input"
           />
         </div>
@@ -454,8 +454,8 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
           </div>
 
           {/* Footer count */}
-          <div className="mt-4 px-1">
-            <span className="text-[13px] tracking-[-0.02em] text-zinc-400">
+          <div className="mt-3 px-1 sm:mt-4">
+            <span className="text-[12px] tracking-[-0.02em] text-zinc-400 sm:text-[13px]">
               Showing {filteredReports.length} of {reports.length} reports
             </span>
           </div>

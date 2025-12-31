@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { motion } from 'framer-motion';
 import { Loader2, MessageSquare } from 'lucide-react';
 
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
@@ -153,20 +152,16 @@ export function ReportDisplay({
 
       {/* Chat Toggle Button */}
       {!isChatOpen && (
-        <motion.button
-          className="fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-2xl bg-zinc-900 px-6 py-4 text-white shadow-[0_8px_30px_rgba(0,0,0,0.12),0_4px_10px_rgba(0,0,0,0.08)] transition-all hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:hover:bg-zinc-100"
+        <button
+          className="fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-2xl bg-zinc-900 px-6 py-4 text-white shadow-[0_8px_30px_rgba(0,0,0,0.12),0_4px_10px_rgba(0,0,0,0.08)] transition-all hover:scale-[1.02] hover:-translate-y-0.5 hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:hover:bg-zinc-100"
           onClick={() => setIsChatOpen(true)}
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          whileHover={{ scale: 1.02, y: -2 }}
-          transition={{ type: 'spring', damping: 20, stiffness: 300 }}
         >
           <MessageSquare className="h-5 w-5" strokeWidth={1.5} />
           <span className="text-[15px] font-medium">Go Deeper</span>
           <span className="rounded-md bg-white/15 px-2 py-1 text-[11px] font-medium dark:bg-zinc-900/20">
             ⌘/
           </span>
-        </motion.button>
+        </button>
       )}
 
       {/* Chat Drawer */}

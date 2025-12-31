@@ -2,13 +2,13 @@ import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-r
 
 export const MATERIALS_SCIENCE_HYBRID_REPORT: HybridReportData = {
   title:
-    'Transparent Wood at Scale: Lignin-Retention Processing for Architectural Glass Replacement',
+    '$40/ft² Transparent Wood: Continuous Processing for 2m² Panels',
   brief:
     'Transparent wood (delignified, polymer-infiltrated) has been demonstrated at lab scale with 80-90% optical transmittance, 5x the impact resistance of glass, and natural insulating properties (R-value 5x glass). But production requires 12-24 hour chemical delignification, expensive polymer infiltration, and produces pieces limited to ~1m². Architectural applications need 2-3m² panels, production at <$50/ft² (vs. ~$500/ft² current), and outdoor durability (UV, moisture). Need scalable process that maintains optical and mechanical properties while cutting cost 90% and enabling larger formats.',
 
   executive_summary: {
     narrative_lead:
-      "The transparent wood field has been solving the wrong problem. For fifteen years, researchers have optimized lignin removal efficiency—but lignin's brown color comes from specific chromophoric structures that can be destroyed oxidatively without removing the lignin itself. Meanwhile, the paper industry has operated continuous delignification at 1,000+ tons/day for decades, and Mi et al. (2020) already proved roll-to-roll transparent wood processing works. The path to $50/ft² isn't a materials science breakthrough—it's process engineering that borrows from industries that solved these problems at scale.",
+      "Lignin's brown color comes from specific chromophoric structures that can be destroyed oxidatively without removing the lignin itself—preserving wood's mechanical properties while achieving transparency. The paper industry has operated continuous chemical processing at 1,000+ tons/day for decades; Mi et al. (2020) demonstrated roll-to-roll transparent wood processing at lab scale. Adapting continuous veneer tunnel processing (Kamyr digester architecture) to thin veneers (0.5-1mm) exploits diffusion scaling to achieve $25-40/ft² at 2-3m² panel sizes. Chromophore destruction chemistry, if UV stability validates, could push costs to $10-20/ft².",
     primary_recommendation:
       'Pursue continuous veneer tunnel processing (adapted from paper industry Kamyr digesters) as the primary path, with parallel validation of chromophore destruction chemistry that could eliminate delignification entirely. The continuous tunnel approach achieves $25-40/ft² with proven technology; chromophore destruction could reach $10-20/ft² if UV stability validates. Both paths use thin veneer (0.5-1mm) to exploit diffusion scaling—the single most important insight for cost reduction.',
     viability: 'uncertain',

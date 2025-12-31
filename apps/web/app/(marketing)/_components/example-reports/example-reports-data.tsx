@@ -373,7 +373,7 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
     id: 'food-waste',
     title: 'Waste',
     headline:
-      'On-Site Food Waste Processing: Mechanical-First Architecture for 80% Energy Reduction',
+      '15 kWh/ton Food Waste Processing with Off-the-Shelf Equipment',
     subtitle: 'Commercial Kitchen Waste-to-Value System',
     locked: false,
     metadata: {
@@ -386,8 +386,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
     id: 'food-tech',
     title: 'Food Tech',
     headline:
-      'Breaking the Cold Chain Assumption: Multi-Mechanism Preservation for Smallholder Farmers',
-    subtitle: 'Post-Harvest Loss Reduction System',
+      '14-Day Mango Shelf Life at 40°C for $0.005/kg',
+    subtitle: 'Post-Harvest Preservation Without Refrigeration',
     locked: false,
     metadata: {
       readTime: '18 min read',
@@ -399,8 +399,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
     id: 'biotech',
     title: 'Biotech',
     headline:
-      'CAR-T Manufacturing Cost Reduction: From $300K to $30K Through Integration, Not Invention',
-    subtitle: 'CAR-T Cell Therapy Manufacturing Innovation',
+      '$30K CAR-T Manufacturing Using Only Validated Components',
+    subtitle: '90% Cost Reduction Without Novel Technology',
     locked: false,
     metadata: {
       readTime: '51 min read',
@@ -412,8 +412,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
     id: 'energy',
     title: 'Energy',
     headline:
-      'EV Fleet Thermal Management: Depot-Centric Pre-Conditioning for 40% Winter Range Recovery',
-    subtitle: 'Cold Climate Electric Vehicle Optimization',
+      '8-Hour Refrigerated EV Routes on 5-8 kWh Total Draw',
+    subtitle: 'Depot-Based Thermal Pre-Conditioning for Delivery Fleets',
     locked: false,
     metadata: {
       readTime: '24 min read',
@@ -425,8 +425,8 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
     id: 'materials-science',
     title: 'Materials Science',
     headline:
-      'Transparent Wood at Scale: Lignin-Retention Processing for Architectural Glass Replacement',
-    subtitle: 'Sustainable Building Materials Innovation',
+      '$40/ft² Transparent Wood: Continuous Processing for 2m² Panels',
+    subtitle: 'Architectural Glass Replacement at Scale',
     locked: false,
     metadata: {
       readTime: '26 min read',

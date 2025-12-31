@@ -12,7 +12,7 @@ export const ChatHeader = memo(function ChatHeader({
   onClose,
 }: ChatHeaderProps) {
   return (
-    <header className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
+    <header className="flex h-14 items-center justify-between border-b border-zinc-200 px-5">
       <h2
         className="text-[14px] font-medium tracking-[-0.01em] text-zinc-900"
         style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
