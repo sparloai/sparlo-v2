@@ -302,6 +302,18 @@ export const POST = enhanceRouteHandler(
     const reportData = report.report_data as Record<string, unknown> | null;
     let reportContext = '';
 
+    // Debug: Log top-level keys and nested structure
+    console.log('[Chat] reportData keys:', reportData ? Object.keys(reportData) : 'null');
+    if (reportData?.report) {
+      const nestedReport = reportData.report as Record<string, unknown>;
+      console.log('[Chat] reportData.report keys:', Object.keys(nestedReport));
+      if (nestedReport.innovation_portfolio) {
+        const ip = nestedReport.innovation_portfolio as Record<string, unknown>;
+        console.log('[Chat] innovation_portfolio keys:', Object.keys(ip));
+        console.log('[Chat] frontier_watch exists:', !!ip.frontier_watch, 'length:', Array.isArray(ip.frontier_watch) ? ip.frontier_watch.length : 'not array');
+      }
+    }
+
     if (reportData?.markdown) {
       // Standard report with markdown already
       reportContext = reportData.markdown as string;
@@ -322,6 +334,8 @@ export const POST = enhanceRouteHandler(
 
     // Log context size for monitoring
     console.log('[Chat] Report context length:', reportContext.length, 'chars');
+    // Debug: Check if frontier is in output
+    console.log('[Chat] Context includes frontier:', reportContext.toLowerCase().includes('frontier'));
 
     // Build messages for Anthropic
     const anthropic = new Anthropic({
