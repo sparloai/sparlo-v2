@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
-import puppeteer, { type Browser } from 'puppeteer';
+import chromium from '@sparticuz/chromium';
+import puppeteer, { type Browser } from 'puppeteer-core';
 
 import { enhanceRouteHandler } from '@kit/next/routes';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
@@ -89,25 +90,10 @@ async function getBrowser(): Promise<Browser> {
     browserLock = true;
     try {
       browserInstance = await puppeteer.launch({
-        headless: true,
-        args: [
-          // Security: --no-sandbox required for containerized environments (Railway).
-          // XSS protection is enforced via whitelist sanitization in render-report-html.ts
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-          '--no-first-run',
-          '--no-zygote',
-          // Removed --single-process for better stability and memory management
-          '--disable-extensions',
-          // Additional memory optimization flags
-          '--disable-background-networking',
-          '--disable-default-apps',
-          '--disable-sync',
-          '--metrics-recording-only',
-          '--mute-audio',
-        ],
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
       });
     } finally {
       browserLock = false;
