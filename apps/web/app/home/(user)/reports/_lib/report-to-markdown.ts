@@ -145,9 +145,11 @@ export function reportToMarkdown(
   }
 
   // Solution Concepts (Execution Track)
-  if (data.execution_track) {
+  // Handle both old schema (execution_track) and v12 schema (solution_concepts)
+  const executionTrackData = data.execution_track ?? (data as Record<string, unknown>).solution_concepts;
+  if (executionTrackData) {
     sections.push('\n## Solution Concepts');
-    const et = data.execution_track as ExecutionTrack;
+    const et = executionTrackData as ExecutionTrack;
 
     if (et.intro) sections.push(et.intro);
 
@@ -206,14 +208,30 @@ export function reportToMarkdown(
   }
 
   // Innovation Concepts
-  if (data.innovation_portfolio) {
-    const ip = data.innovation_portfolio as InnovationPortfolio;
+  // Handle both old schema (innovation_portfolio) and v12 schema (innovation_concepts)
+  const innovationData = data.innovation_portfolio ?? (data as Record<string, unknown>).innovation_concepts;
+  if (innovationData) {
+    const ip = innovationData as InnovationPortfolio & {
+      // v12 schema uses 'recommended' instead of 'recommended_innovation'
+      recommended?: InnovationPortfolio['recommended_innovation'];
+      // v12 schema uses 'parallel' instead of 'parallel_investigations'
+      parallel?: InnovationPortfolio['parallel_investigations'];
+    };
 
-    if (ip.recommended_innovation) {
+    // Handle both old (recommended_innovation) and v12 (recommended) field names
+    const recommendedInnovation = ip.recommended_innovation ?? ip.recommended;
+    // Handle both old (parallel_investigations) and v12 (parallel) field names
+    const parallelInvestigations = ip.parallel_investigations ?? ip.parallel;
+
+    // Only add Innovation Concepts header if we have content
+    const hasInnovationContent = recommendedInnovation || parallelInvestigations?.length || ip.frontier_watch?.length;
+    if (hasInnovationContent) {
       sections.push('\n## Innovation Concepts');
       if (ip.intro) sections.push(ip.intro);
+    }
 
-      const ri = ip.recommended_innovation;
+    if (recommendedInnovation) {
+      const ri = recommendedInnovation;
       sections.push(`\n### Recommended: ${ri.title}`);
       if (ri.what_it_is) sections.push(`**What It Is:** ${ri.what_it_is}`);
       if (ri.why_it_works)
@@ -236,9 +254,9 @@ export function reportToMarkdown(
     }
 
     // Parallel Investigations
-    if (ip.parallel_investigations?.length) {
+    if (parallelInvestigations?.length) {
       sections.push('\n### Parallel Investigations');
-      (ip.parallel_investigations as ParallelInvestigation[]).forEach((p) => {
+      (parallelInvestigations as ParallelInvestigation[]).forEach((p) => {
         sections.push(`\n**${p.title}**`);
         if (p.one_liner) sections.push(p.one_liner);
         if (p.what_it_is) sections.push(`What it is: ${p.what_it_is}`);
