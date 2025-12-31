@@ -1003,8 +1003,29 @@ ${reportContext}
         const response = await anthropic.messages.create({
           model: MODELS.OPUS,
           max_tokens: 4096,
-          system: systemPrompt,
+          system: [
+            {
+              type: 'text',
+              text: systemPrompt,
+              cache_control: { type: 'ephemeral' }, // Enable prompt caching
+            },
+          ],
           messages,
+        });
+
+        // Log cache metrics
+        const usage = response.usage as {
+          cache_read_input_tokens?: number;
+          cache_creation_input_tokens?: number;
+          input_tokens: number;
+          output_tokens: number;
+        };
+        console.log('[Chat] Cache metrics (JSON):', {
+          cache_read_tokens: usage.cache_read_input_tokens ?? 0,
+          cache_creation_tokens: usage.cache_creation_input_tokens ?? 0,
+          input_tokens: usage.input_tokens,
+          output_tokens: usage.output_tokens,
+          cache_hit: (usage.cache_read_input_tokens ?? 0) > 0,
         });
 
         const assistantContent =
@@ -1052,7 +1073,13 @@ ${reportContext}
     const stream = await anthropic.messages.stream({
       model: MODELS.OPUS,
       max_tokens: 4096,
-      system: systemPrompt,
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+          cache_control: { type: 'ephemeral' }, // Enable prompt caching
+        },
+      ],
       messages,
     });
 
@@ -1078,7 +1105,22 @@ ${reportContext}
             );
           });
 
-          await stream.finalMessage();
+          const finalMessage = await stream.finalMessage();
+
+          // Log cache metrics for streaming response
+          const usage = finalMessage.usage as {
+            cache_read_input_tokens?: number;
+            cache_creation_input_tokens?: number;
+            input_tokens: number;
+            output_tokens: number;
+          };
+          console.log('[Chat] Cache metrics (SSE):', {
+            cache_read_tokens: usage.cache_read_input_tokens ?? 0,
+            cache_creation_tokens: usage.cache_creation_input_tokens ?? 0,
+            input_tokens: usage.input_tokens,
+            output_tokens: usage.output_tokens,
+            cache_hit: (usage.cache_read_input_tokens ?? 0) > 0,
+          });
 
           // P0-042: Use atomic append RPC (handles P1-046 history limit internally)
           const newMessages = [
