@@ -41,6 +41,7 @@ import {
   InnovationConceptsSection,
   ProblemAnalysisSection,
   RecommendationSection,
+  ReferencesSection,
   RisksWatchoutsSection,
   SelfCritiqueSection,
   SolutionConceptsSection,
@@ -777,6 +778,9 @@ const ReportContent = memo(function ReportContent({
       {normalizedData.next_steps && normalizedData.next_steps.length > 0 && (
         <NextStepsSection steps={normalizedData.next_steps} />
       )}
+
+      {/* References (inline citations) */}
+      <ReferencesSection data={normalizedData.references} />
     </>
   );
 });

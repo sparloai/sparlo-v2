@@ -13,6 +13,7 @@ export { InnovationAnalysisSection } from './innovation-analysis';
 export { InnovationConceptsSection } from './innovation-concepts';
 export { ProblemAnalysisSection } from './problem-analysis';
 export { RecommendationSection } from './recommendation';
+export { ReferencesSection } from './references';
 export { RisksWatchoutsSection } from './risks-watchouts';
 export { SelfCritiqueSection } from './self-critique';
 export { SolutionConceptsSection } from './solution-concepts';

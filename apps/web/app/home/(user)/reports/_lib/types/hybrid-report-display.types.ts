@@ -464,6 +464,12 @@ export interface SelfCritique {
   validation_gaps?: ValidationGap[];
 }
 
+export interface Reference {
+  id: number;
+  citation: string;
+  url?: string;
+}
+
 export interface HybridReportData {
   title?: string;
   executive_summary?: string | StructuredExecutiveSummary;
@@ -490,6 +496,7 @@ export interface HybridReportData {
   what_id_actually_do?: string;
   follow_up_prompts?: string[];
   innovation_analysis?: InnovationAnalysis;
+  references?: Reference[];
 }
 
 export interface HybridReportDisplayProps {

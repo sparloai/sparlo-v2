@@ -2,493 +2,462 @@ import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-r
 
 /**
  * Biotech Hybrid Report Example Data
- * CAR-T Manufacturing Cost Reduction
+ * Protein A-Free mAb Purification
  */
 export const BIOTECH_HYBRID_REPORT: HybridReportData = {
   title:
-    '$30K CAR-T Manufacturing Using Only Validated Components',
+    'Protein A-Free mAb Purification: Achieving <$5/g Through Validated Non-Affinity Capture',
   brief:
-    'CAR-T manufacturing costs $300-500K per patient, with 2-4 week vein-to-vein time during which patients often progress. The autologous model requires dedicated manufacturing per patient with no economies of scale. Allogeneic approaches solve cost but create rejection and persistence problems. Need a path to <$50K manufacturing cost while maintaining autologous-like persistence and efficacy. Process must work with variable input material quality—patient cells post-chemo are often in poor condition.',
+    'Biologic drug purification uses Protein A chromatography resin at $15,000/L that lasts 100-200 cycles. Chromatography is 50-70% of mAb downstream cost. Capacity can\'t scale with upstream titer improvements. Need purification approach achieving 99%+ purity at <$10/g product cost without Protein A dependency.',
 
   executive_summary: {
     narrative_lead:
-      "Three validated approaches already exist: Novartis proved 2-day manufacturing works (T-Charge), academic groups proved non-viral transduction works (Sleeping Beauty), and Miltenyi proved automated closed systems work (Prodigy). Combining them eliminates the $50-100K viral vector cost, reduces cleanroom time from 14 days to 2-3 days, and uses existing FDA-accepted automation. Investment of $2-5M over 18-24 months to IND delivers $25-35K COGS—a 10x cost reduction using only components with clinical validation history.",
+      'Continuous cation exchange chromatography with flocculation pre-treatment already achieves 95%+ purity at $3-5/g—Pall and Cytiva sell the equipment, and Genentech has validated the precipitation chemistry. The barrier isn\'t finding the solution; it\'s integration and execution. For the 70% of mAbs with pI >7, this combination eliminates Protein A entirely while using commercial, FDA-validated platforms.',
     primary_recommendation:
-      'Pursue integrated rapid manufacturing combining Prodigy automation + Sleeping Beauty non-viral transduction + T-Charge-style minimal expansion with in vivo expansion support. This eliminates the $50-100K viral vector cost, reduces cleanroom time from 14 days to 2-3 days, and uses existing FDA-accepted automation. Investment of $2-5M over 18-24 months to IND. Parallel track: begin hospital blood bank pilot to validate decentralized manufacturing model.',
-    viability: 'uncertain',
+      'Implement continuous 4-column CEX capture (Pall Cadence or Cytiva ÄKTA pcc) with polyelectrolyte flocculation pre-treatment. Investment of $2-4M yields $3-5/g purification cost—a 3-10x improvement over Protein A. For acidic mAbs, use mixed-mode chromatography (Capto MMC) as the capture platform. Both approaches use commercial equipment with established regulatory precedent.',
+    viability: 'viable',
+    viability_label: 'Viable with high confidence for basic mAbs (pI >7); conditionally viable for acidic mAbs requiring mixed-mode alternatives',
   },
 
   problem_analysis: {
     whats_wrong: {
       prose:
-        'CAR-T manufacturing faces three irreducible constraints that compound into the current cost structure. First, cell expansion kinetics: T-cells double every 24-48 hours under optimal stimulation, meaning reaching therapeutic dose (10^9 cells) from apheresis input (10^7 CAR+ cells after transduction) requires ~7 doublings minimum, or 7-14 days. Second, sterility requirements: biological products require contamination control, and the 14-day sterility culture adds unavoidable wait time. Third, the batch-of-one model: each patient requires dedicated manufacturing with fixed costs (cleanroom, personnel, QC) that cannot be amortized across patients. The physics of cell biology set the floor; the business model prevents economies of scale.',
+        'Protein A resin at $15,000/L dominates 50-70% of downstream cost, creating a hard ceiling on mAb manufacturing economics. As upstream titers improve (now 5-10+ g/L), column capacity becomes the bottleneck—you can make more antibody than you can purify. The industry is optimizing an inherently expensive process rather than questioning whether Protein A is necessary at all.',
     },
     current_state_of_art: {
       benchmarks: [
         {
-          entity: 'Novartis (T-Charge platform)',
-          approach: '2-day manufacturing with in vivo expansion',
+          entity: 'Cytiva (MabSelect SuRe LX)',
+          approach:
+            'Alkali-stable Protein A with high capacity',
           current_performance:
-            'Comparable efficacy to standard 9-14 day protocols in Phase 1/2',
+            '50-60 g/L dynamic binding capacity, 300+ cycles with 0.5M NaOH CIP',
           target_roadmap:
-            'Replace standard Kymriah manufacturing; reduce turnaround to <1 week',
-          source: 'Dickinson et al., Blood 2023; NCT03761056',
+            'Incremental capacity improvements; no fundamental cost reduction',
+          source: 'Cytiva technical documentation',
         },
         {
-          entity: 'MD Anderson / Ziopharm (Sleeping Beauty)',
-          approach: 'Non-viral transposon-based CAR delivery',
+          entity: 'Pall Cadence BioSMB',
+          approach: 'Continuous multi-column chromatography',
           current_performance:
-            '10-30% transduction efficiency; clinical responses in Phase 1',
-          target_roadmap: 'Eliminate viral vector dependency entirely',
-          source: 'Kebriaei et al., JCI 2016',
+            '3-5x productivity improvement over batch; validated for mAb capture',
+          target_roadmap:
+            'Integration with non-affinity resins for Protein A-free platform',
+          source: 'Pall technical notes and conference presentations',
         },
         {
-          entity: 'Capstan Therapeutics',
-          approach: 'In vivo CAR generation via T-cell-targeted LNP-mRNA',
+          entity: 'Genentech/Amgen',
+          approach: 'Caprylic acid precipitation pre-treatment',
           current_performance:
-            'Preclinical proof of concept; functional CAR-T generated in vivo',
+            '>99% HCP removal, >95% mAb recovery at pilot scale',
           target_roadmap:
-            'IND filing 2025; eliminate ex vivo manufacturing entirely',
-          source: 'Company presentations; Rurik et al., Science 2022',
+            'Not disclosed; patents suggest commercial interest',
+          source: 'Brodsky et al. 2012; US Patent 8,044,017 B2',
         },
         {
-          entity: 'Fate Therapeutics',
-          approach: 'iPSC-derived allogeneic CAR-T',
+          entity: 'Plasma fractionation industry (CSL, Grifols, Takeda)',
+          approach: 'Cohn precipitation process',
           current_performance:
-            'Unlimited starting material; manufacturing at scale demonstrated',
-          target_roadmap:
-            'Solve persistence through engineering; true off-the-shelf product',
-          source: 'Mandal et al., Cell Stem Cell 2022',
+            'Pharmaceutical-grade IgG at $2-5/g, ton scale, no chromatography',
+          target_roadmap: 'Mature technology; no significant changes planned',
+          source: 'Industry standard for 80+ years',
         },
       ],
     },
     what_industry_does_today: [
       {
-        approach:
-          'Centralized GMP manufacturing with lentiviral vectors (Novartis/Kite model)',
+        approach: 'Protein A affinity chromatography as primary capture',
         limitation:
-          '$150-200K COGS, 3-4 week turnaround, patient progression during wait, 5-15% manufacturing failures',
+          'Resin costs $15,000/L, lasts 100-200 cycles, and capacity (~40 g/L) can\'t keep pace with upstream improvements',
       },
       {
-        approach:
-          'Point-of-care manufacturing with automation (Miltenyi Prodigy)',
+        approach: 'Three-column platform (Protein A → CEX → AEX)',
         limitation:
-          'Reduces logistics but still uses expensive viral vectors; $100K+ per run',
+          'Each step adds cost and yield loss; total downstream cost $15-50/g',
       },
       {
-        approach: 'Allogeneic off-the-shelf (Allogene, Precision Bio)',
+        approach: 'Alkali-stable Protein A variants (MabSelect SuRe)',
         limitation:
-          '$20-30K COGS but persistence measured in weeks, not months; requires redosing',
+          'Extends lifetime to 200+ cycles but doesn\'t address fundamental resin cost',
       },
       {
-        approach: 'Gene-edited allogeneic (CRISPR Therapeutics)',
+        approach: 'Mixed-mode or CEX capture for specific molecules',
         limitation:
-          "HLA knockout enables immune evasion but doesn't solve persistence; complex manufacturing",
+          'Requires molecule-specific optimization; not a true platform',
       },
     ],
     why_its_hard: {
       prose:
-        'The fundamental challenge is that the same crosslink density providing high Tg and creep resistance also makes the network resistant to dissolution. CAR-T manufacturing faces three irreducible constraints: cell expansion kinetics (7-14 days minimum), sterility requirements (14-day culture), and the batch-of-one model (fixed costs per patient). The physics of cell biology set the floor; the business model prevents economies of scale.',
+        'Protein A achieves extraordinary selectivity (Ka ~10⁸ M⁻¹) through a precisely evolved binding interface with the Fc region. This single-step selectivity is difficult to replicate with synthetic ligands or non-affinity mechanisms. The fundamental challenge is achieving 3-4 log HCP reduction (from ~100,000 ppm to <100 ppm) while maintaining >90% yield and avoiding aggregation. Chromatography capacity is limited by diffusion into porous beads—larger beads enable faster flow but lower capacity, creating an inherent tradeoff.',
       governing_equation: {
         equation:
-          'COGS = (Vector Cost + Cleanroom Days × Daily Rate + QC/Release + Labor + Logistics) / Success Rate',
+          'Purity = f(selectivity^stages); for batch chromatography, stages ≈ 1-2',
         explanation:
-          'Current: ($75K + 14×$7K + $30K + $25K + $15K) / 0.90 = ~$275K. Target requires attacking multiple terms simultaneously.',
+          'Protein A achieves high purity in one stage due to extreme selectivity. Lower-selectivity alternatives require more stages (continuous operation) or pre-treatment (flocculation/precipitation) to match performance.',
       },
     },
     first_principles_insight: {
       headline:
-        "The expansion doesn't need to happen in the factory—it can happen in the patient",
+        'Chromatography is not physically required for pharmaceutical-grade IgG—the plasma industry has proven this for 80 years',
       explanation:
-        'Lymph nodes achieve 10,000-fold T-cell expansion in 5-7 days during infection. Current CAR-T manufacturing tries to replicate this in culture flasks, poorly. T-Charge proved that infusing minimally-expanded cells with cytokine support achieves therapeutic doses through in vivo expansion. This insight collapses the manufacturing timeline from 14 days to 2-3 days and eliminates most cleanroom costs.',
+        'The Cohn process (1946) purifies plasma-derived IgG to pharmaceutical specifications using only precipitation and centrifugation. CSL Behring, Grifols, and Takeda operate at ton scale without any chromatography. The assumption that recombinant mAbs require Protein A is historical accident, not physical necessity. The barrier is organizational (different industries, different regulatory frameworks) not technical.',
     },
   },
 
   constraints_and_metrics: {
     hard_constraints: [
-      "Must maintain autologous persistence (patient's own cells avoid rejection)",
-      'Must achieve therapeutic dose (10^8-10^9 functional CAR-T cells)',
-      'Must meet FDA GMP requirements for cell therapy',
-      'Must maintain efficacy comparable to approved products (non-inferior CR rates)',
+      'Must achieve >99% monomeric IgG purity',
+      'HCP <100 ppm (regulatory requirement)',
+      'DNA <10 pg/dose (regulatory requirement)',
+      'Must maintain antibody integrity (no aggregation, denaturation, fragmentation)',
+      'Must be validatable for GMP manufacturing',
     ],
     soft_constraints: [
-      'Target <$50K COGS (assumed fully-loaded excluding R&D amortization)',
-      'Vein-to-vein time reduction (valuable but secondary to cost)',
-      'Process robustness across variable input quality (important but can be addressed through patient selection initially)',
+      'Target cost <$10/g (user stated; $3-5/g achievable with recommended approach)',
+      'Yield >85% (Protein A achieves 95%+; some tradeoff acceptable for cost reduction)',
+      'Process time competitive with 4-6 hour Protein A cycle (continuous operation changes this metric)',
     ],
     assumptions: [
-      'Cost target is COGS, not selling price—if margin requirements differ, adjust targets',
-      'Persistence requirement assumes months-to-years; if shorter persistence with redosing acceptable, different approaches viable',
-      'Efficacy comparison is to current approved products in same indication (B-ALL, DLBCL)',
-      'Vector costs are included in COGS target',
+      'Commercial scale >500 kg/year (economics differ at smaller scale)',
+      'Basic mAbs (pI >7) represent primary target (70% of approved mAbs)',
+      'Regulatory pathway exists via precedent (continuous chromatography, precipitation pre-treatment both validated)',
+      'Freedom to operate for caprylic acid precipitation (Genentech patents may require licensing or have expired)',
     ],
     success_metrics: [
       {
-        metric: 'Manufacturing COGS per patient',
-        target: '$30K',
-        minimum_viable: '$50K',
-        stretch: '$20K',
-        unit: 'USD',
+        metric: 'Purification cost',
+        target: '<$5/g',
+        minimum_viable: '<$10/g',
+        stretch: '<$3/g',
+        unit: '$/g product',
       },
       {
-        metric: 'Vein-to-vein time',
-        target: '7 days',
-        minimum_viable: '14 days',
-        stretch: '5 days',
-        unit: 'days',
+        metric: 'Purity (monomeric IgG)',
+        target: '>99%',
+        minimum_viable: '>95% (with polishing)',
+        stretch: '>99.5%',
+        unit: '% monomer',
       },
       {
-        metric: 'Manufacturing success rate',
-        target: '95%',
-        minimum_viable: '90%',
-        stretch: '98%',
-        unit: 'percent',
+        metric: 'HCP clearance',
+        target: '<50 ppm',
+        minimum_viable: '<100 ppm',
+        stretch: '<10 ppm',
+        unit: 'ppm',
       },
       {
-        metric: 'CAR-T persistence',
-        target: '6 months detectable',
-        minimum_viable: '3 months functional',
-        stretch: '12 months detectable',
-        unit: 'months',
+        metric: 'Yield',
+        target: '>90%',
+        minimum_viable: '>85%',
+        stretch: '>95%',
+        unit: '% recovery',
       },
       {
-        metric: 'Complete response rate',
-        target: 'Non-inferior to Kymriah/Yescarta',
-        minimum_viable: 'Within 10% of comparator',
-        stretch: 'Superior to comparator',
-        unit: 'percent CR',
+        metric: 'Resin/consumable lifetime',
+        target: '>500 cycles',
+        minimum_viable: '>300 cycles',
+        stretch: '>1000 cycles or single-use economics',
+        unit: 'cycles',
       },
     ],
   },
 
   challenge_the_frame: [
     {
-      assumption: 'Autologous persistence is required for efficacy',
+      assumption:
+        '70% of mAbs have pI >7 and are suitable for CEX capture',
       challenge:
-        'mRNA CAR-T trials show clinical responses with transient expression. If redosing is cheap, transient expression with repeated dosing may achieve equivalent outcomes without the complexity of stable integration.',
+        'This estimate comes from analysis of approved mAbs, which may not represent future pipeline. Engineered mAbs increasingly have modified Fc regions that could shift pI distribution.',
       implication:
-        "If transient expression is sufficient, in vivo LNP-mRNA becomes even more attractive, and the 'persistence problem' for allogeneic approaches becomes less critical.",
+        'If <50% of pipeline mAbs are suitable for CEX, mixed-mode chromatography becomes the primary platform rather than fallback',
     },
     {
-      assumption: 'The $50K cost target is the right goal',
+      assumption: 'Continuous chromatography is operationally feasible for typical biopharma organizations',
       challenge:
-        'If CAR-T achieves cure in 40-80% of patients, even $100K may be cost-effective vs. alternatives (palliative care, repeated chemotherapy, transplant). The cost target may be driven by payer negotiations rather than true value.',
+        'Continuous operation requires different skills, different QA/QC approaches, and 24/7 staffing. Many organizations may lack these capabilities.',
       implication:
-        'If $100K is acceptable, simpler approaches (stable producer lines alone, without non-viral transduction) may be sufficient. The integrated approach may be over-engineering.',
+        'If continuous operation is too complex, batch CEX with flocculation pre-treatment may be more practical, though with somewhat higher cost',
     },
     {
-      assumption: 'Manufacturing failures are primarily process-related',
+      assumption: 'Regulatory pathway exists via precedent',
       challenge:
-        "Fraietta et al. showed patient T-cell fitness determines outcomes. Manufacturing 'failures' may actually be patient selection failures—some patients simply don't have T-cells capable of becoming effective CAR-T.",
+        'While continuous chromatography and precipitation pre-treatment have been validated separately, the specific combination may require additional regulatory interaction',
       implication:
-        "If input quality is the bottleneck, process improvements won't help the hardest cases. Alternative cell sources (tissue-resident T-cells, iPSC-derived) or allogeneic approaches become more important.",
+        'Budget additional 6-12 months for regulatory strategy; engage FDA/EMA early in development',
     },
     {
-      assumption: 'Hospital blood banks can achieve manufacturing quality',
+      assumption: 'Plasma industry precedent translates to recombinant mAbs',
       challenge:
-        'Blood bank processing is simpler than CAR-T manufacturing. The failure modes are different (contamination vs. poor expansion). Site-to-site variability may be unacceptable for a cell therapy product.',
+        'CHO HCPs are different from plasma proteins; CHO cell culture conditions create different impurity profiles. The chemistry may not transfer directly.',
       implication:
-        'If decentralized manufacturing proves too variable, the centralized model may be necessary despite higher costs. Investment in blood bank network may be wasted.',
+        'Extensive validation required before assuming plasma fractionation methods work for CHO-derived mAbs; caprylic acid validation by Genentech is encouraging but not comprehensive',
     },
   ],
 
   innovation_analysis: {
-    domains_searched: [
-      'Viral vector manufacturing and producer cell lines',
-      'Non-viral gene delivery (Sleeping Beauty, piggyBac, CRISPR)',
-      'Automated cell processing systems',
-      'In vivo T-cell engineering approaches',
-      'Bone marrow transplant tolerance protocols',
-      'Cytokine biology and T-cell expansion',
-    ],
     reframe:
-      "Instead of asking 'how do we make ex vivo manufacturing cheaper,' we asked 'which parts of ex vivo manufacturing are actually necessary, and what can the patient's biology do better?'",
+      'Instead of asking \'how do we make Protein A cheaper?\', we asked \'what does the plasma industry know that recombinant biopharma has ignored for 80 years?\'',
+    domains_searched: [
+      'Plasma fractionation (Cohn process)',
+      'Dairy whey protein purification',
+      'Petrochemical continuous chromatography (SMB)',
+      'Wastewater treatment (flocculation, electrocoagulation)',
+      'Mineral processing (flotation)',
+      'Polymer chemistry (stimulus-responsive materials)',
+      'Crystallography (protein crystallization)',
+      'Chemical industry (liquid-liquid extraction)',
+    ],
   },
 
   execution_track: {
     intro:
-      'Solution concepts use proven technologies requiring integration, not invention. These represent the lowest-risk path to the cost target, achievable in 18-36 months with existing regulatory frameworks.',
+      'Solution concepts use proven technologies requiring integration, not invention. These approaches use commercial equipment with established regulatory precedent. Start here for lowest risk and fastest implementation.',
     primary: {
       id: 'sol-primary',
       title:
-        'Integrated Rapid Manufacturing: T-Charge + Sleeping Beauty + Prodigy',
-      confidence: 85,
+        'Continuous Multi-Column CEX Capture with Flocculation Pre-treatment',
+      confidence: 88,
       source_type: 'TRANSFER',
       bottom_line:
-        'Combine three individually validated technologies into a single optimized workflow: Miltenyi Prodigy automated closed system for cell processing, Sleeping Beauty transposon system for non-viral CAR delivery, and T-Charge-style minimal expansion (2-3 days) with IL-7/IL-15 cytokine support for in vivo expansion.',
-      expected_improvement: '$25-35K COGS per patient',
-      timeline: '18-24 months to IND',
-      investment: '$2-5M',
+        'Combine two validated technologies—polyelectrolyte flocculation for 90%+ HCP removal followed by continuous 4-column periodic counter-current cation exchange chromatography.',
+      expected_improvement: '$3-5/g purification cost',
+      timeline: '12-18 months to GMP implementation',
+      investment: '$2-4M',
       the_insight: {
-        what: "The three major cost drivers (viral vectors, expansion time, manual processing) have each been solved independently—the industry just hasn't combined the solutions because different companies own different pieces",
+        what: 'Sequential exploitation of charge differences: HCPs are predominantly acidic (average pI ~5.5) and bind cationic flocculants; mAbs are predominantly basic (pI 7-9) and bind cation exchangers at low pH',
         where_we_found_it: {
-          domain: 'Integration across CAR-T manufacturing innovations',
+          domain: 'Combination of wastewater treatment (flocculation) and petrochemical (continuous chromatography)',
           how_they_use_it:
-            'Novartis uses T-Charge with lentivirus; MD Anderson uses Sleeping Beauty with standard expansion; hospitals use Prodigy with traditional protocols',
+            'Wastewater uses polyelectrolyte flocculation to remove proteins and colloids; petrochemical uses SMB chromatography to achieve >99.5% purity with selectivity factors of only 1.5-2.0',
           why_it_transfers:
-            'Each component addresses a different cost driver; combined, they attack the entire cost structure simultaneously',
+            'mAb/HCP separation is fundamentally a charge-based separation problem; continuous operation mathematics are identical regardless of the molecules being separated',
         },
         why_industry_missed_it:
-          "Commercial silos and IP ownership. Novartis has no incentive to adopt Sleeping Beauty (competitor technology). Sleeping Beauty developers use traditional expansion protocols. Prodigy users follow manufacturer-recommended workflows. No single company has economic incentive to combine competitors' innovations.",
+          'Organizational silos—flocculation experts and continuous chromatography experts rarely collaborate. Each technology validated separately but integration not systematically pursued. Protein A works \'well enough\' that there\'s been limited pressure to optimize alternatives.',
       },
       what_it_is:
-        'No new technology required—the innovation is integration across commercial silos. The process flow: Day 0, leukapheresis product is loaded into Prodigy with CD3+ selection via CliniMACS beads. Same day, electroporation of Sleeping Beauty transposon (encoding CAR) plus transposase mRNA, followed by overnight recovery in IL-7/IL-15 media. Days 1-2, minimal activation with CD3/CD28 stimulation—not full expansion, just enough to confirm viability and CAR expression. Day 2-3, wash, formulate, QC sampling, and release. Infuse minimally-expanded CAR-T (10^7-10^8 cells) with IL-7/IL-15 cytokine support for in vivo expansion to therapeutic dose. This eliminates the $50-100K viral vector cost entirely (Sleeping Beauty reagents cost <$1K), reduces cleanroom time from 14 days to 2-3 days, and uses existing FDA-accepted automation.',
+        'Combine two validated technologies—polyelectrolyte flocculation for 90%+ HCP removal followed by continuous 4-column periodic counter-current cation exchange chromatography. The flocculation step (using pDADMAC or chitosan at 0.01-0.05% concentration, pH 5-6) electrostatically complexes with negatively charged HCPs, forming flocs removed by depth filtration. The clarified, HCP-depleted stream then feeds a continuous CEX system (Pall Cadence BioSMB or Cytiva ÄKTA pcc) where mAb binds at pH 5-6 while remaining impurities flow through. Four columns cycle through load-wash-elute-regenerate phases, maintaining constant feed flow and achieving steady-state purity of 95%+ through accumulation of 15-25 theoretical stages.\n\nThis integrated approach uses commercial equipment with cheap CEX resin ($500/L vs $15,000/L for Protein A) to achieve Protein A-equivalent purity at <10% of resin cost. The key insight is that flocculation handles the \'heavy lifting\' of HCP removal (1-2 log reduction at <$0.10/g), allowing the CEX step to operate on a much cleaner feed. This compensates for CEX\'s lower inherent selectivity compared to Protein A. The continuous operation then provides the additional theoretical stages needed to achieve final purity.',
       why_it_works:
-        "The physics of each component are well-established. Electroporation creates transient membrane pores via dielectric breakdown at ~1000 V/cm, allowing DNA entry—this is 40-year-old technology. Sleeping Beauty transposase recognizes inverted terminal repeats, excises the CAR cassette, and integrates at TA dinucleotide sites via cut-and-paste mechanism—integration efficiency of 10-30% is lower than lentivirus but sufficient when combined with in vivo expansion. T-cell expansion in vivo follows normal immunobiology: IL-7 promotes survival and homeostatic proliferation, IL-15 drives effector function and memory formation. The lymph node achieves 10,000-fold expansion in 5-7 days; we're leveraging this rather than fighting it with suboptimal flask culture.",
+        'The physics is straightforward: polycations (quaternary ammonium groups, pKa >12) remain fully charged at process pH, binding acidic HCP surface residues (Asp, Glu, pKa 3.9-4.3). This forms insoluble complexes while basic mAbs remain soluble due to electrostatic repulsion. Subsequent CEX binding occurs via electrostatic interaction between protonated mAb surface residues (Lys ε-amino, pKa 10.5; Arg guanidinium, pKa 12.5) and sulfonate groups (pKa <1) on the resin. The selectivity factor α = 3-10 for mAb over remaining HCPs is lower than Protein A (α >100), but continuous operation with 15-25 theoretical stages achieves equivalent purity: Purity = f(α^stages).',
       why_it_might_fail: [
-        'Sleeping Beauty transduction efficiency in Prodigy context may be significantly lower than standalone, requiring process re-optimization or acceptance of viral vectors',
-        'FDA may require more extensive bridging studies for combined novel elements (non-viral + minimal expansion + automation) than estimated, extending timeline by 12-24 months',
-        'In vivo expansion kinetics may be highly variable across patient populations, leading to unpredictable dosing and outcomes',
+        'Flocculation optimization is molecule-specific and may require significant development for each new mAb',
+        'Novel process combinations may face additional regulatory scrutiny even when individual components are validated',
+        'Continuous chromatography requires new operational capabilities (24/7 operation, different QC approach)',
       ],
       validation_gates: [
         {
-          week: '8-12',
-          test: 'Demonstrate Sleeping Beauty transduction efficiency in Prodigy-processed T-cells matches standalone efficiency (target: >15% CAR+ at day 2)',
+          week: 'Week 4-6',
+          test: 'Flocculation optimization + CEX binding capacity for lead mAb molecule',
           method:
-            'Flow cytometry for CAR expression; viability assay; comparison to standalone Sleeping Beauty protocol',
+            'DoE-based optimization of pDADMAC concentration, pH, temperature; CEX breakthrough analysis',
           success_criteria:
-            'CAR+ percentage >15% at day 2 with >70% viability across all three runs; no significant difference from standalone Sleeping Beauty transduction',
-          cost: '$50-75K (Prodigy consumables ~$10K/run × 3, plasmids ~$15K, flow cytometry and analysis ~$10K, personnel time ~$10K)',
+            'Flocculation achieves >90% HCP reduction with >95% mAb recovery; CEX binding capacity >40 mg/mL at 300 cm/hr; combined purity >90%',
+          cost: '$15-25K (labor + analytics)',
           decision_point:
-            'If efficiency is <10%, troubleshoot electroporation parameters. If still failing, CRISPR knock-in is alternative non-viral approach with higher efficiency.',
+            'If HCP reduction <80% or mAb recovery <90%, troubleshoot flocculation conditions. If CEX capacity <30 mg/mL, evaluate alternative resins. Proceed to continuous validation only if both criteria met.',
         },
       ],
     },
     supporting_concepts: [
       {
         id: 'sol-support-1',
-        title: 'Hospital Blood Bank Manufacturing Network',
-        relationship: 'COMPLEMENTARY',
+        title: 'Mixed-Mode Chromatography Platform (Capto MMC/adhere)',
+        relationship: 'FALLBACK',
         one_liner:
-          'Deploy CAR-T manufacturing as an extension of existing hospital blood bank operations using Prodigy-class automation',
-        confidence: 70,
+          'Molecule-specific optimization required; 85-92% single-step purity means additional polishing step needed',
+        confidence: 75,
         what_it_is:
-          'Blood banks already perform GMP-equivalent cell processing (platelet apheresis, stem cell processing, cord blood banking) with technician-level staff under AABB/FDA 21 CFR 606 standards. The model: standardized protocol locked into Prodigy software, cloud-connected monitoring with central expert oversight, remote QC review and batch release by centralized quality team, reagent kits shipped to site with lot-traced components. Manufacturing happens locally; expertise is networked. This eliminates $15-20K logistics costs per patient.',
+          'Adopt mixed-mode chromatography as primary capture using commercial resins (Capto MMC, Capto adhere, MEP HyperCel) that combine hydrophobic, ionic, and hydrogen-bonding interactions. These resins provide pseudo-affinity selectivity at 70-80% lower cost than Protein A ($3,000-5,000/L), tolerate aggressive CIP (1M NaOH), and are already validated in commercial mAb manufacturing. The multi-point attachment mechanism engages the Fc region\'s unique surface chemistry—clustered hydrophobic residues adjacent to basic residues—providing selectivity approaching affinity chromatography through cumulative weak interactions.',
         why_it_works:
-          'No new physics—blood banks already do the hard parts (sterile cell processing, quality systems, chain of custody). Prodigy automation reduces operator skill requirements to the level of existing blood bank technicians. Cloud connectivity enables real-time expert oversight without physical presence. The regulatory precedent exists: hospital blood banks are already FDA-registered cell processing facilities.',
+          'The Fc region presents a unique surface chemistry: the CH2-CH3 interface has clustered hydrophobic residues (Leu, Ile, Val) adjacent to basic residues (Lys, His). Mixed-mode ligands (e.g., N-benzyl-N-methyl ethanolamine for Capto MMC) engage both simultaneously. HCPs with different surface patterns don\'t achieve the same multi-point engagement, providing selectivity.',
         when_to_use_instead:
-          'Pursue in parallel with primary concept. Blood bank network becomes the deployment model once integrated manufacturing (primary concept) is validated. Particularly valuable for patients who cannot tolerate 2-4 week wait or are geographically distant from centralized facilities.',
+          'Use for acidic mAbs (pI <7) where CEX capture doesn\'t work; use as backup if flocculation optimization proves difficult for specific molecule',
       },
       {
         id: 'sol-support-2',
-        title: 'Stable Lentiviral Producer Lines + Continuous Perfusion',
-        relationship: 'FALLBACK',
-        one_liner:
-          'Address the single largest cost driver (viral vectors at $50-100K/batch) through stable producer cell lines combined with continuous perfusion manufacturing',
-        confidence: 65,
-        what_it_is:
-          'Stable producer lines (Oxgene TRiP system or similar) continuously produce lentiviral vectors without transient transfection. Suspension HEK293 culture in perfusion bioreactor maintains steady-state production. Continuous harvest and purification via inline chromatography. Vector is stockpiled and characterized, then released for CAR-T manufacturing on demand. This approach is less disruptive than non-viral transduction—it maintains current CAR-T manufacturing workflows while dramatically reducing the vector cost input.',
-        why_it_works:
-          'Stable producer lines eliminate the labor-intensive transient transfection step (large-scale plasmid production, transfection reagents, batch-to-batch variability). Continuous perfusion maintains cells at optimal density with steady-state vector production, improving facility utilization from ~20% (batch) to >80% (continuous). The safety concerns that drove abandonment of producer lines in the 1990s are addressed by modern vector designs (self-inactivating, split packaging) and improved RCL testing.',
-        when_to_use_instead:
-          'If non-viral transduction (primary concept) fails to achieve acceptable CAR+ percentages, or if regulatory pathway for Sleeping Beauty proves more complex than anticipated. Also appropriate for organizations with existing lentiviral manufacturing infrastructure seeking cost reduction without platform change.',
-      },
-      {
-        id: 'sol-support-3',
-        title: 'Real-Time Release Testing via Process Analytical Technology',
+        title: 'Caprylic Acid Precipitation + Mixed-Mode Polishing',
         relationship: 'COMPLEMENTARY',
         one_liner:
-          'Eliminate the 14-day sterility hold that delays CAR-T release by implementing comprehensive Process Analytical Technology (PAT) enabling same-day parametric release',
-        confidence: 60,
+          'Freedom to operate—Genentech US Patent 8,044,017 B2 may require licensing. Some mAbs with lower conformational stability may be damaged.',
+        confidence: 70,
         what_it_is:
-          'Replace end-of-process sterility testing with: continuous bioburden monitoring via impedance-based detection, inline endotoxin detection via recombinant Factor C assays, real-time PCR for mycoplasma (4 hours vs 28 days culture), closed system integrity monitoring (pressure decay testing, particle counting), and environmental monitoring with rapid microbial detection. If all in-process controls pass and closed system integrity is maintained, product is released parametrically without waiting for sterility culture results.',
+          'Replace Protein A capture entirely with caprylic acid precipitation (validated in plasma fractionation for 50+ years and adapted to CHO mAbs by Genentech/Amgen). Caprylic (octanoic) acid at 0.5-2% concentration and pH 4.5-5.0 selectively denatures and precipitates non-IgG proteins while mAbs remain soluble due to their compact, stable Fc region structure. The precipitate is removed by centrifugation or depth filtration. The clarified supernatant (85-95% pure) undergoes mixed-mode chromatography for final polishing to >99% purity. Total process: two unit operations, zero affinity resin, <$2/g capture cost.',
         why_it_works:
-          'All rapid detection methods are based on established physics. Impedance-based detection measures bacterial growth in real-time. Recombinant Factor C assays detect endotoxin without horseshoe crab lysate. Real-time PCR amplifies mycoplasma DNA in hours. Pressure decay testing confirms closed system integrity. The combination provides equivalent or better assurance than traditional methods. This approach is FDA-accepted for parenteral drugs and other biologics.',
+          'Caprylic acid\'s hydrophobic tail inserts into hydrophobic pockets of proteins, disrupting tertiary structure. HCPs, with exposed hydrophobic cores and lower conformational stability, denature and aggregate. IgG\'s Fc region has evolved exceptional stability, and its hydrophobic residues are buried in the CH2-CH3 interface, protected from fatty acid insertion. Additionally, IgG\'s glycosylation at Asn297 provides steric protection.',
         when_to_use_instead:
-          'Pursue in parallel with primary concept. Time savings are valuable for patients with rapidly progressing disease. Particularly important when combined with hospital blood bank model to enable true same-day manufacturing and infusion.',
+          'Use when maximum cost reduction is priority and freedom to operate is confirmed; use as pre-treatment before any chromatography step to reduce HCP burden',
       },
     ],
   },
 
   innovation_portfolio: {
     intro:
-      'Higher-risk explorations with breakthrough potential. Innovation concepts offer higher ceilings with higher uncertainty. These represent parallel bets on breakthrough outcomes that could fundamentally change the CAR-T manufacturing paradigm if successful.',
+      'Higher-risk explorations with breakthrough potential. Innovation concepts offer higher ceilings with higher uncertainty. These are parallel bets on breakthrough outcomes that could transform the economics of mAb purification if successful.',
     recommended_innovation: {
       id: 'innov-recommended',
-      title: 'In Vivo CAR Generation via T-Cell-Targeted LNP-mRNA',
+      title: 'Chromatography-Free Precipitation Cascade (Modern Cohn Process)',
       confidence: 55,
       innovation_type: 'CROSS_DOMAIN',
-      source_domain: 'COVID vaccine mRNA-LNP technology',
+      source_domain: 'Plasma fractionation industry',
       the_insight: {
-        what: 'CAR-T manufacturing can be eliminated entirely if we can deliver CAR-encoding genetic material directly to T-cells in the patient',
+        what: 'Sequential exploitation of differential solubility achieves pharmaceutical-grade purity without any chromatography',
         where_we_found_it: {
-          domain: 'mRNA vaccine technology',
+          domain: 'Plasma fractionation (Cohn process, 1946)',
           how_they_use_it:
-            'Lipid nanoparticles deliver mRNA to cells in vivo, proven at billions of doses through COVID vaccines',
+            'CSL Behring, Grifols, and Takeda purify plasma-derived IgG to pharmaceutical specifications using only precipitation and centrifugation at ton scale',
           why_it_transfers:
-            'The same LNP technology can be surface-decorated with T-cell targeting ligands (anti-CD3 Fab, anti-CD7 nanobody, or CD5-binding peptide) to selectively transfect T-cells',
+            'Same 150 kDa protein, same fundamental solubility physics. The barrier is organizational (different industries, different regulatory frameworks) not technical.',
         },
         why_industry_missed_it:
-          'COVID vaccines focused on muscle cell transfection. T-cell-targeted delivery requires additional targeting technology. The transient expression that seems like a limitation is actually a feature: it provides an inherent safety switch.',
+          'Recombinant biopharma and plasma fractionation are separate industries with separate conferences, separate journals, separate regulatory frameworks. Knowledge transfer hasn\'t occurred despite 80 years of plasma industry experience.',
       },
       what_it_is:
-        'Eliminate ex vivo manufacturing entirely by injecting lipid nanoparticles loaded with CAR-encoding mRNA that selectively transfect T-cells in vivo. Manufacturing becomes LNP-mRNA production—scalable, inventoriable, and proven at billions of doses through COVID vaccines. The mechanism: Lipid nanoparticles are formulated with ionizable lipids optimized for endosomal escape and surface-decorated with T-cell targeting ligands. Upon IV injection, LNPs circulate, bind T-cells via targeting ligand, are internalized, and release CAR-encoding mRNA into cytoplasm. T-cells express functional CAR within 4-24 hours. Expression is transient (3-7 days per dose) but redosing is cheap ($500-2000 per injection). This is not theoretical—Rurik et al. (Science 2022) demonstrated functional CAR-T generation in mice using CD5-targeted LNPs. Capstan Therapeutics is pursuing clinical development with IND targeted for 2025.',
+        'Eliminate chromatography entirely by adapting plasma fractionation principles with modern process control. The approach uses sequential precipitation steps, each exploiting a different physical property:\n\n**Step 1 - Caprylic acid precipitation (pH 4.5-5.0, 0.5-2% caprylic acid):** Selectively denatures and precipitates HCPs while mAb remains soluble. Achieves >99% HCP removal in a single step. Precipitate removed by centrifugation or depth filtration.\n\n**Step 2 - PEG or ammonium sulfate precipitation:** After HCP removal, PEG 6000 (12-18%) or ammonium sulfate (40-50% saturation) precipitates mAb while remaining impurities stay soluble. This exploits the Cohn equation: log S = β - K_s × I, where larger proteins (IgG at 150 kDa) precipitate at lower precipitant concentration.\n\n**Step 3 - Resolubilization and crystallization or membrane polish:** mAb precipitate is resolubilized in formulation buffer. For molecules that crystallize, crystallization provides final polish to >99.9% purity. For others, a single membrane chromatography step achieves final purity.\n\nThe result: zero resin cost, continuous operation for consistency, target <$2/g total purification cost.',
       why_it_works:
-        'Ionizable lipids (pKa ~6.5) remain neutral at physiological pH but become cationic in acidic endosomes (pH 5-6), disrupting endosomal membrane and releasing mRNA cargo. Targeting ligands (anti-CD3, anti-CD5, anti-CD7) provide T-cell specificity through receptor-mediated endocytosis. Released mRNA is translated by ribosomal machinery, producing functional CAR protein that traffics to cell surface within 4-12 hours. The efficiency is sufficient: 10-40% of circulating T-cells can be transfected at appropriate doses, generating 10^8-10^9 CAR+ T-cells from the normal T-cell pool of 10^11.',
+        'PEG precipitation mechanism: PEG (MW 6000) is excluded from protein surfaces due to steric exclusion, creating an \'effective concentration\' of protein in the remaining water volume. When this effective concentration exceeds solubility, precipitation occurs. IgG precipitates at lower PEG concentration than small proteins because larger proteins have lower solubility (log S ∝ -MW^(2/3)). At 12-18% PEG 6000, IgG (150 kDa) precipitates while proteins <50 kDa remain soluble.\n\nAmmonium sulfate mechanism: Kosmotropic sulfate ion competes for water of hydration, reducing protein solubility. IgG precipitates at 40-50% saturation (2.4-3.0 M) following the Cohn equation.\n\nCrystallization mechanism: Only molecules fitting the crystal lattice incorporate; impurities face ΔΔG > 5 kJ/mol penalty, making incorporation thermodynamically unfavorable by factor of exp(ΔΔG/RT) > 10.',
       breakthrough_potential: {
         if_it_works:
-          'Complete elimination of ex vivo manufacturing. CAR-T becomes an injectable drug rather than a manufactured cell product. Same-day treatment becomes possible. Manufacturing scales like vaccines, not like cell therapy.',
+          'Eliminates all chromatography resin cost—the dominant expense in current processes. Enables true continuous processing from harvest to formulation.',
         estimated_improvement:
-          '100-1000x cost reduction (from $275K to $3-12K per treatment course). Uncertainty: ±50% on cost estimates; efficacy equivalence not yet proven in humans.',
+          '5-10x cost reduction: from $15-50/g to $1-2/g. Uncertainty range $1-4/g depending on process complexity.',
         industry_impact:
-          'Would fundamentally reshape the cell therapy industry. Manufacturing infrastructure becomes irrelevant. Competition shifts to LNP formulation and targeting technology.',
-      },
-      risks: {
-        physics_risks: [
-          'T-cell targeting specificity may be insufficient, causing off-target transfection',
-          'Transient expression may not achieve durable responses in some tumor types',
-          'Repeated dosing may trigger anti-LNP antibodies reducing efficacy',
-        ],
-        implementation_challenges: [
-          'Clinical validation in humans not yet complete',
-          'Dosing optimization for transient expression model',
-        ],
-        mitigation: [
-          'Use highly specific targeting ligands; validate in human T-cell studies',
-          'Plan for combination with checkpoint inhibitors if needed',
-          'Explore modified lipid compositions to reduce immunogenicity',
-        ],
+          'Would fundamentally reshape mAb manufacturing economics and enable biosimilar competition at unprecedented cost points',
       },
       validation_path: {
         gating_question:
-          'Can in vivo LNP-mRNA CAR delivery achieve therapeutic T-cell responses in humans?',
+          'Can sequential precipitation achieve >99% purity with >85% yield for CHO-derived mAbs?',
         first_test:
-          'Monitor Capstan Therapeutics Phase 1 trial results; validate targeting efficiency in human T-cells ex vivo',
-        cost: 'Monitoring only; $10-20K for ex vivo validation studies',
-        timeline: '12-18 months for Phase 1 data',
+          'Test caprylic acid + PEG precipitation sequence on lead mAb molecule; measure purity, yield, aggregation at each step',
+        cost: '$20-40K (labor + analytics + small-scale equipment)',
+        timeline: '3-4 months',
         go_no_go:
-          'Phase 1 shows >10% T-cell transfection in humans AND evidence of anti-tumor activity → elevate to primary track',
+          'GO if combined purity >95% with yield >85% and <5% aggregation. NO-GO if aggregation >10% or yield <75%.',
+      },
+      risks: {
+        physics_risks: [
+          'CHO HCP profile may respond differently than plasma proteins to precipitation',
+          'Some mAbs may aggregate during precipitation steps',
+        ],
+        implementation_challenges: [
+          'Precipitation processes are less familiar to biopharma organizations',
+          'Regulatory pathway for chromatography-free process may require additional validation',
+        ],
+        mitigation: [
+          'Screen conformational stability (DSF/DSC) early; exclude molecules with Tm <60°C',
+          'Partner with plasma fractionation experts (CSL, Grifols) for technology transfer',
+          'Engage regulators early with precedent from plasma industry',
+        ],
       },
     },
     parallel_investigations: [
       {
         id: 'innov-parallel-1',
         title:
-          'Haploidentical CAR-T Bank with Post-Transplant Cyclophosphamide',
-        confidence: 50,
+          'Crystallization-First Purification for Suitable mAbs',
+        confidence: 45,
         innovation_type: 'CROSS_DOMAIN',
-        source_domain: 'Bone marrow transplant tolerance protocols',
+        source_domain: 'Protein crystallography',
         one_liner:
-          'Create inventory of 50-100 haploidentical (half-matched) CAR-T products covering >95% of population, using post-infusion cyclophosphamide (PTCy) to eliminate alloreactive cells and enable persistence',
+          'Screen crystallization conditions during process development and, for mAbs that crystallize (estimated 20-30%), use crystallization as the primary purification step',
         the_insight: {
-          what: 'Post-transplant cyclophosphamide selectively eliminates alloreactive cells while sparing quiescent CAR-T cells',
+          what: 'A single crystallization achieves >99.9% purity by thermodynamically excluding impurities from the crystal lattice',
           where_we_found_it: {
-            domain: 'Haploidentical bone marrow transplant protocols',
+            domain: 'Protein crystallography and small molecule pharmaceutical manufacturing',
             how_they_use_it:
-              'PTCy on days +3 and +4 after transplant eliminates rapidly-dividing alloreactive T-cells while sparing hematopoietic stem cells',
+              'Multiple commercial mAbs have been crystallized (infliximab, trastuzumab, adalimumab); Merck holds patents on mAb crystallization for purification',
             why_it_transfers:
-              'CAR-T cells that are not actively dividing (quiescent) should survive PTCy just like HSCs do',
+              'Crystallization provides ultimate selectivity—only molecules fitting the lattice incorporate. Zero resin cost, single unit operation.',
           },
           why_industry_missed_it:
-            'CAR-T and BMT communities are largely separate. PTCy is standard in BMT but not applied to CAR-T.',
+            'Crystallization is viewed as an analytical/structural biology technique, not a manufacturing operation. Different communities, different mindsets.',
         },
         ceiling:
-          'True off-the-shelf product with autologous-like persistence. Manufacturing cost <$10K/dose at scale. Immediate availability.',
+          'Zero resin cost, single unit operation, >99.9% purity for crystallizable mAbs',
         key_uncertainty:
-          'PTCy timing is critical—too early eliminates CAR-T cells, too late allows GvHD. The optimal window for CAR-T (vs. HSC) is not established. CAR-T cells may be more activated than HSCs, making them vulnerable to PTCy.',
-        validation_approach: {
-          test: 'Test PTCy timing in mouse haploidentical CAR-T model; measure CAR-T persistence and GvHD prevention',
-          cost: '$75-100K for animal studies',
-          timeline: '6-9 months',
-          go_no_go:
-            'Identify PTCy timing window with >30-day CAR-T persistence AND no GvHD → proceed to clinical protocol development',
-        },
+          'Fraction of mAbs that crystallize under practical conditions (estimated 20-30% but could be higher with systematic screening)',
         when_to_elevate:
-          'If in vivo LNP-mRNA (recommended innovation) fails to achieve durable responses, and autologous manufacturing cost reduction (primary solution) is insufficient for market access goals. Also elevate if BMT centers show interest in leading clinical development.',
+          'Elevate to primary innovation if >50% of pipeline mAbs crystallize; elevate for specific molecule if crystallization achieves >99% purity with >80% yield',
+        validation_approach: {
+          test: 'Systematic crystallization screening for lead mAb using commercial sparse matrix screens',
+          cost: '$10-20K',
+          timeline: '2-3 months',
+          go_no_go:
+            'GO if crystals form with >80% yield and dissolve cleanly. NO-GO if no crystallization conditions found after comprehensive screening.',
+        },
       },
       {
         id: 'innov-parallel-2',
-        title: 'Intratumoral Electroporation for In Situ TIL Arming',
+        title: 'Dairy Industry Technology Transfer: Chitosan Precipitation + Ceramic Membrane Cascade',
         confidence: 40,
         innovation_type: 'CROSS_DOMAIN',
-        source_domain: 'Electrochemotherapy and gene electrotransfer',
+        source_domain: 'Dairy whey protein purification',
         one_liner:
-          'Deliver CAR-encoding DNA directly into tumor-infiltrating lymphocytes via intratumoral electroporation, arming TILs in situ without any ex vivo manufacturing',
+          'Import the dairy whey IgG purification process directly—same 150 kDa protein, 100x lower cost',
         the_insight: {
-          what: 'TILs are already tumor-localized and tumor-primed; adding CAR enhances their killing capacity',
+          what: 'The dairy industry purifies bovine IgG from whey at pharmaceutical grade for <$5/g using chitosan precipitation and ceramic membrane cascades',
           where_we_found_it: {
-            domain: 'Electrochemotherapy clinical practice',
+            domain: 'Dairy processing industry',
             how_they_use_it:
-              'Electroporation delivers chemotherapy drugs directly into tumor cells for enhanced local killing',
+              'Chitosan precipitation of non-IgG proteins, ceramic membrane ultrafiltration cascade for concentration and fractionation, ion exchange polishing',
             why_it_transfers:
-              'Same electroporation physics can deliver DNA plasmids to TILs within the tumor',
+              'Bovine and human IgG have nearly identical structure and properties. Same purification physics should apply.',
           },
           why_industry_missed_it:
-            'Electrochemotherapy community focused on drug delivery, not gene therapy. CAR-T community focused on ex vivo manufacturing. No intersection.',
+            'Dairy processing and biopharma are completely separate industries with no cross-pollination of ideas or personnel.',
         },
         ceiling:
-          'Same-day treatment for accessible tumors. Manufacturing cost essentially zero—just plasmid production. Could reach tumors CAR-T cannot.',
+          '<$5/g purification cost using proven dairy industry equipment and chemistry',
         key_uncertainty:
-          "TIL density varies enormously between tumors (10^6-10^8 per gram). 'Cold' tumors with low TIL infiltration won't respond. Patient selection is critical and may limit addressable population significantly.",
-        validation_approach: {
-          test: 'Inject Sleeping Beauty plasmid into mouse tumors with electroporation; measure CAR expression in TILs and tumor regression',
-          cost: '$50-75K for animal studies',
-          timeline: '4-6 months',
-          go_no_go:
-            '>5% TIL CAR expression AND measurable tumor regression → proceed. No TIL transfection OR no tumor effect → reject approach.',
-        },
+          'CHO HCP profile may not respond to chitosan as favorably as whey proteins; human IgG-chitosan interaction not validated',
         when_to_elevate:
-          'If solid tumor CAR-T continues to underperform in clinical trials, and accessible tumor sites are common in target indication. Particularly relevant for melanoma, head and neck cancer, and other superficial tumors with high TIL infiltration.',
+          'Elevate if chitosan validation succeeds AND ceramic membrane economics are favorable at target scale',
+        validation_approach: {
+          test: 'Test chitosan precipitation on CHO harvest; validate bovine-to-human IgG translation',
+          cost: '$15-25K',
+          timeline: '2-3 months',
+          go_no_go:
+            'GO if >90% HCP reduction with >90% mAb recovery. NO-GO if mAb loss >20% or HCP reduction <70%.',
+        },
       },
     ],
     frontier_watch: [
       {
         id: 'frontier-1',
-        title: 'Trehalose-Based Ambient Temperature CAR-T Preservation',
+        title: 'High-Capacity Magnetic Bead Capture',
         innovation_type: 'EMERGING_SCIENCE',
+        trl_estimate: 5,
         one_liner:
-          'Eliminate $10-20K logistics costs per patient and enable distribution to regions without cryogenic infrastructure',
+          'Eliminates all column-related limitations—binding occurs in solution phase at maximum diffusion-limited rate',
         why_interesting:
-          'Transformative for global access. The biology is proven—tardigrades survive complete desiccation for decades using trehalose.',
+          'Could process unclarified harvest directly, eliminating clarification step. Truly continuous operation straightforward. No diffusion limitations.',
         why_not_now:
-          "Mammalian cells don't naturally take up trehalose—loading requires membrane permeabilization which can damage cells. Viability recovery rates in T-cells not yet demonstrated at acceptable levels. Regulatory pathway for lyophilized cell therapy is undefined.",
+          'Scale-up of magnetic separation not well established—field gradient decreases with distance. Particle cost and lifetime at manufacturing scale unknown. No regulatory precedent for magnetic capture in mAb manufacturing.',
         trigger_to_revisit:
-          'Publication demonstrating >70% viability recovery of human T-cells after 4+ weeks room temperature storage; or FDA guidance on lyophilized cell therapy regulatory pathway',
+          'Commercial demonstration at >100L scale with published particle lifetime >200 cycles; OR regulatory approval for magnetic capture in any biologic manufacturing',
         who_to_monitor:
-          'Dr. John Crowe (UC Davis), Dr. Willem Wolkers (Hannover Medical School), Biomatik Corporation, Society for Cryobiology annual meeting',
-        earliest_viability: '5-7 years',
-        trl_estimate: 3,
+          'JSR Life Sciences (Amsphere products), Miltenyi Biotec (MACS technology), Academic groups: Prof. Matthias Franzreb (KIT), Prof. Owen Thomas (Birmingham)',
+        earliest_viability: '3-5 years',
         competitive_activity:
-          'Limited. Academic groups exploring trehalose loading mechanisms. No commercial CAR-T preservation development known.',
+          'JSR Life Sciences advancing Amsphere magnetic bead products. Limited commercial traction to date but technology advancing.',
       },
       {
         id: 'frontier-2',
-        title:
-          'Engineered Bacterial Symbiont for Continuous Bispecific Secretion',
-        innovation_type: 'PARADIGM',
+        title: 'Stimulus-Responsive Polymer Affinity Capture (Smart Precipitation)',
+        innovation_type: 'EMERGING_SCIENCE',
+        trl_estimate: 3,
         one_liner:
-          'Engineer tumor-colonizing bacteria to continuously secrete BiTE-like bispecific antibodies within the tumor microenvironment',
+          'Combines affinity selectivity with precipitation simplicity—no columns, no packing, no diffusion limits',
         why_interesting:
-          "Completely decouples targeting (scalable bacterial manufacturing) from effector (patient's native T-cells). Manufacturing becomes bacterial fermentation—the cheapest biomanufacturing modality. Self-amplifying at tumor site means low doses needed.",
+          'Binding occurs in solution phase. Could enable single-step capture with affinity-like purity. Polymer precipitates above LCST, carrying bound mAb.',
         why_not_now:
-          "Bacterial safety in immunocompromised patients is a major concern—even attenuated strains can cause sepsis. Regulatory pathway for living bacterial therapeutics is complex. Colonization efficiency is variable. Cultural resistance to 'infecting' patients with bacteria.",
+          'Remains largely academic—no commercial development. Polymer synthesis and ligand conjugation are complex. Heat transfer at manufacturing scale challenging. Polymer recyclability unproven. No regulatory precedent.',
         trigger_to_revisit:
-          'Phase 2 data showing acceptable safety profile for tumor-colonizing bacteria in immunocompromised patients; or demonstration of sustained BiTE secretion achieving tumor control in animal models',
+          'Demonstration of >100 cycle polymer recyclability with maintained binding capacity; OR commercial development announcement from major supplier',
         who_to_monitor:
-          'BioMed Valley Discoveries (Clostridium novyi-NT), Synlogic, Dr. Neil Forbes (UMass), Dr. Jeff Bhardwaj (Memorial Sloan Kettering)',
-        earliest_viability: '7-10 years',
-        trl_estimate: 2,
+          'Prof. Patrick Stayton (University of Washington), Prof. Allan Hoffman (University of Washington) - foundational work, Phase Bioscience (ELP-based systems)',
+        earliest_viability: '5-7 years',
         competitive_activity:
-          'Early stage. BioMed Valley in Phase 1 with tumor-colonizing bacteria (not CAR-related). Synlogic focused on metabolic diseases.',
-      },
-      {
-        id: 'frontier-3',
-        title: 'Surface-Conjugated CAR via Click Chemistry',
-        innovation_type: 'PARADIGM',
-        one_liner:
-          'Attach CAR proteins directly to T-cell surface via bioorthogonal click chemistry, eliminating genetic modification entirely',
-        why_interesting:
-          'If surface-attached CAR can signal effectively, this eliminates genetic modification entirely. Manufacturing becomes recombinant protein production—well-established, scalable, and cheap. Time from blood draw to CAR-T: potentially same day.',
-        why_not_now:
-          'Fundamental uncertainty about whether surface-attached CAR can signal effectively—CAR signaling depends on proper membrane orientation and clustering. Surface proteins turn over in 24-72 hours, requiring frequent redosing. The mechanism is unproven.',
-        trigger_to_revisit:
-          'Publication demonstrating functional CAR signaling from surface-conjugated (non-transmembrane) CAR proteins; or clinical data from any surface-modified cell therapy showing efficacy',
-        who_to_monitor:
-          'Dr. Darrell Irvine (MIT), Dr. Matthias Stephan (Fred Hutch), Click Chemistry Tools, Bioconjugate Chemistry journal',
-        earliest_viability: '5-8 years',
-        trl_estimate: 2,
-        competitive_activity:
-          'Academic only. Irvine and Stephan labs publishing on nanoparticle backpacks and surface modification. No commercial development.',
+          'Academic activity only. No commercial development programs known.',
       },
     ],
   },
@@ -496,102 +465,102 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
   risks_and_watchouts: [
     {
       category: 'Technical',
-      risk: 'Sleeping Beauty transduction efficiency in Prodigy context may be significantly lower than standalone, requiring process re-optimization or acceptance of viral vectors',
-      severity: 'high',
+      risk: 'Flocculation optimization is molecule-specific and may require significant development for each new mAb',
+      severity: 'medium',
       mitigation:
-        'First validation step specifically tests this. If efficiency is <10%, troubleshoot electroporation parameters. If still failing, CRISPR knock-in is alternative non-viral approach with higher efficiency.',
+        'Develop DoE-based optimization protocol; most mAbs respond to similar conditions. Build internal expertise through first few implementations.',
     },
     {
       category: 'Regulatory',
-      risk: 'FDA may require more extensive bridging studies for combined novel elements (non-viral + minimal expansion + automation) than estimated, extending timeline by 12-24 months',
+      risk: 'Novel process combinations may face additional scrutiny even when individual components are validated',
       severity: 'medium',
       mitigation:
-        'Pre-IND meeting to align on bridging study design. Consider academic IND initially to generate data before commercial program. Each component has individual FDA acceptance.',
-    },
-    {
-      category: 'Market',
-      risk: 'Novartis T-Charge or competitor approaches may achieve similar cost reduction first, eliminating differentiation',
-      severity: 'medium',
-      mitigation:
-        'T-Charge still uses lentivirus ($50-100K vector cost). Non-viral integration provides structural cost advantage. Speed to market matters—18-24 month timeline is competitive.',
-    },
-    {
-      category: 'Technical',
-      risk: 'In vivo expansion kinetics may be highly variable across patient populations, leading to unpredictable dosing and outcomes',
-      severity: 'medium',
-      mitigation:
-        'T-Charge data provides baseline variability estimates. Patient selection criteria can exclude severe lymphopenia. IL-7/IL-15 dosing can be adjusted based on early expansion kinetics (day 7 CAR-T counts).',
+        'Engage regulators early; prepare extensive comparability data; leverage existing precedent for each component',
     },
     {
       category: 'Resource',
-      risk: 'Key personnel with expertise in both Sleeping Beauty and Prodigy systems are scarce; recruitment may be difficult',
+      risk: 'Continuous chromatography requires new operational capabilities (24/7 operation, different QC approach)',
+      severity: 'medium',
+      mitigation:
+        'Partner with experienced CDMO for initial implementation; Pall and Cytiva offer training and support',
+    },
+    {
+      category: 'Market',
+      risk: 'Protein A suppliers (Cytiva) may respond with aggressive pricing to defend market position',
       severity: 'low',
       mitigation:
-        'Partner with academic centers (MD Anderson, U Minnesota) that have both capabilities. Miltenyi applications scientists can support Prodigy optimization. Training programs exist.',
+        'Even with 50% Protein A price reduction, non-affinity approaches remain economically superior. Proceed with confidence.',
+    },
+    {
+      category: 'Technical',
+      risk: 'Caprylic acid precipitation may damage some mAbs with lower conformational stability',
+      severity: 'high',
+      mitigation:
+        'Screen thermal stability (DSF/DSC) early in development; exclude molecules with Tm <60°C from precipitation approaches. This is a fundamental limitation for some molecules.',
+    },
+    {
+      category: 'Regulatory',
+      risk: 'Freedom to operate for caprylic acid precipitation—Genentech patents may require licensing',
+      severity: 'high',
+      mitigation:
+        'Conduct patent landscape analysis before significant investment; evaluate licensing options; patents expire 2028',
     },
   ],
 
   self_critique: {
-    confidence_level: 'medium',
-    overall_confidence: 'medium',
+    confidence_level: 'high',
+    overall_confidence: 'high',
     confidence_rationale:
-      'High confidence in individual component technologies (each validated), medium confidence in integration (untested combination), and uncertainty about regulatory pathway for combined novel elements.',
+      'Primary recommendation uses commercial equipment with established precedent; economics are well-supported by component analysis and industry benchmarks',
     what_we_might_be_wrong_about: [
-      "Sleeping Beauty efficiency in Prodigy context—we're assuming it matches standalone, but electroporation parameters may need significant optimization",
-      'In vivo expansion reliability—T-Charge data is from selected patients; real-world variability may be higher',
-      'Regulatory timeline—FDA may be more conservative about combined novel elements than we estimate',
-      'Hospital blood bank capability—the gap between blood bank processing and CAR-T manufacturing may be larger than we assume',
-      'Cost estimates—hidden costs often emerge during scale-up; our $25-35K COGS may be optimistic',
+      'The 70% of mAbs with pI >7 estimate may not hold for future pipeline molecules with engineered Fc regions',
+      'Continuous operation may be more operationally complex than we estimate for typical biopharma organizations',
+      'CHO HCP response to flocculation/precipitation may be more variable than plasma proteins',
+      'Regulatory pathway may require more bridging studies than we anticipate despite component-level precedent',
+      'Caprylic acid patent landscape may be more restrictive than initial search suggests',
     ],
     unexplored_directions: [
-      'iPSC-derived CAR-T with tolerance engineering—we focused on autologous but iPSC solves the input quality problem entirely',
-      "Continuous manufacturing for autologous CAR-T—we mentioned it but didn't develop a concept; may be feasible with proper segregation",
-      'CAR-NK as alternative to CAR-T—different manufacturing constraints, may have different cost structure',
-      'Combination with checkpoint inhibitors to enhance persistence of minimally-expanded cells',
+      'Electrocoagulation for selective HCP precipitation—unexplored in biopharma despite extensive wastewater use',
+      'Counter-current chromatography (no solid phase)—eliminates all bead limitations but unfamiliar to industry',
+      'Acoustic separation for initial enrichment—could provide 10x concentration without consumables',
+      'Foam fractionation (flotation for proteins)—if Fc hydrophobicity enables selective flotation, very cheap pre-enrichment',
     ],
     validation_gaps: [
       {
-        concern:
-          'Sleeping Beauty efficiency in Prodigy context may be lower than standalone',
+        concern: 'CEX capture may not achieve adequate purity for all basic mAbs',
         status: 'ADDRESSED',
         rationale:
-          'First validation step specifically tests this with go/no-go criteria',
+          'First validation step includes purity measurement; go/no-go criteria require >90% purity. If not achieved, mixed-mode fallback is specified.',
       },
       {
-        concern: 'In vivo expansion reliability across patient populations',
-        status: 'EXTENDED_NEEDED',
-        rationale:
-          'Validation step tests healthy donors; should add patient-derived samples with exhausted phenotype to assess worst-case',
-      },
-      {
-        concern: 'Regulatory timeline uncertainty',
+        concern: 'Continuous operation complexity for typical organizations',
         status: 'ACCEPTED_RISK',
         rationale:
-          'Pre-IND meeting is recommended but timeline estimates remain uncertain until FDA feedback received',
+          'Mitigation via CDMO partnership and vendor support is specified. Operational complexity is real but manageable with proper training.',
       },
       {
-        concern: 'Hospital blood bank capability gap',
+        concern: 'CHO HCP response to flocculation may differ from published data',
+        status: 'ADDRESSED',
+        rationale:
+          'First validation step explicitly tests flocculation with lead molecule; go/no-go criteria specified',
+      },
+      {
+        concern: 'Caprylic acid patent freedom to operate',
         status: 'EXTENDED_NEEDED',
         rationale:
-          'Should add site assessment protocol to evaluate blood bank readiness before pilot commitment',
-      },
-      {
-        concern: 'Cost estimate accuracy',
-        status: 'ACCEPTED_RISK',
-        rationale:
-          'Detailed cost modeling requires actual process development; current estimates are based on component costs with reasonable assumptions',
+          'Patent landscape analysis recommended before significant investment; flagged as HIGH severity risk requiring resolution',
       },
     ],
   },
 
   what_id_actually_do:
-    "If this were my project, I'd start with the validation experiment immediately—$50-75K to test Sleeping Beauty efficiency in Prodigy is cheap insurance before committing to the full program. While that's running, I'd have the pre-IND meeting conversation with FDA to understand their expectations for bridging studies. The regulatory pathway is the biggest unknown, and early alignment saves years.\n\nI'd pursue the hospital blood bank model in parallel, but I'd start with a single site partnership rather than building a network. Find one academic medical center with both a strong blood bank and CAR-T program (MD Anderson, Memorial Sloan Kettering, Fred Hutch), and run a pilot. The learnings from one site will inform whether network expansion makes sense.\n\nOn the innovation side, I'd keep a watching brief on Capstan's progress with in vivo LNP-mRNA. If their IND goes well, that's the future—but it's 5+ years out, so it doesn't change near-term strategy. The haploidentical PTCy approach is interesting but requires BMT expertise that most CAR-T developers don't have. I'd look for a partnership with a BMT-focused academic center rather than building that capability internally.\n\nThe thing I'd avoid is trying to do everything at once. The integrated manufacturing approach (primary concept) is the highest-probability path to the cost target. Get that working first, then layer on the blood bank network for distribution, then watch the in vivo approaches mature. Sequence matters—don't let the perfect be the enemy of the good.",
+    "If this were my project, I'd start with continuous CEX plus flocculation for the next molecule entering process development—not as a research project, but as the actual manufacturing process. The technology is commercial, the equipment is available, and the economics are compelling. I'd call Pall and Cytiva this week to get application scientists involved.\n\nFor the caprylic acid precipitation approach, I'd commission a patent landscape analysis immediately. If freedom to operate exists (or licensing is feasible), this becomes the primary path because the economics are even better. The Brodsky 2012 paper gives you the recipe; it's a matter of optimization, not invention.\n\nThe paradigm shift to chromatography-free purification is the strategic play. I'd fund a small team (2-3 people) to systematically adapt Cohn process principles to CHO mAbs. This is a 3-5 year program, but the payoff is transformative. The plasma industry has been doing this for 80 years—we're not inventing anything, we're transferring knowledge across an organizational boundary.\n\nWhat I would not do is wait for the 'perfect' solution. The continuous CEX approach is good enough to implement now, and it's 3-10x better than Protein A. Perfect is the enemy of good, and in this case, 'good' is a $10-40M annual savings at commercial scale.",
 
   follow_up_prompts: [
-    'Create a detailed 18-month development plan for the integrated Prodigy + Sleeping Beauty manufacturing approach with milestones and decision gates',
-    'Help me design the first validation experiment comparing Sleeping Beauty efficiency in Prodigy vs. standalone electroporation',
-    'What should I ask FDA in the pre-IND meeting about bridging study requirements for combined novel elements?',
-    'Draft a partnership proposal for MD Anderson or Memorial Sloan Kettering to pilot the hospital blood bank manufacturing model',
-    'Compare the total cost of ownership for integrated rapid manufacturing vs. stable producer lines at 500 patients/year scale',
+    'Design a DoE protocol for optimizing polyelectrolyte flocculation conditions for my specific mAb',
+    'Help me build a business case comparing continuous CEX vs. Protein A for our manufacturing scale',
+    'What should I ask Pall and Cytiva about continuous chromatography implementation?',
+    'Create a regulatory strategy for introducing flocculation pre-treatment into an existing validated process',
+    'Analyze the patent landscape for caprylic acid precipitation in mAb purification',
   ],
 };

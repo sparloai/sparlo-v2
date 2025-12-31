@@ -19,11 +19,11 @@ import {
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { BIOTECH_HYBRID_REPORT } from './biotech-hybrid-data';
-import { CLIMATE_HYBRID_REPORT } from './climate-hybrid-data';
-import { ENERGY_HYBRID_REPORT } from './energy-hybrid-data';
+import { CARBON_REMOVAL_HYBRID_REPORT } from './carbon-removal-hybrid-data';
 import { EXAMPLE_REPORTS } from './example-reports-data';
 import { FOOD_HYBRID_REPORT } from './food-hybrid-data';
 import { FOODTECH_HYBRID_REPORT } from './foodtech-hybrid-data';
+import { GREEN_H2_HYBRID_REPORT } from './green-h2-hybrid-data';
 import { MATERIALS_SCIENCE_HYBRID_REPORT } from './materials-science-hybrid-data';
 
 /**
@@ -39,12 +39,12 @@ import { MATERIALS_SCIENCE_HYBRID_REPORT } from './materials-science-hybrid-data
 
 // Map report IDs to their data
 const REPORT_DATA_MAP: Record<string, HybridReportData> = {
-  'climate-tech': CLIMATE_HYBRID_REPORT,
   'food-waste': FOOD_HYBRID_REPORT,
   'food-tech': FOODTECH_HYBRID_REPORT,
   biotech: BIOTECH_HYBRID_REPORT,
   'materials-science': MATERIALS_SCIENCE_HYBRID_REPORT,
-  energy: ENERGY_HYBRID_REPORT,
+  'carbon-removal': CARBON_REMOVAL_HYBRID_REPORT,
+  'green-h2': GREEN_H2_HYBRID_REPORT,
 };
 
 // Scroll offset to account for sticky tab bar (top-16 = 64px + ~48px height = ~112px)
