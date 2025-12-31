@@ -958,6 +958,11 @@ export const POST = enhanceRouteHandler(
     const reportData = report.report_data as Record<string, unknown> | null;
     let reportContext = '';
 
+    // Debug: Log report data structure
+    console.log('[Chat] Report data keys:', reportData ? Object.keys(reportData) : 'null');
+    console.log('[Chat] Report mode:', reportData?.mode);
+    console.log('[Chat] Has markdown:', !!reportData?.markdown);
+
     if (reportData?.markdown) {
       // Standard report with markdown
       reportContext = reportData.markdown as string;
@@ -971,6 +976,11 @@ export const POST = enhanceRouteHandler(
       // Fallback: stringify the report data
       reportContext = JSON.stringify(reportData, null, 2);
     }
+
+    // Debug: Log extracted context info
+    console.log('[Chat] Report context length:', reportContext.length);
+    console.log('[Chat] Report context preview (first 500 chars):', reportContext.slice(0, 500));
+    console.log('[Chat] Report context contains frontier_watch:', reportContext.includes('frontier') || reportContext.includes('Frontier'));
 
     // Build messages for Anthropic
     const anthropic = new Anthropic({
