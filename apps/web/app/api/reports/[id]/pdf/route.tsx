@@ -150,38 +150,19 @@ function releaseSlot(): void {
  * Optimized for Railway container environment with embedded base64 fonts.
  *
  * Font loading strategy:
- * - Keep JavaScript enabled (required for CSS font parsing)
- * - Use networkidle0 to wait for all resources including inline fonts
+ * - Use 'load' waitUntil for reliable content parsing
  * - Explicitly wait for document.fonts.ready API
- * - Block only external network requests, not inline resources
+ * - Small delay after fonts ready for layout completion
  */
 async function generatePdfFromHtml(html: string): Promise<Buffer> {
   const browser = await getBrowser();
   const page = await browser.newPage();
 
   try {
-    // Block external network requests only (not needed, all assets are base64 embedded)
-    // This prevents potential tracking/analytics but allows inline resource parsing
-    await page.setRequestInterception(true);
-    page.on('request', (request) => {
-      const url = request.url();
-      // Allow data: URIs (our base64 fonts) and about: URLs
-      // Block any actual network requests to external hosts
-      if (
-        url.startsWith('data:') ||
-        url.startsWith('about:') ||
-        request.resourceType() === 'document'
-      ) {
-        request.continue();
-      } else {
-        request.abort();
-      }
-    });
-
-    // Set content and wait for network to be idle
-    // This ensures CSS is fully parsed including @font-face rules
+    // Set content and wait for page load
+    // All assets (fonts, styles) are base64 embedded, no external requests needed
     await page.setContent(html, {
-      waitUntil: 'networkidle0',
+      waitUntil: 'load',
       timeout: 30000,
     });
 
@@ -192,8 +173,8 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
       new Promise((resolve) => setTimeout(resolve, 5000)), // 5s max font wait
     ]);
 
-    // Additional small delay to ensure font rendering is complete
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // Small delay to ensure font rendering is complete in the layout
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
     // Generate PDF with A4 format
     const pdfBuffer = await page.pdf({
@@ -217,8 +198,6 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
 
     return Buffer.from(pdfBuffer);
   } finally {
-    // Clean up event listeners before closing to prevent memory leaks
-    page.removeAllListeners('request');
     await page.close();
   }
 }
