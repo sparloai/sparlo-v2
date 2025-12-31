@@ -132,11 +132,17 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
 
   try {
     // Set content and wait for DOM to be ready
-    // Using domcontentloaded instead of networkidle0 since HTML is self-contained
     await page.setContent(html, {
       waitUntil: 'domcontentloaded',
       timeout: 30000,
     });
+
+    // Wait for fonts to load before generating PDF (with timeout)
+    // This is critical for proper font rendering in the PDF
+    await Promise.race([
+      page.evaluate(() => document.fonts.ready),
+      new Promise((resolve) => setTimeout(resolve, 5000)), // 5s max font wait
+    ]);
 
     // Generate PDF with A4 format
     const pdfBuffer = await page.pdf({
