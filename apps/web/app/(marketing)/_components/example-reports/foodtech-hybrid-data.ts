@@ -1,138 +1,145 @@
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
+/**
+ * Food Tech Hybrid Report Example Data
+ * Precision Fermentation Scale-Up
+ */
 export const FOODTECH_HYBRID_REPORT: HybridReportData = {
   title:
-    '14-Day Mango Shelf Life at 40°C for $0.005/kg',
+    'Precision Fermentation Scale-Up: Achieving $2-5/kg Protein at 50,000L Through Paradigm Shift from Batch to Continuous Processing',
   brief:
-    "30-40% of fruits and vegetables in sub-Saharan Africa and South Asia rot before reaching consumers—$15B+ annual loss for smallholder farmers. Cold chain doesn't exist (no grid, no roads). Current solutions are evaporative coolers (limited cooling, high humidity promotes mold) or solar-powered refrigeration (too expensive for <$5/day income farmers). Need preservation approach that extends shelf life of tomatoes, mangoes, and leafy greens from 3-5 days to 14-21 days without refrigeration, at <$0.01/kg cost. Must work at ambient 30-40°C, be farmer-operable without training, and use locally available or very cheap materials.",
+    'Precision fermentation proteins (whey, collagen, heme) achieve cost parity at >100,000L scale, but most facilities are 10,000-50,000L. Scaling up hits oxygen transfer limits, contamination risk, and 40-60% of batches fail to meet spec. Need pathway to $2-5/kg protein cost at 50,000L scale with >90% batch success rate.',
 
   executive_summary: {
     narrative_lead:
-      "For climacteric fruits like tomatoes and mangoes, ethylene control alone achieves 3-5x shelf life extension at ambient temperature—demonstrated repeatedly in 1-MCP literature since the 1990s. Charcoal from agricultural waste (coconut shells, rice husks) adsorbs ethylene at 40-60% the efficacy of commercial systems. Lime whitewash oxidizes residual ethylene. Simple oil coatings protect produce from humidity damage in Zeer pots. Combined, these materials—already waste products—achieve 14-21 day preservation at <$0.005/kg operating cost. Investment: $2-10 per household.",
+      'Pharma biologics solved this exact problem 15 years ago by abandoning batch processing entirely. Continuous perfusion with cell retention achieves 10x volumetric productivity with >95% operational uptime—eliminating \'batch failures\' by eliminating batches. The precision fermentation industry inherited batch processing from pharma without questioning whether it applies; the answer is that it doesn\'t. A 10,000L perfusion system can match 100,000L batch output while transforming the 40-60% failure rate into a steady-state control problem.',
     primary_recommendation:
-      'Deploy the Ethylene-First Preservation System immediately: charcoal sachets + lime-washed containers for tomatoes and mangoes, with oil-coated produce in Zeer pots for leafy greens. Investment is $2-10 per household using waste materials. Validate with 2-week side-by-side trial (<$50) before scaling. This approach achieves 2-4x shelf life extension at <$0.005/kg operating cost—half the target budget—while eliminating dependency on electricity, supply chains, or technical expertise.',
+      'Deploy continuous perfusion fermentation with ATF cell retention, targeting 10,000-20,000L working volume to match current 50,000L batch output. Investment of $2-5M over 18-24 months yields 10x volumetric productivity and near-elimination of batch variability. In parallel, optimize conventional approaches (pure O2 sparging, PAT deployment) to improve current operations while perfusion is developed.',
     viability: 'conditionally_viable',
-    viability_label: 'Conditionally viable with field validation',
+    viability_label: 'Viable with moderate confidence—requires adaptation of pharma perfusion technology for yeast/bacterial systems',
   },
 
   problem_analysis: {
     whats_wrong: {
       prose:
-        "Farmers harvest tomatoes on Monday; by Thursday, 30-40% are rotting in the basket. The produce that does reach market is sold at distress prices because buyers know it won't last another day. A farmer earning $5/day loses $1.50-2.00 daily to spoilage—a 30-40% effective tax on their labor. The tragedy is that this loss is largely preventable with interventions costing pennies, but the knowledge gap between agricultural science and smallholder practice remains vast.",
+        'Every second batch fails. At 40-60% failure rate, more resources go to failed batches than successful ones—feedstock, energy, labor, and 72-120 hours of cycle time discarded at harvest when the product doesn\'t meet spec. The oxygen transfer limitation forces lower cell densities, longer cycles, and larger vessels than the biology actually requires. This isn\'t a scaling problem; it\'s a paradigm problem.',
     },
+    current_state_of_art: {
+      benchmarks: [
+        {
+          entity: 'Perfect Day (precision fermentation)',
+          approach:
+            'Fed-batch STR fermentation for whey proteins',
+          current_performance:
+            'Reported $10-20/kg cost at current scale',
+          target_roadmap:
+            'Targeting cost parity with dairy at >100,000L scale',
+          source: 'Press releases and investor presentations, unverified',
+        },
+        {
+          entity: 'Novozymes/DSM (industrial enzymes)',
+          approach: 'Mature fed-batch with decades of strain optimization',
+          current_performance:
+            '$5-20/kg at 100,000-500,000L scale, >95% batch success',
+          target_roadmap:
+            'Continuous 1-5% annual improvement through strain optimization',
+          source: 'Industry reports and academic literature',
+        },
+        {
+          entity: 'Genentech/Amgen (pharma biologics)',
+          approach: 'Continuous perfusion with ATF cell retention',
+          current_performance:
+            '10-50x volumetric productivity vs batch, >95% uptime, 60+ day campaigns',
+          target_roadmap: 'Expanding perfusion to more products',
+          source: 'Konstantinov & Cooney (2015), Journal of Pharmaceutical Sciences',
+        },
+      ],
+    },
+    what_industry_does_today: [
+      {
+        approach: 'Fed-batch in stirred-tank reactors with incremental kLa optimization',
+        limitation:
+          'STRs hit practical kLa ceiling of ~500-600/hr at scale; insufficient for >50g/L cell density',
+      },
+      {
+        approach: 'Pure oxygen sparging to boost dissolved oxygen',
+        limitation:
+          'Creates oxidative stress, foam issues, and fire safety complexity; often partially implemented, not fully optimized',
+      },
+      {
+        approach: 'Scale-up by building larger vessels (100,000-200,000L)',
+        limitation:
+          'Larger vessels have worse mass transfer (surface area to volume ratio); $50-100M capital requirement',
+      },
+      {
+        approach: 'Strain engineering for higher expression titers',
+        limitation:
+          'Diminishing returns on titer improvement; doesn\'t address oxygen limitation or batch variability',
+      },
+    ],
     why_its_hard: {
       prose:
-        'The physics are unforgiving. The Arrhenius equation tells us that decay reactions roughly double with every 10°C increase—at 35°C versus 5°C, decay proceeds 8x faster. But temperature is only part of the story. Climacteric fruits like tomatoes and mangoes have a positive feedback loop: ethylene triggers more ethylene production, which triggers more ripening, which produces more ethylene. This autocatalytic cascade, not temperature alone, is why a tomato can go from firm to mush in 48 hours at ambient conditions. Meanwhile, leafy greens face a different enemy: dehydration and microbial colonization. Any solution must address these fundamentally different decay pathways, ideally with the same simple materials.',
+        'Oxygen mass transfer is governed by OTR = kLa × (C* - CL), where kLa is the volumetric mass transfer coefficient and (C* - CL) is the driving force between saturation and actual dissolved oxygen. At high cell density (>50g/L), oxygen uptake rate (OUR) can exceed 100-200 mmol O2/L/hr. Conventional sparging in large STRs achieves kLa of 200-400/hr with air, yielding maximum OTR of ~50-100 mmol/L/hr—insufficient for high-density aerobic culture. The physics is unforgiving: larger vessels have worse surface-area-to-volume ratios, and bubble coalescence reduces interfacial area. You cannot engineer your way around thermodynamics.',
       governing_equation: {
         equation:
-          'k = A·e^(-Ea/RT) (Arrhenius) + dC2H4/dt = k·C2H4 (ethylene autocatalysis)',
+          'OTR = kLa × (C* - CL) ≥ OUR',
         explanation:
-          'Decay rate k increases exponentially with temperature, while ethylene concentration increases exponentially with itself. Breaking the ethylene cascade can be more impactful than modest temperature reduction.',
+          'Oxygen transfer rate must equal or exceed oxygen uptake rate. At high cell density, OUR increases linearly while OTR hits practical ceiling. The gap forces lower cell density, longer cycles, and higher per-kg costs.',
       },
     },
     first_principles_insight: {
       headline:
-        'For climacteric fruits, ethylene IS the problem—temperature is secondary',
+        'The batch paradigm is the problem, not batch reliability',
       explanation:
-        "The 1-MCP literature proves that blocking ethylene perception alone achieves 3-5x shelf life extension at 20-25°C with zero cooling. This means the industry's obsession with cold chain is solving the wrong problem for 2 of our 3 target produce types. Charcoal adsorbs ethylene; lime oxidizes it. Both are essentially free waste products. The paradigm shift is recognizing that we don't need to fight thermodynamics—we need to interrupt a biochemical cascade.",
-    },
-    what_industry_does_today: [
-      {
-        approach: 'Evaporative coolers (Zeer pots)',
-        limitation:
-          'Achieves 10-15°C cooling but creates 85-95% humidity that accelerates fungal growth on fruits—the cooling benefit is partially offset by mold proliferation',
-      },
-      {
-        approach: 'Solar-powered refrigeration',
-        limitation:
-          '$300-1000+ capital cost is 60-200 days of farmer income; maintenance requirements, theft risk, and single point of failure make it impractical',
-      },
-      {
-        approach: 'Commercial waxing/coating',
-        limitation:
-          "Requires consistent supply chain for coating materials that doesn't exist in rural areas; quality control is challenging",
-      },
-      {
-        approach: 'Hermetic storage (PICS bags)',
-        limitation:
-          'Designed for dormant seeds, not living tissue—fresh produce suffocates and ferments in zero-oxygen environment',
-      },
-      {
-        approach: '1-MCP ethylene blocking',
-        limitation:
-          'Highly effective but requires cold chain for the chemical itself and controlled application environment',
-      },
-    ],
-    current_state_of_art: {
-      benchmarks: [
-        {
-          entity: 'UC Davis Postharvest Technology Center',
-          approach:
-            'Comprehensive postharvest protocols combining temperature, atmosphere, and humidity control',
-          current_performance:
-            'Achieves 21-28 day shelf life for tomatoes at 12-15°C with proper atmosphere',
-          source: 'Kader (2002) Postharvest Technology of Horticultural Crops',
-        },
-        {
-          entity: 'Purdue University (PICS program)',
-          approach: 'Hermetic storage bags for grain',
-          current_performance:
-            '>95% adoption in some African regions; near-zero insect damage for grains',
-          source: 'Murdock & Baoua (2014) PICS technology paper',
-        },
-        {
-          entity: 'CoolBot / Promethean Power Systems',
-          approach: 'Solar-powered cold storage',
-          current_performance: 'Achieves 4-10°C storage; $1000-5000 per unit',
-          source: 'Company websites and press releases',
-        },
-      ],
+        'Industry is trying to make batches more reliable when the answer is to eliminate batches entirely. Continuous perfusion maintains cells at steady-state optimal conditions indefinitely—no lag phase, no stationary phase decline, no batch-to-batch variability. There are no batches to fail. Pharma biologics made this transition 15+ years ago for identical reasons: batch variability was unacceptable for high-value products. Precision fermentation proteins are simpler than antibodies; the technology transfer is straightforward.',
     },
   },
 
   constraints_and_metrics: {
     hard_constraints: [
-      'No grid electricity available',
-      'Farmer income <$5/day limits capital to $20-50 maximum',
-      'Must work at 30-40°C ambient temperature',
-      'No cold chain for distribution—preservation must persist through transport',
+      'Must achieve food-grade/regulatory compliance for protein products',
+      'Cannot exceed practical vessel pressure ratings without new construction (typically 1-2 bar for existing vessels)',
+      'Must maintain protein functionality and folding for target applications',
     ],
     soft_constraints: [
-      'Operating cost <$0.01/kg (target, not absolute)',
-      '14-21 day shelf life (minimum viable may be 10-14 days)',
-      'Zero training (brief demonstration acceptable)',
-      'Single solution for all produce types (produce-specific variants acceptable)',
+      '50,000L vessel scale (analysis includes alternatives if this is negotiable)',
+      'Timeline pressure from investors/market (longer-term solutions may be strategically superior)',
+      'Existing equipment and facility layout (retrofit vs greenfield tradeoffs)',
     ],
     assumptions: [
-      'Charcoal, clay, neem leaves, lime, and vegetable oils are locally available',
-      'Farmers have access to basic containers (baskets, pots)',
-      '30-40°C is daytime peak; nighttime may drop to 22-28°C in dry regions',
-      'Marketable quality means minor cosmetic defects acceptable, no rot, reasonable texture',
+      'Cost target of $2-5/kg is fermentation + primary recovery; DSP adds $3-8/kg additional',
+      'Failure modes are mixed: ~20% contamination, ~40% low titer, ~40% protein quality issues',
+      'Current kLa is 200-400/hr; need 600-1000/hr for target cell density',
+      'Products are secreted proteins (whey, collagen, heme) with different expression challenges',
     ],
     success_metrics: [
       {
-        metric: 'Shelf life extension',
-        target: '14-21 days',
-        minimum_viable: '10 days',
-        stretch: '28 days',
+        metric: 'Cost per kg protein',
+        target: '$3/kg',
+        minimum_viable: '$5/kg',
+        stretch: '$2/kg',
+        unit: 'USD/kg',
       },
       {
-        metric: 'Operating cost',
-        target: '<$0.01/kg',
-        minimum_viable: '$0.02/kg',
-        stretch: '<$0.005/kg',
+        metric: 'Batch/campaign success rate',
+        target: '95%',
+        minimum_viable: '90%',
+        stretch: '>99%',
+        unit: '% meeting spec',
       },
       {
-        metric: 'Capital investment',
-        target: '<$20',
-        minimum_viable: '$50',
-        stretch: '<$5',
+        metric: 'Volumetric productivity',
+        target: '5 g/L/day',
+        minimum_viable: '2 g/L/day',
+        stretch: '10 g/L/day',
+        unit: 'g protein/L/day',
       },
       {
-        metric: 'Adoption rate',
-        target: '>50% of trained farmers',
-        minimum_viable: '25%',
-        stretch: '>80%',
+        metric: 'Cell density achieved',
+        target: '75 g/L DCW',
+        minimum_viable: '50 g/L DCW',
+        stretch: '100 g/L DCW',
+        unit: 'g dry cell weight/L',
       },
     ],
   },
@@ -140,374 +147,299 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
   challenge_the_frame: [
     {
       assumption:
-        'Charcoal + lime will achieve similar ethylene control to 1-MCP',
+        'The 50,000L vessel scale is fixed',
       challenge:
-        '1-MCP blocks ethylene receptors (preventing perception); charcoal/lime remove ethylene (reducing concentration). These are different mechanisms. If produce is already sensitized to ethylene or if removal rate is slower than production rate, results may differ significantly.',
+        'If the goal is $2-5/kg protein cost, vessel size is a means, not an end. A 10,000L perfusion system achieving 10x productivity matches 100,000L batch output. The constraint may be self-imposed.',
       implication:
-        'If charcoal+lime shows <30% improvement vs. control, pivot to hot water treatment as primary intervention (which inactivates ethylene-producing enzymes directly)',
+        'If vessel size is negotiable, perfusion at smaller scale may be superior to optimizing larger batch vessels. Capital efficiency improves dramatically.',
     },
     {
-      assumption: 'Farmers will adopt multi-step preservation practices',
+      assumption: 'Batch failures are a process engineering problem',
       challenge:
-        'Even simple interventions require behavior change. Oil coating adds handling time. Charcoal regeneration requires weekly attention. If adoption barriers are higher than expected, technically superior solutions may fail.',
+        'Brewing achieves >99% batch success with simpler technology than precision fermentation uses. The difference is strain maturity—centuries vs years of optimization. Process engineering may be compensating for immature strains.',
       implication:
-        'If adoption is <25% after training, simplify to single-step intervention (oil coating only, or charcoal only) even at cost of reduced efficacy',
+        'If strain robustness is the binding constraint, ALE investment may have higher ROI than process engineering. The enzyme industry\'s patient approach may be the right model.',
     },
     {
-      assumption: '30-40°C is daytime peak with cooler nights',
+      assumption: 'The failure modes are mixed (contamination, titer, quality)',
       challenge:
-        'In humid tropical regions, nighttime temperatures may stay above 30°C with minimal diurnal swing. This eliminates passive thermal strategies and may accelerate decay beyond our models.',
+        'If one failure mode dominates, the solution focus changes dramatically. If 80% of failures are low titer due to oxygen limitation, solving oxygen solves the problem. If 80% are contamination, sterility improvements matter most.',
       implication:
-        'If humid tropical sites show <50% of dry-region results, develop humidity-specific protocol emphasizing antimicrobial interventions over thermal/atmosphere approaches',
+        'Detailed failure mode analysis should precede major investment. The assumed 20/40/40 split may not reflect reality.',
     },
     {
-      assumption: 'The 14-21 day target is achievable without active cooling',
+      assumption: 'Food-grade regulatory requirements are similar to pharma',
       challenge:
-        'Even with perfect ethylene control, Arrhenius kinetics mean decay at 35°C proceeds 4-8x faster than at 10°C. We may be able to achieve 10-14 days but not 21 days at ambient temperature.',
+        'Food ingredients have different regulatory pathways than pharmaceuticals. Continuous processing is already accepted in food manufacturing. The perceived regulatory barriers may be lower than assumed.',
       implication:
-        'If maximum achievable is 10-14 days, reframe success metric around loss reduction percentage rather than absolute shelf life; 10 days vs. 3 days is still 70% loss reduction',
+        'Regulatory pathway investigation should happen early. If continuous food fermentation has clear precedent, the timeline for perfusion deployment shortens.',
     },
   ],
 
   innovation_analysis: {
     reframe:
-      "Instead of asking 'how do we bring refrigeration to farmers?', we asked 'what if we interrupt the biochemical decay cascade using waste materials?'",
+      'Instead of asking \'how do we make batches more reliable at 50,000L,\' we asked \'what if batch processing itself is the wrong paradigm for oxygen-limited protein production?\'',
     domains_searched: [
-      'Plant hormone biology',
-      'Fermented food microbiology',
-      'Traditional pre-refrigeration storage',
-      'Edible coating science',
-      'Termite mound thermoregulation',
-      'Extremophile biology',
-      'Industrial modified atmosphere packaging',
-      'Biofilm ecology',
+      'Pharmaceutical biologics manufacturing',
+      'Industrial enzyme production',
+      'Wastewater treatment',
+      'Aquaculture oxygenation',
+      'ICI Pruteen historical process',
+      'Electrochemistry',
+      'Biofilm reactor engineering',
+      'Deep-sea biology',
     ],
   },
 
   execution_track: {
     intro:
-      'Solution concepts use proven technologies requiring integration, not invention. These represent the lowest-risk path to achieving the 14-21 day shelf life target using materials that are already waste products in the target contexts.',
+      'Solution concepts use proven technologies requiring integration and adaptation, not fundamental invention. These represent the highest-confidence paths to achieving target economics with manageable risk.',
     primary: {
       id: 'sol-primary',
       title:
-        'Ethylene-First Preservation System (Charcoal + Lime + Oil Coating)',
-      confidence: 82,
-      what_it_is:
-        'A three-component system that addresses the dominant decay pathway for each produce category using only waste materials. For climacteric fruits (tomatoes, mangoes): place produce in a container with a charcoal sachet (50-100g from coconut shells or rice husks) and lime-washed interior surfaces. The charcoal adsorbs ethylene through van der Waals forces; the lime (calcium hydroxide) chemically oxidizes any remaining ethylene while providing antimicrobial surface protection. For all produce types: apply a thin coating of locally available vegetable oil (coconut, mustard, or palm) before storage, which creates a hydrophobic barrier preventing surface moisture accumulation while reducing respiration rate by 30-40%.\n\nThe system is modular: farmers with existing Zeer pots can add oil-coated produce to capture cooling benefits without humidity damage. Farmers without Zeer pots can use any container with charcoal + lime for ethylene control alone. The charcoal is regenerated by placing in direct sunlight for 4-6 hours weekly, which drives off adsorbed ethylene and restores capacity. Lime whitewash is reapplied monthly or when visibly degraded.\n\nFor leafy greens (non-climacteric), the ethylene component is less critical. Instead, the oil coating prevents dehydration while dried neem leaves added to the container provide continuous antimicrobial volatile release. This addresses the microbial colonization pathway that dominates leafy green decay.',
-      why_it_works:
-        'Activated charcoal has enormous surface area (300-500 m²/g even without industrial activation) with micropores (0.5-2 nm diameter) that physically trap ethylene molecules (0.4 nm diameter) through London dispersion forces. At 15-25 mg ethylene per gram charcoal, 100g can adsorb ethylene production from 20kg of tomatoes for 14+ days. Lime (Ca(OH)₂) reacts with ethylene to form calcium carbonate and water—a permanent removal rather than saturation-limited adsorption. The high pH (12+) of lime surfaces also inhibits bacterial and fungal growth.\n\nOil coating works through simple thermodynamics: triglyceride fatty acid chains create a non-polar surface that water cannot wet (contact angle >90°). This maintains surface water activity below 0.80—below the threshold for most bacterial and fungal growth—even when ambient humidity is 95%. Simultaneously, the oil film reduces oxygen permeability, slowing aerobic respiration by 30-40%.',
+        'Continuous Perfusion with ATF Cell Retention',
+      confidence: 80,
+      source_type: 'TRANSFER',
+      bottom_line:
+        'Convert from batch to continuous perfusion operation using alternating tangential flow (ATF) or tangential flow filtration (TFF) cell retention.',
+      expected_improvement: '10x volumetric productivity, near-elimination of batch failures',
+      timeline: '18-24 months to commercial deployment',
+      investment: '$2-5M',
       the_insight: {
-        what: 'Ethylene cascade interruption, not temperature reduction, is the primary lever for climacteric fruit preservation',
+        what: 'Batch processing traverses multiple metabolic states where small perturbations compound into batch failures. Steady-state continuous operation maintains cells at optimal conditions indefinitely, eliminating batch-to-batch variability at its source.',
         where_we_found_it: {
-          domain: '1-MCP (ethylene receptor blocker) research literature',
+          domain: 'Pharmaceutical biologics manufacturing',
           how_they_use_it:
-            'Industrial postharvest treatment achieving 3-5x shelf life extension at ambient temperature',
+            'Genentech, Amgen, and Roche converted batch to perfusion 2005-2015 for monoclonal antibody production, achieving 10-50x volumetric productivity with >95% uptime',
           why_it_transfers:
-            'The mechanism (preventing ethylene perception/production) can be achieved through removal (charcoal adsorption) and oxidation (lime reaction) rather than receptor blocking',
+            'Precision fermentation proteins are simpler than antibodies. The cell retention challenge (yeast/bacteria vs mammalian cells) requires adaptation but not invention.',
         },
         why_industry_missed_it:
-          "Cold chain infrastructure is a multi-billion dollar industry with entrenched interests. Ethylene management is positioned as supplementary to refrigeration, not as a replacement. The translation from 1-MCP efficacy to charcoal+lime implementation hasn't been explicitly validated because no commercial incentive exists.",
+          'Precision fermentation inherited batch processing from pharma without questioning whether it applies. Perfusion is perceived as \'complex\' despite batch failure management being more complex. The startup \'fail fast\' culture accepts batch failures rather than investing in batch elimination.',
       },
-      investment: '$2-10 per household',
-      expected_improvement:
-        '2-4x shelf life extension (7-14 days for tomatoes at 35°C vs. 3-5 days control)',
-      timeline: 'Implementable in days',
+      what_it_is:
+        'Convert from batch to continuous perfusion operation using alternating tangential flow (ATF) or tangential flow filtration (TFF) cell retention. Cells are maintained at steady-state high density (50-100g/L DCW) while spent medium containing secreted product is continuously removed and fresh medium is continuously added. The system reaches steady-state within 5-10 days and then operates indefinitely at constant productivity.\n\nThe cell retention device (hollow fiber membrane) keeps cells in the bioreactor while allowing product-containing permeate to flow through. Dilution rate is controlled to match specific growth rate, maintaining cells in optimal physiological state. Dissolved oxygen is maintained through continuous feed of fresh, oxygenated medium combined with conventional or enhanced sparging.\n\nCritically, this eliminates the concept of \'batch failure\' entirely. There are no batches—only a continuous steady-state that either meets spec or doesn\'t. Deviations are detected in hours and corrected, not discovered at harvest after 72-120 hours of wasted resources.',
+      why_it_works:
+        'The physics is straightforward: steady-state operation at controlled dilution rate maintains cells at constant specific growth rate, avoiding the lag phase (low productivity), late exponential phase (oxygen limitation), and stationary phase (product degradation, cell death) that characterize batch fermentation. Product is harvested continuously before it can accumulate to inhibitory concentrations or be degraded by proteases. Oxygen demand is constant and predictable rather than peaking during exponential phase. The 10x volumetric productivity means a 10,000L perfusion system matches 100,000L batch output—achieving the economics of larger scale without the capital investment.',
+      why_it_might_fail: [
+        'Cell retention systems optimized for mammalian cells may not work efficiently for smaller yeast/bacteria',
+        '18-24 month perfusion development timeline may exceed organizational patience or funding runway',
+        'Genetic drift over long perfusion campaigns may reduce productivity',
+      ],
       validation_gates: [
         {
-          week: 'Week 1-2',
-          test: 'Side-by-side comparison: (A) charcoal+lime container at ambient, (B) Zeer pot without charcoal, (C) Zeer pot with charcoal+lime, (D) oil-coated produce in Zeer pot, (E) control basket. 5kg tomatoes each condition.',
+          week: 'Month 1-3',
+          test: 'Bench-scale perfusion proof-of-concept with production strain',
           method:
-            'Visual quality scoring (1-5 scale for firmness, color, mold presence) daily for 14 days. No specialized equipment required. Photograph documentation.',
+            '2L perfusion system with ATF or TFF cell retention; operation for 30+ days at steady-state',
           success_criteria:
-            'Charcoal+lime conditions show >50% reduction in decay incidence vs. control; oil-coated produce in Zeer pot shows <20% mold incidence vs. uncoated in Zeer pot',
-          cost: '$30-50 (primarily produce cost; materials are near-free)',
+            'Achieve steady-state at >50g/L DCW for >30 days with product titer within 80% of batch peak; cell retention >95%',
+          cost: '$150-300K (equipment rental/purchase + 3 months operation + analysis)',
           decision_point:
-            'No significant difference between charcoal+lime and control → revisit charcoal quality and quantity; pivot to hot water treatment as primary intervention',
+            'If cell retention <90% or steady-state cell density <30g/L, troubleshoot membrane selection and operating parameters. If issues persist, evaluate alternative cell retention technologies or pivot to enhanced batch.',
         },
-      ],
-      why_safe: {
-        track_record:
-          'Charcoal ethylene adsorption is well-documented in academic literature. Oil coating is traditional practice across multiple cultures.',
-        precedent: [
-          'US 4,515,266 (expired 1985) - carbon liner concept, now public domain',
-          'Traditional oil coating practiced in South Asia for centuries',
-          'Lime whitewash is ancient technology with antimicrobial properties',
-        ],
-        failure_modes_understood: true,
-      },
-      why_it_might_fail: [
-        'Charcoal quality variability from different feedstocks may result in inconsistent ethylene adsorption',
-        'Pre-harvest ethylene exposure or mechanical damage may trigger cascade before storage begins',
-        "Doesn't address leafy green preservation as effectively as climacteric fruits",
       ],
     },
     supporting_concepts: [
       {
         id: 'sol-support-1',
-        title: 'Produce-Specific Modular Insert System',
+        title: 'Intensive PAT Deployment with Model Predictive Control',
         relationship: 'COMPLEMENTARY',
         one_liner:
-          'Universal base container with produce-specific modular inserts for optimized preservation',
+          'Requires 20-50 batches of training data before models are accurate; during learning period, failure rate may not improve',
+        confidence: 75,
         what_it_is:
-          'A universal base container (clay pot, woven basket, or wooden box) with produce-specific modular inserts that optimize for the dominant decay pathway of each category. Ethylene-scrubbing insert for climacteric fruits: charcoal sachet (50-100g) + lime-washed inner liner. Humidity-buffering insert for leafy greens: small water reservoir with fabric wick + charcoal for humidity buffering to maintain 90-95% RH. Antimicrobial insert for all: neem leaf sachet. Inserts are color-coded or shape-differentiated for easy selection.\n\nThis approach threads the needle between simplicity (one base system) and effectiveness (optimized interventions). The base container provides scale economies and familiarity; the inserts provide customization without complexity.',
+          'Deploy comprehensive real-time monitoring (Raman spectroscopy for metabolites, NIR for biomass, soft sensors for product) integrated with model predictive control. Detect deviations within 2-4 hours and correct mid-batch rather than discovering failure at harvest. This converts the binary pass/fail outcome at 72-120 hours into continuous trajectory management with intervention capability.\n\nThe system uses multivariate sensors to continuously measure metabolite profiles, dissolved oxygen gradients, and cell physiological state. Machine learning models trained on historical batch data predict trajectory deviations 4-8 hours before they become irrecoverable. MPC adjusts feed rates, temperature, pH, and aeration in real-time.',
         why_it_works:
-          'For climacteric fruits: charcoal adsorbs ethylene, lime oxidizes it, breaking the autocatalytic cascade. For leafy greens: water reservoir maintains >90% RH preventing dehydration (the primary decay pathway), while charcoal prevents over-saturation and neem provides antimicrobial protection. Each insert addresses the rate-limiting decay mechanism for its produce category.',
+          'Real-time measurement of process state enables closed-loop control that maintains optimal conditions despite disturbances. Failed batches detected early enough to abort and restart save 60-80% of batch time versus discovering failure at harvest.',
         when_to_use_instead:
-          'When farmers store multiple produce types and want optimized results for each; when universal approach shows inadequate results for leafy greens specifically',
-        confidence: 78,
-        validation_summary:
-          'Investment $5-10 for base container + 2-3 inserts. Achieves 2-3x shelf life extension for EACH produce category. Key risk: added complexity may confuse users.',
+          'Deploy immediately in parallel with perfusion development. PAT improves current batch operations while perfusion is being developed. Also valuable for perfusion operation—continuous monitoring is even more critical for steady-state control.',
       },
       {
         id: 'sol-support-2',
-        title: 'Hot Water Stress Priming Treatment',
-        relationship: 'COMPLEMENTARY',
+        title: 'Pure Oxygen Sparging Optimization with Microbubble Enhancement',
+        relationship: 'FALLBACK',
         one_liner:
-          'Brief hot water dip triggers protective dormancy response for multi-week effect',
+          'Microbubble stability in protein-rich fermentation media is poorly characterized; coalescence may reduce effectiveness',
+        confidence: 65,
         what_it_is:
-          "Brief hot water dip (45-55°C for 5-10 minutes) immediately after harvest triggers heat shock protein expression that dramatically slows subsequent metabolism and increases stress tolerance. This one-time treatment provides multi-week protective effect. The treatment also kills surface pathogens (pasteurization effect) and inactivates ACC oxidase—the enzyme that produces ethylene.\n\nTemperature control is achieved using simple indicators: wax pellets that melt at target temperature, or the traditional 'elbow test' (water that's uncomfortable but not painful to touch is approximately 50°C). Produce is dipped in batches, then air-dried in shade before storage.",
+          'Systematically optimize pure O2 sparging combined with microbubble generators to maximize kLa within existing vessels. Pure oxygen provides 5x higher partial pressure than air; microbubbles provide 5-10x higher interfacial area than conventional sparging. Combined, these could achieve 3-5x OTR improvement without vessel replacement.\n\nMicrobubble generators (venturi-based or mechanical) produce 10-100 μm bubbles versus conventional 2-5 mm bubbles. Since interfacial area scales with 1/diameter, microbubbles achieve dramatically higher kLa per volume of gas.',
         why_it_works:
-          'Heat shock activates HSF transcription factors, upregulating HSP70 and HSP90 chaperone proteins that prevent protein denaturation. Simultaneously, brief heat inactivates ACC oxidase (>90% at 50°C for 10 minutes) reducing ethylene production capacity. Surface pathogens are killed through thermal denaturation at temperatures plants survive.',
+          'Henry\'s Law (pure O2 increases C* from ~8 to ~40 mg/L) combined with microbubble physics (100x smaller bubbles = 100x more surface area) provides multiplicative improvement in oxygen transfer capacity.',
         when_to_use_instead:
-          'When ethylene-first approach shows insufficient results; when surface pathogen load is high; as synergistic addition to charcoal+lime system for maximum effect',
-        confidence: 72,
-        validation_summary:
-          'Investment $5-20 for pot, fuel, and temperature indicator. Achieves 1.5-2x shelf life extension + surface pathogen reduction. Key risk: temperature precision is critical.',
+          'If perfusion development encounters fundamental barriers (cell retention failure, regulatory obstacles), enhanced batch with PAT + microbubbles + pure O2 provides fallback path to improved economics within existing paradigm. Also valuable as interim improvement while perfusion is developed.',
       },
     ],
   },
 
   innovation_portfolio: {
     intro:
-      'Innovation concepts offer higher ceilings with higher uncertainty. These represent parallel bets on breakthrough outcomes that could exceed the 14-21 day target or dramatically simplify implementation.',
+      'Higher-risk explorations with breakthrough potential. Innovation concepts offer higher ceilings with higher uncertainty. These represent parallel bets on breakthrough outcomes that could fundamentally change precision fermentation economics if successful.',
     recommended_innovation: {
       id: 'innov-recommended',
-      title: 'Probiotic Surface Colonization from Fermented Foods',
-      score: 55,
-      confidence: 55,
-      what_it_is:
-        "Inoculate produce surfaces with lactic acid bacteria (LAB) from locally available fermented foods—yogurt whey, sauerkraut juice, kimchi liquid, or fermented vegetable brine. These beneficial bacteria colonize the produce surface first, establishing competitive exclusion against decay pathogens. The LAB consume surface nutrients, lower surface pH through lactic acid production (to 4.0-4.5, below pathogen tolerance), and produce antimicrobial compounds including bacteriocins and hydrogen peroxide.\n\nApplication is simple: dilute fermented food liquid 1:10 with clean water, dip or spray produce, allow to air dry. The treatment should be applied within hours of harvest, before pathogens can establish. The LAB population is self-sustaining once established, drawing nutrients from the produce surface.\n\nThis approach represents a paradigm shift from 'fight all microbes' to 'cultivate beneficial microbes.' We're applying organisms that people already consume daily in fermented foods—there's no food safety novelty, only application novelty.",
-      why_it_works:
-        'LAB ferment surface sugars to lactic acid (pKa 3.86), dropping surface pH to 4.0-4.5 where most pathogens cannot grow. Bacteriocins (small antimicrobial peptides like nisin, plantaricin) insert into pathogen cell membranes causing lysis. H₂O₂ production oxidizes pathogen cellular components. Competition for iron and other micronutrients starves pathogens. The race for surface dominance is won by whoever colonizes first—LAB inoculation ensures the good guys win.\n\nTrias et al. (2008) demonstrated 2-3 log reduction (99-99.9% kill) in pathogen load on apples and lettuce using LAB surface treatment. The treatment is self-sustaining: once established, the LAB population maintains itself using produce surface nutrients.',
+      title: 'Pressurized Continuous Fermentation (ICI Pruteen Revival)',
+      confidence: 65,
       innovation_type: 'CROSS_DOMAIN',
-      source_domain: 'Fermented food microbiology and biocontrol research',
+      source_domain: 'ICI Pruteen process (1970s-80s)',
       the_insight: {
-        what: 'Competitive exclusion by beneficial microbes prevents pathogen establishment without chemical intervention',
+        what: 'Henry\'s Law provides 3-5x oxygen solubility at 3-5 bar—fundamental thermodynamics that cannot be circumvented but can be exploited',
         where_we_found_it: {
-          domain: 'Fermented food microbiology and biocontrol research',
+          domain: 'ICI Pruteen single-cell protein production (1970s-80s)',
           how_they_use_it:
-            'LAB dominate fermented food ecosystems, preventing spoilage for months without refrigeration. Biocontrol research (Wisniewski & Wilson 1992) documents 60-90% decay reduction through competitive exclusion.',
+            'ICI achieved 50,000+ tonnes/year bacterial protein production at costs of $0.30-0.50/kg using pressurized continuous fermentation',
           why_it_transfers:
-            'The same LAB that preserve sauerkraut can colonize tomato surfaces. The ecological principle (first colonizer wins) is universal.',
+            'At 3 bar with pure oxygen, oxygen saturation concentration increases from ~40 mg/L to ~120 mg/L—a 3x increase in the thermodynamic driving force for mass transfer.',
         },
         why_industry_missed_it:
-          'Food safety paradigm emphasizes elimination, not cultivation. Regulatory frameworks assume sterility is the goal. The idea of intentionally applying bacteria to fresh produce runs counter to hygiene-focused approaches, even though we eat these same bacteria daily.',
+          'The ICI Pruteen process was abandoned due to high energy costs from methanol substrate, not process failure. The fermentation technology itself was proven at massive scale. Modern precision fermentation uses cheaper substrates but hasn\'t revisited the pressure engineering.',
       },
-      selection_rationale: {
-        why_this_one:
-          "This innovation has the highest ratio of potential impact to validation cost. If it works, it's essentially free and self-sustaining. The scientific basis (competitive exclusion, LAB antimicrobial production) is well-established—the uncertainty is only in the specific application to produce surfaces in field conditions. A $30 trial can answer the key question.",
-        ceiling_if_works:
-          'Zero-cost biological protection using waste streams from existing fermented food production. No consumables, no supply chain, no technical expertise required after initial training.',
-        vs_execution_track:
-          'Probiotic approach offers potentially higher efficacy (60-80% decay reduction) at near-zero ongoing cost, but requires more validation than charcoal+lime.',
-      },
+      what_it_is:
+        'Combine continuous perfusion with pressurized operation at 3-5 bar to exploit Henry\'s Law for 3-5x higher oxygen solubility. This is the approach ICI used for the Pruteen process in the 1970s-80s, achieving 50,000+ tonnes/year bacterial protein production at costs of $0.30-0.50/kg.\n\nAt 3 bar with pure oxygen, oxygen saturation concentration increases from ~40 mg/L to ~120 mg/L—a 3x increase in the thermodynamic driving force for mass transfer. This is additive with kLa improvements: if kLa is 400/hr and C* is 120 mg/L (versus 40 mg/L at 1 bar), OTR increases 3x without any change to mass transfer equipment.\n\nThe vessel requires pressure rating (standard in chemical processing, 20-40% cost premium) but no fundamental redesign. Combined with continuous operation and modern control systems, this could achieve productivity levels that current precision fermentation hasn\'t approached.',
+      why_it_works:
+        'Henry\'s Law is fundamental thermodynamics: C* = H × pO2. At 3 bar, oxygen solubility is 3x atmospheric. This increases the \'ceiling\' that mass transfer approaches, enabling higher cell density and productivity without improving kLa. The cells don\'t \'know\' the pressure is elevated—each oxygen molecule in solution has the same activity as at atmospheric pressure. Most production organisms tolerate 5-10 bar without significant growth inhibition.',
       breakthrough_potential: {
         if_it_works:
-          'Zero-cost biological protection using waste streams from existing fermented food production. No consumables, no supply chain, no technical expertise required after initial training.',
+          'Achieves commodity-scale protein economics ($1-3/kg) at 50,000L scale',
         estimated_improvement:
-          '60-80% reduction in decay incidence; potentially 2-3x shelf life extension when combined with other interventions',
+          '3-5x OTR capacity from pressure alone; combined with perfusion, potentially 30-50x productivity versus current batch',
         industry_impact:
-          "Could establish new paradigm of 'probiotic produce' that challenges the sterility-focused food safety model",
+          'Would enable precision fermentation cost parity with commodity proteins, opening mass-market food ingredient applications',
       },
       validation_path: {
         gating_question:
-          'Do LAB from common fermented foods successfully colonize produce surfaces and reduce decay?',
+          'Can production strain maintain productivity and stability at 3-5 bar pressure?',
         first_test:
-          'Tomatoes dipped in diluted yogurt whey (1:10) vs. diluted fermented vegetable brine (1:10) vs. water control. Store at ambient temperature. Daily assessment of decay incidence and surface pH over 14 days.',
-        cost: '$20-30 (produce + fermented foods + pH strips)',
-        timeline: '2 weeks',
+          'Pressurized shake flask or mini-bioreactor studies at 2-5 bar; measure growth rate, titer, and product quality versus atmospheric control',
+        cost: '$50-100K (pressure-rated equipment + 3 months operation + analysis)',
+        timeline: '3-4 months',
         go_no_go:
-          'GO if treated produce shows >40% reduction in decay incidence and surface pH drops to <5.0 within 48 hours. NO-GO if no pH change or decay incidence similar to control.',
+          'GO if growth rate and titer within 80% of atmospheric control at 3 bar. NO-GO if significant growth inhibition or protein quality issues.',
       },
       risks: {
-        physics_risks: ['Surface drying may kill LAB before establishment'],
+        physics_risks: [
+          'Pressure vessel capital cost may exceed budget for existing facilities',
+          'Some organisms may show unexpected pressure sensitivity',
+        ],
         implementation_challenges: [
-          'LAB strains in fermented foods may not be optimal for produce surface colonization',
-          'Cultural/regulatory acceptance barriers',
+          'Pressure-rated vessel procurement and installation',
+          'Safety protocols for pressurized fermentation',
         ],
         mitigation: [
-          'Test multiple fermented food sources; yogurt LAB may differ from vegetable ferment LAB',
-          'Apply in evening when humidity is higher; dont over-dry before storage',
-          'Frame as traditional practice extension; partner with food safety authorities for validation',
+          'Start with smaller pressure-rated vessel for proof-of-concept',
+          'Partner with chemical engineering firms experienced in pressurized bioprocessing',
+          'Implement standard pressure vessel safety protocols',
         ],
-      },
-      relationship_to_execution_track: {
-        run_in_parallel: true,
-        when_to_elevate:
-          'Elevate to primary if probiotic treatment shows >50% decay reduction in field trials while charcoal+lime shows <30% improvement.',
-        complementary: true,
       },
     },
     parallel_investigations: [
       {
         id: 'innov-parallel-1',
-        title: 'Natural Material Passive Modified Atmosphere Container',
-        confidence: 45,
-        innovation_type: 'CROSS_DOMAIN',
-        what_it_is:
-          'A semi-permeable storage container using layered natural materials (woven fabric, clay, charcoal) calibrated to match produce respiration rates. The container allows produce to create its own optimal low-O₂/high-CO₂ atmosphere without hermetic sealing or gas injection. Different fabric weaves and clay porosities can be combined to achieve target oxygen transmission rates for different produce types.\n\nThe key insight is that produce naturally modifies its own atmosphere through respiration. In a container with correctly calibrated permeability, O₂ concentration drops to 3-8% and CO₂ rises to 5-15%, dramatically slowing respiration and ethylene production without suffocating the tissue.',
-        why_it_works:
-          'Respiration follows Michaelis-Menten kinetics—rate decreases hyperbolically as O₂ drops below 8%. At 3-5% O₂, respiration is 50-70% of ambient rate. The system is self-regulating: if O₂ drops too low, respiration slows further, reducing O₂ consumption until equilibrium. Elevated CO₂ (5-10%) further suppresses respiration and provides antimicrobial effect.',
+        title:
+          'Metabolic Engineering for Reduced Oxygen Demand (VHb Expression)',
+        confidence: 70,
+        innovation_type: 'OPTIMIZATION',
+        source_domain: 'Bacterial hemoglobin research',
+        one_liner:
+          'Engineer production strains to express Vitreoscilla hemoglobin (VHb), which provides intracellular oxygen buffering and delivery to cytochromes',
         the_insight: {
-          what: 'Produce creates its own optimal atmosphere if container permeability matches respiration rate',
+          what: 'VHb binds oxygen at very low concentrations (Kd ~10 nM) and delivers it directly to respiratory enzymes, improving oxygen utilization efficiency by 20-40%',
           where_we_found_it: {
-            domain: 'Industrial MAP packaging',
+            domain: 'Bacterial hemoglobin research and industrial strain engineering',
             how_they_use_it:
-              'US Patent 5,160,768 (expired) establishes the principle',
+              'VHb expression has been shown to improve growth and product yields in oxygen-limited conditions across multiple organisms',
             why_it_transfers:
-              'Industrial MAP uses engineered plastics with precise OTR specifications. No one has systematically characterized natural material permeabilities to enable low-cost passive MAP.',
+              'This attacks the demand side of the oxygen equation (OUR) rather than the supply side (OTR), providing an orthogonal improvement pathway',
           },
           why_industry_missed_it:
-            'Industrial MAP uses engineered plastics with precise OTR specifications. No one has systematically characterized natural material permeabilities to enable low-cost passive MAP.',
+            'Focus has been on supply-side solutions (better aeration, larger vessels). Demand-side reduction through metabolic engineering is underexplored in precision fermentation.',
         },
-        key_uncertainty:
-          'Natural material permeability consistency—can we achieve reliable atmosphere modification with variable materials?',
-        when_to_elevate:
-          'If validation shows consistent atmosphere modification achievable with specific material combinations; if charcoal+lime approach shows insufficient results for leafy greens',
         ceiling:
-          '2-4x shelf life extension at ambient temperature using natural materials',
-        investment_recommendation:
-          '$5-15 per container (reusable 2-3 years). All materials locally sourceable.',
+          '20-40% reduction in oxygen demand, enabling higher cell density in existing equipment',
+        key_uncertainty:
+          'VHb expression adds metabolic burden that may reduce product titer; must optimize expression level to balance benefits',
+        when_to_elevate:
+          'If supply-side solutions (perfusion, pressure, microbubbles) prove insufficient or too capital-intensive, demand-side reduction becomes primary strategy',
         validation_approach: {
-          test: 'Place respiring produce in containers of varying materials. Measure headspace O₂/CO₂ at 24h and 48h.',
-          cost: '$50-100 (gas measurement is the main cost)',
+          test: 'Express VHb in production strain; compare growth and titer under oxygen-limited conditions versus parent strain',
+          cost: '$50-100K',
+          timeline: '3-4 months',
           go_no_go:
-            'GO if at least one natural material combination achieves 5-10% O₂ equilibrium. NO-GO if all natural materials either allow full O₂ or cause fermentation.',
+            'GO if oxygen demand reduced >20% with <10% titer reduction. NO-GO if titer drops >20% or no measurable oxygen demand improvement.',
         },
       },
       {
         id: 'innov-parallel-2',
-        title: 'Stomatal-Inspired Self-Regulating Humidity Vents',
-        confidence: 40,
-        innovation_type: 'CROSS_DOMAIN',
-        what_it_is:
-          'Storage container vents made from humidity-responsive natural materials (human hair, certain plant fibers, or hygroscopic clay) that automatically open when internal humidity exceeds optimal levels and close when humidity drops. This maintains ideal 85-90% RH without sensors, power, or manual intervention.\n\nHuman hair expands ~2.5% in length from 0-100% RH—enough to actuate a simple lever mechanism. A vent designed with hair-based actuator would open when humidity rises (hair swells, pushing vent open) and close when humidity drops (hair shrinks, spring returns vent to closed position).',
-        why_it_works:
-          'Hygroscopic materials absorb water into their structure, causing physical expansion. Hair absorbs water into cortex proteins; clay absorbs water between aluminosilicate layers. This absorption causes predictable dimensional change that can drive mechanical actuation.',
+        title: 'Adaptive Laboratory Evolution for Strain Robustness',
+        confidence: 75,
+        innovation_type: 'OPTIMIZATION',
+        source_domain: 'Industrial enzyme strain development',
+        one_liner:
+          'Launch systematic adaptive laboratory evolution (ALE) under production-relevant stress conditions to develop strains with brewing-like robustness',
         the_insight: {
-          what: 'Plant stomata achieve self-regulating gas exchange through humidity-responsive guard cells; this can be replicated mechanically',
+          what: 'Subject production strains to 100-500 generations of selection under stressful conditions (oxygen limitation, high density, late-batch metabolite accumulation); evolved strains accumulate mutations conferring stress tolerance',
           where_we_found_it: {
-            domain: 'Plant biology + historical hygrometer design',
-            how_they_use_it: 'Hair hygrometers invented 1783',
+            domain: 'Industrial enzyme and brewing industry strain development',
+            how_they_use_it:
+              'Brewing achieves >99% batch success with strains evolved over centuries. Enzyme industry uses systematic ALE to develop robust production strains.',
             why_it_transfers:
-              "Industrial solutions use electronic sensors and motorized vents. The low-tech mechanical approach is 'solved' by electronics in high-resource contexts.",
+              'The 40-60% failure rate may reflect strain immaturity rather than process limitations. ALE addresses the root cause.',
           },
           why_industry_missed_it:
-            "Industrial solutions use electronic sensors and motorized vents. The low-tech mechanical approach is 'solved' by electronics in high-resource contexts.",
+            'Precision fermentation startups focus on rapid titer improvement rather than patient strain robustness development. The \'fail fast\' culture doesn\'t align with ALE timelines.',
         },
+        ceiling:
+          'Brewing-like robustness (>99% batch success) without major process changes',
         key_uncertainty:
-          'Mechanical reliability over many cycles—hair degrades, clay may crack, calibration may drift',
+          'Maintaining expression level while selecting for stress tolerance requires careful dual-selection protocols',
         when_to_elevate:
-          'If validation shows reliable mechanical actuation; if humidity control proves to be the limiting factor in other approaches',
-        ceiling: 'Maintains optimal humidity ±5% without manual intervention',
-        investment_recommendation:
-          '$3-10 per container for vent mechanism. Achieves smart functionality without electronics.',
+          'If process engineering solutions plateau and batch failures persist, strain robustness becomes the binding constraint',
         validation_approach: {
-          test: 'Build simple lever mechanism actuated by 10cm hair bundle. Place in humidity chamber, cycle humidity 50-95% RH. Measure actuation displacement over 100 cycles.',
-          cost: '$20-30 for materials and humidity chamber setup',
+          test: 'Run parallel ALE campaigns under oxygen limitation, high density, and metabolite stress; screen evolved strains for batch success rate improvement',
+          cost: '$100-200K',
+          timeline: '6-12 months',
           go_no_go:
-            'GO if >1mm displacement achieved reliably over 100 cycles with <10% degradation. NO-GO if displacement inconsistent or material degrades significantly.',
+            'GO if evolved strains show >30% improvement in batch success rate with <10% titer reduction. NO-GO if no robustness improvement or unacceptable titer loss.',
         },
       },
     ],
     frontier_watch: [
       {
         id: 'frontier-1',
-        title: 'Living Biofilm Storage Surfaces',
+        title: 'In-Situ Electrochemical Oxygen Generation',
         innovation_type: 'PARADIGM',
-        trl_estimate: 2,
+        trl_estimate: 3,
         one_liner:
-          'Cultivate beneficial biofilm on container surfaces that actively maintains optimal conditions',
+          'Eliminates the fundamental kLa limitation—oxygen appears at the molecular level exactly where it\'s produced',
         why_interesting:
-          'If achievable, this represents the ultimate in sustainable preservation: a living system that actively protects stored produce with zero ongoing inputs. The biofilm would be a permanent, self-maintaining feature of the container.',
+          'Could enable arbitrarily high oxygen delivery rates limited only by electrode area and power supply. Hydrogen co-product could be captured for energy recovery.',
         why_not_now:
-          'Biofilms are complex ecosystems with emergent properties that may behave unpredictably. Risk of pathogen contamination or uncontrolled fermentation. Would require extensive validation and possibly strain selection/optimization. Regulatory and cultural acceptance barriers are significant. 12-24 months minimum for basic validation.',
+          'Electrode fouling in protein-rich fermentation media is the critical uncertainty. Early attempts (1980s-90s) failed due to rapid fouling. Modern electrodes are more resistant but validation in fermentation media is needed. Local pH effects at electrodes could damage cells.',
         trigger_to_revisit:
-          'Publication demonstrating stable beneficial biofilm on food contact surface with >6 month stability and no pathogen breakthrough; regulatory guidance on intentional biofilm applications in food systems',
+          'Publication demonstrating >1000 hours electrode operation in fermentation media without significant fouling; or commercial announcement of bioprocess-specific electrochemical oxygenation system',
         who_to_monitor:
-          'Dr. Michael Doyle (University of Georgia Center for Food Safety), Dr. Maria Marco (UC Davis - fermented food microbiology), International Scientific Association for Probiotics and Prebiotics (ISAPP)',
+          'Nel Hydrogen (electrolyzer technology), ITM Power (PEM electrolysis), Academic groups at TU Delft and MIT working on bioelectrochemical systems, Electrochemistry conferences (ECS meetings)',
         earliest_viability: '3-5 years',
-        recent_developments:
-          "Search for 'beneficial biofilm food preservation 2024' returned primarily research on biofilm prevention rather than cultivation. The paradigm shift from 'biofilms are problems' to 'biofilms can be solutions' is nascent in academic literature.",
         competitive_activity:
-          'No commercial entities identified working on this specific application. Academic research is scattered across food science, microbiology, and materials science without integration.',
+          'Limited commercial activity in bioprocess application. Academic research ongoing but no breakthrough yet.',
       },
       {
         id: 'frontier-2',
-        title: 'Trehalose Membrane Stabilization at Scale',
-        innovation_type: 'EMERGING_SCIENCE',
-        trl_estimate: 6,
+        title: 'Biofilm Fermentation for Secreted Proteins',
+        innovation_type: 'PARADIGM',
+        trl_estimate: 2,
         one_liner:
-          'Trehalose dip mimics tardigrade survival mechanism for multi-week produce protection',
+          'Biofilm reactors require minimal mixing energy and achieve very high oxygen transfer efficiency',
         why_interesting:
-          'The mechanism is well-understood and proven. If costs continue to drop (or local production becomes viable), this could provide a one-time treatment with multi-week protective effect. Particularly valuable for high-value produce where the $0.25-1.50/kg treatment cost is acceptable.',
+          'If protein secretion from biofilms is efficient, this could enable 10x productivity with 50-80% energy reduction.',
         why_not_now:
-          'Current cost ($5-15/kg trehalose, requiring 50-100g per kg produce) implies $0.25-1.50/kg treatment cost—25-150x above the $0.01/kg target. Creates supply chain dependency incompatible with self-sufficiency goals. May become viable as prices continue to drop or for higher-value produce only.',
+          'Critical uncertainty: can secreted proteins diffuse out of biofilms efficiently, or will they be trapped in the extracellular matrix? This fundamental question is unanswered. Biofilm thickness control is also challenging.',
         trigger_to_revisit:
-          'Trehalose price drops below $3/kg (enabling <$0.15/kg treatment cost); local enzymatic production from cassava starch demonstrated at village scale',
+          'Publication demonstrating efficient secreted protein recovery from thin biofilms with >50% of suspended culture productivity; or proof-of-concept for biofilm thickness control in protein production',
         who_to_monitor:
-          'Hayashibara (Japan) - largest trehalose producer, Cargill - expanding trehalose production, Agricultural research institutions testing trehalose for postharvest applications',
-        earliest_viability: '2-3 years (cost-dependent)',
-        recent_developments:
-          "Search for 'trehalose agricultural application 2024' shows continued research interest but no breakthrough in cost reduction. Biotechnology advances in enzymatic production continue but haven't yet reached price points viable for staple produce preservation.",
+          'OxyMem and Fluence (commercial MABR systems), Academic groups at University of Notre Dame and Delft working on biofilm protein production, Vinegar production industry (existing biofilm fermentation)',
+        earliest_viability: '4-6 years',
         competitive_activity:
-          'Hayashibara and Cargill dominate production. No competitors specifically targeting smallholder agricultural applications—market focus remains on food processing, cosmetics, and pharmaceuticals.',
-      },
-    ],
-  },
-
-  self_critique: {
-    overall_confidence: 'medium',
-    confidence_level: 'medium',
-    confidence_rationale:
-      'Strong evidence base for individual mechanisms (charcoal ethylene adsorption, oil coating respiration reduction, LAB competitive exclusion) but limited validation of combined system performance at 30-40°C ambient conditions in field settings',
-    what_we_might_be_wrong_about: [
-      'Charcoal+lime achieving similar results to 1-MCP—the mechanisms are different (removal vs. receptor blocking) and efficacy may differ',
-      'Adoption barriers may be higher than anticipated—even simple interventions require behavior change',
-      'The 14-21 day target may be unachievable at 35°C+ without active cooling, even with perfect ethylene control',
-      'Natural material variability may prevent consistent results across different contexts and batches',
-      'Probiotic surface treatment may face unexpected cultural or regulatory barriers',
-    ],
-    validation_gaps: [
-      {
-        concern: 'Charcoal+lime achieving similar results to 1-MCP',
-        status: 'ADDRESSED',
-        rationale:
-          'First validation step directly tests charcoal+lime vs. control with quantified go/no-go criteria',
-      },
-      {
-        concern: 'Adoption barriers may be higher than anticipated',
-        status: 'EXTENDED_NEEDED',
-        rationale:
-          'Technical validation doesnt test adoption. Recommend adding adoption tracking (% continuing use at 30/60/90 days) to pilot program design',
-      },
-      {
-        concern: '14-21 day target may be unachievable at 35°C+',
-        status: 'ADDRESSED',
-        rationale:
-          'Validation protocol runs for 14 days at ambient temperature; results will directly answer this question',
-      },
-      {
-        concern: 'Natural material variability',
-        status: 'EXTENDED_NEEDED',
-        rationale:
-          'Initial validation uses single charcoal source. Recommend testing 3+ charcoal sources in follow-up to characterize variability',
-      },
-      {
-        concern: 'Probiotic surface treatment barriers',
-        status: 'ACCEPTED_RISK',
-        rationale:
-          'Cultural/regulatory barriers are context-specific and cannot be fully validated in technical trial. Recommend parallel cultural acceptance assessment in target communities',
+          'Academic research active. No commercial precision fermentation applications yet.',
       },
     ],
   },
@@ -515,48 +447,100 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
   risks_and_watchouts: [
     {
       category: 'Technical',
-      risk: 'Charcoal quality variability from different feedstocks and pyrolysis conditions may result in inconsistent ethylene adsorption',
-      severity: 'medium',
+      risk: 'Cell retention systems optimized for mammalian cells may not work efficiently for smaller yeast/bacteria',
+      severity: 'high',
       mitigation:
-        'Develop simple quality indicators (flotation test, color); prefer coconut shell charcoal; establish minimum pyrolysis temperature guidance',
+        'Pilot testing with appropriate membranes; engage suppliers with microbial experience (Repligen has microbial-specific products); potentially custom membrane development',
     },
     {
       category: 'Technical',
-      risk: 'Pre-harvest ethylene exposure or mechanical damage may trigger ripening cascade before storage interventions can take effect',
-      severity: 'high',
+      risk: 'Microbubble coalescence in protein-rich media may reduce effectiveness below wastewater benchmarks',
+      severity: 'medium',
       mitigation:
-        'Harvest at mature-green stage; gentle handling protocols; sort damaged produce for immediate consumption; consider hot water treatment to inactivate ethylene-producing enzymes',
+        'Pilot testing in actual fermentation media before full-scale commitment; characterize coalescence rates under process conditions',
     },
     {
       category: 'Market',
-      risk: 'Oil-coated produce may have different appearance (slight sheen) that affects market acceptance',
-      severity: 'low',
-      mitigation:
-        "Test market acceptance with buyers; use neutral oils; position as 'freshness coating' if needed",
-    },
-    {
-      category: 'Resource',
-      risk: 'Water scarcity in some regions may limit evaporative cooling and hot water treatment options',
+      risk: 'Competitor achieves cost parity through different approach (larger scale, different geography, strain breakthrough)',
       severity: 'medium',
       mitigation:
-        'Prioritize ethylene-first approach (no water required) in water-scarce regions; develop water-recycling protocols for hot water treatment',
+        'Pursue multiple parallel paths; maintain flexibility to pivot; focus on approaches that provide structural advantage (perfusion productivity, pressure physics)',
     },
     {
       category: 'Regulatory',
-      risk: 'Probiotic surface treatment may face regulatory uncertainty in some markets',
+      risk: 'Continuous food ingredient production may face unexpected regulatory hurdles',
       severity: 'medium',
       mitigation:
-        'Frame as traditional practice extension; partner with food safety authorities for validation; focus initial deployment on local/informal markets',
+        'Engage FDA/relevant regulators early; document continuous processing precedents in food manufacturing; build regulatory strategy in parallel with technical development',
+    },
+    {
+      category: 'Resource',
+      risk: '18-24 month perfusion development timeline may exceed organizational patience or funding runway',
+      severity: 'high',
+      mitigation:
+        'Pursue quick wins (PAT, O2 optimization) in parallel to show progress; structure development with clear milestones and decision gates; consider partnership with pharma company experienced in perfusion',
     },
     {
       category: 'Technical',
-      risk: 'Leafy greens (non-climacteric) may not respond to ethylene-focused interventions, requiring parallel solution development',
-      severity: 'high',
+      risk: 'Genetic drift over long perfusion campaigns may reduce productivity',
+      severity: 'low',
       mitigation:
-        'Develop parallel protocol: oil coating + neem leaves + high-humidity Zeer pot specifically for leafy greens; validate separately',
+        'Regular strain banking; productivity monitoring; restart protocols; strain stability is manageable with proper procedures',
     },
   ],
 
+  self_critique: {
+    confidence_level: 'medium',
+    overall_confidence: 'medium',
+    confidence_rationale:
+      'High confidence in the physics and the pharma precedent; medium confidence in the adaptation to yeast/bacteria and food-grade requirements',
+    what_we_might_be_wrong_about: [
+      'Cell retention efficiency for yeast/bacteria may be fundamentally lower than mammalian cells, requiring more development than estimated',
+      'Continuous DSP for food proteins may be less mature than assumed, adding timeline and cost',
+      'The 40-60% batch failure rate may have causes we haven\'t identified that persist even with perfusion',
+      'Organizational/cultural resistance to paradigm shift may be stronger than technical barriers',
+    ],
+    unexplored_directions: [
+      'Co-culture systems that reduce oxygen demand through metabolic division of labor—didn\'t pursue due to complexity and regulatory uncertainty',
+      'Solid-state or semi-solid fermentation for some protein types—may be relevant for specific products but not general solution',
+      'Alternative feedstocks (CO2, methane) that change the economics entirely—outside scope but worth monitoring',
+    ],
+    validation_gaps: [
+      {
+        concern: 'Cell retention efficiency for yeast/bacteria may be fundamentally lower than mammalian cells',
+        status: 'ADDRESSED',
+        rationale:
+          'First validation step specifically tests cell retention with production strain; go/no-go criteria defined',
+      },
+      {
+        concern: 'Continuous DSP for food proteins may be less mature than assumed',
+        status: 'EXTENDED_NEEDED',
+        rationale:
+          'Should add parallel DSP development workstream; current validation focuses on fermentation only',
+      },
+      {
+        concern: 'The 40-60% batch failure rate may have causes we haven\'t identified',
+        status: 'EXTENDED_NEEDED',
+        rationale:
+          'Recommend detailed failure mode analysis before major investment; current assumption of 20/40/40 split is unvalidated',
+      },
+      {
+        concern: 'Organizational resistance to paradigm shift',
+        status: 'ACCEPTED_RISK',
+        rationale:
+          'Technical analysis cannot address organizational culture; this is a leadership challenge, not an engineering challenge',
+      },
+    ],
+  },
+
   what_id_actually_do:
-    "If this were my project, I'd start tomorrow with a $50 trial. Buy 25kg of tomatoes at the local market, split into five conditions: (A) control basket, (B) basket with 100g charcoal sachet, (C) basket with charcoal + lime-washed interior, (D) Zeer pot with uncoated tomatoes, (E) Zeer pot with oil-coated tomatoes. Score them daily for firmness, color, and mold. In two weeks, you'll know which interventions actually work in your specific context.\n\nI'd bet on the charcoal+lime combination outperforming the Zeer pot alone, because the literature on ethylene control is compelling and Zeer pot humidity is a known problem. But I might be wrong—maybe your charcoal isn't activated enough, or your ambient humidity is so high that the Zeer pot doesn't create additional fungal pressure. The trial will tell you.\n\nWhile running that trial, I'd also do a parallel test of the probiotic surface treatment—it costs almost nothing (diluted yogurt whey) and could be a game-changer if it works. Dip half your tomatoes in the yogurt solution before putting them in the charcoal+lime basket. If the LAB-treated tomatoes show less mold, you've discovered something valuable.\n\nThe key insight I'd hold onto: we're not trying to replicate refrigeration. We're trying to interrupt the specific biochemical cascades that cause decay. For tomatoes and mangoes, that's ethylene. For leafy greens, that's dehydration and microbial growth. Match the intervention to the decay pathway, use waste materials, and iterate based on what actually works in your fields.",
+    "If this were my project, I'd start three workstreams tomorrow.\n\nFirst, I'd call Repligen and Sartorius and get a bench-scale perfusion system on order. This is the transformative bet—everything else is incremental. The pharma industry proved this works; we just need to adapt it. I'd budget $300K and 6 months for proof-of-concept. If cell retention works for our strain, we're on the path to 10x productivity. If it doesn't, we learn that fast and cheap.\n\nSecond, I'd deploy PAT on our existing batches immediately. Raman spectroscopy and soft sensors are commercial products. We're probably leaving 30-50% batch success improvement on the table by not monitoring properly. This pays for itself in avoided failed batches while we develop perfusion. Budget $500K-1M over 12 months.\n\nThird, I'd dig into the ICI Pruteen literature—patents, publications, and if possible, track down retired engineers who worked on it. They solved these problems 40 years ago at larger scale than we're attempting. The knowledge exists; we just need to find it. This is a $50K research project that could save millions in development.\n\nThe one thing I would NOT do is build a bigger vessel. That's the industry's default answer, and it's wrong. Larger vessels have worse mass transfer, not better. The answer is higher productivity per liter, not more liters.",
+
+  follow_up_prompts: [
+    'Design a bench-scale perfusion pilot study for our production strain',
+    'Help me build a business case comparing perfusion at 10,000L versus batch at 50,000L',
+    'What PAT sensors should we deploy first, and what will they cost?',
+    'Find and summarize the ICI Pruteen literature—patents, publications, and key learnings',
+    'Create a failure mode analysis framework for our current batch operations',
+  ],
 };

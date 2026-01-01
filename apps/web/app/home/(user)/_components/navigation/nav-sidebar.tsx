@@ -372,7 +372,7 @@ export const NavSidebar = memo(function NavSidebar({
       <nav className="flex-1 overflow-y-auto py-3">
         {/* New Analysis */}
         <div
-          className={cn('mb-1', collapsed ? 'px-2' : 'px-3')}
+          className="mb-1 px-2"
           onMouseEnter={() => setHoveredItem('new')}
           onMouseLeave={() => setHoveredItem(null)}
         >
@@ -385,7 +385,7 @@ export const NavSidebar = memo(function NavSidebar({
               className={cn(
                 'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] font-medium transition-colors',
                 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100',
-                collapsed ? 'justify-center px-2' : 'px-3',
+                collapsed ? 'justify-center px-3' : 'px-4',
               )}
             >
               <PlusIcon className="h-5 w-5 flex-shrink-0" />
@@ -396,7 +396,7 @@ export const NavSidebar = memo(function NavSidebar({
 
         {/* All Reports */}
         <div
-          className={cn('mb-4', collapsed ? 'px-2' : 'px-3')}
+          className="mb-4 px-2"
           onMouseEnter={() => setHoveredItem('reports')}
           onMouseLeave={() => setHoveredItem(null)}
         >
@@ -408,7 +408,7 @@ export const NavSidebar = memo(function NavSidebar({
               href="/home/reports"
               className={cn(
                 'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
-                collapsed ? 'justify-center px-2' : 'px-3',
+                collapsed ? 'justify-center px-3' : 'px-4',
               )}
             >
               <ReportsIcon className="h-5 w-5 flex-shrink-0" />
@@ -448,7 +448,7 @@ export const NavSidebar = memo(function NavSidebar({
         />
 
         <div
-          className={cn(collapsed ? 'px-2' : 'px-3')}
+          className="px-2"
           onMouseEnter={() => setHoveredItem('settings')}
           onMouseLeave={() => setHoveredItem(null)}
         >
@@ -460,7 +460,7 @@ export const NavSidebar = memo(function NavSidebar({
               onClick={() => setSettingsOpen(!settingsOpen)}
               className={cn(
                 'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
-                collapsed ? 'justify-center px-2' : 'px-3',
+                collapsed ? 'justify-center px-3' : 'px-4',
                 settingsOpen && 'bg-zinc-100 dark:bg-zinc-800',
               )}
             >
