@@ -59,25 +59,16 @@ let browserLock = false;
 const BROWSER_IDLE_TIMEOUT = 300000; // Close browser after 5 minutes of inactivity
 
 /**
- * Optimized Chromium args for Railway container environment.
- * These reduce memory usage and improve stability in containerized environments.
+ * Chromium args for Railway container environment.
+ * Uses @sparticuz/chromium defaults plus container-specific flags.
  */
-const OPTIMIZED_CHROMIUM_ARGS = [
+const CHROMIUM_ARGS = [
   ...chromium.args,
-  '--disable-dev-shm-usage', // Use /tmp instead of /dev/shm (Railway has limited shared memory)
-  '--disable-accelerated-2d-canvas', // Disable GPU acceleration for canvas
+  '--disable-dev-shm-usage', // Use /tmp instead of /dev/shm
   '--disable-gpu', // Disable GPU hardware acceleration
   '--no-first-run', // Skip first run wizards
-  '--no-zygote', // Disable zygote process (reduces memory)
-  '--single-process', // Run in single process mode (more stable in containers)
-  '--disable-background-networking', // Disable background network requests
-  '--disable-default-apps', // Disable default apps
   '--disable-extensions', // Disable extensions
-  '--disable-sync', // Disable sync
-  '--disable-translate', // Disable translation
-  '--mute-audio', // Mute audio
   '--hide-scrollbars', // Hide scrollbars in screenshots
-  '--font-render-hinting=none', // Disable font hinting for consistent rendering
 ];
 
 /**
@@ -111,12 +102,17 @@ async function getBrowser(): Promise<Browser> {
   if (!browserInstance) {
     browserLock = true;
     try {
+      const executablePath = await chromium.executablePath();
+      console.log('[PDF Export] Launching browser with executable:', executablePath);
+
       browserInstance = await puppeteer.launch({
-        args: OPTIMIZED_CHROMIUM_ARGS,
+        args: CHROMIUM_ARGS,
         defaultViewport: { width: 794, height: 1123 }, // A4 at 96 DPI
-        executablePath: await chromium.executablePath(),
+        executablePath,
         headless: chromium.headless,
       });
+
+      console.log('[PDF Export] Browser launched successfully');
     } finally {
       browserLock = false;
     }
@@ -155,16 +151,20 @@ function releaseSlot(): void {
  * - Small delay after fonts ready for layout completion
  */
 async function generatePdfFromHtml(html: string): Promise<Buffer> {
+  console.log('[PDF Export] Getting browser instance...');
   const browser = await getBrowser();
+  console.log('[PDF Export] Creating new page...');
   const page = await browser.newPage();
 
   try {
+    console.log('[PDF Export] Setting HTML content (%d bytes)...', html.length);
     // Set content and wait for page load
     // All assets (fonts, styles) are base64 embedded, no external requests needed
     await page.setContent(html, {
       waitUntil: 'load',
       timeout: 30000,
     });
+    console.log('[PDF Export] Content loaded, waiting for fonts...');
 
     // Wait for fonts to be fully loaded (critical for Suisse Intl rendering)
     // The document.fonts.ready promise resolves when all @font-face fonts are loaded
@@ -172,6 +172,7 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
       page.evaluate(() => document.fonts.ready),
       new Promise((resolve) => setTimeout(resolve, 5000)), // 5s max font wait
     ]);
+    console.log('[PDF Export] Fonts ready, generating PDF...');
 
     // Small delay to ensure font rendering is complete in the layout
     await new Promise((resolve) => setTimeout(resolve, 200));
@@ -196,6 +197,7 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
       `,
     });
 
+    console.log('[PDF Export] PDF generated, size: %d bytes', pdfBuffer.byteLength);
     return Buffer.from(pdfBuffer);
   } finally {
     await page.close();
