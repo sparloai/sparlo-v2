@@ -141,24 +141,24 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
    ============================================ */
 
 .report-header {
-  margin-bottom: 48px;
+  margin-bottom: 56px;
   page-break-after: avoid;
 }
 
 .report-title {
-  font-size: 28pt;
+  font-size: 32pt;
   font-weight: 600;
   letter-spacing: -0.02em;
-  line-height: 1.1;
+  line-height: 1.15;
   color: var(--zinc-900);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .report-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 9pt;
+  gap: 10px;
+  font-size: 10pt;
   color: var(--zinc-500);
 }
 
@@ -171,12 +171,21 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
    ============================================ */
 
 .section {
-  margin-top: 36px;
+  margin-top: 48px;
   page-break-inside: avoid;
 }
 
 .section-title {
-  font-size: 20pt;
+  font-size: 27pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--zinc-900);
+  margin-bottom: 20px;
+  page-break-after: avoid;
+}
+
+.section-title-lg {
+  font-size: 21pt;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--zinc-900);
@@ -184,8 +193,17 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
   page-break-after: avoid;
 }
 
+.section-title-md {
+  font-size: 18pt;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--zinc-900);
+  margin-bottom: 12px;
+  page-break-after: avoid;
+}
+
 .subsection-title {
-  font-size: 14pt;
+  font-size: 16pt;
   font-weight: 600;
   letter-spacing: -0.01em;
   color: var(--zinc-900);
@@ -195,10 +213,10 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 }
 
 .section-intro {
-  font-size: 11pt;
-  line-height: 1.5;
+  font-size: 13pt;
+  line-height: 1.4;
   color: var(--zinc-600);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   max-width: 60ch;
 }
 
@@ -223,60 +241,67 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 
 .mono-label {
   display: block;
-  font-size: 8pt;
+  font-size: 10pt;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--zinc-500);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .mono-label-strong {
   display: block;
-  font-size: 8pt;
+  font-size: 10pt;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--zinc-900);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .mono-label-muted {
   display: block;
-  font-size: 8pt;
+  font-size: 10pt;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--zinc-400);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
+/* Primary body text - matches web's 18px */
 .body-text {
-  font-size: 11pt;
-  line-height: 1.5;
-  color: var(--zinc-700);
+  font-size: 13pt;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: #1e1e1e;
   max-width: 60ch;
 }
 
+/* Large body text - matches web's 22px */
 .body-text-lg {
-  font-size: 12pt;
-  line-height: 1.5;
-  color: var(--zinc-700);
+  font-size: 16pt;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: #1e1e1e;
   max-width: 60ch;
 }
 
+/* Secondary body text - matches web's 16px */
 .body-text-secondary {
-  font-size: 10pt;
-  line-height: 1.5;
+  font-size: 12pt;
+  line-height: 1.4;
   color: var(--zinc-600);
   max-width: 60ch;
 }
 
+/* Lead/intro text */
 .lead-text {
-  font-size: 13pt;
+  font-size: 14pt;
   line-height: 1.4;
+  letter-spacing: -0.01em;
   color: var(--zinc-800);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   max-width: 60ch;
 }
 
@@ -284,50 +309,56 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
    BOXES & HIGHLIGHTS
    ============================================ */
 
+/* Brief box - elegant left border */
 .brief-box {
-  background: var(--zinc-50);
-  border: 1px solid var(--zinc-200);
-  border-radius: 4px;
-  padding: 16px;
+  border-left: 2px solid var(--zinc-900);
+  padding-left: 24px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
+/* Insight box - heavy left border accent */
 .insight-box {
   border-left: 3px solid var(--zinc-900);
-  padding-left: 16px;
-  margin-top: 16px;
-  page-break-inside: avoid;
-}
-
-.insight-headline {
-  font-size: 13pt;
-  font-weight: 500;
-  color: var(--zinc-900);
-  margin-bottom: 8px;
-}
-
-.insight-block {
-  border-left: 3px solid var(--zinc-900);
-  padding-left: 16px;
+  padding-left: 20px;
   margin-top: 20px;
   page-break-inside: avoid;
 }
 
-.insight-what {
-  font-size: 12pt;
+.insight-headline {
+  font-size: 15pt;
   font-weight: 500;
+  letter-spacing: -0.01em;
   color: var(--zinc-900);
-  margin-bottom: 8px;
-  line-height: 1.4;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.insight-block {
+  border-left: 3px solid var(--zinc-900);
+  padding-left: 20px;
+  margin-top: 24px;
+  page-break-inside: avoid;
+}
+
+.insight-what {
+  font-size: 14pt;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--zinc-900);
+  margin-bottom: 10px;
+  line-height: 1.35;
 }
 
 .insight-source {
-  margin-top: 8px;
-  font-size: 10pt;
+  margin-top: 12px;
+  font-size: 11pt;
   color: var(--zinc-600);
+  line-height: 1.4;
 }
 
 .insight-source p {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .insight-source .label {
@@ -336,17 +367,19 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 }
 
 .insight-missed {
-  margin-top: 8px;
-  font-size: 10pt;
+  margin-top: 10px;
+  font-size: 11pt;
   color: var(--zinc-600);
   font-style: italic;
+  line-height: 1.4;
 }
 
+/* Viability box - inverted accent */
 .viability-box {
   background: var(--zinc-900);
   color: white;
-  padding: 16px;
-  margin-bottom: 20px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
   page-break-inside: avoid;
 }
 
@@ -454,24 +487,25 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 .constraint-list {
   list-style: none;
   padding: 0;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .constraint-list li {
   position: relative;
-  padding-left: 16px;
-  margin-bottom: 8px;
-  font-size: 10pt;
-  color: var(--zinc-600);
+  padding-left: 20px;
+  margin-bottom: 10px;
+  font-size: 12pt;
+  line-height: 1.4;
+  color: var(--zinc-700);
 }
 
 .constraint-list.hard li::before {
   content: '';
   position: absolute;
   left: 0;
-  top: 6px;
-  width: 6px;
-  height: 6px;
+  top: 8px;
+  width: 8px;
+  height: 8px;
   background: var(--zinc-900);
   border-radius: 50%;
 }
@@ -480,9 +514,9 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
   content: '';
   position: absolute;
   left: 0;
-  top: 6px;
-  width: 6px;
-  height: 6px;
+  top: 8px;
+  width: 8px;
+  height: 8px;
   background: var(--zinc-400);
   border-radius: 50%;
 }
@@ -491,9 +525,9 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
   content: '';
   position: absolute;
   left: 0;
-  top: 6px;
-  width: 6px;
-  height: 6px;
+  top: 8px;
+  width: 8px;
+  height: 8px;
   background: var(--zinc-300);
   border-radius: 50%;
 }
@@ -564,29 +598,31 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
    ============================================ */
 
 .benchmark-table {
-  margin-top: 12px;
+  margin-top: 16px;
   overflow: hidden;
 }
 
 .benchmark-table table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 9pt;
+  font-size: 10pt;
 }
 
 .benchmark-table th {
   text-align: left;
-  padding: 8px 12px;
-  background: var(--zinc-100);
+  padding: 12px 16px;
   font-weight: 600;
+  font-size: 10pt;
   color: var(--zinc-700);
-  border-bottom: 1px solid var(--zinc-300);
+  border-bottom: 2px solid var(--zinc-900);
 }
 
 .benchmark-table td {
-  padding: 8px 12px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--zinc-200);
   color: var(--zinc-600);
+  font-size: 10pt;
+  line-height: 1.4;
 }
 
 /* ============================================
@@ -595,30 +631,31 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 
 .primary-recommendation,
 .recommended-innovation {
-  margin-top: 20px;
+  margin-top: 24px;
   page-break-inside: avoid;
 }
 
 .recommendation-header,
 .innovation-header {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   page-break-after: avoid;
 }
 
 .recommendation-title,
 .innovation-title {
-  font-size: 16pt;
+  font-size: 18pt;
   font-weight: 600;
+  letter-spacing: -0.02em;
   color: var(--zinc-900);
-  margin: 8px 0;
+  margin: 10px 0;
 }
 
 .recommendation-meta,
 .innovation-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 9pt;
+  gap: 10px;
+  font-size: 10pt;
   color: var(--zinc-500);
 }
 
@@ -879,13 +916,12 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
    ============================================ */
 
 .risks-list {
-  margin-top: 16px;
+  margin-top: 20px;
 }
 
 .risk-item {
-  padding: 12px;
-  margin-bottom: 12px;
-  background: var(--zinc-50);
+  padding: 16px 20px;
+  margin-bottom: 16px;
   border: 1px solid var(--zinc-200);
   page-break-inside: avoid;
 }
@@ -906,11 +942,11 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .risk-category {
-  font-size: 8pt;
+  font-size: 10pt;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -918,7 +954,7 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 }
 
 .risk-severity {
-  font-size: 8pt;
+  font-size: 10pt;
   color: var(--zinc-500);
 }
 
@@ -928,25 +964,27 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 }
 
 .risk-description {
-  font-size: 10pt;
+  font-size: 12pt;
+  line-height: 1.4;
   color: var(--zinc-700);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .risk-mitigation {
-  font-size: 9pt;
+  font-size: 11pt;
+  line-height: 1.4;
   color: var(--zinc-600);
 }
 
 .risk-section {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .risk-label {
-  font-size: 9pt;
+  font-size: 10pt;
   font-weight: 500;
   color: var(--zinc-600);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 /* ============================================
