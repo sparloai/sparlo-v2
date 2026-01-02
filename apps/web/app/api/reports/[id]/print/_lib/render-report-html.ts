@@ -279,8 +279,17 @@ function formatDate(isoString: string): string {
   });
 }
 
-function escapeHtml(text: string | undefined | null): string {
-  if (!text) return '';
+function escapeHtml(text: unknown): string {
+  if (text === null || text === undefined) return '';
+  // Handle non-string types (objects, arrays, numbers)
+  if (typeof text !== 'string') {
+    // For objects/arrays, stringify them
+    if (typeof text === 'object') {
+      return escapeHtml(JSON.stringify(text));
+    }
+    // For numbers, booleans, etc.
+    return escapeHtml(String(text));
+  }
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -299,8 +308,8 @@ const VALID_GAP_STATUSES = [
   'needs-work',
 ] as const;
 
-function sanitizeSeverity(severity: string | undefined | null): string {
-  if (!severity) return 'medium';
+function sanitizeSeverity(severity: unknown): string {
+  if (!severity || typeof severity !== 'string') return 'medium';
   const normalized = severity.toLowerCase().trim();
   return VALID_SEVERITIES.includes(
     normalized as (typeof VALID_SEVERITIES)[number],
@@ -309,8 +318,8 @@ function sanitizeSeverity(severity: string | undefined | null): string {
     : 'medium';
 }
 
-function sanitizeGapStatus(status: string | undefined | null): string {
-  if (!status) return 'open';
+function sanitizeGapStatus(status: unknown): string {
+  if (!status || typeof status !== 'string') return 'open';
   const normalized = status.toLowerCase().replace(/_/g, '-').trim();
   return VALID_GAP_STATUSES.includes(
     normalized as (typeof VALID_GAP_STATUSES)[number],
@@ -742,7 +751,7 @@ function renderPrimaryRecommendation(data?: ExecutionTrackPrimary): string {
         <span class="mono-label">Primary Recommendation</span>
         <h3 class="recommendation-title">${escapeHtml(data.title)}</h3>
         <div class="recommendation-meta">
-          ${data.source_type ? `<span>${escapeHtml(data.source_type.replace(/_/g, ' '))}</span>` : ''}
+          ${typeof data.source_type === 'string' ? `<span>${escapeHtml(data.source_type.replace(/_/g, ' '))}</span>` : ''}
           ${data.source ? `<span class="meta-separator">·</span><span>${escapeHtml(data.source)}</span>` : ''}
           ${data.confidence !== undefined ? `<span class="meta-separator">·</span><span class="confidence">${data.confidence}% confidence</span>` : ''}
         </div>
@@ -1092,7 +1101,7 @@ function renderSelfCritique(data?: SelfCritique): string {
                 (gap) => `
               <div class="gap-item ${sanitizeGapStatus(gap.status)}">
                 <div class="gap-header">
-                  <span class="gap-status">${escapeHtml(gap.status.replace('_', ' '))}</span>
+                  <span class="gap-status">${escapeHtml(typeof gap.status === 'string' ? gap.status.replace('_', ' ') : '')}</span>
                 </div>
                 <p class="gap-concern">${escapeHtml(gap.concern)}</p>
                 <p class="gap-rationale">${escapeHtml(gap.rationale)}</p>
