@@ -46,7 +46,12 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   // Check for mobile on mount and window resize
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(getIsMobile());
+      const nowMobile = getIsMobile();
+      setIsMobile(nowMobile);
+      // Close mobile menu when switching to desktop (done in same callback to avoid cascading renders)
+      if (!nowMobile) {
+        setMobileMenuOpen(false);
+      }
     };
 
     // Initial check
@@ -56,13 +61,6 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Close mobile menu when switching to desktop
-  useEffect(() => {
-    if (!isMobile) {
-      setMobileMenuOpen(false);
-    }
-  }, [isMobile]);
 
   const setCollapsed = (value: boolean) => {
     setCollapsedState(value);
