@@ -243,8 +243,7 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
   display: block;
   font-size: 10pt;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--zinc-500);
   margin-bottom: 8px;
 }
@@ -253,8 +252,7 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
   display: block;
   font-size: 10pt;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--zinc-900);
   margin-bottom: 8px;
 }
@@ -263,8 +261,7 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
   display: block;
   font-size: 10pt;
   font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--zinc-400);
   margin-bottom: 8px;
 }

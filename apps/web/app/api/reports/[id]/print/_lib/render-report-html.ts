@@ -230,44 +230,205 @@ interface RenderOptions {
   createdAt?: string;
 }
 
+// Reading speed constants (words per minute)
+const WPM_PROSE = 150; // Technical prose - dense, requires comprehension
+const WPM_HEADLINE = 300; // Headlines - scanned quickly
+const WPM_LIST_ITEM = 220; // Bullet points - structured, easier to parse
+const SECONDS_PER_TABLE_ROW = 3; // Fixed time per table/data row
+
 /**
- * Calculate estimated read time based on word count.
+ * Calculate estimated read time by extracting only rendered content
+ * and applying content-type specific reading speeds.
+ *
+ * This function explicitly extracts text from fields that are actually
+ * rendered to users, avoiding metadata, IDs, and non-displayed content.
  */
 function calculateReadTime(data: HybridReportData): number {
-  const textParts: string[] = [];
+  let proseWords = 0;
+  let headlineWords = 0;
+  let listItemWords = 0;
+  let tableRows = 0;
 
-  function isProseContent(str: string): boolean {
-    if (str.length < 20) return false;
-    if (/^https?:\/\//.test(str)) return false;
-    if (
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        str,
-      )
-    )
-      return false;
-    const letterRatio = (str.match(/[a-zA-Z]/g) || []).length / str.length;
-    if (letterRatio < 0.5) return false;
-    if (!str.includes(' ')) return false;
-    return true;
+  const countWords = (text: string | undefined | null): number => {
+    if (!text || typeof text !== 'string') return 0;
+    return text.trim().split(/\s+/).filter(Boolean).length;
+  };
+
+  // Brief - user's original input
+  proseWords += countWords(data.brief);
+
+  // Executive Summary
+  if (typeof data.executive_summary === 'string') {
+    proseWords += countWords(data.executive_summary);
+  } else if (data.executive_summary) {
+    proseWords += countWords(data.executive_summary.narrative_lead);
+    proseWords += countWords(data.executive_summary.the_problem);
+    proseWords += countWords(data.executive_summary.core_insight?.explanation);
+    proseWords += countWords(data.executive_summary.primary_recommendation);
+    headlineWords += countWords(data.executive_summary.core_insight?.headline);
   }
 
-  function extractText(value: unknown): void {
-    if (value === null || value === undefined) return;
+  // Problem Analysis
+  if (data.problem_analysis) {
+    proseWords += countWords(data.problem_analysis.whats_wrong?.prose);
+    proseWords += countWords(data.problem_analysis.why_its_hard?.prose);
+    proseWords += countWords(
+      data.problem_analysis.first_principles_insight?.explanation,
+    );
+    headlineWords += countWords(
+      data.problem_analysis.first_principles_insight?.headline,
+    );
 
-    if (typeof value === 'string' && isProseContent(value)) {
-      textParts.push(value);
-    } else if (Array.isArray(value)) {
-      value.forEach(extractText);
-    } else if (typeof value === 'object') {
-      Object.values(value).forEach(extractText);
+    // Root cause hypotheses
+    data.problem_analysis.root_cause_hypotheses?.forEach((h) => {
+      listItemWords += countWords(h.hypothesis);
+      listItemWords += countWords(h.explanation);
+    });
+
+    // Industry approaches
+    data.problem_analysis.what_industry_does_today?.forEach((item) => {
+      listItemWords += countWords(item.approach);
+      listItemWords += countWords(item.limitation);
+    });
+
+    // Benchmarks table
+    tableRows +=
+      data.problem_analysis.current_state_of_art?.benchmarks?.length || 0;
+  }
+
+  // Constraints & Metrics
+  if (data.constraints_and_metrics) {
+    data.constraints_and_metrics.hard_constraints?.forEach((c) => {
+      listItemWords += countWords(c);
+    });
+    data.constraints_and_metrics.soft_constraints?.forEach((c) => {
+      listItemWords += countWords(c);
+    });
+    data.constraints_and_metrics.assumptions?.forEach((a) => {
+      listItemWords += countWords(a);
+    });
+    tableRows += data.constraints_and_metrics.success_metrics?.length || 0;
+  }
+
+  // Challenge the Frame
+  data.challenge_the_frame?.forEach((c) => {
+    listItemWords += countWords(c.assumption);
+    listItemWords += countWords(c.challenge);
+    listItemWords += countWords(c.implication);
+  });
+
+  // Execution Track (Solution Concepts)
+  if (data.execution_track) {
+    proseWords += countWords(data.execution_track.intro);
+
+    if (data.execution_track.primary) {
+      const p = data.execution_track.primary;
+      headlineWords += countWords(p.title);
+      headlineWords += countWords(p.bottom_line);
+      proseWords += countWords(p.what_it_is);
+      proseWords += countWords(p.why_it_works);
+      proseWords += countWords(p.expected_improvement);
+      tableRows += p.validation_gates?.length || 0;
+
+      // Why it might fail
+      p.why_it_might_fail?.forEach((reason) => {
+        listItemWords += countWords(reason);
+      });
     }
+
+    // Supporting concepts
+    data.execution_track.supporting_concepts?.forEach((c) => {
+      headlineWords += countWords(c.title);
+      listItemWords += countWords(c.one_liner);
+      proseWords += countWords(c.what_it_is);
+      proseWords += countWords(c.why_it_works);
+    });
   }
 
-  extractText(data);
-  const text = textParts.join(' ');
-  const wordCount = text.split(/\s+/).filter(Boolean).length;
+  // Innovation Portfolio
+  if (data.innovation_portfolio) {
+    proseWords += countWords(data.innovation_portfolio.intro);
 
-  return Math.max(1, Math.round(wordCount / 200));
+    if (data.innovation_portfolio.recommended_innovation) {
+      const r = data.innovation_portfolio.recommended_innovation;
+      headlineWords += countWords(r.title);
+      proseWords += countWords(r.what_it_is);
+      proseWords += countWords(r.why_it_works);
+      proseWords += countWords(r.the_insight?.what);
+      proseWords += countWords(r.the_insight?.why_industry_missed_it);
+    }
+
+    // Parallel investigations
+    data.innovation_portfolio.parallel_investigations?.forEach((inv) => {
+      headlineWords += countWords(inv.title);
+      listItemWords += countWords(inv.one_liner);
+      proseWords += countWords(inv.what_it_is);
+      proseWords += countWords(inv.why_it_works);
+    });
+
+    // Frontier watch
+    data.innovation_portfolio.frontier_watch?.forEach((fw) => {
+      headlineWords += countWords(fw.title);
+      listItemWords += countWords(fw.one_liner);
+      proseWords += countWords(fw.why_interesting);
+      proseWords += countWords(fw.why_not_now);
+    });
+  }
+
+  // Risks & Watchouts
+  data.risks_and_watchouts?.forEach((r) => {
+    listItemWords += countWords(r.risk);
+    listItemWords += countWords(r.mitigation);
+  });
+
+  // Self Critique
+  if (data.self_critique) {
+    proseWords += countWords(data.self_critique.confidence_rationale);
+    data.self_critique.what_we_might_be_wrong_about?.forEach((w) => {
+      listItemWords += countWords(w);
+    });
+    data.self_critique.unexplored_directions?.forEach((d) => {
+      listItemWords += countWords(d);
+    });
+  }
+
+  // Strategic Integration
+  if (data.strategic_integration) {
+    proseWords += countWords(
+      data.strategic_integration.portfolio_view?.combined_strategy,
+    );
+    proseWords += countWords(
+      data.strategic_integration.personal_recommendation?.intro,
+    );
+    proseWords += countWords(
+      data.strategic_integration.personal_recommendation?.key_insight,
+    );
+
+    data.strategic_integration.action_plan?.forEach((action) => {
+      listItemWords += countWords(action.rationale);
+      action.actions?.forEach((a) => {
+        listItemWords += countWords(a);
+      });
+    });
+  }
+
+  // Final Recommendation
+  proseWords += countWords(data.what_id_actually_do);
+
+  // Key Insights & Next Steps
+  data.key_insights?.forEach((i) => (listItemWords += countWords(i)));
+  data.next_steps?.forEach((s) => (listItemWords += countWords(s)));
+
+  // Calculate time for each content type
+  const proseMinutes = proseWords / WPM_PROSE;
+  const headlineMinutes = headlineWords / WPM_HEADLINE;
+  const listMinutes = listItemWords / WPM_LIST_ITEM;
+  const tableMinutes = (tableRows * SECONDS_PER_TABLE_ROW) / 60;
+
+  const totalMinutes =
+    proseMinutes + headlineMinutes + listMinutes + tableMinutes;
+
+  return Math.max(1, Math.round(totalMinutes));
 }
 
 function formatDate(isoString: string): string {
