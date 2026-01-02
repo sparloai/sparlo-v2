@@ -296,6 +296,42 @@ function ExpandIcon({ className }: { className?: string }) {
   );
 }
 
+function CloseIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M6 18L18 6M6 6l12 12"
+      />
+    </svg>
+  );
+}
+
+function MenuIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.5}
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
+      />
+    </svg>
+  );
+}
+
 export const NavSidebar = memo(function NavSidebar({
   recentReports,
   user,
@@ -303,7 +339,7 @@ export const NavSidebar = memo(function NavSidebar({
 }: NavSidebarProps) {
   const router = useRouter();
   const signOut = useSignOut();
-  const { collapsed, setCollapsed } = useSidebarState();
+  const { collapsed, setCollapsed, isMobile, mobileMenuOpen, setMobileMenuOpen } = useSidebarState();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -314,31 +350,52 @@ export const NavSidebar = memo(function NavSidebar({
   }, [collapsed, setCollapsed]);
 
   const handleNewAnalysis = useCallback(() => {
+    if (isMobile) setMobileMenuOpen(false);
     router.push('/home/reports/new');
-  }, [router]);
+  }, [router, isMobile, setMobileMenuOpen]);
 
   const handleSignOut = useCallback(async () => {
     await signOut.mutateAsync();
   }, [signOut]);
 
+  const handleLinkClick = useCallback(() => {
+    if (isMobile) setMobileMenuOpen(false);
+  }, [isMobile, setMobileMenuOpen]);
+
   const width = collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH;
 
+  // On mobile, hide sidebar completely when menu is closed
+  if (isMobile && !mobileMenuOpen) {
+    return null;
+  }
+
   return (
-    <aside
-      style={{ width }}
-      className={cn(
-        'fixed top-0 left-0 z-40 flex h-screen flex-col border-r border-zinc-200 bg-white transition-[width] duration-300 ease-out dark:border-zinc-800 dark:bg-zinc-950',
+    <>
+      {/* Mobile overlay backdrop */}
+      {isMobile && mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 transition-opacity"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
       )}
-    >
+
+      <aside
+        style={{ width: isMobile ? EXPANDED_WIDTH : width }}
+        className={cn(
+          'fixed top-0 left-0 z-50 flex h-screen flex-col border-r border-zinc-200 bg-white transition-[width,transform] duration-300 ease-out dark:border-zinc-800 dark:bg-zinc-950',
+          isMobile && 'shadow-2xl',
+        )}
+      >
       {/* Header */}
       <div
         className={cn(
           'flex h-14 items-center border-b border-zinc-200 dark:border-zinc-800',
-          collapsed ? 'justify-center px-0' : 'justify-between px-4',
+          (collapsed && !isMobile) ? 'justify-center px-0' : 'justify-between px-4',
         )}
       >
-        {!collapsed && (
-          <Link href="/home" className="transition-opacity hover:opacity-70">
+        {(!collapsed || isMobile) && (
+          <Link href="/home" onClick={handleLinkClick} className="transition-opacity hover:opacity-70">
             <Image
               src="/images/sparlo-logo.png"
               alt="Sparlo"
@@ -355,17 +412,27 @@ export const NavSidebar = memo(function NavSidebar({
             />
           </Link>
         )}
-        <button
-          onClick={toggleCollapsed}
-          className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {collapsed ? (
-            <ExpandIcon className="h-5 w-5" />
-          ) : (
-            <CollapseIcon className="h-5 w-5" />
-          )}
-        </button>
+        {isMobile ? (
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+            aria-label="Close menu"
+          >
+            <CloseIcon className="h-5 w-5" />
+          </button>
+        ) : (
+          <button
+            onClick={toggleCollapsed}
+            className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {collapsed ? (
+              <ExpandIcon className="h-5 w-5" />
+            ) : (
+              <CollapseIcon className="h-5 w-5" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* Navigation */}
@@ -378,18 +445,18 @@ export const NavSidebar = memo(function NavSidebar({
         >
           <Tooltip
             label="New Analysis"
-            show={collapsed && hoveredItem === 'new'}
+            show={collapsed && !isMobile && hoveredItem === 'new'}
           >
             <button
               onClick={handleNewAnalysis}
               className={cn(
                 'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] font-medium transition-colors',
                 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100',
-                collapsed ? 'justify-center px-3' : 'px-4',
+                (collapsed && !isMobile) ? 'justify-center px-3' : 'px-4',
               )}
             >
               <PlusIcon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && <span>New Analysis</span>}
+              {(!collapsed || isMobile) && <span>New Analysis</span>}
             </button>
           </Tooltip>
         </div>
@@ -402,23 +469,24 @@ export const NavSidebar = memo(function NavSidebar({
         >
           <Tooltip
             label="All Reports"
-            show={collapsed && hoveredItem === 'reports'}
+            show={collapsed && !isMobile && hoveredItem === 'reports'}
           >
             <Link
               href="/home/reports"
+              onClick={handleLinkClick}
               className={cn(
                 'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
-                collapsed ? 'justify-center px-3' : 'px-4',
+                (collapsed && !isMobile) ? 'justify-center px-3' : 'px-4',
               )}
             >
               <ReportsIcon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && <span>All Reports</span>}
+              {(!collapsed || isMobile) && <span>All Reports</span>}
             </Link>
           </Tooltip>
         </div>
 
-        {/* Recents - only show when expanded */}
-        {!collapsed && recentReports.length > 0 && (
+        {/* Recents - show when expanded or on mobile */}
+        {(!collapsed || isMobile) && recentReports.length > 0 && (
           <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
             <div className="mb-2 px-4 text-[11px] font-medium tracking-wider text-zinc-400 uppercase">
               Recents
@@ -428,6 +496,7 @@ export const NavSidebar = memo(function NavSidebar({
                 <Link
                   key={report.id}
                   href={`/home/reports/${report.id}`}
+                  onClick={handleLinkClick}
                   className="block truncate rounded px-3 py-1.5 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
                 >
                   {report.title || 'Untitled Report'}
@@ -444,7 +513,7 @@ export const NavSidebar = memo(function NavSidebar({
           isOpen={settingsOpen}
           onClose={() => setSettingsOpen(false)}
           onSignOut={handleSignOut}
-          collapsed={collapsed}
+          collapsed={collapsed && !isMobile}
         />
 
         <div
@@ -454,18 +523,18 @@ export const NavSidebar = memo(function NavSidebar({
         >
           <Tooltip
             label="Settings"
-            show={collapsed && hoveredItem === 'settings' && !settingsOpen}
+            show={collapsed && !isMobile && hoveredItem === 'settings' && !settingsOpen}
           >
             <button
               onClick={() => setSettingsOpen(!settingsOpen)}
               className={cn(
                 'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
-                collapsed ? 'justify-center px-3' : 'px-4',
+                (collapsed && !isMobile) ? 'justify-center px-3' : 'px-4',
                 settingsOpen && 'bg-zinc-100 dark:bg-zinc-800',
               )}
             >
               <SettingsIcon className="h-5 w-5 flex-shrink-0" />
-              {!collapsed && (
+              {(!collapsed || isMobile) && (
                 <span className="flex-1 truncate text-left">
                   {workspace.name || user.email || 'Settings'}
                 </span>
@@ -474,7 +543,8 @@ export const NavSidebar = memo(function NavSidebar({
           </Tooltip>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 });
 
