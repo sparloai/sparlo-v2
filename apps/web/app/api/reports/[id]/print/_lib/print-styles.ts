@@ -146,10 +146,10 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 }
 
 .report-title {
-  font-size: 32pt;
-  font-weight: 600;
+  font-size: 30pt;
+  font-weight: 400;
   letter-spacing: -0.02em;
-  line-height: 1.15;
+  line-height: 1;
   color: var(--zinc-900);
   margin-bottom: 16px;
 }
