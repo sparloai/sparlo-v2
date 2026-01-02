@@ -7,6 +7,41 @@
  */
 
 // ============================================
+// Risk Classification and Actionable Confidence Types (v4.0+)
+// ============================================
+
+export interface ScientificRisk {
+  status?: 'RETIRED' | 'ACTIVE' | 'HIGH';
+  explanation?: string;
+}
+
+export interface EngineeringRisk {
+  status?: 'LOW' | 'MEDIUM' | 'HIGH';
+  explanation?: string;
+}
+
+export interface RiskClassification {
+  scientific_risk?: ScientificRisk;
+  engineering_risk?: EngineeringRisk;
+  one_line_summary?: string;
+}
+
+export interface ActionableConfidence {
+  level?: 'HIGH' | 'MEDIUM' | 'LOW';
+  percent?: number;
+  hinges_on?: string;
+  if_wrong?: string;
+  what_would_change_my_mind?: string;
+}
+
+export interface Readiness {
+  trl?: number;
+  trl_rationale?: string;
+  scale_up_risk?: 'LOW' | 'MEDIUM' | 'HIGH';
+  key_scale_challenge?: string;
+}
+
+// ============================================
 // Execution Track + Innovation Portfolio Types
 // ============================================
 
@@ -36,13 +71,20 @@ export interface ExecutionTrackPrimary {
   id?: string;
   title?: string;
   score?: number;
+  /** Legacy: simple confidence number */
   confidence?: number;
+  /** v4.0+: Actionable confidence with context */
+  confidence_detail?: ActionableConfidence;
   source_type?: 'CATALOG' | 'TRANSFER' | 'OPTIMIZATION' | 'FIRST_PRINCIPLES';
   source?: string;
   bottom_line?: string;
   expected_improvement?: string;
   timeline?: string;
   investment?: string;
+  /** v4.0+: Risk classification */
+  risk_classification?: RiskClassification;
+  /** v4.0+: Technology readiness */
+  readiness?: Readiness;
   why_safe?: {
     track_record?: string;
     precedent?: string[];
@@ -95,9 +137,16 @@ export interface RecommendedInnovation {
   id?: string;
   title?: string;
   score?: number;
+  /** Legacy: simple confidence number */
   confidence?: number;
+  /** v4.0+: Actionable confidence with context */
+  confidence_detail?: ActionableConfidence;
   what_it_is?: string;
   why_it_works?: string;
+  /** v4.0+: Risk classification */
+  risk_classification?: RiskClassification;
+  /** v4.0+: Technology readiness */
+  readiness?: Readiness;
   selection_rationale?: {
     why_this_one?: string;
     ceiling_if_works?: string;

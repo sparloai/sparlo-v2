@@ -108,6 +108,102 @@ export const TrackSchema = z
 
 export const ConfidenceLevel = SeverityLevel;
 
+// ============================================
+// v4.0+ Risk Classification and Actionable Confidence Schemas
+// ============================================
+
+/**
+ * Scientific Risk Status - Is the underlying mechanism proven?
+ * RETIRED: Physics demonstrated at relevant scale, peer-reviewed, reproducible
+ * ACTIVE: Mechanism understood but not validated for this specific application
+ * HIGH: Mechanism is theoretical or disputed
+ */
+export const ScientificRiskStatus = z
+  .enum(['RETIRED', 'ACTIVE', 'HIGH'])
+  .catch('ACTIVE');
+export type ScientificRiskStatus = z.infer<typeof ScientificRiskStatus>;
+
+/**
+ * Engineering Risk Status - How hard is implementation?
+ * LOW: Off-the-shelf components, standard integration
+ * MEDIUM: Custom engineering required, but known approaches exist
+ * HIGH: Novel integration, no clear precedent for this combination
+ */
+export const EngineeringRiskStatus = z
+  .enum(['LOW', 'MEDIUM', 'HIGH'])
+  .catch('MEDIUM');
+export type EngineeringRiskStatus = z.infer<typeof EngineeringRiskStatus>;
+
+/**
+ * Scientific Risk Assessment
+ */
+export const ScientificRiskSchema = z
+  .object({
+    status: ScientificRiskStatus,
+    explanation: z.string().catch(''),
+  })
+  .passthrough();
+export type ScientificRisk = z.infer<typeof ScientificRiskSchema>;
+
+/**
+ * Engineering Risk Assessment
+ */
+export const EngineeringRiskSchema = z
+  .object({
+    status: EngineeringRiskStatus,
+    explanation: z.string().catch(''),
+  })
+  .passthrough();
+export type EngineeringRisk = z.infer<typeof EngineeringRiskSchema>;
+
+/**
+ * Risk Classification - categorizes whether this is scientific discovery,
+ * engineering execution, or integration challenge
+ */
+export const RiskClassificationSchema = z
+  .object({
+    scientific_risk: ScientificRiskSchema,
+    engineering_risk: EngineeringRiskSchema,
+    one_line_summary: z.string().catch(''),
+  })
+  .passthrough();
+export type RiskClassification = z.infer<typeof RiskClassificationSchema>;
+
+/**
+ * Actionable Confidence - replaces simple confidence_percent
+ * Provides actionable context for what the confidence depends on
+ */
+export const ActionableConfidenceSchema = z
+  .object({
+    level: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
+    percent: z.number().int().min(0).max(100).catch(50),
+    hinges_on: z.string().catch(''),
+    if_wrong: z.string().catch(''),
+    what_would_change_my_mind: z.string().catch(''),
+  })
+  .passthrough();
+export type ActionableConfidence = z.infer<typeof ActionableConfidenceSchema>;
+
+/**
+ * Scale Up Risk - based on gap between demonstrated scale and target
+ */
+export const ScaleUpRisk = z.enum(['LOW', 'MEDIUM', 'HIGH']).catch('MEDIUM');
+export type ScaleUpRisk = z.infer<typeof ScaleUpRisk>;
+
+/**
+ * Technology Readiness - TRL and scale challenge assessment
+ * trl: 1-3 Research, 4-5 Lab validation, 6-7 Pilot/demo, 8-9 Commercial
+ */
+export const ReadinessSchema = z
+  .object({
+    trl: z.number().int().min(1).max(9).catch(5),
+    trl_rationale: z.string().catch(''),
+    scale_up_risk: ScaleUpRisk,
+    key_scale_challenge: z.string().catch(''),
+  })
+  .passthrough();
+export type Readiness = z.infer<typeof ReadinessSchema>;
+
 /**
  * Sustainability Flag Types for v4.0 Narrative Flow
  * Flags material sustainability implications for concepts
@@ -1985,8 +2081,15 @@ export const PrimarySolutionConceptSchema = z
   .object({
     id: z.string().catch(''),
     title: z.string().catch(''),
+    // v4.0+: Actionable confidence with context (preferred)
+    confidence: ActionableConfidenceSchema.optional(),
+    // Legacy: Simple confidence percent (backward compatibility)
     confidence_percent: z.number().int().min(0).max(100).catch(50),
     source_type: SolutionSourceType,
+    // v4.0+: Risk classification
+    risk_classification: RiskClassificationSchema.optional(),
+    // v4.0+: Technology readiness
+    readiness: ReadinessSchema.optional(),
     what_it_is: z.string().catch(''),
     the_insight: TheInsightSchema,
     why_it_works: z.string().catch(''),
@@ -2045,6 +2148,9 @@ export const SupportingSolutionConceptSchema = z
   .object({
     id: z.string().catch(''),
     title: z.string().catch(''),
+    // v4.0+: Actionable confidence with context (preferred)
+    confidence: ActionableConfidenceSchema.optional(),
+    // Legacy: Simple confidence percent (backward compatibility)
     confidence_percent: z.number().int().min(0).max(100).catch(50),
     relationship: SupportingRelationship,
     what_it_is: z.string().catch(''),
@@ -2088,8 +2194,15 @@ export const RecommendedInnovationConceptSchema = z
   .object({
     id: z.string().catch(''),
     title: z.string().catch(''),
+    // v4.0+: Actionable confidence with context (preferred)
+    confidence: ActionableConfidenceSchema.optional(),
+    // Legacy: Simple confidence percent (backward compatibility)
     confidence_percent: z.number().int().min(0).max(100).catch(50),
     innovation_type: InnovationConceptType,
+    // v4.0+: Risk classification
+    risk_classification: RiskClassificationSchema.optional(),
+    // v4.0+: Technology readiness
+    readiness: ReadinessSchema.optional(),
     what_it_is: z.string().catch(''),
     the_insight: TheInsightSchema,
     why_it_works: z.string().catch(''),
@@ -2145,6 +2258,9 @@ export const ParallelInnovationConceptSchema = z
   .object({
     id: z.string().catch(''),
     title: z.string().catch(''),
+    // v4.0+: Actionable confidence with context (preferred)
+    confidence: ActionableConfidenceSchema.optional(),
+    // Legacy: Simple confidence percent (backward compatibility)
     confidence_percent: z.number().int().min(0).max(100).catch(50),
     innovation_type: InnovationConceptType,
     what_it_is: z.string().catch(''),

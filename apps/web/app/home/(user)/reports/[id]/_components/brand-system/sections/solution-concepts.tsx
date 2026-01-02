@@ -11,9 +11,12 @@ import { memo } from 'react';
 import { cn } from '@kit/ui/utils';
 
 import type {
+  ActionableConfidence,
   ExecutionTrack,
   ExecutionTrackPrimary,
   InsightBlock,
+  Readiness,
+  RiskClassification,
   SupportingConcept,
   ValidationGate,
 } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
@@ -29,6 +32,277 @@ import {
   SectionTitle,
   UnknownFieldRenderer,
 } from '../primitives';
+
+// ============================================
+// RISK CLASSIFICATION BLOCK
+// ============================================
+
+interface RiskClassificationBlockProps {
+  data?: RiskClassification;
+}
+
+const RiskClassificationBlock = memo(function RiskClassificationBlock({
+  data,
+}: RiskClassificationBlockProps) {
+  if (!data) return null;
+
+  const hasContent =
+    data.scientific_risk?.status ||
+    data.engineering_risk?.status ||
+    data.one_line_summary;
+
+  if (!hasContent) return null;
+
+  // Monochrome styling per Air Company aesthetic
+  const getRiskStyles = (
+    status?: 'RETIRED' | 'ACTIVE' | 'HIGH' | 'LOW' | 'MEDIUM',
+  ) => {
+    switch (status) {
+      case 'HIGH':
+        return { dot: 'bg-zinc-900', text: 'text-zinc-700 font-medium' };
+      case 'ACTIVE':
+      case 'MEDIUM':
+        return { dot: 'bg-zinc-500', text: 'text-zinc-500' };
+      case 'RETIRED':
+      case 'LOW':
+        return { dot: 'bg-zinc-400', text: 'text-zinc-400' };
+      default:
+        return { dot: 'bg-zinc-400', text: 'text-zinc-500' };
+    }
+  };
+
+  return (
+    <ContentBlock withBorder className="max-w-[70ch]">
+      <MonoLabel>Risk Classification</MonoLabel>
+
+      {data.one_line_summary && (
+        <p className="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-900">
+          {data.one_line_summary}
+        </p>
+      )}
+
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        {data.scientific_risk?.status && (
+          <div className="space-y-2">
+            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              Scientific Risk
+            </span>
+            <div className="flex items-center gap-2">
+              <div
+                className={cn(
+                  'h-1.5 w-1.5 rounded-full',
+                  getRiskStyles(data.scientific_risk.status).dot,
+                )}
+              />
+              <span
+                className={cn(
+                  'text-[13px]',
+                  getRiskStyles(data.scientific_risk.status).text,
+                )}
+              >
+                {data.scientific_risk.status}
+              </span>
+            </div>
+            {data.scientific_risk.explanation && (
+              <p className="text-[16px] leading-[1.4] tracking-[-0.02em] text-zinc-600">
+                {data.scientific_risk.explanation}
+              </p>
+            )}
+          </div>
+        )}
+
+        {data.engineering_risk?.status && (
+          <div className="space-y-2">
+            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              Engineering Risk
+            </span>
+            <div className="flex items-center gap-2">
+              <div
+                className={cn(
+                  'h-1.5 w-1.5 rounded-full',
+                  getRiskStyles(data.engineering_risk.status).dot,
+                )}
+              />
+              <span
+                className={cn(
+                  'text-[13px]',
+                  getRiskStyles(data.engineering_risk.status).text,
+                )}
+              >
+                {data.engineering_risk.status}
+              </span>
+            </div>
+            {data.engineering_risk.explanation && (
+              <p className="text-[16px] leading-[1.4] tracking-[-0.02em] text-zinc-600">
+                {data.engineering_risk.explanation}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </ContentBlock>
+  );
+});
+
+// ============================================
+// ACTIONABLE CONFIDENCE BLOCK
+// ============================================
+
+interface ConfidenceDetailBlockProps {
+  data?: ActionableConfidence;
+}
+
+const ConfidenceDetailBlock = memo(function ConfidenceDetailBlock({
+  data,
+}: ConfidenceDetailBlockProps) {
+  if (!data) return null;
+
+  const hasContent =
+    data.hinges_on || data.if_wrong || data.what_would_change_my_mind;
+
+  if (!hasContent) return null;
+
+  return (
+    <ContentBlock withBorder className="max-w-[70ch]">
+      <MonoLabel>Confidence Analysis</MonoLabel>
+
+      <div className="mt-4 space-y-4">
+        {data.hinges_on && (
+          <div>
+            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              Critical Assumption
+            </span>
+            <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-900">
+              {data.hinges_on}
+            </p>
+          </div>
+        )}
+
+        {data.if_wrong && (
+          <div>
+            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              If Wrong
+            </span>
+            <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              {data.if_wrong}
+            </p>
+          </div>
+        )}
+
+        {data.what_would_change_my_mind && (
+          <div>
+            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              What Would Change Our Mind
+            </span>
+            <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              {data.what_would_change_my_mind}
+            </p>
+          </div>
+        )}
+      </div>
+    </ContentBlock>
+  );
+});
+
+// ============================================
+// READINESS / TRL BLOCK
+// ============================================
+
+interface ReadinessBlockProps {
+  data?: Readiness;
+}
+
+const ReadinessBlock = memo(function ReadinessBlock({
+  data,
+}: ReadinessBlockProps) {
+  if (!data) return null;
+
+  const hasContent =
+    data.trl || data.trl_rationale || data.scale_up_risk || data.key_scale_challenge;
+
+  if (!hasContent) return null;
+
+  // Monochrome styling per Air Company aesthetic
+  const getScaleRiskStyles = (risk?: 'LOW' | 'MEDIUM' | 'HIGH') => {
+    switch (risk) {
+      case 'HIGH':
+        return { dot: 'bg-zinc-900', text: 'text-zinc-700 font-medium' };
+      case 'MEDIUM':
+        return { dot: 'bg-zinc-500', text: 'text-zinc-500' };
+      case 'LOW':
+        return { dot: 'bg-zinc-400', text: 'text-zinc-400' };
+      default:
+        return { dot: 'bg-zinc-400', text: 'text-zinc-500' };
+    }
+  };
+
+  return (
+    <ContentBlock withBorder className="max-w-[70ch]">
+      <MonoLabel>Technology Readiness</MonoLabel>
+
+      <div className="mt-4 space-y-4">
+        {data.trl && (
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50">
+              <span className="text-[20px] font-semibold text-zinc-900">
+                {data.trl}
+              </span>
+            </div>
+            <div>
+              <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+                Technology Readiness Level
+              </span>
+              <p className="text-[16px] tracking-[-0.02em] text-zinc-700">
+                TRL {data.trl} of 9
+              </p>
+            </div>
+          </div>
+        )}
+
+        {data.trl_rationale && (
+          <p className="text-[16px] leading-[1.4] tracking-[-0.02em] text-zinc-600">
+            {data.trl_rationale}
+          </p>
+        )}
+
+        {data.scale_up_risk && (
+          <div className="flex items-center gap-3">
+            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              Scale-up Risk
+            </span>
+            <div className="flex items-center gap-2">
+              <div
+                className={cn(
+                  'h-1.5 w-1.5 rounded-full',
+                  getScaleRiskStyles(data.scale_up_risk).dot,
+                )}
+              />
+              <span
+                className={cn(
+                  'text-[13px]',
+                  getScaleRiskStyles(data.scale_up_risk).text,
+                )}
+              >
+                {data.scale_up_risk}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {data.key_scale_challenge && (
+          <div>
+            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              Key Scale Challenge
+            </span>
+            <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
+              {data.key_scale_challenge}
+            </p>
+          </div>
+        )}
+      </div>
+    </ContentBlock>
+  );
+});
 
 // ============================================
 // INSIGHT BLOCK
@@ -199,22 +473,43 @@ const PrimaryRecommendationCard = memo(function PrimaryRecommendationCard({
               <span className="text-zinc-500">{data.source}</span>
             </>
           )}
-          {data.confidence !== undefined && (
+          {/* Prefer confidence_detail if available, fall back to legacy confidence */}
+          {data.confidence_detail?.level ? (
             <>
               <span className="text-zinc-300">·</span>
               <span
                 className={cn(
                   'font-medium',
-                  data.confidence >= 70
+                  data.confidence_detail.level === 'HIGH'
                     ? 'text-zinc-700'
-                    : data.confidence >= 40
+                    : data.confidence_detail.level === 'MEDIUM'
                       ? 'text-zinc-500'
                       : 'text-zinc-400',
                 )}
               >
-                {data.confidence}% confidence
+                {data.confidence_detail.level} confidence
+                {data.confidence_detail.percent !== undefined &&
+                  ` (${data.confidence_detail.percent}%)`}
               </span>
             </>
+          ) : (
+            data.confidence !== undefined && (
+              <>
+                <span className="text-zinc-300">·</span>
+                <span
+                  className={cn(
+                    'font-medium',
+                    data.confidence >= 70
+                      ? 'text-zinc-700'
+                      : data.confidence >= 40
+                        ? 'text-zinc-500'
+                        : 'text-zinc-400',
+                  )}
+                >
+                  {data.confidence}% confidence
+                </span>
+              </>
+            )
           )}
         </div>
       </header>
@@ -247,6 +542,15 @@ const PrimaryRecommendationCard = memo(function PrimaryRecommendationCard({
 
       {/* THE INSIGHT */}
       <InsightBlockComponent insight={data.the_insight} />
+
+      {/* RISK CLASSIFICATION */}
+      <RiskClassificationBlock data={data.risk_classification} />
+
+      {/* CONFIDENCE ANALYSIS */}
+      <ConfidenceDetailBlock data={data.confidence_detail} />
+
+      {/* TECHNOLOGY READINESS */}
+      <ReadinessBlock data={data.readiness} />
 
       {/* KEY METRICS GRID */}
       {(data.expected_improvement || data.timeline || data.investment) && (

@@ -1291,8 +1291,33 @@ Before writing the narrative_lead, verify:
     "primary": {
       "id": "sol-primary",
       "title": "Concept title",
-      "confidence_percent": 85,
+      "confidence": {
+        "level": "HIGH | MEDIUM | LOW",
+        "percent": 85,
+        "hinges_on": "The ONE critical assumption this depends on",
+        "if_wrong": "What happens AND what to do instead",
+        "what_would_change_my_mind": "Specific evidence that would lower confidence"
+      },
       "source_type": "CATALOG | EMERGING | CROSS_DOMAIN | PARADIGM",
+
+      "risk_classification": {
+        "scientific_risk": {
+          "status": "RETIRED | ACTIVE | HIGH",
+          "explanation": "One sentence on whether physics/chemistry is proven"
+        },
+        "engineering_risk": {
+          "status": "LOW | MEDIUM | HIGH",
+          "explanation": "One sentence on implementation challenges"
+        },
+        "one_line_summary": "This is [scientific discovery / engineering execution / integration challenge] — the physics is proven, the challenge is [specific engineering hurdle]."
+      },
+
+      "readiness": {
+        "trl": 7,
+        "trl_rationale": "Commercial systems exist (Orange County GWRS at 100 MGD), but this specific integration is novel",
+        "scale_up_risk": "LOW | MEDIUM | HIGH",
+        "key_scale_challenge": "The specific technical hurdle for scaling"
+      },
 
       "what_it_is": "2-3 paragraphs. Enough detail to act on it. Not a teaser.",
 
@@ -1380,7 +1405,13 @@ Before writing the narrative_lead, verify:
       {
         "id": "sol-support-1",
         "title": "Concept title",
-        "confidence_percent": 75,
+        "confidence": {
+          "level": "HIGH | MEDIUM | LOW",
+          "percent": 75,
+          "hinges_on": "Critical assumption",
+          "if_wrong": "Fallback path",
+          "what_would_change_my_mind": "Evidence to validate"
+        },
         "relationship": "FALLBACK | COMPLEMENTARY",
 
         "what_it_is": "1-2 paragraphs. Full enough to understand and evaluate.",
@@ -1419,8 +1450,33 @@ Before writing the narrative_lead, verify:
     "recommended": {
       "id": "innov-recommended",
       "title": "Concept title",
-      "confidence_percent": 45,
+      "confidence": {
+        "level": "HIGH | MEDIUM | LOW",
+        "percent": 45,
+        "hinges_on": "The ONE critical assumption this depends on",
+        "if_wrong": "What happens AND what to do instead",
+        "what_would_change_my_mind": "Specific evidence that would lower confidence"
+      },
       "innovation_type": "CROSS_DOMAIN | PARADIGM | TECHNOLOGY_REVIVAL | FIRST_PRINCIPLES",
+
+      "risk_classification": {
+        "scientific_risk": {
+          "status": "RETIRED | ACTIVE | HIGH",
+          "explanation": "One sentence on whether physics/chemistry is proven"
+        },
+        "engineering_risk": {
+          "status": "LOW | MEDIUM | HIGH",
+          "explanation": "One sentence on implementation challenges"
+        },
+        "one_line_summary": "This is [scientific discovery / engineering execution / integration challenge] — the physics is proven, the challenge is [specific engineering hurdle]."
+      },
+
+      "readiness": {
+        "trl": 4,
+        "trl_rationale": "Lab validation complete, but not yet demonstrated at relevant scale",
+        "scale_up_risk": "LOW | MEDIUM | HIGH",
+        "key_scale_challenge": "The specific technical hurdle for scaling"
+      },
 
       "what_it_is": "2-3 paragraphs. Full development.",
 
@@ -1507,7 +1563,13 @@ Before writing the narrative_lead, verify:
       {
         "id": "innov-parallel-1",
         "title": "Concept title",
-        "confidence_percent": 40,
+        "confidence": {
+          "level": "HIGH | MEDIUM | LOW",
+          "percent": 40,
+          "hinges_on": "Critical assumption",
+          "if_wrong": "Fallback path",
+          "what_would_change_my_mind": "Evidence to validate"
+        },
         "innovation_type": "CROSS_DOMAIN | PARADIGM | TECHNOLOGY_REVIVAL",
 
         "what_it_is": "1-2 paragraphs. Full enough to understand.",
@@ -1739,8 +1801,26 @@ b) Accept and flag: "Initial validation tests steady-state only. If pass, recomm
 - Claim HIGH confidence while having unaddressed uncertainties
 - Leave validation_gaps array empty if what_we_might_be_wrong_about has items
 
-### Follow-Up Prompts
-Guide user to high-value follow-up questions. These replace the action plan, operational alternatives, and decision architecture that we removed.
+### Follow-Up Prompts (Required - Report-Specific)
+
+Generate 5 follow-up prompts that are SPECIFIC to this report's content. These will appear as clickable buttons in the chat interface.
+
+**Categories to cover:**
+1. **Validation deep-dive**: "Design a 4-week validation plan for [Primary Concept], starting with [first validation step]"
+2. **Supplier/vendor prep**: "What questions should I ask [specific vendor/supplier mentioned] about [specific technical concern]?"
+3. **Business case**: "Help me build the ROI case for [concept] — I need to justify [specific investment or audit]"
+4. **Technical deep-dive**: "Walk me through the failure modes for [specific mechanism] and early warning signs"
+5. **Alternative exploration**: "Compare [Concept A] vs [Concept B] for my specific constraints"
+
+**Bad (generic):**
+- "Tell me more about the recommendations"
+- "What are the next steps?"
+- "Help me implement this"
+
+**Good (specific):**
+- "Design a validation protocol for EC silica removal — what's the minimum bench test to derisk electrode passivation?"
+- "What should I ask Munters about HERO membrane compatibility with pH 10.5+ operation and our boron levels?"
+- "Help me scope the waste heat audit — what data do I need to collect and what's the decision threshold for flash precipitation?"
 
 // FIX: Gap 6 - Risk severity calibration
 ### Risk Severity Calibration (Required)
@@ -1778,6 +1858,61 @@ If genuinely no HIGH risks, state explicitly: "Unusually low-risk project becaus
 - 1-2 HIGH risks (the real concerns)
 - 2-4 MEDIUM risks (manageable)
 - 2-3 LOW risks (monitoring items)
+
+## RISK CLASSIFICATION (Primary + Recommended Innovation only)
+
+Classify the dominant risk type for each major concept:
+
+**SCIENTIFIC RISK** — Is the underlying mechanism proven?
+- RETIRED: Physics demonstrated at relevant scale, peer-reviewed, reproducible
+- ACTIVE: Mechanism understood but not validated for this specific application
+- HIGH: Mechanism is theoretical or disputed
+
+**ENGINEERING RISK** — How hard is implementation?
+- LOW: Off-the-shelf components, standard integration
+- MEDIUM: Custom engineering required, but known approaches exist
+- HIGH: Novel integration, no clear precedent for this combination
+
+**ONE-LINE SUMMARY** — Give the reader instant clarity:
+✅ "This is engineering execution — the physics is proven (20+ years GWRS operation), the challenge is sizing EC electrodes for your specific flow rate."
+✅ "This is scientific discovery — the mechanism is promising but unvalidated at >100 ppm silica concentrations."
+❌ "This is a complex technical challenge." (too vague)
+
+## CONFIDENCE FORMAT (Required for all concepts)
+
+Confidence must be ACTIONABLE, not arbitrary. The reader should know exactly what assumption to validate first.
+
+**level**: HIGH (>80% likely to work as described) | MEDIUM (50-80%) | LOW (<50%)
+
+**percent**: Numeric estimate (acknowledge this is judgment, not calculation)
+
+**hinges_on**: The ONE critical assumption this confidence depends on. Be specific.
+✅ "Silica is predominantly reactive (H₄SiO₄), not colloidal"
+❌ "The technology works as expected"
+
+**if_wrong**: What happens AND what to do instead. This is the fallback path.
+✅ "If colloidal >50%, pivot to CCRO with zeolite pre-treatment"
+❌ "Would need to reconsider approach"
+
+**what_would_change_my_mind**: Specific evidence that would lower confidence. This becomes the first validation gate.
+✅ "Bench test showing <70% silica removal with EC at 20 mA/cm²"
+❌ "If testing shows problems"
+
+## TECHNOLOGY READINESS (Primary + Recommended Innovation only)
+
+**TRL Scale:**
+- 1-3: Research/proof of concept
+- 4-5: Lab validation, component testing
+- 6-7: Pilot/demonstration at relevant scale
+- 8-9: Commercial deployment, operational
+
+**trl_rationale**: One sentence explaining the rating. Reference specific deployments if TRL 6+.
+
+**scale_up_risk**: Based on gap between current demonstrated scale and target application.
+
+**key_scale_challenge**: The specific technical hurdle for scaling. Be concrete.
+✅ "EC electrode passivation rate unknown above 1,000 m³/day continuous operation"
+❌ "Scaling to production"
 
 ## ECONOMICS BASIS PRESENTATION (PRIMARY + RECOMMENDED only)
 

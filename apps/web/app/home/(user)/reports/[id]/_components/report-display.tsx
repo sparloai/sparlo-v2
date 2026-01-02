@@ -15,7 +15,13 @@ import { useChat } from '../_lib/hooks/use-chat';
 import { useReportActions } from '../_lib/hooks/use-report-actions';
 import type { ChatMessage } from '../_lib/schemas/chat.schema';
 import { BrandSystemReport } from './brand-system';
-import { ChatDrawer, ChatHeader, ChatInput, ChatMessages } from './chat';
+import {
+  ChatDrawer,
+  ChatHeader,
+  ChatInput,
+  ChatMessages,
+  ChatSuggestions,
+} from './chat';
 import { ShareModal } from './share-modal';
 
 interface Report {
@@ -172,6 +178,20 @@ export function ReportDisplay({
       >
         <ChatHeader onClose={() => setIsChatOpen(false)} />
         <ChatMessages messages={chatMessages} isStreaming={isChatLoading} />
+
+        {/* Show conversation starters when no messages yet */}
+        {chatMessages.length === 0 &&
+          reportData.follow_up_prompts &&
+          reportData.follow_up_prompts.length > 0 && (
+            <ChatSuggestions
+              suggestions={reportData.follow_up_prompts}
+              onSelect={(suggestion) => {
+                void submitChatMessage(suggestion);
+              }}
+              disabled={isChatLoading}
+            />
+          )}
+
         <ChatInput
           value={chatInput}
           onChange={setChatInput}

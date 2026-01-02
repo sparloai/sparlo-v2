@@ -1,0 +1,76 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - link "Sparlo" [ref=e6] [cursor=pointer]:
+          - /url: /home
+          - img "Sparlo" [ref=e7]
+        - button "Close menu" [ref=e8]:
+          - img [ref=e9]
+      - navigation [ref=e11]:
+        - button "New Analysis" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - generic [ref=e17]: New Analysis
+        - link "All Reports" [ref=e20] [cursor=pointer]:
+          - /url: /home/reports
+          - img [ref=e21]
+          - generic [ref=e23]: All Reports
+        - generic [ref=e24]:
+          - generic [ref=e25]: Recents
+          - generic [ref=e26]:
+            - 'link "DAC Regeneration Energy Reduction: From Rotary Wheels to Electrochemical Paradigm Shifts" [ref=e27] [cursor=pointer]':
+              - /url: /home/reports/14cea12c-4f34-432f-989d-44d4d23ad035
+            - 'link "PEM Electrolyzer Bubble Occlusion: Cross-Domain Transfer Strategy for Step-Change Current Density" [ref=e28] [cursor=pointer]':
+              - /url: /home/reports/7c0f8964-1704-464b-a6b3-6111d34991c8
+            - 'link "Viscous Fluid Dispensing: Precision Cut-off at Production Speed" [ref=e29] [cursor=pointer]':
+              - /url: /home/reports/df7d2998-f96f-4fe3-a9aa-5bc636e1322c
+            - 'link "High-Performance Retrofit Insulation: Achieving R-20+ Through Exterior Access at Scale" [ref=e30] [cursor=pointer]':
+              - /url: /home/reports/4c3428a1-7e2d-4a54-bca4-a101530b7499
+            - 'link "Industrial Thermal Storage: Crushed Rock and Refractory Systems Beat Exotic Alternatives" [ref=e31] [cursor=pointer]':
+              - /url: /home/reports/2c047cfd-a0ce-4b03-b6c3-b4f6a1ba9fa9
+      - button "swimakaswim" [ref=e35] [cursor=pointer]:
+        - img [ref=e36]
+        - generic [ref=e39]: swimakaswim
+    - banner [ref=e40]:
+      - navigation [ref=e41]:
+        - generic [ref=e42]:
+          - button "Open menu" [active] [ref=e43]:
+            - img [ref=e44]
+          - link "Sparlo" [ref=e46] [cursor=pointer]:
+            - /url: /home
+            - img "Sparlo" [ref=e47]
+        - link "Usage 98%" [ref=e49] [cursor=pointer]:
+          - /url: /home/billing
+          - generic [ref=e50]:
+            - generic [ref=e51]:
+              - generic [ref=e52]: Usage
+              - generic [ref=e53]: 98%
+            - progressbar [ref=e54]
+    - main [ref=e56]:
+      - main [ref=e57]:
+        - generic [ref=e59]:
+          - link "All Reports" [ref=e60] [cursor=pointer]:
+            - /url: /home/reports
+            - img [ref=e61]
+            - text: All Reports
+          - heading "New Analysis" [level=1] [ref=e63]
+          - generic [ref=e67]:
+            - textbox "Describe your technical challenge." [ref=e68]
+            - generic [ref=e69]:
+              - generic [ref=e72]: Problem
+              - generic [ref=e75]: Constraints
+              - generic [ref=e78]: Success criteria
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - paragraph [ref=e81]: ~25 min analysis
+                - generic [ref=e82]: ·
+                - button "Attach file" [ref=e83]
+              - generic [ref=e84]:
+                - button "Run Analysis" [disabled] [ref=e85]
+                - generic [ref=e86]: Min 50 characters
+  - region "Notifications alt+T"
+  - alert [ref=e87]: Sparlo - Innovation AI
+```

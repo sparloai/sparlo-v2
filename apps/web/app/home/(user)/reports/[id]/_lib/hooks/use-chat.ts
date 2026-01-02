@@ -14,7 +14,8 @@ interface UseChatReturn {
   input: string;
   setInput: (input: string) => void;
   isLoading: boolean;
-  submitMessage: () => Promise<void>;
+  /** Submit a message. If messageOverride is provided, submits that instead of input state. */
+  submitMessage: (messageOverride?: string) => Promise<void>;
   handleSubmit: (e: React.FormEvent) => void;
   cancelStream: () => void;
 }
@@ -41,16 +42,17 @@ export function useChat({
     setIsLoading(false);
   }, []);
 
-  const submitMessage = useCallback(async () => {
-    if (!input.trim() || isLoading) return;
+  const submitMessage = useCallback(async (messageOverride?: string) => {
+    const messageToSend = messageOverride ?? input;
+    if (!messageToSend.trim() || isLoading) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: 'user',
-      content: input.trim(),
+      content: messageToSend.trim(),
     };
 
-    const savedInput = input.trim();
+    const savedInput = messageToSend.trim();
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
