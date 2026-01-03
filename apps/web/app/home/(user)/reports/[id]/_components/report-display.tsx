@@ -14,7 +14,7 @@ import { extractUserInput } from '../_lib/extract-report';
 import { useChat } from '../_lib/hooks/use-chat';
 import { useReportActions } from '../_lib/hooks/use-report-actions';
 import type { ChatMessage } from '../_lib/schemas/chat.schema';
-import { BrandSystemReport } from './brand-system';
+import { BrandSystemReport, DDReportDisplay } from './brand-system';
 import {
   ChatDrawer,
   ChatHeader,
@@ -24,6 +24,17 @@ import {
 } from './chat';
 import { ShareModal } from './share-modal';
 
+// Type for DD mode report data
+interface DDReportData {
+  mode: 'dd';
+  report: unknown;
+  claim_extraction?: unknown;
+  problem_framing?: unknown;
+  solution_space?: unknown;
+  claim_validation?: unknown;
+  solution_mapping?: unknown;
+}
+
 interface Report {
   id: string;
   title: string;
@@ -31,7 +42,8 @@ interface Report {
   current_step: string | null;
   phase_progress: number | null;
   report_data: {
-    report?: HybridReportData;
+    mode?: string;
+    report?: HybridReportData | unknown;
   } | null;
   clarifications: Array<{
     question: string;
@@ -115,14 +127,35 @@ export function ReportDisplay({
   // Check if we have valid report content
   // Try both nested (.report) and direct storage patterns
   const rawReportData = report.report_data;
-  const reportData =
-    (rawReportData?.report as HybridReportData | undefined) ??
-    (rawReportData as HybridReportData | null);
+
+  // Detect DD mode
+  const isDDMode = rawReportData?.mode === 'dd';
+
+  // For DD mode, use the DD report data structure
+  // For other modes, extract HybridReportData
+  const reportData = isDDMode
+    ? null
+    : ((rawReportData?.report as HybridReportData | undefined) ??
+      (rawReportData as HybridReportData | null));
 
   // Debug logging for production issues
   if (process.env.NODE_ENV !== 'production') {
     console.log('[ReportDisplay] report_data:', rawReportData);
+    console.log('[ReportDisplay] isDDMode:', isDDMode);
     console.log('[ReportDisplay] extracted reportData:', reportData);
+  }
+
+  // For DD mode, render DD report display
+  if (isDDMode && rawReportData) {
+    return (
+      <DDReportDisplay
+        reportData={rawReportData as DDReportData}
+        title={report.title}
+        createdAt={report.created_at}
+        showActions={true}
+        reportId={report.id}
+      />
+    );
   }
 
   if (!reportData) {
@@ -159,7 +192,7 @@ export function ReportDisplay({
       {/* Chat Toggle Button */}
       {!isChatOpen && (
         <button
-          className="fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-2xl bg-zinc-900 px-6 py-4 text-white shadow-[0_8px_30px_rgba(0,0,0,0.12),0_4px_10px_rgba(0,0,0,0.08)] transition-all hover:scale-[1.02] hover:-translate-y-0.5 hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:hover:bg-zinc-100"
+          className="fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-2xl bg-zinc-900 px-6 py-4 text-white shadow-[0_8px_30px_rgba(0,0,0,0.12),0_4px_10px_rgba(0,0,0,0.08)] transition-all hover:-translate-y-0.5 hover:scale-[1.02] hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:shadow-[0_8px_30px_rgba(0,0,0,0.3)] dark:hover:bg-zinc-100"
           onClick={() => setIsChatOpen(true)}
         >
           <MessageSquare className="h-5 w-5" strokeWidth={1.5} />

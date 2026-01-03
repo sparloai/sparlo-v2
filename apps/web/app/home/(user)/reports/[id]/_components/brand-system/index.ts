@@ -10,6 +10,9 @@
 // Main report component
 export { BrandSystemReport } from './brand-system-report';
 
+// DD Mode report component
+export { DDReportDisplay } from './dd-report-display';
+
 // Table of Contents
 export {
   TableOfContents,

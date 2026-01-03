@@ -123,3 +123,10 @@ export const PHASES = [
 ] as const;
 
 export type PhaseId = (typeof PHASES)[number]['id'];
+
+/**
+ * DD Mode exports
+ *
+ * Due Diligence mode for evaluating startup technical claims.
+ */
+export * from './dd';
