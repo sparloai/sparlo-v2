@@ -4,8 +4,8 @@ import Link from 'next/link';
 /**
  * Share Page Header
  *
- * Minimal header with just the Sparlo logo linking to the main site.
- * Matches the styling of the main navigation but without any nav links.
+ * Header with Sparlo logo and Get Started CTA to encourage signups
+ * from users viewing shared reports.
  */
 export function ShareHeader() {
   return (
@@ -25,6 +25,13 @@ export function ShareHeader() {
             className="h-6 w-auto"
             priority
           />
+        </Link>
+
+        <Link
+          href="/auth/sign-up"
+          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800"
+        >
+          Get Started
         </Link>
       </nav>
     </header>
