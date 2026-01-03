@@ -180,12 +180,11 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   cardLabel: {
-    fontSize: 9,
+    fontSize: 10,
     fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc500,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: -0.2,
     marginBottom: 4,
   },
   cardContent: {
@@ -194,14 +193,13 @@ const styles = StyleSheet.create({
     color: colors.zinc600,
     letterSpacing: -0.1,
   },
-  // Mono Label (matches web MonoLabel - 13px uppercase tracking wide)
+  // Section Label - matches web styling (no uppercase, tighter tracking)
   monoLabel: {
-    fontSize: 9,
+    fontSize: 10,
     fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc500,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: -0.2,
     marginBottom: 6,
   },
   // Tags - minimal monochrome only (no colored badges)
@@ -217,8 +215,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc600,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: -0.1,
   },
   tagRow: {
     flexDirection: 'row',
@@ -308,8 +305,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc500,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: -0.1,
   },
   tableRow: {
     flexDirection: 'row',
@@ -358,8 +354,7 @@ const styles = StyleSheet.create({
     fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc400,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: -0.1,
   },
   metaValue: {
     fontSize: 10,
@@ -376,12 +371,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   insightLabel: {
-    fontSize: 9,
+    fontSize: 10,
     fontFamily: 'NotoSans',
     fontWeight: 700,
     color: colors.zinc400,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: -0.2,
     marginBottom: 4,
   },
   insightText: {
