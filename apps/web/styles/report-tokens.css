@@ -103,11 +103,10 @@
     --track-spark-border: rgba(245, 158, 11, 0.25);
 
     /* Typography */
-    --font-display: 'Söhne', -apple-system, BlinkMacSystemFont,
+    --font-display: 'Suisse Intl', -apple-system, BlinkMacSystemFont,
       sans-serif;
-    --font-body: 'Söhne', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-mono: 'Söhne Mono', 'JetBrains Mono', 'SF Mono', 'Fira Code',
-      monospace;
+    --font-body: 'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'Suisse Mono', 'SF Mono', ui-monospace, monospace;
 
     /* Type scale - Apple-inspired with 18px body text baseline */
     --text-xxs: 9px;

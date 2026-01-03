@@ -306,7 +306,7 @@ export default function HybridNewReportPage() {
   return (
     <div
       className="relative flex min-h-screen flex-col items-center justify-center bg-[--surface-base] px-4 py-12 text-[--text-secondary]"
-      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
     >
       {/* Ambient Background Glows - Hybrid mode uses amber/orange */}
       <div className="pointer-events-none absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-amber-900/10 opacity-0 blur-[120px] dark:opacity-50" />
@@ -410,7 +410,7 @@ export default function HybridNewReportPage() {
                 spellCheck={false}
                 className="min-h-[240px] flex-1 resize-none border-0 bg-transparent text-lg leading-relaxed font-light text-[--text-primary] placeholder-[--text-muted] ring-0 outline-none focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none disabled:opacity-40 md:text-xl"
                 style={{
-                  fontFamily: 'Soehne, Inter, sans-serif',
+                  fontFamily: "'Suisse Intl', Inter, sans-serif",
                   outline: 'none',
                 }}
               />
@@ -487,7 +487,7 @@ export default function HybridNewReportPage() {
                             ? 'text-amber-700 dark:text-amber-300'
                             : 'text-[--text-muted]',
                         )}
-                        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                        style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
                       >
                         {context.label}
                       </span>
@@ -511,14 +511,14 @@ export default function HybridNewReportPage() {
                   <div className="flex flex-col">
                     <span
                       className="text-[10px] font-semibold text-[--text-muted]"
-                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                      style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
                     >
                       Hybrid analysis
                     </span>
                     <span
                       className="text-xs text-[--text-secondary]"
                       style={{
-                        fontFamily: 'Soehne, Inter, sans-serif',
+                        fontFamily: "'Suisse Intl', Inter, sans-serif",
                       }}
                     >
                       ~20 minutes
@@ -550,7 +550,7 @@ export default function HybridNewReportPage() {
                   >
                     <span
                       className="relative z-10 text-base font-semibold tracking-tight"
-                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                      style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
                     >
                       {isSubmitting ? 'Analyzing...' : 'Run Hybrid Analysis'}
                     </span>
@@ -568,7 +568,7 @@ export default function HybridNewReportPage() {
         {error && (
           <p
             className="mt-4 text-center text-sm text-red-600 dark:text-red-400"
-            style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+            style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
           >
             {error}
           </p>
@@ -580,7 +580,7 @@ export default function HybridNewReportPage() {
             <Lock className="h-3 w-3 text-[--text-muted]" />
             <span
               className="font-mono text-xs tracking-tight text-[--text-secondary]"
-              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+              style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
             >
               DATA NEVER TRAINS AI
             </span>
@@ -590,7 +590,7 @@ export default function HybridNewReportPage() {
             <ShieldCheck className="h-3 w-3 text-amber-600 dark:text-amber-500" />
             <span
               className="font-mono text-xs tracking-tight text-[--text-secondary]"
-              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+              style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
             >
               BUILT ON SOC2 INFRASTRUCTURE
             </span>

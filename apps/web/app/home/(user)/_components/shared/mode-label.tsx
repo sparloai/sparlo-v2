@@ -10,7 +10,7 @@ export function ModeLabel({ mode }: ModeLabelProps) {
   return (
     <span
       className="font-mono text-[10px] tracking-wider text-[--text-muted] uppercase"
-      style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+      style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
     >
       [{REPORT_MODE_LABELS[mode]}]
     </span>

@@ -5,7 +5,7 @@ import 'server-only';
  *
  * These styles are embedded directly in the HTML output and are designed
  * for Puppeteer/Chromium PDF rendering. Uses Suisse Intl for headings
- * and Soehne for body text, matching the Sparlo brand.
+ * and Suisse Intl for body text, matching the Sparlo brand.
  */
 
 // Logo as base64 for reliable embedding in PDF
@@ -93,7 +93,7 @@ h1, h2, h3, h4, .report-title, .section-title, .subsection-title,
 
 /* Monospace for labels and code */
 .mono-label, .mono-label-strong, .mono-label-muted, code {
-  font-family: 'Soehne Mono', 'SF Mono', 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Suisse Mono', 'SF Mono', ui-monospace, monospace;
 }
 
 /* ============================================

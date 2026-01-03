@@ -35,14 +35,14 @@ function EmptyState() {
       </div>
       <p
         className="mt-4 text-sm text-[--text-muted]"
-        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+        style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
       >
         No archived reports
       </p>
       <Link
         href="/home"
         className="mt-4 inline-block rounded-sm bg-[--text-primary] px-4 py-2 font-mono text-xs font-medium tracking-wider text-[--surface-base] uppercase transition-colors hover:opacity-90"
-        style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+        style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
       >
         View All Reports
       </Link>
@@ -55,7 +55,7 @@ function NoResultsState({ query }: { query: string }) {
     <div className="rounded-lg border border-[--border-subtle] bg-[--surface-elevated] px-6 py-12 text-center">
       <p
         className="text-sm text-[--text-muted]"
-        style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+        style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
       >
         No archived reports match &ldquo;{query}&rdquo;
       </p>
@@ -103,7 +103,7 @@ export function ArchivedReportsDashboard({
   return (
     <div
       className="mx-auto w-full max-w-4xl px-6 py-12 md:py-16"
-      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+      style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
     >
       {/* Header Actions */}
       <div className="mb-6 flex items-end justify-between">
@@ -116,7 +116,7 @@ export function ArchivedReportsDashboard({
           </Link>
           <h1
             className="font-mono text-xs font-medium tracking-[0.2em] text-[--text-muted] uppercase"
-            style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+            style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
           >
             ARCHIVED
           </h1>
@@ -135,7 +135,7 @@ export function ArchivedReportsDashboard({
           placeholder="Search archived reports..."
           className="w-full rounded-lg border border-[--border-subtle] bg-[--surface-elevated] py-3.5 pr-4 pl-11 text-sm text-[--text-primary] shadow-sm transition-all placeholder:text-[--text-muted] focus:border-[--border-default] focus:ring-1 focus:ring-[--border-default] focus:outline-none"
           data-test="search-archived-input"
-          style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+          style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
         />
       </div>
 
@@ -179,7 +179,7 @@ export function ArchivedReportsDashboard({
                     <ModeLabel mode={report.mode} />
                     <h3
                       className="truncate pr-16 text-sm font-medium text-[--text-muted] transition-colors group-hover:text-[--text-secondary]"
-                      style={{ fontFamily: 'Soehne, Inter, sans-serif' }}
+                      style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
                     >
                       {displayTitle}
                     </h3>
@@ -187,7 +187,7 @@ export function ArchivedReportsDashboard({
                       <span
                         className="font-mono text-xs text-[--text-muted]"
                         style={{
-                          fontFamily: 'Soehne Mono, JetBrains Mono, monospace',
+                          fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
                         }}
                       >
                         {formatReportDate(report.created_at)}
@@ -199,7 +199,7 @@ export function ArchivedReportsDashboard({
                             className="flex items-center gap-1.5 font-mono text-xs text-[--text-muted]"
                             style={{
                               fontFamily:
-                                'Soehne Mono, JetBrains Mono, monospace',
+                                "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
                             }}
                           >
                             <FileText className="h-3 w-3" />
@@ -237,7 +237,7 @@ export function ArchivedReportsDashboard({
           <div className="mt-4 flex items-center justify-between px-1">
             <span
               className="font-mono text-[10px] tracking-wider text-[--text-secondary] uppercase"
-              style={{ fontFamily: 'Soehne Mono, JetBrains Mono, monospace' }}
+              style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
             >
               {filteredReports.length} ARCHIVED{' '}
               {filteredReports.length === 1 ? 'REPORT' : 'REPORTS'}

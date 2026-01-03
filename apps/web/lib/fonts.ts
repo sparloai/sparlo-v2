@@ -4,79 +4,24 @@ import { cn } from '@kit/ui/utils';
 
 /**
  * @sans
- * @description Söhne font (primary brand typeface).
- * Söhne license required. Place font files in /public/fonts/:
- * - Soehne-Buch.woff2 (400)
- * - Soehne-Kraeftig.woff2 (500)
- * - Soehne-halbFett.woff2 (600)
+ * @description Suisse Intl - primary brand typeface for all text.
+ * Place font files in /public/fonts/Suisse/WOFF2/
  */
-const soehne = localFont({
+const suisseIntl = localFont({
   src: [
     {
-      path: '../public/fonts/Soehne-Buch.woff2',
-      weight: '400',
+      path: '../public/fonts/Suisse/WOFF2/SuisseIntlTrial-Light.woff2',
+      weight: '300',
       style: 'normal',
     },
-    {
-      path: '../public/fonts/Soehne-Kraeftig.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/Soehne-halbFett.woff2',
-      weight: '600',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-sans',
-  display: 'swap',
-  fallback: ['-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-});
-
-// Primary font (Söhne)
-const sans = soehne;
-
-/**
- * @mono
- * @description Söhne Mono font (monospace typeface).
- * Söhne license required. Place font files in /public/fonts/:
- * - Soehne-Mono-Buch.woff2 (400)
- * - Soehne-Mono-Kraeftig.woff2 (500)
- * - Soehne-Mono-halbFett.woff2 (600)
- */
-const mono = localFont({
-  src: [
-    {
-      path: '../public/fonts/Soehne-Mono-Buch.woff2',
-      weight: '400',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/Soehne-Mono-Kraeftig.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: '../public/fonts/Soehne-Mono-halbFett.woff2',
-      weight: '600',
-      style: 'normal',
-    },
-  ],
-  variable: '--font-mono',
-  display: 'swap',
-  fallback: ['JetBrains Mono', 'SF Mono', 'ui-monospace', 'monospace'],
-});
-
-/**
- * @heading
- * @description Suisse Intl for page titles and headings.
- * Using Regular weight (400) with -0.02em tracking.
- */
-const heading = localFont({
-  src: [
     {
       path: '../public/fonts/Suisse/WOFF2/SuisseIntlTrial-Regular.woff2',
       weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../public/fonts/Suisse/WOFF2/SuisseIntlTrial-Book.woff2',
+      weight: '450',
       style: 'normal',
     },
     {
@@ -89,11 +34,43 @@ const heading = localFont({
       weight: '600',
       style: 'normal',
     },
+    {
+      path: '../public/fonts/Suisse/WOFF2/SuisseIntlTrial-Bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
   ],
-  variable: '--font-heading',
+  variable: '--font-sans',
   display: 'swap',
   fallback: ['-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
 });
+
+// Primary font (Suisse Intl)
+const sans = suisseIntl;
+
+/**
+ * @mono
+ * @description System monospace font stack for code blocks.
+ */
+const mono = localFont({
+  src: [
+    {
+      path: '../public/fonts/Suisse/WOFF2/SuisseIntlTrial-Regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-mono',
+  display: 'swap',
+  fallback: ['Suisse Mono', 'SF Mono', 'ui-monospace', 'monospace'],
+});
+
+/**
+ * @heading
+ * @description Suisse Intl for page titles and headings.
+ * Same as sans - unified typeface across the site.
+ */
+const heading = suisseIntl;
 
 // we export these fonts into the root layout
 export { sans, heading, mono };
@@ -102,15 +79,15 @@ export { sans, heading, mono };
 // FONT FAMILY STRING CONSTANTS
 // ============================================
 
-/** Suisse Intl (heading/display) with system fallbacks */
+/** Suisse Intl with system fallbacks */
 export const FONT_HEADING =
   "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif";
 
-/** Soehne (body) with system fallbacks */
-export const FONT_BODY = "'Soehne', 'Inter', sans-serif";
+/** Suisse Intl (body) with system fallbacks */
+export const FONT_BODY = "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif";
 
-/** Soehne Mono with system fallbacks */
-export const FONT_MONO = "'Soehne Mono', 'JetBrains Mono', monospace";
+/** System monospace with fallbacks */
+export const FONT_MONO = "'Suisse Mono', 'SF Mono', ui-monospace, monospace";
 
 /** CSS style objects for direct use in style props */
 export const fontStyles = {

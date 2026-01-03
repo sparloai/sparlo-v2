@@ -20,6 +20,7 @@ import { cn } from '@kit/ui/utils';
 
 import { cancelReportGeneration } from '../_lib/server/sparlo-reports-server-actions';
 import type { ConversationStatus, DashboardReport } from '../_lib/types';
+import { useProcessingReportsSubscription } from '../_lib/use-processing-reports-subscription';
 import { formatElapsed, useElapsedTime } from '../_lib/utils/elapsed-time';
 import { formatReportDate, truncateText } from '../_lib/utils/report-utils';
 import { ArchiveToggleButton } from './shared/archive-toggle-button';
@@ -365,6 +366,10 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
     () => new Set(),
   );
 
+  // Subscribe to real-time updates for processing reports
+  // When a report completes, this triggers a refresh
+  useProcessingReportsSubscription(reports);
+
   const filteredReports = useMemo(() => {
     const filtered = reports.filter((r) => !optimisticallyHidden.has(r.id));
 
@@ -413,7 +418,7 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
             className="inline-flex items-center gap-2 bg-zinc-900 px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800 sm:px-5"
           >
             <Plus className="h-4 w-4" />
-            <span className="hidden xs:inline">New</span> Analysis
+            <span className="xs:inline hidden">New</span> Analysis
           </Link>
         </div>
       </div>

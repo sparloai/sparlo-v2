@@ -10,7 +10,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 const lightTheme: Record<string, React.CSSProperties> = {
   'code[class*="language-"]': {
     color: '#3f3f46',
-    fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
+    fontFamily: 'var(--font-mono), "Suisse Mono", monospace',
     fontSize: '12px',
     lineHeight: '1.6',
     direction: 'ltr',
@@ -23,7 +23,7 @@ const lightTheme: Record<string, React.CSSProperties> = {
   },
   'pre[class*="language-"]': {
     color: '#3f3f46',
-    fontFamily: 'var(--font-mono), "JetBrains Mono", monospace',
+    fontFamily: 'var(--font-mono), "Suisse Mono", monospace',
     fontSize: '12px',
     lineHeight: '1.6',
     direction: 'ltr',
