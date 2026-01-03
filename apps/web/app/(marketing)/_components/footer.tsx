@@ -11,7 +11,7 @@ export function Footer() {
   return (
     <footer className="bg-zinc-950 py-20">
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-8 px-6">
-        {/* Wordmark */}
+        {/* Logo */}
         <Link href="/" className="transition-opacity hover:opacity-70">
           <Image
             src="/images/sparlo-logo-white.png"
