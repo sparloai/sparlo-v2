@@ -62,18 +62,20 @@ function Tooltip({
 }
 
 /**
- * Settings dropdown menu
+ * Settings dropdown menu - Sparlo design system
  */
 function SettingsDropdown({
   isOpen,
   onClose,
   onSignOut,
   collapsed,
+  userEmail,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSignOut: () => void;
   collapsed: boolean;
+  userEmail?: string | null;
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -107,50 +109,67 @@ function SettingsDropdown({
     <div
       ref={dropdownRef}
       className={cn(
-        'absolute bottom-full mb-2 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-800',
-        collapsed ? 'left-full ml-2' : 'right-0 left-0 mx-3',
+        'absolute bottom-full mb-3 rounded-xl border border-zinc-200 bg-white p-1.5 shadow-lg dark:border-zinc-800 dark:bg-zinc-900',
+        collapsed ? 'left-full ml-3 w-56' : 'right-0 left-0 mx-2',
       )}
     >
+      {/* User Info Header with signature left border */}
+      {userEmail && (
+        <>
+          <div className="border-l-2 border-zinc-900 px-3 py-3 dark:border-zinc-100">
+            <span className="mb-1 block text-[11px] font-semibold tracking-[0.08em] text-zinc-400 uppercase dark:text-zinc-500">
+              Signed in as
+            </span>
+            <span className="block truncate text-[15px] font-medium tracking-[-0.01em] text-zinc-900 dark:text-white">
+              {userEmail}
+            </span>
+          </div>
+          <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
+        </>
+      )}
+
       <Link
         href={pathsConfig.app.personalAccountSettings}
         onClick={onClose}
-        className="flex min-h-[44px] items-center gap-2 px-3 py-2 text-base text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
-        <SettingsIcon className="h-5 w-5" />
+        <SettingsIcon className="h-[18px] w-[18px] flex-shrink-0" />
         Settings
       </Link>
       <Link
         href={pathsConfig.app.personalAccountBilling}
         onClick={onClose}
-        className="flex min-h-[44px] items-center gap-2 px-3 py-2 text-base text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
-        <BillingIcon className="h-5 w-5" />
+        <BillingIcon className="h-[18px] w-[18px] flex-shrink-0" />
         Billing
       </Link>
       <a
         href="mailto:support@sparlo.ai"
         onClick={onClose}
-        className="flex min-h-[44px] items-center gap-2 px-3 py-2 text-base text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
-        <HelpIcon className="h-5 w-5" />
+        <HelpIcon className="h-[18px] w-[18px] flex-shrink-0" />
         Help
       </a>
-      <div className="my-1 border-t border-zinc-200 dark:border-zinc-700" />
+
+      <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
+
       <button
         onClick={() => {
           onSignOut();
           onClose();
         }}
-        className="flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-base text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
-        <LogOutIcon className="h-5 w-5" />
-        Log out
+        <LogOutIcon className="h-[18px] w-[18px] flex-shrink-0" />
+        Sign out
       </button>
     </div>
   );
 }
 
-// Icons
+// Icons - Consistent 1.5px stroke following Sparlo design system
 function PlusIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -158,9 +177,28 @@ function PlusIcon({ className }: { className?: string }) {
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      strokeWidth={2}
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+      <path d="M12 4v16m8-8H4" />
+    </svg>
+  );
+}
+
+function ChevronUpDownIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="m7 15 5 5 5-5" />
+      <path d="m7 9 5-5 5 5" />
     </svg>
   );
 }
@@ -169,16 +207,18 @@ function ReportsIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
-      />
+      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+      <polyline points="14,2 14,8 20,8" />
+      <line x1="16" x2="8" y1="13" y2="13" />
+      <line x1="16" x2="8" y1="17" y2="17" />
+      <line x1="10" x2="8" y1="9" y2="9" />
     </svg>
   );
 }
@@ -187,21 +227,15 @@ function SettingsIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"
-      />
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-      />
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
@@ -210,16 +244,15 @@ function BillingIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
-      />
+      <rect width="20" height="14" x="2" y="5" rx="2" />
+      <line x1="2" x2="22" y1="10" y2="10" />
     </svg>
   );
 }
@@ -228,16 +261,16 @@ function HelpIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
-      />
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+      <path d="M12 17h.01" />
     </svg>
   );
 }
@@ -246,16 +279,16 @@ function LogOutIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"
-      />
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" x2="9" y1="12" y2="12" />
     </svg>
   );
 }
@@ -264,16 +297,16 @@ function CollapseIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12"
-      />
+      <rect width="18" height="18" x="3" y="3" rx="2" />
+      <path d="M9 3v18" />
+      <path d="m14 9-3 3 3 3" />
     </svg>
   );
 }
@@ -282,16 +315,16 @@ function ExpandIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-      />
+      <rect width="18" height="18" x="3" y="3" rx="2" />
+      <path d="M9 3v18" />
+      <path d="m16 15-3-3 3-3" />
     </svg>
   );
 }
@@ -300,16 +333,15 @@ function CloseIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
       stroke="currentColor"
       strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M6 18L18 6M6 6l12 12"
-      />
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
     </svg>
   );
 }
@@ -508,6 +540,7 @@ export const NavSidebar = memo(function NavSidebar({
             onClose={() => setSettingsOpen(false)}
             onSignOut={handleSignOut}
             collapsed={collapsed && !isMobile}
+            userEmail={user.email}
           />
 
           <div
@@ -516,7 +549,7 @@ export const NavSidebar = memo(function NavSidebar({
             onMouseLeave={() => setHoveredItem(null)}
           >
             <Tooltip
-              label="Settings"
+              label={user.email || 'Settings'}
               show={
                 collapsed &&
                 !isMobile &&
@@ -527,16 +560,35 @@ export const NavSidebar = memo(function NavSidebar({
               <button
                 onClick={() => setSettingsOpen(!settingsOpen)}
                 className={cn(
-                  'flex min-h-[44px] w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-base text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
-                  collapsed && !isMobile ? 'justify-center px-3' : 'px-4',
-                  settingsOpen && 'bg-zinc-100 dark:bg-zinc-800',
+                  'group/settings flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 transition-colors',
+                  collapsed && !isMobile ? 'justify-center px-3' : 'px-3',
+                  settingsOpen
+                    ? 'bg-zinc-100 dark:bg-zinc-800'
+                    : 'hover:bg-zinc-100 dark:hover:bg-zinc-800',
                 )}
               >
-                <SettingsIcon className="h-5 w-5 flex-shrink-0" />
+                {/* User Avatar */}
+                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-[13px] font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
+                  {(user.email?.[0] || 'U').toUpperCase()}
+                </div>
+
                 {(!collapsed || isMobile) && (
-                  <span className="flex-1 truncate text-left">
-                    {workspace.name || user.email || 'Settings'}
-                  </span>
+                  <>
+                    <div className="flex flex-1 flex-col truncate text-left">
+                      <span className="truncate text-[15px] font-medium tracking-[-0.01em] text-zinc-900 dark:text-white">
+                        {workspace.name || 'My Account'}
+                      </span>
+                      <span className="truncate text-[13px] tracking-[-0.02em] text-zinc-500 dark:text-zinc-400">
+                        {user.email}
+                      </span>
+                    </div>
+                    <ChevronUpDownIcon
+                      className={cn(
+                        'h-4 w-4 flex-shrink-0 text-zinc-400 transition-colors dark:text-zinc-500',
+                        settingsOpen && 'text-zinc-600 dark:text-zinc-300',
+                      )}
+                    />
+                  </>
                 )}
               </button>
             </Tooltip>

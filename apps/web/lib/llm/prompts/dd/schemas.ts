@@ -111,6 +111,7 @@ export const CommercialAssumptionCategory = z.enum([
   'TIMELINE',
   'ECOSYSTEM',
   'SCALEUP',
+  'POLICY',
 ]);
 
 // Commercial viability verdicts
@@ -673,6 +674,7 @@ export const DD3_5_M_OutputSchema = z.object({
         'SIGNED',
         'IN_DISCUSSION',
         'IDENTIFIED',
+        'PARTIALLY_IDENTIFIED',
         'UNCLEAR',
       ]),
     }),
