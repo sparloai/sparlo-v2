@@ -77,17 +77,16 @@ export const Navigation = memo(function Navigation({
     setMobileMenuOpen(false);
   }, []);
 
-  const isDark = variant === 'dark';
+  // Use light colors when at top of dark hero, dark colors when scrolled
+  const useLightUI = variant === 'dark' && !scrolled;
 
   return (
     <>
       <header
         className={cn(
-          'fixed top-0 right-0 left-0 z-50 transition-all duration-300',
+          'fixed top-0 right-0 left-0 z-50 transition-all duration-500',
           scrolled
-            ? isDark
-              ? 'border-b border-white/10 bg-zinc-950/60 backdrop-blur-xl'
-              : 'border-b border-zinc-200 bg-white/90 backdrop-blur-sm'
+            ? 'bg-white/80 shadow-[0_1px_0_rgba(0,0,0,0.04)] backdrop-blur-md'
             : 'bg-transparent',
         )}
       >
@@ -98,14 +97,14 @@ export const Navigation = memo(function Navigation({
             <Link href="/" className="transition-opacity hover:opacity-80">
               <Image
                 src={
-                  isDark
+                  useLightUI
                     ? '/images/sparlo-logo-white.png'
                     : '/images/sparlo-logo.png'
                 }
                 alt="Sparlo"
                 width={90}
                 height={24}
-                className="h-6 w-auto"
+                className="h-6 w-auto transition-opacity duration-500"
                 priority
               />
             </Link>
@@ -126,9 +125,9 @@ export const Navigation = memo(function Navigation({
                 <Link
                   href={pathsConfig.auth.signIn}
                   className={cn(
-                    'text-[14px] leading-[1.2] tracking-[-0.02em] transition-colors',
-                    isDark
-                      ? 'text-zinc-400 hover:text-white'
+                    'text-[14px] leading-[1.2] tracking-[-0.02em] transition-colors duration-500',
+                    useLightUI
+                      ? 'text-white/70 hover:text-white'
                       : 'text-zinc-500 hover:text-zinc-900',
                   )}
                 >
@@ -137,8 +136,8 @@ export const Navigation = memo(function Navigation({
                 <Link
                   href={pathsConfig.auth.signUp}
                   className={cn(
-                    'rounded px-4 py-2 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors',
-                    isDark
+                    'rounded px-4 py-2 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors duration-500',
+                    useLightUI
                       ? 'bg-white text-zinc-900 hover:bg-zinc-100'
                       : 'bg-zinc-900 text-white hover:bg-zinc-800',
                   )}
@@ -152,8 +151,8 @@ export const Navigation = memo(function Navigation({
           {/* Mobile Menu Button */}
           <button
             className={cn(
-              'p-2 md:hidden',
-              isDark ? 'text-white' : 'text-zinc-900',
+              'p-2 transition-colors duration-500 md:hidden',
+              useLightUI ? 'text-white' : 'text-zinc-900',
             )}
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open menu"
