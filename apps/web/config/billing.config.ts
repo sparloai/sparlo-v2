@@ -21,7 +21,7 @@ export default createBillingSchema({
           interval: 'month',
           lineItems: [
             {
-              id: 'price_1ShDIuEvKpUSC4D5L44n2jvV',
+              id: 'price_1SlTJFEe4gCtTPhv72apc9yq',
               name: 'Core',
               cost: 19900,
               type: 'flat' as const,
@@ -35,7 +35,7 @@ export default createBillingSchema({
           interval: 'year',
           lineItems: [
             {
-              id: 'price_core_annual',
+              id: 'price_1SlTQcEe4gCtTPhvAyhzMLGE',
               name: 'Core',
               cost: 199000,
               type: 'flat' as const,
@@ -59,7 +59,7 @@ export default createBillingSchema({
           interval: 'month',
           lineItems: [
             {
-              id: 'price_1ShDJwEvKpUSC4D5fKIiTcNf',
+              id: 'price_1SlTLUEe4gCtTPhvwy9m7oKd',
               name: 'Pro',
               cost: 49900,
               type: 'flat' as const,
@@ -73,7 +73,7 @@ export default createBillingSchema({
           interval: 'year',
           lineItems: [
             {
-              id: 'price_pro_annual',
+              id: 'price_1SlTQ3Ee4gCtTPhvjZz8TuaA',
               name: 'Pro',
               cost: 499000,
               type: 'flat' as const,
@@ -96,7 +96,7 @@ export default createBillingSchema({
           interval: 'month',
           lineItems: [
             {
-              id: 'price_1ShDLCEvKpUSC4D5DVyqvaJS',
+              id: 'price_1SlTMmEe4gCtTPhv4Uj5295n',
               name: 'Max',
               cost: 99900,
               type: 'flat' as const,
@@ -110,7 +110,7 @@ export default createBillingSchema({
           interval: 'year',
           lineItems: [
             {
-              id: 'price_max_annual',
+              id: 'price_1SlTPGEe4gCtTPhvv5of2HDt',
               name: 'Max',
               cost: 999000,
               type: 'flat' as const,
