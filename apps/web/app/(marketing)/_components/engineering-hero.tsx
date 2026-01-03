@@ -103,6 +103,11 @@ export const EngineeringHero = memo(function EngineeringHero() {
         >
           Run Analysis
         </Link>
+
+        {/* Value Prop */}
+        <p className="mt-3 text-[13px] tracking-[-0.02em] text-white/50">
+          First Report Free
+        </p>
       </div>
 
       {/* Scroll indicator */}
