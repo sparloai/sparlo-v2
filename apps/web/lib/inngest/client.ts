@@ -74,6 +74,18 @@ export const HybridClarificationAnsweredEventSchema = z.object({
   answer: z.string().min(1),
 });
 
+// DD Mode event schemas (Due Diligence for investor technical analysis)
+export const DDReportGenerateEventSchema = z.object({
+  reportId: z.string().uuid(),
+  accountId: z.string().uuid(),
+  userId: z.string().uuid(),
+  companyName: z.string().min(1),
+  startupMaterials: z.string().min(100),
+  vcNotes: z.string().optional(),
+  conversationId: z.string(),
+  attachments: z.array(AttachmentSchema).optional(),
+});
+
 // Cancel event schema
 export const ReportCancelEventSchema = z.object({
   reportId: z.string().uuid(),
@@ -98,6 +110,7 @@ export type HybridReportGenerateEvent = z.infer<
 export type HybridClarificationAnsweredEvent = z.infer<
   typeof HybridClarificationAnsweredEventSchema
 >;
+export type DDReportGenerateEvent = z.infer<typeof DDReportGenerateEventSchema>;
 
 /**
  * Type-safe event definitions for Inngest
@@ -115,9 +128,14 @@ type Events = {
   'report/hybrid-clarification-answered': {
     data: HybridClarificationAnsweredEvent;
   };
+  // DD Mode events (Due Diligence)
+  'report/generate-dd': { data: DDReportGenerateEvent };
   // Cancel event (works for all report types)
   'report/cancel.requested': { data: ReportCancelEvent };
 };
+
+// Shared schemas configuration
+const eventSchemas = new EventSchemas().fromRecord<Events>();
 
 /**
  * Inngest client with typed events
@@ -126,15 +144,20 @@ type Events = {
  * - Production: Set INNGEST_ENCRYPTION_KEY to encrypt event data (shows as blobs in dashboard)
  * - Development: Don't set the key to see full JSON in Inngest dashboard for debugging
  */
-export const inngest = process.env.INNGEST_ENCRYPTION_KEY
-  ? new Inngest({
+function createInngestClient() {
+  if (process.env.INNGEST_ENCRYPTION_KEY) {
+    return new Inngest({
       id: 'sparlo-v2',
-      schemas: new EventSchemas().fromRecord<Events>(),
+      schemas: eventSchemas,
       middleware: [
         encryptionMiddleware({ key: process.env.INNGEST_ENCRYPTION_KEY }),
       ],
-    })
-  : new Inngest({
-      id: 'sparlo-v2',
-      schemas: new EventSchemas().fromRecord<Events>(),
     });
+  }
+  return new Inngest({
+    id: 'sparlo-v2',
+    schemas: eventSchemas,
+  });
+}
+
+export const inngest = createInngestClient();
