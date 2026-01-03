@@ -125,10 +125,10 @@ export const Navigation = memo(function Navigation({
                 <Link
                   href={pathsConfig.auth.signIn}
                   className={cn(
-                    'text-[14px] leading-[1.2] tracking-[-0.02em] transition-colors duration-500',
+                    'inline-flex min-h-[44px] items-center text-base leading-[1.2] tracking-[-0.02em] transition-all duration-500',
                     useLightUI
-                      ? 'text-white/70 hover:text-white'
-                      : 'text-zinc-500 hover:text-zinc-900',
+                      ? 'text-white/70 hover:text-white hover:underline'
+                      : 'text-zinc-500 hover:text-zinc-900 hover:underline',
                   )}
                 >
                   Sign In
@@ -136,10 +136,10 @@ export const Navigation = memo(function Navigation({
                 <Link
                   href={pathsConfig.auth.signUp}
                   className={cn(
-                    'rounded px-4 py-2 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] transition-colors duration-500',
+                    'inline-flex min-h-[44px] items-center rounded px-6 py-2 text-base leading-[1.2] font-medium tracking-[-0.02em] transition-all duration-500',
                     useLightUI
-                      ? 'bg-white text-zinc-900 hover:bg-zinc-100'
-                      : 'bg-zinc-900 text-white hover:bg-zinc-800',
+                      ? 'bg-white text-zinc-900 hover:bg-zinc-100 hover:shadow-md'
+                      : 'bg-zinc-900 text-white hover:bg-zinc-800 hover:shadow-md',
                   )}
                 >
                   Get Started
@@ -151,14 +151,14 @@ export const Navigation = memo(function Navigation({
           {/* Mobile Menu Button */}
           <button
             className={cn(
-              'p-2 transition-colors duration-500 md:hidden',
+              'inline-flex min-h-[44px] min-w-[44px] items-center justify-center transition-colors duration-500 md:hidden',
               useLightUI ? 'text-white' : 'text-zinc-900',
             )}
             onClick={() => setMobileMenuOpen(true)}
             aria-label="Open menu"
           >
             <svg
-              className="h-5 w-5"
+              className="h-6 w-6"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -208,11 +208,11 @@ const MobileMenu = memo(function MobileMenu({
         </Link>
         <button
           onClick={onClose}
-          className="p-2 text-white"
+          className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-white"
           aria-label="Close menu"
         >
           <svg
-            className="h-5 w-5"
+            className="h-6 w-6"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -236,14 +236,14 @@ const MobileMenu = memo(function MobileMenu({
               <Link
                 href={pathsConfig.app.home}
                 onClick={onClose}
-                className="block text-[16px] leading-[1.2] tracking-[-0.02em] text-white"
+                className="block min-h-[44px] py-2 text-lg leading-[1.2] tracking-[-0.02em] text-white transition-colors hover:text-zinc-300"
               >
                 Dashboard
               </Link>
               <Link
                 href={pathsConfig.app.personalAccountSettings}
                 onClick={onClose}
-                className="block text-[16px] leading-[1.2] tracking-[-0.02em] text-zinc-400"
+                className="block min-h-[44px] py-2 text-lg leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white"
               >
                 Settings
               </Link>
@@ -252,7 +252,7 @@ const MobileMenu = memo(function MobileMenu({
                   signOut.mutateAsync();
                   onClose();
                 }}
-                className="block text-[16px] leading-[1.2] tracking-[-0.02em] text-zinc-400"
+                className="block min-h-[44px] py-2 text-lg leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white"
               >
                 Sign Out
               </button>
@@ -262,14 +262,14 @@ const MobileMenu = memo(function MobileMenu({
               <Link
                 href={pathsConfig.auth.signIn}
                 onClick={onClose}
-                className="block text-[16px] leading-[1.2] tracking-[-0.02em] text-zinc-400"
+                className="block min-h-[44px] py-2 text-lg leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white"
               >
                 Sign In
               </Link>
               <Link
                 href={pathsConfig.auth.signUp}
                 onClick={onClose}
-                className="inline-block rounded bg-white px-6 py-3 text-[15px] leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900"
+                className="inline-flex min-h-[44px] items-center rounded bg-white px-6 py-3 text-base leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:bg-zinc-100"
               >
                 Get Started
               </Link>

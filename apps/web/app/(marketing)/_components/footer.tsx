@@ -25,30 +25,30 @@ export function Footer() {
         {/* Contact */}
         <a
           href="mailto:help@sparlo.ai"
-          className="text-[13px] tracking-[-0.02em] text-zinc-500 transition-colors hover:text-zinc-300"
+          className="text-base tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white hover:underline"
         >
           help@sparlo.ai
         </a>
 
         {/* Legal Links */}
-        <div className="flex items-center gap-3 text-[12px] tracking-[-0.02em] text-zinc-600">
+        <div className="flex items-center gap-4 text-base tracking-[-0.02em] text-zinc-500">
           <Link
             href="/privacy-policy"
-            className="transition-colors hover:text-zinc-400"
+            className="transition-colors hover:text-white hover:underline"
           >
             Privacy
           </Link>
           <span className="text-zinc-700">·</span>
           <Link
             href="/terms-of-service"
-            className="transition-colors hover:text-zinc-400"
+            className="transition-colors hover:text-white hover:underline"
           >
             Terms
           </Link>
         </div>
 
         {/* Copyright */}
-        <p className="text-[11px] tracking-[-0.01em] text-zinc-700">
+        <p className="text-base tracking-[-0.01em] text-zinc-500">
           © 2025 Sparlo, Inc.
         </p>
       </div>

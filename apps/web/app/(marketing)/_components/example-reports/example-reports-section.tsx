@@ -87,7 +87,7 @@ export function ExampleReportsSection() {
           <h2 className="text-[28px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[36px] dark:text-white">
             Example Reports
           </h2>
-          <p className="mt-4 max-w-[50ch] text-[18px] leading-[1.4] font-normal tracking-[-0.02em] text-zinc-500 dark:text-zinc-400">
+          <p className="mt-4 max-w-[50ch] text-lg leading-[1.2] font-normal tracking-[-0.02em] text-zinc-500 dark:text-zinc-400">
             Explore real innovation intelligence reports across industries.
           </p>
         </div>
@@ -121,7 +121,7 @@ export function ExampleReportsSection() {
                   }
                 }}
                 className={cn(
-                  'flex shrink-0 items-center gap-2 rounded-md px-4 py-2.5 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] whitespace-nowrap transition-all',
+                  'flex min-h-[44px] shrink-0 items-center gap-2 rounded-md px-4 py-2.5 text-base leading-[1.2] font-medium tracking-[-0.02em] whitespace-nowrap transition-all',
                   activeTab === i
                     ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
                     : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100',
@@ -191,7 +191,7 @@ const StickyTocSidebar = memo(function StickyTocSidebar({
       {/* top-36 = 144px to clear the sticky tab bar (top-16 + ~48px height + padding) */}
       <nav className="sticky top-36 max-h-[calc(100vh-10rem)] overflow-y-auto">
         {/* Contents label */}
-        <p className="mb-4 text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
+        <p className="mb-4 text-xs font-medium tracking-[0.08em] text-zinc-400 uppercase">
           Contents
         </p>
 
@@ -201,7 +201,7 @@ const StickyTocSidebar = memo(function StickyTocSidebar({
               <button
                 onClick={() => onNavigate(section.id)}
                 className={cn(
-                  'relative block w-full py-1.5 text-left text-[14px] transition-colors',
+                  'relative block min-h-[36px] w-full py-2 text-left text-sm transition-colors',
                   activeSection === section.id
                     ? 'font-medium text-zinc-900'
                     : 'text-zinc-500 hover:text-zinc-900',
@@ -222,7 +222,7 @@ const StickyTocSidebar = memo(function StickyTocSidebar({
                       <button
                         onClick={() => onNavigate(sub.id)}
                         className={cn(
-                          'block w-full py-1 text-left text-[13px] transition-colors',
+                          'block min-h-[32px] w-full py-1.5 text-left text-sm transition-colors',
                           activeSection === sub.id
                             ? 'text-zinc-700'
                             : 'text-zinc-400 hover:text-zinc-600',
@@ -281,13 +281,13 @@ function LockedOverlay({ report }: { report: Report }) {
           <h3 className="text-[24px] leading-[1.2] font-semibold tracking-[-0.02em] text-zinc-900 dark:text-white">
             Premium Report
           </h3>
-          <p className="mt-2 max-w-sm text-[16px] leading-[1.2] tracking-[-0.02em] text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 max-w-sm text-base leading-[1.2] tracking-[-0.02em] text-zinc-600 dark:text-zinc-400">
             Sign up to access the full {report.title} analysis and all other
             intelligence reports.
           </p>
           <a
             href="/auth/sign-up"
-            className="mt-6 inline-block rounded-md bg-zinc-900 px-6 py-3 text-[14px] leading-[1.2] font-medium tracking-[-0.02em] text-white transition-colors hover:bg-zinc-800"
+            className="mt-6 inline-flex min-h-[44px] items-center rounded-md bg-zinc-900 px-6 py-3 text-base leading-[1.2] font-medium tracking-[-0.02em] text-white transition-colors hover:bg-zinc-800"
           >
             Get Started Free
           </a>
@@ -306,10 +306,10 @@ function ReportContent({ report }: { report: Report }) {
           <h1 className="text-[36px] leading-[1.2] font-semibold tracking-[-0.02em] text-zinc-900 lg:text-[48px] dark:text-white">
             {report.title}
           </h1>
-          <p className="text-[18px] leading-[1.2] tracking-[-0.02em] text-zinc-600 dark:text-zinc-400">
+          <p className="text-lg leading-[1.2] tracking-[-0.02em] text-zinc-600 dark:text-zinc-400">
             {report.subtitle}
           </p>
-          <div className="flex items-center gap-3 text-[14px] leading-[1.2] tracking-[-0.02em] text-zinc-500 dark:text-zinc-500">
+          <div className="flex items-center gap-3 text-base leading-[1.2] tracking-[-0.02em] text-zinc-500 dark:text-zinc-500">
             <span>{report.metadata.readTime}</span>
             <span className="text-zinc-300 dark:text-zinc-700">•</span>
             <span>{report.metadata.dataPoints}</span>

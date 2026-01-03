@@ -51,7 +51,7 @@ function Tooltip({
     <div className="relative">
       {children}
       {show && (
-        <div className="pointer-events-none absolute top-1/2 left-full z-50 ml-3 -translate-y-1/2 rounded bg-zinc-900 px-2.5 py-1.5 text-[12px] whitespace-nowrap text-white shadow-lg">
+        <div className="pointer-events-none absolute top-1/2 left-full z-50 ml-3 -translate-y-1/2 rounded bg-zinc-900 px-2.5 py-1.5 text-sm whitespace-nowrap text-white shadow-lg">
           {label}
           {/* Arrow */}
           <div className="absolute top-1/2 right-full -translate-y-1/2 border-4 border-transparent border-r-zinc-900" />
@@ -114,25 +114,25 @@ function SettingsDropdown({
       <Link
         href={pathsConfig.app.personalAccountSettings}
         onClick={onClose}
-        className="flex items-center gap-2 px-3 py-2 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        className="flex min-h-[44px] items-center gap-2 px-3 py-2 text-base text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
       >
-        <SettingsIcon className="h-4 w-4" />
+        <SettingsIcon className="h-5 w-5" />
         Settings
       </Link>
       <Link
         href={pathsConfig.app.personalAccountBilling}
         onClick={onClose}
-        className="flex items-center gap-2 px-3 py-2 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        className="flex min-h-[44px] items-center gap-2 px-3 py-2 text-base text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
       >
-        <BillingIcon className="h-4 w-4" />
+        <BillingIcon className="h-5 w-5" />
         Billing
       </Link>
       <a
         href="mailto:support@sparlo.ai"
         onClick={onClose}
-        className="flex items-center gap-2 px-3 py-2 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        className="flex min-h-[44px] items-center gap-2 px-3 py-2 text-base text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
       >
-        <HelpIcon className="h-4 w-4" />
+        <HelpIcon className="h-5 w-5" />
         Help
       </a>
       <div className="my-1 border-t border-zinc-200 dark:border-zinc-700" />
@@ -141,9 +141,9 @@ function SettingsDropdown({
           onSignOut();
           onClose();
         }}
-        className="flex w-full items-center gap-2 px-3 py-2 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        className="flex min-h-[44px] w-full items-center gap-2 px-3 py-2 text-base text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-700"
       >
-        <LogOutIcon className="h-4 w-4" />
+        <LogOutIcon className="h-5 w-5" />
         Log out
       </button>
     </div>
@@ -321,7 +321,13 @@ export const NavSidebar = memo(function NavSidebar({
 }: NavSidebarProps) {
   const router = useRouter();
   const signOut = useSignOut();
-  const { collapsed, setCollapsed, isMobile, mobileMenuOpen, setMobileMenuOpen } = useSidebarState();
+  const {
+    collapsed,
+    setCollapsed,
+    isMobile,
+    mobileMenuOpen,
+    setMobileMenuOpen,
+  } = useSidebarState();
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -369,162 +375,173 @@ export const NavSidebar = memo(function NavSidebar({
           isMobile && 'shadow-2xl',
         )}
       >
-      {/* Header */}
-      <div
-        className={cn(
-          'flex h-14 items-center border-b border-zinc-200 dark:border-zinc-800',
-          (collapsed && !isMobile) ? 'justify-center px-0' : 'justify-between px-4',
-        )}
-      >
-        {(!collapsed || isMobile) && (
-          <Link href="/home" onClick={handleLinkClick} className="transition-opacity hover:opacity-70">
-            <Image
-              src="/images/sparlo-logo.png"
-              alt="Sparlo"
-              width={80}
-              height={22}
-              className="h-[22px] w-auto dark:hidden"
-            />
-            <Image
-              src="/images/sparlo-logo-white.png"
-              alt="Sparlo"
-              width={80}
-              height={22}
-              className="hidden h-[22px] w-auto dark:block"
-            />
-          </Link>
-        )}
-        {isMobile ? (
-          <button
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-            aria-label="Close menu"
-          >
-            <CloseIcon className="h-5 w-5" />
-          </button>
-        ) : (
-          <button
-            onClick={toggleCollapsed}
-            className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? (
-              <ExpandIcon className="h-5 w-5" />
-            ) : (
-              <CollapseIcon className="h-5 w-5" />
-            )}
-          </button>
-        )}
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-3">
-        {/* New Analysis */}
+        {/* Header */}
         <div
-          className="mb-1 px-2"
-          onMouseEnter={() => setHoveredItem('new')}
-          onMouseLeave={() => setHoveredItem(null)}
+          className={cn(
+            'flex h-14 items-center border-b border-zinc-200 dark:border-zinc-800',
+            collapsed && !isMobile
+              ? 'justify-center px-0'
+              : 'justify-between px-4',
+          )}
         >
-          <Tooltip
-            label="New Analysis"
-            show={collapsed && !isMobile && hoveredItem === 'new'}
-          >
-            <button
-              onClick={handleNewAnalysis}
-              className={cn(
-                'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] font-medium transition-colors',
-                'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100',
-                (collapsed && !isMobile) ? 'justify-center px-3' : 'px-4',
-              )}
-            >
-              <PlusIcon className="h-5 w-5 flex-shrink-0" />
-              {(!collapsed || isMobile) && <span>New Analysis</span>}
-            </button>
-          </Tooltip>
-        </div>
-
-        {/* All Reports */}
-        <div
-          className="mb-4 px-2"
-          onMouseEnter={() => setHoveredItem('reports')}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Tooltip
-            label="All Reports"
-            show={collapsed && !isMobile && hoveredItem === 'reports'}
-          >
+          {(!collapsed || isMobile) && (
             <Link
-              href="/home/reports"
+              href="/home"
               onClick={handleLinkClick}
-              className={cn(
-                'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
-                (collapsed && !isMobile) ? 'justify-center px-3' : 'px-4',
-              )}
+              className="transition-opacity hover:opacity-70"
             >
-              <ReportsIcon className="h-5 w-5 flex-shrink-0" />
-              {(!collapsed || isMobile) && <span>All Reports</span>}
+              <Image
+                src="/images/sparlo-logo.png"
+                alt="Sparlo"
+                width={80}
+                height={22}
+                className="h-[22px] w-auto dark:hidden"
+              />
+              <Image
+                src="/images/sparlo-logo-white.png"
+                alt="Sparlo"
+                width={80}
+                height={22}
+                className="hidden h-[22px] w-auto dark:block"
+              />
             </Link>
-          </Tooltip>
-        </div>
-
-        {/* Recents - show when expanded or on mobile */}
-        {(!collapsed || isMobile) && recentReports.length > 0 && (
-          <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
-            <div className="mb-2 px-4 text-[11px] font-medium tracking-wider text-zinc-400 uppercase">
-              Recents
-            </div>
-            <div className="space-y-0.5 px-3">
-              {recentReports.slice(0, 10).map((report) => (
-                <Link
-                  key={report.id}
-                  href={`/home/reports/${report.id}`}
-                  onClick={handleLinkClick}
-                  className="block truncate rounded px-3 py-1.5 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-                >
-                  {report.title || 'Untitled Report'}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Bottom: Settings */}
-      <div className="relative border-t border-zinc-200 py-3 dark:border-zinc-800">
-        <SettingsDropdown
-          isOpen={settingsOpen}
-          onClose={() => setSettingsOpen(false)}
-          onSignOut={handleSignOut}
-          collapsed={collapsed && !isMobile}
-        />
-
-        <div
-          className="px-2"
-          onMouseEnter={() => setHoveredItem('settings')}
-          onMouseLeave={() => setHoveredItem(null)}
-        >
-          <Tooltip
-            label="Settings"
-            show={collapsed && !isMobile && hoveredItem === 'settings' && !settingsOpen}
-          >
+          )}
+          {isMobile ? (
             <button
-              onClick={() => setSettingsOpen(!settingsOpen)}
-              className={cn(
-                'flex w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
-                (collapsed && !isMobile) ? 'justify-center px-3' : 'px-4',
-                settingsOpen && 'bg-zinc-100 dark:bg-zinc-800',
-              )}
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+              aria-label="Close menu"
             >
-              <SettingsIcon className="h-5 w-5 flex-shrink-0" />
-              {(!collapsed || isMobile) && (
-                <span className="flex-1 truncate text-left">
-                  {workspace.name || user.email || 'Settings'}
-                </span>
+              <CloseIcon className="h-5 w-5" />
+            </button>
+          ) : (
+            <button
+              onClick={toggleCollapsed}
+              className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+              aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            >
+              {collapsed ? (
+                <ExpandIcon className="h-5 w-5" />
+              ) : (
+                <CollapseIcon className="h-5 w-5" />
               )}
             </button>
-          </Tooltip>
+          )}
         </div>
-      </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-3">
+          {/* New Analysis */}
+          <div
+            className="mb-1 px-2"
+            onMouseEnter={() => setHoveredItem('new')}
+            onMouseLeave={() => setHoveredItem(null)}
+          >
+            <Tooltip
+              label="New Analysis"
+              show={collapsed && !isMobile && hoveredItem === 'new'}
+            >
+              <button
+                onClick={handleNewAnalysis}
+                className={cn(
+                  'flex min-h-[44px] w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-base font-medium transition-colors',
+                  'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100',
+                  collapsed && !isMobile ? 'justify-center px-3' : 'px-4',
+                )}
+              >
+                <PlusIcon className="h-5 w-5 flex-shrink-0" />
+                {(!collapsed || isMobile) && <span>New Analysis</span>}
+              </button>
+            </Tooltip>
+          </div>
+
+          {/* All Reports */}
+          <div
+            className="mb-4 px-2"
+            onMouseEnter={() => setHoveredItem('reports')}
+            onMouseLeave={() => setHoveredItem(null)}
+          >
+            <Tooltip
+              label="All Reports"
+              show={collapsed && !isMobile && hoveredItem === 'reports'}
+            >
+              <Link
+                href="/home/reports"
+                onClick={handleLinkClick}
+                className={cn(
+                  'flex min-h-[44px] w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-base text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
+                  collapsed && !isMobile ? 'justify-center px-3' : 'px-4',
+                )}
+              >
+                <ReportsIcon className="h-5 w-5 flex-shrink-0" />
+                {(!collapsed || isMobile) && <span>All Reports</span>}
+              </Link>
+            </Tooltip>
+          </div>
+
+          {/* Recents - show when expanded or on mobile */}
+          {(!collapsed || isMobile) && recentReports.length > 0 && (
+            <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
+              <div className="mb-2 px-4 text-xs font-medium tracking-wider text-zinc-400 uppercase">
+                Recents
+              </div>
+              <div className="space-y-0.5 px-3">
+                {recentReports.slice(0, 10).map((report) => (
+                  <Link
+                    key={report.id}
+                    href={`/home/reports/${report.id}`}
+                    onClick={handleLinkClick}
+                    className="block min-h-[36px] truncate rounded px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+                  >
+                    {report.title || 'Untitled Report'}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </nav>
+
+        {/* Bottom: Settings */}
+        <div className="relative border-t border-zinc-200 py-3 dark:border-zinc-800">
+          <SettingsDropdown
+            isOpen={settingsOpen}
+            onClose={() => setSettingsOpen(false)}
+            onSignOut={handleSignOut}
+            collapsed={collapsed && !isMobile}
+          />
+
+          <div
+            className="px-2"
+            onMouseEnter={() => setHoveredItem('settings')}
+            onMouseLeave={() => setHoveredItem(null)}
+          >
+            <Tooltip
+              label="Settings"
+              show={
+                collapsed &&
+                !isMobile &&
+                hoveredItem === 'settings' &&
+                !settingsOpen
+              }
+            >
+              <button
+                onClick={() => setSettingsOpen(!settingsOpen)}
+                className={cn(
+                  'flex min-h-[44px] w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-base text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
+                  collapsed && !isMobile ? 'justify-center px-3' : 'px-4',
+                  settingsOpen && 'bg-zinc-100 dark:bg-zinc-800',
+                )}
+              >
+                <SettingsIcon className="h-5 w-5 flex-shrink-0" />
+                {(!collapsed || isMobile) && (
+                  <span className="flex-1 truncate text-left">
+                    {workspace.name || user.email || 'Settings'}
+                  </span>
+                )}
+              </button>
+            </Tooltip>
+          </div>
+        </div>
       </aside>
     </>
   );
