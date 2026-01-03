@@ -84,6 +84,48 @@ Example transformation:
 - BAD: "We help food companies reduce waste" (business framing)
 - GOOD: "Extend produce shelf life from 7 to 21 days at ambient temperature without active refrigeration, at <$0.05/kg cost" (engineering framing)
 
+## COMMERCIAL ASSUMPTION EXTRACTION
+
+Deep tech startups embed commercial assumptions that are often more fragile than their physics. Extract them alongside technical claims.
+
+### Assumption Categories
+
+**UNIT ECONOMICS**
+- What cost do they claim at scale?
+- What scale is required for that cost?
+- What's the cost TODAY vs. projected?
+- What drives the cost reduction? (learning curve, scale, breakthrough required?)
+- What are gross margins at scale?
+
+**MARKET ASSUMPTIONS**
+- Who is the customer? (Be specific — not "energy companies" but which ones)
+- What's the stated/implied willingness to pay?
+- What's the sales cycle length?
+- Does the market exist TODAY or are they waiting for one to emerge?
+
+**GO-TO-MARKET**
+- How do they plan to sell?
+- What's the path from pilot to commercial?
+- What partnerships/channels are required?
+- What's the land-and-expand motion?
+
+**TIMELINE ASSUMPTIONS**
+- When do they claim commercial scale?
+- When do they claim profitability?
+- How does this compare to typical deep tech timelines (7-10 years to meaningful scale)?
+- What are the critical path dependencies?
+
+**ECOSYSTEM DEPENDENCIES**
+- What infrastructure must exist that doesn't today?
+- What standards/regulations must change?
+- What complementary technologies must mature?
+- Who else must succeed for them to succeed?
+
+**SCALE-UP ASSUMPTIONS**
+- What changes from pilot to commercial?
+- What's the capital required for scale-up?
+- What are the known hard problems at scale?
+
 ## RED FLAGS (Auto-detect)
 
 - Performance claims exceeding theoretical limits
@@ -185,6 +227,36 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     "competitor_queries": ["Queries to find competitors they didn't mention"],
     "mechanism_queries": ["Queries to validate underlying science"],
     "failure_mode_queries": ["Queries to find why similar approaches failed"]
+  },
+
+  "commercial_assumptions": [
+    {
+      "id": "comm-1",
+      "assumption": "The specific assumption stated or implied",
+      "category": "UNIT_ECONOMICS | MARKET | GTM | TIMELINE | ECOSYSTEM | SCALEUP",
+      "stated_or_implied": "STATED | IMPLIED",
+      "source_in_materials": "Where this appears or is implied",
+      "evidence_provided": "What backs this up (if anything)",
+      "validation_approach": "How we will check this",
+      "risk_if_wrong": "What happens if this assumption fails",
+      "validation_priority": "CRITICAL | HIGH | MEDIUM | LOW"
+    }
+  ],
+
+  "policy_dependencies": [
+    {
+      "policy": "Specific policy/regulation/incentive",
+      "dependency_level": "CRITICAL | HIGH | MEDIUM | LOW",
+      "current_status": "What the policy currently provides",
+      "risk_factors": "What could change"
+    }
+  ],
+
+  "ecosystem_map": {
+    "required_infrastructure": ["What must exist"],
+    "required_partners": ["Who they need"],
+    "required_technologies": ["What else must mature"],
+    "chicken_and_egg_problems": ["Coordination failures they face"]
   }
 }
 
@@ -466,6 +538,516 @@ export const DD3_M_METADATA = {
 };
 
 // ============================================
+// DD3.5-M: Commercialization Reality Check
+// ============================================
+
+export const DD3_5_M_PROMPT = `You are evaluating whether a technically valid deep tech approach can become a viable business.
+
+## CONTEXT
+
+You have:
+- DD0 output: Extracted claims including commercial assumptions
+- DD3 output: Technical validation results (physics works or doesn't)
+
+The physics has been validated. Now validate the business.
+
+## WHY THIS MATTERS
+
+Deep tech graveyards are full of companies where:
+- The physics worked but unit economics never closed
+- The product worked but no one would buy it at that price
+- The pilot succeeded but commercial scale was impossible
+- The technology was ready but the market wasn't
+- The startup was right but 10 years too early
+- The physics worked but policy changed and killed the economics
+
+Your job: Identify which of these traps this startup might fall into.
+
+## COMMERCIALIZATION FRAMEWORK
+
+### 1. UNIT ECONOMICS REALITY
+
+**Current vs. Claimed Analysis**
+- What does it cost TODAY at pilot scale?
+- What do they CLAIM at commercial scale?
+- What's the gap factor (e.g., 1.5x, 3x, 10x reduction needed)?
+- What specifically closes the gap?
+
+**Cost Reduction Validity**
+For each claimed cost reduction, assess:
+- Learning curve: Typical is 10-20% cost reduction per cumulative doubling. What are they assuming?
+- Scale effects: What actually gets cheaper at scale? What doesn't?
+- Magic assumptions: Are they assuming breakthroughs that haven't happened?
+
+**The 10x Question**
+- Is this 10x better than alternatives on the metric customers care about?
+- If only 2-3x better, is that enough to overcome switching costs and risk?
+- What's the "good enough" threshold for the market?
+
+**Margin Structure**
+- What are gross margins at claimed scale?
+- What's the capital intensity ($ per unit of capacity)?
+- When does this become cash-flow positive?
+- How does this compare to typical VC expectations?
+
+### 2. MARKET REALITY
+
+**Customer Identification**
+- Who SPECIFICALLY is the customer? (Names, not categories)
+- Have they talked to them? Sold to them? Signed LOIs?
+- What evidence exists of customer commitment?
+- What's the customer's ACTUAL willingness to pay (not hypothetical)?
+
+**Market Timing**
+- Does the market exist TODAY at meaningful scale?
+- If not, what triggers it? When?
+- Are they selling vitamins (nice-to-have) or painkillers (must-have)?
+- What's the forcing function that makes customers buy?
+
+**Competitive Dynamics**
+- What do customers use today? (The real alternative, including "do nothing")
+- What's the switching cost?
+- Why would customers take risk on a startup vs. waiting for incumbents?
+- What's the customer's cost of being wrong?
+
+### 3. GO-TO-MARKET REALITY
+
+**Sales Cycle Analysis**
+- How long from first contact to revenue? (Deep tech B2B: often 18-36 months)
+- Does their runway support this?
+- How many parallel opportunities can they pursue?
+
+**Path to Scale**
+- First customer → 10 customers: What's required? What's the timeline?
+- 10 → 100 customers: What changes? Where are step-function challenges?
+- What's the expansion motion within accounts?
+
+**Channel Strategy**
+- Direct sales? Partnerships? Licensing?
+- What's realistic for a company their size?
+- What partnerships are critical vs. nice-to-have?
+
+### 4. TIMELINE REALITY
+
+**Critical Path Analysis**
+- What's the actual sequence to commercial scale?
+- What's on critical path? What can be parallelized?
+- Where are the long poles?
+- What dependencies are outside their control?
+
+**VC Math Alignment**
+- Typical VC fund: 10-year life, deploy capital in years 1-5
+- Series A today needs clear exit path by year 7-8
+- Does their timeline fit this math?
+- What happens if they're 2 years slower than planned?
+
+**The "Too Early" Check**
+- Are they 2 years early? (Good — can ride the wave)
+- Are they 5-10 years early? (Dangerous — will run out of money)
+- What signals would tell you which?
+- What enabling conditions must be met?
+
+### 5. SCALE-UP REALITY
+
+**Pilot to Commercial Gap**
+- What works at pilot that breaks at scale?
+- What problems don't appear until scale?
+- What's the capital required to discover scale problems?
+
+**Manufacturing/Production Reality**
+- Can this be manufactured at claimed scale?
+- By whom? With what equipment?
+- Does the equipment exist or must it be invented?
+- What's the supply chain risk?
+
+**Valley of Death Analysis**
+- How much capital needed from working pilot to commercial revenue?
+- How long does this take?
+- What's the risk of getting stranded in between?
+- What milestones unlock additional capital?
+
+### 6. ECOSYSTEM DEPENDENCIES
+
+**Infrastructure Requirements**
+- What must exist that doesn't today?
+- Who builds it? Who pays for it?
+- What's the chicken-and-egg problem?
+- Can they succeed before the infrastructure exists?
+
+**Regulatory Path**
+- What approvals/permits/certifications are needed?
+- How long do they typically take?
+- What's the risk of regulatory change (positive or negative)?
+- Are there fast-track pathways?
+
+**Complementary Technologies**
+- What else must mature for this to work?
+- Are those on track?
+- What if they're delayed 2-3 years?
+
+### 7. POLICY DEPENDENCY
+
+**Critical Policy Analysis**
+For each policy the business depends on:
+- What does the policy provide? (Subsidy, mandate, tax credit, etc.)
+- What's the dependency level? (Business dies without it vs. nice tailwind)
+- What's the probability of adverse change?
+- What's the impact magnitude if it changes?
+- Is there a sunset provision?
+
+**Policy Scenario Analysis**
+- Base case: Current policy continues
+- Bear case: Policy reduced/eliminated
+- Bull case: Policy expanded
+- Which scenario are they underwriting?
+
+### 8. INCUMBENT RESPONSE
+
+**"What Does [Biggest Player] Do?"**
+- If this succeeds, what do large incumbents do?
+- Acquire? Copy? Crush? Ignore? Partner?
+- What determines which response?
+
+**Speed to Response**
+- How long before incumbents could replicate?
+- What's the startup's lead time?
+- Is the lead durable or temporary?
+
+**Acquisition Math**
+- Who are likely acquirers?
+- What triggers acquisition interest?
+- What's likely price range based on comps?
+- Is acquisition a realistic exit path?
+
+## OUTPUT FORMAT
+
+CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
+
+{
+  "commercialization_summary": {
+    "overall_verdict": "CLEAR_PATH | CHALLENGING_BUT_VIABLE | SIGNIFICANT_OBSTACLES | UNLIKELY_TO_COMMERCIALIZE",
+    "confidence": "HIGH | MEDIUM | LOW",
+    "one_paragraph": "Plain English summary of commercial viability. What's the path? What's hard? What's the timeline?",
+    "critical_commercial_risk": "The single biggest commercial risk",
+    "secondary_commercial_risks": ["Risk 2", "Risk 3"],
+    "timeline_to_meaningful_revenue": "Realistic estimate with basis",
+    "capital_to_commercial_scale": "$ estimate with basis",
+    "vc_timeline_fit": "FITS | STRETCHED | MISALIGNED"
+  },
+
+  "unit_economics_analysis": {
+    "current_unit_cost": {
+      "value": "$X/unit",
+      "basis": "How we know (pilot data, estimates)",
+      "confidence": "HIGH | MEDIUM | LOW"
+    },
+    "claimed_scale_cost": {
+      "value": "$Y/unit",
+      "basis": "Their stated projection"
+    },
+    "gap_factor": "X divided by Y",
+    "cost_reduction_assessment": {
+      "learning_curve": {
+        "assumption": "X% per doubling",
+        "verdict": "REALISTIC | OPTIMISTIC | UNREALISTIC",
+        "reasoning": "Why"
+      },
+      "scale_effects": {
+        "what_scales": ["Things that get cheaper"],
+        "what_doesnt": ["Things that don't"],
+        "verdict": "REALISTIC | OPTIMISTIC | UNREALISTIC"
+      },
+      "magic_assumptions": [
+        {
+          "assumption": "Breakthrough required",
+          "probability": "X%",
+          "impact_if_wrong": "What happens"
+        }
+      ]
+    },
+    "ten_x_analysis": {
+      "comparison_metric": "The metric customers care about",
+      "startup_performance": "Their value",
+      "incumbent_performance": "Alternative value",
+      "multiple": "Nx better/worse",
+      "switching_cost": "What customers give up to switch",
+      "sufficient_for_adoption": true,
+      "reasoning": "Why this multiple is/isn't enough"
+    },
+    "margin_structure": {
+      "gross_margin_at_scale": "X%",
+      "basis": "How derived",
+      "capital_intensity": "$/unit capacity",
+      "years_to_cash_flow_positive": "X years",
+      "total_capital_to_profitability": "$X"
+    },
+    "verdict": "VIABLE | CHALLENGING | UNLIKELY",
+    "reasoning": "Summary"
+  },
+
+  "market_reality": {
+    "customer_identification": {
+      "stated_customer": "Who they say",
+      "actual_buyer": "Who writes checks (may differ)",
+      "specificity": "SPECIFIC_NAMES | CATEGORIES_ONLY | VAGUE",
+      "evidence_of_demand": {
+        "lois_signed": 0,
+        "pilots_active": 1,
+        "conversations_claimed": "X",
+        "revenue_to_date": "$0",
+        "assessment": "VALIDATED | PARTIALLY_VALIDATED | UNVALIDATED"
+      },
+      "willingness_to_pay": {
+        "claimed": "$X",
+        "evidence": "What supports this",
+        "market_alternatives_cost": "$Y",
+        "premium_or_discount": "X% premium/discount to alternatives",
+        "credibility": "HIGH | MEDIUM | LOW"
+      }
+    },
+    "market_timing": {
+      "market_exists_today": true,
+      "current_market_size": "$X",
+      "projected_market_size": "$Y by YEAR",
+      "growth_driver": "What causes growth",
+      "timing_assessment": "RIGHT_TIME | 2_YEARS_EARLY | 5_PLUS_YEARS_EARLY | TOO_LATE",
+      "timing_reasoning": "Why"
+    },
+    "vitamin_or_painkiller": {
+      "assessment": "PAINKILLER | VITAMIN | UNCLEAR",
+      "forcing_function": "What makes customers HAVE to buy",
+      "what_happens_if_they_dont_buy": "Consequence for customer"
+    },
+    "competitive_position": {
+      "current_alternative": "What customers do today",
+      "switching_cost": "What customers give up",
+      "risk_for_customer": "What customer risks by switching",
+      "why_choose_startup": "Compelling reason to switch"
+    },
+    "verdict": "CLEAR_DEMAND | EMERGING_DEMAND | SPECULATIVE_DEMAND",
+    "reasoning": "Summary"
+  },
+
+  "gtm_reality": {
+    "sales_cycle": {
+      "estimated_months": 24,
+      "basis": "Industry typical / their data",
+      "runway_vs_cycle": "X months runway, Y month cycle",
+      "parallel_opportunities": "How many they can pursue",
+      "verdict": "SUSTAINABLE | TIGHT | UNSUSTAINABLE"
+    },
+    "path_to_scale": [
+      {
+        "stage": "0 → 1 customers",
+        "key_challenge": "What's hard",
+        "timeline_months": 12,
+        "capital_required": "$X",
+        "key_dependencies": ["What must happen"]
+      },
+      {
+        "stage": "1 → 10 customers",
+        "key_challenge": "What's hard",
+        "timeline_months": 24,
+        "capital_required": "$X",
+        "key_dependencies": ["What must happen"]
+      },
+      {
+        "stage": "10 → 100 customers",
+        "key_challenge": "What's hard",
+        "timeline_months": 36,
+        "capital_required": "$X",
+        "key_dependencies": ["What must happen"]
+      }
+    ],
+    "channel_strategy": {
+      "stated_approach": "Their plan",
+      "realistic_assessment": "What's actually feasible",
+      "critical_partnerships": ["Must-have partners"],
+      "partnership_status": "SIGNED | IN_DISCUSSION | IDENTIFIED | UNCLEAR"
+    },
+    "verdict": "CLEAR_PATH | CHALLENGING | UNCLEAR",
+    "reasoning": "Summary"
+  },
+
+  "timeline_reality": {
+    "critical_path": [
+      {
+        "milestone": "Description",
+        "their_timeline": "When they say",
+        "realistic_timeline": "Our assessment",
+        "dependencies": ["What must happen first"],
+        "risk_factors": ["What could delay"]
+      }
+    ],
+    "total_time_to_scale": {
+      "their_estimate": "X months",
+      "realistic_estimate": "Y months",
+      "gap_reasoning": "Why different"
+    },
+    "vc_math": {
+      "years_from_series_a_to_scale": "X years",
+      "fits_fund_timeline": true,
+      "exit_path_visibility": "CLEAR | EMERGING | UNCLEAR",
+      "likely_exit_type": "ACQUISITION | IPO | SECONDARY | UNCLEAR"
+    },
+    "too_early_assessment": {
+      "verdict": "RIGHT_TIME | 2_YEARS_EARLY | 5_PLUS_YEARS_EARLY",
+      "enabling_conditions_status": [
+        {
+          "condition": "What must be true",
+          "status": "MET | EMERGING | NOT_MET",
+          "timeline_to_met": "When it will be ready"
+        }
+      ],
+      "early_mover_tradeoff": "Does being early help or hurt?"
+    },
+    "verdict": "ALIGNED | STRETCHED | MISALIGNED",
+    "reasoning": "Summary"
+  },
+
+  "scaleup_reality": {
+    "pilot_to_commercial_gap": {
+      "what_changes": ["Things that break at scale"],
+      "known_hard_problems": ["Identified scale challenges"],
+      "unknown_unknowns_risk": "HIGH | MEDIUM | LOW",
+      "discovery_cost": "$ to find out what breaks"
+    },
+    "manufacturing": {
+      "can_be_manufactured": true,
+      "by_whom": "Who makes this at scale",
+      "equipment_exists": true,
+      "equipment_gap": "What must be built/bought",
+      "supply_chain_risks": ["Key risks"],
+      "verdict": "READY | NEEDS_DEVELOPMENT | MAJOR_GAPS"
+    },
+    "valley_of_death": {
+      "capital_required": "$X",
+      "time_required_months": 30,
+      "stranding_risk": "HIGH | MEDIUM | LOW",
+      "what_unlocks_next_capital": "Milestone that de-risks",
+      "fallback_if_stuck": "Options if they stall"
+    },
+    "verdict": "MANAGEABLE | CHALLENGING | SEVERE",
+    "reasoning": "Summary"
+  },
+
+  "ecosystem_dependencies": {
+    "infrastructure": [
+      {
+        "requirement": "What must exist",
+        "exists_today": false,
+        "who_builds": "Who",
+        "who_pays": "Who",
+        "timeline": "When ready",
+        "startup_can_succeed_without": false,
+        "chicken_egg_problem": "The coordination challenge"
+      }
+    ],
+    "regulatory": {
+      "approvals_needed": ["List"],
+      "typical_timeline_months": 18,
+      "fast_track_available": false,
+      "regulatory_risk": "HIGH | MEDIUM | LOW",
+      "adverse_change_probability": "X%"
+    },
+    "complementary_tech": [
+      {
+        "technology": "What must mature",
+        "current_readiness": "TRL X",
+        "needed_readiness": "TRL Y",
+        "timeline_to_ready": "When",
+        "owner": "Who's developing it",
+        "risk_if_delayed": "Impact"
+      }
+    ],
+    "verdict": "FEW_DEPENDENCIES | MANAGEABLE | HEAVILY_DEPENDENT",
+    "reasoning": "Summary"
+  },
+
+  "policy_dependency": {
+    "critical_policies": [
+      {
+        "policy": "Name (e.g., 45Q tax credit)",
+        "what_it_provides": "Benefit",
+        "current_value": "$X/unit",
+        "dependency_level": "CRITICAL | HIGH | MEDIUM | LOW",
+        "economics_without_it": "What happens to margins",
+        "sunset_date": "When it expires (if any)",
+        "change_probability": "X% chance of adverse change in 5 years",
+        "change_impact": "What happens if reduced/eliminated"
+      }
+    ],
+    "regulatory_tailwinds": ["Helpful trends"],
+    "regulatory_headwinds": ["Concerning trends"],
+    "policy_scenario_analysis": {
+      "base_case": "Current policy continues - impact on economics",
+      "bear_case": "Policy reduced/eliminated - impact on economics",
+      "bull_case": "Policy expanded - impact on economics"
+    },
+    "verdict": "LOW_EXPOSURE | MODERATE_EXPOSURE | HIGH_EXPOSURE",
+    "reasoning": "Summary"
+  },
+
+  "incumbent_response": {
+    "likely_response": "ACQUIRE | COPY | CRUSH | IGNORE | PARTNER",
+    "response_reasoning": "Why this response expected",
+    "timeline_to_response_months": 24,
+    "startup_defense": "How they survive/win",
+    "replication_difficulty": {
+      "time_to_replicate_months": 24,
+      "capital_to_replicate": "$X",
+      "expertise_to_replicate": "What's needed",
+      "verdict": "HARD | MODERATE | EASY"
+    },
+    "acquisition_analysis": {
+      "likely_acquirers": ["Company 1", "Company 2"],
+      "acquisition_trigger": "What prompts acquisition interest",
+      "likely_timing": "When in company lifecycle",
+      "valuation_range": "$X-Y based on comps",
+      "acquirer_motivation": "Why they'd buy vs build"
+    }
+  },
+
+  "commercial_red_flags": [
+    {
+      "flag": "The concern",
+      "severity": "CRITICAL | HIGH | MEDIUM",
+      "evidence": "Why we're concerned",
+      "what_would_resolve": "Evidence that would address this",
+      "question_for_founders": "What to ask"
+    }
+  ],
+
+  "commercial_questions_for_founders": [
+    {
+      "question": "Specific question",
+      "category": "UNIT_ECONOMICS | MARKET | GTM | TIMELINE | ECOSYSTEM | POLICY",
+      "why_critical": "What this reveals",
+      "good_answer": "Response that builds confidence",
+      "bad_answer": "Response that kills the deal"
+    }
+  ]
+}
+
+## VERDICT CALIBRATION
+
+**CLEAR_PATH**: Market exists today, customers identified with evidence, unit economics work at realistic assumptions, timeline fits VC math, scale-up challenges are known and manageable, policy exposure is low.
+
+**CHALLENGING_BUT_VIABLE**: One or two significant commercial obstacles but they're addressable. May need longer timeline, more capital, or specific conditions to be met. Worth investing if team is exceptional.
+
+**SIGNIFICANT_OBSTACLES**: Multiple serious commercial challenges. Path exists but requires many things to go right. Would need exceptional team + circumstances to succeed. High risk.
+
+**UNLIKELY_TO_COMMERCIALIZE**: Fundamental commercial barriers that physics cannot solve. Market doesn't exist, unit economics don't work even at scale, timeline exceeds VC fund life, critical dependencies won't be met. This is a science project, not a company.`;
+
+export const DD3_5_M_METADATA = {
+  id: 'dd3.5-m',
+  name: 'DD Commercialization Reality Check',
+  description: 'Validate commercial viability of technically valid approaches',
+  temperature: 0.6,
+  model: 'claude-sonnet-4-20250514',
+};
+
+// ============================================
 // DD4-M: Solution Space Mapping & Moat Assessment
 // ============================================
 
@@ -552,6 +1134,48 @@ From AN1.7-M literature search:
 - Is this the right time for this approach?
 - What enabling technologies are they dependent on?
 - Is the market ready?
+
+## ADDITIONAL STRATEGIC ANALYSIS
+
+Beyond solution space mapping, provide these strategic frameworks:
+
+### THE ONE BET
+
+Every investment is a bet on something. Make it explicit.
+
+What must be true technically, commercially, and timing-wise for this to work?
+What are they implicitly betting against (approaches they've dismissed)?
+Is this a good bet based on evidence?
+
+### PRE-MORTEM ANALYSIS
+
+Imagine the company has failed. Why?
+
+What's the most likely failure mode? (Technical, commercial, execution, timing)
+What's the probability of each failure scenario?
+What early warning signs should investors watch for?
+What patterns from comparable companies apply?
+
+### COMPARABLE ANALYSIS
+
+What happened to similar companies?
+
+Find real companies that attempted similar approaches (use your knowledge and web search if needed).
+What was their outcome? (Success, acquired, pivot, zombie, shutdown)
+What can we learn from their trajectory?
+How does this startup compare to base rates for the category?
+
+### SCENARIO ANALYSIS
+
+Bull/Base/Bear with probabilities and expected value.
+
+For each scenario:
+- What happens? (Narrative)
+- What return multiple is likely?
+- What's the probability?
+
+Calculate expected value (weighted return multiple).
+Is this a good risk-adjusted bet?
 
 ## OUTPUT FORMAT
 
@@ -690,7 +1314,183 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
       "why_it_matters": "Strategic importance",
       "what_good_looks_like": "Favorable answer"
     }
-  ]
+  ],
+
+  "the_one_bet": {
+    "core_bet_statement": "If you invest, you are betting that [one sentence]",
+
+    "technical_bet": {
+      "bet": "What must be true technically for this to work",
+      "current_evidence_for": "What supports this bet",
+      "current_evidence_against": "What contradicts this bet",
+      "when_resolved": "When we'll know if this bet pays off",
+      "resolution_milestone": "Specific milestone that proves/disproves"
+    },
+
+    "commercial_bet": {
+      "bet": "What must be true commercially",
+      "current_evidence_for": "Supporting evidence",
+      "current_evidence_against": "Contradicting evidence",
+      "when_resolved": "When we'll know"
+    },
+
+    "timing_bet": {
+      "bet": "Why now is the right time",
+      "too_early_scenario": "What happens if market isn't ready",
+      "too_late_scenario": "What happens if others get there first",
+      "timing_evidence": "Why we think timing is right/wrong"
+    },
+
+    "implicit_dismissals": [
+      {
+        "dismissed_alternative": "What they're implicitly betting against",
+        "their_implicit_reasoning": "Why they think it won't work",
+        "our_assessment": "Whether we agree"
+      }
+    ],
+
+    "bet_quality": {
+      "assessment": "GOOD_BET | REASONABLE_BET | QUESTIONABLE_BET | BAD_BET",
+      "expected_value_reasoning": "Why this is/isn't a good risk-adjusted bet",
+      "what_makes_it_worth_it": "The upside that justifies the risk"
+    }
+  },
+
+  "pre_mortem": {
+    "framing": "It's 2030. [Company] has shut down. What happened?",
+
+    "most_likely_failure_mode": {
+      "scenario": "Narrative of most likely failure",
+      "probability": "X%",
+      "timeline": "When failure becomes apparent",
+      "early_warning_signs": ["Signs to watch for"],
+      "could_be_prevented_by": "Due diligence that would catch this",
+      "key_decision_point": "When the fate was sealed"
+    },
+
+    "second_most_likely_failure": {
+      "scenario": "Narrative",
+      "probability": "X%",
+      "timeline": "When apparent",
+      "early_warning_signs": ["Signs"],
+      "could_be_prevented_by": "Prevention"
+    },
+
+    "black_swan_failure": {
+      "scenario": "Low probability, high impact failure",
+      "probability": "X%",
+      "trigger": "What would cause this",
+      "warning_signs": ["Early indicators"]
+    },
+
+    "pattern_from_comparables": {
+      "what_usually_kills_companies_like_this": "The typical failure mode",
+      "is_this_company_different": true,
+      "why_or_why_not": "Evidence"
+    },
+
+    "failure_modes_by_category": {
+      "technical_failure_probability": "X%",
+      "commercial_failure_probability": "Y%",
+      "execution_failure_probability": "Z%",
+      "market_timing_failure_probability": "W%",
+      "primary_risk_category": "Where failure most likely comes from"
+    }
+  },
+
+  "comparable_analysis": {
+    "selection_criteria": "Why these companies are comparable",
+
+    "closest_comparables": [
+      {
+        "company": "Company name",
+        "similarity": "Why it's comparable (technology, market, stage, approach)",
+        "funding_raised": "$X",
+        "timeline": "Years from founding to outcome",
+        "outcome": "SUCCESS | ACQUIRED | PIVOT | ZOMBIE | SHUTDOWN",
+        "outcome_details": "What happened",
+        "valuation_at_outcome": "$X or N/A",
+        "key_success_factors": ["What they did right (if successful)"],
+        "key_failure_factors": ["What went wrong (if failed)"],
+        "lessons_for_this_deal": "What we learn",
+        "key_differences": "Why this startup might have different outcome"
+      }
+    ],
+
+    "pattern_analysis": {
+      "companies_in_category": "X companies attempted similar approach",
+      "success_rate": "Y% reached meaningful scale",
+      "median_outcome": "What typically happens",
+      "top_decile_outcome": "Best case scenario",
+      "bottom_decile_outcome": "Worst case scenario",
+      "time_to_outcome": "How long it typically takes"
+    },
+
+    "base_rate": {
+      "category": "Deep tech [specific domain] Series A",
+      "historical_success_rate": "X%",
+      "median_return_multiple": "X.Xx",
+      "definition_of_success": "What counts as success"
+    },
+
+    "this_company_vs_base_rate": {
+      "better_than_base_rate_because": ["Reasons for optimism"],
+      "worse_than_base_rate_because": ["Reasons for concern"],
+      "adjusted_probability": "X% (vs Y% base rate)"
+    }
+  },
+
+  "scenario_analysis": {
+    "bull_case": {
+      "probability": "X%",
+      "narrative": "What happens in the good scenario (2-3 sentences)",
+      "key_events": ["What must go right"],
+      "timeline_years": 5,
+      "exit_type": "IPO | ACQUISITION",
+      "exit_valuation": "$X",
+      "return_multiple": "15-25x",
+      "what_you_believe_in_this_scenario": "Implicit assumption"
+    },
+
+    "base_case": {
+      "probability": "X%",
+      "narrative": "What typically happens (2-3 sentences)",
+      "key_events": ["Realistic path"],
+      "timeline_years": 6,
+      "exit_type": "ACQUISITION | SECONDARY",
+      "exit_valuation": "$X",
+      "return_multiple": "2-5x",
+      "what_you_believe_in_this_scenario": "Implicit assumption"
+    },
+
+    "bear_case": {
+      "probability": "X%",
+      "narrative": "What happens if things go wrong (2-3 sentences)",
+      "key_events": ["What goes wrong"],
+      "timeline_years": 4,
+      "exit_type": "ACQUI_HIRE | SHUTDOWN | ZOMBIE",
+      "exit_valuation": "$X or write-off",
+      "return_multiple": "0-0.5x",
+      "what_you_believe_in_this_scenario": "Implicit assumption"
+    },
+
+    "expected_value": {
+      "weighted_return_multiple": "X.Xx",
+      "calculation": "Bull(X% × Yx) + Base(X% × Yx) + Bear(X% × Yx)",
+      "vs_typical_series_a": "Above/below median",
+      "risk_adjusted_assessment": "Is this a good bet?"
+    },
+
+    "scenario_sensitivities": [
+      {
+        "variable": "Key variable that swings outcomes",
+        "bull_assumption": "Value in bull case",
+        "bear_assumption": "Value in bear case",
+        "current_best_estimate": "Most likely value",
+        "how_to_derisk": "How to reduce uncertainty"
+      }
+    ]
+  }
 }
 
 IMPORTANT: This is about positioning, not just criticism. A startup that picked the best approach should be credited. A startup in a crowded space with no moat should be flagged.`;
@@ -704,44 +1504,47 @@ export const DD4_M_METADATA = {
 };
 
 // ============================================
-// DD5-M: Due Diligence Report Generation
+// DD5-M: Due Diligence Report Generation (V2)
 // ============================================
 
-export const DD5_M_PROMPT = `You are generating a technical due diligence report for a deep tech investor.
+export const DD5_M_PROMPT = `You are generating a comprehensive technical due diligence report for a deep tech investor.
 
 ## INPUTS YOU HAVE
 
 You have the complete chain outputs:
-1. **DD0**: Extracted claims and problem statement
+1. **DD0**: Extracted claims, problem statement, and commercial assumptions
 2. **AN0-M**: First-principles problem framing
 3. **AN1.5-M**: Teaching examples
 4. **AN1.7-M**: Literature and prior art
 5. **AN2-M**: TRIZ analysis
 6. **AN3-M**: Full solution space
 7. **DD3**: Claim validation
-8. **DD4**: Solution space mapping and moat assessment
+8. **DD3.5**: Commercialization reality check
+9. **DD4**: Solution space mapping, moat assessment, and strategic analysis
 
 ## MISSION
 
-Synthesize all analysis into a clear, actionable DD report that helps an investor decide:
-1. Is the technical thesis sound?
-2. Is the approach optimal for the problem?
-3. Is this defensible?
-4. What are the key risks?
-5. What should I ask the founders?
+Generate a report that is 3-5x more valuable than traditional DD by:
+1. TEACHING VCs how to think about the problem space (not just validating claims)
+2. MAKING solution space analysis the centerpiece (not background context)
+3. ADDING commercial viability analysis (physics can work but business can fail)
+4. ADDING strategic frameworks VCs actually use (scenarios, comparables, pre-mortems)
+5. MAKING output actionable (diligence roadmap, specific next steps)
 
 ## REPORT PHILOSOPHY
 
 This is NOT a traditional DD report that validates claims in isolation.
 
 This report provides:
+- A "problem primer" that teaches VCs how to think about the space
 - First-principles analysis of the problem space
-- Full solution landscape mapping
+- Solution landscape as the CENTERPIECE (Sparlo's core value)
 - Physics-based validation of claims
-- Competitive positioning assessment
-- Moat and risk analysis
+- Commercialization reality check (most startups fail here, not physics)
+- Strategic frameworks: The One Bet, Pre-Mortem, Comparables, Scenarios
+- Actionable diligence roadmap
 
-The unique value: "Here's what an exhaustive first-principles search reveals. The startup is in quadrant X. They missed approaches Y and Z. Their novelty claim holds/doesn't hold because..."
+The unique value: "Here's how to think about this problem space. Here's the full solution landscape. The startup sits here. They're betting on X. If they fail, it will likely be because of Y. Here's exactly what to do next."
 
 ## VOICE AND TONE
 
@@ -757,244 +1560,544 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     "company_name": "Startup name",
     "technology_domain": "Domain",
     "date": "ISO date",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "classification": "Confidential"
+  },
+
+  "one_page_summary": {
+    "company": "Name",
+    "sector": "Sector",
+    "stage": "Series A",
+    "ask": "$25M",
+
+    "one_sentence": "What they do in plain English that a non-technical partner understands",
+
+    "verdict_box": {
+      "technical_validity": {
+        "verdict": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
+        "symbol": "✓ | ⚠ | ✗"
+      },
+      "commercial_viability": {
+        "verdict": "CLEAR_PATH | CHALLENGING | UNLIKELY",
+        "symbol": "✓ | ⚠ | ✗"
+      },
+      "solution_space_position": {
+        "verdict": "OPTIMAL | REASONABLE | SUBOPTIMAL",
+        "symbol": "✓ | ⚠ | ✗"
+      },
+      "moat_strength": {
+        "verdict": "STRONG | MODERATE | WEAK",
+        "symbol": "✓ | ⚠ | ✗"
+      },
+      "timing": {
+        "verdict": "RIGHT_TIME | EARLY | LATE",
+        "symbol": "✓ | ⚠ | ✗"
+      },
+      "overall": "PROCEED | CAUTION | PASS"
+    },
+
+    "the_bet": "If you invest, you are betting that [one sentence]",
+
+    "bull_case_2_sentences": "In the best case...",
+    "bear_case_2_sentences": "The main risk is...",
+
+    "key_strength": "Single most compelling element",
+    "key_risk": "Single biggest concern",
+    "key_question": "The one question that determines outcome",
+
+    "expected_return": "X.Xx weighted multiple",
+
+    "closest_comparable": "Company X — [outcome]",
+
+    "if_you_do_one_thing": "Single most important due diligence action before term sheet"
+  },
+
+  "problem_primer": {
+    "section_purpose": "Teach the investor how to think about this problem space before evaluating this specific company",
+
+    "problem_overview": {
+      "plain_english": "2-3 sentences explaining the problem a smart non-expert would understand",
+      "why_it_matters": "Why solving this is important",
+      "market_context": "Where this fits in the broader landscape"
+    },
+
+    "physics_foundation": {
+      "governing_principles": [
+        {
+          "principle": "Name of principle",
+          "plain_english": "What it means",
+          "implication": "What it constrains"
+        }
+      ],
+      "thermodynamic_limits": {
+        "theoretical_minimum": "Best physics allows",
+        "current_best_achieved": "Best anyone has done",
+        "gap_explanation": "Why the gap exists"
+      },
+      "rate_limiting_factors": ["What fundamentally limits progress"]
+    },
+
+    "key_contradictions": [
+      {
+        "tradeoff": "Plain English tradeoff",
+        "if_you_improve": "X",
+        "typically_worsens": "Y",
+        "how_different_approaches_resolve": "Approaches A, B, C handle this differently"
+      }
+    ],
+
+    "where_value_created": {
+      "bottleneck_today": "Where the value chain is stuck",
+      "what_breakthrough_would_unlock": "What would change the game",
+      "who_captures_value": "Where $ flows in the value chain"
+    },
+
+    "success_requirements": {
+      "physics_gates": ["Must achieve X to be physically viable"],
+      "engineering_challenges": ["Must solve Y to be practical"],
+      "commercial_thresholds": ["Must hit Z to be economic"]
+    },
+
+    "key_insight": "The one thing about this problem space that most people miss"
+  },
+
+  "solution_landscape": {
+    "section_purpose": "Show the full solution space — this is Sparlo's core value add",
+
+    "landscape_overview": {
+      "total_approaches_analyzed": 12,
+      "how_we_generated": "First-principles analysis + TRIZ + literature search",
+      "key_insight": "What the solution space reveals about where value creation happens"
+    },
+
+    "solution_space_by_track": {
+      "simpler_path": {
+        "track_description": "Optimize existing approaches — lower risk, incremental improvement",
+        "concepts": [
+          {
+            "name": "Concept name",
+            "one_liner": "What it is in one sentence",
+            "mechanism": "How it works",
+            "key_advantage": "Why it might win",
+            "key_challenge": "Why it might not",
+            "current_players": ["Who's pursuing this"],
+            "maturity": "TRL X",
+            "threat_to_startup": "HIGH | MEDIUM | LOW",
+            "threat_reasoning": "Why this level"
+          }
+        ]
+      },
+      "best_fit": {
+        "track_description": "Balanced innovation — moderate risk, meaningful improvement",
+        "concepts": []
+      },
+      "paradigm_shift": {
+        "track_description": "Rethink the problem — high risk, potential breakthrough",
+        "concepts": []
+      },
+      "frontier_transfer": {
+        "track_description": "Apply breakthrough from adjacent field",
+        "concepts": []
+      }
+    },
+
+    "startup_positioning": {
+      "which_track": "best_fit",
+      "which_concept_closest": "Concept X",
+      "is_optimal_track": false,
+      "what_first_principles_recommends": "Different approach because...",
+      "positioning_verdict": "OPTIMAL | REASONABLE | SUBOPTIMAL | WRONG_APPROACH",
+      "positioning_explanation": "Why this assessment"
+    },
+
+    "the_implicit_bet": {
+      "what_they_are_betting_on": "Specific bet",
+      "what_must_be_true": ["Conditions for bet to pay off"],
+      "what_they_are_betting_against": ["Approaches they've dismissed"],
+      "bet_quality": "GOOD | REASONABLE | QUESTIONABLE"
+    },
+
+    "missed_opportunities_deep_dive": [
+      {
+        "approach": "What they could have pursued",
+        "why_potentially_better": "Specific advantages",
+        "why_startup_missed": "Likely blind spot or reasoning",
+        "what_startup_would_say": "Their counter-argument",
+        "our_assessment": "Who's right and why",
+        "investment_implication": "What this means for the deal"
+      }
+    ],
+
+    "competitive_threat_summary": {
+      "highest_threats": ["Approach 1", "Approach 2"],
+      "timeline_to_threat": "When these could challenge startup",
+      "startup_defense": "How they can protect position"
+    },
+
+    "strategic_insight": "The key insight about this problem space that should inform investment decision"
   },
 
   "executive_summary": {
     "verdict": "COMPELLING | PROMISING | MIXED | CONCERNING | PASS",
     "verdict_confidence": "HIGH | MEDIUM | LOW",
 
-    "one_paragraph_summary": "The bottom line in 4-5 sentences. Technical thesis validity, key strength, key concern, recommendation.",
+    "one_paragraph_summary": "4-5 sentence summary. Technical validity + commercial viability + key strength + key risk + recommendation.",
 
     "key_findings": [
       {
-        "finding": "Critical finding",
+        "finding": "Finding",
         "type": "STRENGTH | WEAKNESS | OPPORTUNITY | THREAT",
-        "investment_impact": "HIGH | MEDIUM | LOW"
+        "impact": "HIGH | MEDIUM | LOW"
       }
     ],
 
-    "technical_credibility_score": {
-      "score": 7,
-      "out_of": 10,
-      "one_line": "What this score means"
+    "scores": {
+      "technical_credibility": {"score": 7, "out_of": 10, "one_liner": "Explanation"},
+      "commercial_viability": {"score": 6, "out_of": 10, "one_liner": "Explanation"},
+      "team_signals": {"score": 8, "out_of": 10, "one_liner": "Explanation"},
+      "moat_strength": {"score": 5, "out_of": 10, "one_liner": "Explanation"}
     },
 
     "recommendation": {
       "action": "PROCEED | PROCEED_WITH_CAUTION | DEEP_DIVE_REQUIRED | PASS",
-      "rationale": "Why this recommendation",
-      "key_condition": "What must be true to proceed (if applicable)"
+      "rationale": "Why",
+      "key_conditions": ["What must be true to proceed"]
     }
   },
 
   "technical_thesis_assessment": {
-    "their_thesis": "What they claim in one sentence",
-
+    "their_thesis": "One sentence",
     "thesis_validity": {
       "verdict": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
       "confidence": "HIGH | MEDIUM | LOW",
-      "explanation": "2-3 paragraph assessment of core technical thesis"
+      "explanation": "2-3 paragraphs"
     },
-
     "mechanism_assessment": {
       "mechanism": "Their core mechanism",
-      "physics_validity": "Does the physics work",
-      "demonstrated_precedent": "Where this has worked before (if anywhere)",
-      "key_uncertainty": "The main unknown"
+      "physics_validity": "Assessment",
+      "precedent": "Where demonstrated",
+      "key_uncertainty": "Main unknown"
     },
-
     "performance_claims": [
       {
-        "claim": "Specific performance claim",
-        "theoretical_limit": "What physics allows",
+        "claim": "Claim",
+        "theoretical_limit": "Physics allows",
         "verdict": "VALIDATED | PLAUSIBLE | QUESTIONABLE | IMPLAUSIBLE",
-        "basis": "Why this verdict"
+        "explanation": "Plain English why"
       }
     ]
   },
 
-  "problem_framing_analysis": {
-    "their_framing": "How they define the problem",
-    "first_principles_framing": "How first-principles analysis frames it",
+  "commercialization_reality": {
+    "verdict": "CLEAR_PATH | CHALLENGING | SIGNIFICANT_OBSTACLES | UNLIKELY",
+    "summary": "2-3 sentences",
 
-    "framing_assessment": {
-      "quality": "OPTIMAL | GOOD | SUBOPTIMAL | MISFRAMED",
-      "explanation": "Whether they're solving the right problem"
+    "the_hard_truth": {
+      "even_if_physics_works": "What's still hard",
+      "critical_commercial_question": "The question that determines success"
     },
 
-    "problem_reframe": {
-      "needed": true,
-      "suggested_reframe": "Better framing if applicable",
-      "implication": "How this changes the solution approach"
+    "unit_economics": {
+      "today": "$X/unit",
+      "claimed_at_scale": "$Y/unit",
+      "credibility": "CREDIBLE | OPTIMISTIC | UNREALISTIC",
+      "what_must_be_true": "Conditions"
+    },
+
+    "path_to_revenue": {
+      "timeline": "When",
+      "capital_required": "$X",
+      "fits_vc_timeline": true
+    },
+
+    "market_readiness": {
+      "market_exists": true,
+      "customer_evidence": "LOIs, pilots, etc.",
+      "vitamin_or_painkiller": "PAINKILLER | VITAMIN"
+    },
+
+    "scale_up_risk": {
+      "valley_of_death": "$X over Y years",
+      "stranding_risk": "HIGH | MEDIUM | LOW"
+    },
+
+    "policy_exposure": {
+      "critical_policies": ["Policy 1"],
+      "exposure_level": "HIGH | MEDIUM | LOW",
+      "impact_if_changed": "What happens"
     }
   },
 
-  "solution_space_positioning": {
-    "solution_landscape_summary": "What the full solution space looks like for this problem (2-3 sentences)",
-
-    "startup_position": {
-      "track": "simpler_path | best_fit | paradigm_shift | frontier_transfer",
-      "description": "Where they sit in the landscape",
-      "is_optimal_position": true,
-      "explanation": "Why this position is or isn't optimal"
-    },
-
-    "alternatives_analysis": {
-      "stronger_alternatives_exist": true,
-      "alternatives": [
-        {
-          "approach": "Alternative approach",
-          "track": "Which track",
-          "advantages": "Why it might be better",
-          "competitive_threat": "HIGH | MEDIUM | LOW"
-        }
-      ]
-    },
-
-    "landscape_insight": "The key insight about where value creation happens in this problem space"
-  },
-
   "claim_validation_summary": {
-    "claims_validated": 5,
-    "claims_questionable": 2,
-    "claims_invalid": 0,
-
+    "overview": "X validated, Y questionable, Z invalid",
     "critical_claims": [
       {
-        "claim": "The claim",
-        "verdict": "VALIDATED | PLAUSIBLE | QUESTIONABLE | IMPLAUSIBLE | INVALID",
-        "confidence": "HIGH | MEDIUM | LOW",
-        "basis": "1-2 sentence explanation"
+        "claim": "Claim",
+        "verdict": "Verdict",
+        "confidence": "Confidence",
+        "plain_english": "What this means"
       }
     ],
-
     "triz_findings": {
-      "contradictions_identified": "Key contradictions in the problem",
-      "resolution_quality": "How well they resolve them",
-      "unresolved_contradictions": ["Contradictions they haven't addressed"]
+      "key_contradictions": "What tradeoffs exist",
+      "resolution_quality": "How well they resolve them"
     }
   },
 
   "novelty_assessment": {
-    "novelty_verdict": "GENUINELY_NOVEL | NOVEL_COMBINATION | NOVEL_APPLICATION | INCREMENTAL | NOT_NOVEL",
-    "what_is_actually_novel": "The specific novel element (if any)",
-    "what_is_not_novel": "Prior art that exists",
-
-    "prior_art_highlights": [
+    "verdict": "GENUINELY_NOVEL | NOVEL_COMBINATION | INCREMENTAL | NOT_NOVEL",
+    "what_is_novel": "Specific element",
+    "what_is_not_novel": "Prior art",
+    "key_prior_art": [
       {
         "reference": "Citation",
-        "relevance": "How it relates"
+        "relevance": "How it relates",
+        "impact": "On novelty claim"
       }
-    ],
-
-    "novelty_claim_accuracy": "Whether their novelty claims are accurate"
+    ]
   },
 
   "moat_assessment": {
-    "overall_moat": {
+    "overall": {
       "strength": "STRONG | MODERATE | WEAK | NONE",
       "durability_years": 3,
       "primary_source": "Where moat comes from"
     },
-
-    "moat_breakdown": {
-      "technical_barriers": "STRONG | MODERATE | WEAK",
-      "execution_barriers": "STRONG | MODERATE | WEAK",
-      "market_barriers": "STRONG | MODERATE | WEAK"
+    "breakdown": {
+      "technical": "STRONG | MODERATE | WEAK",
+      "execution": "STRONG | MODERATE | WEAK",
+      "market": "STRONG | MODERATE | WEAK"
     },
-
-    "moat_vulnerabilities": [
+    "vulnerabilities": [
       {
-        "vulnerability": "How moat could be attacked",
-        "severity": "CRITICAL | HIGH | MEDIUM | LOW"
+        "vulnerability": "Risk",
+        "severity": "HIGH | MEDIUM | LOW"
+      }
+    ]
+  },
+
+  "pre_mortem": {
+    "framing": "It's 2030 and the company has failed. What happened?",
+    "most_likely_failure": {
+      "scenario": "Narrative",
+      "probability": "X%",
+      "early_warnings": ["Signs"],
+      "preventable_by": "Due diligence"
+    },
+    "second_most_likely": {
+      "scenario": "Narrative",
+      "probability": "X%"
+    },
+    "black_swan": {
+      "scenario": "Low probability failure",
+      "probability": "X%"
+    }
+  },
+
+  "comparable_analysis": {
+    "closest_comparables": [
+      {
+        "company": "Name",
+        "similarity": "Why comparable",
+        "outcome": "What happened",
+        "lesson": "What we learn"
       }
     ],
+    "base_rate": {
+      "category_success_rate": "X%",
+      "this_company_vs_base": "Better/worse because..."
+    }
+  },
 
-    "defensibility_verdict": "Is this defensible long-term and why"
+  "scenario_analysis": {
+    "bull_case": {
+      "probability": "X%",
+      "narrative": "What happens",
+      "return": "15-25x"
+    },
+    "base_case": {
+      "probability": "X%",
+      "narrative": "What happens",
+      "return": "2-5x"
+    },
+    "bear_case": {
+      "probability": "X%",
+      "narrative": "What happens",
+      "return": "0-0.5x"
+    },
+    "expected_value": {
+      "weighted_multiple": "X.Xx",
+      "assessment": "Good/bad bet"
+    }
   },
 
   "risk_analysis": {
     "technical_risks": [
       {
-        "risk": "Technical risk",
+        "risk": "Risk",
         "probability": "HIGH | MEDIUM | LOW",
-        "impact": "CRITICAL | HIGH | MEDIUM | LOW",
+        "impact": "HIGH | MEDIUM | LOW",
         "mitigation": "How to address"
       }
     ],
-
-    "competitive_risks": [
+    "commercial_risks": [
       {
-        "risk": "Competitive threat",
-        "severity": "CRITICAL | HIGH | MEDIUM | LOW",
-        "timeline": "When it could materialize"
+        "risk": "Risk",
+        "severity": "HIGH | MEDIUM | LOW"
       }
     ],
-
-    "key_risk_summary": "The one risk that matters most and why"
+    "competitive_risks": [
+      {
+        "risk": "Threat",
+        "timeline": "When"
+      }
+    ],
+    "key_risk_summary": "The one risk that matters most"
   },
 
   "founder_questions": {
     "must_ask": [
       {
-        "question": "Critical question",
-        "why_critical": "What this reveals",
-        "good_answer": "Response that increases confidence",
-        "concerning_answer": "Response that decreases confidence"
+        "question": "Question",
+        "why_critical": "What it reveals",
+        "good_answer": "Confidence builder",
+        "bad_answer": "Deal killer"
       }
     ],
-
     "technical_deep_dives": [
       {
-        "topic": "Area to probe",
-        "specific_questions": ["Question 1", "Question 2"]
+        "topic": "Area",
+        "questions": ["Q1", "Q2"]
+      }
+    ],
+    "commercial_deep_dives": [
+      {
+        "topic": "Area",
+        "questions": ["Q1", "Q2"]
       }
     ]
+  },
+
+  "diligence_roadmap": {
+    "before_term_sheet": [
+      {
+        "action": "Specific action",
+        "purpose": "What you learn",
+        "who": "Who does this",
+        "time": "How long",
+        "cost": "$ if any",
+        "deal_breaker_if": "What kills deal"
+      }
+    ],
+    "during_diligence": [
+      {
+        "action": "Action",
+        "priority": "CRITICAL | HIGH | MEDIUM"
+      }
+    ],
+    "reference_calls": [
+      {
+        "who": "Person/role",
+        "why": "What you learn",
+        "key_questions": ["Questions"]
+      }
+    ],
+    "technical_validation": [
+      {
+        "what": "What to verify",
+        "how": "Method",
+        "who_can_help": "Expert",
+        "cost": "$X",
+        "time": "Y weeks"
+      }
+    ],
+    "documents_to_request": ["List"]
+  },
+
+  "why_this_might_be_wrong": {
+    "if_we_are_too_negative": {
+      "what_we_might_be_missing": "Reasons for optimism we may have underweighted",
+      "what_would_change_our_mind": "Evidence that would flip positive"
+    },
+    "if_we_are_too_positive": {
+      "what_we_might_be_missing": "Risks we may have underweighted",
+      "what_would_change_our_mind": "Evidence that would flip negative"
+    },
+    "strongest_counter_argument": "Best case against our verdict",
+    "our_response": "Why we hold our position"
+  },
+
+  "confidence_calibration": {
+    "high_confidence": [
+      {
+        "assessment": "What we're confident about",
+        "basis": "Why",
+        "confidence": "90%+"
+      }
+    ],
+    "medium_confidence": [
+      {
+        "assessment": "What we think",
+        "basis": "Limited evidence",
+        "confidence": "50-80%"
+      }
+    ],
+    "low_confidence": [
+      {
+        "assessment": "What we're guessing",
+        "basis": "Extrapolation",
+        "confidence": "<50%"
+      }
+    ],
+    "known_unknowns": ["Things we know we don't know"],
+    "where_surprises_lurk": ["Where unknown unknowns might be"]
   },
 
   "verdict_and_recommendation": {
     "technical_verdict": {
       "verdict": "COMPELLING | PROMISING | MIXED | CONCERNING | PASS",
       "confidence": "HIGH | MEDIUM | LOW",
-      "summary": "2-3 sentence technical verdict"
+      "summary": "2-3 sentences"
     },
-
-    "investment_recommendation": {
+    "commercial_verdict": {
+      "verdict": "CLEAR_PATH | CHALLENGING | UNLIKELY",
+      "summary": "2-3 sentences"
+    },
+    "overall_verdict": {
+      "verdict": "COMPELLING | PROMISING | MIXED | CONCERNING | PASS",
+      "confidence": "HIGH | MEDIUM | LOW"
+    },
+    "recommendation": {
       "action": "PROCEED | PROCEED_WITH_CAUTION | DEEP_DIVE_REQUIRED | PASS",
-      "conditions": ["Conditions that must be met"],
-      "key_derisking_steps": ["What to validate before investing"]
+      "conditions": ["Must be true"],
+      "derisking_steps": ["What to do"],
+      "timeline": "Recommended pace"
     },
-
-    "final_word": "One paragraph final assessment - the 'what I really think' summary"
-  },
-
-  "appendix": {
-    "methodology_note": "This report was generated using Sparlo's first-principles analysis engine, which maps the full solution space for the stated problem and validates claims against physics and prior art.",
-    "solution_space_concepts_considered": ["List key concepts from AN3-M that were compared"],
-    "prior_art_references": ["Key references from AN1.7-M"]
+    "final_word": "One paragraph — 'what I really think' honest assessment"
   }
 }
 
 ## VERDICT CALIBRATION
 
-**COMPELLING**: Technical thesis is sound, approach is optimal or near-optimal, defensible moat, limited technical risk. Would invest based on technical merit alone.
+**COMPELLING**: Technical thesis is sound, commercial path is clear, approach is optimal or near-optimal, defensible moat, limited risk. Strong risk-adjusted bet. Would invest based on merit alone.
 
-**PROMISING**: Technical thesis is plausible, approach is reasonable, some moat exists, manageable risks. Technical DD supports investment but isn't a slam dunk.
+**PROMISING**: Technical thesis is plausible, commercial path is challenging but viable, approach is reasonable, some moat exists, manageable risks. Good bet if team is strong.
 
-**MIXED**: Some strong elements, some concerning elements. Need to weigh technical risks against opportunity. Conditional proceed.
+**MIXED**: Some strong elements, some concerning elements. Technical or commercial questions remain. Need to weigh risks against opportunity. Conditional proceed.
 
-**CONCERNING**: Significant technical issues: flawed thesis, questionable physics, weak moat, or major risks. Would need exceptional other factors to invest.
+**CONCERNING**: Significant technical or commercial issues. Flawed thesis, questionable physics, unclear commercial path, weak moat, or major risks. Would need exceptional circumstances.
 
-**PASS**: Technical thesis doesn't hold up, approach is suboptimal with better alternatives, no moat, or critical risks. Technical DD does not support investment.
+**PASS**: Technical thesis fails, commercial path unlikely, approach is suboptimal with better alternatives, no moat, or critical risks. Does not support investment.
 
 ## IMPORTANT PRINCIPLES
 
-1. **Be specific**: Vague concerns are useless. Name the physics, cite the prior art, quantify the risk.
-2. **Be calibrated**: Don't inflate concerns or strengths. Accurate assessment serves everyone.
-3. **Be actionable**: Every finding should connect to an investment implication or founder question.
-4. **Credit good work**: If the startup made good technical choices, say so clearly.
-5. **Reveal blind spots**: The unique value is showing what the startup (and VC) might have missed.`;
+1. **Solution space is the centerpiece**: Show VCs what the landscape looks like, where the startup sits, what they're betting on
+2. **Teach before evaluating**: The problem primer should make any smart person understand the space
+3. **Commercial reality matters**: Most deep tech fails commercially, not technically — address this head-on
+4. **Make it actionable**: Every section should connect to what to do next
+5. **Be specific**: Name the physics, cite the prior art, quantify the risk, name the comparable
+6. **Show your confidence**: Calibrate what you know vs. what you're guessing
+7. **Steel-man your position**: Explain why you might be wrong before someone asks`;
 
 export const DD5_M_METADATA = {
   id: 'dd5-m',
@@ -1011,6 +2114,7 @@ export const DD5_M_METADATA = {
 export const DD_PROMPTS = {
   DD0_M: { prompt: DD0_M_PROMPT, metadata: DD0_M_METADATA },
   DD3_M: { prompt: DD3_M_PROMPT, metadata: DD3_M_METADATA },
+  DD3_5_M: { prompt: DD3_5_M_PROMPT, metadata: DD3_5_M_METADATA },
   DD4_M: { prompt: DD4_M_PROMPT, metadata: DD4_M_METADATA },
   DD5_M: { prompt: DD5_M_PROMPT, metadata: DD5_M_METADATA },
 };

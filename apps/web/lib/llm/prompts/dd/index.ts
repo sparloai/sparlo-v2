@@ -36,14 +36,30 @@ export {
   DDVerdict,
   RecommendedAction,
   FindingType,
+  // New commercial enums
+  CommercialAssumptionCategory,
+  CommercialViabilityVerdict,
+  UnitEconomicsVerdict,
+  MarketDemandVerdict,
+  GTMVerdict,
+  TimelineFitVerdict,
+  ScaleUpVerdict,
+  EcosystemVerdict,
+  PolicyExposureVerdict,
+  IncumbentResponse,
+  BetQuality,
+  CompanyOutcome,
+  OverallVerdict,
   // Schema exports
   DD0_M_OutputSchema,
   DD3_M_OutputSchema,
+  DD3_5_M_OutputSchema,
   DD4_M_OutputSchema,
   DD5_M_OutputSchema,
   // Type exports
   type DD0_M_Output,
   type DD3_M_Output,
+  type DD3_5_M_Output,
   type DD4_M_Output,
   type DD5_M_Output,
 } from './schemas';
@@ -54,6 +70,8 @@ export {
   DD0_M_METADATA,
   DD3_M_PROMPT,
   DD3_M_METADATA,
+  DD3_5_M_PROMPT,
+  DD3_5_M_METADATA,
   DD4_M_PROMPT,
   DD4_M_METADATA,
   DD5_M_PROMPT,
@@ -96,7 +114,7 @@ export const DD_PHASES = [
     id: 'dd0-m',
     name: 'Claim Extraction',
     description:
-      'Extracting claims and problem statement from startup materials',
+      'Extracting claims, commercial assumptions, and problem statement from startup materials',
     estimatedMinutes: 3,
   },
   {
@@ -136,16 +154,24 @@ export const DD_PHASES = [
     estimatedMinutes: 4,
   },
   {
+    id: 'dd3.5-m',
+    name: 'Commercial Reality Check',
+    description:
+      'Validating commercial viability of technically valid approaches',
+    estimatedMinutes: 4,
+  },
+  {
     id: 'dd4-m',
-    name: 'Moat Assessment',
-    description: 'Mapping approach and assessing defensibility',
-    estimatedMinutes: 3,
+    name: 'Strategic Analysis',
+    description:
+      'Solution mapping, moat assessment, scenarios, and comparables',
+    estimatedMinutes: 4,
   },
   {
     id: 'dd5-m',
     name: 'DD Report',
-    description: 'Generating investor-facing due diligence report',
-    estimatedMinutes: 4,
+    description: 'Generating comprehensive due diligence report',
+    estimatedMinutes: 5,
   },
 ] as const;
 
@@ -159,7 +185,11 @@ export type DDPhaseId = (typeof DD_PHASES)[number]['id'];
 export const DD_CONTEXT_REQUIREMENTS = {
   'dd0-m': {
     requires: ['startup_materials'],
-    produces: ['claim_extraction', 'problem_statement_for_analysis'],
+    produces: [
+      'claim_extraction',
+      'commercial_assumptions',
+      'problem_statement_for_analysis',
+    ],
   },
   'an0-m': {
     requires: ['problem_statement_for_analysis'],
@@ -196,23 +226,35 @@ export const DD_CONTEXT_REQUIREMENTS = {
     ],
     produces: ['claim_validation'],
   },
+  'dd3.5-m': {
+    requires: [
+      'claim_extraction',
+      'commercial_assumptions',
+      'claim_validation',
+    ],
+    produces: ['commercialization_analysis'],
+  },
   'dd4-m': {
     requires: [
       'claim_extraction',
       'solution_space',
       'claim_validation',
+      'commercialization_analysis',
       'literature_search',
     ],
-    produces: ['solution_mapping', 'moat_assessment'],
+    produces: ['solution_mapping', 'moat_assessment', 'strategic_analysis'],
   },
   'dd5-m': {
     requires: [
       'claim_extraction',
+      'commercial_assumptions',
       'problem_framing',
       'solution_space',
       'claim_validation',
+      'commercialization_analysis',
       'solution_mapping',
       'moat_assessment',
+      'strategic_analysis',
     ],
     produces: ['dd_report'],
   },
