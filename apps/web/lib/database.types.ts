@@ -19,6 +19,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           email: string | null
+          first_report_used_at: string | null
           id: string
           is_personal_account: boolean
           name: string
@@ -33,6 +34,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           email?: string | null
+          first_report_used_at?: string | null
           id?: string
           is_personal_account?: boolean
           name: string
@@ -47,6 +49,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           email?: string | null
+          first_report_used_at?: string | null
           id?: string
           is_personal_account?: boolean
           name?: string
@@ -471,6 +474,141 @@ export type Database = {
           },
         ]
       }
+      processed_webhook_events: {
+        Row: {
+          created_at: string
+          event_id: string
+          event_type: string
+          id: string
+          processed_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          event_type: string
+          id?: string
+          processed_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          event_type?: string
+          id?: string
+          processed_at?: string
+        }
+        Relationships: []
+      }
+      rate_limit_windows: {
+        Row: {
+          account_id: string
+          id: string
+          request_count: number
+          resource_type: string
+          window_start: string
+        }
+        Insert: {
+          account_id: string
+          id?: string
+          request_count?: number
+          resource_type: string
+          window_start: string
+        }
+        Update: {
+          account_id?: string
+          id?: string
+          request_count?: number
+          resource_type?: string
+          window_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rate_limit_windows_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rate_limit_windows_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "user_account_workspace"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rate_limit_windows_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "user_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rate_limits: {
+        Row: {
+          endpoint: string
+          request_count: number
+          user_id: string
+          window_start: string
+          window_type: string
+        }
+        Insert: {
+          endpoint: string
+          request_count?: number
+          user_id: string
+          window_start?: string
+          window_type: string
+        }
+        Update: {
+          endpoint?: string
+          request_count?: number
+          user_id?: string
+          window_start?: string
+          window_type?: string
+        }
+        Relationships: []
+      }
+      report_shares: {
+        Row: {
+          access_count: number
+          created_at: string
+          created_by: string | null
+          expires_at: string
+          last_accessed_at: string | null
+          report_id: string
+          revoked_at: string | null
+          share_token: string
+        }
+        Insert: {
+          access_count?: number
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          last_accessed_at?: string | null
+          report_id: string
+          revoked_at?: string | null
+          share_token?: string
+        }
+        Update: {
+          access_count?: number
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string
+          last_accessed_at?: string | null
+          report_id?: string
+          revoked_at?: string | null
+          share_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_shares_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "sparlo_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           id: number
@@ -523,6 +661,7 @@ export type Database = {
           created_by: string | null
           current_step: string | null
           error_message: string | null
+          headline: string | null
           id: string
           inngest_run_id: string | null
           last_message: string | null
@@ -531,6 +670,7 @@ export type Database = {
           report_data: Json | null
           status: string
           title: string
+          token_usage: Json | null
           updated_at: string
         }
         Insert: {
@@ -543,6 +683,7 @@ export type Database = {
           created_by?: string | null
           current_step?: string | null
           error_message?: string | null
+          headline?: string | null
           id?: string
           inngest_run_id?: string | null
           last_message?: string | null
@@ -551,6 +692,7 @@ export type Database = {
           report_data?: Json | null
           status?: string
           title: string
+          token_usage?: Json | null
           updated_at?: string
         }
         Update: {
@@ -563,6 +705,7 @@ export type Database = {
           created_by?: string | null
           current_step?: string | null
           error_message?: string | null
+          headline?: string | null
           id?: string
           inngest_run_id?: string | null
           last_message?: string | null
@@ -571,6 +714,7 @@ export type Database = {
           report_data?: Json | null
           status?: string
           title?: string
+          token_usage?: Json | null
           updated_at?: string
         }
         Relationships: [
@@ -727,6 +871,126 @@ export type Database = {
           },
         ]
       }
+      token_usage_events: {
+        Row: {
+          account_id: string
+          created_at: string
+          id: string
+          idempotency_key: string
+          report_id: string | null
+          tokens: number
+        }
+        Insert: {
+          account_id: string
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          report_id?: string | null
+          tokens: number
+        }
+        Update: {
+          account_id?: string
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          report_id?: string | null
+          tokens?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_usage_events_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "token_usage_events_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "user_account_workspace"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "token_usage_events_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "user_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "token_usage_events_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "sparlo_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usage_periods: {
+        Row: {
+          account_id: string
+          chat_tokens_used: number
+          created_at: string | null
+          id: string
+          period_end: string
+          period_start: string
+          reports_count: number
+          status: string
+          tokens_limit: number
+          tokens_used: number
+          updated_at: string | null
+        }
+        Insert: {
+          account_id: string
+          chat_tokens_used?: number
+          created_at?: string | null
+          id?: string
+          period_end: string
+          period_start: string
+          reports_count?: number
+          status?: string
+          tokens_limit?: number
+          tokens_used?: number
+          updated_at?: string | null
+        }
+        Update: {
+          account_id?: string
+          chat_tokens_used?: number
+          created_at?: string | null
+          id?: string
+          period_end?: string
+          period_start?: string
+          reports_count?: number
+          status?: string
+          tokens_limit?: number
+          tokens_used?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "usage_periods_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usage_periods_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "user_account_workspace"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "usage_periods_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "user_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       user_account_workspace: {
@@ -771,9 +1035,44 @@ export type Database = {
         }
         Returns: Database["public"]["Tables"]["invitations"]["Row"][]
       }
+      append_chat_messages: {
+        Args: { p_messages: Json; p_report_id: string }
+        Returns: Json
+      }
       can_action_account_member: {
         Args: { target_team_account_id: string; target_user_id: string }
         Returns: boolean
+      }
+      check_rate_limit: {
+        Args: {
+          p_account_id: string
+          p_limit: number
+          p_resource_type: string
+          p_window_minutes?: number
+        }
+        Returns: Json
+      }
+      check_usage_allowed: {
+        Args: { p_account_id: string; p_estimated_tokens?: number }
+        Returns: Json
+      }
+      check_webhook_processed: {
+        Args: { p_event_id: string }
+        Returns: boolean
+      }
+      cleanup_old_tracking_records: { Args: never; Returns: undefined }
+      cleanup_stale_rate_limits: { Args: never; Returns: number }
+      complete_dd_report_atomic: {
+        Args: {
+          p_account_id: string
+          p_headline: string
+          p_idempotency_key: string
+          p_report_data: Json
+          p_report_id: string
+          p_title: string
+          p_total_tokens: number
+        }
+        Returns: Json
       }
       count_completed_reports: {
         Args: { target_account_id: string }
@@ -816,6 +1115,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           email: string | null
+          first_report_used_at: string | null
           id: string
           is_personal_account: boolean
           name: string
@@ -832,6 +1132,16 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      finalize_usage: {
+        Args: {
+          p_account_id: string
+          p_actual_tokens: number
+          p_is_chat?: boolean
+          p_is_report?: boolean
+          p_reserved_tokens: number
+        }
+        Returns: Json
       }
       get_account_invitations: {
         Args: { account_slug: string }
@@ -866,7 +1176,62 @@ export type Database = {
       }
       get_config: { Args: never; Returns: Json }
       get_nonce_status: { Args: { p_id: string }; Returns: Json }
+      get_or_create_usage_period: {
+        Args: { p_account_id: string; p_tokens_limit?: number }
+        Returns: {
+          account_id: string
+          chat_tokens_used: number
+          created_at: string | null
+          id: string
+          period_end: string
+          period_start: string
+          reports_count: number
+          status: string
+          tokens_limit: number
+          tokens_used: number
+          updated_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "usage_periods"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      get_paginated_reports: {
+        Args: {
+          p_account_id: string
+          p_include_archived?: boolean
+          p_limit?: number
+          p_offset?: number
+        }
+        Returns: {
+          archived: boolean
+          conversation_id: string
+          created_at: string
+          current_step: string
+          id: string
+          last_message: string
+          status: string
+          title: string
+          total_count: number
+          updated_at: string
+        }[]
+      }
       get_upper_system_role: { Args: never; Returns: string }
+      get_usage_history: {
+        Args: { p_account_id: string; p_limit?: number }
+        Returns: {
+          chat_tokens_used: number
+          id: string
+          period_end: string
+          period_start: string
+          reports_count: number
+          status: string
+          tokens_limit: number
+          tokens_used: number
+        }[]
+      }
       has_active_subscription: {
         Args: { target_account_id: string }
         Returns: boolean
@@ -899,6 +1264,26 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_usage: {
+        Args: {
+          p_account_id: string
+          p_is_chat?: boolean
+          p_is_report?: boolean
+          p_tokens: number
+        }
+        Returns: Json
+      }
+      increment_usage_idempotent: {
+        Args: {
+          p_account_id: string
+          p_idempotency_key: string
+          p_is_chat?: boolean
+          p_is_report?: boolean
+          p_report_id?: string
+          p_tokens: number
+        }
+        Returns: Json
+      }
       is_aal2: { Args: never; Returns: boolean }
       is_account_owner: { Args: { account_id: string }; Returns: boolean }
       is_account_team_member: {
@@ -911,6 +1296,31 @@ export type Database = {
       is_team_member: {
         Args: { account_id: string; user_id: string }
         Returns: boolean
+      }
+      mark_first_report_used: {
+        Args: { p_account_id: string }
+        Returns: boolean
+      }
+      mark_webhook_processed: {
+        Args: { p_event_id: string; p_event_type: string }
+        Returns: undefined
+      }
+      release_usage: {
+        Args: { p_account_id: string; p_tokens: number }
+        Returns: Json
+      }
+      reserve_usage: {
+        Args: { p_account_id: string; p_tokens: number }
+        Returns: Json
+      }
+      reset_usage_period: {
+        Args: {
+          p_account_id: string
+          p_period_end: string
+          p_period_start: string
+          p_tokens_limit: number
+        }
+        Returns: undefined
       }
       revoke_nonce: {
         Args: { p_id: string; p_reason?: string }
@@ -933,6 +1343,10 @@ export type Database = {
       transfer_team_account_ownership: {
         Args: { new_owner_id: string; target_account_id: string }
         Returns: undefined
+      }
+      try_claim_first_report: {
+        Args: { p_account_id: string }
+        Returns: string
       }
       upsert_order: {
         Args: {

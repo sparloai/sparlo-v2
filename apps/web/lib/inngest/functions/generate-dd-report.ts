@@ -18,6 +18,9 @@ import {
   type DD0_M_Output,
   DD0_M_OutputSchema,
   DD0_M_PROMPT,
+  type DD3_5_M_Output,
+  DD3_5_M_OutputSchema,
+  DD3_5_M_PROMPT,
   type DD3_M_Output,
   DD3_M_OutputSchema,
   DD3_M_PROMPT,
@@ -50,8 +53,18 @@ import {
   HYBRID_TEMPERATURES,
 } from '../../llm/prompts/hybrid';
 import { HYBRID_CACHED_PREFIX } from '../../llm/prompts/hybrid/cached-prefix';
+// Import security utilities
+import {
+  categorizeError,
+  createErrorLogEntry,
+} from '../../llm/security/error-handler';
+import {
+  sanitizeCompanyName,
+  sanitizeUserInput,
+  validateAttachments,
+  validateDDInput,
+} from '../../llm/security/input-validator';
 import { inngest } from '../client';
-import { handleReportFailure } from '../utils/report-failure-handler';
 
 /**
  * Generate DD Report - Inngest Durable Function
@@ -64,15 +77,46 @@ import { handleReportFailure } from '../utils/report-failure-handler';
  * - AN2-M: TRIZ methodology briefing (reused from hybrid)
  * - AN3-M: Full solution space generation (reused from hybrid)
  * - DD3-M: Claim validation against physics and TRIZ
+ * - DD3.5-M: Commercialization reality check
  * - DD4-M: Solution space mapping and moat assessment
  * - DD5-M: Generate investor-facing DD report
  *
  * Philosophy: Map the full solution space first, then evaluate where
  * the startup sits within it. This reveals blind spots and validates claims.
+ *
+ * Security: Implements input validation, prompt injection protection,
+ * rate limiting, atomic updates, and idempotent token tracking.
  */
 
-// Token budget limit for safety
+// =============================================================================
+// Constants
+// =============================================================================
+
+/** Token budget limit for safety */
 const TOKEN_BUDGET_LIMIT = 250000; // 250K tokens max per DD report
+
+/** Rate limit: max reports per hour per account */
+const RATE_LIMIT_REPORTS_PER_HOUR = 5;
+
+/** Rate limit window in minutes */
+const RATE_LIMIT_WINDOW_MINUTES = 60;
+
+// =============================================================================
+// Types
+// =============================================================================
+
+interface DDReportEventData {
+  reportId: string;
+  startupMaterials: string;
+  vcNotes?: string;
+  companyName: string;
+  attachments?: Array<{ media_type: string; data: string }>;
+  accountId: string;
+}
+
+// =============================================================================
+// Inngest Function
+// =============================================================================
 
 export const generateDDReport = inngest.createFunction(
   {
@@ -86,10 +130,30 @@ export const generateDDReport = inngest.createFunction(
     ],
     onFailure: async ({ error, event, step }) => {
       const failureEvent = event as unknown as {
-        event: { data: { reportId: string } };
+        event: { data: DDReportEventData };
       };
       const reportId = failureEvent.event.data.reportId;
-      await handleReportFailure(reportId, error, step);
+
+      // Use categorized error handling
+      const categorizedError = categorizeError(error);
+      const logEntry = createErrorLogEntry(reportId, error, {
+        step: 'onFailure',
+      });
+
+      console.error('[DD Function] Report failed:', logEntry);
+
+      // Update report with user-friendly error message
+      await step.run('update-failed-status', async () => {
+        const supabase = getSupabaseServerAdminClient();
+        await supabase
+          .from('sparlo_reports')
+          .update({
+            status: 'failed',
+            error_message: categorizedError.userMessage,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', reportId);
+      });
     },
   },
   { event: 'report/generate-dd' },
@@ -105,6 +169,9 @@ export const generateDDReport = inngest.createFunction(
     ).__inngestActiveExecutions;
     tracker?.increment();
 
+    // Generate idempotency key from event ID for token tracking
+    const idempotencyKey = `dd-report-${event.data.reportId}-${event.id || Date.now()}`;
+
     try {
       console.log('[DD Function] Starting with event:', {
         name: event.name,
@@ -113,19 +180,18 @@ export const generateDDReport = inngest.createFunction(
         companyName: event.data.companyName,
       });
 
-      const {
-        reportId,
-        startupMaterials,
-        vcNotes,
-        companyName,
-        attachments,
-        accountId,
-      } = event.data;
+      const { reportId, startupMaterials, vcNotes, attachments } =
+        event.data as DDReportEventData;
+
+      // Sanitize company name
+      const companyName = sanitizeCompanyName(event.data.companyName);
 
       const supabase = getSupabaseServerAdminClient();
       console.log('[DD Function] Supabase client initialized');
 
-      // Authorization check: Verify report belongs to this account
+      // =========================================
+      // P1 FIX (141): Authorization - Use report's account_id as source of truth
+      // =========================================
       const { data: report, error: authError } = await supabase
         .from('sparlo_reports')
         .select('id, account_id')
@@ -137,16 +203,129 @@ export const generateDDReport = inngest.createFunction(
         return { success: false, reportId, error: 'Report not found' };
       }
 
-      if (report.account_id !== accountId) {
-        console.error('[DD Function] Authorization failed:', {
-          reportAccountId: report.account_id,
-          eventAccountId: accountId,
+      // Use the report's account_id as the source of truth (not event data)
+      const accountId = report.account_id;
+
+      // Log if event accountId differs (potential attack attempt)
+      if (event.data.accountId !== accountId) {
+        console.warn(
+          '[DD Function] Account ID mismatch (using report value):',
+          {
+            reportAccountId: accountId,
+            eventAccountId: event.data.accountId,
+          },
+        );
+      }
+
+      // =========================================
+      // P1 FIX (142): Rate Limiting Check
+      // =========================================
+      // Note: Uses type assertion because the RPC function is added by migration
+      // that may not have been applied yet. Regenerate types after migration.
+      const rateLimitResult = await step.run('check-rate-limit', async () => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const rpc = supabase.rpc as any;
+          const { data, error } = await rpc('check_rate_limit', {
+            p_account_id: accountId,
+            p_resource_type: 'dd_report',
+            p_limit: RATE_LIMIT_REPORTS_PER_HOUR,
+            p_window_minutes: RATE_LIMIT_WINDOW_MINUTES,
+          });
+
+          if (error) {
+            console.warn('[DD Function] Rate limit check failed:', error);
+            // Don't fail the report if rate limiting check fails
+            return { allowed: true, reset_at: null };
+          }
+
+          return data as {
+            allowed: boolean;
+            current_count: number;
+            limit: number;
+            reset_at: string | null;
+          };
+        } catch {
+          // Function may not exist yet - allow the request
+          console.warn('[DD Function] Rate limit function not available');
+          return { allowed: true, reset_at: null };
+        }
+      });
+
+      if (!rateLimitResult.allowed && rateLimitResult.reset_at) {
+        const resetAt = new Date(rateLimitResult.reset_at);
+        const errorMessage = `Rate limit exceeded. You can generate ${RATE_LIMIT_REPORTS_PER_HOUR} reports per hour. Try again at ${resetAt.toLocaleTimeString()}.`;
+
+        await supabase
+          .from('sparlo_reports')
+          .update({
+            status: 'failed',
+            error_message: errorMessage,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', reportId);
+
+        return { success: false, reportId, error: errorMessage };
+      }
+
+      // =========================================
+      // P1 FIX (139, 140): Input Validation & Token Budget Check
+      // =========================================
+      const validationResult = validateDDInput({
+        startupMaterials,
+        vcNotes,
+        companyName,
+        attachments,
+        tokenBudgetLimit: TOKEN_BUDGET_LIMIT,
+      });
+
+      if (!validationResult.valid) {
+        const errorMessage = validationResult.errors.join(' ');
+        console.error('[DD Function] Input validation failed:', {
+          errors: validationResult.errors,
+          warnings: validationResult.warnings,
         });
-        return {
-          success: false,
-          reportId,
-          error: 'Not authorized to access this report',
-        };
+
+        await supabase
+          .from('sparlo_reports')
+          .update({
+            status: 'failed',
+            error_message: errorMessage,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', reportId);
+
+        return { success: false, reportId, error: errorMessage };
+      }
+
+      // Log warnings if any
+      if (validationResult.warnings.length > 0) {
+        console.warn('[DD Function] Input validation warnings:', {
+          warnings: validationResult.warnings,
+          estimatedTokens: validationResult.estimatedTokens,
+        });
+      }
+
+      // =========================================
+      // P2 FIX (147): Attachment Validation
+      // =========================================
+      const attachmentValidation = validateAttachments(attachments);
+      if (!attachmentValidation.valid) {
+        const errorMessage = attachmentValidation.errors.join(' ');
+        console.error('[DD Function] Attachment validation failed:', {
+          errors: attachmentValidation.errors,
+        });
+
+        await supabase
+          .from('sparlo_reports')
+          .update({
+            status: 'failed',
+            error_message: errorMessage,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', reportId);
+
+        return { success: false, reportId, error: errorMessage };
       }
 
       // Convert attachments to appropriate formats for Claude
@@ -168,6 +347,18 @@ export const generateDDReport = inngest.createFunction(
           media_type: 'application/pdf' as const,
           data: a.data,
         }));
+
+      // P1 FIX (139): Sanitize user inputs
+      const { sanitized: sanitizedMaterials, suspiciousPatterns } =
+        sanitizeUserInput(startupMaterials);
+      const { sanitized: sanitizedNotes } = sanitizeUserInput(vcNotes || '');
+
+      if (suspiciousPatterns.length > 0) {
+        console.warn('[DD Function] Filtered suspicious patterns:', {
+          count: suspiciousPatterns.length,
+          patterns: suspiciousPatterns.slice(0, 5), // Log first 5 only
+        });
+      }
 
       // Handle ClaudeRefusalError at the top level
       try {
@@ -211,15 +402,7 @@ export const generateDDReport = inngest.createFunction(
         // Helper to calculate total usage from collected step usages
         function calculateTotalUsage(usages: TokenUsage[]): TokenUsage & {
           costUsd: number;
-          byStep: Record<string, TokenUsage>;
         } {
-          const byStep: Record<string, TokenUsage> = {};
-          usages.forEach((u, i) => {
-            if (u && u.totalTokens > 0) {
-              byStep[`step-${i}`] = u;
-            }
-          });
-
           const totals = usages.reduce(
             (acc, usage) => {
               if (!usage) return acc;
@@ -237,12 +420,12 @@ export const generateDDReport = inngest.createFunction(
               totals,
               MODELS.OPUS as keyof typeof CLAUDE_PRICING,
             ),
-            byStep,
           };
         }
 
         /**
          * Helper: Update report progress in Supabase
+         * P1 FIX (143): Now throws on error instead of silent logging
          */
         async function updateProgress(updates: Record<string, unknown>) {
           const { error } = await supabase
@@ -255,7 +438,59 @@ export const generateDDReport = inngest.createFunction(
 
           if (error) {
             console.error('Failed to update progress:', error);
+            // Throw to allow Inngest retry to handle
+            throw new Error(`Database update failed: ${error.message}`);
           }
+        }
+
+        /**
+         * P2 FIX (150): Validate chain step output has required data
+         */
+        function validateStepOutput(
+          stepName: string,
+          output: Record<string, unknown>,
+          requiredFields: string[],
+        ): void {
+          const missing: string[] = [];
+          const empty: string[] = [];
+
+          for (const field of requiredFields) {
+            const value = getNestedValue(output, field);
+            if (value === undefined) {
+              missing.push(field);
+            } else if (typeof value === 'string' && value.trim().length === 0) {
+              empty.push(field);
+            } else if (Array.isArray(value) && value.length === 0) {
+              empty.push(field);
+            }
+          }
+
+          if (missing.length > 0) {
+            throw new Error(
+              `${stepName} output missing required fields: ${missing.join(', ')}`,
+            );
+          }
+
+          if (empty.length > 0) {
+            console.warn(
+              `[DD] ${stepName} has empty required fields: ${empty.join(', ')}`,
+            );
+          }
+        }
+
+        function getNestedValue(
+          obj: Record<string, unknown>,
+          path: string,
+        ): unknown {
+          return path
+            .split('.')
+            .reduce<unknown>(
+              (current, key) =>
+                current && typeof current === 'object'
+                  ? (current as Record<string, unknown>)[key]
+                  : undefined,
+              obj,
+            );
         }
 
         // =========================================
@@ -276,10 +511,10 @@ export const generateDDReport = inngest.createFunction(
             attachmentNotes.push(`${pdfAttachments.length} PDF document(s)`);
           }
 
-          // Build user message with startup materials and optional VC notes
-          let userMessage = `## Startup Materials\n\n${startupMaterials}`;
-          if (vcNotes) {
-            userMessage += `\n\n## VC Notes\n\n${vcNotes}`;
+          // Build user message with sanitized inputs
+          let userMessage = `## Startup Materials\n\n${sanitizedMaterials}`;
+          if (sanitizedNotes) {
+            userMessage += `\n\n## VC Notes\n\n${sanitizedNotes}`;
           }
           if (attachmentNotes.length > 0) {
             userMessage += `\n\n[Note: ${attachmentNotes.join(' and ')} attached for context]`;
@@ -299,6 +534,12 @@ export const generateDDReport = inngest.createFunction(
           const parsed = parseJsonResponse<DD0_M_Output>(content, 'DD0-M');
           const validated = DD0_M_OutputSchema.parse(parsed);
 
+          // P2 FIX (150): Validate critical outputs
+          validateStepOutput('DD0-M', validated as Record<string, unknown>, [
+            'problem_extraction.problem_statement_for_analysis',
+            'technical_claims',
+          ]);
+
           await updateProgress({ phase_progress: 100 });
           checkTokenBudget(usage, 'DD0-M');
 
@@ -308,6 +549,14 @@ export const generateDDReport = inngest.createFunction(
         // Extract the problem statement for AN0-M
         const problemStatementForAnalysis =
           dd0Result.result.problem_extraction.problem_statement_for_analysis;
+
+        // P2 FIX (150): Validate problem statement is not empty
+        if (!problemStatementForAnalysis?.trim()) {
+          throw new Error(
+            'DD0-M failed to extract a valid problem statement from the startup materials. ' +
+              'Please ensure the materials describe the problem being solved.',
+          );
+        }
 
         // =========================================
         // AN0-M: Problem Framing (Existing)
@@ -346,7 +595,6 @@ Please frame this problem from first principles, independent of their proposed s
         });
 
         // Type assertion for problem analysis (skip clarification in DD mode)
-        // Note: We use an0mResult.result directly since DD mode never needs clarification
         const _an0mAnalysis = an0mResult.result as Extract<
           AN0_M_Output,
           { needs_clarification: false }
@@ -354,6 +602,7 @@ Please frame this problem from first principles, independent of their proposed s
 
         // =========================================
         // AN1.5-M: Teaching Selection (Existing)
+        // P1 FIX (146): Remove pretty-printing from JSON.stringify
         // =========================================
         const an1_5mResult = await step.run(
           'an1.5-m-teaching-selection',
@@ -365,7 +614,7 @@ Please frame this problem from first principles, independent of their proposed s
 
             const contextMessage = `## Problem Framing (DD Mode)
 
-${JSON.stringify(an0mResult.result, null, 2)}
+${JSON.stringify(an0mResult.result)}
 
 ## DD Context
 
@@ -411,11 +660,11 @@ Select teaching examples that will help us:
             // Include DD0 search seeds for targeted prior art search
             const contextMessage = `## Problem Framing (DD Mode)
 
-${JSON.stringify(an0mResult.result, null, 2)}
+${JSON.stringify(an0mResult.result)}
 
 ## Teaching Examples Selected
 
-${JSON.stringify(an1_5mResult.result, null, 2)}
+${JSON.stringify(an1_5mResult.result)}
 
 ## DD-Specific Search Seeds
 
@@ -472,15 +721,15 @@ This is Due Diligence for "${companyName}". Pay special attention to:
 
             const contextMessage = `## Problem Framing (DD Mode)
 
-${JSON.stringify(an0mResult.result, null, 2)}
+${JSON.stringify(an0mResult.result)}
 
 ## Teaching Examples
 
-${JSON.stringify(an1_5mResult.result, null, 2)}
+${JSON.stringify(an1_5mResult.result)}
 
 ## Literature Search Results
 
-${JSON.stringify(an1_7mResult.result, null, 2)}
+${JSON.stringify(an1_7mResult.result)}
 
 ## DD Context
 
@@ -520,19 +769,19 @@ This is Due Diligence for "${companyName}". The methodology briefing should:
 
           const contextMessage = `## Problem Framing (DD Mode)
 
-${JSON.stringify(an0mResult.result, null, 2)}
+${JSON.stringify(an0mResult.result)}
 
 ## Methodology Briefing
 
-${JSON.stringify(an2mResult.result, null, 2)}
+${JSON.stringify(an2mResult.result)}
 
 ## Teaching Examples
 
-${JSON.stringify(an1_5mResult.result, null, 2)}
+${JSON.stringify(an1_5mResult.result)}
 
 ## Literature Search Results
 
-${JSON.stringify(an1_7mResult.result, null, 2)}
+${JSON.stringify(an1_7mResult.result)}
 
 ## DD Context
 
@@ -576,23 +825,23 @@ We will later map the startup's approach onto this landscape to assess:
 
           const contextMessage = `## DD0 Output (Extracted Claims)
 
-${JSON.stringify(dd0Result.result, null, 2)}
+${JSON.stringify(dd0Result.result)}
 
 ## AN0-M Output (Problem Framing)
 
-${JSON.stringify(an0mResult.result, null, 2)}
+${JSON.stringify(an0mResult.result)}
 
 ## AN1.5-M Output (Teaching Examples)
 
-${JSON.stringify(an1_5mResult.result, null, 2)}
+${JSON.stringify(an1_5mResult.result)}
 
 ## AN1.7-M Output (Literature Search)
 
-${JSON.stringify(an1_7mResult.result, null, 2)}
+${JSON.stringify(an1_7mResult.result)}
 
 ## AN2-M Output (TRIZ Analysis)
 
-${JSON.stringify(an2mResult.result, null, 2)}
+${JSON.stringify(an2mResult.result)}
 
 ## Your Task
 
@@ -621,6 +870,59 @@ Validate each of ${companyName}'s claims against:
         });
 
         // =========================================
+        // DD3.5-M: Commercialization Reality Check
+        // =========================================
+        const dd3_5Result = await step.run(
+          'dd3.5-m-commercialization',
+          async () => {
+            await updateProgress({
+              current_step: 'dd3.5-m',
+              phase_progress: 0,
+            });
+
+            const contextMessage = `## DD0 Output (Claim Extraction & Commercial Assumptions)
+
+${JSON.stringify(dd0Result.result)}
+
+## DD3 Output (Technical Claim Validation)
+
+${JSON.stringify(dd3Result.result)}
+
+## Your Task
+
+Analyze the commercial viability for ${companyName}:
+1. Validate unit economics assumptions
+2. Assess market reality and customer demand
+3. Evaluate GTM challenges
+4. Check timeline fit with VC expectations
+5. Identify scale-up challenges
+6. Analyze ecosystem dependencies
+7. Evaluate policy exposure
+8. Predict incumbent response`;
+
+            const { content, usage } = await callClaude({
+              model: MODELS.OPUS,
+              system: DD3_5_M_PROMPT,
+              userMessage: contextMessage,
+              maxTokens: HYBRID_MAX_TOKENS,
+              temperature: DD_TEMPERATURES.validation,
+              cacheablePrefix: HYBRID_CACHED_PREFIX,
+            });
+
+            const parsed = parseJsonResponse<DD3_5_M_Output>(
+              content,
+              'DD3.5-M',
+            );
+            const validated = DD3_5_M_OutputSchema.parse(parsed);
+
+            await updateProgress({ phase_progress: 100 });
+            checkTokenBudget(usage, 'DD3.5-M');
+
+            return { result: validated, usage };
+          },
+        );
+
+        // =========================================
         // DD4-M: Solution Space Mapping & Moat
         // =========================================
         const dd4Result = await step.run('dd4-m-moat-assessment', async () => {
@@ -631,19 +933,23 @@ Validate each of ${companyName}'s claims against:
 
           const contextMessage = `## DD0 Output (Extracted Claims & Proposed Solution)
 
-${JSON.stringify(dd0Result.result, null, 2)}
+${JSON.stringify(dd0Result.result)}
 
 ## AN3-M Output (Full Solution Space)
 
-${JSON.stringify(an3mResult.result, null, 2)}
+${JSON.stringify(an3mResult.result)}
 
 ## DD3 Output (Claim Validation)
 
-${JSON.stringify(dd3Result.result, null, 2)}
+${JSON.stringify(dd3Result.result)}
+
+## DD3.5 Output (Commercialization Reality Check)
+
+${JSON.stringify(dd3_5Result.result)}
 
 ## AN1.7-M Output (Prior Art)
 
-${JSON.stringify(an1_7mResult.result, null, 2)}
+${JSON.stringify(an1_7mResult.result)}
 
 ## Your Task
 
@@ -653,7 +959,11 @@ Map ${companyName}'s approach onto the solution space:
 3. What alternatives did they miss or dismiss?
 4. Assess novelty against prior art
 5. Evaluate moat strength and durability
-6. Identify competitive threats from other approaches`;
+6. Identify competitive threats from other approaches
+7. Formulate "The One Bet" - what they're really betting on
+8. Conduct pre-mortem analysis
+9. Analyze comparable companies
+10. Build scenario analysis with expected value`;
 
           const { content, usage } = await callClaude({
             model: MODELS.OPUS,
@@ -684,36 +994,45 @@ Map ${companyName}'s approach onto the solution space:
               phase_progress: 0,
             });
 
-            const contextMessage = `## DD0 Output (Claim Extraction)
+            const contextMessage = `## DD0 Output (Claim Extraction & Commercial Assumptions)
 
-${JSON.stringify(dd0Result.result, null, 2)}
+${JSON.stringify(dd0Result.result)}
 
 ## AN0-M Output (Problem Framing)
 
-${JSON.stringify(an0mResult.result, null, 2)}
+${JSON.stringify(an0mResult.result)}
 
 ## AN3-M Output (Solution Space)
 
-${JSON.stringify(an3mResult.result, null, 2)}
+${JSON.stringify(an3mResult.result)}
 
-## DD3 Output (Claim Validation)
+## DD3 Output (Technical Claim Validation)
 
-${JSON.stringify(dd3Result.result, null, 2)}
+${JSON.stringify(dd3Result.result)}
 
-## DD4 Output (Solution Mapping & Moat)
+## DD3.5 Output (Commercialization Reality Check)
 
-${JSON.stringify(dd4Result.result, null, 2)}
+${JSON.stringify(dd3_5Result.result)}
+
+## DD4 Output (Solution Mapping, Moat & Strategic Analysis)
+
+${JSON.stringify(dd4Result.result)}
 
 ## Your Task
 
-Generate a Technical Due Diligence Report for ${companyName}.
+Generate a comprehensive Technical Due Diligence Report for ${companyName}.
 
-This report should help an investor decide:
-1. Is the technical thesis sound?
-2. Is the approach optimal for the problem?
-3. Is this defensible?
-4. What are the key risks?
-5. What should they ask the founders?`;
+This V2 report provides:
+1. One-page summary with verdict box
+2. Problem primer teaching VCs how to think about the space
+3. Solution landscape as the centerpiece (Sparlo's core value)
+4. Technical thesis validation
+5. Commercialization reality check
+6. Pre-mortem, comparables, and scenario analysis
+7. Actionable diligence roadmap
+8. Calibrated confidence levels
+
+Make the report 3-5x more valuable than traditional DD.`;
 
             const { content, usage } = await callClaude({
               model: MODELS.OPUS,
@@ -736,6 +1055,7 @@ This report should help an investor decide:
 
         // =========================================
         // Complete Report
+        // P1 FIX (143, 145): Use atomic completion with idempotency
         // =========================================
         const allUsages = [
           dd0Result.usage,
@@ -745,29 +1065,13 @@ This report should help an investor decide:
           an2mResult.usage,
           an3mResult.usage,
           dd3Result.usage,
+          dd3_5Result.usage,
           dd4Result.usage,
           dd5Result.usage,
         ];
         const totalUsage = calculateTotalUsage(allUsages);
 
         await step.run('complete-dd-report', async () => {
-          // Persist token usage to database
-          const { error: usageError } = await supabase.rpc('increment_usage', {
-            p_account_id: accountId,
-            p_tokens: totalUsage.totalTokens,
-            p_is_report: true,
-            p_is_chat: false,
-          });
-          if (usageError) {
-            console.error('[Usage] Failed to persist usage:', usageError);
-          } else {
-            console.log('[Usage] Persisted (DD):', {
-              accountId,
-              tokens: totalUsage.totalTokens,
-              costUsd: totalUsage.costUsd,
-            });
-          }
-
           // Generate title from report
           const generatedTitle = `DD: ${dd5Result.result.header.company_name} - ${dd5Result.result.executive_summary.verdict}`;
 
@@ -777,25 +1081,94 @@ This report should help an investor decide:
               .slice(0, 200)
               .trim();
 
-          await updateProgress({
-            status: 'complete',
-            current_step: 'complete',
-            phase_progress: 100,
-            title: generatedTitle,
-            headline,
-            report_data: {
-              mode: 'dd',
-              report: dd5Result.result,
-              claim_extraction: dd0Result.result,
-              problem_framing: an0mResult.result,
-              teaching_examples: an1_5mResult.result,
-              literature: an1_7mResult.result,
-              methodology: an2mResult.result,
-              solution_space: an3mResult.result,
-              claim_validation: dd3Result.result,
-              solution_mapping: dd4Result.result,
-              tokenUsage: totalUsage,
-            },
+          // Build report data
+          const reportData = {
+            mode: 'dd',
+            version: '2.0.0',
+            report: dd5Result.result,
+            claim_extraction: dd0Result.result,
+            problem_framing: an0mResult.result,
+            teaching_examples: an1_5mResult.result,
+            literature: an1_7mResult.result,
+            methodology: an2mResult.result,
+            solution_space: an3mResult.result,
+            claim_validation: dd3Result.result,
+            commercialization_analysis: dd3_5Result.result,
+            solution_mapping: dd4Result.result,
+            tokenUsage: totalUsage,
+          };
+
+          // P1 FIX (143, 145): Use atomic completion function with idempotency
+          // Note: Uses type assertion because the RPC function is added by migration
+          // that may not have been applied yet. Regenerate types after migration.
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const rpc = supabase.rpc as any;
+          const { data, error } = await rpc('complete_dd_report_atomic', {
+            p_report_id: reportId,
+            p_report_data: reportData,
+            p_title: generatedTitle,
+            p_headline: headline,
+            p_account_id: accountId,
+            p_total_tokens: totalUsage.totalTokens,
+            p_idempotency_key: idempotencyKey,
+          });
+
+          if (error) {
+            // Fallback to non-atomic update if function doesn't exist
+            if (
+              error.message?.includes('function') &&
+              error.message?.includes('does not exist')
+            ) {
+              console.warn(
+                '[DD Function] Atomic completion not available, using fallback',
+              );
+
+              // Non-atomic fallback
+              const { error: updateError } = await supabase
+                .from('sparlo_reports')
+                .update({
+                  status: 'complete',
+                  current_step: 'complete',
+                  phase_progress: 100,
+                  title: generatedTitle,
+                  headline,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  report_data: reportData as any,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq('id', reportId)
+                .eq('account_id', accountId);
+
+              if (updateError) {
+                throw new Error(
+                  `Failed to update report: ${updateError.message}`,
+                );
+              }
+
+              // Track token usage (non-idempotent fallback)
+              await supabase.rpc('increment_usage', {
+                p_account_id: accountId,
+                p_tokens: totalUsage.totalTokens,
+                p_is_report: true,
+                p_is_chat: false,
+              });
+            } else {
+              console.error('[DD Function] Atomic completion failed:', error);
+              throw new Error(`Failed to complete report: ${error.message}`);
+            }
+          } else {
+            const result = data as { success: boolean; error?: string };
+            if (!result.success) {
+              throw new Error(
+                result.error || 'Unknown error completing report',
+              );
+            }
+          }
+
+          console.log('[DD Function] Report completed atomically:', {
+            reportId,
+            tokens: totalUsage.totalTokens,
+            costUsd: totalUsage.costUsd,
           });
         });
 
