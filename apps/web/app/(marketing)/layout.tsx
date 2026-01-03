@@ -1,6 +1,7 @@
 import { requireUser } from '@kit/supabase/require-user';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
+import { Footer } from '~/(marketing)/_components/footer';
 import { Navigation } from '~/(marketing)/_components/navigation';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
@@ -13,7 +14,9 @@ async function SiteLayout(props: React.PropsWithChildren) {
       <Navigation user={user.data} variant="dark" />
 
       {/* No padding-top - hero is full viewport with nav overlay */}
-      {props.children}
+      <main className="flex-1">{props.children}</main>
+
+      <Footer />
     </div>
   );
 }
