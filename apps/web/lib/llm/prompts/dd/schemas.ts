@@ -71,7 +71,7 @@ function flexibleEnum<T extends [string, ...string[]]>(
   return z.string().transform((val): T[number] => {
     // Step 1: Extract the first word/phrase before any annotation
     // Handles: "WEAK - reason", "WEAK (reason)", "WEAK: reason"
-    let normalized = val
+    const normalized = val
       .replace(/\s*[-:(].*$/, '') // Strip everything after -, :, or (
       .trim()
       .toUpperCase();
@@ -112,7 +112,7 @@ function flexibleEnum<T extends [string, ...string[]]>(
 /**
  * Creates an antifragile enum that can also be null/undefined
  */
-function flexibleEnumOptional<T extends [string, ...string[]]>(
+function _flexibleEnumOptional<T extends [string, ...string[]]>(
   values: T,
   defaultValue: T[number],
 ): z.ZodEffects<z.ZodString, T[number], string> {
@@ -155,9 +155,7 @@ function flexibleNumber(
     }
 
     // Fall back to default
-    console.warn(
-      `[DD Schema] Number fallback: "${val}" -> ${defaultValue}`,
-    );
+    console.warn(`[DD Schema] Number fallback: "${val}" -> ${defaultValue}`);
     return defaultValue;
   });
 }
@@ -167,7 +165,15 @@ function flexibleNumber(
 // ============================================
 
 export const ClaimType = flexibleEnum(
-  ['PERFORMANCE', 'NOVELTY', 'MECHANISM', 'FEASIBILITY', 'TIMELINE', 'COST', 'MOAT'],
+  [
+    'PERFORMANCE',
+    'NOVELTY',
+    'MECHANISM',
+    'FEASIBILITY',
+    'TIMELINE',
+    'COST',
+    'MOAT',
+  ],
   'MECHANISM',
 );
 
@@ -177,7 +183,13 @@ export const EvidenceLevel = flexibleEnum(
 );
 
 export const Verifiability = flexibleEnum(
-  ['PHYSICS_CHECK', 'LITERATURE_CHECK', 'DATA_REQUIRED', 'TEST_REQUIRED', 'UNVERIFIABLE'],
+  [
+    'PHYSICS_CHECK',
+    'LITERATURE_CHECK',
+    'DATA_REQUIRED',
+    'TEST_REQUIRED',
+    'UNVERIFIABLE',
+  ],
   'DATA_REQUIRED',
 );
 
@@ -206,13 +218,16 @@ export const MechanismVerdict = flexibleEnum(
   'QUESTIONABLE',
 );
 
-export const Confidence = flexibleEnum(
-  ['HIGH', 'MEDIUM', 'LOW'],
-  'MEDIUM',
-);
+export const Confidence = flexibleEnum(['HIGH', 'MEDIUM', 'LOW'], 'MEDIUM');
 
 export const NoveltyClassification = flexibleEnum(
-  ['GENUINELY_NOVEL', 'NOVEL_COMBINATION', 'NOVEL_APPLICATION', 'INCREMENTAL', 'NOT_NOVEL'],
+  [
+    'GENUINELY_NOVEL',
+    'NOVEL_COMBINATION',
+    'NOVEL_APPLICATION',
+    'INCREMENTAL',
+    'NOT_NOVEL',
+  ],
   'INCREMENTAL',
 );
 
@@ -243,13 +258,26 @@ export const FindingType = flexibleEnum(
 
 // Commercial assumption categories
 export const CommercialAssumptionCategory = flexibleEnum(
-  ['UNIT_ECONOMICS', 'MARKET', 'GTM', 'TIMELINE', 'ECOSYSTEM', 'SCALEUP', 'POLICY'],
+  [
+    'UNIT_ECONOMICS',
+    'MARKET',
+    'GTM',
+    'TIMELINE',
+    'ECOSYSTEM',
+    'SCALEUP',
+    'POLICY',
+  ],
   'MARKET',
 );
 
 // Commercial viability verdicts
 export const CommercialViabilityVerdict = flexibleEnum(
-  ['CLEAR_PATH', 'CHALLENGING_BUT_VIABLE', 'SIGNIFICANT_OBSTACLES', 'UNLIKELY_TO_COMMERCIALIZE'],
+  [
+    'CLEAR_PATH',
+    'CHALLENGING_BUT_VIABLE',
+    'SIGNIFICANT_OBSTACLES',
+    'UNLIKELY_TO_COMMERCIALIZE',
+  ],
   'CHALLENGING_BUT_VIABLE',
 );
 
@@ -314,7 +342,10 @@ export const CompanyOutcome = flexibleEnum(
 );
 
 // Overall verdict for one-page summary
-export const OverallVerdict = flexibleEnum(['PROCEED', 'CAUTION', 'PASS'], 'CAUTION');
+export const OverallVerdict = flexibleEnum(
+  ['PROCEED', 'CAUTION', 'PASS'],
+  'CAUTION',
+);
 
 // ============================================
 // DD0 Output Schema - Claim Extraction
@@ -324,7 +355,11 @@ export const DD0_M_OutputSchema = z.object({
   startup_profile: z.object({
     company_name: z.string(),
     technology_domain: z.string(),
-    stage: Stage,
+    stage: z.object({
+      extracted: Stage,
+      source: z.string(),
+      confidence: Confidence,
+    }),
     team_background: z.string().optional(),
   }),
 
@@ -372,7 +407,10 @@ export const DD0_M_OutputSchema = z.object({
       id: z.string(),
       mechanism: z.string(),
       how_described: z.string(),
-      depth_of_explanation: flexibleEnum(['DETAILED', 'MODERATE', 'SUPERFICIAL', 'HAND_WAVY'], 'MODERATE'),
+      depth_of_explanation: flexibleEnum(
+        ['DETAILED', 'MODERATE', 'SUPERFICIAL', 'HAND_WAVY'],
+        'MODERATE',
+      ),
       physics_to_validate: z.array(z.string()),
       potential_contradictions: z.array(z.string()),
     }),
@@ -380,7 +418,18 @@ export const DD0_M_OutputSchema = z.object({
 
   red_flags: z.array(
     z.object({
-      flag_type: flexibleEnum(['PHYSICS_VIOLATION', 'EXCEEDS_LIMITS', 'UNSUPPORTED_NOVELTY', 'VAGUE_MECHANISM', 'TRL_MISMATCH', 'UNBASED_ECONOMICS', 'TIMELINE_UNREALISTIC'], 'VAGUE_MECHANISM'),
+      flag_type: flexibleEnum(
+        [
+          'PHYSICS_VIOLATION',
+          'EXCEEDS_LIMITS',
+          'UNSUPPORTED_NOVELTY',
+          'VAGUE_MECHANISM',
+          'TRL_MISMATCH',
+          'UNBASED_ECONOMICS',
+          'TIMELINE_UNREALISTIC',
+        ],
+        'VAGUE_MECHANISM',
+      ),
       description: z.string(),
       severity: flexibleEnum(['CRITICAL', 'HIGH', 'MEDIUM'], 'MEDIUM'),
       related_claim_id: z.string(),
@@ -501,7 +550,10 @@ export const DD3_M_OutputSchema = z.object({
           mode: z.string(),
           trigger: z.string(),
           startup_addresses: z.boolean(),
-          mitigation_quality: flexibleEnum(['STRONG', 'ADEQUATE', 'WEAK', 'MISSING'], 'WEAK'),
+          mitigation_quality: flexibleEnum(
+            ['STRONG', 'ADEQUATE', 'WEAK', 'MISSING'],
+            'WEAK',
+          ),
         }),
       ),
     }),
@@ -525,9 +577,15 @@ export const DD3_M_OutputSchema = z.object({
         type: flexibleEnum(['TECHNICAL', 'PHYSICAL'], 'TECHNICAL'),
         improving_parameter: z.string(),
         worsening_parameter: z.string(),
-        startup_awareness: flexibleEnum(['IDENTIFIED', 'PARTIALLY_AWARE', 'UNAWARE'], 'PARTIALLY_AWARE'),
+        startup_awareness: flexibleEnum(
+          ['IDENTIFIED', 'PARTIALLY_AWARE', 'UNAWARE'],
+          'PARTIALLY_AWARE',
+        ),
         startup_resolution: z.string(),
-        resolution_validity: flexibleEnum(['RESOLVED', 'PARTIALLY_RESOLVED', 'UNRESOLVED', 'IGNORED'], 'PARTIALLY_RESOLVED'),
+        resolution_validity: flexibleEnum(
+          ['RESOLVED', 'PARTIALLY_RESOLVED', 'UNRESOLVED', 'IGNORED'],
+          'PARTIALLY_RESOLVED',
+        ),
         standard_resolution: z.string(),
         inventive_principles_applicable: z.array(z.string()),
       }),
@@ -543,7 +601,10 @@ export const DD3_M_OutputSchema = z.object({
 
     triz_assessment: z.object({
       contradiction_awareness: Confidence,
-      resolution_quality: flexibleEnum(['ELEGANT', 'ADEQUATE', 'PARTIAL', 'POOR'], 'ADEQUATE'),
+      resolution_quality: flexibleEnum(
+        ['ELEGANT', 'ADEQUATE', 'PARTIAL', 'POOR'],
+        'ADEQUATE',
+      ),
       inventive_level: flexibleNumber(3, { min: 1, max: 5 }),
       inventive_level_rationale: z.string(),
     }),
@@ -558,10 +619,16 @@ export const DD3_M_OutputSchema = z.object({
           challenge: z.string(),
           nonlinearity: z.string(),
           startup_addresses: z.boolean(),
-          assessment: flexibleEnum(['MANAGEABLE', 'SIGNIFICANT', 'SEVERE'], 'SIGNIFICANT'),
+          assessment: flexibleEnum(
+            ['MANAGEABLE', 'SIGNIFICANT', 'SEVERE'],
+            'SIGNIFICANT',
+          ),
         }),
       ),
-      scale_verdict: flexibleEnum(['FEASIBLE', 'CHALLENGING', 'UNLIKELY'], 'CHALLENGING'),
+      scale_verdict: flexibleEnum(
+        ['FEASIBLE', 'CHALLENGING', 'UNLIKELY'],
+        'CHALLENGING',
+      ),
     }),
 
     cost_assessment: z.object({
@@ -579,14 +646,20 @@ export const DD3_M_OutputSchema = z.object({
         }),
       ),
       realistic_cost_range: z.string(),
-      cost_verdict: flexibleEnum(['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'], 'OPTIMISTIC'),
+      cost_verdict: flexibleEnum(
+        ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
+        'OPTIMISTIC',
+      ),
     }),
 
     timeline_assessment: z.object({
       claimed_timeline: z.string(),
       trl_current: z.string(),
       trl_claimed: z.string(),
-      timeline_verdict: flexibleEnum(['REALISTIC', 'AGGRESSIVE', 'UNREALISTIC'], 'AGGRESSIVE'),
+      timeline_verdict: flexibleEnum(
+        ['REALISTIC', 'AGGRESSIVE', 'UNREALISTIC'],
+        'AGGRESSIVE',
+      ),
       realistic_timeline: z.string(),
     }),
   }),
@@ -650,7 +723,10 @@ export const DD3_5_M_OutputSchema = z.object({
     secondary_commercial_risks: z.array(z.string()),
     timeline_to_meaningful_revenue: z.string(),
     capital_to_commercial_scale: z.string(),
-    vc_timeline_fit: flexibleEnum(['FITS', 'STRETCHED', 'MISALIGNED'], 'STRETCHED'),
+    vc_timeline_fit: flexibleEnum(
+      ['FITS', 'STRETCHED', 'MISALIGNED'],
+      'STRETCHED',
+    ),
   }),
 
   unit_economics_analysis: z.object({
@@ -667,13 +743,19 @@ export const DD3_5_M_OutputSchema = z.object({
     cost_reduction_assessment: z.object({
       learning_curve: z.object({
         assumption: z.string(),
-        verdict: flexibleEnum(['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'], 'OPTIMISTIC'),
+        verdict: flexibleEnum(
+          ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
+          'OPTIMISTIC',
+        ),
         reasoning: z.string(),
       }),
       scale_effects: z.object({
         what_scales: z.array(z.string()),
         what_doesnt: z.array(z.string()),
-        verdict: flexibleEnum(['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'], 'OPTIMISTIC'),
+        verdict: flexibleEnum(
+          ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
+          'OPTIMISTIC',
+        ),
       }),
       magic_assumptions: z.array(
         z.object({
@@ -707,13 +789,19 @@ export const DD3_5_M_OutputSchema = z.object({
     customer_identification: z.object({
       stated_customer: z.string(),
       actual_buyer: z.string(),
-      specificity: flexibleEnum(['SPECIFIC_NAMES', 'CATEGORIES_ONLY', 'VAGUE'], 'CATEGORIES_ONLY'),
+      specificity: flexibleEnum(
+        ['SPECIFIC_NAMES', 'CATEGORIES_ONLY', 'VAGUE'],
+        'CATEGORIES_ONLY',
+      ),
       evidence_of_demand: z.object({
         lois_signed: flexibleNumber(0),
         pilots_active: flexibleNumber(0),
         conversations_claimed: z.string(),
         revenue_to_date: z.string(),
-        assessment: flexibleEnum(['VALIDATED', 'PARTIALLY_VALIDATED', 'UNVALIDATED'], 'PARTIALLY_VALIDATED'),
+        assessment: flexibleEnum(
+          ['VALIDATED', 'PARTIALLY_VALIDATED', 'UNVALIDATED'],
+          'PARTIALLY_VALIDATED',
+        ),
       }),
       willingness_to_pay: z.object({
         claimed: z.string(),
@@ -770,7 +858,16 @@ export const DD3_5_M_OutputSchema = z.object({
       stated_approach: z.string(),
       realistic_assessment: z.string(),
       critical_partnerships: z.array(z.string()),
-      partnership_status: flexibleEnum(['SIGNED', 'IN_DISCUSSION', 'IDENTIFIED', 'PARTIALLY_IDENTIFIED', 'UNCLEAR'], 'UNCLEAR'),
+      partnership_status: flexibleEnum(
+        [
+          'SIGNED',
+          'IN_DISCUSSION',
+          'IDENTIFIED',
+          'PARTIALLY_IDENTIFIED',
+          'UNCLEAR',
+        ],
+        'UNCLEAR',
+      ),
     }),
     verdict: GTMVerdict,
     reasoning: z.string(),
@@ -794,11 +891,20 @@ export const DD3_5_M_OutputSchema = z.object({
     vc_math: z.object({
       years_from_series_a_to_scale: z.string(),
       fits_fund_timeline: z.boolean(),
-      exit_path_visibility: flexibleEnum(['CLEAR', 'EMERGING', 'UNCLEAR'], 'EMERGING'),
-      likely_exit_type: flexibleEnum(['ACQUISITION', 'IPO', 'SECONDARY', 'UNCLEAR'], 'UNCLEAR'),
+      exit_path_visibility: flexibleEnum(
+        ['CLEAR', 'EMERGING', 'UNCLEAR'],
+        'EMERGING',
+      ),
+      likely_exit_type: flexibleEnum(
+        ['ACQUISITION', 'IPO', 'SECONDARY', 'UNCLEAR'],
+        'UNCLEAR',
+      ),
     }),
     too_early_assessment: z.object({
-      verdict: flexibleEnum(['RIGHT_TIME', '2_YEARS_EARLY', '5_PLUS_YEARS_EARLY'], '2_YEARS_EARLY'),
+      verdict: flexibleEnum(
+        ['RIGHT_TIME', '2_YEARS_EARLY', '5_PLUS_YEARS_EARLY'],
+        '2_YEARS_EARLY',
+      ),
       enabling_conditions_status: z.array(
         z.object({
           condition: z.string(),
@@ -825,7 +931,10 @@ export const DD3_5_M_OutputSchema = z.object({
       equipment_exists: z.boolean(),
       equipment_gap: z.string(),
       supply_chain_risks: z.array(z.string()),
-      verdict: flexibleEnum(['READY', 'NEEDS_DEVELOPMENT', 'MAJOR_GAPS'], 'NEEDS_DEVELOPMENT'),
+      verdict: flexibleEnum(
+        ['READY', 'NEEDS_DEVELOPMENT', 'MAJOR_GAPS'],
+        'NEEDS_DEVELOPMENT',
+      ),
     }),
     valley_of_death: z.object({
       capital_required: z.string(),
@@ -951,7 +1060,10 @@ export const DD4_M_OutputSchema = z.object({
       optimal_for_problem: z.boolean(),
       explanation: z.string(),
       what_first_principles_suggests: z.string(),
-      alignment: flexibleEnum(['ALIGNED', 'PARTIALLY_ALIGNED', 'MISALIGNED'], 'PARTIALLY_ALIGNED'),
+      alignment: flexibleEnum(
+        ['ALIGNED', 'PARTIALLY_ALIGNED', 'MISALIGNED'],
+        'PARTIALLY_ALIGNED',
+      ),
     }),
 
     problem_framing_assessment: z.object({
@@ -982,7 +1094,10 @@ export const DD4_M_OutputSchema = z.object({
 
     prior_art_findings: z.array(
       z.object({
-        source_type: flexibleEnum(['PATENT', 'ACADEMIC', 'COMMERCIAL', 'ABANDONED'], 'COMMERCIAL'),
+        source_type: flexibleEnum(
+          ['PATENT', 'ACADEMIC', 'COMMERCIAL', 'ABANDONED'],
+          'COMMERCIAL',
+        ),
         reference: z.string(),
         relevance: z.string(),
         what_it_covers: z.string(),
@@ -1009,8 +1124,14 @@ export const DD4_M_OutputSchema = z.object({
     technical_moat: z.object({
       patentability: MoatStrength,
       patent_rationale: z.string(),
-      trade_secret_potential: flexibleEnum(['STRONG', 'MODERATE', 'WEAK'], 'MODERATE'),
-      replication_difficulty: flexibleEnum(['VERY_HARD', 'HARD', 'MODERATE', 'EASY'], 'MODERATE'),
+      trade_secret_potential: flexibleEnum(
+        ['STRONG', 'MODERATE', 'WEAK'],
+        'MODERATE',
+      ),
+      replication_difficulty: flexibleEnum(
+        ['VERY_HARD', 'HARD', 'MODERATE', 'EASY'],
+        'MODERATE',
+      ),
       time_to_replicate: z.string(),
       key_barriers: z.array(z.string()),
     }),
@@ -1271,11 +1392,17 @@ export const DD5_M_OutputSchema = z.object({
         symbol: z.string(),
       }),
       commercial_viability: z.object({
-        verdict: flexibleEnum(['CLEAR_PATH', 'CHALLENGING', 'UNLIKELY'], 'CHALLENGING'),
+        verdict: flexibleEnum(
+          ['CLEAR_PATH', 'CHALLENGING', 'UNLIKELY'],
+          'CHALLENGING',
+        ),
         symbol: z.string(),
       }),
       solution_space_position: z.object({
-        verdict: flexibleEnum(['OPTIMAL', 'REASONABLE', 'SUBOPTIMAL'], 'REASONABLE'),
+        verdict: flexibleEnum(
+          ['OPTIMAL', 'REASONABLE', 'SUBOPTIMAL'],
+          'REASONABLE',
+        ),
         symbol: z.string(),
       }),
       moat_strength: z.object({
@@ -1430,7 +1557,10 @@ export const DD5_M_OutputSchema = z.object({
       what_they_are_betting_on: z.string(),
       what_must_be_true: z.array(z.string()),
       what_they_are_betting_against: z.array(z.string()),
-      bet_quality: flexibleEnum(['GOOD', 'REASONABLE', 'QUESTIONABLE'], 'REASONABLE'),
+      bet_quality: flexibleEnum(
+        ['GOOD', 'REASONABLE', 'QUESTIONABLE'],
+        'REASONABLE',
+      ),
     }),
     missed_opportunities_deep_dive: z.array(
       z.object({
@@ -1526,7 +1656,10 @@ export const DD5_M_OutputSchema = z.object({
     unit_economics: z.object({
       today: z.string(),
       claimed_at_scale: z.string(),
-      credibility: flexibleEnum(['CREDIBLE', 'OPTIMISTIC', 'UNREALISTIC'], 'OPTIMISTIC'),
+      credibility: flexibleEnum(
+        ['CREDIBLE', 'OPTIMISTIC', 'UNREALISTIC'],
+        'OPTIMISTIC',
+      ),
       what_must_be_true: z.string(),
     }),
     path_to_revenue: z.object({
@@ -1782,7 +1915,10 @@ export const DD5_M_OutputSchema = z.object({
       summary: z.string(),
     }),
     commercial_verdict: z.object({
-      verdict: flexibleEnum(['CLEAR_PATH', 'CHALLENGING', 'UNLIKELY'], 'CHALLENGING'),
+      verdict: flexibleEnum(
+        ['CLEAR_PATH', 'CHALLENGING', 'UNLIKELY'],
+        'CHALLENGING',
+      ),
       summary: z.string(),
     }),
     overall_verdict: z.object({
