@@ -282,6 +282,39 @@ export type Database = {
         }
         Relationships: []
       }
+      help_docs: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          search_vector: unknown
+          section: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          search_vector?: unknown
+          section?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          search_vector?: unknown
+          section?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       invitations: {
         Row: {
           account_id: string
@@ -1448,6 +1481,24 @@ export type Database = {
           title: string
         }[]
       }
+      search_help_docs: {
+        Args: {
+          fuzzy_threshold?: number
+          match_count?: number
+          search_query: string
+        }
+        Returns: {
+          content: string
+          id: string
+          rank: number
+          section: string
+          similarity: number
+          slug: string
+          title: string
+        }[]
+      }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       team_account_workspace: {
         Args: { account_slug: string }
         Returns: {
