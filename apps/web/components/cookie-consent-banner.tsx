@@ -1,8 +1,33 @@
 'use client';
 
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 const COOKIE_CONSENT_KEY = 'cookie_consent_status';
+
+/**
+ * Detect if user is likely in EU/EEA based on timezone.
+ * No external API calls, privacy-friendly, instant.
+ */
+function isLikelyEU(): boolean {
+  if (typeof Intl === 'undefined') return false;
+
+  try {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    // EU/EEA timezones
+    const euTimezones = [
+      'Europe/',
+      'Atlantic/Canary',
+      'Atlantic/Faroe',
+      'Atlantic/Madeira',
+      'Africa/Ceuta',
+    ];
+
+    return euTimezones.some((tz) => timezone.startsWith(tz));
+  } catch {
+    return false;
+  }
+}
 
 type ConsentStatus = 'unknown' | 'accepted' | 'rejected';
 
@@ -55,11 +80,45 @@ export function useCookieConsent() {
 }
 
 export function CookieConsentBanner() {
-  const { status, accept } = useCookieConsent();
+  const { status, accept, reject } = useCookieConsent();
+  const isEU = useMemo(() => isLikelyEU(), []);
 
   // Don't show if user has already made a choice
   if (status !== 'unknown') return null;
 
+  // EU/EEA: GDPR-compliant banner with equal accept/reject options
+  if (isEU) {
+    return (
+      <div
+        className="animate-in slide-in-from-bottom-4 fill-mode-both fixed inset-x-0 bottom-0 z-50 duration-500"
+        style={{ animationDelay: '0.5s' }}
+      >
+        <div className="bg-zinc-950 px-4 py-3 sm:px-6">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 sm:flex-row sm:gap-4">
+            <p className="text-center text-[13px] tracking-[-0.01em] text-zinc-400 sm:text-left sm:text-[14px]">
+              We use cookies to analyze site usage and improve your experience.
+            </p>
+            <div className="flex shrink-0 items-center gap-3">
+              <button
+                onClick={reject}
+                className="border border-zinc-700 px-4 py-1.5 text-[13px] font-medium text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white sm:text-[14px]"
+              >
+                Decline
+              </button>
+              <button
+                onClick={accept}
+                className="bg-white px-4 py-1.5 text-[13px] font-medium text-zinc-900 transition-colors hover:bg-zinc-100 sm:text-[14px]"
+              >
+                Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Non-EU: Aggressive banner optimized for opt-in
   return (
     <div
       className="animate-in slide-in-from-bottom-4 fill-mode-both fixed inset-x-0 bottom-0 z-50 duration-500"
