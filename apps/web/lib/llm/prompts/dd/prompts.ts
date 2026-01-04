@@ -126,6 +126,27 @@ Deep tech startups embed commercial assumptions that are often more fragile than
 - What's the capital required for scale-up?
 - What are the known hard problems at scale?
 
+## STAGE EXTRACTION (BE EXPLICIT)
+
+Extract the funding stage from materials. Look for:
+- "Series [X]" mentions in headers, titles, or body
+- "Raising $X [Stage]" language
+- "Pre-seed / Seed / Series A / Series B / Growth" labels
+- Investment amount as signal ($1-5M typically Seed, $5-20M typically A, $20-100M typically B, $100M+ typically C or Growth)
+
+**CRITICAL RULES:**
+- If the document title or header says "Series B Investment Memorandum" → stage is "Series B"
+- If raising amount is stated as "Series B" → stage is "Series B"
+- Do NOT default to "Seed" — extract what's actually stated
+- If multiple stage references exist, use the most explicit one (header > body text > implied from amount)
+
+In the output, include source attribution:
+"stage": {
+  "extracted": "Series B",
+  "source": "Document header: 'Series B Investment Memorandum'",
+  "confidence": "HIGH"
+}
+
 ## RED FLAGS (Auto-detect)
 
 - Performance claims exceeding theoretical limits
@@ -143,7 +164,11 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
   "startup_profile": {
     "company_name": "If provided",
     "technology_domain": "Primary domain (e.g., 'Direct Air Capture', 'Battery Technology')",
-    "stage": "Pre-seed | Seed | Series A | Series B | Growth",
+    "stage": {
+      "extracted": "Pre-seed | Seed | Series A | Series B | Growth",
+      "source": "Where in materials this was found (e.g., 'Document header: Series B Investment Memorandum')",
+      "confidence": "HIGH | MEDIUM | LOW"
+    },
     "team_background": "Technical credibility signals if mentioned"
   },
 
@@ -336,10 +361,38 @@ For each claim, assign:
 - **IMPLAUSIBLE**: Unlikely to work as claimed
 - **INVALID**: Violates known physics or contradicts evidence
 
-**CONFIDENCE:**
-- HIGH (>80%): Strong physics basis, corroborating evidence
-- MEDIUM (50-80%): Reasonable basis, some uncertainty
-- LOW (<50%): Significant unknowns, limited basis
+## CONFIDENCE CALIBRATION STANDARDS
+
+When assigning confidence levels, use these definitions consistently:
+
+**HIGH confidence (>80%)**:
+- Multiple independent sources confirm
+- Peer-reviewed or third-party validated
+- Consistent with well-established principles
+- Would be very surprised if wrong
+
+**MEDIUM confidence (50-80%)**:
+- Single credible source or reasonable inference
+- Consistent with general patterns but not specifically validated
+- Some uncertainty but more likely right than wrong
+- Could be wrong but have reasonable basis
+
+**LOW confidence (<50%)**:
+- Extrapolation or assumption
+- Limited evidence
+- High uncertainty
+- Essentially an educated guess
+
+**When to say "UNKNOWN"**:
+- No basis for estimate
+- Conflicting information
+- Outside area of analysis
+
+**Do NOT**:
+- Use "HIGH" confidence without strong basis
+- Use round probability numbers (80%, 50%) without justification
+- Assign confidence without explaining basis
+- Conflate "we hope this is true" with "we believe this is true"
 
 ## OUTPUT FORMAT
 
@@ -590,6 +643,72 @@ For each claimed cost reduction, assess:
 - When does this become cash-flow positive?
 - How does this compare to typical VC expectations?
 
+## UNIT ECONOMICS BRIDGE (Critical Section)
+
+For ANY company claiming significant cost reduction at scale (>30%), you MUST:
+
+1. List every claimed cost reduction driver
+2. Quantify each driver's contribution to total reduction
+3. Identify the mechanism (HOW does scale reduce this cost?)
+4. Assess whether the assumption is reasonable
+5. Calculate the "unexplained gap" — cost reduction claimed but not explained
+6. Provide a realistic cost range, not just their number
+
+Common cost reduction mechanisms (validate which apply):
+- **Learning curve**: Typical is 10-20% per cumulative doubling. Anything above 25% needs justification.
+- **Fixed cost spreading**: Real but often overestimated. Check what's actually fixed vs. step-function.
+- **Bulk purchasing**: Usually 10-30% for 10x volume. Check commodity vs. specialty inputs.
+- **Automation**: Real but requires CAPEX. Check if CAPEX is in their model.
+- **Yield improvement**: Common in early production. Check what's driving yield losses today.
+- **Process optimization**: Real but hard to quantify. Be skeptical of large claims.
+
+Red flags:
+- ">50% cost reduction" with vague "scale economies" explanation
+- Reductions that exceed industry benchmarks without explanation
+- No sensitivity analysis on key assumptions
+- CAPEX assumptions that don't include first-of-kind premiums (typically 30-50%)
+
+If >20% of claimed cost reduction is unexplained, flag as: "CONTAINS_UNSUBSTANTIATED_ASSUMPTIONS"
+
+## BYPRODUCT / SECONDARY REVENUE ANALYSIS (Required if byproduct is >10% of economics)
+
+If the company has significant byproduct or secondary revenue streams:
+
+**Market Analysis**
+- What's the total addressable market for this byproduct?
+- What volume will they produce at scale?
+- What market share does that imply?
+- Is that market share realistic given competitors?
+
+**Pricing Analysis**
+- What price are they claiming?
+- What's the current market price range?
+- What grade/quality commands their claimed price?
+- Does their product meet that spec? (VALIDATED | CLAIMED | UNVALIDATED)
+
+**Volume/Price Trap**
+- What's the current market volume?
+- How much does their production add?
+- If they flood the market, what happens to price?
+- Price elasticity assessment (HIGH | MEDIUM | LOW)
+
+**Customer Evidence**
+- Who specifically will buy this?
+- Contracts signed? LOIs? Discussions?
+- Customer qualification requirements?
+- Do they meet those requirements?
+
+**Scenario Analysis**
+- Bull case: Price $X, volume Y, revenue $Z (X% probability)
+- Base case: Price $X, volume Y, revenue $Z (X% probability)
+- Bear case: Price $X, volume Y, revenue $Z (X% probability)
+- Expected value contribution
+
+**Verdict**
+- Revenue assumption credibility (VALIDATED | REASONABLE | OPTIMISTIC | UNREALISTIC)
+- Realistic estimate vs. claimed
+- Risk to thesis if this doesn't materialize
+
 ### 2. MARKET REALITY
 
 **Customer Identification**
@@ -701,6 +820,33 @@ For each policy the business depends on:
 - Bull case: Policy expanded
 - Which scenario are they underwriting?
 
+## POLICY DEEP DIVE (Required for Policy-Dependent Businesses)
+
+If a company's economics materially depend on government policy (tax credits, mandates, subsidies, regulations), you MUST provide deep policy analysis.
+
+**Materiality threshold**: Policy is "material" if removing/reducing it changes IRR by >5 percentage points or makes the business unprofitable.
+
+**For each material policy:**
+
+1. **Quantify the impact**: Show economics with and without the policy. "45V is worth $1.50/kg to our economics" is more useful than "we benefit from 45V."
+
+2. **Assess qualification risk**: Do they actually qualify? What's uncertain? What do they need to do?
+
+3. **Map regulatory uncertainty**: What rules are still pending? When will they finalize? What's the range of outcomes?
+
+4. **Assess political risk**: Is this policy vulnerable to repeal/modification? What's the probability?
+
+5. **Test viability without policy**: Does the business work if policy disappears? Is policy upside or essential?
+
+**Common policy traps to flag:**
+- Assuming most favorable interpretation of ambiguous rules
+- Ignoring qualification requirements
+- Not modeling policy reduction scenarios
+- Assuming policy extension that isn't guaranteed
+- Policy dependency disguised as "government tailwind"
+
+**Output requirement**: If policy dependency is HIGH or CRITICAL, the policy_deep_dive section is REQUIRED and must be comprehensive.
+
 ### 8. INCUMBENT RESPONSE
 
 **"What Does [Biggest Player] Do?"**
@@ -718,6 +864,39 @@ For each policy the business depends on:
 - What triggers acquisition interest?
 - What's likely price range based on comps?
 - Is acquisition a realistic exit path?
+
+## CONFIDENCE CALIBRATION STANDARDS
+
+When assigning confidence levels, use these definitions consistently:
+
+**HIGH confidence (>80%)**:
+- Multiple independent sources confirm
+- Peer-reviewed or third-party validated
+- Consistent with well-established principles
+- Would be very surprised if wrong
+
+**MEDIUM confidence (50-80%)**:
+- Single credible source or reasonable inference
+- Consistent with general patterns but not specifically validated
+- Some uncertainty but more likely right than wrong
+- Could be wrong but have reasonable basis
+
+**LOW confidence (<50%)**:
+- Extrapolation or assumption
+- Limited evidence
+- High uncertainty
+- Essentially an educated guess
+
+**When to say "UNKNOWN"**:
+- No basis for estimate
+- Conflicting information
+- Outside area of analysis
+
+**Do NOT**:
+- Use "HIGH" confidence without strong basis
+- Use round probability numbers (80%, 50%) without justification
+- Assign confidence without explaining basis
+- Conflate "we hope this is true" with "we believe this is true"
 
 ## OUTPUT FORMAT
 
@@ -783,6 +962,56 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     },
     "verdict": "VIABLE | CHALLENGING | UNLIKELY",
     "reasoning": "Summary"
+  },
+
+  "unit_economics_bridge": {
+    "applicability": "REQUIRED if company claims >30% cost reduction at scale",
+    "current_state": {
+      "cost": "$X/unit",
+      "scale": "Current production volume",
+      "basis": "Pilot data / estimates / claims"
+    },
+    "target_state": {
+      "cost": "$Y/unit",
+      "scale": "Target production volume",
+      "basis": "Their projection"
+    },
+    "gap_to_close": {
+      "absolute": "$X - $Y = $Z reduction needed",
+      "percentage": "X% reduction required"
+    },
+    "cost_reduction_drivers": [
+      {
+        "driver": "Specific cost reduction driver (e.g., 'Scale economies on labor')",
+        "line_item": "Which cost component this affects",
+        "current_cost": "$X/unit",
+        "projected_cost": "$Y/unit",
+        "reduction": "$Z/unit",
+        "reduction_percent": "X%",
+        "mechanism": "HOW this reduction happens (not just 'scale')",
+        "assumption_required": "What must be true for this to work",
+        "assumption_validity": "VALIDATED | REASONABLE | OPTIMISTIC | AGGRESSIVE | UNREALISTIC",
+        "confidence": "HIGH | MEDIUM | LOW",
+        "evidence": "What supports this"
+      }
+    ],
+    "bridge_summary": {
+      "total_reduction_explained": "$X/unit from identified drivers",
+      "total_reduction_claimed": "$Y/unit claimed",
+      "unexplained_gap": "$Z/unit (gap between explained and claimed)",
+      "gap_assessment": "FULLY_EXPLAINED | MOSTLY_EXPLAINED | CONTAINS_MAGIC_ASSUMPTIONS"
+    },
+    "sensitivity_analysis": {
+      "if_scale_economies_50_percent_of_projected": "Cost becomes $X/unit",
+      "if_no_improvement_in_largest_driver": "Cost becomes $X/unit",
+      "realistic_range": "$X - $Y/unit (vs. $Z claimed)"
+    },
+    "verdict": {
+      "claimed_achievable": true,
+      "realistic_estimate": "$X/unit",
+      "confidence": "HIGH | MEDIUM | LOW",
+      "key_risk": "The assumption most likely to fail"
+    }
   },
 
   "market_reality": {
@@ -988,6 +1217,96 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     "reasoning": "Summary"
   },
 
+  "policy_deep_dive": {
+    "applicability": "REQUIRED if policy_dependency is HIGH or CRITICAL",
+    "policy_dependency_level": "CRITICAL | HIGH | MEDIUM | LOW",
+    "dependency_explanation": "How policy affects economics (quantified)",
+
+    "critical_policies": [
+      {
+        "policy_name": "e.g., IRA Section 45V Clean Hydrogen Production Tax Credit",
+        "what_it_provides": "Specific benefit ($X/unit, Y% tax credit, etc.)",
+        "current_status": "Enacted / Proposed / Under rulemaking",
+
+        "economics_analysis": {
+          "with_full_benefit": {
+            "unit_economics": "$X/unit cost, Y% margin",
+            "irr": "X%",
+            "payback": "Y years"
+          },
+          "without_benefit": {
+            "unit_economics": "$X/unit cost, Y% margin",
+            "irr": "X%",
+            "payback": "Y years"
+          },
+          "delta": "Policy worth $X/unit to economics"
+        },
+
+        "qualification_requirements": {
+          "stated_requirements": ["Requirement 1", "Requirement 2"],
+          "company_status": "QUALIFIES | LIKELY_QUALIFIES | UNCERTAIN | UNLIKELY",
+          "gaps_to_qualification": ["What they need to do to qualify"],
+          "qualification_risk": "HIGH | MEDIUM | LOW"
+        },
+
+        "regulatory_uncertainty": {
+          "pending_rules": ["Specific rules/guidance still pending"],
+          "decision_timeline": "When final rules expected",
+          "range_of_outcomes": {
+            "favorable": "What favorable interpretation looks like",
+            "neutral": "What neutral interpretation looks like",
+            "unfavorable": "What unfavorable interpretation looks like"
+          },
+          "company_assumption": "Which interpretation they're assuming",
+          "our_assessment": "Which interpretation is most likely"
+        },
+
+        "sunset_risk": {
+          "expiration_date": "When policy expires (if applicable)",
+          "extension_likelihood": "HIGH | MEDIUM | LOW",
+          "impact_if_not_extended": "What happens to economics"
+        },
+
+        "political_risk": {
+          "vulnerability_to_administration_change": "HIGH | MEDIUM | LOW",
+          "repeal_likelihood_next_5_years": "X%",
+          "modification_likelihood": "X%",
+          "most_likely_modification": "What might change"
+        }
+      }
+    ],
+
+    "scenario_matrix": {
+      "scenarios": [
+        {
+          "name": "Policy Bull Case",
+          "description": "Favorable rule interpretation + extension + expansion",
+          "probability": "X%",
+          "economics_impact": "IRR becomes X%, payback Y years"
+        },
+        {
+          "name": "Policy Base Case",
+          "description": "Neutral interpretation, current policy continues",
+          "probability": "X%",
+          "economics_impact": "IRR becomes X%, payback Y years"
+        },
+        {
+          "name": "Policy Bear Case",
+          "description": "Unfavorable interpretation or policy reduction",
+          "probability": "X%",
+          "economics_impact": "IRR becomes X%, payback Y years"
+        }
+      ],
+      "policy_expected_value": "Probability-weighted economics"
+    },
+
+    "business_viability_without_policy": {
+      "viable": true,
+      "explanation": "Whether business works without policy support",
+      "margin_of_safety": "How much policy can degrade before business fails"
+    }
+  },
+
   "incumbent_response": {
     "likely_response": "ACQUIRE | COPY | CRUSH | IGNORE | PARTNER",
     "response_reasoning": "Why this response expected",
@@ -1005,6 +1324,91 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
       "likely_timing": "When in company lifecycle",
       "valuation_range": "$X-Y based on comps",
       "acquirer_motivation": "Why they'd buy vs build"
+    }
+  },
+
+  "byproduct_analysis": {
+    "applicability": "REQUIRED if byproduct is >10% of unit economics",
+    "byproduct_materiality": {
+      "byproduct": "e.g., Solid carbon",
+      "revenue_contribution": "$X/unit of primary product",
+      "percentage_of_economics": "X% of unit economics",
+      "is_material": true
+    },
+
+    "market_analysis": {
+      "total_addressable_market": {
+        "volume": "X tons/year",
+        "value": "$X billion",
+        "source": "How estimated"
+      },
+      "company_volume_at_scale": "X tons/year",
+      "market_share_implied": "X%",
+      "market_share_realistic": "Is this achievable?"
+    },
+
+    "pricing_analysis": {
+      "claimed_price": "$X/ton",
+      "current_market_price_range": "$X - $Y/ton",
+      "price_basis": "What grade/quality commands this price",
+      "company_product_quality": "Does their product meet this spec?",
+      "quality_validation": "VALIDATED | CLAIMED | UNVALIDATED",
+
+      "price_at_volume_concern": {
+        "current_market_volume": "X tons/year",
+        "company_volume_at_scale": "Y tons/year",
+        "volume_increase": "X%",
+        "price_impact_if_flooded": "What happens to price if they add Y tons",
+        "price_elasticity_assessment": "HIGH | MEDIUM | LOW"
+      }
+    },
+
+    "customer_analysis": {
+      "target_customers": ["Customer segment 1", "Customer segment 2"],
+      "customer_evidence": {
+        "contracts_signed": 0,
+        "lois_signed": 0,
+        "discussions": "X",
+        "pilot_sales": "X tons at $Y/ton to [customer type]"
+      },
+      "customer_qualification_requirements": ["Spec 1", "Spec 2"],
+      "company_meets_requirements": "YES | PARTIALLY | NO | UNKNOWN"
+    },
+
+    "competitive_supply": {
+      "existing_supply_sources": ["Source 1", "Source 2"],
+      "existing_supply_volume": "X tons/year",
+      "existing_supply_price": "$X/ton",
+      "company_competitive_position": "Premium | Parity | Discount"
+    },
+
+    "scenario_analysis": {
+      "bull_case": {
+        "price": "$X/ton",
+        "volume": "X tons",
+        "revenue": "$X",
+        "probability": "X%"
+      },
+      "base_case": {
+        "price": "$X/ton",
+        "volume": "X tons",
+        "revenue": "$X",
+        "probability": "X%"
+      },
+      "bear_case": {
+        "price": "$X/ton",
+        "volume": "X tons",
+        "revenue": "$X",
+        "probability": "X%"
+      },
+      "expected_value": "$X revenue, $Y/unit contribution"
+    },
+
+    "verdict": {
+      "revenue_assumption_credibility": "VALIDATED | REASONABLE | OPTIMISTIC | UNREALISTIC",
+      "realistic_estimate": "$X/ton at Y tons → $Z contribution/unit",
+      "variance_from_claimed": "X% below claimed",
+      "risk_to_thesis": "How much does thesis depend on this revenue"
     }
   },
 
@@ -1165,17 +1569,108 @@ What was their outcome? (Success, acquired, pivot, zombie, shutdown)
 What can we learn from their trajectory?
 How does this startup compare to base rates for the category?
 
+## COMPARABLE PATTERN SYNTHESIS (Required)
+
+After analyzing individual comparables, you MUST synthesize quantified patterns:
+
+**Required outputs:**
+1. **Outcome distribution**: What % reached scale, struggled, failed?
+2. **Quantified benchmarks**: Median time to commercial, median capital required, delay frequency, cost overrun frequency
+3. **Failure mode frequency**: What kills companies like this, and how often?
+4. **Success factor analysis**: What do winners have that losers don't?
+5. **This company vs. pattern**: Are they better or worse than average, and why?
+
+**How to estimate if data is incomplete:**
+- Use ranges instead of point estimates
+- State confidence level
+- Note sample size limitations
+- Compare to broader industry base rates if specific comparables are scarce
+
+**The synthesis should answer:**
+- "What usually happens to companies like this?" (base rate)
+- "What specifically kills them when they fail?" (failure modes)
+- "What do the winners do differently?" (success factors)
+- "Is this company more or less likely to succeed than average?" (adjusted probability)
+
+**Red flag**: If your adjusted probability is >2x the base rate, you need strong justification.
+
 ### SCENARIO ANALYSIS
 
 Bull/Base/Bear with probabilities and expected value.
 
+## SCENARIO PROBABILITY DERIVATION (Required)
+
+Do NOT assign scenario probabilities arbitrarily. Derive them from component conditions.
+
+**Methodology:**
+
+1. **Identify key conditions** that determine which scenario materializes (3-6 conditions)
+2. **Estimate probability of each condition** based on:
+   - Historical base rates from comparable companies/situations
+   - Technical assessment from DD3
+   - Commercial assessment from DD3.5
+   - Expert judgment (but make assumptions explicit)
+
+3. **Calculate joint probabilities**:
+   - If conditions are independent: P(Bull) = P(A) × P(B) × P(C)
+   - If conditions are correlated: Adjust for correlation (e.g., if scale-up fails, funding fails too)
+
+4. **Sanity check**: Probabilities should sum to ~100%. If they don't, explain residual.
+
+5. **Compare to base rates**: How does your probability estimate compare to historical success rates for similar companies?
+
+**Example derivation:**
+- Bull case requires: Scale-up succeeds (60%) × Carbon at $800+ (50%) × 45V at $1+/kg (40%) × Green H2 stays >$3/kg (70%)
+- If independent: 60% × 50% × 40% × 70% = 8.4%
+- Adjusted for positive correlation between scale-up and funding: ~12%
+- Final bull probability: 12%
+
+**Red flags in your own analysis:**
+- Probabilities that don't trace to specific conditions
+- Bull case >30% without exceptional justification
+- Bear case <20% for first-of-kind technology
+- No comparison to historical base rates
+
 For each scenario:
 - What happens? (Narrative)
 - What return multiple is likely?
-- What's the probability?
+- What's the probability AND how was it derived?
 
 Calculate expected value (weighted return multiple).
 Is this a good risk-adjusted bet?
+
+## CONFIDENCE CALIBRATION STANDARDS
+
+When assigning confidence levels, use these definitions consistently:
+
+**HIGH confidence (>80%)**:
+- Multiple independent sources confirm
+- Peer-reviewed or third-party validated
+- Consistent with well-established principles
+- Would be very surprised if wrong
+
+**MEDIUM confidence (50-80%)**:
+- Single credible source or reasonable inference
+- Consistent with general patterns but not specifically validated
+- Some uncertainty but more likely right than wrong
+- Could be wrong but have reasonable basis
+
+**LOW confidence (<50%)**:
+- Extrapolation or assumption
+- Limited evidence
+- High uncertainty
+- Essentially an educated guess
+
+**When to say "UNKNOWN"**:
+- No basis for estimate
+- Conflicting information
+- Outside area of analysis
+
+**Do NOT**:
+- Use "HIGH" confidence without strong basis
+- Use round probability numbers (80%, 50%) without justification
+- Assign confidence without explaining basis
+- Conflate "we hope this is true" with "we believe this is true"
 
 ## OUTPUT FORMAT
 
@@ -1440,9 +1935,103 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     }
   },
 
+  "comparable_pattern_synthesis": {
+    "sample_analyzed": {
+      "total_companies": 8,
+      "directly_comparable": 4,
+      "adjacent_comparable": 4,
+      "selection_criteria": "How comparables were selected"
+    },
+
+    "outcome_distribution": {
+      "reached_commercial_scale": {
+        "count": 2,
+        "percentage": "25%",
+        "examples": ["Company A", "Company B"],
+        "time_to_scale_range": "8-18 years",
+        "capital_to_scale_range": "$300M - $1B+"
+      },
+      "struggling_or_delayed": {
+        "count": 3,
+        "percentage": "37.5%",
+        "examples": ["Company C", "Company D"],
+        "common_issues": ["Commissioning delays", "Cost overruns", "Market timing"]
+      },
+      "failed_or_pivoted": {
+        "count": 2,
+        "percentage": "25%",
+        "examples": ["Company E"],
+        "common_failure_modes": ["Scale-up failure", "Unit economics never worked"]
+      },
+      "too_early_to_tell": {
+        "count": 1,
+        "percentage": "12.5%",
+        "examples": ["Company F"]
+      }
+    },
+
+    "quantified_patterns": {
+      "median_time_to_commercial": "X years from Series A",
+      "median_capital_to_commercial": "$X",
+      "first_of_kind_delay_frequency": "X% experienced >12 month delays",
+      "first_of_kind_cost_overrun_frequency": "X% experienced >30% cost overruns",
+      "median_cost_overrun": "X%",
+      "acquisition_rate": "X% were acquired",
+      "median_acquisition_multiple": "X.Xx on invested capital"
+    },
+
+    "most_common_failure_modes": [
+      {
+        "failure_mode": "e.g., Scale-up didn't work as expected",
+        "frequency": "X% of failures",
+        "typical_manifestation": "How this shows up",
+        "early_warning_signs": ["Sign 1", "Sign 2"],
+        "applies_to_this_company": true,
+        "mitigation_in_place": "What they're doing about it"
+      }
+    ],
+
+    "success_factor_analysis": {
+      "common_success_factors": [
+        {
+          "factor": "e.g., Intermediate scale validation before commercial",
+          "present_in_successes": "4 of 4",
+          "present_in_failures": "1 of 4",
+          "this_company_has": false,
+          "implication": "Consider requiring intermediate demo"
+        }
+      ]
+    },
+
+    "this_company_vs_pattern": {
+      "better_than_average_because": ["Reason 1", "Reason 2"],
+      "worse_than_average_because": ["Reason 1", "Reason 2"],
+      "adjusted_success_probability": "X% (vs Y% base rate)",
+      "adjustment_reasoning": "Why we think they'll beat/miss the base rate"
+    }
+  },
+
   "scenario_analysis": {
+    "probability_methodology": "Explain how probabilities were derived - must trace to specific conditions",
+
+    "key_conditions": [
+      {
+        "condition": "e.g., Scale-up achieves >80% of nameplate capacity",
+        "probability": "X%",
+        "basis": "How this probability was estimated",
+        "historical_reference": "Base rate from comparable situations"
+      }
+    ],
+
     "bull_case": {
-      "probability": "X%",
+      "requires": [
+        {"condition": "Condition 1", "probability": "X%"},
+        {"condition": "Condition 2", "probability": "Y%"},
+        {"condition": "Condition 3", "probability": "Z%"}
+      ],
+      "joint_probability_calculation": "X% × Y% × Z% = W% (assuming independence) or adjusted calculation if correlated",
+      "correlation_adjustment": "If conditions are correlated, explain adjustment",
+      "final_probability": "X%",
       "narrative": "What happens in the good scenario (2-3 sentences)",
       "key_events": ["What must go right"],
       "timeline_years": 5,
@@ -1453,7 +2042,12 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     },
 
     "base_case": {
-      "probability": "X%",
+      "requires": [
+        {"condition": "Condition 1", "probability": "X%"},
+        {"condition": "Condition 2", "probability": "Y%"}
+      ],
+      "joint_probability_calculation": "Derivation",
+      "final_probability": "X%",
       "narrative": "What typically happens (2-3 sentences)",
       "key_events": ["Realistic path"],
       "timeline_years": 6,
@@ -1464,7 +2058,11 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     },
 
     "bear_case": {
-      "probability": "X%",
+      "requires": [
+        {"condition": "Condition 1", "probability": "X%"}
+      ],
+      "joint_probability_calculation": "Derivation",
+      "final_probability": "X%",
       "narrative": "What happens if things go wrong (2-3 sentences)",
       "key_events": ["What goes wrong"],
       "timeline_years": 4,
@@ -1474,11 +2072,23 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
       "what_you_believe_in_this_scenario": "Implicit assumption"
     },
 
+    "probability_sanity_check": {
+      "probabilities_sum_to": "X% (should be ~100%)",
+      "adjustment_if_needed": "How residual probability is allocated"
+    },
+
     "expected_value": {
+      "calculation": "(Bull prob × Bull return) + (Base prob × Base return) + (Bear prob × Bear return)",
       "weighted_return_multiple": "X.Xx",
-      "calculation": "Bull(X% × Yx) + Base(X% × Yx) + Bear(X% × Yx)",
-      "vs_typical_series_a": "Above/below median",
-      "risk_adjusted_assessment": "Is this a good bet?"
+      "confidence_in_ev": "HIGH | MEDIUM | LOW",
+      "key_sensitivity": "Which probability assumption most affects EV"
+    },
+
+    "base_rate_comparison": {
+      "category": "e.g., Deep tech climate Series B",
+      "historical_success_rate": "X%",
+      "historical_median_return": "X.Xx",
+      "this_company_vs_base_rate": "Above/below average because..."
     },
 
     "scenario_sensitivities": [
@@ -1546,9 +2156,80 @@ This report provides:
 
 The unique value: "Here's how to think about this problem space. Here's the full solution landscape. The startup sits here. They're betting on X. If they fail, it will likely be because of Y. Here's exactly what to do next."
 
+## EXECUTIVE PARAGRAPH (Required)
+
+The one_page_summary MUST include an "executive_paragraph" — a 150-200 word synthesis that stands alone.
+
+**Purpose**: A partner should be able to read ONLY this paragraph and:
+1. Understand what the company does
+2. Understand why it matters
+3. Know the key strength and key risk
+4. Understand the recommendation
+5. Know the expected return
+
+**Structure** (follow this order):
+1. What they do + market context (2 sentences)
+2. Technical assessment (1 sentence)
+3. Commercial assessment (1 sentence)
+4. The bet — what you're really investing in (1 sentence)
+5. Key risk (1 sentence)
+6. Recommendation + expected return (1 sentence)
+
+**Constraints**:
+- 150-200 words (not longer)
+- No jargon — a generalist partner must understand it
+- Specific, not generic — include numbers
+- Must include recommendation and expected return multiple
+
+**Test**: If someone reads only this paragraph, can they make a preliminary go/no-go decision?
+
+## TEAM ASSESSMENT
+
+Do NOT include a team score or detailed team assessment. Team evaluation requires reference calls and deeper diligence not possible from pitch materials alone.
+
+Instead, include a brief "team_note" that:
+1. Lists key credentials observed (titles, companies, relevant experience from materials)
+2. Flags any red flags to investigate (gaps in experience, missing roles, concerning patterns)
+3. Recommends reference call priority (HIGH | MEDIUM | LOW)
+
+The team assessment should happen during diligence, not from the pitch deck.
+
 ## VOICE AND TONE
 
 Write like a senior technical advisor briefing a partner. Direct, confident, insight-dense. No padding or filler.
+
+## CONFIDENCE CALIBRATION STANDARDS
+
+When assigning confidence levels, use these definitions consistently:
+
+**HIGH confidence (>80%)**:
+- Multiple independent sources confirm
+- Peer-reviewed or third-party validated
+- Consistent with well-established principles
+- Would be very surprised if wrong
+
+**MEDIUM confidence (50-80%)**:
+- Single credible source or reasonable inference
+- Consistent with general patterns but not specifically validated
+- Some uncertainty but more likely right than wrong
+- Could be wrong but have reasonable basis
+
+**LOW confidence (<50%)**:
+- Extrapolation or assumption
+- Limited evidence
+- High uncertainty
+- Essentially an educated guess
+
+**When to say "UNKNOWN"**:
+- No basis for estimate
+- Conflicting information
+- Outside area of analysis
+
+**Do NOT**:
+- Use "HIGH" confidence without strong basis
+- Use round probability numbers (80%, 50%) without justification
+- Assign confidence without explaining basis
+- Conflate "we hope this is true" with "we believe this is true"
 
 ## OUTPUT FORMAT
 
@@ -1609,7 +2290,9 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
 
     "closest_comparable": "Company X — [outcome]",
 
-    "if_you_do_one_thing": "Single most important due diligence action before term sheet"
+    "if_you_do_one_thing": "Single most important due diligence action before term sheet",
+
+    "executive_paragraph": "A 150-200 word synthesis that stands alone. Structure: (1) What they do + market context (2 sentences). (2) Technical assessment (1 sentence). (3) Commercial assessment (1 sentence). (4) The bet — what you're really investing in (1 sentence). (5) Key risk (1 sentence). (6) Recommendation + expected return (1 sentence). Example: 'PyroHydrogen converts natural gas into clean hydrogen using molten metal technology, targeting the $XX billion clean hydrogen market created by IRA incentives. The core technology is scientifically validated with 2,800+ hours of pilot operation, but the proposed 100x scale-up is unprecedented for novel chemical processes. Commercial traction is strong with a signed 15-year offtake, though economics depend on unvalidated carbon revenue and uncertain policy qualification. If you invest, you're betting this exceptional team can execute a first-of-kind scale-up before green hydrogen costs fall enough to close the market window. The critical risk is that commercial facility underperforms, compressing returns to 1.5-3x. Recommendation: PROCEED_WITH_CAUTION with milestone-based funding; expected return 5.8x with high variance.'"
   },
 
   "problem_primer": {
@@ -1754,8 +2437,15 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
     "scores": {
       "technical_credibility": {"score": 7, "out_of": 10, "one_liner": "Explanation"},
       "commercial_viability": {"score": 6, "out_of": 10, "one_liner": "Explanation"},
-      "team_signals": {"score": 8, "out_of": 10, "one_liner": "Explanation"},
       "moat_strength": {"score": 5, "out_of": 10, "one_liner": "Explanation"}
+    },
+
+    "team_note": {
+      "assessment_status": "NOT_INCLUDED",
+      "reason": "Team assessment requires reference calls and deeper diligence not possible from materials alone. Evaluate team separately.",
+      "key_credentials_observed": ["Credential 1 from materials", "Credential 2 from materials"],
+      "red_flags_to_investigate": ["Any red flags noticed in materials"],
+      "reference_call_priority": "HIGH | MEDIUM | LOW"
     },
 
     "recommendation": {

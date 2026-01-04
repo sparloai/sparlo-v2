@@ -1043,6 +1043,153 @@ export const DD3_5_M_OutputSchema = z.object({
       bad_answer: z.string(),
     }),
   ),
+
+  // Optional: Unit economics bridge for >30% cost reduction claims
+  unit_economics_bridge: z
+    .object({
+      triggers: z.object({
+        cost_reduction_claimed: z.string(),
+        threshold_exceeded: z.boolean(),
+      }),
+      current_cost_breakdown: z.array(
+        z.object({
+          component: z.string(),
+          current_cost: z.string(),
+          percentage_of_total: z.string(),
+        }),
+      ),
+      reduction_pathway: z.array(
+        z.object({
+          cost_component: z.string(),
+          reduction_mechanism: z.string(),
+          reduction_percentage: z.string(),
+          confidence: Confidence,
+          precedent: z.string(),
+          assumption_risk: z.string(),
+        }),
+      ),
+      learning_curve_analysis: z.object({
+        claimed_learning_rate: z.string(),
+        industry_benchmark: z.string(),
+        assessment: flexibleEnum(
+          ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
+          'OPTIMISTIC',
+        ),
+        reasoning: z.string(),
+      }),
+      scale_effects_analysis: z.object({
+        what_scales_linearly: z.array(z.string()),
+        what_scales_sub_linearly: z.array(z.string()),
+        what_doesnt_scale: z.array(z.string()),
+        net_effect: z.string(),
+      }),
+      bridge_verdict: z.object({
+        achievable_cost: z.string(),
+        gap_vs_claimed: z.string(),
+        confidence: Confidence,
+        key_assumption: z.string(),
+        if_assumption_wrong: z.string(),
+      }),
+    })
+    .optional(),
+
+  // Optional: Policy deep dive for policy-dependent businesses
+  policy_deep_dive: z
+    .object({
+      triggers: z.object({
+        policy_identified: z.string(),
+        dependency_level: z.string(),
+      }),
+      policy_details: z.object({
+        full_name: z.string(),
+        mechanism: z.string(),
+        value_to_company: z.string(),
+        percentage_of_margin: z.string(),
+        expiration_date: z.string(),
+      }),
+      qualification_analysis: z.object({
+        requirements: z.array(z.string()),
+        company_status: flexibleEnum(
+          ['QUALIFIES', 'LIKELY_QUALIFIES', 'UNCERTAIN', 'UNLIKELY'],
+          'UNCERTAIN',
+        ),
+        uncertain_requirements: z.array(z.string()),
+        what_could_disqualify: z.array(z.string()),
+      }),
+      political_risk_assessment: z.object({
+        current_political_support: z.string(),
+        sunset_risk: z.string(),
+        modification_risk: z.string(),
+        timeline_of_risk: z.string(),
+      }),
+      scenario_economics: z.object({
+        with_policy: z.object({
+          unit_cost: z.string(),
+          margin: z.string(),
+          viability: flexibleEnum(['VIABLE', 'MARGINAL', 'UNVIABLE'], 'VIABLE'),
+        }),
+        without_policy: z.object({
+          unit_cost: z.string(),
+          margin: z.string(),
+          viability: flexibleEnum(
+            ['VIABLE', 'MARGINAL', 'UNVIABLE'],
+            'UNVIABLE',
+          ),
+        }),
+        breakeven_policy_value: z.string(),
+      }),
+      mitigation_options: z.array(
+        z.object({
+          strategy: z.string(),
+          feasibility: Confidence,
+          timeline: z.string(),
+        }),
+      ),
+      policy_verdict: z.object({
+        exposure_level: PolicyExposureVerdict,
+        recommendation: z.string(),
+        diligence_action: z.string(),
+      }),
+    })
+    .optional(),
+
+  // Optional: Byproduct and revenue stream analysis
+  byproduct_analysis: z
+    .object({
+      byproducts_identified: z.array(
+        z.object({
+          byproduct: z.string(),
+          quantity_per_unit: z.string(),
+          quality: z.string(),
+          market_value: z.string(),
+          addressable_market: z.string(),
+          monetization_status: flexibleEnum(
+            ['CONTRACTED', 'IN_DISCUSSION', 'IDENTIFIED', 'SPECULATIVE'],
+            'IDENTIFIED',
+          ),
+        }),
+      ),
+      revenue_contribution: z.object({
+        percentage_of_revenue: z.string(),
+        margin_impact: z.string(),
+        required_for_viability: z.boolean(),
+      }),
+      market_risks: z.array(
+        z.object({
+          risk: z.string(),
+          impact: z.string(),
+          mitigation: z.string(),
+        }),
+      ),
+      verdict: z.object({
+        byproduct_quality: flexibleEnum(
+          ['STRONG_ASSET', 'HELPFUL', 'UNCERTAIN', 'LIABILITY'],
+          'HELPFUL',
+        ),
+        reasoning: z.string(),
+      }),
+    })
+    .optional(),
 });
 
 export type DD3_5_M_Output = z.infer<typeof DD3_5_M_OutputSchema>;
@@ -1316,8 +1463,24 @@ export const DD4_M_OutputSchema = z.object({
   }),
 
   scenario_analysis: z.object({
+    probability_methodology: z.string(),
+    key_conditions: z.array(
+      z.object({
+        condition: z.string(),
+        probability: z.string(),
+        basis: z.string(),
+        confidence: Confidence,
+      }),
+    ),
     bull_case: z.object({
-      probability: z.string(),
+      requires: z.array(
+        z.object({
+          condition: z.string(),
+          probability: z.string(),
+        }),
+      ),
+      joint_probability_calculation: z.string(),
+      final_probability: z.string(),
       narrative: z.string(),
       key_events: z.array(z.string()),
       timeline_years: flexibleNumber(0),
@@ -1327,7 +1490,14 @@ export const DD4_M_OutputSchema = z.object({
       what_you_believe_in_this_scenario: z.string(),
     }),
     base_case: z.object({
-      probability: z.string(),
+      requires: z.array(
+        z.object({
+          condition: z.string(),
+          probability: z.string(),
+        }),
+      ),
+      joint_probability_calculation: z.string(),
+      final_probability: z.string(),
       narrative: z.string(),
       key_events: z.array(z.string()),
       timeline_years: flexibleNumber(0),
@@ -1337,7 +1507,14 @@ export const DD4_M_OutputSchema = z.object({
       what_you_believe_in_this_scenario: z.string(),
     }),
     bear_case: z.object({
-      probability: z.string(),
+      requires: z.array(
+        z.object({
+          condition: z.string(),
+          probability: z.string(),
+        }),
+      ),
+      joint_probability_calculation: z.string(),
+      final_probability: z.string(),
       narrative: z.string(),
       key_events: z.array(z.string()),
       timeline_years: flexibleNumber(0),
@@ -1346,11 +1523,21 @@ export const DD4_M_OutputSchema = z.object({
       return_multiple: z.string(),
       what_you_believe_in_this_scenario: z.string(),
     }),
+    probability_sanity_check: z.object({
+      probabilities_sum_to: z.string(),
+      adjustment_if_needed: z.string(),
+    }),
     expected_value: z.object({
-      weighted_return_multiple: z.string(),
       calculation: z.string(),
-      vs_typical_series_a: z.string(),
-      risk_adjusted_assessment: z.string(),
+      weighted_return_multiple: z.string(),
+      confidence_in_ev: Confidence,
+      key_sensitivity: z.string(),
+    }),
+    base_rate_comparison: z.object({
+      category: z.string(),
+      historical_success_rate: z.string(),
+      historical_median_return: z.string(),
+      this_company_vs_base_rate: z.string(),
     }),
     scenario_sensitivities: z.array(
       z.object({
@@ -1361,6 +1548,31 @@ export const DD4_M_OutputSchema = z.object({
         how_to_derisk: z.string(),
       }),
     ),
+  }),
+
+  // Comparable pattern synthesis (Patch 5)
+  comparable_pattern_synthesis: z.object({
+    methodology: z.string(),
+    quantified_patterns: z.array(
+      z.object({
+        pattern: z.string(),
+        n_companies: flexibleNumber(0),
+        success_rate_if_present: z.string(),
+        success_rate_if_absent: z.string(),
+        this_company_status: flexibleEnum(
+          ['PRESENT', 'ABSENT', 'PARTIAL'],
+          'PARTIAL',
+        ),
+        implication: z.string(),
+      }),
+    ),
+    pattern_scorecard: z.object({
+      positive_indicators_count: flexibleNumber(0),
+      negative_indicators_count: flexibleNumber(0),
+      net_score: z.string(),
+      interpretation: z.string(),
+    }),
+    differentiated_insight: z.string(),
   }),
 });
 
@@ -1424,6 +1636,7 @@ export const DD5_M_OutputSchema = z.object({
     expected_return: z.string(),
     closest_comparable: z.string(),
     if_you_do_one_thing: z.string(),
+    executive_paragraph: z.string(),
   }),
 
   problem_primer: z.object({
@@ -1602,10 +1815,12 @@ export const DD5_M_OutputSchema = z.object({
         out_of: flexibleNumber(0),
         one_liner: z.string(),
       }),
-      team_signals: z.object({
-        score: flexibleNumber(0),
-        out_of: flexibleNumber(0),
-        one_liner: z.string(),
+      team_note: z.object({
+        assessment_status: z.string(),
+        reason: z.string(),
+        key_credentials_observed: z.array(z.string()),
+        red_flags_to_investigate: z.array(z.string()),
+        reference_call_priority: Confidence,
       }),
       moat_strength: z.object({
         score: flexibleNumber(0),

@@ -331,7 +331,11 @@ function generateDefaultDD3_5Output(): DD3_5_M_Output {
  */
 function generateDefaultStrategicAnalysis(): Pick<
   DD4_M_Output,
-  'the_one_bet' | 'pre_mortem' | 'comparable_analysis' | 'scenario_analysis'
+  | 'the_one_bet'
+  | 'pre_mortem'
+  | 'comparable_analysis'
+  | 'scenario_analysis'
+  | 'comparable_pattern_synthesis'
 > {
   const notAnalyzedNote =
     'Not analyzed in v1 report - regenerate for full analysis';
@@ -425,8 +429,12 @@ function generateDefaultStrategicAnalysis(): Pick<
       },
     },
     scenario_analysis: {
+      probability_methodology: notAnalyzedNote,
+      key_conditions: [],
       bull_case: {
-        probability: 'Unknown',
+        requires: [],
+        joint_probability_calculation: notAnalyzedNote,
+        final_probability: 'Unknown',
         narrative: notAnalyzedNote,
         key_events: [],
         timeline_years: 0,
@@ -436,7 +444,9 @@ function generateDefaultStrategicAnalysis(): Pick<
         what_you_believe_in_this_scenario: notAnalyzedNote,
       },
       base_case: {
-        probability: 'Unknown',
+        requires: [],
+        joint_probability_calculation: notAnalyzedNote,
+        final_probability: 'Unknown',
         narrative: notAnalyzedNote,
         key_events: [],
         timeline_years: 0,
@@ -446,7 +456,9 @@ function generateDefaultStrategicAnalysis(): Pick<
         what_you_believe_in_this_scenario: notAnalyzedNote,
       },
       bear_case: {
-        probability: 'Unknown',
+        requires: [],
+        joint_probability_calculation: notAnalyzedNote,
+        final_probability: 'Unknown',
         narrative: notAnalyzedNote,
         key_events: [],
         timeline_years: 0,
@@ -455,13 +467,34 @@ function generateDefaultStrategicAnalysis(): Pick<
         return_multiple: 'Unknown',
         what_you_believe_in_this_scenario: notAnalyzedNote,
       },
+      probability_sanity_check: {
+        probabilities_sum_to: 'Unknown',
+        adjustment_if_needed: notAnalyzedNote,
+      },
       expected_value: {
-        weighted_return_multiple: 'Unknown',
         calculation: notAnalyzedNote,
-        vs_typical_series_a: 'Unknown',
-        risk_adjusted_assessment: notAnalyzedNote,
+        weighted_return_multiple: 'Unknown',
+        confidence_in_ev: 'MEDIUM',
+        key_sensitivity: notAnalyzedNote,
+      },
+      base_rate_comparison: {
+        category: 'Unknown',
+        historical_success_rate: 'Unknown',
+        historical_median_return: 'Unknown',
+        this_company_vs_base_rate: notAnalyzedNote,
       },
       scenario_sensitivities: [],
+    },
+    comparable_pattern_synthesis: {
+      methodology: notAnalyzedNote,
+      quantified_patterns: [],
+      pattern_scorecard: {
+        positive_indicators_count: 0,
+        negative_indicators_count: 0,
+        net_score: 'Unknown',
+        interpretation: notAnalyzedNote,
+      },
+      differentiated_insight: notAnalyzedNote,
     },
   };
 }
