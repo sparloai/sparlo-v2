@@ -143,6 +143,22 @@ async function getRedirects() {
 }
 
 /**
+ * Paths that should NOT be rewritten on the app subdomain.
+ * These are public/system paths that exist at the root level.
+ */
+const APP_SUBDOMAIN_EXCLUDED_PATHS = [
+  'home', // Already at /home, no rewrite needed
+  'auth', // Auth routes stay at /auth
+  'api', // API routes
+  'share', // Public share pages
+  'healthcheck', // Health check endpoint
+  '_next', // Next.js internals
+  'locales', // i18n files
+  'images', // Static images
+  'assets', // Static assets
+];
+
+/**
  * Rewrites for app subdomain routing.
  * On app.sparlo.ai, root-level paths are rewritten to /home/* internally.
  * This allows the file structure to remain at /home/* while URLs are clean.
@@ -153,8 +169,10 @@ async function getRedirects() {
  * - app.sparlo.ai/team-slug → /home/team-slug
  * - app.sparlo.ai/team-slug/reports → /home/team-slug/reports
  *
- * Note: Paths already starting with /home hit the routes directly (no rewrite needed).
- * This maintains backwards compatibility with existing /home/* links.
+ * Excluded paths (not rewritten):
+ * - app.sparlo.ai/auth/* → /auth/* (auth routes)
+ * - app.sparlo.ai/api/* → /api/* (API routes)
+ * - app.sparlo.ai/home/* → /home/* (already prefixed)
  */
 async function getRewrites() {
   // Only apply rewrites in production on the app subdomain
@@ -162,15 +180,15 @@ async function getRewrites() {
     return [];
   }
 
+  // Build negative lookahead regex for excluded paths
+  const excludePattern = APP_SUBDOMAIN_EXCLUDED_PATHS.join('|');
+
   return {
     beforeFiles: [
       // Rewrite app subdomain requests to /home/* routes
-      // Only applies to paths that DON'T already start with /home
-      // This ensures:
-      // - app.sparlo.ai/team-slug → /home/team-slug (rewritten)
-      // - app.sparlo.ai/home/team-slug → /home/team-slug (no rewrite, direct hit)
+      // Excludes: home, auth, api, share, healthcheck, _next, locales, images, assets
       {
-        source: '/((?!home).*)',
+        source: `/((?!${excludePattern}).*)`,
         has: [
           {
             type: 'host',
