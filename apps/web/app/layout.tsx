@@ -1,4 +1,5 @@
 import { headers } from 'next/headers';
+import Script from 'next/script';
 
 import { Toaster } from '@kit/ui/sonner';
 import { cn } from '@kit/ui/utils';
@@ -31,6 +32,20 @@ export default async function RootLayout({
 
   return (
     <html lang={language} className={className}>
+      <head>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-NLBNBEJK74"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-NLBNBEJK74');
+          `}
+        </Script>
+      </head>
       <body>
         <RootProviders theme={theme} lang={language} nonce={nonce}>
           {children}
