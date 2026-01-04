@@ -284,44 +284,34 @@ export const ScaleUpVerdict = flexibleEnum(
 );
 
 // Ecosystem dependency verdicts
-export const EcosystemVerdict = z.enum([
-  'FEW_DEPENDENCIES',
+export const EcosystemVerdict = flexibleEnum(
+  ['FEW_DEPENDENCIES', 'MANAGEABLE', 'HEAVILY_DEPENDENT'],
   'MANAGEABLE',
-  'HEAVILY_DEPENDENT',
-]);
+);
 
 // Policy exposure verdicts
-export const PolicyExposureVerdict = z.enum([
-  'LOW_EXPOSURE',
+export const PolicyExposureVerdict = flexibleEnum(
+  ['LOW_EXPOSURE', 'MODERATE_EXPOSURE', 'HIGH_EXPOSURE'],
   'MODERATE_EXPOSURE',
-  'HIGH_EXPOSURE',
-]);
+);
 
 // Incumbent response types
-export const IncumbentResponse = z.enum([
-  'ACQUIRE',
-  'COPY',
-  'CRUSH',
+export const IncumbentResponse = flexibleEnum(
+  ['ACQUIRE', 'COPY', 'CRUSH', 'IGNORE', 'PARTNER'],
   'IGNORE',
-  'PARTNER',
-]);
+);
 
 // Bet quality assessment
-export const BetQuality = z.enum([
-  'GOOD_BET',
+export const BetQuality = flexibleEnum(
+  ['GOOD_BET', 'REASONABLE_BET', 'QUESTIONABLE_BET', 'BAD_BET'],
   'REASONABLE_BET',
-  'QUESTIONABLE_BET',
-  'BAD_BET',
-]);
+);
 
 // Company outcome types
-export const CompanyOutcome = z.enum([
-  'SUCCESS',
-  'ACQUIRED',
+export const CompanyOutcome = flexibleEnum(
+  ['SUCCESS', 'ACQUIRED', 'PIVOT', 'ZOMBIE', 'SHUTDOWN'],
   'PIVOT',
-  'ZOMBIE',
-  'SHUTDOWN',
-]);
+);
 
 // Overall verdict for one-page summary
 export const OverallVerdict = flexibleEnum(['PROCEED', 'CAUTION', 'PASS'], 'CAUTION');
@@ -382,12 +372,7 @@ export const DD0_M_OutputSchema = z.object({
       id: z.string(),
       mechanism: z.string(),
       how_described: z.string(),
-      depth_of_explanation: z.enum([
-        'DETAILED',
-        'MODERATE',
-        'SUPERFICIAL',
-        'HAND_WAVY',
-      ]),
+      depth_of_explanation: flexibleEnum(['DETAILED', 'MODERATE', 'SUPERFICIAL', 'HAND_WAVY'], 'MODERATE'),
       physics_to_validate: z.array(z.string()),
       potential_contradictions: z.array(z.string()),
     }),
@@ -395,15 +380,7 @@ export const DD0_M_OutputSchema = z.object({
 
   red_flags: z.array(
     z.object({
-      flag_type: z.enum([
-        'PHYSICS_VIOLATION',
-        'EXCEEDS_LIMITS',
-        'UNSUPPORTED_NOVELTY',
-        'VAGUE_MECHANISM',
-        'TRL_MISMATCH',
-        'UNBASED_ECONOMICS',
-        'TIMELINE_UNREALISTIC',
-      ]),
+      flag_type: flexibleEnum(['PHYSICS_VIOLATION', 'EXCEEDS_LIMITS', 'UNSUPPORTED_NOVELTY', 'VAGUE_MECHANISM', 'TRL_MISMATCH', 'UNBASED_ECONOMICS', 'TIMELINE_UNREALISTIC'], 'VAGUE_MECHANISM'),
       description: z.string(),
       severity: flexibleEnum(['CRITICAL', 'HIGH', 'MEDIUM'], 'MEDIUM'),
       related_claim_id: z.string(),
@@ -503,12 +480,10 @@ export const DD3_M_OutputSchema = z.object({
   mechanism_validation: z.object({
     claimed_mechanism: z.string(),
     actual_physics: z.string(),
-    accuracy_assessment: z.enum([
-      'ACCURATE',
+    accuracy_assessment: flexibleEnum(
+      ['ACCURATE', 'OVERSIMPLIFIED', 'PARTIALLY_WRONG', 'FUNDAMENTALLY_WRONG'],
       'OVERSIMPLIFIED',
-      'PARTIALLY_WRONG',
-      'FUNDAMENTALLY_WRONG',
-    ]),
+    ),
 
     mechanism_deep_dive: z.object({
       working_principle: z.string(),
@@ -592,12 +567,10 @@ export const DD3_M_OutputSchema = z.object({
     cost_assessment: z.object({
       claimed_cost: z.string(),
       cost_basis_provided: z.string(),
-      cost_basis_quality: z.enum([
-        'DETAILED',
-        'REASONABLE',
+      cost_basis_quality: flexibleEnum(
+        ['DETAILED', 'REASONABLE', 'SUPERFICIAL', 'MISSING'],
         'SUPERFICIAL',
-        'MISSING',
-      ]),
+      ),
       hidden_costs_identified: z.array(
         z.object({
           cost: z.string(),
@@ -755,12 +728,10 @@ export const DD3_5_M_OutputSchema = z.object({
       current_market_size: z.string(),
       projected_market_size: z.string(),
       growth_driver: z.string(),
-      timing_assessment: z.enum([
-        'RIGHT_TIME',
+      timing_assessment: flexibleEnum(
+        ['RIGHT_TIME', '2_YEARS_EARLY', '5_PLUS_YEARS_EARLY', 'TOO_LATE'],
         '2_YEARS_EARLY',
-        '5_PLUS_YEARS_EARLY',
-        'TOO_LATE',
-      ]),
+      ),
       timing_reasoning: z.string(),
     }),
     vitamin_or_painkiller: z.object({
@@ -986,12 +957,10 @@ export const DD4_M_OutputSchema = z.object({
     problem_framing_assessment: z.object({
       their_framing: z.string(),
       optimal_framing: z.string(),
-      framing_quality: z.enum([
-        'OPTIMAL',
-        'GOOD',
+      framing_quality: flexibleEnum(
+        ['OPTIMAL', 'GOOD', 'SUBOPTIMAL', 'WRONG_PROBLEM'],
         'SUBOPTIMAL',
-        'WRONG_PROBLEM',
-      ]),
+      ),
       implications: z.string(),
     }),
   }),
@@ -1066,11 +1035,10 @@ export const DD4_M_OutputSchema = z.object({
     threats_from_solution_space: z.array(
       z.object({
         threat_source: z.string(),
-        threat_type: z.enum([
+        threat_type: flexibleEnum(
+          ['DIRECT_COMPETITION', 'SUBSTITUTION', 'DISRUPTION'],
           'DIRECT_COMPETITION',
-          'SUBSTITUTION',
-          'DISRUPTION',
-        ]),
+        ),
         threat_level: Severity,
         time_horizon: z.string(),
         likelihood: Confidence,
@@ -1452,12 +1420,10 @@ export const DD5_M_OutputSchema = z.object({
       which_concept_closest: z.string(),
       is_optimal_track: z.boolean(),
       what_first_principles_recommends: z.string(),
-      positioning_verdict: z.enum([
-        'OPTIMAL',
+      positioning_verdict: flexibleEnum(
+        ['OPTIMAL', 'REASONABLE', 'SUBOPTIMAL', 'WRONG_APPROACH'],
         'REASONABLE',
-        'SUBOPTIMAL',
-        'WRONG_APPROACH',
-      ]),
+      ),
       positioning_explanation: z.string(),
     }),
     the_implicit_bet: z.object({
@@ -1541,12 +1507,10 @@ export const DD5_M_OutputSchema = z.object({
       z.object({
         claim: z.string(),
         theoretical_limit: z.string(),
-        verdict: z.enum([
-          'VALIDATED',
-          'PLAUSIBLE',
+        verdict: flexibleEnum(
+          ['VALIDATED', 'PLAUSIBLE', 'QUESTIONABLE', 'IMPLAUSIBLE'],
           'QUESTIONABLE',
-          'IMPLAUSIBLE',
-        ]),
+        ),
         explanation: z.string(),
       }),
     ),
