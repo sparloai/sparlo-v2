@@ -4,6 +4,7 @@ packages:
   - tooling/*
 
 catalog:
+  '@hookform/resolvers': 3.10.0
   '@next/bundle-analyzer': 16.0.10
   '@next/eslint-plugin-next': 16.0.10
   '@supabase/supabase-js': 2.87.1

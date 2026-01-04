@@ -10,7 +10,7 @@
   "dependencies": {
     "@ai-sdk/openai": "^2.0.80",
     "@faker-js/faker": "^10.1.0",
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "catalog:",
     "@tanstack/react-query": "catalog:",
     "ai": "5.0.108",
     "lucide-react": "^0.556.0",

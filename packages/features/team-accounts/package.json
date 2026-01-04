@@ -21,7 +21,7 @@
     "nanoid": "^5.1.6"
   },
   "devDependencies": {
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "catalog:",
     "@kit/accounts": "workspace:*",
     "@kit/billing-gateway": "workspace:*",
     "@kit/email-templates": "workspace:*",

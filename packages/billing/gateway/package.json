@@ -16,7 +16,7 @@
     "./marketing": "./src/components/marketing.tsx"
   },
   "devDependencies": {
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "catalog:",
     "@kit/billing": "workspace:*",
     "@kit/eslint-config": "workspace:*",
     "@kit/lemon-squeezy": "workspace:*",

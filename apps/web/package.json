@@ -33,7 +33,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
     "@edge-csrf/nextjs": "2.5.3-cloudflare-rc1",
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "catalog:",
     "@inngest/middleware-encryption": "^1.0.2",
     "@kit/accounts": "workspace:*",
     "@kit/admin": "workspace:*",
