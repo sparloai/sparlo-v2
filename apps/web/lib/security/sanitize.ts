@@ -1,15 +1,14 @@
 import 'server-only';
 
-import DOMPurify from 'isomorphic-dompurify';
-
 /**
  * Sanitizes user input to prevent XSS attacks
+ * Uses simple regex-based sanitization to avoid jsdom dependency issues
  */
 export function sanitizeHtml(text: string): string {
-  return DOMPurify.sanitize(text, {
-    ALLOWED_TAGS: [],
-    ALLOWED_ATTR: [],
-  }).trim();
+  return text
+    .replace(/<[^>]*>/g, '') // Remove all HTML tags
+    .replace(/&[^;]+;/g, '') // Remove HTML entities
+    .trim();
 }
 
 /**
