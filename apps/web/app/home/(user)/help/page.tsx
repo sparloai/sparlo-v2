@@ -1,5 +1,6 @@
-import { ArrowLeft, FileText, MessageSquare, Send } from 'lucide-react';
 import Link from 'next/link';
+
+import { ArrowLeft, FileText, MessageSquare, Send } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@kit/ui/tabs';
 
@@ -19,7 +20,7 @@ export const metadata = {
 function HelpPage() {
   return (
     <main className="min-h-screen bg-white">
-      <div className="mx-auto max-w-3xl px-8 pb-16 pt-12">
+      <div className="mx-auto max-w-3xl px-8 pt-12 pb-16">
         {/* Back link */}
         <Link
           href="/home"
@@ -31,10 +32,10 @@ function HelpPage() {
 
         {/* Page title with signature left border */}
         <div className="mb-12 border-l-4 border-zinc-950 py-1 pl-6">
-          <h1 className="mb-3 font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
+          <h1 className="font-heading mb-3 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
             Help Center
           </h1>
-          <p className="max-w-2xl text-lg font-normal leading-relaxed text-zinc-600">
+          <p className="max-w-2xl text-lg leading-relaxed font-normal text-zinc-600">
             Get answers from our support assistant, submit a request, or browse
             documentation.
           </p>
@@ -45,21 +46,21 @@ function HelpPage() {
           <TabsList className="mb-8 grid h-auto w-full grid-cols-3 gap-2 bg-transparent p-0">
             <TabsTrigger
               value="chat"
-              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white hover:border-zinc-300"
+              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all hover:border-zinc-300 data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
             >
               <MessageSquare className="h-4 w-4" />
               Support Chat
             </TabsTrigger>
             <TabsTrigger
               value="ticket"
-              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white hover:border-zinc-300"
+              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all hover:border-zinc-300 data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
             >
               <Send className="h-4 w-4" />
               Submit Request
             </TabsTrigger>
             <TabsTrigger
               value="docs"
-              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white hover:border-zinc-300"
+              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all hover:border-zinc-300 data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
             >
               <FileText className="h-4 w-4" />
               Documentation
