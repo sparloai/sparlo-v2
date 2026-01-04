@@ -1,4 +1,7 @@
-import { generateDDReport } from './generate-dd-report';
+import {
+  generateDDReport,
+  handleDDReportCancellation,
+} from './generate-dd-report';
 import { generateDiscoveryReport } from './generate-discovery-report';
 import { generateHybridReport } from './generate-hybrid-report';
 import { generateReport } from './generate-report';
@@ -11,4 +14,5 @@ export const functions = [
   generateDiscoveryReport,
   generateHybridReport,
   generateDDReport,
+  handleDDReportCancellation,
 ];

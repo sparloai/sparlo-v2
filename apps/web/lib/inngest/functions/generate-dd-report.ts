@@ -65,6 +65,7 @@ import {
   validateDDInput,
 } from '../../llm/security/input-validator';
 import { inngest } from '../client';
+import { trackReportCompleted } from '../utils/analytics';
 
 /**
  * Generate DD Report - Inngest Durable Function
@@ -118,6 +119,75 @@ interface DDReportEventData {
 // Inngest Function
 // =============================================================================
 
+/**
+ * Handle DD report cancellation
+ * This runs when a report/cancel.requested event is sent
+ * and updates the report status to 'cancelled'
+ */
+export const handleDDReportCancellation = inngest.createFunction(
+  {
+    id: 'sparlo-dd-report-cancellation-handler',
+    retries: 3,
+  },
+  { event: 'report/cancel.requested' },
+  async ({ event }) => {
+    const { reportId } = event.data as { reportId: string };
+
+    if (!reportId) {
+      console.error(
+        '[DD Cancellation] No reportId in cancel event:',
+        event.data,
+      );
+      return { success: false, error: 'No reportId provided' };
+    }
+
+    console.log('[DD Cancellation] Processing cancellation for:', reportId);
+
+    try {
+      const supabase = getSupabaseServerAdminClient();
+
+      // Only update if report is still processing
+      const { data: report } = await supabase
+        .from('sparlo_reports')
+        .select('status')
+        .eq('id', reportId)
+        .single();
+
+      if (report?.status === 'processing') {
+        const { error: updateError } = await supabase
+          .from('sparlo_reports')
+          .update({
+            status: 'cancelled',
+            error_message: 'Report generation was cancelled.',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', reportId)
+          .eq('status', 'processing'); // Only update if still processing
+
+        if (updateError) {
+          console.error(
+            '[DD Cancellation] Failed to update report status:',
+            updateError,
+          );
+          return { success: false, error: updateError.message };
+        }
+
+        console.log('[DD Cancellation] Report marked as cancelled:', reportId);
+        return { success: true, reportId };
+      } else {
+        console.log(
+          '[DD Cancellation] Report not in processing state:',
+          report?.status,
+        );
+        return { success: true, reportId, skipped: true };
+      }
+    } catch (error) {
+      console.error('[DD Cancellation] Exception:', error);
+      throw error; // Let Inngest retry
+    }
+  },
+);
+
 export const generateDDReport = inngest.createFunction(
   {
     id: 'sparlo-dd-report-generator',
@@ -128,11 +198,23 @@ export const generateDDReport = inngest.createFunction(
         match: 'data.reportId',
       },
     ],
-    onFailure: async ({ error, event, step }) => {
+    onFailure: async ({ error, event }) => {
+      // Extract reportId from the failure event structure
       const failureEvent = event as unknown as {
-        event: { data: DDReportEventData };
+        data: {
+          event: { data: DDReportEventData };
+          error: { message: string; name: string };
+        };
       };
-      const reportId = failureEvent.event.data.reportId;
+      const reportId = failureEvent.data?.event?.data?.reportId;
+
+      if (!reportId) {
+        console.error(
+          '[DD Function] onFailure: Could not extract reportId from event',
+          JSON.stringify(event, null, 2),
+        );
+        return;
+      }
 
       // Use categorized error handling
       const categorizedError = categorizeError(error);
@@ -143,9 +225,10 @@ export const generateDDReport = inngest.createFunction(
       console.error('[DD Function] Report failed:', logEntry);
 
       // Update report with user-friendly error message
-      await step.run('update-failed-status', async () => {
+      // Note: Don't use step.run in onFailure - it can cause issues
+      try {
         const supabase = getSupabaseServerAdminClient();
-        await supabase
+        const { error: updateError } = await supabase
           .from('sparlo_reports')
           .update({
             status: 'failed',
@@ -153,7 +236,24 @@ export const generateDDReport = inngest.createFunction(
             updated_at: new Date().toISOString(),
           })
           .eq('id', reportId);
-      });
+
+        if (updateError) {
+          console.error(
+            '[DD Function] Failed to update report status in onFailure:',
+            updateError,
+          );
+        } else {
+          console.log(
+            '[DD Function] Successfully marked report as failed:',
+            reportId,
+          );
+        }
+      } catch (dbError) {
+        console.error(
+          '[DD Function] Exception updating report status in onFailure:',
+          dbError,
+        );
+      }
     },
   },
   { event: 'report/generate-dd' },
@@ -1168,6 +1268,16 @@ Make the report 3-5x more valuable than traditional DD.`;
           console.log('[DD Function] Report completed atomically:', {
             reportId,
             tokens: totalUsage.totalTokens,
+            costUsd: totalUsage.costUsd,
+          });
+
+          // Track report completion for analytics (fire-and-forget)
+          trackReportCompleted({
+            reportId,
+            reportType: 'dd',
+            accountId,
+            generationTimeMs: event.ts ? Date.now() - event.ts : 0,
+            tokenCount: totalUsage.totalTokens,
             costUsd: totalUsage.costUsd,
           });
         });
