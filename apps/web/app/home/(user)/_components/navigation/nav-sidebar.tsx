@@ -10,6 +10,7 @@ import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { cn } from '@kit/ui/utils';
 
 import pathsConfig from '~/config/paths.config';
+import { useAppPath } from '~/lib/hooks/use-app-path';
 
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
 import {
@@ -70,12 +71,14 @@ function SettingsDropdown({
   onSignOut,
   collapsed,
   userEmail,
+  getPath,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSignOut: () => void;
   collapsed: boolean;
   userEmail?: string | null;
+  getPath: (path: string) => string;
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -129,7 +132,7 @@ function SettingsDropdown({
       )}
 
       <Link
-        href={pathsConfig.app.personalAccountSettings}
+        href={getPath(pathsConfig.app.personalAccountSettings)}
         onClick={onClose}
         className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
@@ -137,7 +140,7 @@ function SettingsDropdown({
         Settings
       </Link>
       <Link
-        href={pathsConfig.app.personalAccountBilling}
+        href={getPath(pathsConfig.app.personalAccountBilling)}
         onClick={onClose}
         className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
@@ -145,7 +148,7 @@ function SettingsDropdown({
         Billing
       </Link>
       <Link
-        href="/home/help"
+        href={getPath('/home/help')}
         onClick={onClose}
         className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
@@ -353,6 +356,7 @@ export const NavSidebar = memo(function NavSidebar({
 }: NavSidebarProps) {
   const router = useRouter();
   const signOut = useSignOut();
+  const { getPath } = useAppPath();
   const {
     collapsed,
     setCollapsed,
@@ -371,8 +375,8 @@ export const NavSidebar = memo(function NavSidebar({
 
   const handleNewAnalysis = useCallback(() => {
     if (isMobile) setMobileMenuOpen(false);
-    router.push('/home/reports/new');
-  }, [router, isMobile, setMobileMenuOpen]);
+    router.push(getPath('/home/reports/new'));
+  }, [router, isMobile, setMobileMenuOpen, getPath]);
 
   const handleSignOut = useCallback(async () => {
     await signOut.mutateAsync();
@@ -418,7 +422,7 @@ export const NavSidebar = memo(function NavSidebar({
         >
           {(!collapsed || isMobile) && (
             <Link
-              href="/home"
+              href={getPath('/home')}
               onClick={handleLinkClick}
               className="transition-opacity hover:opacity-70"
             >
@@ -498,7 +502,7 @@ export const NavSidebar = memo(function NavSidebar({
               show={collapsed && !isMobile && hoveredItem === 'reports'}
             >
               <Link
-                href="/home/reports"
+                href={getPath('/home/reports')}
                 onClick={handleLinkClick}
                 className={cn(
                   'flex min-h-[44px] w-full cursor-pointer items-center gap-3 rounded-lg py-2.5 text-base text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white',
@@ -521,7 +525,7 @@ export const NavSidebar = memo(function NavSidebar({
                 {recentReports.slice(0, 10).map((report) => (
                   <Link
                     key={report.id}
-                    href={`/home/reports/${report.id}`}
+                    href={getPath(`/home/reports/${report.id}`)}
                     onClick={handleLinkClick}
                     className="block min-h-[36px] truncate rounded px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
                   >
@@ -541,6 +545,7 @@ export const NavSidebar = memo(function NavSidebar({
             onSignOut={handleSignOut}
             collapsed={collapsed && !isMobile}
             userEmail={user.email}
+            getPath={getPath}
           />
 
           <div

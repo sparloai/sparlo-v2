@@ -3,9 +3,10 @@
 import { memo } from 'react';
 
 import Image from 'next/image';
-import Link from 'next/link';
 
 import { cn } from '@kit/ui/utils';
+
+import { AppLink } from '~/components/app-link';
 
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
 import type { UsageData } from '../../_lib/server/usage.loader';
@@ -87,7 +88,7 @@ export const NavHeader = memo(function NavHeader({
                 <MenuIcon className="h-6 w-6" />
               </button>
             )}
-            <Link href="/home" className="transition-opacity hover:opacity-70">
+            <AppLink href="/home" className="transition-opacity hover:opacity-70">
               <Image
                 src="/images/sparlo-logo.png"
                 alt="Sparlo"
@@ -102,21 +103,21 @@ export const NavHeader = memo(function NavHeader({
                 height={22}
                 className="hidden h-[22px] w-auto dark:block"
               />
-            </Link>
+            </AppLink>
           </div>
 
           {/* Right: Usage indicator */}
           <div className="flex items-center gap-4">
             {/* Usage indicator - only shows when >= 25% used */}
             {usage?.showUsageBar && (
-              <Link href="/home/billing" className="w-28">
+              <AppLink href="/home/billing" className="w-28">
                 <UsageIndicator
                   tokensUsed={usage.tokensUsed}
                   tokensLimit={usage.tokensLimit}
                   reportsCount={usage.reportsCount}
                   periodEnd={usage.periodEnd}
                 />
-              </Link>
+              </AppLink>
             )}
           </div>
         </nav>
