@@ -216,9 +216,10 @@ export {
 
 /**
  * Simple constants - no per-phase maps needed when all values are identical
- * Max tokens set to Claude's maximum output limit to prevent truncation
+ * Max tokens set high to prevent truncation on complex DD/Hybrid outputs
+ * Claude Opus 4.5 supports up to 128K output tokens
  */
-export const HYBRID_MAX_TOKENS = 32000;
+export const HYBRID_MAX_TOKENS = 64000;
 export const HYBRID_MODEL = 'claude-opus-4-5-20251101';
 
 export const HYBRID_TEMPERATURES = {

@@ -220,6 +220,15 @@ export async function callClaude(params: {
         );
       }
 
+      // Log warning if truncated due to max_tokens
+      if (finalMessage.stop_reason === 'max_tokens') {
+        console.warn(
+          `[Claude] Response truncated due to max_tokens limit. ` +
+            `Used ${finalMessage.usage.output_tokens}/${maxTokens} tokens. ` +
+            `Model: ${finalMessage.model}`,
+        );
+      }
+
       if (!result) {
         throw new Error(
           `No text content from Claude stream. ` +

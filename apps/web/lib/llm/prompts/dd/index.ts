@@ -80,9 +80,10 @@ export {
 } from './prompts';
 
 /**
- * DD Mode max tokens - set to Claude's maximum to prevent truncation
+ * DD Mode max tokens - set high to prevent truncation on complex outputs
+ * Claude Opus 4.5 supports up to 128K output tokens
  */
-export const DD_MAX_TOKENS = 32000;
+export const DD_MAX_TOKENS = 64000;
 
 /**
  * DD Mode model - use Opus for judgment-heavy stages
