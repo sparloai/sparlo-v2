@@ -5,29 +5,26 @@ import { CsrfError, createCsrfProtect } from '@edge-csrf/nextjs';
 
 import { isSuperAdmin } from '@kit/admin';
 import { getSafeRedirectPath } from '@kit/shared/utils';
-import { checkRequiresMultiFactorAuthentication } from '@kit/supabase/check-requires-mfa';
 import { createMiddlewareClient } from '@kit/supabase/middleware-client';
 
 import appConfig from '~/config/app.config';
 import pathsConfig from '~/config/paths.config';
+import {
+  PRODUCTION_DOMAIN,
+  isAppSubdomainHost,
+  isPublicPath,
+} from '~/config/subdomain.config';
 
 const CSRF_SECRET_COOKIE = 'csrfSecret';
 const NEXT_ACTION_HEADER = 'next-action';
 
 /**
- * App subdomain configuration for cross-subdomain routing.
- * On app.sparlo.ai, all routes require authentication (no /home prefix in URL).
- */
-const APP_SUBDOMAIN = 'app';
-const PRODUCTION_DOMAIN = 'sparlo.ai';
-
-/**
  * Check if the request is coming from the app subdomain.
- * On the app subdomain, routes don't have the /home prefix.
+ * Uses exact hostname matching to prevent host header injection attacks.
  */
 function isAppSubdomain(request: NextRequest): boolean {
   const host = request.headers.get('host') ?? '';
-  return host.startsWith(`${APP_SUBDOMAIN}.${PRODUCTION_DOMAIN}`);
+  return isAppSubdomainHost(host);
 }
 
 export const config = {
@@ -97,10 +94,10 @@ async function withCsrfMiddleware(
 
     return response;
   } catch (error) {
-    // if there is a CSRF error, return a 403 response
+    // if there is a CSRF error, return a 403 Forbidden response
     if (error instanceof CsrfError) {
       return NextResponse.json('Invalid CSRF token', {
-        status: 401,
+        status: 403,
       });
     }
 
@@ -144,27 +141,29 @@ async function adminMiddleware(request: NextRequest, response: NextResponse) {
 }
 
 /**
- * Paths that are public on the app subdomain (don't require authentication).
- * These should not trigger auth redirects.
+ * Check if MFA verification is required based on JWT claims.
+ * Reads AAL (Authenticator Assurance Level) directly from claims to avoid
+ * an extra API call on every request.
+ *
+ * MFA is required when:
+ * - User has MFA factors enrolled (amr contains 'mfa')
+ * - Current AAL is aal1 (not yet verified with second factor)
  */
-const APP_SUBDOMAIN_PUBLIC_PATHS = [
-  '/auth',
-  '/healthcheck',
-  '/api',
-  '/share',
-  '/_next',
-  '/locales',
-  '/images',
-  '/assets',
-];
+function requiresMfaVerification(claims: Record<string, unknown>): boolean {
+  const aal = claims.aal as string | undefined;
+  const amr = claims.amr as Array<{ method: string }> | undefined;
 
-/**
- * Check if a path is public on the app subdomain.
- */
-function isPublicPath(pathname: string): boolean {
-  return APP_SUBDOMAIN_PUBLIC_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`),
-  );
+  // If user is already at aal2, no MFA verification needed
+  if (aal === 'aal2') {
+    return false;
+  }
+
+  // Check if user has MFA factors enrolled
+  // The amr (Authentication Methods Reference) array indicates enrolled methods
+  const hasMfaEnrolled = amr?.some((method) => method.method === 'totp');
+
+  // MFA required if factors are enrolled but user is at aal1
+  return hasMfaEnrolled === true && aal === 'aal1';
 }
 
 /**
@@ -198,10 +197,10 @@ async function protectedRouteHandler(
     return NextResponse.redirect(new URL(redirectPath, origin).href);
   }
 
-  const supabase = createMiddlewareClient(req, res);
-
-  const requiresMultiFactorAuthentication =
-    await checkRequiresMultiFactorAuthentication(supabase);
+  // Check MFA requirement from claims (no extra API call)
+  const requiresMultiFactorAuthentication = requiresMfaVerification(
+    data.claims as Record<string, unknown>,
+  );
 
   // If user requires multi-factor authentication, redirect to MFA page.
   if (requiresMultiFactorAuthentication) {
