@@ -30,9 +30,15 @@ export interface TeamUsageResult {
 export const loadTeamUsage = cache(teamUsageLoader);
 
 async function teamUsageLoader(accountId: string): Promise<TeamUsageResult> {
-  const client = getSupabaseServerClient();
-
   try {
+    const client = getSupabaseServerClient();
+
+    // Defensive check for client initialization
+    if (!client) {
+      console.error('Team usage loader: Supabase client not initialized');
+      return { data: null, error: 'Database client not available' };
+    }
+
     // 1. Get usage period data - this also validates account access via RLS
     const { data: usageData, error: usageError } = await client.rpc(
       'check_usage_allowed',
@@ -110,6 +116,18 @@ async function teamUsageLoader(accountId: string): Promise<TeamUsageResult> {
       error: null,
     };
   } catch (error) {
+    // Handle Supabase client initialization errors gracefully
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+
+    if (errorMessage.includes('rest') || errorMessage.includes('undefined')) {
+      console.error(
+        'Team usage loader: Supabase client initialization failed',
+        error,
+      );
+      return { data: null, error: 'Database connection unavailable' };
+    }
+
     console.error('Unexpected error loading team usage:', error);
     return { data: null, error: 'An unexpected error occurred' };
   }
