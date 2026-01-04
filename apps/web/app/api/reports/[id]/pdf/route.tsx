@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server';
 
-import chromium from '@sparticuz/chromium';
-import puppeteer, { type Browser } from 'puppeteer-core';
-
 import { enhanceRouteHandler } from '@kit/next/routes';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
@@ -10,7 +7,7 @@ import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-r
 
 import { renderReportToHtml } from '../print/_lib/render-report-html';
 
-const PDF_GENERATION_TIMEOUT_MS = 60000; // 60 seconds for Puppeteer
+const PDF_GENERATION_TIMEOUT_MS = 60000; // 60 seconds for DocRaptor
 
 // Rate limit configuration for PDF export
 const PDF_RATE_LIMITS = {
@@ -19,7 +16,7 @@ const PDF_RATE_LIMITS = {
 };
 
 // Concurrency limit to prevent memory exhaustion
-const MAX_CONCURRENT_PDFS = 3;
+const MAX_CONCURRENT_PDFS = 5;
 let activeRequests = 0;
 
 interface RateLimitResult {
@@ -52,79 +49,6 @@ function isValidUUID(id: string): boolean {
   return UUID_REGEX.test(id);
 }
 
-// Browser instance for connection pooling
-let browserInstance: Browser | null = null;
-let browserLastUsed = 0;
-let browserLock = false;
-const BROWSER_IDLE_TIMEOUT = 300000; // Close browser after 5 minutes of inactivity
-
-/**
- * Chromium args for Railway container environment.
- * Uses @sparticuz/chromium defaults plus container-specific flags.
- */
-const CHROMIUM_ARGS = [
-  ...chromium.args,
-  '--disable-dev-shm-usage', // Use /tmp instead of /dev/shm
-  '--disable-gpu', // Disable GPU hardware acceleration
-  '--no-first-run', // Skip first run wizards
-  '--disable-extensions', // Disable extensions
-  '--hide-scrollbars', // Hide scrollbars in screenshots
-];
-
-/**
- * Get or create a browser instance for PDF generation.
- * Uses connection pooling to avoid cold start penalty on subsequent requests.
- *
- * Security note: --no-sandbox is required for Railway container environment.
- * XSS protection is enforced at the HTML rendering layer via whitelist sanitization.
- */
-async function getBrowser(): Promise<Browser> {
-  // Simple lock to prevent race condition during browser creation
-  while (browserLock) {
-    await new Promise((resolve) => setTimeout(resolve, 50));
-  }
-
-  const now = Date.now();
-
-  // Close idle browser
-  if (browserInstance && now - browserLastUsed > BROWSER_IDLE_TIMEOUT) {
-    browserLock = true;
-    try {
-      await browserInstance.close();
-    } catch {
-      // Ignore close errors
-    }
-    browserInstance = null;
-    browserLock = false;
-  }
-
-  // Create new browser if needed
-  if (!browserInstance) {
-    browserLock = true;
-    try {
-      const executablePath = await chromium.executablePath();
-      console.log(
-        '[PDF Export] Launching browser with executable:',
-        executablePath,
-      );
-
-      browserInstance = await puppeteer.launch({
-        args: CHROMIUM_ARGS,
-        defaultViewport: { width: 794, height: 1123 }, // A4 at 96 DPI
-        executablePath,
-        headless: chromium.headless,
-      });
-
-      console.log('[PDF Export] Browser launched successfully');
-    } finally {
-      browserLock = false;
-    }
-  }
-
-  browserLastUsed = now;
-  return browserInstance;
-}
-
 /**
  * Acquire a slot for PDF generation.
  * Returns false if the server is at capacity.
@@ -145,69 +69,58 @@ function releaseSlot(): void {
 }
 
 /**
- * Generate PDF from HTML using Puppeteer.
- * Optimized for Railway container environment with embedded base64 fonts.
+ * DocRaptor API configuration
+ */
+const DOCRAPTOR_API_URL = 'https://api.docraptor.com/docs';
+
+/**
+ * Generate PDF from HTML using DocRaptor API.
+ * DocRaptor uses Prince XML engine for high-quality PDF rendering.
  *
- * Font loading strategy:
- * - Use 'load' waitUntil for reliable content parsing
- * - Explicitly wait for document.fonts.ready API
- * - Small delay after fonts ready for layout completion
+ * Features:
+ * - Excellent CSS support including flexbox, grid, and @font-face
+ * - Base64 embedded fonts work natively
+ * - Page breaks and print styling work correctly
  */
 async function generatePdfFromHtml(html: string): Promise<Buffer> {
-  console.log('[PDF Export] Getting browser instance...');
-  const browser = await getBrowser();
-  console.log('[PDF Export] Creating new page...');
-  const page = await browser.newPage();
+  const apiKey = process.env.DOCRAPTOR_API_KEY;
 
-  try {
-    console.log('[PDF Export] Setting HTML content (%d bytes)...', html.length);
-    // Set content and wait for page load
-    // All assets (fonts, styles) are base64 embedded, no external requests needed
-    await page.setContent(html, {
-      waitUntil: 'load',
-      timeout: 30000,
-    });
-    console.log('[PDF Export] Content loaded, waiting for fonts...');
-
-    // Wait for fonts to be fully loaded (critical for Suisse Intl rendering)
-    // The document.fonts.ready promise resolves when all @font-face fonts are loaded
-    await Promise.race([
-      page.evaluate(() => document.fonts.ready),
-      new Promise((resolve) => setTimeout(resolve, 5000)), // 5s max font wait
-    ]);
-    console.log('[PDF Export] Fonts ready, generating PDF...');
-
-    // Small delay to ensure font rendering is complete in the layout
-    await new Promise((resolve) => setTimeout(resolve, 200));
-
-    // Generate PDF with A4 format
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      preferCSSPageSize: true,
-      margin: {
-        top: '48px',
-        bottom: '64px',
-        left: '48px',
-        right: '48px',
-      },
-      displayHeaderFooter: true,
-      headerTemplate: '<div></div>',
-      footerTemplate: `
-        <div style="font-size: 9px; width: 100%; text-align: center; color: #71717a; padding-top: 8px;">
-          Page <span class="pageNumber"></span> of <span class="totalPages"></span>
-        </div>
-      `,
-    });
-
-    console.log(
-      '[PDF Export] PDF generated, size: %d bytes',
-      pdfBuffer.byteLength,
-    );
-    return Buffer.from(pdfBuffer);
-  } finally {
-    await page.close();
+  if (!apiKey) {
+    throw new Error('DOCRAPTOR_API_KEY environment variable is not set');
   }
+
+  console.log('[PDF Export] Calling DocRaptor API (%d bytes HTML)...', html.length);
+
+  const response = await fetch(DOCRAPTOR_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      user_credentials: apiKey,
+      doc: {
+        test: process.env.NODE_ENV !== 'production', // Free watermarked PDFs in non-production
+        document_type: 'pdf',
+        document_content: html,
+        prince_options: {
+          media: 'print',
+          pdf_profile: 'PDF/A-1b', // Archival quality
+        },
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    // DocRaptor returns error messages in the response body
+    const errorText = await response.text();
+    console.error('[PDF Export] DocRaptor API error:', response.status, errorText);
+    throw new Error(`DocRaptor API error: ${response.status} - ${errorText}`);
+  }
+
+  const pdfBuffer = await response.arrayBuffer();
+  console.log('[PDF Export] PDF generated, size: %d bytes', pdfBuffer.byteLength);
+
+  return Buffer.from(pdfBuffer);
 }
 
 export const GET = enhanceRouteHandler(
@@ -372,6 +285,14 @@ export const GET = enhanceRouteHandler(
         return NextResponse.json(
           { error: 'PDF generation timed out', code: 'TIMEOUT' },
           { status: 504 },
+        );
+      }
+
+      // Check for DocRaptor-specific errors
+      if (err instanceof Error && err.message.includes('DocRaptor')) {
+        return NextResponse.json(
+          { error: 'PDF generation service error', code: 'SERVICE_ERROR' },
+          { status: 502 },
         );
       }
 
