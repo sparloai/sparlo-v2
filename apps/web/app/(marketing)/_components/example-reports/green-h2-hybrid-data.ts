@@ -8,7 +8,7 @@ export const GREEN_H2_HYBRID_REPORT: HybridReportData = {
   title:
     '4% Energy Penalty H2 Compression—Or Why 350 Bar Electrolyzers Make Compressors Obsolete',
   brief:
-    'Mechanical H2 compression from electrolyzer output (30 bar) to storage pressure (350-700 bar) consumes 10-15% of hydrogen\'s energy content, adds $50-100/kW capex, and introduces oil contamination and maintenance burden. Need compression approach achieving 500+ bar at <5% energy penalty, >50,000 hour life, and oil-free operation compatible with fuel cell purity requirements (<10 ppb contaminants).',
+    "Mechanical H2 compression from electrolyzer output (30 bar) to storage pressure (350-700 bar) consumes 10-15% of hydrogen's energy content, adds $50-100/kW capex, and introduces oil contamination and maintenance burden. Need compression approach achieving 500+ bar at <5% energy penalty, >50,000 hour life, and oil-free operation compatible with fuel cell purity requirements (<10 ppb contaminants).",
 
   executive_summary: {
     narrative_lead:
@@ -39,16 +39,15 @@ export const GREEN_H2_HYBRID_REPORT: HybridReportData = {
           approach: 'Electrochemical hydrogen compression',
           current_performance:
             '85% efficiency to 200 bar, >15,000 hours demonstrated',
-          target_roadmap:
-            'Higher pressure operation with reinforced membranes',
+          target_roadmap: 'Higher pressure operation with reinforced membranes',
           source: 'HyET technical documentation, 2020-2023',
         },
         {
           entity: 'PDC Machines (1,500+ units deployed)',
           approach: 'Metal diaphragm compression',
-          current_performance:
-            '12-15% of H2 LHV, 700+ bar, >20,000 hour MTBO',
-          target_roadmap: 'Efficiency improvements through staging optimization',
+          current_performance: '12-15% of H2 LHV, 700+ bar, >20,000 hour MTBO',
+          target_roadmap:
+            'Efficiency improvements through staging optimization',
           source: 'PDC Machines Technical Bulletin TB-2019-H2',
         },
         {
@@ -97,7 +96,7 @@ export const GREEN_H2_HYBRID_REPORT: HybridReportData = {
       headline:
         'Different compression mechanisms have different optimal pressure ranges—combining them beats optimizing either alone',
       explanation:
-        'Electrochemical compression approaches thermodynamic efficiency at low pressure ratios (Nernst potential scales with ln(P2/P1), giving 0.086V for 30→200 bar). Mechanical compression excels at high absolute pressures where it\'s proven and reliable. A hybrid system using EHC for 30→200 bar (85-90% efficient) followed by single-stage mechanical for 200→700 bar (75% efficient at only 3.5:1 ratio) achieves combined efficiency that neither technology can match alone: ~1.4 kWh/kg total, below the 5% target.',
+        "Electrochemical compression approaches thermodynamic efficiency at low pressure ratios (Nernst potential scales with ln(P2/P1), giving 0.086V for 30→200 bar). Mechanical compression excels at high absolute pressures where it's proven and reliable. A hybrid system using EHC for 30→200 bar (85-90% efficient) followed by single-stage mechanical for 200→700 bar (75% efficient at only 3.5:1 ratio) achieves combined efficiency that neither technology can match alone: ~1.4 kWh/kg total, below the 5% target.",
     },
   },
 
@@ -306,7 +305,7 @@ export const GREEN_H2_HYBRID_REPORT: HybridReportData = {
         if_it_works:
           'Separate compression equipment becomes largely obsolete for new installations. Total system efficiency improves. Capex drops as compression equipment is eliminated. Maintenance burden shifts from compressor to electrolyzer, which is already the critical component.',
         estimated_improvement:
-          '<2% of H2 LHV for \'compression\' portion (vs 10-15% baseline)—a 5-7x improvement',
+          "<2% of H2 LHV for 'compression' portion (vs 10-15% baseline)—a 5-7x improvement",
         industry_impact:
           'Could fundamentally restructure hydrogen infrastructure by eliminating a major cost and complexity component',
       },
@@ -422,7 +421,7 @@ export const GREEN_H2_HYBRID_REPORT: HybridReportData = {
         trigger_to_revisit:
           'Publication demonstrating ceramic proton conductor operation at >200 bar pressure differential with >10,000 hour stability; or commercial SOFC manufacturer announcing compression application development',
         who_to_monitor:
-          'Prof. Sossina Haile, Northwestern University - pioneering work on proton-conducting ceramics; Prof. Ryan O\'Hayre, Colorado School of Mines - protonic ceramic fuel cells; Bloom Energy and Ceres Power - commercial SOFC manufacturers who could pivot to compression',
+          "Prof. Sossina Haile, Northwestern University - pioneering work on proton-conducting ceramics; Prof. Ryan O'Hayre, Colorado School of Mines - protonic ceramic fuel cells; Bloom Energy and Ceres Power - commercial SOFC manufacturers who could pivot to compression",
         earliest_viability: '5-7 years',
         trl_estimate: 3,
         competitive_activity:

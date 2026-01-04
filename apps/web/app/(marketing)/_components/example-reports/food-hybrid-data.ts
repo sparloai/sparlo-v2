@@ -5,14 +5,13 @@ import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-r
  * Source: food_json from GitHub
  */
 export const FOOD_HYBRID_REPORT: HybridReportData = {
-  title:
-    '15 kWh/ton Food Waste Processing with Off-the-Shelf Equipment',
+  title: '15 kWh/ton Food Waste Processing with Off-the-Shelf Equipment',
   brief:
     "Commercial kitchens, hospitals, and universities generate 1-5 tons/week of food waste. Hauling costs $150-300/ton and rising. Composting requires space and management. Anaerobic digestion needs scale (100+ tons/day) to be economical. On-site dehydrators exist but consume 800-1200 kWh/ton, take 12-24 hours per batch, produce output that's not consistently compostable, and cost $30-50K for a 200 lb/day unit. Need on-site solution that reduces food waste volume by 80%+, processes 500+ lbs/day, uses <200 kWh/ton, produces stable output (compostable or fuel), and costs <$15K installed.",
 
   executive_summary: {
     narrative_lead:
-      "Mechanical dewatering removes 50-70% of food waste moisture at 10-15 kWh/ton—a fraction of the 600+ kWh/ton floor for thermal evaporation. Agricultural screw presses and olive oil centrifuges have operated at this efficiency for decades. The path to <200 kWh/ton combines a Vincent CP-4 screw press ($6-8K) with either solar cabinet finishing for sunny climates (15-30 kWh/ton) or a compact drum dryer with heat recovery for year-round operation (150-200 kWh/ton). Total installed cost: $8-18K using equipment that ships next week.",
+      'Mechanical dewatering removes 50-70% of food waste moisture at 10-15 kWh/ton—a fraction of the 600+ kWh/ton floor for thermal evaporation. Agricultural screw presses and olive oil centrifuges have operated at this efficiency for decades. The path to <200 kWh/ton combines a Vincent CP-4 screw press ($6-8K) with either solar cabinet finishing for sunny climates (15-30 kWh/ton) or a compact drum dryer with heat recovery for year-round operation (150-200 kWh/ton). Total installed cost: $8-18K using equipment that ships next week.',
     primary_recommendation:
       'Deploy a Vincent CP-4 screw press ($6-8K) with solar cabinet finishing for $8-12K total installed cost, achieving 15-30 kWh/ton electrical consumption in sunny climates. For year-round reliability in variable climates, add a compact drum dryer with heat recovery for $12-18K total, targeting 150-200 kWh/ton. Both approaches use off-the-shelf equipment requiring only integration engineering, not invention.',
     viability: 'viable',

@@ -85,6 +85,13 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
       dependencies: ['setup'],
     },
+    // Learning loop tests - no auth required, run on public pages only
+    {
+      name: 'learning-loop',
+      testMatch: /learning-loop\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+      // No dependencies - runs without authentication
+    },
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',

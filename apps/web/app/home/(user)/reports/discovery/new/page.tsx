@@ -480,7 +480,9 @@ export default function DiscoveryNewReportPage() {
                             ? 'text-teal-700 dark:text-teal-300'
                             : 'text-[--text-muted]',
                         )}
-                        style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
+                        style={{
+                          fontFamily: "'Suisse Intl', Inter, sans-serif",
+                        }}
                       >
                         {context.label}
                       </span>
@@ -573,7 +575,9 @@ export default function DiscoveryNewReportPage() {
             <Lock className="h-3 w-3 text-[--text-muted]" />
             <span
               className="font-mono text-xs tracking-tight text-[--text-secondary]"
-              style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
+              style={{
+                fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
+              }}
             >
               DATA NEVER TRAINS AI
             </span>
@@ -583,7 +587,9 @@ export default function DiscoveryNewReportPage() {
             <ShieldCheck className="h-3 w-3 text-teal-600 dark:text-teal-500" />
             <span
               className="font-mono text-xs tracking-tight text-[--text-secondary]"
-              style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
+              style={{
+                fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
+              }}
             >
               BUILT ON SOC2 INFRASTRUCTURE
             </span>

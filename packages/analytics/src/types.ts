@@ -19,9 +19,12 @@ interface ProviderManager {
   removeProvider(provider: string): void;
 }
 
-export interface AnalyticsService extends TrackPageView, TrackEvent, Identify {
+interface Initializable {
   initialize(): Promise<unknown>;
 }
+
+export interface AnalyticsService
+  extends TrackPageView, TrackEvent, Identify, Initializable {}
 
 export type AnalyticsProviderFactory<Config extends object> = (
   config?: Config,
@@ -35,4 +38,4 @@ export interface CreateAnalyticsManagerOptions<
 }
 
 export interface AnalyticsManager
-  extends TrackPageView, TrackEvent, Identify, ProviderManager {}
+  extends TrackPageView, TrackEvent, Identify, ProviderManager, Initializable {}

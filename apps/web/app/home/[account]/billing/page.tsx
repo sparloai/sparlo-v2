@@ -14,6 +14,7 @@ import { Trans } from '@kit/ui/trans';
 import { cn } from '@kit/ui/utils';
 
 import billingConfig from '~/config/billing.config';
+import { AuraUsageCard } from '~/home/(user)/billing/_components/aura-usage-card';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
@@ -21,6 +22,7 @@ import { withI18n } from '~/lib/i18n/with-i18n';
 import { TeamAccountLayoutPageHeader } from '../_components/team-account-layout-page-header';
 import { loadTeamAccountBillingPage } from '../_lib/server/team-account-billing-page.loader';
 import { loadTeamWorkspace } from '../_lib/server/team-account-workspace.loader';
+import { loadTeamUsage } from '../_lib/server/team-usage.loader';
 import { TeamAccountCheckoutForm } from './_components/team-account-checkout-form';
 import { createBillingPortalSession } from './_lib/server/server-actions';
 
@@ -42,8 +44,12 @@ async function TeamAccountBillingPage({ params }: TeamAccountBillingPageProps) {
   const workspace = await loadTeamWorkspace(account);
   const accountId = workspace.account.id;
 
-  const [subscription, order, customerId] =
-    await loadTeamAccountBillingPage(accountId);
+  const [billingData, usageResult] = await Promise.all([
+    loadTeamAccountBillingPage(accountId),
+    loadTeamUsage(accountId),
+  ]);
+
+  const [subscription, order, customerId] = billingData;
 
   const variantId = subscription?.items[0]?.variant_id;
   const orderVariantId = order?.items[0]?.variant_id;
@@ -72,46 +78,71 @@ async function TeamAccountBillingPage({ params }: TeamAccountBillingPageProps) {
       />
 
       <PageBody>
-        <div className={cn(`flex max-w-2xl flex-col space-y-4`)}>
-          <If condition={!hasBillingData}>
-            <If
-              condition={canManageBilling}
-              fallback={<CannotManageBillingAlert />}
-            >
-              <TeamAccountCheckoutForm
-                customerId={customerId}
-                accountId={accountId}
-              />
+        <div className="border-l-2 border-zinc-900 pl-10">
+          <div className={cn(`flex max-w-2xl flex-col space-y-4`)}>
+            <If condition={!hasBillingData}>
+              <If
+                condition={canManageBilling}
+                fallback={<CannotManageBillingAlert />}
+              >
+                <TeamAccountCheckoutForm
+                  customerId={customerId}
+                  accountId={accountId}
+                />
+              </If>
             </If>
-          </If>
 
-          <If condition={subscription}>
-            {(subscription) => {
-              return (
-                <CurrentSubscriptionCard
-                  subscription={subscription}
-                  product={subscriptionProductPlan!.product}
-                  plan={subscriptionProductPlan!.plan}
-                />
-              );
-            }}
-          </If>
+            <If condition={subscription}>
+              {(subscription) => {
+                return (
+                  <CurrentSubscriptionCard
+                    subscription={subscription}
+                    product={subscriptionProductPlan!.product}
+                    plan={subscriptionProductPlan!.plan}
+                  />
+                );
+              }}
+            </If>
 
-          <If condition={order}>
-            {(order) => {
-              return (
-                <CurrentLifetimeOrderCard
-                  order={order}
-                  product={orderProductPlan!.product}
-                  plan={orderProductPlan!.plan}
-                />
-              );
-            }}
-          </If>
+            <If condition={order}>
+              {(order) => {
+                return (
+                  <CurrentLifetimeOrderCard
+                    order={order}
+                    product={orderProductPlan!.product}
+                    plan={orderProductPlan!.plan}
+                  />
+                );
+              }}
+            </If>
 
-          {shouldShowBillingPortal ? (
-            <BillingPortalForm accountId={accountId} account={account} />
-          ) : null}
+            {canManageBilling && usageResult.error && (
+              <Alert variant={'warning'}>
+                <ExclamationTriangleIcon className={'h-4'} />
+                <AlertTitle>Usage Data Unavailable</AlertTitle>
+                <AlertDescription>{usageResult.error}</AlertDescription>
+              </Alert>
+            )}
+
+            {canManageBilling && usageResult.data && subscription && (
+              <AuraUsageCard
+                tokensUsed={usageResult.data.tokensUsed}
+                tokensLimit={usageResult.data.tokensLimit}
+                reportsCount={usageResult.data.memberUsage.reduce(
+                  (sum, m) => sum + m.reportsCount,
+                  0,
+                )}
+                chatTokensUsed={0}
+                periodEnd={subscription.period_ends_at}
+                planName={subscriptionProductPlan?.product.name ?? 'Team'}
+                memberUsage={usageResult.data.memberUsage}
+              />
+            )}
+
+            {shouldShowBillingPortal ? (
+              <BillingPortalForm accountId={accountId} account={account} />
+            ) : null}
+          </div>
         </div>
       </PageBody>
     </>

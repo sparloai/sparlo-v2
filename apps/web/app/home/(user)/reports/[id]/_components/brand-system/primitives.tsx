@@ -44,7 +44,7 @@ export function parseCitations(text: string): (string | ReactNode)[] {
     parts.push(
       <sup
         key={`citation-${match.index}`}
-        className="text-[11px] font-medium text-zinc-500 ml-0.5"
+        className="ml-0.5 text-[11px] font-medium text-zinc-500"
       >
         [{citationNumber}]
       </sup>,

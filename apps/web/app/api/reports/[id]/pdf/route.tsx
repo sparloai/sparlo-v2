@@ -103,7 +103,10 @@ async function getBrowser(): Promise<Browser> {
     browserLock = true;
     try {
       const executablePath = await chromium.executablePath();
-      console.log('[PDF Export] Launching browser with executable:', executablePath);
+      console.log(
+        '[PDF Export] Launching browser with executable:',
+        executablePath,
+      );
 
       browserInstance = await puppeteer.launch({
         args: CHROMIUM_ARGS,
@@ -197,7 +200,10 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
       `,
     });
 
-    console.log('[PDF Export] PDF generated, size: %d bytes', pdfBuffer.byteLength);
+    console.log(
+      '[PDF Export] PDF generated, size: %d bytes',
+      pdfBuffer.byteLength,
+    );
     return Buffer.from(pdfBuffer);
   } finally {
     await page.close();

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { SignUpMethodsContainer } from '@kit/auth/sign-up';
 import { Trans } from '@kit/ui/trans';
 
+import { TrackSignupStarted } from '~/components/analytics-events';
 import authConfig from '~/config/auth.config';
 import pathsConfig from '~/config/paths.config';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
@@ -24,6 +25,7 @@ const paths = {
 async function SignUpPage() {
   return (
     <>
+      <TrackSignupStarted />
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-[28px] font-semibold tracking-tight text-zinc-900">
           Create Account

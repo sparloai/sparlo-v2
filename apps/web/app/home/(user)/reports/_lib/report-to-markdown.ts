@@ -146,7 +146,8 @@ export function reportToMarkdown(
 
   // Solution Concepts (Execution Track)
   // Handle both old schema (execution_track) and v12 schema (solution_concepts)
-  const executionTrackData = data.execution_track ?? (data as Record<string, unknown>).solution_concepts;
+  const executionTrackData =
+    data.execution_track ?? (data as Record<string, unknown>).solution_concepts;
   if (executionTrackData) {
     sections.push('\n## Solution Concepts');
     const et = executionTrackData as ExecutionTrack;
@@ -209,7 +210,9 @@ export function reportToMarkdown(
 
   // Innovation Concepts
   // Handle both old schema (innovation_portfolio) and v12 schema (innovation_concepts)
-  const innovationData = data.innovation_portfolio ?? (data as Record<string, unknown>).innovation_concepts;
+  const innovationData =
+    data.innovation_portfolio ??
+    (data as Record<string, unknown>).innovation_concepts;
   if (innovationData) {
     const ip = innovationData as InnovationPortfolio & {
       // v12 schema uses 'recommended' instead of 'recommended_innovation'
@@ -224,7 +227,10 @@ export function reportToMarkdown(
     const parallelInvestigations = ip.parallel_investigations ?? ip.parallel;
 
     // Only add Innovation Concepts header if we have content
-    const hasInnovationContent = recommendedInnovation || parallelInvestigations?.length || ip.frontier_watch?.length;
+    const hasInnovationContent =
+      recommendedInnovation ||
+      parallelInvestigations?.length ||
+      ip.frontier_watch?.length;
     if (hasInnovationContent) {
       sections.push('\n## Innovation Concepts');
       if (ip.intro) sections.push(ip.intro);

@@ -84,7 +84,7 @@ const RiskClassificationBlock = memo(function RiskClassificationBlock({
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
         {data.scientific_risk?.status && (
           <div className="space-y-2">
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               Scientific Risk
             </span>
             <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ const RiskClassificationBlock = memo(function RiskClassificationBlock({
 
         {data.engineering_risk?.status && (
           <div className="space-y-2">
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               Engineering Risk
             </span>
             <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ const ConfidenceDetailBlock = memo(function ConfidenceDetailBlock({
       <div className="mt-4 space-y-4">
         {data.hinges_on && (
           <div>
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               Critical Assumption
             </span>
             <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-900">
@@ -180,7 +180,7 @@ const ConfidenceDetailBlock = memo(function ConfidenceDetailBlock({
 
         {data.if_wrong && (
           <div>
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               If Wrong
             </span>
             <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
@@ -191,7 +191,7 @@ const ConfidenceDetailBlock = memo(function ConfidenceDetailBlock({
 
         {data.what_would_change_my_mind && (
           <div>
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               What Would Change Our Mind
             </span>
             <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
@@ -218,7 +218,10 @@ const ReadinessBlock = memo(function ReadinessBlock({
   if (!data) return null;
 
   const hasContent =
-    data.trl || data.trl_rationale || data.scale_up_risk || data.key_scale_challenge;
+    data.trl ||
+    data.trl_rationale ||
+    data.scale_up_risk ||
+    data.key_scale_challenge;
 
   if (!hasContent) return null;
 
@@ -249,7 +252,7 @@ const ReadinessBlock = memo(function ReadinessBlock({
               </span>
             </div>
             <div>
-              <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
                 Technology Readiness Level
               </span>
               <p className="text-[16px] tracking-[-0.02em] text-zinc-700">
@@ -267,7 +270,7 @@ const ReadinessBlock = memo(function ReadinessBlock({
 
         {data.scale_up_risk && (
           <div className="flex items-center gap-3">
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               Scale-up Risk
             </span>
             <div className="flex items-center gap-2">
@@ -291,7 +294,7 @@ const ReadinessBlock = memo(function ReadinessBlock({
 
         {data.key_scale_challenge && (
           <div>
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               Key Scale Challenge
             </span>
             <p className="mt-1 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600">

@@ -40,6 +40,7 @@ import {
 } from '../../llm/prompts/hybrid';
 import { HYBRID_CACHED_PREFIX } from '../../llm/prompts/hybrid/cached-prefix';
 import { inngest } from '../client';
+import { trackReportCompleted } from '../utils/analytics';
 import { handleReportFailure } from '../utils/report-failure-handler';
 
 /**
@@ -801,6 +802,16 @@ The BEST solution wins regardless of origin (simple vs complex, conventional vs 
               methodology: an2mResult.result,
               tokenUsage: totalUsage,
             },
+          });
+
+          // Track report completion for analytics (fire-and-forget)
+          trackReportCompleted({
+            reportId,
+            reportType: 'hybrid',
+            accountId: event.data.accountId,
+            generationTimeMs: event.ts ? Date.now() - event.ts : 0,
+            tokenCount: totalUsage.totalTokens,
+            costUsd: totalUsage.costUsd,
           });
         });
 

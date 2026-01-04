@@ -23,7 +23,7 @@ async function PrivacyPolicyPage() {
       <div className="container mx-auto max-w-3xl px-4 py-12">
         <div className="prose prose-zinc dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-sm">
-            Last updated: January 2, 2025
+            Last updated: January 3, 2025
           </p>
 
           <Section title="Our Commitment to Your Privacy">
@@ -221,8 +221,20 @@ async function PrivacyPolicyPage() {
                 security standards)
               </li>
               <li>
-                <strong>Analytics:</strong> Privacy-focused analytics that do
-                not track individual users
+                <strong>Product Analytics:</strong> PostHog (privacy-focused,
+                GDPR compliant). We use PostHog to understand how users interact
+                with our Service, measure conversion funnels, and improve user
+                experience. PostHog only collects data after you consent to
+                analytics cookies. We do not use PostHog for advertising or
+                share your data with advertisers.{' '}
+                <a
+                  href="https://posthog.com/privacy"
+                  className="text-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  PostHog Privacy Policy
+                </a>
               </li>
             </ul>
             <p>

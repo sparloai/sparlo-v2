@@ -12,28 +12,26 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
 
   executive_summary: {
     narrative_lead:
-      'Pharma biologics solved this exact problem 15 years ago by abandoning batch processing entirely. Continuous perfusion with cell retention achieves 10x volumetric productivity with >95% operational uptime—eliminating \'batch failures\' by eliminating batches. The precision fermentation industry inherited batch processing from pharma without questioning whether it applies; the answer is that it doesn\'t. A 10,000L perfusion system can match 100,000L batch output while transforming the 40-60% failure rate into a steady-state control problem.',
+      "Pharma biologics solved this exact problem 15 years ago by abandoning batch processing entirely. Continuous perfusion with cell retention achieves 10x volumetric productivity with >95% operational uptime—eliminating 'batch failures' by eliminating batches. The precision fermentation industry inherited batch processing from pharma without questioning whether it applies; the answer is that it doesn't. A 10,000L perfusion system can match 100,000L batch output while transforming the 40-60% failure rate into a steady-state control problem.",
     primary_recommendation:
       'Deploy continuous perfusion fermentation with ATF cell retention, targeting 10,000-20,000L working volume to match current 50,000L batch output. Investment of $2-5M over 18-24 months yields 10x volumetric productivity and near-elimination of batch variability. In parallel, optimize conventional approaches (pure O2 sparging, PAT deployment) to improve current operations while perfusion is developed.',
     viability: 'conditionally_viable',
-    viability_label: 'Viable with moderate confidence—requires adaptation of pharma perfusion technology for yeast/bacterial systems',
+    viability_label:
+      'Viable with moderate confidence—requires adaptation of pharma perfusion technology for yeast/bacterial systems',
   },
 
   problem_analysis: {
     whats_wrong: {
       prose:
-        'Every second batch fails. At 40-60% failure rate, more resources go to failed batches than successful ones—feedstock, energy, labor, and 72-120 hours of cycle time discarded at harvest when the product doesn\'t meet spec. The oxygen transfer limitation forces lower cell densities, longer cycles, and larger vessels than the biology actually requires. This isn\'t a scaling problem; it\'s a paradigm problem.',
+        "Every second batch fails. At 40-60% failure rate, more resources go to failed batches than successful ones—feedstock, energy, labor, and 72-120 hours of cycle time discarded at harvest when the product doesn't meet spec. The oxygen transfer limitation forces lower cell densities, longer cycles, and larger vessels than the biology actually requires. This isn't a scaling problem; it's a paradigm problem.",
     },
     current_state_of_art: {
       benchmarks: [
         {
           entity: 'Perfect Day (precision fermentation)',
-          approach:
-            'Fed-batch STR fermentation for whey proteins',
-          current_performance:
-            'Reported $10-20/kg cost at current scale',
-          target_roadmap:
-            'Targeting cost parity with dairy at >100,000L scale',
+          approach: 'Fed-batch STR fermentation for whey proteins',
+          current_performance: 'Reported $10-20/kg cost at current scale',
+          target_roadmap: 'Targeting cost parity with dairy at >100,000L scale',
           source: 'Press releases and investor presentations, unverified',
         },
         {
@@ -51,13 +49,15 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
           current_performance:
             '10-50x volumetric productivity vs batch, >95% uptime, 60+ day campaigns',
           target_roadmap: 'Expanding perfusion to more products',
-          source: 'Konstantinov & Cooney (2015), Journal of Pharmaceutical Sciences',
+          source:
+            'Konstantinov & Cooney (2015), Journal of Pharmaceutical Sciences',
         },
       ],
     },
     what_industry_does_today: [
       {
-        approach: 'Fed-batch in stirred-tank reactors with incremental kLa optimization',
+        approach:
+          'Fed-batch in stirred-tank reactors with incremental kLa optimization',
         limitation:
           'STRs hit practical kLa ceiling of ~500-600/hr at scale; insufficient for >50g/L cell density',
       },
@@ -74,22 +74,20 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
       {
         approach: 'Strain engineering for higher expression titers',
         limitation:
-          'Diminishing returns on titer improvement; doesn\'t address oxygen limitation or batch variability',
+          "Diminishing returns on titer improvement; doesn't address oxygen limitation or batch variability",
       },
     ],
     why_its_hard: {
       prose:
         'Oxygen mass transfer is governed by OTR = kLa × (C* - CL), where kLa is the volumetric mass transfer coefficient and (C* - CL) is the driving force between saturation and actual dissolved oxygen. At high cell density (>50g/L), oxygen uptake rate (OUR) can exceed 100-200 mmol O2/L/hr. Conventional sparging in large STRs achieves kLa of 200-400/hr with air, yielding maximum OTR of ~50-100 mmol/L/hr—insufficient for high-density aerobic culture. The physics is unforgiving: larger vessels have worse surface-area-to-volume ratios, and bubble coalescence reduces interfacial area. You cannot engineer your way around thermodynamics.',
       governing_equation: {
-        equation:
-          'OTR = kLa × (C* - CL) ≥ OUR',
+        equation: 'OTR = kLa × (C* - CL) ≥ OUR',
         explanation:
           'Oxygen transfer rate must equal or exceed oxygen uptake rate. At high cell density, OUR increases linearly while OTR hits practical ceiling. The gap forces lower cell density, longer cycles, and higher per-kg costs.',
       },
     },
     first_principles_insight: {
-      headline:
-        'The batch paradigm is the problem, not batch reliability',
+      headline: 'The batch paradigm is the problem, not batch reliability',
       explanation:
         'Industry is trying to make batches more reliable when the answer is to eliminate batches entirely. Continuous perfusion maintains cells at steady-state optimal conditions indefinitely—no lag phase, no stationary phase decline, no batch-to-batch variability. There are no batches to fail. Pharma biologics made this transition 15+ years ago for identical reasons: batch variability was unacceptable for high-value products. Precision fermentation proteins are simpler than antibodies; the technology transfer is straightforward.',
     },
@@ -146,8 +144,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
 
   challenge_the_frame: [
     {
-      assumption:
-        'The 50,000L vessel scale is fixed',
+      assumption: 'The 50,000L vessel scale is fixed',
       challenge:
         'If the goal is $2-5/kg protein cost, vessel size is a means, not an end. A 10,000L perfusion system achieving 10x productivity matches 100,000L batch output. The constraint may be self-imposed.',
       implication:
@@ -158,7 +155,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
       challenge:
         'Brewing achieves >99% batch success with simpler technology than precision fermentation uses. The difference is strain maturity—centuries vs years of optimization. Process engineering may be compensating for immature strains.',
       implication:
-        'If strain robustness is the binding constraint, ALE investment may have higher ROI than process engineering. The enzyme industry\'s patient approach may be the right model.',
+        "If strain robustness is the binding constraint, ALE investment may have higher ROI than process engineering. The enzyme industry's patient approach may be the right model.",
     },
     {
       assumption: 'The failure modes are mixed (contamination, titer, quality)',
@@ -178,7 +175,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
 
   innovation_analysis: {
     reframe:
-      'Instead of asking \'how do we make batches more reliable at 50,000L,\' we asked \'what if batch processing itself is the wrong paradigm for oxygen-limited protein production?\'',
+      "Instead of asking 'how do we make batches more reliable at 50,000L,' we asked 'what if batch processing itself is the wrong paradigm for oxygen-limited protein production?'",
     domains_searched: [
       'Pharmaceutical biologics manufacturing',
       'Industrial enzyme production',
@@ -196,13 +193,13 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
       'Solution concepts use proven technologies requiring integration and adaptation, not fundamental invention. These represent the highest-confidence paths to achieving target economics with manageable risk.',
     primary: {
       id: 'sol-primary',
-      title:
-        'Continuous Perfusion with ATF Cell Retention',
+      title: 'Continuous Perfusion with ATF Cell Retention',
       confidence: 80,
       source_type: 'TRANSFER',
       bottom_line:
         'Convert from batch to continuous perfusion operation using alternating tangential flow (ATF) or tangential flow filtration (TFF) cell retention.',
-      expected_improvement: '10x volumetric productivity, near-elimination of batch failures',
+      expected_improvement:
+        '10x volumetric productivity, near-elimination of batch failures',
       timeline: '18-24 months to commercial deployment',
       investment: '$2-5M',
       the_insight: {
@@ -215,10 +212,10 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
             'Precision fermentation proteins are simpler than antibodies. The cell retention challenge (yeast/bacteria vs mammalian cells) requires adaptation but not invention.',
         },
         why_industry_missed_it:
-          'Precision fermentation inherited batch processing from pharma without questioning whether it applies. Perfusion is perceived as \'complex\' despite batch failure management being more complex. The startup \'fail fast\' culture accepts batch failures rather than investing in batch elimination.',
+          "Precision fermentation inherited batch processing from pharma without questioning whether it applies. Perfusion is perceived as 'complex' despite batch failure management being more complex. The startup 'fail fast' culture accepts batch failures rather than investing in batch elimination.",
       },
       what_it_is:
-        'Convert from batch to continuous perfusion operation using alternating tangential flow (ATF) or tangential flow filtration (TFF) cell retention. Cells are maintained at steady-state high density (50-100g/L DCW) while spent medium containing secreted product is continuously removed and fresh medium is continuously added. The system reaches steady-state within 5-10 days and then operates indefinitely at constant productivity.\n\nThe cell retention device (hollow fiber membrane) keeps cells in the bioreactor while allowing product-containing permeate to flow through. Dilution rate is controlled to match specific growth rate, maintaining cells in optimal physiological state. Dissolved oxygen is maintained through continuous feed of fresh, oxygenated medium combined with conventional or enhanced sparging.\n\nCritically, this eliminates the concept of \'batch failure\' entirely. There are no batches—only a continuous steady-state that either meets spec or doesn\'t. Deviations are detected in hours and corrected, not discovered at harvest after 72-120 hours of wasted resources.',
+        "Convert from batch to continuous perfusion operation using alternating tangential flow (ATF) or tangential flow filtration (TFF) cell retention. Cells are maintained at steady-state high density (50-100g/L DCW) while spent medium containing secreted product is continuously removed and fresh medium is continuously added. The system reaches steady-state within 5-10 days and then operates indefinitely at constant productivity.\n\nThe cell retention device (hollow fiber membrane) keeps cells in the bioreactor while allowing product-containing permeate to flow through. Dilution rate is controlled to match specific growth rate, maintaining cells in optimal physiological state. Dissolved oxygen is maintained through continuous feed of fresh, oxygenated medium combined with conventional or enhanced sparging.\n\nCritically, this eliminates the concept of 'batch failure' entirely. There are no batches—only a continuous steady-state that either meets spec or doesn't. Deviations are detected in hours and corrected, not discovered at harvest after 72-120 hours of wasted resources.",
       why_it_works:
         'The physics is straightforward: steady-state operation at controlled dilution rate maintains cells at constant specific growth rate, avoiding the lag phase (low productivity), late exponential phase (oxygen limitation), and stationary phase (product degradation, cell death) that characterize batch fermentation. Product is harvested continuously before it can accumulate to inhibitory concentrations or be degraded by proteases. Oxygen demand is constant and predictable rather than peaking during exponential phase. The 10x volumetric productivity means a 10,000L perfusion system matches 100,000L batch output—achieving the economics of larger scale without the capital investment.',
       why_it_might_fail: [
@@ -265,7 +262,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
         what_it_is:
           'Systematically optimize pure O2 sparging combined with microbubble generators to maximize kLa within existing vessels. Pure oxygen provides 5x higher partial pressure than air; microbubbles provide 5-10x higher interfacial area than conventional sparging. Combined, these could achieve 3-5x OTR improvement without vessel replacement.\n\nMicrobubble generators (venturi-based or mechanical) produce 10-100 μm bubbles versus conventional 2-5 mm bubbles. Since interfacial area scales with 1/diameter, microbubbles achieve dramatically higher kLa per volume of gas.',
         why_it_works:
-          'Henry\'s Law (pure O2 increases C* from ~8 to ~40 mg/L) combined with microbubble physics (100x smaller bubbles = 100x more surface area) provides multiplicative improvement in oxygen transfer capacity.',
+          "Henry's Law (pure O2 increases C* from ~8 to ~40 mg/L) combined with microbubble physics (100x smaller bubbles = 100x more surface area) provides multiplicative improvement in oxygen transfer capacity.",
         when_to_use_instead:
           'If perfusion development encounters fundamental barriers (cell retention failure, regulatory obstacles), enhanced batch with PAT + microbubbles + pure O2 provides fallback path to improved economics within existing paradigm. Also valuable as interim improvement while perfusion is developed.',
       },
@@ -282,7 +279,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
       innovation_type: 'CROSS_DOMAIN',
       source_domain: 'ICI Pruteen process (1970s-80s)',
       the_insight: {
-        what: 'Henry\'s Law provides 3-5x oxygen solubility at 3-5 bar—fundamental thermodynamics that cannot be circumvented but can be exploited',
+        what: "Henry's Law provides 3-5x oxygen solubility at 3-5 bar—fundamental thermodynamics that cannot be circumvented but can be exploited",
         where_we_found_it: {
           domain: 'ICI Pruteen single-cell protein production (1970s-80s)',
           how_they_use_it:
@@ -291,12 +288,12 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
             'At 3 bar with pure oxygen, oxygen saturation concentration increases from ~40 mg/L to ~120 mg/L—a 3x increase in the thermodynamic driving force for mass transfer.',
         },
         why_industry_missed_it:
-          'The ICI Pruteen process was abandoned due to high energy costs from methanol substrate, not process failure. The fermentation technology itself was proven at massive scale. Modern precision fermentation uses cheaper substrates but hasn\'t revisited the pressure engineering.',
+          "The ICI Pruteen process was abandoned due to high energy costs from methanol substrate, not process failure. The fermentation technology itself was proven at massive scale. Modern precision fermentation uses cheaper substrates but hasn't revisited the pressure engineering.",
       },
       what_it_is:
-        'Combine continuous perfusion with pressurized operation at 3-5 bar to exploit Henry\'s Law for 3-5x higher oxygen solubility. This is the approach ICI used for the Pruteen process in the 1970s-80s, achieving 50,000+ tonnes/year bacterial protein production at costs of $0.30-0.50/kg.\n\nAt 3 bar with pure oxygen, oxygen saturation concentration increases from ~40 mg/L to ~120 mg/L—a 3x increase in the thermodynamic driving force for mass transfer. This is additive with kLa improvements: if kLa is 400/hr and C* is 120 mg/L (versus 40 mg/L at 1 bar), OTR increases 3x without any change to mass transfer equipment.\n\nThe vessel requires pressure rating (standard in chemical processing, 20-40% cost premium) but no fundamental redesign. Combined with continuous operation and modern control systems, this could achieve productivity levels that current precision fermentation hasn\'t approached.',
+        "Combine continuous perfusion with pressurized operation at 3-5 bar to exploit Henry's Law for 3-5x higher oxygen solubility. This is the approach ICI used for the Pruteen process in the 1970s-80s, achieving 50,000+ tonnes/year bacterial protein production at costs of $0.30-0.50/kg.\n\nAt 3 bar with pure oxygen, oxygen saturation concentration increases from ~40 mg/L to ~120 mg/L—a 3x increase in the thermodynamic driving force for mass transfer. This is additive with kLa improvements: if kLa is 400/hr and C* is 120 mg/L (versus 40 mg/L at 1 bar), OTR increases 3x without any change to mass transfer equipment.\n\nThe vessel requires pressure rating (standard in chemical processing, 20-40% cost premium) but no fundamental redesign. Combined with continuous operation and modern control systems, this could achieve productivity levels that current precision fermentation hasn't approached.",
       why_it_works:
-        'Henry\'s Law is fundamental thermodynamics: C* = H × pO2. At 3 bar, oxygen solubility is 3x atmospheric. This increases the \'ceiling\' that mass transfer approaches, enabling higher cell density and productivity without improving kLa. The cells don\'t \'know\' the pressure is elevated—each oxygen molecule in solution has the same activity as at atmospheric pressure. Most production organisms tolerate 5-10 bar without significant growth inhibition.',
+        "Henry's Law is fundamental thermodynamics: C* = H × pO2. At 3 bar, oxygen solubility is 3x atmospheric. This increases the 'ceiling' that mass transfer approaches, enabling higher cell density and productivity without improving kLa. The cells don't 'know' the pressure is elevated—each oxygen molecule in solution has the same activity as at atmospheric pressure. Most production organisms tolerate 5-10 bar without significant growth inhibition.",
       breakthrough_potential: {
         if_it_works:
           'Achieves commodity-scale protein economics ($1-3/kg) at 50,000L scale',
@@ -344,7 +341,8 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
         the_insight: {
           what: 'VHb binds oxygen at very low concentrations (Kd ~10 nM) and delivers it directly to respiratory enzymes, improving oxygen utilization efficiency by 20-40%',
           where_we_found_it: {
-            domain: 'Bacterial hemoglobin research and industrial strain engineering',
+            domain:
+              'Bacterial hemoglobin research and industrial strain engineering',
             how_they_use_it:
               'VHb expression has been shown to improve growth and product yields in oxygen-limited conditions across multiple organisms',
             why_it_transfers:
@@ -385,7 +383,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
               'The 40-60% failure rate may reflect strain immaturity rather than process limitations. ALE addresses the root cause.',
           },
           why_industry_missed_it:
-            'Precision fermentation startups focus on rapid titer improvement rather than patient strain robustness development. The \'fail fast\' culture doesn\'t align with ALE timelines.',
+            "Precision fermentation startups focus on rapid titer improvement rather than patient strain robustness development. The 'fail fast' culture doesn't align with ALE timelines.",
         },
         ceiling:
           'Brewing-like robustness (>99% batch success) without major process changes',
@@ -409,7 +407,7 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
         innovation_type: 'PARADIGM',
         trl_estimate: 3,
         one_liner:
-          'Eliminates the fundamental kLa limitation—oxygen appears at the molecular level exactly where it\'s produced',
+          "Eliminates the fundamental kLa limitation—oxygen appears at the molecular level exactly where it's produced",
         why_interesting:
           'Could enable arbitrarily high oxygen delivery rates limited only by electrode area and power supply. Hydrogen co-product could be captured for energy recovery.',
         why_not_now:
@@ -497,29 +495,32 @@ export const FOODTECH_HYBRID_REPORT: HybridReportData = {
     what_we_might_be_wrong_about: [
       'Cell retention efficiency for yeast/bacteria may be fundamentally lower than mammalian cells, requiring more development than estimated',
       'Continuous DSP for food proteins may be less mature than assumed, adding timeline and cost',
-      'The 40-60% batch failure rate may have causes we haven\'t identified that persist even with perfusion',
+      "The 40-60% batch failure rate may have causes we haven't identified that persist even with perfusion",
       'Organizational/cultural resistance to paradigm shift may be stronger than technical barriers',
     ],
     unexplored_directions: [
-      'Co-culture systems that reduce oxygen demand through metabolic division of labor—didn\'t pursue due to complexity and regulatory uncertainty',
+      "Co-culture systems that reduce oxygen demand through metabolic division of labor—didn't pursue due to complexity and regulatory uncertainty",
       'Solid-state or semi-solid fermentation for some protein types—may be relevant for specific products but not general solution',
       'Alternative feedstocks (CO2, methane) that change the economics entirely—outside scope but worth monitoring',
     ],
     validation_gaps: [
       {
-        concern: 'Cell retention efficiency for yeast/bacteria may be fundamentally lower than mammalian cells',
+        concern:
+          'Cell retention efficiency for yeast/bacteria may be fundamentally lower than mammalian cells',
         status: 'ADDRESSED',
         rationale:
           'First validation step specifically tests cell retention with production strain; go/no-go criteria defined',
       },
       {
-        concern: 'Continuous DSP for food proteins may be less mature than assumed',
+        concern:
+          'Continuous DSP for food proteins may be less mature than assumed',
         status: 'EXTENDED_NEEDED',
         rationale:
           'Should add parallel DSP development workstream; current validation focuses on fermentation only',
       },
       {
-        concern: 'The 40-60% batch failure rate may have causes we haven\'t identified',
+        concern:
+          "The 40-60% batch failure rate may have causes we haven't identified",
         status: 'EXTENDED_NEEDED',
         rationale:
           'Recommend detailed failure mode analysis before major investment; current assumption of 20/40/40 split is unvalidated',

@@ -75,7 +75,7 @@ const InnovationRiskClassificationBlock = memo(
         <MonoLabel variant="muted">Risk Classification</MonoLabel>
 
         {data.one_line_summary && (
-          <p className="mt-2 text-[16px] leading-[1.3] tracking-[-0.02em] font-medium text-zinc-900">
+          <p className="mt-2 text-[16px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900">
             {data.one_line_summary}
           </p>
         )}
@@ -152,7 +152,7 @@ const InnovationConfidenceDetailBlock = memo(
         <div className="mt-3 space-y-3">
           {data.hinges_on && (
             <div>
-              <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
                 Hinges on
               </span>
               <p className="mt-1 text-[16px] leading-[1.3] tracking-[-0.02em] text-zinc-900">
@@ -163,7 +163,7 @@ const InnovationConfidenceDetailBlock = memo(
 
           {data.if_wrong && (
             <div>
-              <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
                 If wrong
               </span>
               <p className="mt-1 text-[16px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
@@ -174,7 +174,7 @@ const InnovationConfidenceDetailBlock = memo(
 
           {data.what_would_change_my_mind && (
             <div>
-              <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
                 Would change our mind
               </span>
               <p className="mt-1 text-[16px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
@@ -267,7 +267,7 @@ const InnovationReadinessBlock = memo(function InnovationReadinessBlock({
 
         {data.key_scale_challenge && (
           <div>
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               Key challenge
             </span>
             <p className="mt-1 text-[16px] leading-[1.3] tracking-[-0.02em] text-zinc-600">
@@ -458,7 +458,9 @@ const RecommendedInnovationCard = memo(function RecommendedInnovationCard({
       )}
 
       {/* RISK CLASSIFICATION */}
-      <InnovationRiskClassificationBlock data={innovation.risk_classification} />
+      <InnovationRiskClassificationBlock
+        data={innovation.risk_classification}
+      />
 
       {/* CONFIDENCE ANALYSIS */}
       <InnovationConfidenceDetailBlock data={innovation.confidence_detail} />

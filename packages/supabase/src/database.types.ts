@@ -167,6 +167,42 @@ export type Database = {
           },
         ]
       }
+      chat_feedback: {
+        Row: {
+          comment: string | null
+          created_at: string
+          deleted_at: string | null
+          id: string
+          message_content: string
+          rating: string
+          response_content: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          message_content: string
+          rating: string
+          response_content: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          message_content?: string
+          rating?: string
+          response_content?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       config: {
         Row: {
           billing_provider: Database["public"]["Enums"]["billing_provider"]
@@ -185,6 +221,39 @@ export type Database = {
           enable_account_billing?: boolean
           enable_team_account_billing?: boolean
           enable_team_accounts?: boolean
+        }
+        Relationships: []
+      }
+      docs_embeddings: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          embedding: string | null
+          id: string
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          chunk_index?: number
+          content: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          slug?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1218,6 +1287,20 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_team_member_usage: {
+        Args: {
+          p_account_id: string
+          p_period_end: string
+          p_period_start: string
+        }
+        Returns: {
+          is_current_member: boolean
+          reports_count: number
+          user_email: string
+          user_id: string
+          user_name: string
+        }[]
+      }
       get_upper_system_role: { Args: never; Returns: string }
       get_usage_history: {
         Args: { p_account_id: string; p_limit?: number }
@@ -1325,6 +1408,20 @@ export type Database = {
       revoke_nonce: {
         Args: { p_id: string; p_reason?: string }
         Returns: boolean
+      }
+      search_docs: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          id: string
+          similarity: number
+          slug: string
+          title: string
+        }[]
       }
       team_account_workspace: {
         Args: { account_slug: string }

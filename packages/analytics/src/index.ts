@@ -1,9 +1,8 @@
-import { createAnalyticsManager } from './analytics-manager';
-import { NullAnalyticsService } from './null-analytics-service';
-import type { AnalyticsManager } from './types';
+export type {
+  AnalyticsManager,
+  AnalyticsService,
+  AnalyticsProviderFactory,
+} from './types';
 
-export const analytics: AnalyticsManager = createAnalyticsManager({
-  providers: {
-    null: () => NullAnalyticsService,
-  },
-});
+export { createAnalyticsManager } from './analytics-manager';
+export { NullAnalyticsService } from './null-analytics-service';

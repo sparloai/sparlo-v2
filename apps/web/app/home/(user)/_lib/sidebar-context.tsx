@@ -68,7 +68,11 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   };
 
   // On mobile, sidebar width is 0 (hidden)
-  const sidebarWidth = isMobile ? 0 : collapsed ? COLLAPSED_WIDTH : EXPANDED_WIDTH;
+  const sidebarWidth = isMobile
+    ? 0
+    : collapsed
+      ? COLLAPSED_WIDTH
+      : EXPANDED_WIDTH;
 
   return (
     <SidebarContext.Provider

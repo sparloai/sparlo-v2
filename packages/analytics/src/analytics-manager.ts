@@ -6,9 +6,10 @@ import type {
 } from './types';
 
 export function createAnalyticsManager<T extends string, Config extends object>(
-  options: CreateAnalyticsManagerOptions<T, Config>,
+  options: CreateAnalyticsManagerOptions<T, Config> & { autoInit?: boolean },
 ): AnalyticsManager {
   const activeServices = new Map<T, AnalyticsService>();
+  let servicesInitialized = false;
 
   const getActiveServices = (): AnalyticsService[] => {
     if (activeServices.size === 0) {
@@ -22,9 +23,9 @@ export function createAnalyticsManager<T extends string, Config extends object>(
     return Array.from(activeServices.values());
   };
 
-  const registerActiveServices = (
-    options: CreateAnalyticsManagerOptions<T, Config>,
-  ) => {
+  const registerActiveServices = () => {
+    if (servicesInitialized) return;
+
     Object.keys(options.providers).forEach((provider) => {
       const providerKey = provider as keyof typeof options.providers;
       const factory = options.providers[providerKey];
@@ -39,14 +40,30 @@ export function createAnalyticsManager<T extends string, Config extends object>(
 
       const service = factory();
       activeServices.set(provider as T, service);
-
-      void service.initialize();
     });
+
+    servicesInitialized = true;
   };
 
-  registerActiveServices(options);
+  const initializeServices = async (): Promise<void> => {
+    registerActiveServices();
+
+    await Promise.all(
+      getActiveServices().map((service) => service.initialize()),
+    );
+  };
+
+  // Auto-initialize if not explicitly disabled
+  if (options.autoInit !== false) {
+    registerActiveServices();
+    getActiveServices().forEach((service) => {
+      void service.initialize();
+    });
+  }
 
   return {
+    initialize: initializeServices,
+
     addProvider: (provider: T, config: Config) => {
       const factory = options.providers[provider];
 

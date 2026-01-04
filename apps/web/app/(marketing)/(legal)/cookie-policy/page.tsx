@@ -23,7 +23,7 @@ async function CookiePolicyPage() {
       <div className="container mx-auto max-w-3xl px-4 py-12">
         <div className="prose prose-zinc dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-sm">
-            Last updated: January 2, 2025
+            Last updated: January 3, 2025
           </p>
 
           <Section title="What Are Cookies">
@@ -84,21 +84,32 @@ async function CookiePolicyPage() {
               ]}
             />
 
-            <h4>Analytics Cookies</h4>
+            <h4>Analytics Cookies (Consent Required)</h4>
             <p>
-              We use privacy-focused analytics to understand how the Service is
-              used:
+              We use PostHog for privacy-focused product analytics. These
+              cookies are only set after you accept analytics cookies via our
+              consent banner:
             </p>
             <CookieTable
               cookies={[
                 {
-                  name: 'Analytics',
+                  name: 'ph_*',
                   purpose:
-                    'Aggregated usage statistics (no personal identification)',
+                    'PostHog analytics: tracks page views, feature usage, and conversion funnels to improve the Service',
                   duration: '1 year',
+                },
+                {
+                  name: 'posthog_session_id',
+                  purpose: 'Groups page views into sessions for usage analysis',
+                  duration: 'Session',
                 },
               ]}
             />
+            <p className="text-sm">
+              You can withdraw consent at any time by clearing cookies or using
+              browser privacy settings. Analytics data is not used for
+              advertising and is not shared with third parties.
+            </p>
           </Section>
 
           <Section title="Cookies We Do Not Use">
@@ -147,6 +158,19 @@ async function CookiePolicyPage() {
                   rel="noopener noreferrer"
                 >
                   Supabase Privacy Policy
+                </a>
+              </li>
+              <li>
+                <strong>PostHog</strong> - For product analytics (consent
+                required). PostHog helps us understand how users interact with
+                the Service.{' '}
+                <a
+                  href="https://posthog.com/privacy"
+                  className="text-primary"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  PostHog Privacy Policy
                 </a>
               </li>
             </ul>

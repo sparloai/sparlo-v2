@@ -7,6 +7,13 @@ import { cn } from '@kit/ui/utils';
 import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 import { formatTokens } from '~/lib/usage/utils';
 
+interface TeamMemberUsage {
+  userId: string;
+  userName: string;
+  reportsCount: number;
+  isCurrentMember: boolean;
+}
+
 interface AuraUsageCardProps {
   tokensUsed: number;
   tokensLimit: number;
@@ -14,6 +21,8 @@ interface AuraUsageCardProps {
   chatTokensUsed: number;
   periodEnd: string | null;
   planName: string;
+  /** Optional per-member breakdown for team accounts */
+  memberUsage?: TeamMemberUsage[];
 }
 
 export function AuraUsageCard({
@@ -23,6 +32,7 @@ export function AuraUsageCard({
   chatTokensUsed,
   periodEnd,
   planName,
+  memberUsage,
 }: AuraUsageCardProps) {
   const usagePercent = Math.min((tokensUsed / tokensLimit) * 100, 100);
   const formattedTokensUsed = (tokensUsed / 1_000_000).toFixed(1);
@@ -133,6 +143,44 @@ export function AuraUsageCard({
             <span className="text-xs text-zinc-500">Reports left</span>
           </div>
         </div>
+
+        {/* Member Usage Breakdown (for team accounts) */}
+        {memberUsage && memberUsage.length > 0 && (
+          <div className="border-t border-zinc-200 pt-6">
+            <h4 className="mb-4 font-mono text-xs font-bold tracking-widest text-zinc-600 uppercase">
+              Reports by Member
+            </h4>
+            <div className="space-y-3">
+              {memberUsage.map((member) => (
+                <div
+                  key={member.userId}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-zinc-700">
+                      {member.userName}
+                    </span>
+                    {!member.isCurrentMember && (
+                      <span className="text-xs text-zinc-400">(removed)</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-zinc-900">
+                    {member.reportsCount}{' '}
+                    {member.reportsCount === 1 ? 'report' : 'reports'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {memberUsage && memberUsage.length === 0 && (
+          <div className="border-t border-zinc-200 pt-6">
+            <p className="text-sm text-zinc-400 italic">
+              No reports generated this period
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

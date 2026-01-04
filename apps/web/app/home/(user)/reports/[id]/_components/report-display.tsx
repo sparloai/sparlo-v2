@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Loader2, MessageSquare } from 'lucide-react';
 
+import { TrackReportViewed } from '~/components/analytics-events';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { ProcessingScreen } from '../../../_components/processing-screen';
@@ -148,13 +149,16 @@ export function ReportDisplay({
   // For DD mode, render DD report display
   if (isDDMode && rawReportData) {
     return (
-      <DDReportDisplay
-        reportData={rawReportData as DDReportData}
-        title={report.title}
-        createdAt={report.created_at}
-        showActions={true}
-        reportId={report.id}
-      />
+      <>
+        <TrackReportViewed reportId={report.id} reportType="dd" />
+        <DDReportDisplay
+          reportData={rawReportData as DDReportData}
+          title={report.title}
+          createdAt={report.created_at}
+          showActions={true}
+          reportId={report.id}
+        />
+      </>
     );
   }
 
@@ -177,8 +181,15 @@ export function ReportDisplay({
   // Extract user's original input for the Brief section
   const userBrief = extractUserInput(report.report_data, report.title);
 
+  // Determine report type for analytics
+  const reportType =
+    rawReportData?.mode === 'discovery' ? 'discovery' : 'hybrid';
+
   return (
     <div className="report-page relative min-h-screen">
+      {/* Analytics tracking */}
+      <TrackReportViewed reportId={report.id} reportType={reportType} />
+
       {/* Full-width report with brand system */}
       <BrandSystemReport
         reportData={reportData}

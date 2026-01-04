@@ -1,14 +1,13 @@
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 export const ENERGY_HYBRID_REPORT: HybridReportData = {
-  title:
-    '8-Hour Refrigerated EV Routes on 5-8 kWh Total Draw',
+  title: '8-Hour Refrigerated EV Routes on 5-8 kWh Total Draw',
   brief:
     "Refrigerated delivery vans for groceries and pharmaceuticals run diesel-powered compressor units that consume 30-40% of total vehicle fuel. Electric vans eliminate the engine but refrigeration still drains 40-60% of battery capacity, cutting delivery range in half. Current solutions are eutectic plates (limited hold time), oversized batteries (cost/weight), or trailer-mounted diesel gensets (defeats the purpose). Need refrigeration approach that maintains -20°C to +5°C for 8-hour delivery routes while consuming <15% of a 60kWh EV battery. Must handle 50+ door openings per route. Retrofit path preferred—fleet operators won't buy new vehicles just for this.",
 
   executive_summary: {
     narrative_lead:
-      "Door openings dump 15-20 kWh of thermal load into cargo spaces over a typical route—more than your entire energy budget. Air curtain + strip door systems ($500-1,500/vehicle) reduce infiltration losses 70-85%, a technology proven in supermarket refrigeration for 40 years. Combined with vacuum insulation panels (5x conventional performance) and depot-charged phase change materials, total consumption drops to 5-8 kWh for 8-hour routes. The air curtain retrofit pays back in weeks; the full system validates with a 5-10 vehicle pilot before fleet commitment.",
+      'Door openings dump 15-20 kWh of thermal load into cargo spaces over a typical route—more than your entire energy budget. Air curtain + strip door systems ($500-1,500/vehicle) reduce infiltration losses 70-85%, a technology proven in supermarket refrigeration for 40 years. Combined with vacuum insulation panels (5x conventional performance) and depot-charged phase change materials, total consumption drops to 5-8 kWh for 8-hour routes. The air curtain retrofit pays back in weeks; the full system validates with a 5-10 vehicle pilot before fleet commitment.',
     primary_recommendation:
       'Deploy air curtain + strip door systems fleet-wide immediately ($500-1,500/vehicle) for 30-50% thermal load reduction within weeks. Simultaneously pilot VIP-enhanced cargo bodies with optimized PCM on 5-10 vehicles to validate the integrated system achieving 5-8 kWh consumption. This phased approach de-risks the larger investment while capturing immediate savings.',
     viability: 'uncertain',

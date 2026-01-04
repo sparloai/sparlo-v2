@@ -33,14 +33,14 @@ export const CARBON_REMOVAL_HYBRID_REPORT: HybridReportData = {
           current_performance:
             '$100-150/ton CO2 at pilot scale (disclosed in DOE ARPA-E documentation)',
           target_roadmap: '$50-70/ton CO2 at commercial scale by 2027',
-          source: 'DOE ARPA-E award documentation and company disclosures, 2022-2023',
+          source:
+            'DOE ARPA-E award documentation and company disclosures, 2022-2023',
         },
         {
           entity: 'Ebb Carbon',
           approach:
             'Electrochemical ocean alkalinity enhancement with proprietary electrode design',
-          current_performance:
-            'Not disclosed; pilot operations in 2023',
+          current_performance: 'Not disclosed; pilot operations in 2023',
           target_roadmap: 'Commercial deployment by 2026',
           source: 'Press releases, unverified',
         },
@@ -97,8 +97,7 @@ export const CARBON_REMOVAL_HYBRID_REPORT: HybridReportData = {
       },
     },
     first_principles_insight: {
-      headline:
-        'Optimize for $/kg-NaOH-lifetime, not component longevity',
+      headline: 'Optimize for $/kg-NaOH-lifetime, not component longevity',
       explanation:
         "The 5-year electrode life target may be self-imposed rather than economically optimal. If electrode replacement is cheap and fast enough (modular cartridges, quick-connect interfaces), designing for 6-12 month disposable electrodes might beat 5-year hardened electrodes on total cost. The offshore wind industry accepts regular blade inspections and component replacement; the question is whether the electrolyzer industry's longevity obsession reflects optimal economics or inherited assumptions from chlor-alkali plants that operate with purified brine.",
     },
@@ -199,7 +198,7 @@ export const CARBON_REMOVAL_HYBRID_REPORT: HybridReportData = {
       'Geothermal (precipitation steering)',
       'Marine biology (Sharklet antifouling)',
       'Cathodic protection (sacrificial anodes)',
-      "Chlor-alkali history (mercury cells)",
+      'Chlor-alkali history (mercury cells)',
       'Battery industry (solid electrolytes)',
       'Microfluidics (membraneless flow cells)',
       'Pulp & paper (black liquor electrolysis)',
@@ -266,7 +265,7 @@ export const CARBON_REMOVAL_HYBRID_REPORT: HybridReportData = {
           'Stop fighting chlorine evolution at the anode. Accept mixed Cl₂/O₂ production and react chlorine with olivine or limestone slurry downstream.',
         confidence: 75,
         what_it_is:
-          "This is the Equatic approach, commercially validated at pilot scale. At the anode, seawater electrolysis produces both O₂ and Cl₂ (ratio depends on catalyst and conditions). Cl₂ hydrolysis produces HOCl/HCl. This acidic stream contacts olivine (Mg₂SiO₄): 2HCl + Mg₂SiO₄ → MgCl₂ + H₄SiO₄. The net reaction consumes acid and produces dissolved cations that represent alkalinity when discharged to the ocean.",
+          'This is the Equatic approach, commercially validated at pilot scale. At the anode, seawater electrolysis produces both O₂ and Cl₂ (ratio depends on catalyst and conditions). Cl₂ hydrolysis produces HOCl/HCl. This acidic stream contacts olivine (Mg₂SiO₄): 2HCl + Mg₂SiO₄ → MgCl₂ + H₄SiO₄. The net reaction consumes acid and produces dissolved cations that represent alkalinity when discharged to the ocean.',
         why_it_works:
           'HOCl (pKa 7.5) and HCl from chlorine hydrolysis attack mineral surfaces. Olivine dissolution: Mg₂SiO₄ + 4H⁺ → 2Mg²⁺ + H₄SiO₄. Each mole of Cl₂ produces 2 moles of H⁺, which can dissolve ~1 mole of Mg from olivine. The Mg²⁺ released represents 2 equivalents of alkalinity. Net effect: chlorine becomes a positive contributor to alkalinity production.',
         when_to_use_instead:
@@ -327,7 +326,7 @@ export const CARBON_REMOVAL_HYBRID_REPORT: HybridReportData = {
       what_it_is:
         "Flip the paradigm: instead of protecting electrodes from corrosion, design the anode to corrode productively. Magnesium sacrificial anodes dissolve to produce Mg(OH)₂ directly—the anode IS the alkalinity product. No membrane needed because there's no chlorine production. Pair with inert cathode for hydrogen evolution.\n\nMagnesium metal spontaneously oxidizes in seawater: Mg → Mg²⁺ + 2e⁻. At the cathode, water reduces: 2H₂O + 2e⁻ → H₂ + 2OH⁻. The Mg²⁺ and OH⁻ combine to form Mg(OH)₂ (brucite), which is sparingly soluble and disperses as alkaline suspension.\n\nThis eliminates the membrane entirely—there's no chlorine to separate because there's no oxidation of water or chloride at the anode, only metal dissolution. It eliminates biofouling on the anode because the surface is constantly dissolving. It eliminates the chlorine selectivity problem because no chlorine can form.",
       why_it_works:
-        'Magnesium dissolution proceeds through direct electrochemical oxidation: Mg → Mg²⁺ + 2e⁻ (E° = -2.37V vs SHE). In seawater, the reaction is spontaneous and fast. The Mg²⁺ immediately hydrolyzes: Mg²⁺ + 2OH⁻ → Mg(OH)₂. Each mole of Mg produces 2 moles of OH⁻ equivalents = 3.4 g OH⁻/g Mg. No chlorine can form because there\'s no oxidation reaction at the anode—only metal dissolution. Energy requirement is theoretically zero (galvanic); <0.5 kWh/kg NaOH equivalent with enhancement current.',
+        "Magnesium dissolution proceeds through direct electrochemical oxidation: Mg → Mg²⁺ + 2e⁻ (E° = -2.37V vs SHE). In seawater, the reaction is spontaneous and fast. The Mg²⁺ immediately hydrolyzes: Mg²⁺ + 2OH⁻ → Mg(OH)₂. Each mole of Mg produces 2 moles of OH⁻ equivalents = 3.4 g OH⁻/g Mg. No chlorine can form because there's no oxidation reaction at the anode—only metal dissolution. Energy requirement is theoretically zero (galvanic); <0.5 kWh/kg NaOH equivalent with enhancement current.",
       breakthrough_potential: {
         if_it_works:
           'Eliminates membrane, chlorine, and fouling problems simultaneously. Simplest possible architecture.',
@@ -462,7 +461,7 @@ export const CARBON_REMOVAL_HYBRID_REPORT: HybridReportData = {
         why_interesting:
           'Eliminates membrane failure mode entirely. Kjeang et al. demonstrated >1 W/cm² in membraneless fuel cells. If manufacturing scales, this could be the ultimate membrane-free architecture.',
         why_not_now:
-          'Manufacturing millions of parallel microchannels at acceptable cost is a major challenge. Clogging from seawater particles is serious concern. 3-5 year timeline and $5-20M development cost. The physics works; the manufacturing doesn\'t exist.',
+          "Manufacturing millions of parallel microchannels at acceptable cost is a major challenge. Clogging from seawater particles is serious concern. 3-5 year timeline and $5-20M development cost. The physics works; the manufacturing doesn't exist.",
         trigger_to_revisit:
           'Cost of microchannel arrays drops below $100/m² (currently ~$1000/m²), or 3D printing of metal microchannels becomes viable at scale',
         who_to_monitor:
@@ -550,8 +549,7 @@ export const CARBON_REMOVAL_HYBRID_REPORT: HybridReportData = {
     ],
     validation_gaps: [
       {
-        concern:
-          'Seawater may be fundamentally harder than brackish water',
+        concern: 'Seawater may be fundamentally harder than brackish water',
         status: 'ADDRESSED',
         rationale:
           'First validation step explicitly tests in seawater, not brackish water. 3-month exposure will reveal if polarity reversal is sufficient.',

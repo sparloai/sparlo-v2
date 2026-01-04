@@ -84,7 +84,8 @@ export const FONT_HEADING =
   "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif";
 
 /** Suisse Intl (body) with system fallbacks */
-export const FONT_BODY = "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif";
+export const FONT_BODY =
+  "'Suisse Intl', -apple-system, BlinkMacSystemFont, sans-serif";
 
 /** System monospace with fallbacks */
 export const FONT_MONO = "'Suisse Mono', 'SF Mono', ui-monospace, monospace";

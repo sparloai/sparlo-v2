@@ -22,9 +22,7 @@ export function useProcessingReportsSubscription(reports: DashboardReport[]) {
   // Get IDs of reports that are currently processing
   const processingReportIds = useMemo(() => {
     return reports
-      .filter(
-        (r) => r.status === 'processing' || r.status === 'confirm_rerun',
-      )
+      .filter((r) => r.status === 'processing' || r.status === 'confirm_rerun')
       .map((r) => r.id);
   }, [reports]);
 

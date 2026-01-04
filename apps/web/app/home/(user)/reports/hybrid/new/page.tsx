@@ -487,7 +487,9 @@ export default function HybridNewReportPage() {
                             ? 'text-amber-700 dark:text-amber-300'
                             : 'text-[--text-muted]',
                         )}
-                        style={{ fontFamily: "'Suisse Intl', Inter, sans-serif" }}
+                        style={{
+                          fontFamily: "'Suisse Intl', Inter, sans-serif",
+                        }}
                       >
                         {context.label}
                       </span>
@@ -580,7 +582,9 @@ export default function HybridNewReportPage() {
             <Lock className="h-3 w-3 text-[--text-muted]" />
             <span
               className="font-mono text-xs tracking-tight text-[--text-secondary]"
-              style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
+              style={{
+                fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
+              }}
             >
               DATA NEVER TRAINS AI
             </span>
@@ -590,7 +594,9 @@ export default function HybridNewReportPage() {
             <ShieldCheck className="h-3 w-3 text-amber-600 dark:text-amber-500" />
             <span
               className="font-mono text-xs tracking-tight text-[--text-secondary]"
-              style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
+              style={{
+                fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
+              }}
             >
               BUILT ON SOC2 INFRASTRUCTURE
             </span>

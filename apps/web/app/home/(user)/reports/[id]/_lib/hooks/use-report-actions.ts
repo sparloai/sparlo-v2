@@ -4,6 +4,8 @@ import { useCallback, useState } from 'react';
 
 import { toast } from '@kit/ui/sonner';
 
+import { trackReportShared } from '~/components/analytics-events';
+
 import { generateShareLink } from '../server/share-actions';
 
 /**
@@ -102,6 +104,8 @@ export function useReportActions({
             title: reportTitle,
             url: result.shareUrl,
           });
+          // Track successful share
+          trackReportShared(reportId, 'link');
           return; // Success - native share handled it
         }
       } catch (err) {
@@ -130,6 +134,8 @@ export function useReportActions({
       if (result.success && result.shareUrl) {
         await navigator.clipboard.writeText(result.shareUrl);
         toast.success('Share link copied to clipboard');
+        // Track successful share via clipboard
+        trackReportShared(reportId, 'link');
       } else {
         toast.error('Failed to generate share link');
       }
@@ -163,6 +169,8 @@ export function useReportActions({
       document.body.removeChild(a);
 
       toast.success('PDF downloaded');
+      // Track successful PDF export
+      trackReportShared(reportId, 'pdf');
     } catch (error) {
       console.error('[useReportActions] Error exporting PDF:', error);
       toast.error('Failed to export PDF');

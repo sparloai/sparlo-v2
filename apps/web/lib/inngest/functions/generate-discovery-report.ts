@@ -37,6 +37,7 @@ import {
   DISCOVERY_CHAIN_CONFIG,
 } from '../../llm/prompts/discovery';
 import { inngest } from '../client';
+import { trackReportCompleted } from '../utils/analytics';
 import { handleReportFailure } from '../utils/report-failure-handler';
 
 /**
@@ -666,6 +667,16 @@ Focus on:
               problem_framing: an0dResult.result,
               tokenUsage: totalUsage,
             },
+          });
+
+          // Track report completion for analytics (fire-and-forget)
+          trackReportCompleted({
+            reportId,
+            reportType: 'discovery',
+            accountId: event.data.accountId,
+            generationTimeMs: event.ts ? Date.now() - event.ts : 0,
+            tokenCount: totalUsage.totalTokens,
+            costUsd: totalUsage.costUsd,
           });
         });
 

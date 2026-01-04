@@ -44,10 +44,10 @@ export const ReferencesSection = memo(function ReferencesSection({
                     href={ref.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-1 inline-flex items-center gap-1 text-[14px] text-zinc-500 hover:text-zinc-900 transition-colors"
+                    className="mt-1 inline-flex items-center gap-1 text-[14px] text-zinc-500 transition-colors hover:text-zinc-900"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
-                    <span className="truncate max-w-[400px]">{ref.url}</span>
+                    <span className="max-w-[400px] truncate">{ref.url}</span>
                   </a>
                 )}
               </div>

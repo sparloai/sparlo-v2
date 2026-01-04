@@ -7,6 +7,10 @@ import { z } from 'zod';
 import { enhanceAction } from '@kit/next/actions';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
+import {
+  USAGE_ERROR_CODES,
+  createUsageErrorMessage,
+} from '~/lib/errors/usage-error';
 import { inngest } from '~/lib/inngest/client';
 import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 
@@ -444,15 +448,18 @@ export const startReportGeneration = enhanceAction(
       if (!usage.allowed) {
         if (usage.reason === 'subscription_required') {
           throw new Error(
-            'Your free report has been used. Please subscribe to generate more reports.',
+            createUsageErrorMessage(
+              USAGE_ERROR_CODES.SUBSCRIPTION_REQUIRED,
+              'Your free report has been used. Please subscribe to generate more reports.',
+            ),
           );
         }
         if (usage.reason === 'limit_exceeded') {
-          const periodInfo = usage.periodEnd
-            ? ` Wait until ${new Date(usage.periodEnd).toLocaleDateString()}.`
-            : '';
           throw new Error(
-            `Usage limit reached (${usage.percentage.toFixed(0)}% used).${periodInfo}`,
+            createUsageErrorMessage(
+              USAGE_ERROR_CODES.LIMIT_EXCEEDED,
+              'You have reached your monthly usage limit.',
+            ),
           );
         }
       }

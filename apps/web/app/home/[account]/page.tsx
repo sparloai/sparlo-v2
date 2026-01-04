@@ -35,7 +35,9 @@ function TeamAccountHomePage({ params }: TeamAccountHomePageProps) {
       />
 
       <PageBody>
-        <DashboardDemo />
+        <div className="border-l-2 border-zinc-900 pl-10">
+          <DashboardDemo />
+        </div>
       </PageBody>
     </>
   );

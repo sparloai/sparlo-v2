@@ -42,7 +42,9 @@ function EmptyState() {
       <Link
         href="/home"
         className="mt-4 inline-block rounded-sm bg-[--text-primary] px-4 py-2 font-mono text-xs font-medium tracking-wider text-[--surface-base] uppercase transition-colors hover:opacity-90"
-        style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
+        style={{
+          fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
+        }}
       >
         View All Reports
       </Link>
@@ -116,7 +118,9 @@ export function ArchivedReportsDashboard({
           </Link>
           <h1
             className="font-mono text-xs font-medium tracking-[0.2em] text-[--text-muted] uppercase"
-            style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
+            style={{
+              fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
+            }}
           >
             ARCHIVED
           </h1>
@@ -187,7 +191,8 @@ export function ArchivedReportsDashboard({
                       <span
                         className="font-mono text-xs text-[--text-muted]"
                         style={{
-                          fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
+                          fontFamily:
+                            "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
                         }}
                       >
                         {formatReportDate(report.created_at)}
@@ -237,7 +242,9 @@ export function ArchivedReportsDashboard({
           <div className="mt-4 flex items-center justify-between px-1">
             <span
               className="font-mono text-[10px] tracking-wider text-[--text-secondary] uppercase"
-              style={{ fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace" }}
+              style={{
+                fontFamily: "'Suisse Mono', 'SF Mono', ui-monospace, monospace",
+              }}
             >
               {filteredReports.length} ARCHIVED{' '}
               {filteredReports.length === 1 ? 'REPORT' : 'REPORTS'}

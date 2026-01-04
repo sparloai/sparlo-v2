@@ -50,8 +50,7 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'food-waste',
     title: 'Waste',
-    headline:
-      '15 kWh/ton Food Waste Processing with Off-the-Shelf Equipment',
+    headline: '15 kWh/ton Food Waste Processing with Off-the-Shelf Equipment',
     subtitle: 'Commercial Kitchen Waste-to-Value System',
     locked: false,
     metadata: {
@@ -63,8 +62,7 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'materials-science',
     title: 'Advanced Materials',
-    headline:
-      '$40/ft² Transparent Wood: Continuous Processing for 2m² Panels',
+    headline: '$40/ft² Transparent Wood: Continuous Processing for 2m² Panels',
     subtitle: 'Architectural Glass Replacement at Scale',
     locked: false,
     metadata: {

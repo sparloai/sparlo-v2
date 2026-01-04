@@ -8,15 +8,16 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
   title:
     'Protein A-Free mAb Purification: Achieving <$5/g Through Validated Non-Affinity Capture',
   brief:
-    'Biologic drug purification uses Protein A chromatography resin at $15,000/L that lasts 100-200 cycles. Chromatography is 50-70% of mAb downstream cost. Capacity can\'t scale with upstream titer improvements. Need purification approach achieving 99%+ purity at <$10/g product cost without Protein A dependency.',
+    "Biologic drug purification uses Protein A chromatography resin at $15,000/L that lasts 100-200 cycles. Chromatography is 50-70% of mAb downstream cost. Capacity can't scale with upstream titer improvements. Need purification approach achieving 99%+ purity at <$10/g product cost without Protein A dependency.",
 
   executive_summary: {
     narrative_lead:
-      'Continuous cation exchange chromatography with flocculation pre-treatment already achieves 95%+ purity at $3-5/g—Pall and Cytiva sell the equipment, and Genentech has validated the precipitation chemistry. The barrier isn\'t finding the solution; it\'s integration and execution. For the 70% of mAbs with pI >7, this combination eliminates Protein A entirely while using commercial, FDA-validated platforms.',
+      "Continuous cation exchange chromatography with flocculation pre-treatment already achieves 95%+ purity at $3-5/g—Pall and Cytiva sell the equipment, and Genentech has validated the precipitation chemistry. The barrier isn't finding the solution; it's integration and execution. For the 70% of mAbs with pI >7, this combination eliminates Protein A entirely while using commercial, FDA-validated platforms.",
     primary_recommendation:
       'Implement continuous 4-column CEX capture (Pall Cadence or Cytiva ÄKTA pcc) with polyelectrolyte flocculation pre-treatment. Investment of $2-4M yields $3-5/g purification cost—a 3-10x improvement over Protein A. For acidic mAbs, use mixed-mode chromatography (Capto MMC) as the capture platform. Both approaches use commercial equipment with established regulatory precedent.',
     viability: 'viable',
-    viability_label: 'Viable with high confidence for basic mAbs (pI >7); conditionally viable for acidic mAbs requiring mixed-mode alternatives',
+    viability_label:
+      'Viable with high confidence for basic mAbs (pI >7); conditionally viable for acidic mAbs requiring mixed-mode alternatives',
   },
 
   problem_analysis: {
@@ -28,8 +29,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       benchmarks: [
         {
           entity: 'Cytiva (MabSelect SuRe LX)',
-          approach:
-            'Alkali-stable Protein A with high capacity',
+          approach: 'Alkali-stable Protein A with high capacity',
           current_performance:
             '50-60 g/L dynamic binding capacity, 300+ cycles with 0.5M NaOH CIP',
           target_roadmap:
@@ -50,8 +50,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
           approach: 'Caprylic acid precipitation pre-treatment',
           current_performance:
             '>99% HCP removal, >95% mAb recovery at pilot scale',
-          target_roadmap:
-            'Not disclosed; patents suggest commercial interest',
+          target_roadmap: 'Not disclosed; patents suggest commercial interest',
           source: 'Brodsky et al. 2012; US Patent 8,044,017 B2',
         },
         {
@@ -68,7 +67,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       {
         approach: 'Protein A affinity chromatography as primary capture',
         limitation:
-          'Resin costs $15,000/L, lasts 100-200 cycles, and capacity (~40 g/L) can\'t keep pace with upstream improvements',
+          "Resin costs $15,000/L, lasts 100-200 cycles, and capacity (~40 g/L) can't keep pace with upstream improvements",
       },
       {
         approach: 'Three-column platform (Protein A → CEX → AEX)',
@@ -78,7 +77,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       {
         approach: 'Alkali-stable Protein A variants (MabSelect SuRe)',
         limitation:
-          'Extends lifetime to 200+ cycles but doesn\'t address fundamental resin cost',
+          "Extends lifetime to 200+ cycles but doesn't address fundamental resin cost",
       },
       {
         approach: 'Mixed-mode or CEX capture for specific molecules',
@@ -164,15 +163,15 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
 
   challenge_the_frame: [
     {
-      assumption:
-        '70% of mAbs have pI >7 and are suitable for CEX capture',
+      assumption: '70% of mAbs have pI >7 and are suitable for CEX capture',
       challenge:
         'This estimate comes from analysis of approved mAbs, which may not represent future pipeline. Engineered mAbs increasingly have modified Fc regions that could shift pI distribution.',
       implication:
         'If <50% of pipeline mAbs are suitable for CEX, mixed-mode chromatography becomes the primary platform rather than fallback',
     },
     {
-      assumption: 'Continuous chromatography is operationally feasible for typical biopharma organizations',
+      assumption:
+        'Continuous chromatography is operationally feasible for typical biopharma organizations',
       challenge:
         'Continuous operation requires different skills, different QA/QC approaches, and 24/7 staffing. Many organizations may lack these capabilities.',
       implication:
@@ -196,7 +195,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
 
   innovation_analysis: {
     reframe:
-      'Instead of asking \'how do we make Protein A cheaper?\', we asked \'what does the plasma industry know that recombinant biopharma has ignored for 80 years?\'',
+      "Instead of asking 'how do we make Protein A cheaper?', we asked 'what does the plasma industry know that recombinant biopharma has ignored for 80 years?'",
     domains_searched: [
       'Plasma fractionation (Cohn process)',
       'Dairy whey protein purification',
@@ -226,17 +225,18 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       the_insight: {
         what: 'Sequential exploitation of charge differences: HCPs are predominantly acidic (average pI ~5.5) and bind cationic flocculants; mAbs are predominantly basic (pI 7-9) and bind cation exchangers at low pH',
         where_we_found_it: {
-          domain: 'Combination of wastewater treatment (flocculation) and petrochemical (continuous chromatography)',
+          domain:
+            'Combination of wastewater treatment (flocculation) and petrochemical (continuous chromatography)',
           how_they_use_it:
             'Wastewater uses polyelectrolyte flocculation to remove proteins and colloids; petrochemical uses SMB chromatography to achieve >99.5% purity with selectivity factors of only 1.5-2.0',
           why_it_transfers:
             'mAb/HCP separation is fundamentally a charge-based separation problem; continuous operation mathematics are identical regardless of the molecules being separated',
         },
         why_industry_missed_it:
-          'Organizational silos—flocculation experts and continuous chromatography experts rarely collaborate. Each technology validated separately but integration not systematically pursued. Protein A works \'well enough\' that there\'s been limited pressure to optimize alternatives.',
+          "Organizational silos—flocculation experts and continuous chromatography experts rarely collaborate. Each technology validated separately but integration not systematically pursued. Protein A works 'well enough' that there's been limited pressure to optimize alternatives.",
       },
       what_it_is:
-        'Combine two validated technologies—polyelectrolyte flocculation for 90%+ HCP removal followed by continuous 4-column periodic counter-current cation exchange chromatography. The flocculation step (using pDADMAC or chitosan at 0.01-0.05% concentration, pH 5-6) electrostatically complexes with negatively charged HCPs, forming flocs removed by depth filtration. The clarified, HCP-depleted stream then feeds a continuous CEX system (Pall Cadence BioSMB or Cytiva ÄKTA pcc) where mAb binds at pH 5-6 while remaining impurities flow through. Four columns cycle through load-wash-elute-regenerate phases, maintaining constant feed flow and achieving steady-state purity of 95%+ through accumulation of 15-25 theoretical stages.\n\nThis integrated approach uses commercial equipment with cheap CEX resin ($500/L vs $15,000/L for Protein A) to achieve Protein A-equivalent purity at <10% of resin cost. The key insight is that flocculation handles the \'heavy lifting\' of HCP removal (1-2 log reduction at <$0.10/g), allowing the CEX step to operate on a much cleaner feed. This compensates for CEX\'s lower inherent selectivity compared to Protein A. The continuous operation then provides the additional theoretical stages needed to achieve final purity.',
+        "Combine two validated technologies—polyelectrolyte flocculation for 90%+ HCP removal followed by continuous 4-column periodic counter-current cation exchange chromatography. The flocculation step (using pDADMAC or chitosan at 0.01-0.05% concentration, pH 5-6) electrostatically complexes with negatively charged HCPs, forming flocs removed by depth filtration. The clarified, HCP-depleted stream then feeds a continuous CEX system (Pall Cadence BioSMB or Cytiva ÄKTA pcc) where mAb binds at pH 5-6 while remaining impurities flow through. Four columns cycle through load-wash-elute-regenerate phases, maintaining constant feed flow and achieving steady-state purity of 95%+ through accumulation of 15-25 theoretical stages.\n\nThis integrated approach uses commercial equipment with cheap CEX resin ($500/L vs $15,000/L for Protein A) to achieve Protein A-equivalent purity at <10% of resin cost. The key insight is that flocculation handles the 'heavy lifting' of HCP removal (1-2 log reduction at <$0.10/g), allowing the CEX step to operate on a much cleaner feed. This compensates for CEX's lower inherent selectivity compared to Protein A. The continuous operation then provides the additional theoretical stages needed to achieve final purity.",
       why_it_works:
         'The physics is straightforward: polycations (quaternary ammonium groups, pKa >12) remain fully charged at process pH, binding acidic HCP surface residues (Asp, Glu, pKa 3.9-4.3). This forms insoluble complexes while basic mAbs remain soluble due to electrostatic repulsion. Subsequent CEX binding occurs via electrostatic interaction between protonated mAb surface residues (Lys ε-amino, pKa 10.5; Arg guanidinium, pKa 12.5) and sulfonate groups (pKa <1) on the resin. The selectivity factor α = 3-10 for mAb over remaining HCPs is lower than Protein A (α >100), but continuous operation with 15-25 theoretical stages achieves equivalent purity: Purity = f(α^stages).',
       why_it_might_fail: [
@@ -267,11 +267,11 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
           'Molecule-specific optimization required; 85-92% single-step purity means additional polishing step needed',
         confidence: 75,
         what_it_is:
-          'Adopt mixed-mode chromatography as primary capture using commercial resins (Capto MMC, Capto adhere, MEP HyperCel) that combine hydrophobic, ionic, and hydrogen-bonding interactions. These resins provide pseudo-affinity selectivity at 70-80% lower cost than Protein A ($3,000-5,000/L), tolerate aggressive CIP (1M NaOH), and are already validated in commercial mAb manufacturing. The multi-point attachment mechanism engages the Fc region\'s unique surface chemistry—clustered hydrophobic residues adjacent to basic residues—providing selectivity approaching affinity chromatography through cumulative weak interactions.',
+          "Adopt mixed-mode chromatography as primary capture using commercial resins (Capto MMC, Capto adhere, MEP HyperCel) that combine hydrophobic, ionic, and hydrogen-bonding interactions. These resins provide pseudo-affinity selectivity at 70-80% lower cost than Protein A ($3,000-5,000/L), tolerate aggressive CIP (1M NaOH), and are already validated in commercial mAb manufacturing. The multi-point attachment mechanism engages the Fc region's unique surface chemistry—clustered hydrophobic residues adjacent to basic residues—providing selectivity approaching affinity chromatography through cumulative weak interactions.",
         why_it_works:
-          'The Fc region presents a unique surface chemistry: the CH2-CH3 interface has clustered hydrophobic residues (Leu, Ile, Val) adjacent to basic residues (Lys, His). Mixed-mode ligands (e.g., N-benzyl-N-methyl ethanolamine for Capto MMC) engage both simultaneously. HCPs with different surface patterns don\'t achieve the same multi-point engagement, providing selectivity.',
+          "The Fc region presents a unique surface chemistry: the CH2-CH3 interface has clustered hydrophobic residues (Leu, Ile, Val) adjacent to basic residues (Lys, His). Mixed-mode ligands (e.g., N-benzyl-N-methyl ethanolamine for Capto MMC) engage both simultaneously. HCPs with different surface patterns don't achieve the same multi-point engagement, providing selectivity.",
         when_to_use_instead:
-          'Use for acidic mAbs (pI <7) where CEX capture doesn\'t work; use as backup if flocculation optimization proves difficult for specific molecule',
+          "Use for acidic mAbs (pI <7) where CEX capture doesn't work; use as backup if flocculation optimization proves difficult for specific molecule",
       },
       {
         id: 'sol-support-2',
@@ -283,7 +283,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
         what_it_is:
           'Replace Protein A capture entirely with caprylic acid precipitation (validated in plasma fractionation for 50+ years and adapted to CHO mAbs by Genentech/Amgen). Caprylic (octanoic) acid at 0.5-2% concentration and pH 4.5-5.0 selectively denatures and precipitates non-IgG proteins while mAbs remain soluble due to their compact, stable Fc region structure. The precipitate is removed by centrifugation or depth filtration. The clarified supernatant (85-95% pure) undergoes mixed-mode chromatography for final polishing to >99% purity. Total process: two unit operations, zero affinity resin, <$2/g capture cost.',
         why_it_works:
-          'Caprylic acid\'s hydrophobic tail inserts into hydrophobic pockets of proteins, disrupting tertiary structure. HCPs, with exposed hydrophobic cores and lower conformational stability, denature and aggregate. IgG\'s Fc region has evolved exceptional stability, and its hydrophobic residues are buried in the CH2-CH3 interface, protected from fatty acid insertion. Additionally, IgG\'s glycosylation at Asn297 provides steric protection.',
+          "Caprylic acid's hydrophobic tail inserts into hydrophobic pockets of proteins, disrupting tertiary structure. HCPs, with exposed hydrophobic cores and lower conformational stability, denature and aggregate. IgG's Fc region has evolved exceptional stability, and its hydrophobic residues are buried in the CH2-CH3 interface, protected from fatty acid insertion. Additionally, IgG's glycosylation at Asn297 provides steric protection.",
         when_to_use_instead:
           'Use when maximum cost reduction is priority and freedom to operate is confirmed; use as pre-treatment before any chromatography step to reduce HCP burden',
       },
@@ -309,12 +309,12 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
             'Same 150 kDa protein, same fundamental solubility physics. The barrier is organizational (different industries, different regulatory frameworks) not technical.',
         },
         why_industry_missed_it:
-          'Recombinant biopharma and plasma fractionation are separate industries with separate conferences, separate journals, separate regulatory frameworks. Knowledge transfer hasn\'t occurred despite 80 years of plasma industry experience.',
+          "Recombinant biopharma and plasma fractionation are separate industries with separate conferences, separate journals, separate regulatory frameworks. Knowledge transfer hasn't occurred despite 80 years of plasma industry experience.",
       },
       what_it_is:
         'Eliminate chromatography entirely by adapting plasma fractionation principles with modern process control. The approach uses sequential precipitation steps, each exploiting a different physical property:\n\n**Step 1 - Caprylic acid precipitation (pH 4.5-5.0, 0.5-2% caprylic acid):** Selectively denatures and precipitates HCPs while mAb remains soluble. Achieves >99% HCP removal in a single step. Precipitate removed by centrifugation or depth filtration.\n\n**Step 2 - PEG or ammonium sulfate precipitation:** After HCP removal, PEG 6000 (12-18%) or ammonium sulfate (40-50% saturation) precipitates mAb while remaining impurities stay soluble. This exploits the Cohn equation: log S = β - K_s × I, where larger proteins (IgG at 150 kDa) precipitate at lower precipitant concentration.\n\n**Step 3 - Resolubilization and crystallization or membrane polish:** mAb precipitate is resolubilized in formulation buffer. For molecules that crystallize, crystallization provides final polish to >99.9% purity. For others, a single membrane chromatography step achieves final purity.\n\nThe result: zero resin cost, continuous operation for consistency, target <$2/g total purification cost.',
       why_it_works:
-        'PEG precipitation mechanism: PEG (MW 6000) is excluded from protein surfaces due to steric exclusion, creating an \'effective concentration\' of protein in the remaining water volume. When this effective concentration exceeds solubility, precipitation occurs. IgG precipitates at lower PEG concentration than small proteins because larger proteins have lower solubility (log S ∝ -MW^(2/3)). At 12-18% PEG 6000, IgG (150 kDa) precipitates while proteins <50 kDa remain soluble.\n\nAmmonium sulfate mechanism: Kosmotropic sulfate ion competes for water of hydration, reducing protein solubility. IgG precipitates at 40-50% saturation (2.4-3.0 M) following the Cohn equation.\n\nCrystallization mechanism: Only molecules fitting the crystal lattice incorporate; impurities face ΔΔG > 5 kJ/mol penalty, making incorporation thermodynamically unfavorable by factor of exp(ΔΔG/RT) > 10.',
+        "PEG precipitation mechanism: PEG (MW 6000) is excluded from protein surfaces due to steric exclusion, creating an 'effective concentration' of protein in the remaining water volume. When this effective concentration exceeds solubility, precipitation occurs. IgG precipitates at lower PEG concentration than small proteins because larger proteins have lower solubility (log S ∝ -MW^(2/3)). At 12-18% PEG 6000, IgG (150 kDa) precipitates while proteins <50 kDa remain soluble.\n\nAmmonium sulfate mechanism: Kosmotropic sulfate ion competes for water of hydration, reducing protein solubility. IgG precipitates at 40-50% saturation (2.4-3.0 M) following the Cohn equation.\n\nCrystallization mechanism: Only molecules fitting the crystal lattice incorporate; impurities face ΔΔG > 5 kJ/mol penalty, making incorporation thermodynamically unfavorable by factor of exp(ΔΔG/RT) > 10.",
       breakthrough_potential: {
         if_it_works:
           'Eliminates all chromatography resin cost—the dominant expense in current processes. Enables true continuous processing from harvest to formulation.',
@@ -352,8 +352,7 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
     parallel_investigations: [
       {
         id: 'innov-parallel-1',
-        title:
-          'Crystallization-First Purification for Suitable mAbs',
+        title: 'Crystallization-First Purification for Suitable mAbs',
         confidence: 45,
         innovation_type: 'CROSS_DOMAIN',
         source_domain: 'Protein crystallography',
@@ -362,7 +361,8 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
         the_insight: {
           what: 'A single crystallization achieves >99.9% purity by thermodynamically excluding impurities from the crystal lattice',
           where_we_found_it: {
-            domain: 'Protein crystallography and small molecule pharmaceutical manufacturing',
+            domain:
+              'Protein crystallography and small molecule pharmaceutical manufacturing',
             how_they_use_it:
               'Multiple commercial mAbs have been crystallized (infliximab, trastuzumab, adalimumab); Merck holds patents on mAb crystallization for purification',
             why_it_transfers:
@@ -387,7 +387,8 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       },
       {
         id: 'innov-parallel-2',
-        title: 'Dairy Industry Technology Transfer: Chitosan Precipitation + Ceramic Membrane Cascade',
+        title:
+          'Dairy Industry Technology Transfer: Chitosan Precipitation + Ceramic Membrane Cascade',
         confidence: 40,
         innovation_type: 'CROSS_DOMAIN',
         source_domain: 'Dairy whey protein purification',
@@ -442,7 +443,8 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
       },
       {
         id: 'frontier-2',
-        title: 'Stimulus-Responsive Polymer Affinity Capture (Smart Precipitation)',
+        title:
+          'Stimulus-Responsive Polymer Affinity Capture (Smart Precipitation)',
         innovation_type: 'EMERGING_SCIENCE',
         trl_estimate: 3,
         one_liner:
@@ -527,7 +529,8 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
     ],
     validation_gaps: [
       {
-        concern: 'CEX capture may not achieve adequate purity for all basic mAbs',
+        concern:
+          'CEX capture may not achieve adequate purity for all basic mAbs',
         status: 'ADDRESSED',
         rationale:
           'First validation step includes purity measurement; go/no-go criteria require >90% purity. If not achieved, mixed-mode fallback is specified.',
@@ -539,7 +542,8 @@ export const BIOTECH_HYBRID_REPORT: HybridReportData = {
           'Mitigation via CDMO partnership and vendor support is specified. Operational complexity is real but manageable with proper training.',
       },
       {
-        concern: 'CHO HCP response to flocculation may differ from published data',
+        concern:
+          'CHO HCP response to flocculation may differ from published data',
         status: 'ADDRESSED',
         rationale:
           'First validation step explicitly tests flocculation with lead molecule; go/no-go criteria specified',

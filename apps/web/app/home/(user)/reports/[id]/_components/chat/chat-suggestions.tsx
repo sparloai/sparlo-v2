@@ -28,7 +28,7 @@ export const ChatSuggestions = memo(function ChatSuggestions({
 
   return (
     <div className="px-4 pb-4">
-      <span className="mb-3 block text-[11px] font-semibold tracking-[0.08em] uppercase text-zinc-400">
+      <span className="mb-3 block text-[11px] font-semibold tracking-[0.08em] text-zinc-400 uppercase">
         Suggested Questions
       </span>
       <div className="space-y-2">

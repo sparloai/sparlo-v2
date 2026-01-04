@@ -54,7 +54,12 @@ function normalizeReportData(data: HybridReportData): HybridReportData {
   }
 
   // If no solution/innovation concepts at all, return as-is
-  if (!hasSolutionConcepts && !hasInnovationConcepts && !hasExecutionTrack && !hasInnovationPortfolio) {
+  if (
+    !hasSolutionConcepts &&
+    !hasInnovationConcepts &&
+    !hasExecutionTrack &&
+    !hasInnovationPortfolio
+  ) {
     return {
       ...data,
       constraints_and_metrics:

@@ -12,6 +12,7 @@ import { VersionUpdater } from '@kit/ui/version-updater';
 
 import { AnalyticsProvider } from '~/components/analytics-provider';
 import { AuthProvider } from '~/components/auth-provider';
+import { CookieConsentBanner } from '~/components/cookie-consent-banner';
 import appConfig from '~/config/app.config';
 import featuresFlagConfig from '~/config/feature-flags.config';
 import { i18nResolver } from '~/lib/i18n/i18n.resolver';
@@ -58,6 +59,8 @@ export function RootProviders({
               <If condition={featuresFlagConfig.enableVersionUpdater}>
                 <VersionUpdater />
               </If>
+
+              <CookieConsentBanner />
             </I18nProvider>
           </ReactQueryProvider>
         </AnalyticsProvider>

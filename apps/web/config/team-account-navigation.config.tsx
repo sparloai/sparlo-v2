@@ -1,4 +1,10 @@
-import { CreditCard, LayoutDashboard, Settings, Users } from 'lucide-react';
+import {
+  CreditCard,
+  HelpCircle,
+  LayoutDashboard,
+  Settings,
+  Users,
+} from 'lucide-react';
 
 import { NavigationConfigSchema } from '@kit/ui/navigation-schema';
 
@@ -40,6 +46,11 @@ const getRoutes = (account: string) => [
             Icon: <CreditCard className={iconClasses} />,
           }
         : undefined,
+      {
+        label: 'common:routes.help',
+        path: createPath(pathsConfig.app.accountHelp, account),
+        Icon: <HelpCircle className={iconClasses} />,
+      },
     ].filter(Boolean),
   },
 ];
