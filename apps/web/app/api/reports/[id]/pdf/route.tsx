@@ -72,15 +72,27 @@ function releaseSlot(): void {
  * DocRaptor API configuration
  */
 const DOCRAPTOR_API_URL = 'https://api.docraptor.com/docs';
+const DOCRAPTOR_FETCH_TIMEOUT_MS = 55000; // 55s (5s buffer before outer 60s timeout)
+
+/**
+ * Map DocRaptor HTTP status codes to user-friendly error messages.
+ * Prevents leaking sensitive info (like API keys) from raw error responses.
+ */
+const DOCRAPTOR_ERROR_MESSAGES: Record<number, string> = {
+  400: 'Invalid PDF request',
+  401: 'PDF service authentication failed',
+  402: 'PDF service quota exceeded',
+  403: 'PDF service access denied',
+  422: 'Invalid document content',
+  429: 'PDF service rate limit exceeded',
+  500: 'PDF service internal error',
+  502: 'PDF service unavailable',
+  503: 'PDF service temporarily unavailable',
+};
 
 /**
  * Generate PDF from HTML using DocRaptor API.
- * DocRaptor uses Prince XML engine for high-quality PDF rendering.
- *
- * Features:
- * - Excellent CSS support including flexbox, grid, and @font-face
- * - Base64 embedded fonts work natively
- * - Page breaks and print styling work correctly
+ * Uses Prince XML engine for high-quality PDF rendering.
  */
 async function generatePdfFromHtml(html: string): Promise<Buffer> {
   const apiKey = process.env.DOCRAPTOR_API_KEY;
@@ -89,38 +101,65 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
     throw new Error('DOCRAPTOR_API_KEY environment variable is not set');
   }
 
-  console.log('[PDF Export] Calling DocRaptor API (%d bytes HTML)...', html.length);
+  console.log(
+    '[PDF Export] Calling DocRaptor API (%d bytes HTML)...',
+    html.length,
+  );
 
-  const response = await fetch(DOCRAPTOR_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      user_credentials: apiKey,
-      doc: {
-        test: process.env.NODE_ENV !== 'production', // Free watermarked PDFs in non-production
-        document_type: 'pdf',
-        document_content: html,
-        prince_options: {
-          media: 'print',
-          pdf_profile: 'PDF/A-1b', // Archival quality
-        },
+  // Create AbortController for proper timeout handling
+  const controller = new AbortController();
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    DOCRAPTOR_FETCH_TIMEOUT_MS,
+  );
+
+  try {
+    const response = await fetch(DOCRAPTOR_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Use HTTP Basic Auth instead of credentials in body (security best practice)
+        Authorization: `Basic ${Buffer.from(apiKey + ':').toString('base64')}`,
       },
-    }),
-  });
+      signal: controller.signal,
+      body: JSON.stringify({
+        doc: {
+          test: process.env.NODE_ENV !== 'production',
+          document_type: 'pdf',
+          document_content: html,
+          prince_options: {
+            media: 'print',
+            pdf_profile: 'PDF/A-1b',
+          },
+        },
+      }),
+    });
 
-  if (!response.ok) {
-    // DocRaptor returns error messages in the response body
-    const errorText = await response.text();
-    console.error('[PDF Export] DocRaptor API error:', response.status, errorText);
-    throw new Error(`DocRaptor API error: ${response.status} - ${errorText}`);
+    if (!response.ok) {
+      // Log only status code - raw error may contain API key
+      console.error('[PDF Export] DocRaptor API error:', response.status);
+      const safeMessage =
+        DOCRAPTOR_ERROR_MESSAGES[response.status] ||
+        'PDF generation service error';
+      throw new Error(safeMessage);
+    }
+
+    const pdfBuffer = await response.arrayBuffer();
+    console.log(
+      '[PDF Export] PDF generated, size: %d bytes',
+      pdfBuffer.byteLength,
+    );
+
+    return Buffer.from(pdfBuffer);
+  } catch (error) {
+    // Convert AbortError to user-friendly timeout message
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('PDF generation timeout - service did not respond');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  const pdfBuffer = await response.arrayBuffer();
-  console.log('[PDF Export] PDF generated, size: %d bytes', pdfBuffer.byteLength);
-
-  return Buffer.from(pdfBuffer);
 }
 
 export const GET = enhanceRouteHandler(
