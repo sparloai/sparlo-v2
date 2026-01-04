@@ -120,6 +120,54 @@ function _flexibleEnumOptional<T extends [string, ...string[]]>(
 }
 
 /**
+ * Creates an antifragile optional object schema.
+ * - Returns undefined if input is undefined, null, or empty object
+ * - Tries to parse with inner schema, returns undefined on failure
+ * - Returns parsed value on success
+ *
+ * This ensures optional complex objects never crash on malformed LLM output.
+ */
+function flexibleOptionalObject<T extends z.ZodRawShape>(
+  shape: T,
+): z.ZodEffects<z.ZodUnknown, z.infer<z.ZodObject<T>> | undefined, unknown> {
+  const innerSchema = z.object(shape);
+
+  return z
+    .unknown()
+    .transform((val): z.infer<typeof innerSchema> | undefined => {
+      // Handle undefined/null
+      if (val === undefined || val === null) {
+        return undefined;
+      }
+
+      // Handle non-objects
+      if (typeof val !== 'object') {
+        console.warn(
+          '[DD Schema] Optional object received non-object, returning undefined',
+        );
+        return undefined;
+      }
+
+      // Handle empty objects
+      if (Object.keys(val as object).length === 0) {
+        return undefined;
+      }
+
+      // Try to parse - if it fails, return undefined instead of throwing
+      const result = innerSchema.safeParse(val);
+      if (result.success) {
+        return result.data;
+      }
+
+      // Log the failure but don't crash
+      console.warn(
+        `[DD Schema] Optional object validation failed, returning undefined. Errors: ${result.error.errors.map((e) => e.path.join('.')).join(', ')}`,
+      );
+      return undefined;
+    });
+}
+
+/**
  * Creates an antifragile number schema that coerces strings to numbers.
  * - Handles "3" -> 3
  * - Handles "3.5" -> 3.5
@@ -1045,151 +1093,145 @@ export const DD3_5_M_OutputSchema = z.object({
   ),
 
   // Optional: Unit economics bridge for >30% cost reduction claims
-  unit_economics_bridge: z
-    .object({
-      triggers: z.object({
-        cost_reduction_claimed: z.string(),
-        threshold_exceeded: z.boolean(),
+  // Uses flexibleOptionalObject to gracefully handle empty/malformed LLM output
+  unit_economics_bridge: flexibleOptionalObject({
+    triggers: z.object({
+      cost_reduction_claimed: z.string(),
+      threshold_exceeded: z.boolean(),
+    }),
+    current_cost_breakdown: z.array(
+      z.object({
+        component: z.string(),
+        current_cost: z.string(),
+        percentage_of_total: z.string(),
       }),
-      current_cost_breakdown: z.array(
-        z.object({
-          component: z.string(),
-          current_cost: z.string(),
-          percentage_of_total: z.string(),
-        }),
-      ),
-      reduction_pathway: z.array(
-        z.object({
-          cost_component: z.string(),
-          reduction_mechanism: z.string(),
-          reduction_percentage: z.string(),
-          confidence: Confidence,
-          precedent: z.string(),
-          assumption_risk: z.string(),
-        }),
-      ),
-      learning_curve_analysis: z.object({
-        claimed_learning_rate: z.string(),
-        industry_benchmark: z.string(),
-        assessment: flexibleEnum(
-          ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
-          'OPTIMISTIC',
-        ),
-        reasoning: z.string(),
-      }),
-      scale_effects_analysis: z.object({
-        what_scales_linearly: z.array(z.string()),
-        what_scales_sub_linearly: z.array(z.string()),
-        what_doesnt_scale: z.array(z.string()),
-        net_effect: z.string(),
-      }),
-      bridge_verdict: z.object({
-        achievable_cost: z.string(),
-        gap_vs_claimed: z.string(),
+    ),
+    reduction_pathway: z.array(
+      z.object({
+        cost_component: z.string(),
+        reduction_mechanism: z.string(),
+        reduction_percentage: z.string(),
         confidence: Confidence,
-        key_assumption: z.string(),
-        if_assumption_wrong: z.string(),
+        precedent: z.string(),
+        assumption_risk: z.string(),
       }),
-    })
-    .optional(),
+    ),
+    learning_curve_analysis: z.object({
+      claimed_learning_rate: z.string(),
+      industry_benchmark: z.string(),
+      assessment: flexibleEnum(
+        ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
+        'OPTIMISTIC',
+      ),
+      reasoning: z.string(),
+    }),
+    scale_effects_analysis: z.object({
+      what_scales_linearly: z.array(z.string()),
+      what_scales_sub_linearly: z.array(z.string()),
+      what_doesnt_scale: z.array(z.string()),
+      net_effect: z.string(),
+    }),
+    bridge_verdict: z.object({
+      achievable_cost: z.string(),
+      gap_vs_claimed: z.string(),
+      confidence: Confidence,
+      key_assumption: z.string(),
+      if_assumption_wrong: z.string(),
+    }),
+  }),
 
   // Optional: Policy deep dive for policy-dependent businesses
-  policy_deep_dive: z
-    .object({
-      triggers: z.object({
-        policy_identified: z.string(),
-        dependency_level: z.string(),
-      }),
-      policy_details: z.object({
-        full_name: z.string(),
-        mechanism: z.string(),
-        value_to_company: z.string(),
-        percentage_of_margin: z.string(),
-        expiration_date: z.string(),
-      }),
-      qualification_analysis: z.object({
-        requirements: z.array(z.string()),
-        company_status: flexibleEnum(
-          ['QUALIFIES', 'LIKELY_QUALIFIES', 'UNCERTAIN', 'UNLIKELY'],
-          'UNCERTAIN',
-        ),
-        uncertain_requirements: z.array(z.string()),
-        what_could_disqualify: z.array(z.string()),
-      }),
-      political_risk_assessment: z.object({
-        current_political_support: z.string(),
-        sunset_risk: z.string(),
-        modification_risk: z.string(),
-        timeline_of_risk: z.string(),
-      }),
-      scenario_economics: z.object({
-        with_policy: z.object({
-          unit_cost: z.string(),
-          margin: z.string(),
-          viability: flexibleEnum(['VIABLE', 'MARGINAL', 'UNVIABLE'], 'VIABLE'),
-        }),
-        without_policy: z.object({
-          unit_cost: z.string(),
-          margin: z.string(),
-          viability: flexibleEnum(
-            ['VIABLE', 'MARGINAL', 'UNVIABLE'],
-            'UNVIABLE',
-          ),
-        }),
-        breakeven_policy_value: z.string(),
-      }),
-      mitigation_options: z.array(
-        z.object({
-          strategy: z.string(),
-          feasibility: Confidence,
-          timeline: z.string(),
-        }),
+  // Uses flexibleOptionalObject to gracefully handle empty/malformed LLM output
+  policy_deep_dive: flexibleOptionalObject({
+    triggers: z.object({
+      policy_identified: z.string(),
+      dependency_level: z.string(),
+    }),
+    policy_details: z.object({
+      full_name: z.string(),
+      mechanism: z.string(),
+      value_to_company: z.string(),
+      percentage_of_margin: z.string(),
+      expiration_date: z.string(),
+    }),
+    qualification_analysis: z.object({
+      requirements: z.array(z.string()),
+      company_status: flexibleEnum(
+        ['QUALIFIES', 'LIKELY_QUALIFIES', 'UNCERTAIN', 'UNLIKELY'],
+        'UNCERTAIN',
       ),
-      policy_verdict: z.object({
-        exposure_level: PolicyExposureVerdict,
-        recommendation: z.string(),
-        diligence_action: z.string(),
+      uncertain_requirements: z.array(z.string()),
+      what_could_disqualify: z.array(z.string()),
+    }),
+    political_risk_assessment: z.object({
+      current_political_support: z.string(),
+      sunset_risk: z.string(),
+      modification_risk: z.string(),
+      timeline_of_risk: z.string(),
+    }),
+    scenario_economics: z.object({
+      with_policy: z.object({
+        unit_cost: z.string(),
+        margin: z.string(),
+        viability: flexibleEnum(['VIABLE', 'MARGINAL', 'UNVIABLE'], 'VIABLE'),
       }),
-    })
-    .optional(),
+      without_policy: z.object({
+        unit_cost: z.string(),
+        margin: z.string(),
+        viability: flexibleEnum(['VIABLE', 'MARGINAL', 'UNVIABLE'], 'UNVIABLE'),
+      }),
+      breakeven_policy_value: z.string(),
+    }),
+    mitigation_options: z.array(
+      z.object({
+        strategy: z.string(),
+        feasibility: Confidence,
+        timeline: z.string(),
+      }),
+    ),
+    policy_verdict: z.object({
+      exposure_level: PolicyExposureVerdict,
+      recommendation: z.string(),
+      diligence_action: z.string(),
+    }),
+  }),
 
   // Optional: Byproduct and revenue stream analysis
-  byproduct_analysis: z
-    .object({
-      byproducts_identified: z.array(
-        z.object({
-          byproduct: z.string(),
-          quantity_per_unit: z.string(),
-          quality: z.string(),
-          market_value: z.string(),
-          addressable_market: z.string(),
-          monetization_status: flexibleEnum(
-            ['CONTRACTED', 'IN_DISCUSSION', 'IDENTIFIED', 'SPECULATIVE'],
-            'IDENTIFIED',
-          ),
-        }),
-      ),
-      revenue_contribution: z.object({
-        percentage_of_revenue: z.string(),
-        margin_impact: z.string(),
-        required_for_viability: z.boolean(),
-      }),
-      market_risks: z.array(
-        z.object({
-          risk: z.string(),
-          impact: z.string(),
-          mitigation: z.string(),
-        }),
-      ),
-      verdict: z.object({
-        byproduct_quality: flexibleEnum(
-          ['STRONG_ASSET', 'HELPFUL', 'UNCERTAIN', 'LIABILITY'],
-          'HELPFUL',
+  // Uses flexibleOptionalObject to gracefully handle empty/malformed LLM output
+  byproduct_analysis: flexibleOptionalObject({
+    byproducts_identified: z.array(
+      z.object({
+        byproduct: z.string(),
+        quantity_per_unit: z.string(),
+        quality: z.string(),
+        market_value: z.string(),
+        addressable_market: z.string(),
+        monetization_status: flexibleEnum(
+          ['CONTRACTED', 'IN_DISCUSSION', 'IDENTIFIED', 'SPECULATIVE'],
+          'IDENTIFIED',
         ),
-        reasoning: z.string(),
       }),
-    })
-    .optional(),
+    ),
+    revenue_contribution: z.object({
+      percentage_of_revenue: z.string(),
+      margin_impact: z.string(),
+      required_for_viability: z.boolean(),
+    }),
+    market_risks: z.array(
+      z.object({
+        risk: z.string(),
+        impact: z.string(),
+        mitigation: z.string(),
+      }),
+    ),
+    verdict: z.object({
+      byproduct_quality: flexibleEnum(
+        ['STRONG_ASSET', 'HELPFUL', 'UNCERTAIN', 'LIABILITY'],
+        'HELPFUL',
+      ),
+      reasoning: z.string(),
+    }),
+  }),
 });
 
 export type DD3_5_M_Output = z.infer<typeof DD3_5_M_OutputSchema>;
