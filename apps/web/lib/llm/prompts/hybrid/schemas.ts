@@ -87,24 +87,94 @@ function createAntifragileEnum<T extends readonly [string, ...string[]]>(
   return z
     .string()
     .transform((val) => {
-      const normalized = val.toUpperCase().replace(/[-\s]/g, '_');
-      return mappings[normalized] ?? fallback;
-    })
-    .pipe(z.enum(canonical));
+      // Step 1: Strip annotations like "WEAK - reason" or "HIGH (explanation)"
+      const stripped = val
+        .replace(/\s*[-:(].*$/, '') // Strip everything after -, :, or (
+        .trim();
+      // Step 2: Normalize to uppercase with underscores
+      const normalized = stripped.toUpperCase().replace(/[-\s]/g, '_');
+      // Step 3: Check mappings or direct match
+      if (mappings[normalized]) return mappings[normalized];
+      if (canonical.includes(normalized as T[number])) return normalized as T[number];
+      // Step 4: Fallback
+      return fallback;
+    });
 }
 
 /**
- * Severity/confidence level - accepts both cases for backward compatibility
- * Normalizes HIGH/MEDIUM/LOW to lowercase
+ * Simple antifragile enum for cases without complex mappings
+ * Strips annotations and normalizes case, falls back to default
  */
-export const SeverityLevel = z
-  .enum(['low', 'medium', 'high', 'LOW', 'MEDIUM', 'HIGH'])
-  .transform((val) => val.toLowerCase() as 'low' | 'medium' | 'high')
-  .pipe(z.enum(['low', 'medium', 'high']));
+function flexibleEnum<T extends readonly [string, ...string[]]>(
+  values: T,
+  defaultValue: T[number],
+): z.ZodEffects<z.ZodString, T[number], string> {
+  return z.string().transform((val): T[number] => {
+    // Strip annotations: "WEAK - reason" -> "WEAK", "HIGH (note)" -> "HIGH"
+    const stripped = val
+      .replace(/\s*[-:(].*$/, '')
+      .trim()
+      .toUpperCase();
 
-export const TrackSchema = z
-  .enum(['simpler_path', 'best_fit', 'paradigm_shift', 'frontier_transfer'])
-  .catch('best_fit');
+    // Direct match
+    if (values.includes(stripped as T[number])) {
+      return stripped as T[number];
+    }
+
+    // Try lowercase match for lowercase enums
+    const lowercased = stripped.toLowerCase();
+    if (values.includes(lowercased as T[number])) {
+      return lowercased as T[number];
+    }
+
+    // Fallback
+    return defaultValue;
+  });
+}
+
+/**
+ * Antifragile number that coerces strings to numbers
+ */
+function flexibleNumber(
+  defaultValue: number,
+  options?: { min?: number; max?: number },
+): z.ZodEffects<z.ZodUnknown, number, unknown> {
+  return z.unknown().transform((val): number => {
+    if (typeof val === 'number' && !isNaN(val)) {
+      let num = val;
+      if (options?.min !== undefined) num = Math.max(num, options.min);
+      if (options?.max !== undefined) num = Math.min(num, options.max);
+      return num;
+    }
+    if (typeof val === 'string') {
+      const match = val.match(/[\d.]+/);
+      if (match) {
+        const parsed = parseFloat(match[0]);
+        if (!isNaN(parsed)) {
+          let num = parsed;
+          if (options?.min !== undefined) num = Math.max(num, options.min);
+          if (options?.max !== undefined) num = Math.min(num, options.max);
+          return num;
+        }
+      }
+    }
+    return defaultValue;
+  });
+}
+
+/**
+ * Severity/confidence level - antifragile, handles annotations and case
+ * Normalizes to lowercase: HIGH/MEDIUM/LOW -> high/medium/low
+ */
+export const SeverityLevel = flexibleEnum(
+  ['low', 'medium', 'high'] as const,
+  'medium',
+);
+
+export const TrackSchema = flexibleEnum(
+  ['simpler_path', 'best_fit', 'paradigm_shift', 'frontier_transfer'] as const,
+  'best_fit',
+);
 
 export const ConfidenceLevel = SeverityLevel;
 
@@ -118,9 +188,10 @@ export const ConfidenceLevel = SeverityLevel;
  * ACTIVE: Mechanism understood but not validated for this specific application
  * HIGH: Mechanism is theoretical or disputed
  */
-export const ScientificRiskStatus = z
-  .enum(['RETIRED', 'ACTIVE', 'HIGH'])
-  .catch('ACTIVE');
+export const ScientificRiskStatus = flexibleEnum(
+  ['RETIRED', 'ACTIVE', 'HIGH'] as const,
+  'ACTIVE',
+);
 export type ScientificRiskStatus = z.infer<typeof ScientificRiskStatus>;
 
 /**
@@ -129,9 +200,10 @@ export type ScientificRiskStatus = z.infer<typeof ScientificRiskStatus>;
  * MEDIUM: Custom engineering required, but known approaches exist
  * HIGH: Novel integration, no clear precedent for this combination
  */
-export const EngineeringRiskStatus = z
-  .enum(['LOW', 'MEDIUM', 'HIGH'])
-  .catch('MEDIUM');
+export const EngineeringRiskStatus = flexibleEnum(
+  ['LOW', 'MEDIUM', 'HIGH'] as const,
+  'MEDIUM',
+);
 export type EngineeringRiskStatus = z.infer<typeof EngineeringRiskStatus>;
 
 /**
@@ -175,8 +247,8 @@ export type RiskClassification = z.infer<typeof RiskClassificationSchema>;
  */
 export const ActionableConfidenceSchema = z
   .object({
-    level: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
-    percent: z.number().int().min(0).max(100).catch(50),
+    level: flexibleEnum(['HIGH', 'MEDIUM', 'LOW'] as const, 'MEDIUM'),
+    percent: flexibleNumber(50, { min: 0, max: 100 }),
     hinges_on: z.string().catch(''),
     if_wrong: z.string().catch(''),
     what_would_change_my_mind: z.string().catch(''),
@@ -187,7 +259,10 @@ export type ActionableConfidence = z.infer<typeof ActionableConfidenceSchema>;
 /**
  * Scale Up Risk - based on gap between demonstrated scale and target
  */
-export const ScaleUpRisk = z.enum(['LOW', 'MEDIUM', 'HIGH']).catch('MEDIUM');
+export const ScaleUpRisk = flexibleEnum(
+  ['LOW', 'MEDIUM', 'HIGH'] as const,
+  'MEDIUM',
+);
 export type ScaleUpRisk = z.infer<typeof ScaleUpRisk>;
 
 /**
@@ -537,8 +612,8 @@ export const ViabilityVerdict = z
 export const RiskItemSchema = z
   .object({
     risk: z.string().catch(''),
-    likelihood: z.enum(['low', 'medium', 'high']).catch('medium'),
-    impact: z.enum(['low', 'medium', 'high']).catch('medium'),
+    likelihood: flexibleEnum(['low', 'medium', 'high'] as const, 'medium'),
+    impact: flexibleEnum(['low', 'medium', 'high'] as const, 'medium'),
     mitigation: z.string().nullable().optional(),
   })
   .passthrough();
@@ -1155,19 +1230,17 @@ export type SolutionClassification = z.infer<
 
 const FeasibilityAssessmentSchema = z
   .object({
-    score: z.number().min(1).max(10).catch(5),
+    score: flexibleNumber(5, { min: 1, max: 10 }),
     analysis: z.string(),
     blockers: z.array(z.string()).catch([]),
   })
   .passthrough();
 
-// Paradigm significance enum
-const ParadigmSignificance = z.enum([
-  'TRANSFORMATIVE',
-  'SIGNIFICANT',
+// Paradigm significance enum - antifragile
+const ParadigmSignificance = flexibleEnum(
+  ['TRANSFORMATIVE', 'SIGNIFICANT', 'INCREMENTAL', 'OPTIMIZATION'] as const,
   'INCREMENTAL',
-  'OPTIMIZATION',
-]);
+);
 
 // Paradigm assessment for each concept
 const ParadigmAssessmentSchema = z
@@ -1188,14 +1261,15 @@ const ValidationResultSchema = z
     engineering_feasibility: FeasibilityAssessmentSchema,
     economic_viability: z
       .object({
-        score: z.number().min(1).max(10).catch(5),
+        score: flexibleNumber(5, { min: 1, max: 10 }),
         analysis: z.string(),
       })
       .passthrough(),
-    overall_merit_score: z.number().min(1).max(10).catch(5),
-    recommendation: z
-      .enum(['pursue', 'investigate', 'defer', 'reject'])
-      .catch('investigate'),
+    overall_merit_score: flexibleNumber(5, { min: 1, max: 10 }),
+    recommendation: flexibleEnum(
+      ['pursue', 'investigate', 'defer', 'reject'] as const,
+      'investigate',
+    ),
     key_uncertainties: z.array(z.string()).catch([]),
     paradigm_assessment: ParadigmAssessmentSchema.optional(),
     // v4.0: Sustainability screening for concepts
@@ -1900,17 +1974,19 @@ export type WhatSparloProvides = z.infer<typeof WhatSparloProvidesSchema>;
  */
 export const CalibratedClaimsSchema = z
   .object({
-    paradigm_insight_claim: z
-      .enum(['JUSTIFIED', 'OVERSTATED', 'NOT_CLAIMED'])
-      .catch('NOT_CLAIMED'),
-    novelty_claim: z.enum(['HIGH', 'MEDIUM', 'LOW']).catch('MEDIUM'),
-    expert_reaction_prediction: z
-      .enum([
+    paradigm_insight_claim: flexibleEnum(
+      ['JUSTIFIED', 'OVERSTATED', 'NOT_CLAIMED'] as const,
+      'NOT_CLAIMED',
+    ),
+    novelty_claim: flexibleEnum(['HIGH', 'MEDIUM', 'LOW'] as const, 'MEDIUM'),
+    expert_reaction_prediction: flexibleEnum(
+      [
         'SURPRISED_AND_GRATEFUL', // Genuine insight they didn't have
         'USEFUL_FRAMEWORK', // Helpful structure, known content
         'COULD_GET_ELSEWHERE', // Limited value-add
-      ])
-      .catch('USEFUL_FRAMEWORK'),
+      ] as const,
+      'USEFUL_FRAMEWORK',
+    ),
   })
   .passthrough();
 export type CalibratedClaims = z.infer<typeof CalibratedClaimsSchema>;
@@ -2484,25 +2560,19 @@ const KeyPatternSchema = z
 
 // --- Solution Concepts (Major Restructure) ---
 
-// Tags for visual rendering
-const InnovationType = z.enum([
+// Tags for visual rendering - antifragile
+const InnovationType = flexibleEnum(
+  ['Combination', 'Transfer', 'Optimization', 'Revival', 'Paradigm'] as const,
   'Combination',
-  'Transfer',
-  'Optimization',
-  'Revival',
-  'Paradigm',
-]);
-const NoveltyLevel = z.enum([
-  'Significant Novelty',
+);
+const NoveltyLevel = flexibleEnum(
+  ['Significant Novelty', 'Moderate Novelty', 'Known Approach'] as const,
   'Moderate Novelty',
-  'Known Approach',
-]);
-const PursuitRecommendation = z.enum([
-  'Must Pursue',
-  'Strong Consider',
+);
+const PursuitRecommendation = flexibleEnum(
+  ['Must Pursue', 'Strong Consider', 'Worth Exploring', 'Long-term Watch'] as const,
   'Worth Exploring',
-  'Long-term Watch',
-]);
+);
 
 const ConceptTagsSchema = z
   .object({
@@ -2800,7 +2870,7 @@ const _RiskWatchoutSchema = z
   .object({
     category: z.string(),
     risk: z.string(),
-    severity: z.enum(['low', 'medium', 'high']).catch('medium'),
+    severity: flexibleEnum(['low', 'medium', 'high'] as const, 'medium'),
     mitigation: z.string().optional(),
   })
   .passthrough();
@@ -2821,7 +2891,10 @@ const ReportSelfCritiqueSchema = z
         z
           .object({
             concern: z.string(),
-            status: z.enum(['ADDRESSED', 'EXTENDED_NEEDED', 'ACCEPTED_RISK']),
+            status: flexibleEnum(
+              ['ADDRESSED', 'EXTENDED_NEEDED', 'ACCEPTED_RISK'] as const,
+              'ACCEPTED_RISK',
+            ),
             rationale: z.string(),
           })
           .passthrough(),
