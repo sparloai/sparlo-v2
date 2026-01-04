@@ -55,36 +55,28 @@ export function useCookieConsent() {
 }
 
 export function CookieConsentBanner() {
-  const { status, accept, reject } = useCookieConsent();
+  const { status, accept } = useCookieConsent();
 
   // Don't show if user has already made a choice
   if (status !== 'unknown') return null;
 
   return (
     <div
-      className="animate-in slide-in-from-bottom-4 fill-mode-both fixed inset-x-0 bottom-0 z-50 p-4 duration-500"
-      style={{ animationDelay: '1.5s' }}
+      className="animate-in slide-in-from-bottom-4 fill-mode-both fixed inset-x-0 bottom-0 z-50 duration-500"
+      style={{ animationDelay: '0.5s' }}
     >
-      <div className="mx-auto max-w-md rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4 shadow-2xl">
-        <div className="flex flex-col gap-4">
-          <p className="text-[14px] leading-relaxed tracking-[-0.01em] text-zinc-300">
-            We use cookies to understand how you use Sparlo and improve your
+      <div className="bg-zinc-950 px-4 py-3 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 sm:flex-row sm:gap-4">
+          <p className="text-center text-[13px] tracking-[-0.01em] text-zinc-400 sm:text-left sm:text-[14px]">
+            By continuing, you agree to our use of cookies to improve your
             experience.
           </p>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={accept}
-              className="flex-1 rounded-lg bg-white px-4 py-2 text-[14px] font-medium text-zinc-900 transition-colors hover:bg-zinc-100"
-            >
-              Accept
-            </button>
-            <button
-              onClick={reject}
-              className="rounded-lg px-4 py-2 text-[14px] text-zinc-500 transition-colors hover:text-zinc-300"
-            >
-              No thanks
-            </button>
-          </div>
+          <button
+            onClick={accept}
+            className="shrink-0 bg-white px-5 py-1.5 text-[13px] font-medium text-zinc-900 transition-colors hover:bg-zinc-100 sm:text-[14px]"
+          >
+            Got it
+          </button>
         </div>
       </div>
     </div>
