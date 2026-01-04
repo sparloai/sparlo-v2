@@ -47,7 +47,12 @@ export function MultiFactorChallengeContainer({
 
   const verifyMFAChallenge = useVerifyMFAChallenge({
     onSuccess: () => {
-      router.replace(paths.redirectPath);
+      // Use window.location for full URLs (cross-domain) or router for relative paths
+      if (paths.redirectPath.startsWith('http')) {
+        window.location.href = paths.redirectPath;
+      } else {
+        router.replace(paths.redirectPath);
+      }
     },
   });
 
