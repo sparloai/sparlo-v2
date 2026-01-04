@@ -56,7 +56,7 @@ export function LineItemDetails(
                     values={{
                       setupFee: formatCurrency({
                         currencyCode,
-                        value: item.setupFee as number,
+                        value: (item.setupFee as number) / 100,
                         locale,
                       }),
                     }}
@@ -98,7 +98,7 @@ export function LineItemDetails(
               <span className={'text-xs font-semibold'}>
                 {formatCurrency({
                   currencyCode,
-                  value: item.cost,
+                  value: item.cost / 100,
                   locale,
                 })}
               </span>
@@ -143,7 +143,7 @@ export function LineItemDetails(
                   <span className={'font-semibold'}>
                     {formatCurrency({
                       currencyCode,
-                      value: item.cost,
+                      value: item.cost / 100,
                       locale,
                     })}
                   </span>
@@ -184,7 +184,7 @@ export function LineItemDetails(
                 <span className={'font-semibold'}>
                   {formatCurrency({
                     currencyCode,
-                    value: item.cost,
+                    value: item.cost / 100,
                     locale,
                   })}
                 </span>
@@ -248,7 +248,7 @@ function Tiers({
           <span className={'font-bold'}>
             {formatCurrency({
               currencyCode: currency.toLowerCase(),
-              value: tier.cost,
+              value: tier.cost / 100,
               locale,
             })}
           </span>{' '}
@@ -284,7 +284,7 @@ function Tiers({
             <span className={'font-bold'}>
               {formatCurrency({
                 currencyCode: currency.toLowerCase(),
-                value: tier.cost,
+                value: tier.cost / 100,
                 locale,
               })}
             </span>{' '}

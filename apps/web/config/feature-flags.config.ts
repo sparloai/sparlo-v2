@@ -83,7 +83,7 @@ const featuresFlagConfig = FeatureFlagsSchema.parse({
   ),
   enableTeamAccountBilling: getBoolean(
     process.env.NEXT_PUBLIC_ENABLE_TEAM_ACCOUNTS_BILLING,
-    false,
+    true,
   ),
   languagePriority: process.env
     .NEXT_PUBLIC_LANGUAGE_PRIORITY as LanguagePriority,

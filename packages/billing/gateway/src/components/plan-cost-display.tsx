@@ -52,10 +52,12 @@ export function PlanCostDisplay({
 
       const isYearlyPricing = interval === 'year';
 
+      // Convert from cents to dollars (costs are stored in cents)
+      const costInDollars = primaryLineItem.cost / 100;
       const cost =
         isYearlyPricing && alwaysDisplayMonthlyPrice
-          ? Number(primaryLineItem.cost / 12)
-          : primaryLineItem.cost;
+          ? Number(costInDollars / 12)
+          : costInDollars;
 
       return {
         shouldDisplayTier,
@@ -69,9 +71,10 @@ export function PlanCostDisplay({
     }, [primaryLineItem, interval, alwaysDisplayMonthlyPrice]);
 
   if (shouldDisplayTier) {
+    // Convert tier cost from cents to dollars
     const formattedCost = formatCurrency({
       currencyCode: currencyCode.toLowerCase(),
-      value: lowestTier?.cost ?? 0,
+      value: (lowestTier?.cost ?? 0) / 100,
       locale: i18n.language,
     });
 
