@@ -11,6 +11,8 @@ import appConfig from '~/config/app.config';
 import pathsConfig from '~/config/paths.config';
 import {
   PRODUCTION_DOMAIN,
+  getAppSubdomainUrl,
+  isAppPath,
   isAppSubdomainHost,
   isPublicPath,
 } from '~/config/subdomain.config';
@@ -204,15 +206,17 @@ async function protectedRouteHandler(
 
   // If user requires multi-factor authentication, redirect to MFA page.
   if (requiresMultiFactorAuthentication) {
+    const mfaPath = pathsConfig.auth.verifyMfa;
+    // Preserve the original destination so user returns there after MFA
+    const mfaRedirectPath = `${mfaPath}?next=${encodeURIComponent(nextPath)}`;
+
     // For app subdomain, redirect to main domain for MFA
     if (isAppSubdomain(req)) {
-      const mainDomainUrl = `https://${PRODUCTION_DOMAIN}${pathsConfig.auth.verifyMfa}`;
+      const mainDomainUrl = `https://${PRODUCTION_DOMAIN}${mfaRedirectPath}`;
       return NextResponse.redirect(mainDomainUrl);
     }
 
-    return NextResponse.redirect(
-      new URL(pathsConfig.auth.verifyMfa, origin).href,
-    );
+    return NextResponse.redirect(new URL(mfaRedirectPath, origin).href);
   }
 }
 
@@ -253,6 +257,11 @@ async function getPatterns(request: NextRequest) {
             req.nextUrl.searchParams.get('next'),
             pathsConfig.app.home,
           );
+
+          // In production, redirect app paths to app subdomain
+          if (appConfig.production && isAppPath(nextPath)) {
+            return NextResponse.redirect(getAppSubdomainUrl(nextPath));
+          }
 
           return NextResponse.redirect(
             new URL(nextPath, req.nextUrl.origin).href,
