@@ -14,6 +14,22 @@ import pathsConfig from '~/config/paths.config';
 const CSRF_SECRET_COOKIE = 'csrfSecret';
 const NEXT_ACTION_HEADER = 'next-action';
 
+/**
+ * App subdomain configuration for cross-subdomain routing.
+ * On app.sparlo.ai, all routes require authentication (no /home prefix in URL).
+ */
+const APP_SUBDOMAIN = 'app';
+const PRODUCTION_DOMAIN = 'sparlo.ai';
+
+/**
+ * Check if the request is coming from the app subdomain.
+ * On the app subdomain, routes don't have the /home prefix.
+ */
+function isAppSubdomain(request: NextRequest): boolean {
+  const host = request.headers.get('host') ?? '';
+  return host.startsWith(`${APP_SUBDOMAIN}.${PRODUCTION_DOMAIN}`);
+}
+
 export const config = {
   matcher: ['/((?!_next/static|_next/image|images|locales|assets|api/*).*)'],
 };
@@ -36,7 +52,7 @@ export async function proxy(request: NextRequest) {
   const csrfResponse = await withCsrfMiddleware(request, response);
 
   // handle patterns for specific routes
-  const handlePattern = await matchUrlPattern(request.url);
+  const handlePattern = await matchUrlPattern(request);
 
   // if a pattern handler exists, call it
   if (handlePattern) {
@@ -128,9 +144,84 @@ async function adminMiddleware(request: NextRequest, response: NextResponse) {
 }
 
 /**
- * Define URL patterns and their corresponding handlers.
+ * Paths that are public on the app subdomain (don't require authentication).
+ * These should not trigger auth redirects.
  */
-async function getPatterns() {
+const APP_SUBDOMAIN_PUBLIC_PATHS = [
+  '/auth',
+  '/healthcheck',
+  '/api',
+  '/share',
+  '/_next',
+  '/locales',
+  '/images',
+  '/assets',
+];
+
+/**
+ * Check if a path is public on the app subdomain.
+ */
+function isPublicPath(pathname: string): boolean {
+  return APP_SUBDOMAIN_PUBLIC_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+}
+
+/**
+ * Handler for protected routes (requires authentication and MFA check).
+ * Used for both /home/* on main domain and /* on app subdomain.
+ */
+async function protectedRouteHandler(
+  req: NextRequest,
+  res: NextResponse,
+  options: { redirectPrefix?: string } = {},
+) {
+  const { data } = await getUser(req, res);
+  const { origin, pathname } = req.nextUrl;
+
+  // Build the redirect path - on app subdomain, no /home prefix needed
+  const nextPath = options.redirectPrefix
+    ? `${options.redirectPrefix}${pathname}`
+    : pathname;
+
+  // If user is not logged in, redirect to sign in page.
+  if (!data?.claims) {
+    const signIn = pathsConfig.auth.signIn;
+
+    // For app subdomain, redirect to main domain for auth
+    if (isAppSubdomain(req)) {
+      const mainDomainUrl = `https://${PRODUCTION_DOMAIN}${signIn}?next=${encodeURIComponent(nextPath)}`;
+      return NextResponse.redirect(mainDomainUrl);
+    }
+
+    const redirectPath = `${signIn}?next=${nextPath}`;
+    return NextResponse.redirect(new URL(redirectPath, origin).href);
+  }
+
+  const supabase = createMiddlewareClient(req, res);
+
+  const requiresMultiFactorAuthentication =
+    await checkRequiresMultiFactorAuthentication(supabase);
+
+  // If user requires multi-factor authentication, redirect to MFA page.
+  if (requiresMultiFactorAuthentication) {
+    // For app subdomain, redirect to main domain for MFA
+    if (isAppSubdomain(req)) {
+      const mainDomainUrl = `https://${PRODUCTION_DOMAIN}${pathsConfig.auth.verifyMfa}`;
+      return NextResponse.redirect(mainDomainUrl);
+    }
+
+    return NextResponse.redirect(
+      new URL(pathsConfig.auth.verifyMfa, origin).href,
+    );
+  }
+}
+
+/**
+ * Define URL patterns and their corresponding handlers.
+ * Patterns vary based on whether the request is from the app subdomain.
+ */
+async function getPatterns(request: NextRequest) {
   let URLPattern = globalThis.URLPattern;
 
   if (!URLPattern) {
@@ -138,7 +229,7 @@ async function getPatterns() {
     URLPattern = polyfill as typeof URLPattern;
   }
 
-  return [
+  const basePatterns = [
     {
       pattern: new URLPattern({ pathname: '/admin/*?' }),
       handler: adminMiddleware,
@@ -173,40 +264,42 @@ async function getPatterns() {
     {
       pattern: new URLPattern({ pathname: '/home/*?' }),
       handler: async (req: NextRequest, res: NextResponse) => {
-        const { data } = await getUser(req, res);
-        const { origin, pathname: next } = req.nextUrl;
-
-        // If user is not logged in, redirect to sign in page.
-        if (!data?.claims) {
-          const signIn = pathsConfig.auth.signIn;
-          const redirectPath = `${signIn}?next=${next}`;
-
-          return NextResponse.redirect(new URL(redirectPath, origin).href);
-        }
-
-        const supabase = createMiddlewareClient(req, res);
-
-        const requiresMultiFactorAuthentication =
-          await checkRequiresMultiFactorAuthentication(supabase);
-
-        // If user requires multi-factor authentication, redirect to MFA page.
-        if (requiresMultiFactorAuthentication) {
-          return NextResponse.redirect(
-            new URL(pathsConfig.auth.verifyMfa, origin).href,
-          );
-        }
+        return protectedRouteHandler(req, res);
       },
     },
   ];
+
+  // On app subdomain, add a catch-all pattern for protected routes
+  // This handles paths like /team-slug, /settings, etc.
+  if (isAppSubdomain(request)) {
+    basePatterns.push({
+      pattern: new URLPattern({ pathname: '/*?' }),
+      handler: async (req: NextRequest, res: NextResponse) => {
+        const pathname = req.nextUrl.pathname;
+
+        // Skip public paths
+        if (isPublicPath(pathname)) {
+          return;
+        }
+
+        // Protect all other routes on app subdomain
+        // Add /home prefix for redirect path since that's where the routes are
+        return protectedRouteHandler(req, res, { redirectPrefix: '/home' });
+      },
+    });
+  }
+
+  return basePatterns;
 }
 
 /**
  * Match URL patterns to specific handlers.
- * @param url
+ * Handles both main domain (/home/*) and app subdomain (/*) routing.
+ * @param request - The incoming request
  */
-async function matchUrlPattern(url: string) {
-  const patterns = await getPatterns();
-  const input = url.split('?')[0];
+async function matchUrlPattern(request: NextRequest) {
+  const patterns = await getPatterns(request);
+  const input = request.url.split('?')[0];
 
   for (const pattern of patterns) {
     const patternResult = pattern.pattern.exec(input);

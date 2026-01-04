@@ -10,8 +10,13 @@ const APP_SUBDOMAIN = 'app';
 const PRODUCTION_DOMAIN = 'sparlo.ai';
 
 /**
+ * Paths that should stay on the main domain.
+ */
+const MAIN_DOMAIN_PATHS = ['/auth', '/share', '/api', '/healthcheck'];
+
+/**
  * Validate redirect path to prevent open redirect vulnerabilities.
- * Only allows relative paths within the app (starting with /home or /join).
+ * Only allows relative paths that are safe app paths.
  */
 function isValidRedirectPath(path: string): boolean {
   // Must be a string
@@ -26,23 +31,36 @@ function isValidRedirectPath(path: string): boolean {
   // Reject any URL with protocol (javascript:, data:, http:, etc.)
   if (/^[a-z][a-z0-9+.-]*:/i.test(path)) return false;
 
-  // Only allow paths within the app (home or join routes)
-  const allowedPrefixes = ['/home', '/join'];
-  return allowedPrefixes.some((prefix) => path.startsWith(prefix));
+  // Allow /home/* paths (main domain) and clean app paths
+  // Disallow main domain paths that shouldn't be redirect targets
+  const isMainDomainPath = MAIN_DOMAIN_PATHS.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
+
+  return !isMainDomainPath;
 }
 
 /**
- * Redirect to app subdomain for /home paths in production.
+ * Check if a path is an app path that should live on the app subdomain.
  */
-function redirectToAppSubdomain(path: string): string {
-  const isProduction = process.env.NODE_ENV === 'production';
+function isAppPath(path: string): boolean {
+  const isMainDomainPath = MAIN_DOMAIN_PATHS.some(
+    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
+  );
 
-  if (isProduction && path.startsWith('/home')) {
-    const appPath = path.replace(/^\/home/, '') || '/';
-    return `https://${APP_SUBDOMAIN}.${PRODUCTION_DOMAIN}${appPath}`;
-  }
+  return !isMainDomainPath;
+}
 
-  return path;
+/**
+ * Get the app subdomain URL for a given path.
+ * Handles both /home/* paths (from middleware redirects) and clean paths.
+ */
+function getAppSubdomainUrl(path: string): string {
+  const appPath = path.startsWith('/home')
+    ? path.replace(/^\/home/, '') || '/'
+    : path;
+
+  return `https://${APP_SUBDOMAIN}.${PRODUCTION_DOMAIN}${appPath}`;
 }
 
 export async function GET(request: NextRequest) {
@@ -61,6 +79,8 @@ export async function GET(request: NextRequest) {
       ? callbackRedirect
       : pathsConfig.app.home;
 
+  const isProduction = process.env.NODE_ENV === 'production';
+
   if (authCode) {
     // PKCE flow - use exchangeCodeForSession
     const { nextPath } = await service.exchangeCodeForSession(request, {
@@ -68,9 +88,12 @@ export async function GET(request: NextRequest) {
       redirectPath,
     });
 
-    // Redirect to app subdomain for /home paths in production
-    const finalPath = redirectToAppSubdomain(nextPath);
-    return redirect(finalPath);
+    // Redirect to app subdomain in production for app paths
+    if (isProduction && isAppPath(nextPath)) {
+      return redirect(getAppSubdomainUrl(nextPath));
+    }
+
+    return redirect(nextPath);
   } else if (tokenHash) {
     // Token hash flow - use verifyTokenHash
     const url = await service.verifyTokenHash(request, {
@@ -78,16 +101,15 @@ export async function GET(request: NextRequest) {
       redirectPath,
     });
 
-    // Check if URL needs app subdomain redirect
-    const urlString = url.toString();
-    if (process.env.NODE_ENV === 'production' && urlString.includes('/home')) {
-      const appUrl = new URL(url);
-      const appPath = appUrl.pathname.replace(/^\/home/, '') || '/';
-      return NextResponse.redirect(
-        new URL(
-          `https://${APP_SUBDOMAIN}.${PRODUCTION_DOMAIN}${appPath}${appUrl.search}`,
-        ),
-      );
+    // Redirect to app subdomain in production for app paths
+    if (isProduction && isAppPath(url.pathname)) {
+      const appUrl = getAppSubdomainUrl(url.pathname);
+      const finalUrl = new URL(appUrl);
+      // Preserve query params
+      url.searchParams.forEach((value, key) => {
+        finalUrl.searchParams.set(key, value);
+      });
+      return NextResponse.redirect(finalUrl);
     }
 
     return NextResponse.redirect(url);

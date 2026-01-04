@@ -4,6 +4,13 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const ENABLE_REACT_COMPILER = process.env.ENABLE_REACT_COMPILER === 'true';
 
+/**
+ * App subdomain for authenticated users.
+ * Routes on app.sparlo.ai are rewritten to /home/* internally.
+ */
+const APP_SUBDOMAIN = 'app';
+const PRODUCTION_DOMAIN = 'sparlo.ai';
+
 const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -49,6 +56,7 @@ const config = {
     '/*': ['./content/**/*'],
   },
   redirects: getRedirects,
+  rewrites: getRewrites,
   headers: getSecurityHeaders,
   turbopack: {
     resolveExtensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -132,6 +140,47 @@ async function getRedirects() {
       permanent: true,
     },
   ];
+}
+
+/**
+ * Rewrites for app subdomain routing.
+ * On app.sparlo.ai, root-level paths are rewritten to /home/* internally.
+ * This allows the file structure to remain at /home/* while URLs are clean.
+ *
+ * Examples:
+ * - app.sparlo.ai/ → /home/ (personal dashboard)
+ * - app.sparlo.ai/settings → /home/settings
+ * - app.sparlo.ai/team-slug → /home/team-slug
+ * - app.sparlo.ai/team-slug/reports → /home/team-slug/reports
+ *
+ * Note: Paths already starting with /home hit the routes directly (no rewrite needed).
+ * This maintains backwards compatibility with existing /home/* links.
+ */
+async function getRewrites() {
+  // Only apply rewrites in production on the app subdomain
+  if (!IS_PRODUCTION) {
+    return [];
+  }
+
+  return {
+    beforeFiles: [
+      // Rewrite app subdomain requests to /home/* routes
+      // Only applies to paths that DON'T already start with /home
+      // This ensures:
+      // - app.sparlo.ai/team-slug → /home/team-slug (rewritten)
+      // - app.sparlo.ai/home/team-slug → /home/team-slug (no rewrite, direct hit)
+      {
+        source: '/((?!home).*)',
+        has: [
+          {
+            type: 'host',
+            value: `${APP_SUBDOMAIN}.${PRODUCTION_DOMAIN}`,
+          },
+        ],
+        destination: '/home/$1',
+      },
+    ],
+  };
 }
 
 async function getSecurityHeaders() {
