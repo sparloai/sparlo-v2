@@ -62,26 +62,27 @@ export function CookieConsentBanner() {
 
   return (
     <div
-      className="animate-in slide-in-from-bottom-4 fill-mode-both fixed inset-x-0 bottom-0 z-50 duration-500"
-      style={{ animationDelay: '1s' }}
+      className="animate-in slide-in-from-bottom-4 fill-mode-both fixed inset-x-0 bottom-0 z-50 p-4 duration-500"
+      style={{ animationDelay: '1.5s' }}
     >
-      <div className="bg-zinc-950 px-4 py-3 sm:px-6">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 sm:flex-row sm:gap-4">
-          <p className="text-center text-[13px] tracking-[-0.01em] text-zinc-400 sm:text-left sm:text-[14px]">
-            We use cookies to improve your experience and analyze site usage.
+      <div className="mx-auto max-w-md rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4 shadow-2xl">
+        <div className="flex flex-col gap-4">
+          <p className="text-[14px] leading-relaxed tracking-[-0.01em] text-zinc-300">
+            We use cookies to understand how you use Sparlo and improve your
+            experience.
           </p>
-          <div className="flex shrink-0 items-center gap-3">
-            <button
-              onClick={reject}
-              className="text-[13px] text-zinc-500 transition-colors hover:text-white sm:text-[14px]"
-            >
-              Decline
-            </button>
+          <div className="flex items-center gap-3">
             <button
               onClick={accept}
-              className="bg-white px-4 py-1.5 text-[13px] font-medium text-zinc-900 transition-colors hover:bg-zinc-100 sm:text-[14px]"
+              className="flex-1 rounded-lg bg-white px-4 py-2 text-[14px] font-medium text-zinc-900 transition-colors hover:bg-zinc-100"
             >
               Accept
+            </button>
+            <button
+              onClick={reject}
+              className="rounded-lg px-4 py-2 text-[14px] text-zinc-500 transition-colors hover:text-zinc-300"
+            >
+              No thanks
             </button>
           </div>
         </div>
