@@ -144,14 +144,14 @@ function SettingsDropdown({
         <BillingIcon className="h-[18px] w-[18px] flex-shrink-0" />
         Billing
       </Link>
-      <a
-        href="mailto:support@sparlo.ai"
+      <Link
+        href="/home/help"
         onClick={onClose}
         className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
         <HelpIcon className="h-[18px] w-[18px] flex-shrink-0" />
-        Help
-      </a>
+        Help Center
+      </Link>
 
       <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
 
