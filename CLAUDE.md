@@ -4,6 +4,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 - **Next.js 16** with App Router
 - **Supabase** for database, auth, and storage
+- **Railway** for hosting and deployment (NOT Vercel)
 - **React 19**
 - **TypeScript**
 - **Tailwind CSS 4**, Shadcn UI, Lucide React
@@ -215,6 +216,49 @@ Do NOT reference archived design docs in `docs/archive/`.
 ## Delegate to Agents
 
 Please use the Task tool to delegate suitable tasks to specialized sub-agents for best handling the task at hand.
+
+## LLM Output Schemas (CRITICAL)
+
+**Location**: `apps/web/lib/llm/prompts/*/schemas.ts`
+
+LLM outputs are unpredictable. Schemas validating LLM responses MUST be antifragile.
+
+### NEVER use raw `z.enum()` for LLM outputs
+
+```typescript
+// ❌ WRONG - Will break when LLM returns "WEAK - needs improvement"
+verdict: z.enum(['STRONG', 'MODERATE', 'WEAK'])
+
+// ✅ CORRECT - Uses flexibleEnum helper
+verdict: flexibleEnum(['STRONG', 'MODERATE', 'WEAK'], 'MODERATE')
+```
+
+### NEVER use raw `z.number()` for LLM outputs
+
+```typescript
+// ❌ WRONG - Will break when LLM returns "3" as string
+score: z.number()
+
+// ✅ CORRECT - Uses flexibleNumber helper
+score: flexibleNumber(5, { min: 1, max: 10 })
+```
+
+### The `flexibleEnum` helper handles:
+- Annotations: `"WEAK - reason"` → `"WEAK"`
+- Parentheticals: `"SUCCESS (partial)"` → `"SUCCESS"`
+- Case: `"weak"` → `"WEAK"`
+- Synonyms: `"MODERATE"` → `"SIGNIFICANT"` (via ENUM_SYNONYMS map)
+- Fallback: Unknown values → default
+
+### When modifying LLM schemas:
+1. **BEFORE making changes**: Run `grep -c "z\.enum" apps/web/lib/llm/prompts/*/schemas.ts`
+2. If count > 0, convert ALL to `flexibleEnum` first
+3. Same for `z.number()` → `flexibleNumber()`
+
+### Adding new enums:
+1. Add to ENUM_SYNONYMS if common variations exist
+2. Choose sensible default (middle-ground value, not extreme)
+3. Test with intentionally malformed inputs
 
 ## Verification Steps
 
