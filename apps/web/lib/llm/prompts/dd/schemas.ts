@@ -31,18 +31,30 @@ const ENUM_SYNONYMS: Record<string, string> = {
   // Status variations
   PARTIAL: 'PARTIALLY_IDENTIFIED',
   PARTIALLY: 'PARTIALLY_IDENTIFIED',
+  PARTIALLY_SECURED: 'IN_DISCUSSION',
+  SECURED: 'SIGNED',
   // Quality variations
   GOOD: 'ADEQUATE',
   POOR: 'WEAK',
   NONE: 'MISSING',
+  N_A: 'MISSING',
+  NA: 'MISSING',
   // Verdict variations
   YES: 'VALIDATED',
   NO: 'INVALID',
   MAYBE: 'PLAUSIBLE',
+  UNKNOWN: 'UNCLEAR',
+  TBD: 'UNCLEAR',
   // Confidence variations
   HIGH_CONFIDENCE: 'HIGH',
   MEDIUM_CONFIDENCE: 'MEDIUM',
   LOW_CONFIDENCE: 'LOW',
+  // Timing variations
+  ON_TIME: 'ALIGNED',
+  DELAYED: 'STRETCHED',
+  // Boolean-like
+  TRUE: 'YES',
+  FALSE: 'NO',
 };
 
 /**
