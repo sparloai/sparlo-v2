@@ -50,6 +50,8 @@ export function createMiddlewareClient<GenericSchema = Database>(
             ...(isProduction && { secure: true }),
             // Prevent CSRF while allowing cross-subdomain navigation
             sameSite: 'lax' as const,
+            // Security: Prevent XSS from accessing auth cookies
+            httpOnly: true,
           };
 
           response.cookies.set(name, value, cookieOptions);

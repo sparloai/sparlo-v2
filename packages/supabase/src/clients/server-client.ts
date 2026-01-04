@@ -40,6 +40,8 @@ export function getSupabaseServerClient<GenericSchema = Database>() {
               ...(isProduction && { domain: COOKIE_DOMAIN }),
               ...(isProduction && { secure: true }),
               sameSite: 'lax' as const,
+              // Security: Prevent XSS from accessing auth cookies
+              httpOnly: true,
             };
 
             cookieStore.set(name, value, cookieOptions);

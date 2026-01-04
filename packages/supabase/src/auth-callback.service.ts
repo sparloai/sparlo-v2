@@ -186,8 +186,28 @@ class AuthCallbackService {
     };
   }
 
+  /**
+   * Allowed hosts for production environment.
+   * Prevents host header injection attacks.
+   */
+  private static readonly ALLOWED_HOSTS = new Set([
+    'sparlo.ai',
+    'app.sparlo.ai',
+    'www.sparlo.ai',
+  ]);
+
   private adjustUrlHostForLocalDevelopment(url: URL, host: string | null) {
     if (host && this.isLocalhost(url.host) && !this.isLocalhost(host)) {
+      // Security: Validate host header to prevent injection attacks
+      const hostWithoutPort = host.split(':')[0];
+      if (
+        hostWithoutPort &&
+        !AuthCallbackService.ALLOWED_HOSTS.has(hostWithoutPort)
+      ) {
+        console.warn(`[Auth] Rejected invalid host header: ${host}`);
+        return; // Don't modify URL with untrusted host
+      }
+
       url.host = host;
       url.port = '';
     }
