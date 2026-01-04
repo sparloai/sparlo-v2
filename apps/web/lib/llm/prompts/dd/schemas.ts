@@ -119,6 +119,49 @@ function flexibleEnumOptional<T extends [string, ...string[]]>(
   return flexibleEnum(values, defaultValue);
 }
 
+/**
+ * Creates an antifragile number schema that coerces strings to numbers.
+ * - Handles "3" -> 3
+ * - Handles "3.5" -> 3.5
+ * - Handles "3/5" -> 3 (extracts first number)
+ * - Falls back to default on failure
+ */
+function flexibleNumber(
+  defaultValue: number,
+  options?: { min?: number; max?: number },
+): z.ZodEffects<z.ZodUnknown, number, unknown> {
+  return z.unknown().transform((val): number => {
+    // Already a number
+    if (typeof val === 'number' && !isNaN(val)) {
+      let num = val;
+      if (options?.min !== undefined) num = Math.max(num, options.min);
+      if (options?.max !== undefined) num = Math.min(num, options.max);
+      return num;
+    }
+
+    // String - try to parse
+    if (typeof val === 'string') {
+      // Extract first number from string (handles "3/5", "3 out of 5", etc.)
+      const match = val.match(/[\d.]+/);
+      if (match) {
+        const parsed = parseFloat(match[0]);
+        if (!isNaN(parsed)) {
+          let num = parsed;
+          if (options?.min !== undefined) num = Math.max(num, options.min);
+          if (options?.max !== undefined) num = Math.min(num, options.max);
+          return num;
+        }
+      }
+    }
+
+    // Fall back to default
+    console.warn(
+      `[DD Schema] Number fallback: "${val}" -> ${defaultValue}`,
+    );
+    return defaultValue;
+  });
+}
+
 // ============================================
 // Shared Enums and Primitives (Antifragile)
 // ============================================
@@ -452,7 +495,7 @@ export const DD3_M_OutputSchema = z.object({
       }),
       verdict: Verdict,
       confidence: Confidence,
-      confidence_percent: z.number().min(0).max(100),
+      confidence_percent: flexibleNumber(50, { min: 0, max: 100 }),
       reasoning: z.string(),
     }),
   ),
@@ -526,7 +569,7 @@ export const DD3_M_OutputSchema = z.object({
     triz_assessment: z.object({
       contradiction_awareness: Confidence,
       resolution_quality: flexibleEnum(['ELEGANT', 'ADEQUATE', 'PARTIAL', 'POOR'], 'ADEQUATE'),
-      inventive_level: z.number().min(1).max(5),
+      inventive_level: flexibleNumber(3, { min: 1, max: 5 }),
       inventive_level_rationale: z.string(),
     }),
   }),
@@ -607,13 +650,13 @@ export const DD3_M_OutputSchema = z.object({
   ),
 
   technical_credibility_score: z.object({
-    score: z.number().min(1).max(10),
-    out_of: z.number(),
+    score: flexibleNumber(5, { min: 1, max: 10 }),
+    out_of: flexibleNumber(0),
     breakdown: z.object({
-      physics_validity: z.number(),
-      mechanism_soundness: z.number(),
-      feasibility_realism: z.number(),
-      internal_consistency: z.number(),
+      physics_validity: flexibleNumber(0),
+      mechanism_soundness: flexibleNumber(0),
+      feasibility_realism: flexibleNumber(0),
+      internal_consistency: flexibleNumber(0),
     }),
     rationale: z.string(),
   }),
@@ -693,8 +736,8 @@ export const DD3_5_M_OutputSchema = z.object({
       actual_buyer: z.string(),
       specificity: flexibleEnum(['SPECIFIC_NAMES', 'CATEGORIES_ONLY', 'VAGUE'], 'CATEGORIES_ONLY'),
       evidence_of_demand: z.object({
-        lois_signed: z.number(),
-        pilots_active: z.number(),
+        lois_signed: flexibleNumber(0),
+        pilots_active: flexibleNumber(0),
         conversations_claimed: z.string(),
         revenue_to_date: z.string(),
         assessment: flexibleEnum(['VALIDATED', 'PARTIALLY_VALIDATED', 'UNVALIDATED'], 'PARTIALLY_VALIDATED'),
@@ -737,7 +780,7 @@ export const DD3_5_M_OutputSchema = z.object({
 
   gtm_reality: z.object({
     sales_cycle: z.object({
-      estimated_months: z.number(),
+      estimated_months: flexibleNumber(0),
       basis: z.string(),
       runway_vs_cycle: z.string(),
       parallel_opportunities: z.string(),
@@ -747,7 +790,7 @@ export const DD3_5_M_OutputSchema = z.object({
       z.object({
         stage: z.string(),
         key_challenge: z.string(),
-        timeline_months: z.number(),
+        timeline_months: flexibleNumber(0),
         capital_required: z.string(),
         key_dependencies: z.array(z.string()),
       }),
@@ -815,7 +858,7 @@ export const DD3_5_M_OutputSchema = z.object({
     }),
     valley_of_death: z.object({
       capital_required: z.string(),
-      time_required_months: z.number(),
+      time_required_months: flexibleNumber(0),
       stranding_risk: Confidence,
       what_unlocks_next_capital: z.string(),
       fallback_if_stuck: z.string(),
@@ -838,7 +881,7 @@ export const DD3_5_M_OutputSchema = z.object({
     ),
     regulatory: z.object({
       approvals_needed: z.array(z.string()),
-      typical_timeline_months: z.number(),
+      typical_timeline_months: flexibleNumber(0),
       fast_track_available: z.boolean(),
       regulatory_risk: Confidence,
       adverse_change_probability: z.string(),
@@ -884,10 +927,10 @@ export const DD3_5_M_OutputSchema = z.object({
   incumbent_response: z.object({
     likely_response: IncumbentResponse,
     response_reasoning: z.string(),
-    timeline_to_response_months: z.number(),
+    timeline_to_response_months: flexibleNumber(0),
     startup_defense: z.string(),
     replication_difficulty: z.object({
-      time_to_replicate_months: z.number(),
+      time_to_replicate_months: flexibleNumber(0),
       capital_to_replicate: z.string(),
       expertise_to_replicate: z.string(),
       verdict: flexibleEnum(['HARD', 'MODERATE', 'EASY'], 'MODERATE'),
@@ -1188,7 +1231,7 @@ export const DD4_M_OutputSchema = z.object({
       probability: z.string(),
       narrative: z.string(),
       key_events: z.array(z.string()),
-      timeline_years: z.number(),
+      timeline_years: flexibleNumber(0),
       exit_type: z.string(),
       exit_valuation: z.string(),
       return_multiple: z.string(),
@@ -1198,7 +1241,7 @@ export const DD4_M_OutputSchema = z.object({
       probability: z.string(),
       narrative: z.string(),
       key_events: z.array(z.string()),
-      timeline_years: z.number(),
+      timeline_years: flexibleNumber(0),
       exit_type: z.string(),
       exit_valuation: z.string(),
       return_multiple: z.string(),
@@ -1208,7 +1251,7 @@ export const DD4_M_OutputSchema = z.object({
       probability: z.string(),
       narrative: z.string(),
       key_events: z.array(z.string()),
-      timeline_years: z.number(),
+      timeline_years: flexibleNumber(0),
       exit_type: z.string(),
       exit_valuation: z.string(),
       return_multiple: z.string(),
@@ -1334,7 +1377,7 @@ export const DD5_M_OutputSchema = z.object({
   solution_landscape: z.object({
     section_purpose: z.string(),
     landscape_overview: z.object({
-      total_approaches_analyzed: z.number(),
+      total_approaches_analyzed: flexibleNumber(0),
       how_we_generated: z.string(),
       key_insight: z.string(),
     }),
@@ -1454,23 +1497,23 @@ export const DD5_M_OutputSchema = z.object({
     ),
     scores: z.object({
       technical_credibility: z.object({
-        score: z.number(),
-        out_of: z.number(),
+        score: flexibleNumber(0),
+        out_of: flexibleNumber(0),
         one_liner: z.string(),
       }),
       commercial_viability: z.object({
-        score: z.number(),
-        out_of: z.number(),
+        score: flexibleNumber(0),
+        out_of: flexibleNumber(0),
         one_liner: z.string(),
       }),
       team_signals: z.object({
-        score: z.number(),
-        out_of: z.number(),
+        score: flexibleNumber(0),
+        out_of: flexibleNumber(0),
         one_liner: z.string(),
       }),
       moat_strength: z.object({
-        score: z.number(),
-        out_of: z.number(),
+        score: flexibleNumber(0),
+        out_of: flexibleNumber(0),
         one_liner: z.string(),
       }),
     }),
@@ -1575,7 +1618,7 @@ export const DD5_M_OutputSchema = z.object({
   moat_assessment: z.object({
     overall: z.object({
       strength: MoatStrength,
-      durability_years: z.number(),
+      durability_years: flexibleNumber(0),
       primary_source: z.string(),
     }),
     breakdown: z.object({
