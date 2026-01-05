@@ -5,6 +5,7 @@ import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client'
 import {
   CLAUDE_PRICING,
   ClaudeRefusalError,
+  type ClaudeResult,
   type ImageAttachment,
   MODELS,
   type PDFAttachment,
@@ -620,7 +621,7 @@ export const generateDDReport = inngest.createFunction(
             userMessage += `\n\n[Note: ${attachmentNotes.join(' and ')} attached for context]`;
           }
 
-          const { content, usage } = await callClaude({
+          const result = await callClaude({
             model: MODELS.OPUS,
             system: DD0_M_PROMPT,
             userMessage,
@@ -630,8 +631,11 @@ export const generateDDReport = inngest.createFunction(
             documents: pdfAttachments.length > 0 ? pdfAttachments : undefined,
             cacheablePrefix: HYBRID_CACHED_PREFIX,
           });
+          const { content, usage } = result;
 
-          const parsed = parseJsonResponse<DD0_M_Output>(content, 'DD0-M');
+          const parsed = parseJsonResponse<DD0_M_Output>(content, 'DD0-M', {
+            wasTruncated: result.wasTruncated,
+          });
           const validated = DD0_M_OutputSchema.parse(parsed);
 
           // P2 FIX (150): Validate critical outputs
@@ -951,7 +955,7 @@ Validate each of ${companyName}'s claims against:
 3. Prior art and demonstrated precedent
 4. Feasibility at claimed scale and cost`;
 
-          const { content, usage } = await callClaude({
+          const result = await callClaude({
             model: MODELS.OPUS,
             system: DD3_M_PROMPT,
             userMessage: contextMessage,
@@ -959,8 +963,11 @@ Validate each of ${companyName}'s claims against:
             temperature: DD_TEMPERATURES.validation,
             cacheablePrefix: HYBRID_CACHED_PREFIX,
           });
+          const { content, usage } = result;
 
-          const parsed = parseJsonResponse<DD3_M_Output>(content, 'DD3-M');
+          const parsed = parseJsonResponse<DD3_M_Output>(content, 'DD3-M', {
+            wasTruncated: result.wasTruncated,
+          });
           const validated = DD3_M_OutputSchema.parse(parsed);
 
           await updateProgress({ phase_progress: 100 });
@@ -1000,7 +1007,7 @@ Analyze the commercial viability for ${companyName}:
 7. Evaluate policy exposure
 8. Predict incumbent response`;
 
-            const { content, usage } = await callClaude({
+            const result = await callClaude({
               model: MODELS.OPUS,
               system: DD3_5_M_PROMPT,
               userMessage: contextMessage,
@@ -1008,10 +1015,12 @@ Analyze the commercial viability for ${companyName}:
               temperature: DD_TEMPERATURES.validation,
               cacheablePrefix: HYBRID_CACHED_PREFIX,
             });
+            const { content, usage } = result;
 
             const parsed = parseJsonResponse<DD3_5_M_Output>(
               content,
               'DD3.5-M',
+              { wasTruncated: result.wasTruncated },
             );
             const validated = DD3_5_M_OutputSchema.parse(parsed);
 
@@ -1024,6 +1033,7 @@ Analyze the commercial viability for ${companyName}:
 
         // =========================================
         // DD4-M: Solution Space Mapping & Moat
+        // ANTIFRAGILE: Retry on truncation with higher token limit
         // =========================================
         const dd4Result = await step.run('dd4-m-moat-assessment', async () => {
           await updateProgress({
@@ -1065,26 +1075,94 @@ Map ${companyName}'s approach onto the solution space:
 9. Analyze comparable companies
 10. Build scenario analysis with expected value`;
 
-          const { content, usage } = await callClaude({
-            model: MODELS.OPUS,
-            system: DD4_M_PROMPT,
-            userMessage: contextMessage,
-            maxTokens: HYBRID_MAX_TOKENS,
-            temperature: DD_TEMPERATURES.mapping,
-            cacheablePrefix: HYBRID_CACHED_PREFIX,
-          });
+          // ANTIFRAGILE: Retry with escalating token limits
+          const MAX_RETRIES = 2;
+          const TOKEN_LIMITS = [HYBRID_MAX_TOKENS, 96000, 128000]; // Escalate on retry
 
-          const parsed = parseJsonResponse<DD4_M_Output>(content, 'DD4-M');
-          const validated = DD4_M_OutputSchema.parse(parsed);
+          let lastError: Error | null = null;
+          let totalUsage: TokenUsage = {
+            inputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+          };
 
-          await updateProgress({ phase_progress: 100 });
-          checkTokenBudget(usage, 'DD4-M');
+          for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            const currentMaxTokens =
+              TOKEN_LIMITS[Math.min(attempt, TOKEN_LIMITS.length - 1)];
 
-          return { result: validated, usage };
+            try {
+              console.log(
+                `[DD4-M] Attempt ${attempt + 1}/${MAX_RETRIES + 1} with maxTokens=${currentMaxTokens}`,
+              );
+
+              const result: ClaudeResult = await callClaude({
+                model: MODELS.OPUS,
+                system: DD4_M_PROMPT,
+                userMessage: contextMessage,
+                maxTokens: currentMaxTokens,
+                temperature: DD_TEMPERATURES.mapping,
+                cacheablePrefix: HYBRID_CACHED_PREFIX,
+              });
+
+              // Accumulate usage across retries
+              totalUsage = {
+                inputTokens: totalUsage.inputTokens + result.usage.inputTokens,
+                outputTokens:
+                  totalUsage.outputTokens + result.usage.outputTokens,
+                totalTokens: totalUsage.totalTokens + result.usage.totalTokens,
+              };
+
+              // Pass wasTruncated flag to enable smarter repair
+              const parsed = parseJsonResponse<DD4_M_Output>(
+                result.content,
+                'DD4-M',
+                { wasTruncated: result.wasTruncated },
+              );
+
+              const validated = DD4_M_OutputSchema.parse(parsed);
+
+              // Success!
+              if (attempt > 0) {
+                console.log(
+                  `[DD4-M] Succeeded on attempt ${attempt + 1} with ${currentMaxTokens} tokens`,
+                );
+              }
+
+              await updateProgress({ phase_progress: 100 });
+              checkTokenBudget(totalUsage, 'DD4-M');
+
+              return { result: validated, usage: totalUsage };
+            } catch (error) {
+              lastError =
+                error instanceof Error ? error : new Error(String(error));
+              const errorMessage = lastError.message;
+
+              // Only retry on JSON parsing errors or truncation issues
+              const isParseError =
+                errorMessage.includes('Failed to parse JSON') ||
+                errorMessage.includes('truncated');
+
+              if (!isParseError || attempt >= MAX_RETRIES) {
+                // Don't retry on non-parse errors or if we've exhausted retries
+                console.error(
+                  `[DD4-M] Failed after ${attempt + 1} attempts: ${errorMessage}`,
+                );
+                throw lastError;
+              }
+
+              console.warn(
+                `[DD4-M] Attempt ${attempt + 1} failed with parse error, retrying with more tokens...`,
+              );
+            }
+          }
+
+          // Should never reach here, but satisfy TypeScript
+          throw lastError || new Error('DD4-M failed unexpectedly');
         });
 
         // =========================================
         // DD5-M: DD Report Generation
+        // ANTIFRAGILE: Retry on truncation with higher token limit
         // =========================================
         const dd5Result = await step.run(
           'dd5-m-report-generation',
@@ -1134,22 +1212,84 @@ This V2 report provides:
 
 Make the report 3-5x more valuable than traditional DD.`;
 
-            const { content, usage } = await callClaude({
-              model: MODELS.OPUS,
-              system: DD5_M_PROMPT,
-              userMessage: contextMessage,
-              maxTokens: HYBRID_MAX_TOKENS,
-              temperature: DD_TEMPERATURES.report,
-              cacheablePrefix: HYBRID_CACHED_PREFIX,
-            });
+            // ANTIFRAGILE: Retry with escalating token limits
+            const MAX_RETRIES = 2;
+            const TOKEN_LIMITS = [HYBRID_MAX_TOKENS, 96000, 128000];
 
-            const parsed = parseJsonResponse<DD5_M_Output>(content, 'DD5-M');
-            const validated = DD5_M_OutputSchema.parse(parsed);
+            let lastError: Error | null = null;
+            let totalUsage: TokenUsage = {
+              inputTokens: 0,
+              outputTokens: 0,
+              totalTokens: 0,
+            };
 
-            await updateProgress({ phase_progress: 100 });
-            checkTokenBudget(usage, 'DD5-M');
+            for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+              const currentMaxTokens =
+                TOKEN_LIMITS[Math.min(attempt, TOKEN_LIMITS.length - 1)];
 
-            return { result: validated, usage };
+              try {
+                console.log(
+                  `[DD5-M] Attempt ${attempt + 1}/${MAX_RETRIES + 1} with maxTokens=${currentMaxTokens}`,
+                );
+
+                const result: ClaudeResult = await callClaude({
+                  model: MODELS.OPUS,
+                  system: DD5_M_PROMPT,
+                  userMessage: contextMessage,
+                  maxTokens: currentMaxTokens,
+                  temperature: DD_TEMPERATURES.report,
+                  cacheablePrefix: HYBRID_CACHED_PREFIX,
+                });
+
+                totalUsage = {
+                  inputTokens:
+                    totalUsage.inputTokens + result.usage.inputTokens,
+                  outputTokens:
+                    totalUsage.outputTokens + result.usage.outputTokens,
+                  totalTokens:
+                    totalUsage.totalTokens + result.usage.totalTokens,
+                };
+
+                const parsed = parseJsonResponse<DD5_M_Output>(
+                  result.content,
+                  'DD5-M',
+                  { wasTruncated: result.wasTruncated },
+                );
+                const validated = DD5_M_OutputSchema.parse(parsed);
+
+                if (attempt > 0) {
+                  console.log(
+                    `[DD5-M] Succeeded on attempt ${attempt + 1} with ${currentMaxTokens} tokens`,
+                  );
+                }
+
+                await updateProgress({ phase_progress: 100 });
+                checkTokenBudget(totalUsage, 'DD5-M');
+
+                return { result: validated, usage: totalUsage };
+              } catch (error) {
+                lastError =
+                  error instanceof Error ? error : new Error(String(error));
+                const errorMessage = lastError.message;
+
+                const isParseError =
+                  errorMessage.includes('Failed to parse JSON') ||
+                  errorMessage.includes('truncated');
+
+                if (!isParseError || attempt >= MAX_RETRIES) {
+                  console.error(
+                    `[DD5-M] Failed after ${attempt + 1} attempts: ${errorMessage}`,
+                  );
+                  throw lastError;
+                }
+
+                console.warn(
+                  `[DD5-M] Attempt ${attempt + 1} failed with parse error, retrying with more tokens...`,
+                );
+              }
+            }
+
+            throw lastError || new Error('DD5-M failed unexpectedly');
           },
         );
 

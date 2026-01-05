@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-01-04T19:13:09.683Z",
+  "teamSlug": "audit-team",
+  "summary": {
+    "critical": 0,
+    "major": 0,
+    "minor": 0
+  },
+  "issues": []
+}

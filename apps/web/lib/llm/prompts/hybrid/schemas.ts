@@ -84,21 +84,20 @@ function createAntifragileEnum<T extends readonly [string, ...string[]]>(
   mappings: Record<string, T[number]>,
   fallback: T[number],
 ) {
-  return z
-    .string()
-    .transform((val) => {
-      // Step 1: Strip annotations like "WEAK - reason" or "HIGH (explanation)"
-      const stripped = val
-        .replace(/\s*[-:(].*$/, '') // Strip everything after -, :, or (
-        .trim();
-      // Step 2: Normalize to uppercase with underscores
-      const normalized = stripped.toUpperCase().replace(/[-\s]/g, '_');
-      // Step 3: Check mappings or direct match
-      if (mappings[normalized]) return mappings[normalized];
-      if (canonical.includes(normalized as T[number])) return normalized as T[number];
-      // Step 4: Fallback
-      return fallback;
-    });
+  return z.string().transform((val) => {
+    // Step 1: Strip annotations like "WEAK - reason" or "HIGH (explanation)"
+    const stripped = val
+      .replace(/\s*[-:(].*$/, '') // Strip everything after -, :, or (
+      .trim();
+    // Step 2: Normalize to uppercase with underscores
+    const normalized = stripped.toUpperCase().replace(/[-\s]/g, '_');
+    // Step 3: Check mappings or direct match
+    if (mappings[normalized]) return mappings[normalized];
+    if (canonical.includes(normalized as T[number]))
+      return normalized as T[number];
+    // Step 4: Fallback
+    return fallback;
+  });
 }
 
 /**
@@ -2570,7 +2569,12 @@ const NoveltyLevel = flexibleEnum(
   'Moderate Novelty',
 );
 const PursuitRecommendation = flexibleEnum(
-  ['Must Pursue', 'Strong Consider', 'Worth Exploring', 'Long-term Watch'] as const,
+  [
+    'Must Pursue',
+    'Strong Consider',
+    'Worth Exploring',
+    'Long-term Watch',
+  ] as const,
   'Worth Exploring',
 );
 

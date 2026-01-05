@@ -1,0 +1,65 @@
+{
+  "cookies": [
+    {
+      "name": "csrfSecret",
+      "value": "e7Aur0V%2FsY04GuPrC2zn2OKR",
+      "domain": "sparlo.ai",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "lang",
+      "value": "en",
+      "domain": "sparlo.ai",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Strict"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.274759282.1767553738",
+      "domain": ".sparlo.ai",
+      "path": "/",
+      "expires": 1802113756.491632,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "sb-byxbftlbhyiouvnbpeiy-auth-token",
+      "value": "base64-eyJhY2Nlc3NfdG9rZW4iOiJleUpoYkdjaU9pSklVekkxTmlJc0ltdHBaQ0k2SW05UFNWVkxaRVUyUm5kaFNUQm9TV3NpTENKMGVYQWlPaUpLVjFRaWZRLmV5SnBjM01pT2lKb2RIUndjem92TDJKNWVHSm1kR3hpYUhscGIzVjJibUp3WldsNUxuTjFjR0ZpWVhObExtTnZMMkYxZEdndmRqRWlMQ0p6ZFdJaU9pSmpNVGt5WXpZeE1TMHlPVEkyTFRRNE1qZ3RZakF3TnkwMU1HRTFNamxoWm1RMU5EY2lMQ0poZFdRaU9pSmhkWFJvWlc1MGFXTmhkR1ZrSWl3aVpYaHdJam94TnpZM05UVTNNelEwTENKcFlYUWlPakUzTmpjMU5UTTNORFFzSW1WdFlXbHNJam9pYzNkcGJXRnJZWE4zYVcxQVoyMWhhV3d1WTI5dElpd2ljR2h2Ym1VaU9pSWlMQ0poY0hCZmJXVjBZV1JoZEdFaU9uc2ljSEp2ZG1sa1pYSWlPaUpsYldGcGJDSXNJbkJ5YjNacFpHVnljeUk2V3lKbGJXRnBiQ0pkZlN3aWRYTmxjbDl0WlhSaFpHRjBZU0k2ZXlKbGJXRnBiQ0k2SW5OM2FXMWhhMkZ6ZDJsdFFHZHRZV2xzTG1OdmJTSXNJbVZ0WVdsc1gzWmxjbWxtYVdWa0lqcDBjblZsTENKd2FHOXVaVjkyWlhKcFptbGxaQ0k2Wm1Gc2MyVXNJbk4xWWlJNkltTXhPVEpqTmpFeExUSTVNall0TkRneU9DMWlNREEzTFRVd1lUVXlPV0ZtWkRVME55SjlMQ0p5YjJ4bElqb2lZWFYwYUdWdWRHbGpZWFJsWkNJc0ltRmhiQ0k2SW1GaGJERWlMQ0poYlhJaU9sdDdJbTFsZEdodlpDSTZJbkJoYzNOM2IzSmtJaXdpZEdsdFpYTjBZVzF3SWpveE56WTNOVFV6TnpRMGZWMHNJbk5sYzNOcGIyNWZhV1FpT2lJMVlUaGtaamN4WWkxbE5tRXhMVFEyWW1ZdE9XVTVaQzFoTURNMk1qaGtaR1UyTVRraUxDSnBjMTloYm05dWVXMXZkWE1pT21aaGJITmxmUS5HR3JULVRFVF9McU5GaUtpMHNTX2ppbWxxUW1Rb1B4TGgyOWt2ek5NSDVBIiwidG9rZW5fdHlwZSI6ImJlYXJlciIsImV4cGlyZXNfaW4iOjM2MDAsImV4cGlyZXNfYXQiOjE3Njc1NTczNDQsInJlZnJlc2hfdG9rZW4iOiJ2cWJkYzJ0dzV1M20iLCJ1c2VyIjp7ImlkIjoiYzE5MmM2MTEtMjkyNi00ODI4LWIwMDctNTBhNTI5YWZkNTQ3IiwiYXVkIjoiYXV0aGVudGljYXRlZCIsInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiZW1haWwiOiJzd2ltYWthc3dpbUBnbWFpbC5jb20iLCJlbWFpbF9jb25maXJtZWRfYXQiOiIyMDI1LTEyLTE3VDIyOjQwOjEyLjQwMzAyNVoiLCJwaG9uZSI6IiIsImNvbmZpcm1lZF9hdCI6IjIwMjUtMTItMTdUMjI6NDA6MTIuNDAzMDI1WiIsImxhc3Rfc2lnbl9pbl9hdCI6IjIwMjYtMDEtMDRUMTk6MDk6MDQuNTQ5ODUwMTg2WiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsIjoic3dpbWFrYXN3aW1AZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiYzE5MmM2MTEtMjkyNi00ODI4LWIwMDctNTBhNTI5YWZkNTQ3In0sImlkZW50aXRpZXMiOlt7ImlkZW50aXR5X2lkIjoiOTJlM2JjYWQtMDM3NS00ZTYzLWJjOTUtMDZhY2JmNzc5YzU4IiwiaWQiOiJjMTkyYzYxMS0yOTI2LTQ4MjgtYjAwNy01MGE1MjlhZmQ1NDciLCJ1c2VyX2lkIjoiYzE5MmM2MTEtMjkyNi00ODI4LWIwMDctNTBhNTI5YWZkNTQ3IiwiaWRlbnRpdHlfZGF0YSI6eyJlbWFpbCI6InN3aW1ha2Fzd2ltQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicGhvbmVfdmVyaWZpZWQiOmZhbHNlLCJzdWIiOiJjMTkyYzYxMS0yOTI2LTQ4MjgtYjAwNy01MGE1MjlhZmQ1NDcifSwicHJvdmlkZXIiOiJlbWFpbCIsImxhc3Rfc2lnbl9pbl9hdCI6IjIwMjUtMTItMTdUMjI6NDA6MTIuMzk4Njk0WiIsImNyZWF0ZWRfYXQiOiIyMDI1LTEyLTE3VDIyOjQwOjEyLjM5ODc3NVoiLCJ1cGRhdGVkX2F0IjoiMjAyNS0xMi0xN1QyMjo0MDoxMi4zOTg3NzVaIiwiZW1haWwiOiJzd2ltYWthc3dpbUBnbWFpbC5jb20ifV0sImNyZWF0ZWRfYXQiOiIyMDI1LTEyLTE3VDIyOjQwOjEyLjM2NjQwNloiLCJ1cGRhdGVkX2F0IjoiMjAyNi0wMS0wNFQxOTowOTowNC41ODM4NjZaIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0sIndlYWtfcGFzc3dvcmQiOm51bGx9",
+      "domain": "sparlo.ai",
+      "path": "/",
+      "expires": 1802113744.558862,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga_NLBNBEJK74",
+      "value": "GS2.1.s1767553738$o1$g1$t1767553756$j42$l0$h0",
+      "domain": ".sparlo.ai",
+      "path": "/",
+      "expires": 1802113756.49688,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "https://sparlo.ai",
+      "localStorage": [
+        {
+          "name": "auth_last_method",
+          "value": "{\"method\":\"password\",\"email\":\"swimakaswim@gmail.com\",\"timestamp\":1767553744559}"
+        }
+      ]
+    }
+  ]
+}

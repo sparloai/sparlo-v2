@@ -23,7 +23,8 @@ import { PasswordSignInContainer } from './password-sign-in-container';
  */
 function getAppSubdomainUrl(path: string): string {
   const appSubdomain = process.env.NEXT_PUBLIC_APP_SUBDOMAIN || 'app';
-  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'sparlo.ai';
+  const productionDomain =
+    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'sparlo.ai';
 
   // Strip /home prefix for clean app subdomain URLs
   const appPath = path.startsWith('/home')

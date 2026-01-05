@@ -6,12 +6,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { Users } from 'lucide-react';
+
 import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { cn } from '@kit/ui/utils';
 
 import pathsConfig from '~/config/paths.config';
 import { useAppPath } from '~/lib/hooks/use-app-path';
 
+import { useAppWorkspace } from '../../_lib/app-workspace-context';
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
 import {
   COLLAPSED_WIDTH,
@@ -72,6 +75,7 @@ function SettingsDropdown({
   collapsed,
   userEmail,
   getPath,
+  isPaidPlan,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -79,6 +83,7 @@ function SettingsDropdown({
   collapsed: boolean;
   userEmail?: string | null;
   getPath: (path: string) => string;
+  isPaidPlan: boolean;
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -147,6 +152,19 @@ function SettingsDropdown({
         <BillingIcon className="h-[18px] w-[18px] flex-shrink-0" />
         Billing
       </Link>
+      {isPaidPlan && (
+        <Link
+          href={getPath(pathsConfig.app.personalAccountTeams)}
+          onClick={onClose}
+          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+        >
+          <Users
+            className="h-[18px] w-[18px] flex-shrink-0"
+            strokeWidth={1.5}
+          />
+          Teams
+        </Link>
+      )}
       <Link
         href={getPath('/home/help')}
         onClick={onClose}
@@ -357,6 +375,7 @@ export const NavSidebar = memo(function NavSidebar({
   const router = useRouter();
   const signOut = useSignOut();
   const { getPath } = useAppPath();
+  const { isPaidPlan } = useAppWorkspace();
   const {
     collapsed,
     setCollapsed,
@@ -546,6 +565,7 @@ export const NavSidebar = memo(function NavSidebar({
             collapsed={collapsed && !isMobile}
             userEmail={user.email}
             getPath={getPath}
+            isPaidPlan={isPaidPlan}
           />
 
           <div

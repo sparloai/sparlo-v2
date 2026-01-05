@@ -197,7 +197,11 @@ export default function HybridNewReportPage() {
 
     // Clear params from URL without navigation
     if (prefill || errorType) {
-      window.history.replaceState({}, '', getAppPath('/home/reports/hybrid/new'));
+      window.history.replaceState(
+        {},
+        '',
+        getAppPath('/home/reports/hybrid/new'),
+      );
     }
   }, [searchParams]);
 

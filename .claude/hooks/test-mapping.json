@@ -1,0 +1,29 @@
+{
+  "mappings": [
+    {
+      "pattern": "apps/web/app/(marketing)/**",
+      "tests": ["learning-loop/design-system.spec.ts", "learning-loop/accessibility.spec.ts"]
+    },
+    {
+      "pattern": "apps/web/app/home/(user)/reports/**",
+      "tests": ["learning-loop/accessibility.spec.ts", "learning-loop/visual-regression.spec.ts"]
+    },
+    {
+      "pattern": "apps/web/app/home/(user)/new/**",
+      "tests": ["learning-loop/accessibility.spec.ts"]
+    },
+    {
+      "pattern": "apps/web/app/home/**",
+      "tests": ["learning-loop/accessibility.spec.ts", "learning-loop/design-system.spec.ts"]
+    },
+    {
+      "pattern": "packages/ui/**",
+      "tests": ["learning-loop/design-system.spec.ts", "learning-loop/visual-regression.spec.ts"]
+    },
+    {
+      "pattern": "**/*.css",
+      "tests": ["learning-loop/design-system.spec.ts", "learning-loop/accessibility.spec.ts"]
+    }
+  ],
+  "fallback": ["learning-loop/"]
+}

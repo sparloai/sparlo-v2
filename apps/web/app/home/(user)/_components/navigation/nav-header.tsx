@@ -88,7 +88,10 @@ export const NavHeader = memo(function NavHeader({
                 <MenuIcon className="h-6 w-6" />
               </button>
             )}
-            <AppLink href="/home" className="transition-opacity hover:opacity-70">
+            <AppLink
+              href="/home"
+              className="transition-opacity hover:opacity-70"
+            >
               <Image
                 src="/images/sparlo-logo.png"
                 alt="Sparlo"
