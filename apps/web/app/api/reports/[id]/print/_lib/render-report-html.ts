@@ -464,6 +464,20 @@ function escapeHtml(text: unknown): string {
     .replace(/'/g, '&#039;');
 }
 
+/**
+ * Convert a string to Title Case (e.g., "HIGH" -> "High", "MEDIUM" -> "Medium")
+ * Handles compound labels like "HIGH VIABILITY" -> "High Viability"
+ */
+function toTitleCase(text: unknown): string {
+  if (text === null || text === undefined) return '';
+  if (typeof text !== 'string') return String(text);
+  return text
+    .toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 // Whitelist sanitizers for values used in CSS class names to prevent XSS
 const VALID_SEVERITIES = ['high', 'medium', 'low'] as const;
 const VALID_GAP_STATUSES = [
@@ -580,7 +594,7 @@ function renderExecutiveSummary(
         data.viability
           ? `
         <div class="viability-box">
-          ${data.viability_label ? `<span class="mono-label">${escapeHtml(data.viability_label)}</span>` : ''}
+          ${data.viability_label ? `<span class="mono-label">${escapeHtml(toTitleCase(data.viability_label))}</span>` : ''}
           <p class="body-text-lg">${escapeHtml(data.viability)}</p>
         </div>
       `
@@ -1222,7 +1236,7 @@ function renderSelfCritique(data?: SelfCritique): string {
           ? `
         <div class="confidence-box">
           <span class="mono-label">Confidence Level</span>
-          <p class="confidence-value">${escapeHtml(data.confidence_level || data.overall_confidence)}</p>
+          <p class="confidence-value">${escapeHtml(toTitleCase(data.confidence_level || data.overall_confidence))}</p>
           ${data.confidence_rationale ? `<p class="body-text-secondary">${escapeHtml(data.confidence_rationale)}</p>` : ''}
         </div>
       `
