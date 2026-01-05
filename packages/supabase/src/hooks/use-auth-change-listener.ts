@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useEffectEvent } from 'react';
+import { useEffect, useEffectEvent, useRef } from 'react';
 
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
@@ -38,6 +38,9 @@ export function useAuthChangeListener({
   onEvent?: (event: AuthChangeEvent, user: Session | null) => void;
 }) {
   const client = useSupabase();
+  // Track if user was ever signed in during this session
+  // This prevents reload loops when SIGNED_OUT fires on initial load without a session
+  const hadSessionRef = useRef(false);
 
   const setupAuthListener = useEffectEvent(() => {
     // don't run on the server
@@ -53,6 +56,11 @@ export function useAuthChangeListener({
         onEvent(event, user);
       }
 
+      // Track if we've ever had a session
+      if (user) {
+        hadSessionRef.current = true;
+      }
+
       // log user out if user is falsy
       // and if the current path is a private route
       const shouldRedirectUser =
@@ -66,7 +74,8 @@ export function useAuthChangeListener({
       }
 
       // revalidate user session when user signs in or out
-      if (event === 'SIGNED_OUT') {
+      // Only reload if user was previously signed in to prevent infinite loops
+      if (event === 'SIGNED_OUT' && hadSessionRef.current) {
         // sometimes Supabase sends SIGNED_OUT event
         // but in the auth path, so we ignore it
         if (AUTH_PATHS.some((path) => pathName.startsWith(path))) {
