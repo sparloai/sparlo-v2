@@ -80,18 +80,9 @@ function clearAuthCookies(request: NextRequest, response: NextResponse) {
 
 const getUser = async (request: NextRequest, response: NextResponse) => {
   const supabase = createMiddlewareClient(request, response);
-  const pathname = request.nextUrl.pathname;
 
   try {
     const result = await supabase.auth.getClaims();
-
-    // Debug logging
-    console.log('[Middleware:getUser]', {
-      pathname,
-      hasClaims: !!result.data?.claims,
-      hasError: !!result.error,
-      errorCode: result.error ? (result.error as { code?: string })?.code : null,
-    });
 
     // Handle returned errors (not thrown)
     if (result.error) {
