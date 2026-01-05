@@ -37,9 +37,7 @@ const paths = {
   home: pathsConfig.app.home,
 };
 
-const features = {
-  enableThemeToggle: featuresFlagConfig.enableThemeToggle,
-};
+const features = {};
 
 export const Navigation = memo(function Navigation({
   user,

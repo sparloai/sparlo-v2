@@ -23,7 +23,7 @@ import { usePersonalAccountData } from '../hooks/use-personal-account-data';
  * Minimal icon components following Sparlo design system
  * Consistent 1.5px stroke, 24x24 viewBox
  */
-function GridIcon({ className }: { className?: string }) {
+function SettingsIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -34,10 +34,25 @@ function GridIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="7" rx="1" />
-      <rect x="3" y="14" width="7" height="7" rx="1" />
-      <rect x="14" y="14" width="7" height="7" rx="1" />
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function BillingIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="20" height="14" x="2" y="5" rx="2" />
+      <line x1="2" x2="22" y1="10" y2="10" />
     </svg>
   );
 }
@@ -56,30 +71,6 @@ function HelpIcon({ className }: { className?: string }) {
       <circle cx="12" cy="12" r="10" />
       <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
       <path d="M12 17h.01" />
-    </svg>
-  );
-}
-
-function SunMoonIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2" />
-      <path d="M12 20v2" />
-      <path d="m4.93 4.93 1.41 1.41" />
-      <path d="m17.66 17.66 1.41 1.41" />
-      <path d="M2 12h2" />
-      <path d="M20 12h2" />
-      <path d="m6.34 17.66-1.41 1.41" />
-      <path d="m19.07 4.93-1.41 1.41" />
     </svg>
   );
 }
@@ -142,11 +133,12 @@ export function PersonalAccountDropdown({
     home: string;
     settings?: string;
     billing?: string;
+    help?: string;
   };
 
   features: {
-    enableThemeToggle: boolean;
     enableBilling?: boolean;
+    enableThemeToggle?: boolean; // Kept for backwards compatibility
   };
 
   showProfileName?: boolean;
@@ -234,39 +226,38 @@ export function PersonalAccountDropdown({
         <DropdownMenuSeparator className="my-1.5 bg-zinc-100 dark:bg-zinc-800" />
 
         {/* Navigation Items */}
-        <DropdownMenuItem asChild>
-          <Link
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white dark:focus:bg-zinc-800"
-            href={paths.home}
-          >
-            <GridIcon className="h-[18px] w-[18px] flex-shrink-0" />
-            <span>Dashboard</span>
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild>
-          <Link
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white dark:focus:bg-zinc-800"
-            href={'/docs'}
-          >
-            <HelpIcon className="h-[18px] w-[18px] flex-shrink-0" />
-            <span>Help & Docs</span>
-          </Link>
-        </DropdownMenuItem>
-
-        <If condition={features.enableThemeToggle}>
-          <DropdownMenuSeparator className="my-1.5 bg-zinc-100 dark:bg-zinc-800" />
-
+        <If condition={!!paths.settings}>
           <DropdownMenuItem asChild>
             <Link
               className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white dark:focus:bg-zinc-800"
-              href={paths.settings ? `${paths.settings}#appearance` : '#'}
+              href={paths.settings!}
             >
-              <SunMoonIcon className="h-[18px] w-[18px] flex-shrink-0" />
-              <span>Theme</span>
-              <span className="ml-auto text-[13px] text-zinc-400 dark:text-zinc-500">
-                →
-              </span>
+              <SettingsIcon className="h-[18px] w-[18px] flex-shrink-0" />
+              <span>Settings</span>
+            </Link>
+          </DropdownMenuItem>
+        </If>
+
+        <If condition={features.enableBilling && !!paths.billing}>
+          <DropdownMenuItem asChild>
+            <Link
+              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white dark:focus:bg-zinc-800"
+              href={paths.billing!}
+            >
+              <BillingIcon className="h-[18px] w-[18px] flex-shrink-0" />
+              <span>Billing</span>
+            </Link>
+          </DropdownMenuItem>
+        </If>
+
+        <If condition={!!paths.help}>
+          <DropdownMenuItem asChild>
+            <Link
+              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white dark:focus:bg-zinc-800"
+              href={paths.help!}
+            >
+              <HelpIcon className="h-[18px] w-[18px] flex-shrink-0" />
+              <span>Help Center</span>
             </Link>
           </DropdownMenuItem>
         </If>

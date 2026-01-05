@@ -12,10 +12,10 @@ const paths = {
   home: pathsConfig.app.home,
   settings: pathsConfig.app.personalAccountSettings,
   billing: pathsConfig.app.personalAccountBilling,
+  help: '/home/help',
 };
 
 const features = {
-  enableThemeToggle: featuresFlagConfig.enableThemeToggle,
   enableBilling: featuresFlagConfig.enablePersonalAccountBilling,
 };
 
