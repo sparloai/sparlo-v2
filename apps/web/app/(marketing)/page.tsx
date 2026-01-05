@@ -1,17 +1,63 @@
-import { withI18n } from '~/lib/i18n/with-i18n';
+'use client';
+
+import { useState } from 'react';
+
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { EngineeringHero } from './_components/engineering-hero';
 import { ExampleReportsSection } from './_components/example-reports/example-reports-section';
 import { MethodologySection } from './_components/methodology-section';
+import { type Mode, ModeTabs } from './_components/mode-tabs';
 
+/**
+ * Get initial mode from URL hash (client-side only)
+ */
+function getInitialMode(): Mode {
+  if (typeof window !== 'undefined' && window.location.hash === '#investors') {
+    return 'investors';
+  }
+  return 'engineers';
+}
+
+/**
+ * Landing Page
+ *
+ * Features:
+ * - Mode tabs for Engineers/Investors switching
+ * - URL hash support for shareability (/#investors)
+ * - Animated content transitions
+ */
 function Home() {
+  const [mode, setMode] = useState<Mode>(getInitialMode);
+
+  // Update URL hash on mode change
+  const handleModeChange = (newMode: Mode) => {
+    setMode(newMode);
+    window.history.replaceState(
+      null,
+      '',
+      newMode === 'investors' ? '#investors' : window.location.pathname,
+    );
+  };
+
   return (
     <>
       <EngineeringHero />
-      <MethodologySection />
-      <ExampleReportsSection />
+      <ModeTabs mode={mode} onModeChange={handleModeChange} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={mode}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2, ease: 'easeOut' }}
+        >
+          <MethodologySection mode={mode} />
+          <ExampleReportsSection mode={mode} />
+        </motion.div>
+      </AnimatePresence>
     </>
   );
 }
 
-export default withI18n(Home);
+export default Home;

@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 
 import { Lock } from 'lucide-react';
 
@@ -18,9 +18,14 @@ import {
 } from '~/home/(user)/reports/[id]/_lib/hooks/use-toc-scroll';
 import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
+import type { Mode } from '../mode-tabs';
 import { BIOTECH_HYBRID_REPORT } from './biotech-hybrid-data';
 import { CARBON_REMOVAL_HYBRID_REPORT } from './carbon-removal-hybrid-data';
-import { EXAMPLE_REPORTS } from './example-reports-data';
+import {
+  EXAMPLE_REPORTS,
+  INVESTOR_REPORTS,
+  INVESTOR_REPORT_DATA_MAP,
+} from './example-reports-data';
 import { FOOD_HYBRID_REPORT } from './food-hybrid-data';
 import { FOODTECH_HYBRID_REPORT } from './foodtech-hybrid-data';
 import { GREEN_H2_HYBRID_REPORT } from './green-h2-hybrid-data';
@@ -35,6 +40,7 @@ import { MATERIALS_SCIENCE_HYBRID_REPORT } from './materials-science-hybrid-data
  * - Tab navigation for different reports
  * - Sticky TOC sidebar (within section only)
  * - Two-column layout on desktop
+ * - Mode-aware content (Engineers vs Investors)
  */
 
 // Map report IDs to their data
@@ -47,16 +53,48 @@ const REPORT_DATA_MAP: Record<string, HybridReportData> = {
   'green-h2': GREEN_H2_HYBRID_REPORT,
 };
 
+// Section content config per mode
+const SECTION_CONTENT = {
+  engineers: {
+    title: 'Example Reports',
+    subtitle: 'Explore real innovation intelligence reports across industries.',
+  },
+  investors: {
+    title: 'Example Reports',
+    subtitle:
+      'Explore real due diligence reports across climate and deep tech sectors.',
+  },
+};
+
 // Scroll offset to account for sticky tab bar (top-16 = 64px + ~48px height = ~112px)
 // Plus some extra padding for visual breathing room
 const LP_SCROLL_OFFSET = 140;
 
-export function ExampleReportsSection() {
+interface ExampleReportsSectionProps {
+  mode: Mode;
+}
+
+export function ExampleReportsSection({ mode }: ExampleReportsSectionProps) {
   const [activeTab, setActiveTab] = useState(0);
-  const report = EXAMPLE_REPORTS[activeTab]!;
+
+  // Get the correct reports array based on mode
+  const reports = mode === 'engineers' ? EXAMPLE_REPORTS : INVESTOR_REPORTS;
+  const report = reports[activeTab]!;
+
+  // Reset active tab when mode changes to avoid out-of-bounds
+  useEffect(() => {
+    setActiveTab(0);
+  }, [mode]);
 
   // Get the hybrid report data for current tab
-  const reportData = REPORT_DATA_MAP[report.id];
+  // For investors mode, map to existing reports via INVESTOR_REPORT_DATA_MAP
+  const reportData = useMemo(() => {
+    if (mode === 'investors') {
+      const mappedId = INVESTOR_REPORT_DATA_MAP[report.id];
+      return mappedId ? REPORT_DATA_MAP[mappedId] : undefined;
+    }
+    return REPORT_DATA_MAP[report.id];
+  }, [mode, report.id]);
 
   // Generate TOC sections from report data
   const tocSections = useMemo(() => {
@@ -76,6 +114,8 @@ export function ExampleReportsSection() {
     scrollOffset: LP_SCROLL_OFFSET,
   });
 
+  const sectionContent = SECTION_CONTENT[mode];
+
   return (
     <section
       id="example-reports"
@@ -85,10 +125,10 @@ export function ExampleReportsSection() {
       <div className="border-t border-zinc-200 px-8 pt-24 pb-12 md:px-16 lg:px-24 dark:border-zinc-800">
         <div className="mx-auto max-w-[1400px]">
           <h2 className="text-[28px] leading-[1.2] font-normal tracking-[-0.02em] text-zinc-900 md:text-[36px] dark:text-white">
-            Example Reports
+            {sectionContent.title}
           </h2>
           <p className="mt-4 max-w-[50ch] text-lg leading-[1.2] font-normal tracking-[-0.02em] text-zinc-500 dark:text-zinc-400">
-            Explore real innovation intelligence reports across industries.
+            {sectionContent.subtitle}
           </p>
         </div>
       </div>
@@ -100,7 +140,7 @@ export function ExampleReportsSection() {
       >
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="no-scrollbar flex gap-1 overflow-x-auto py-3">
-            {EXAMPLE_REPORTS.map((r, i) => (
+            {reports.map((r, i) => (
               <button
                 key={r.id}
                 onClick={() => {
