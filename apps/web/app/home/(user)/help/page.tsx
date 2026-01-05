@@ -1,19 +1,16 @@
-import { ArrowLeft, FileText, MessageSquare, Send } from 'lucide-react';
-
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@kit/ui/tabs';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
 
 import { AppLink } from '~/components/app-link';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
 // Import shared components from team account help
-import { HelpChat } from '../../[account]/help/_components/help-chat';
 import { HelpDocsLink } from '../../[account]/help/_components/help-docs-link';
 import { HelpTicketForm } from '../../[account]/help/_components/help-ticket-form';
 
 export const metadata = {
   title: 'Help Center',
   description:
-    'Get help with Sparlo - chat with our AI assistant, submit a support ticket, or browse documentation',
+    'Get help with Sparlo - submit a support ticket or browse documentation',
 };
 
 function HelpPage() {
@@ -35,49 +32,34 @@ function HelpPage() {
             Help Center
           </h1>
           <p className="max-w-2xl text-lg leading-relaxed font-normal text-zinc-600">
-            Get answers from our support assistant, submit a request, or browse
-            documentation.
+            Submit a support request or browse our documentation.
           </p>
         </div>
 
-        {/* Tabs with custom styling */}
-        <Tabs defaultValue="chat" className="w-full">
-          <TabsList className="mb-8 grid h-auto w-full grid-cols-3 gap-2 bg-transparent p-0">
-            <TabsTrigger
-              value="chat"
-              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all hover:border-zinc-300 data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
-            >
-              <MessageSquare className="h-4 w-4" />
-              Support Chat
-            </TabsTrigger>
-            <TabsTrigger
-              value="ticket"
-              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all hover:border-zinc-300 data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
-            >
-              <Send className="h-4 w-4" />
-              Submit Request
-            </TabsTrigger>
-            <TabsTrigger
-              value="docs"
-              className="flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-[14px] font-medium text-zinc-600 transition-all hover:border-zinc-300 data-[state=active]:border-zinc-900 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
-            >
-              <FileText className="h-4 w-4" />
-              Documentation
-            </TabsTrigger>
-          </TabsList>
+        {/* Chat widget hint */}
+        <div className="mb-8 flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3">
+          <MessageSquare className="h-5 w-5 text-zinc-500" />
+          <p className="text-sm text-zinc-600">
+            Have a quick question? Use the chat widget in the bottom-right
+            corner for instant help.
+          </p>
+        </div>
 
-          <TabsContent value="chat" className="mt-0">
-            <HelpChat />
-          </TabsContent>
+        {/* Submit ticket section */}
+        <section className="mb-10">
+          <h2 className="mb-4 text-lg font-medium text-zinc-900">
+            Submit a Request
+          </h2>
+          <HelpTicketForm />
+        </section>
 
-          <TabsContent value="ticket" className="mt-0">
-            <HelpTicketForm />
-          </TabsContent>
-
-          <TabsContent value="docs" className="mt-0">
-            <HelpDocsLink />
-          </TabsContent>
-        </Tabs>
+        {/* Documentation section */}
+        <section>
+          <h2 className="mb-4 text-lg font-medium text-zinc-900">
+            Documentation
+          </h2>
+          <HelpDocsLink />
+        </section>
       </div>
     </main>
   );

@@ -42,6 +42,7 @@ export type UsageStatus =
 /**
  * Check if the account is allowed to generate a new report based on usage limits.
  * Implements freemium model: first report is free, then requires subscription.
+ * Super admins bypass all usage limits.
  * Wrapped with React cache() for request-level deduplication.
  */
 export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
@@ -50,20 +51,49 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
 ): Promise<UsageStatus> {
   const client = getSupabaseServerClient();
 
+  // Check super admin status first - they bypass all limits
+  const { data: isSuperAdmin } = (await (client.rpc as CallableFunction)(
+    'is_super_admin',
+  )) as { data: boolean | null; error: Error | null };
+
+  if (isSuperAdmin) {
+    return {
+      allowed: true,
+      reason: 'ok',
+      tokensUsed: 0,
+      tokensLimit: Number.MAX_SAFE_INTEGER,
+      percentage: 0,
+      periodEnd: null,
+      isFirstReport: false,
+      hasActiveSubscription: true,
+      showUsageBar: false,
+      isWarning: false,
+      isAtLimit: false,
+    };
+  }
+
   // Execute account and subscription queries in parallel for performance
-  const [accountResult, subscriptionResult] = await Promise.all([
-    client
-      .from('accounts')
-      .select('id, first_report_used_at')
-      .eq('id', accountId)
-      .single(),
-    client
-      .from('subscriptions')
-      .select('id, status, period_ends_at')
-      .eq('account_id', accountId)
-      .or('active.eq.true,and(status.eq.canceled,period_ends_at.gte.now())')
-      .maybeSingle(),
-  ]);
+  // First query all subscriptions for this account (for debugging)
+  const [accountResult, subscriptionResult, allSubscriptionsResult] =
+    await Promise.all([
+      client
+        .from('accounts')
+        .select('id, first_report_used_at')
+        .eq('id', accountId)
+        .single(),
+      // Query for active subscriptions OR cancelled but still in period
+      client
+        .from('subscriptions')
+        .select('id, status, period_ends_at, active')
+        .eq('account_id', accountId)
+        .or('active.eq.true,and(status.eq.canceled,period_ends_at.gte.now())')
+        .maybeSingle(),
+      // Also get all subscriptions for debugging (if first query fails)
+      client
+        .from('subscriptions')
+        .select('id, status, period_ends_at, active')
+        .eq('account_id', accountId),
+    ]);
 
   if (accountResult.error) {
     throw new Error(
@@ -78,8 +108,33 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
   }
 
   const account = accountResult.data;
-  const subscription = subscriptionResult.data;
+  let subscription = subscriptionResult.data;
   const hasUsedFirstReport = !!account.first_report_used_at;
+
+  // Debug: If no active subscription found but we have subscriptions, log it
+  if (!subscription && allSubscriptionsResult.data?.length) {
+    console.warn(
+      '[Usage] Account has subscriptions but none matched active criteria:',
+      {
+        accountId,
+        subscriptions: allSubscriptionsResult.data,
+        hasUsedFirstReport,
+      },
+    );
+
+    // Fallback: If there's any subscription with a future period_ends_at, use it
+    const fallbackSub = allSubscriptionsResult.data.find(
+      (s) => new Date(s.period_ends_at) > new Date(),
+    );
+    if (fallbackSub) {
+      console.warn(
+        '[Usage] Using fallback subscription with future period_ends_at:',
+        fallbackSub,
+      );
+      subscription = fallbackSub;
+    }
+  }
+
   const hasActiveSubscription = !!subscription;
 
   // First report is free
@@ -144,7 +199,7 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
     tokensUsed: usage.tokens_used,
     tokensLimit: usage.tokens_limit,
     percentage: usage.percentage,
-    periodEnd: subscription.period_ends_at ?? usage.period_end,
+    periodEnd: subscription?.period_ends_at ?? usage.period_end,
     hasActiveSubscription: true as const,
     showUsageBar:
       usage.percentage >= USAGE_CONSTANTS.USAGE_BAR_VISIBLE_THRESHOLD,
