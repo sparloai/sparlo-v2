@@ -61,7 +61,13 @@ export async function requireUser(
 > {
   const { data, error } = await client.auth.getClaims();
 
+  // Debug logging for auth issues
   if (!data?.claims || error) {
+    console.error('[requireUser] Auth failed:', {
+      hasClaims: !!data?.claims,
+      error: error ? { message: error.message, code: (error as { code?: string }).code } : null,
+      redirectTo: getRedirectTo(SIGN_IN_PATH, options?.next),
+    });
     return {
       data: null,
       error: new AuthenticationError(),
