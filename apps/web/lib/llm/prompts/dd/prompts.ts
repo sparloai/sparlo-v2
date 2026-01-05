@@ -394,18 +394,76 @@ When assigning confidence levels, use these definitions consistently:
 - Assign confidence without explaining basis
 - Conflate "we hope this is true" with "we believe this is true"
 
+## PROSE OUTPUT REQUIREMENTS
+
+In addition to structured validation data, you MUST output educational prose that explains your reasoning in depth.
+
+### TECHNICAL DEEP DIVE (800-1200 words)
+
+Write a detailed technical analysis covering:
+
+1. **HOW THEIR TECHNOLOGY WORKS** (300-400 words)
+
+   Explain the core mechanism at a physics level. Don't just name it—explain WHY it works:
+   - What physical/chemical/biological principle does it exploit?
+   - What are the governing equations or thermodynamic limits?
+   - What makes this approach different from alternatives?
+
+   Example of good depth:
+   "PyroHydrogen's approach exploits a density differential to solve the catalyst deactivation problem. At 1000°C, carbon (2.2 g/cm³) is significantly less dense than the molten tin-nickel alloy (6.5-7.0 g/cm³). As methane cracks at catalytic nickel sites distributed throughout the melt volume, the resulting carbon particles experience buoyant forces sufficient to drive continuous migration to the surface. This is elegant because the catalyst (dissolved nickel) can never be 'blocked' by carbon deposits—the carbon simply floats away. The underlying thermodynamics are favorable: the reaction CH₄ → C + 2H₂ requires only 75 kJ/mol of heat input, and the challenge is kinetics (getting the reaction to proceed fast enough) rather than thermodynamics."
+
+2. **CLAIM-BY-CLAIM VALIDATION** (400-600 words)
+
+   For each critical claim, explain your reasoning in full:
+   - State the claim and its source
+   - Identify the theoretical limit or benchmark
+   - Cite relevant literature or precedent
+   - Explain WHY you reached your verdict (3-5 sentences per claim)
+   - Note what would change your assessment
+
+   Example:
+   "**92% methane conversion:** The company claims 92% conversion at 1000°C. This is actually conservative—thermodynamic equilibrium at 1000°C permits >99% conversion, and the Upham et al. Science 2017 paper demonstrated 95%+ with similar Ni-Bi systems. The fact that PyroHydrogen claims 92% rather than a rounder number suggests they're reporting actual operational measurements, not theoretical projections—a credibility signal. VALIDATED with HIGH confidence. What would change this: evidence of measurement methodology issues or inconsistent results across runs."
+
+3. **SCALE-UP ASSESSMENT** (200-300 words)
+
+   Analyze what could break at scale:
+   - What is the scale-up ratio? (e.g., 10x, 100x)
+   - What scale-dependent phenomena could cause problems?
+   - What historical precedent exists for this type of scale-up?
+   - What's your probability estimate for successful scale-up?
+
+   Be specific. "Scale-up is risky" is useless. "The 100x scale-up introduces thermal gradient challenges because surface-area-to-volume ratio decreases 4.6x, potentially creating hot spots that accelerate materials degradation" is useful.
+
+### MECHANISM EXPLANATION (400-600 words)
+
+Write a standalone explanation of how this technology works that would educate a smart non-expert. This should:
+- Start with the problem it solves
+- Explain the physical mechanism
+- Note what makes it different from alternatives
+- Identify the key engineering parameters
+- Flag the main uncertainties
+
+This section should be quotable in an investment memo.
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
 
 {
-  "validation_summary": {
-    "overall_technical_assessment": "One paragraph on overall technical credibility",
-    "critical_claims_status": "X of Y critical claims validated, Z questionable, W invalid",
-    "mechanism_validity": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
-    "key_concern": "The single biggest technical concern",
-    "key_strength": "The strongest technical element"
+  "prose_output": {
+    "technical_deep_dive": "800-1200 words covering mechanism, claim validation, and scale-up assessment as flowing prose. Write as if briefing a partner who needs to understand the technology deeply.",
+
+    "mechanism_explanation": "400-600 words standalone explanation of how the technology works. Should be quotable in an investment memo."
   },
+
+  "quick_reference": {
+    "validation_summary": {
+      "overall_technical_assessment": "One paragraph on overall technical credibility",
+      "critical_claims_status": "X of Y critical claims validated, Z questionable, W invalid",
+      "mechanism_validity": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
+      "key_concern": "The single biggest technical concern",
+      "key_strength": "The strongest technical element"
+    },
 
   "physics_validation": [
     {
@@ -577,6 +635,7 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
       "internal_consistency": 8
     },
     "rationale": "Paragraph explaining the score"
+    }
   }
 }
 
@@ -898,12 +957,42 @@ When assigning confidence levels, use these definitions consistently:
 - Assign confidence without explaining basis
 - Conflate "we hope this is true" with "we believe this is true"
 
+## PROSE OUTPUT REQUIREMENTS
+
+### COMMERCIALIZATION NARRATIVE (600-800 words)
+
+Write a synthesis of the commercial analysis that answers: "Can this become a real business?"
+
+Structure:
+
+1. **THE COMMERCIAL THESIS** (100-150 words)
+   What's the business model? Who pays? How much? When?
+
+2. **UNIT ECONOMICS REALITY** (150-200 words)
+   Synthesize the unit economics bridge. Don't just list drivers—explain which assumptions are solid and which are shaky. What's the realistic cost range vs. their claim?
+
+   Example: "PyroHydrogen claims $0.87/kg at scale, down from $2.27/kg at pilot—a 62% reduction. Breaking this down: feedstock and energy costs are credible at Texas prices. But the model assumes 85%+ capacity factor from Year 1 (first-of-kind facilities typically achieve 60-70%), carbon revenue at $1,000/ton (unvalidated at volume), and full 45V credit qualification (uncertain with Texas grid electricity). Realistic range: $1.10-1.60/kg. The target is achievable if everything goes right; $1.35 is more probable."
+
+3. **CUSTOMER & MARKET EVIDENCE** (100-150 words)
+   How real is the demand? What's the quality of customer evidence?
+
+4. **PATH TO REVENUE** (100-150 words)
+   What's the realistic timeline? What capital is required? What could delay them?
+
+5. **THE HARD TRUTH** (100-150 words)
+   Even if the physics works, what's still hard? What's the critical commercial question that determines success?
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
 
 {
-  "commercialization_summary": {
+  "prose_output": {
+    "commercialization_narrative": "600-800 words synthesizing the commercial analysis. Covers business model, unit economics reality, customer evidence, path to revenue, and the hard truth. Should answer: Can this become a real business?"
+  },
+
+  "detailed_analysis": {
+    "commercialization_summary": {
     "overall_verdict": "CLEAR_PATH | CHALLENGING_BUT_VIABLE | SIGNIFICANT_OBSTACLES | UNLIKELY_TO_COMMERCIALIZE",
     "confidence": "HIGH | MEDIUM | LOW",
     "one_paragraph": "Plain English summary of commercial viability. What's the path? What's hard? What's the timeline?",
@@ -1431,6 +1520,7 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
       "bad_answer": "Response that kills the deal"
     }
   ]
+  }
 }
 
 ## VERDICT CALIBRATION
@@ -1672,16 +1762,71 @@ When assigning confidence levels, use these definitions consistently:
 - Assign confidence without explaining basis
 - Conflate "we hope this is true" with "we believe this is true"
 
+## PROSE OUTPUT REQUIREMENTS
+
+### SOLUTION LANDSCAPE NARRATIVE (600-800 words)
+
+This is Sparlo's core value add. Write a narrative that shows the investor the FULL solution space for this problem.
+
+Structure:
+
+1. **THE LANDSCAPE OVERVIEW** (150-200 words)
+   How many fundamentally different approaches exist? What are the major tracks? What does first-principles analysis reveal about where value is created?
+
+2. **KEY APPROACHES EXPLAINED** (300-400 words)
+   For the 3-4 most important approaches (including cross-domain innovations from AN3-M):
+   - What is it and how does it work?
+   - Who's pursuing it?
+   - What are its advantages and disadvantages?
+   - Why might it win or lose?
+
+   Include approaches the startup DIDN'T choose. Show what else exists.
+
+3. **WHERE THIS STARTUP SITS** (100-150 words)
+   Position them in the landscape:
+   - Which track did they choose?
+   - Is this the optimal approach based on first-principles?
+   - What are they implicitly betting against?
+
+4. **WHAT THEY MIGHT HAVE MISSED** (100-150 words)
+   From AN3-M solution space, identify approaches they didn't pursue:
+   - Are any potentially better?
+   - Why might they have missed them?
+   - What's the competitive threat?
+
+### STRATEGIC SYNTHESIS (400-600 words)
+
+Synthesize the strategic frameworks:
+
+1. **THE BET** (100-150 words)
+   If you invest, what are you betting on? Make it explicit.
+
+2. **PRE-MORTEM** (150-200 words)
+   It's 2030 and the company failed. What happened? Write a specific narrative, not generic risks.
+
+3. **SCENARIO SUMMARY** (100-150 words)
+   Bull/base/bear with probabilities and expected value. Show your reasoning for the probabilities.
+
+4. **COMPARABLE INSIGHT** (100-150 words)
+   What do similar companies' outcomes tell us? What's the base rate? Is this company better or worse than average?
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
 
 {
-  "solution_space_position": {
-    "primary_track": "simpler_path | best_fit | paradigm_shift | frontier_transfer",
-    "track_rationale": "Why this classification",
+  "prose_output": {
+    "solution_landscape_narrative": "600-800 words mapping the full solution space. Covers landscape overview, key approaches explained, where the startup sits, and what they might have missed. This is Sparlo's core value add.",
 
-    "fit_assessment": {
+    "strategic_synthesis": "400-600 words synthesizing the strategic frameworks: the bet, pre-mortem narrative, scenario summary with probabilities, and comparable insight."
+  },
+
+  "detailed_analysis": {
+    "solution_space_position": {
+      "primary_track": "simpler_path | best_fit | paradigm_shift | frontier_transfer",
+      "track_rationale": "Why this classification",
+
+      "fit_assessment": {
       "optimal_for_problem": true,
       "explanation": "Whether this is the best approach for their stated problem",
       "what_first_principles_suggests": "What AN0-M analysis would recommend",
@@ -2100,6 +2245,7 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
         "how_to_derisk": "How to reduce uncertainty"
       }
     ]
+    }
   }
 }
 
@@ -2231,208 +2377,186 @@ When assigning confidence levels, use these definitions consistently:
 - Assign confidence without explaining basis
 - Conflate "we hope this is true" with "we believe this is true"
 
+## REPORT STRUCTURE
+
+This report has THREE layers:
+
+1. **PROSE REPORT** (Primary): 3,500-4,500 words of educational narrative
+2. **QUICK REFERENCE** (Secondary): Structured data for at-a-glance verdicts
+3. **APPENDIX** (Supporting): Detailed analysis for deep-dive readers
+
+### PROSE REPORT SECTIONS
+
+#### 1. PROBLEM PRIMER (800-1200 words)
+
+Synthesize AN0-M and AN1.7 into an educational narrative that TEACHES the investor about this problem space.
+
+**Required content:**
+- What is the problem in plain English? (2-3 sentences)
+- Why does this problem matter? (market size, impact, urgency)
+- What are the fundamental physics/chemistry/biology constraints?
+- Include governing equations or thermodynamic limits where they build intuition
+- What has been tried before? Why did it fail or succeed partially?
+- What would a solution HAVE to achieve to be viable?
+
+**Voice:** Write like a patient expert teaching a smart non-expert. Use specific numbers. Explain WHY constraints exist, not just THAT they exist.
+
+**Test:** Could an investor read ONLY this section and understand the problem space well enough to ask good questions?
+
+#### 2. TECHNICAL DEEP DIVE (800-1200 words)
+
+Synthesize DD3-M into a narrative explaining their specific technology.
+
+**Required content:**
+- How does their technology work at a physics level?
+- Claim-by-claim validation WITH reasoning (not just verdicts)
+- Scale-up assessment with specific engineering concerns
+- What could break? What's the key technical risk?
+
+**Voice:** Rigorous but accessible. Show your reasoning.
+
+#### 3. SOLUTION LANDSCAPE (600-800 words)
+
+Synthesize AN3-M and DD4-M into a narrative mapping the full solution space.
+
+**Required content:**
+- What are ALL the approaches to this problem? (from AN3-M)
+- Where does this startup's approach sit in the landscape?
+- What did they choose NOT to pursue? Was that the right call?
+- What cross-domain innovations exist? (from AN3-M frontier_transfer)
+- Who are the competitive threats and why?
+
+**Voice:** Strategic. Show the investor the whole landscape, not just this company.
+
+#### 4. COMMERCIALIZATION REALITY (600-800 words)
+
+Synthesize DD3.5-M into a narrative on business viability.
+
+**Required content:**
+- Can this become a real business?
+- Unit economics: current vs. claimed vs. realistic
+- Customer evidence quality
+- Path to revenue with realistic timeline
+- The hard truth: even if physics works, what's still hard?
+
+**Voice:** Direct. Don't sugarcoat commercial challenges.
+
+#### 5. INVESTMENT SYNTHESIS (500-700 words)
+
+Synthesize DD4-M strategic analysis into a verdict narrative.
+
+**Required content:**
+- THE BET: What you're betting on if you invest (explicit, specific)
+- SCENARIO ANALYSIS: Bull/base/bear with probabilities and reasoning
+- PRE-MORTEM: Specific narrative of how this company fails
+- COMPARABLE INSIGHT: What similar companies' outcomes tell us
+- FINAL WORD: Your honest assessment and recommendation
+
+**Voice:** Partner-level. Direct, confident, insight-dense.
+
+### QUICK REFERENCE SECTION
+
+Keep all current structured data but move it to quick_reference:
+- one_page_summary (including executive_paragraph)
+- verdict_box
+- scores
+- scenarios
+- key_risks
+- founder_questions (top 5 only, rest in appendix)
+- diligence_roadmap (key actions only, rest in appendix)
+
+### APPENDIX
+
+Detailed analysis for readers who want to go deeper:
+- Full claim validation details
+- Full solution space with all concepts
+- Full commercial analysis
+- All comparables
+- All founder questions
+- Full diligence roadmap
+
 ## OUTPUT FORMAT
 
 CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
 
 {
-  "header": {
-    "report_type": "Technical Due Diligence Report",
+  "report_metadata": {
     "company_name": "Startup name",
-    "technology_domain": "Domain",
     "date": "ISO date",
-    "version": "2.0.0",
-    "classification": "Confidential"
+    "version": "3.0.0"
   },
 
-  "one_page_summary": {
-    "company": "Name",
-    "sector": "Sector",
-    "stage": "Series A",
-    "ask": "$25M",
-
-    "one_sentence": "What they do in plain English that a non-technical partner understands",
-
-    "verdict_box": {
-      "technical_validity": {
-        "verdict": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
-        "symbol": "✓ | ⚠ | ✗"
-      },
-      "commercial_viability": {
-        "verdict": "CLEAR_PATH | CHALLENGING | UNLIKELY",
-        "symbol": "✓ | ⚠ | ✗"
-      },
-      "solution_space_position": {
-        "verdict": "OPTIMAL | REASONABLE | SUBOPTIMAL",
-        "symbol": "✓ | ⚠ | ✗"
-      },
-      "moat_strength": {
-        "verdict": "STRONG | MODERATE | WEAK",
-        "symbol": "✓ | ⚠ | ✗"
-      },
-      "timing": {
-        "verdict": "RIGHT_TIME | EARLY | LATE",
-        "symbol": "✓ | ⚠ | ✗"
-      },
-      "overall": "PROCEED | CAUTION | PASS"
+  "prose_report": {
+    "problem_primer": {
+      "content": "800-1200 words teaching the problem space. Synthesized from AN0-M first-principles analysis and AN1.7 literature search. Covers: what is the problem, why it matters, physics constraints, what's been tried, what success requires.",
+      "source": "Synthesized from AN0-M first-principles analysis and AN1.7 literature search"
     },
 
-    "the_bet": "If you invest, you are betting that [one sentence]",
+    "technical_deep_dive": {
+      "content": "800-1200 words on mechanism, claims, scale-up. Synthesized from DD3-M technical validation. Covers: how their technology works at physics level, claim-by-claim validation with reasoning, scale-up assessment, key technical risk.",
+      "source": "Synthesized from DD3-M technical validation"
+    },
 
-    "bull_case_2_sentences": "In the best case...",
-    "bear_case_2_sentences": "The main risk is...",
+    "solution_landscape": {
+      "content": "600-800 words mapping all approaches. Synthesized from AN3-M solution space and DD4-M positioning. Covers: all approaches to this problem, where startup sits, what they didn't pursue, cross-domain innovations, competitive threats.",
+      "source": "Synthesized from AN3-M solution space and DD4-M positioning"
+    },
 
-    "key_strength": "Single most compelling element",
-    "key_risk": "Single biggest concern",
-    "key_question": "The one question that determines outcome",
+    "commercialization_reality": {
+      "content": "600-800 words on business viability. Synthesized from DD3.5-M commercial analysis. Covers: can this become a business, unit economics reality, customer evidence, path to revenue, the hard truth.",
+      "source": "Synthesized from DD3.5-M commercial analysis"
+    },
 
-    "expected_return": "X.Xx weighted multiple",
-
-    "closest_comparable": "Company X — [outcome]",
-
-    "if_you_do_one_thing": "Single most important due diligence action before term sheet",
-
-    "executive_paragraph": "A 150-200 word synthesis that stands alone. Structure: (1) What they do + market context (2 sentences). (2) Technical assessment (1 sentence). (3) Commercial assessment (1 sentence). (4) The bet — what you're really investing in (1 sentence). (5) Key risk (1 sentence). (6) Recommendation + expected return (1 sentence). Example: 'PyroHydrogen converts natural gas into clean hydrogen using molten metal technology, targeting the $XX billion clean hydrogen market created by IRA incentives. The core technology is scientifically validated with 2,800+ hours of pilot operation, but the proposed 100x scale-up is unprecedented for novel chemical processes. Commercial traction is strong with a signed 15-year offtake, though economics depend on unvalidated carbon revenue and uncertain policy qualification. If you invest, you're betting this exceptional team can execute a first-of-kind scale-up before green hydrogen costs fall enough to close the market window. The critical risk is that commercial facility underperforms, compressing returns to 1.5-3x. Recommendation: PROCEED_WITH_CAUTION with milestone-based funding; expected return 5.8x with high variance.'"
+    "investment_synthesis": {
+      "content": "500-700 words on the verdict. Synthesized from DD4-M strategic analysis. Covers: the bet, scenario analysis with probabilities, pre-mortem narrative, comparable insight, final word.",
+      "source": "Synthesized from DD4-M strategic analysis"
+    }
   },
 
-  "problem_primer": {
-    "section_purpose": "Teach the investor how to think about this problem space before evaluating this specific company",
+  "quick_reference": {
+    "one_page_summary": {
+      "company": "Name",
+      "sector": "Sector",
+      "stage": "Series A",
+      "ask": "$25M",
+      "one_sentence": "What they do in plain English that a non-technical partner understands",
 
-    "problem_overview": {
-      "plain_english": "2-3 sentences explaining the problem a smart non-expert would understand",
-      "why_it_matters": "Why solving this is important",
-      "market_context": "Where this fits in the broader landscape"
-    },
-
-    "physics_foundation": {
-      "governing_principles": [
-        {
-          "principle": "Name of principle",
-          "plain_english": "What it means",
-          "implication": "What it constrains"
-        }
-      ],
-      "thermodynamic_limits": {
-        "theoretical_minimum": "Best physics allows",
-        "current_best_achieved": "Best anyone has done",
-        "gap_explanation": "Why the gap exists"
+      "verdict_box": {
+        "technical_validity": {
+          "verdict": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
+          "symbol": "✓ | ⚠ | ✗"
+        },
+        "commercial_viability": {
+          "verdict": "CLEAR_PATH | CHALLENGING | UNLIKELY",
+          "symbol": "✓ | ⚠ | ✗"
+        },
+        "solution_space_position": {
+          "verdict": "OPTIMAL | REASONABLE | SUBOPTIMAL",
+          "symbol": "✓ | ⚠ | ✗"
+        },
+        "moat_strength": {
+          "verdict": "STRONG | MODERATE | WEAK",
+          "symbol": "✓ | ⚠ | ✗"
+        },
+        "timing": {
+          "verdict": "RIGHT_TIME | EARLY | LATE",
+          "symbol": "✓ | ⚠ | ✗"
+        },
+        "overall": "PROCEED | CAUTION | PASS"
       },
-      "rate_limiting_factors": ["What fundamentally limits progress"]
+
+      "the_bet": "If you invest, you are betting that [one sentence]",
+      "bull_case_2_sentences": "In the best case...",
+      "bear_case_2_sentences": "The main risk is...",
+      "key_strength": "Single most compelling element",
+      "key_risk": "Single biggest concern",
+      "key_question": "The one question that determines outcome",
+      "expected_return": "X.Xx weighted multiple",
+      "closest_comparable": "Company X — [outcome]",
+      "if_you_do_one_thing": "Single most important due diligence action before term sheet",
+
+      "executive_paragraph": "A 150-200 word synthesis that stands alone. Structure: (1) What they do + market context (2 sentences). (2) Technical assessment (1 sentence). (3) Commercial assessment (1 sentence). (4) The bet — what you're really investing in (1 sentence). (5) Key risk (1 sentence). (6) Recommendation + expected return (1 sentence)."
     },
-
-    "key_contradictions": [
-      {
-        "tradeoff": "Plain English tradeoff",
-        "if_you_improve": "X",
-        "typically_worsens": "Y",
-        "how_different_approaches_resolve": "Approaches A, B, C handle this differently"
-      }
-    ],
-
-    "where_value_created": {
-      "bottleneck_today": "Where the value chain is stuck",
-      "what_breakthrough_would_unlock": "What would change the game",
-      "who_captures_value": "Where $ flows in the value chain"
-    },
-
-    "success_requirements": {
-      "physics_gates": ["Must achieve X to be physically viable"],
-      "engineering_challenges": ["Must solve Y to be practical"],
-      "commercial_thresholds": ["Must hit Z to be economic"]
-    },
-
-    "key_insight": "The one thing about this problem space that most people miss"
-  },
-
-  "solution_landscape": {
-    "section_purpose": "Show the full solution space — this is Sparlo's core value add",
-
-    "landscape_overview": {
-      "total_approaches_analyzed": 12,
-      "how_we_generated": "First-principles analysis + TRIZ + literature search",
-      "key_insight": "What the solution space reveals about where value creation happens"
-    },
-
-    "solution_space_by_track": {
-      "simpler_path": {
-        "track_description": "Optimize existing approaches — lower risk, incremental improvement",
-        "concepts": [
-          {
-            "name": "Concept name",
-            "one_liner": "What it is in one sentence",
-            "mechanism": "How it works",
-            "key_advantage": "Why it might win",
-            "key_challenge": "Why it might not",
-            "current_players": ["Who's pursuing this"],
-            "maturity": "TRL X",
-            "threat_to_startup": "HIGH | MEDIUM | LOW",
-            "threat_reasoning": "Why this level"
-          }
-        ]
-      },
-      "best_fit": {
-        "track_description": "Balanced innovation — moderate risk, meaningful improvement",
-        "concepts": []
-      },
-      "paradigm_shift": {
-        "track_description": "Rethink the problem — high risk, potential breakthrough",
-        "concepts": []
-      },
-      "frontier_transfer": {
-        "track_description": "Apply breakthrough from adjacent field",
-        "concepts": []
-      }
-    },
-
-    "startup_positioning": {
-      "which_track": "best_fit",
-      "which_concept_closest": "Concept X",
-      "is_optimal_track": false,
-      "what_first_principles_recommends": "Different approach because...",
-      "positioning_verdict": "OPTIMAL | REASONABLE | SUBOPTIMAL | WRONG_APPROACH",
-      "positioning_explanation": "Why this assessment"
-    },
-
-    "the_implicit_bet": {
-      "what_they_are_betting_on": "Specific bet",
-      "what_must_be_true": ["Conditions for bet to pay off"],
-      "what_they_are_betting_against": ["Approaches they've dismissed"],
-      "bet_quality": "GOOD | REASONABLE | QUESTIONABLE"
-    },
-
-    "missed_opportunities_deep_dive": [
-      {
-        "approach": "What they could have pursued",
-        "why_potentially_better": "Specific advantages",
-        "why_startup_missed": "Likely blind spot or reasoning",
-        "what_startup_would_say": "Their counter-argument",
-        "our_assessment": "Who's right and why",
-        "investment_implication": "What this means for the deal"
-      }
-    ],
-
-    "competitive_threat_summary": {
-      "highest_threats": ["Approach 1", "Approach 2"],
-      "timeline_to_threat": "When these could challenge startup",
-      "startup_defense": "How they can protect position"
-    },
-
-    "strategic_insight": "The key insight about this problem space that should inform investment decision"
-  },
-
-  "executive_summary": {
-    "verdict": "COMPELLING | PROMISING | MIXED | CONCERNING | PASS",
-    "verdict_confidence": "HIGH | MEDIUM | LOW",
-
-    "one_paragraph_summary": "4-5 sentence summary. Technical validity + commercial viability + key strength + key risk + recommendation.",
-
-    "key_findings": [
-      {
-        "finding": "Finding",
-        "type": "STRENGTH | WEAKNESS | OPPORTUNITY | THREAT",
-        "impact": "HIGH | MEDIUM | LOW"
-      }
-    ],
 
     "scores": {
       "technical_credibility": {"score": 7, "out_of": 10, "one_liner": "Explanation"},
@@ -2440,213 +2564,37 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
       "moat_strength": {"score": 5, "out_of": 10, "one_liner": "Explanation"}
     },
 
-    "team_note": {
-      "assessment_status": "NOT_INCLUDED",
-      "reason": "Team assessment requires reference calls and deeper diligence not possible from materials alone. Evaluate team separately.",
-      "key_credentials_observed": ["Credential 1 from materials", "Credential 2 from materials"],
-      "red_flags_to_investigate": ["Any red flags noticed in materials"],
-      "reference_call_priority": "HIGH | MEDIUM | LOW"
-    },
-
-    "recommendation": {
-      "action": "PROCEED | PROCEED_WITH_CAUTION | DEEP_DIVE_REQUIRED | PASS",
-      "rationale": "Why",
-      "key_conditions": ["What must be true to proceed"]
-    }
-  },
-
-  "technical_thesis_assessment": {
-    "their_thesis": "One sentence",
-    "thesis_validity": {
-      "verdict": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
-      "confidence": "HIGH | MEDIUM | LOW",
-      "explanation": "2-3 paragraphs"
-    },
-    "mechanism_assessment": {
-      "mechanism": "Their core mechanism",
-      "physics_validity": "Assessment",
-      "precedent": "Where demonstrated",
-      "key_uncertainty": "Main unknown"
-    },
-    "performance_claims": [
-      {
-        "claim": "Claim",
-        "theoretical_limit": "Physics allows",
-        "verdict": "VALIDATED | PLAUSIBLE | QUESTIONABLE | IMPLAUSIBLE",
-        "explanation": "Plain English why"
+    "scenarios": {
+      "bull_case": {
+        "probability": "X%",
+        "narrative": "What happens",
+        "return": "15-25x"
+      },
+      "base_case": {
+        "probability": "X%",
+        "narrative": "What happens",
+        "return": "2-5x"
+      },
+      "bear_case": {
+        "probability": "X%",
+        "narrative": "What happens",
+        "return": "0-0.5x"
+      },
+      "expected_value": {
+        "weighted_multiple": "X.Xx",
+        "assessment": "Good/bad bet"
       }
-    ]
-  },
-
-  "commercialization_reality": {
-    "verdict": "CLEAR_PATH | CHALLENGING | SIGNIFICANT_OBSTACLES | UNLIKELY",
-    "summary": "2-3 sentences",
-
-    "the_hard_truth": {
-      "even_if_physics_works": "What's still hard",
-      "critical_commercial_question": "The question that determines success"
     },
 
-    "unit_economics": {
-      "today": "$X/unit",
-      "claimed_at_scale": "$Y/unit",
-      "credibility": "CREDIBLE | OPTIMISTIC | UNREALISTIC",
-      "what_must_be_true": "Conditions"
-    },
-
-    "path_to_revenue": {
-      "timeline": "When",
-      "capital_required": "$X",
-      "fits_vc_timeline": true
-    },
-
-    "market_readiness": {
-      "market_exists": true,
-      "customer_evidence": "LOIs, pilots, etc.",
-      "vitamin_or_painkiller": "PAINKILLER | VITAMIN"
-    },
-
-    "scale_up_risk": {
-      "valley_of_death": "$X over Y years",
-      "stranding_risk": "HIGH | MEDIUM | LOW"
-    },
-
-    "policy_exposure": {
-      "critical_policies": ["Policy 1"],
-      "exposure_level": "HIGH | MEDIUM | LOW",
-      "impact_if_changed": "What happens"
-    }
-  },
-
-  "claim_validation_summary": {
-    "overview": "X validated, Y questionable, Z invalid",
-    "critical_claims": [
+    "key_risks": [
       {
-        "claim": "Claim",
-        "verdict": "Verdict",
-        "confidence": "Confidence",
-        "plain_english": "What this means"
-      }
-    ],
-    "triz_findings": {
-      "key_contradictions": "What tradeoffs exist",
-      "resolution_quality": "How well they resolve them"
-    }
-  },
-
-  "novelty_assessment": {
-    "verdict": "GENUINELY_NOVEL | NOVEL_COMBINATION | INCREMENTAL | NOT_NOVEL",
-    "what_is_novel": "Specific element",
-    "what_is_not_novel": "Prior art",
-    "key_prior_art": [
-      {
-        "reference": "Citation",
-        "relevance": "How it relates",
-        "impact": "On novelty claim"
-      }
-    ]
-  },
-
-  "moat_assessment": {
-    "overall": {
-      "strength": "STRONG | MODERATE | WEAK | NONE",
-      "durability_years": 3,
-      "primary_source": "Where moat comes from"
-    },
-    "breakdown": {
-      "technical": "STRONG | MODERATE | WEAK",
-      "execution": "STRONG | MODERATE | WEAK",
-      "market": "STRONG | MODERATE | WEAK"
-    },
-    "vulnerabilities": [
-      {
-        "vulnerability": "Risk",
-        "severity": "HIGH | MEDIUM | LOW"
-      }
-    ]
-  },
-
-  "pre_mortem": {
-    "framing": "It's 2030 and the company has failed. What happened?",
-    "most_likely_failure": {
-      "scenario": "Narrative",
-      "probability": "X%",
-      "early_warnings": ["Signs"],
-      "preventable_by": "Due diligence"
-    },
-    "second_most_likely": {
-      "scenario": "Narrative",
-      "probability": "X%"
-    },
-    "black_swan": {
-      "scenario": "Low probability failure",
-      "probability": "X%"
-    }
-  },
-
-  "comparable_analysis": {
-    "closest_comparables": [
-      {
-        "company": "Name",
-        "similarity": "Why comparable",
-        "outcome": "What happened",
-        "lesson": "What we learn"
-      }
-    ],
-    "base_rate": {
-      "category_success_rate": "X%",
-      "this_company_vs_base": "Better/worse because..."
-    }
-  },
-
-  "scenario_analysis": {
-    "bull_case": {
-      "probability": "X%",
-      "narrative": "What happens",
-      "return": "15-25x"
-    },
-    "base_case": {
-      "probability": "X%",
-      "narrative": "What happens",
-      "return": "2-5x"
-    },
-    "bear_case": {
-      "probability": "X%",
-      "narrative": "What happens",
-      "return": "0-0.5x"
-    },
-    "expected_value": {
-      "weighted_multiple": "X.Xx",
-      "assessment": "Good/bad bet"
-    }
-  },
-
-  "risk_analysis": {
-    "technical_risks": [
-      {
-        "risk": "Risk",
-        "probability": "HIGH | MEDIUM | LOW",
-        "impact": "HIGH | MEDIUM | LOW",
+        "risk": "Risk description",
+        "severity": "HIGH | MEDIUM | LOW",
         "mitigation": "How to address"
       }
     ],
-    "commercial_risks": [
-      {
-        "risk": "Risk",
-        "severity": "HIGH | MEDIUM | LOW"
-      }
-    ],
-    "competitive_risks": [
-      {
-        "risk": "Threat",
-        "timeline": "When"
-      }
-    ],
-    "key_risk_summary": "The one risk that matters most"
-  },
 
-  "founder_questions": {
-    "must_ask": [
+    "founder_questions": [
       {
         "question": "Question",
         "why_critical": "What it reveals",
@@ -2654,118 +2602,105 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
         "bad_answer": "Deal killer"
       }
     ],
-    "technical_deep_dives": [
+
+    "diligence_roadmap": [
       {
-        "topic": "Area",
-        "questions": ["Q1", "Q2"]
-      }
-    ],
-    "commercial_deep_dives": [
-      {
-        "topic": "Area",
-        "questions": ["Q1", "Q2"]
+        "action": "Specific action",
+        "purpose": "What you learn",
+        "priority": "CRITICAL | HIGH | MEDIUM"
       }
     ]
   },
 
-  "diligence_roadmap": {
-    "before_term_sheet": [
+  "appendix": {
+    "detailed_claim_validation": [
       {
-        "action": "Specific action",
-        "purpose": "What you learn",
-        "who": "Who does this",
-        "time": "How long",
-        "cost": "$ if any",
-        "deal_breaker_if": "What kills deal"
+        "claim": "Claim",
+        "verdict": "Verdict",
+        "confidence": "Confidence",
+        "plain_english": "What this means",
+        "full_reasoning": "Detailed explanation"
       }
     ],
-    "during_diligence": [
-      {
-        "action": "Action",
-        "priority": "CRITICAL | HIGH | MEDIUM"
-      }
-    ],
-    "reference_calls": [
-      {
-        "who": "Person/role",
-        "why": "What you learn",
-        "key_questions": ["Questions"]
-      }
-    ],
-    "technical_validation": [
-      {
-        "what": "What to verify",
-        "how": "Method",
-        "who_can_help": "Expert",
-        "cost": "$X",
-        "time": "Y weeks"
-      }
-    ],
-    "documents_to_request": ["List"]
-  },
 
-  "why_this_might_be_wrong": {
-    "if_we_are_too_negative": {
-      "what_we_might_be_missing": "Reasons for optimism we may have underweighted",
-      "what_would_change_our_mind": "Evidence that would flip positive"
+    "detailed_solution_space": {
+      "simpler_path": [],
+      "best_fit": [],
+      "paradigm_shift": [],
+      "frontier_transfer": []
     },
-    "if_we_are_too_positive": {
-      "what_we_might_be_missing": "Risks we may have underweighted",
-      "what_would_change_our_mind": "Evidence that would flip negative"
-    },
-    "strongest_counter_argument": "Best case against our verdict",
-    "our_response": "Why we hold our position"
-  },
 
-  "confidence_calibration": {
-    "high_confidence": [
-      {
-        "assessment": "What we're confident about",
-        "basis": "Why",
-        "confidence": "90%+"
-      }
-    ],
-    "medium_confidence": [
-      {
-        "assessment": "What we think",
-        "basis": "Limited evidence",
-        "confidence": "50-80%"
-      }
-    ],
-    "low_confidence": [
-      {
-        "assessment": "What we're guessing",
-        "basis": "Extrapolation",
-        "confidence": "<50%"
-      }
-    ],
-    "known_unknowns": ["Things we know we don't know"],
-    "where_surprises_lurk": ["Where unknown unknowns might be"]
-  },
+    "detailed_commercial_analysis": {
+      "unit_economics_bridge": {},
+      "market_reality": {},
+      "gtm_reality": {},
+      "timeline_reality": {},
+      "policy_deep_dive": {}
+    },
 
-  "verdict_and_recommendation": {
-    "technical_verdict": {
-      "verdict": "COMPELLING | PROMISING | MIXED | CONCERNING | PASS",
-      "confidence": "HIGH | MEDIUM | LOW",
-      "summary": "2-3 sentences"
+    "comparable_details": [
+      {
+        "company": "Name",
+        "similarity": "Why comparable",
+        "outcome": "What happened",
+        "lesson": "What we learn",
+        "full_analysis": "Detailed breakdown"
+      }
+    ],
+
+    "all_founder_questions": {
+      "technical_deep_dives": [
+        {
+          "topic": "Area",
+          "questions": ["Q1", "Q2"]
+        }
+      ],
+      "commercial_deep_dives": [
+        {
+          "topic": "Area",
+          "questions": ["Q1", "Q2"]
+        }
+      ]
     },
-    "commercial_verdict": {
-      "verdict": "CLEAR_PATH | CHALLENGING | UNLIKELY",
-      "summary": "2-3 sentences"
-    },
-    "overall_verdict": {
-      "verdict": "COMPELLING | PROMISING | MIXED | CONCERNING | PASS",
-      "confidence": "HIGH | MEDIUM | LOW"
-    },
-    "recommendation": {
-      "action": "PROCEED | PROCEED_WITH_CAUTION | DEEP_DIVE_REQUIRED | PASS",
-      "conditions": ["Must be true"],
-      "derisking_steps": ["What to do"],
-      "timeline": "Recommended pace"
-    },
-    "final_word": "One paragraph — 'what I really think' honest assessment"
+
+    "full_diligence_roadmap": {
+      "before_term_sheet": [
+        {
+          "action": "Specific action",
+          "purpose": "What you learn",
+          "who": "Who does this",
+          "time": "How long",
+          "cost": "$ if any",
+          "deal_breaker_if": "What kills deal"
+        }
+      ],
+      "during_diligence": [],
+      "reference_calls": [],
+      "technical_validation": [],
+      "documents_to_request": []
+    }
   }
 }
+
+## IMPORTANT PRINCIPLES
+
+1. **Prose report is the centerpiece**: The 5 prose sections totaling 3,500-4,500 words ARE the report. Quick reference is for at-a-glance data.
+2. **Teach before evaluating**: The problem primer should make any smart person understand the space
+3. **Show your reasoning**: Don't just give verdicts — explain WHY
+4. **Be specific**: Name the physics, cite the prior art, quantify the risk, name the comparable
+5. **Make it actionable**: Every section should connect to what to do next
+6. **Solution space is the value add**: Show VCs what the landscape looks like, where the startup sits, what they're betting on
+
+## PROSE QUALITY STANDARDS
+
+Each prose section must be:
+- **Self-contained**: Readable independently, but builds on previous sections
+- **Educational**: Teaches the reader something they didn't know
+- **Specific**: Uses numbers, names, dates — not vague generalizations
+- **Quotable**: Partners should be able to excerpt sentences for memos
+- **Honest**: States uncertainty where it exists, doesn't hedge unnecessarily
+
+**Test for each section**: Would a partner share this section with their LP advisory committee? Is it insight-dense enough?
 
 ## VERDICT CALIBRATION
 
@@ -2777,17 +2712,7 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
 
 **CONCERNING**: Significant technical or commercial issues. Flawed thesis, questionable physics, unclear commercial path, weak moat, or major risks. Would need exceptional circumstances.
 
-**PASS**: Technical thesis fails, commercial path unlikely, approach is suboptimal with better alternatives, no moat, or critical risks. Does not support investment.
-
-## IMPORTANT PRINCIPLES
-
-1. **Solution space is the centerpiece**: Show VCs what the landscape looks like, where the startup sits, what they're betting on
-2. **Teach before evaluating**: The problem primer should make any smart person understand the space
-3. **Commercial reality matters**: Most deep tech fails commercially, not technically — address this head-on
-4. **Make it actionable**: Every section should connect to what to do next
-5. **Be specific**: Name the physics, cite the prior art, quantify the risk, name the comparable
-6. **Show your confidence**: Calibrate what you know vs. what you're guessing
-7. **Steel-man your position**: Explain why you might be wrong before someone asks`;
+**PASS**: Technical thesis fails, commercial path unlikely, approach is suboptimal with better alternatives, no moat, or critical risks. Does not support investment.`;
 
 export const DD5_M_METADATA = {
   id: 'dd5-m',
