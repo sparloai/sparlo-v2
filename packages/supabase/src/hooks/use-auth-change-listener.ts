@@ -14,11 +14,7 @@ import { useSupabase } from './use-supabase';
  * Allowed hostnames for the app subdomain.
  * Uses exact match to prevent host header injection attacks.
  */
-const ALLOWED_APP_HOSTS = new Set([
-  'app.sparlo.ai',
-  'localhost',
-  '127.0.0.1',
-]);
+const ALLOWED_APP_HOSTS = new Set(['app.sparlo.ai', 'localhost', '127.0.0.1']);
 
 /**
  * Allowed production domains for redirects.
@@ -87,7 +83,11 @@ function isAppSubdomain(): boolean {
     const hostname = window.location.hostname;
     const isApp = ALLOWED_APP_HOSTS.has(hostname);
 
-    debugLog('isAppSubdomain', { hostname, isApp, allowedHosts: [...ALLOWED_APP_HOSTS] });
+    debugLog('isAppSubdomain', {
+      hostname,
+      isApp,
+      allowedHosts: [...ALLOWED_APP_HOSTS],
+    });
 
     return isApp;
   } catch (error) {
@@ -120,8 +120,14 @@ function isPrivateRoute(path: string, privatePathPrefixes: string[]): boolean {
   }
 
   // On main domain, use the prefix list
-  const isPrivate = privatePathPrefixes.some((prefix) => path.startsWith(prefix));
-  debugLog('isPrivateRoute:mainDomain', { path, isPrivate, prefixes: privatePathPrefixes });
+  const isPrivate = privatePathPrefixes.some((prefix) =>
+    path.startsWith(prefix),
+  );
+  debugLog('isPrivateRoute:mainDomain', {
+    path,
+    isPrivate,
+    prefixes: privatePathPrefixes,
+  });
   return isPrivate;
 }
 
@@ -138,7 +144,9 @@ function getMainDomainAuthUrl(): string {
 
   // Security: Validate domain against allowlist
   if (!ALLOWED_REDIRECT_DOMAINS.has(domain)) {
-    console.error(`[AuthListener:SECURITY] Invalid domain: ${domain}, using fallback`);
+    console.error(
+      `[AuthListener:SECURITY] Invalid domain: ${domain}, using fallback`,
+    );
     return 'https://sparlo.ai/auth/sign-in';
   }
 
@@ -178,7 +186,8 @@ function determineAuthAction(params: {
   hadStableSession: boolean;
   privatePathPrefixes: string[];
 }): AuthAction {
-  const { event, user, pathname, hadStableSession, privatePathPrefixes } = params;
+  const { event, user, pathname, hadStableSession, privatePathPrefixes } =
+    params;
   const onAppSubdomain = isAppSubdomain();
   const isOnAuthPath = AUTH_PATHS.some((path) => pathname.startsWith(path));
 
@@ -191,8 +200,16 @@ function determineAuthAction(params: {
     isOnAuthPath,
   });
 
+  // CRITICAL: Never redirect on INITIAL_SESSION - the session may still be loading
+  // from cookies. Wait for a definitive SIGNED_IN or SIGNED_OUT event.
+  if (event === 'INITIAL_SESSION') {
+    debugLog('determineAuthAction:initialSession', { action: 'IGNORE' });
+    return { type: 'IGNORE' };
+  }
+
   // Priority 1: No user on private route - redirect to auth
-  if (!user && isPrivateRoute(pathname, privatePathPrefixes)) {
+  // Only act on SIGNED_OUT events, not transient states
+  if (!user && event === 'SIGNED_OUT' && isPrivateRoute(pathname, privatePathPrefixes)) {
     const action: AuthAction = onAppSubdomain
       ? { type: 'REDIRECT_TO_MAIN_AUTH' }
       : { type: 'REDIRECT_TO_ROOT' };
@@ -212,7 +229,9 @@ function determineAuthAction(params: {
     // On app subdomain, debounce then redirect to main domain
     // This prevents loops from transient auth issues
     if (onAppSubdomain) {
-      debugLog('determineAuthAction:signedOutOnSubdomain', { action: 'DEBOUNCE_SIGNED_OUT' });
+      debugLog('determineAuthAction:signedOutOnSubdomain', {
+        action: 'DEBOUNCE_SIGNED_OUT',
+      });
       return { type: 'DEBOUNCE_SIGNED_OUT' };
     }
 
