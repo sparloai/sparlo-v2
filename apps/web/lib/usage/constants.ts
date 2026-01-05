@@ -35,24 +35,34 @@ export const USAGE_CONSTANTS = {
 
 /**
  * Token limits per subscription plan.
- * These values should match the billing configuration metadata.
+ * Plan IDs must match billing.config.ts (core, pro, max).
  *
- * Calculated as: reports × 180,000 tokens per report
- * - Standard: 15 reports × 180,000 = 2,700,000
- * - Pro: 30 reports × 180,000 = 5,400,000
- * - Max: 75 reports × 180,000 = 13,500,000
+ * Calculated based on Claude Opus 4.5 pricing (~$33/1M tokens blended):
+ * - Core: $90/month  → 2,700,000 tokens (~15 reports)
+ * - Pro:  $270/month → 8,100,000 tokens (~45 reports)
+ * - Max:  $540/month → 16,200,000 tokens (~90 reports)
  */
 export const PLAN_TOKEN_LIMITS: Record<string, number> = {
-  'standard-monthly': 2_700_000,
-  'pro-monthly': 5_400_000,
-  'max-monthly': 13_500_000,
+  // Core tier (~$90/month in token costs)
+  'core-monthly': 2_700_000,
+  'core-annual': 2_700_000,
+  // Pro tier (~$270/month in token costs)
+  'pro-monthly': 8_100_000,
+  'pro-annual': 8_100_000,
+  // Max tier (~$540/month in token costs)
+  'max-monthly': 16_200_000,
+  'max-annual': 16_200_000,
 } as const;
 
 /**
  * Report limits per subscription plan.
+ * Based on ~180,000 tokens per report.
  */
 export const PLAN_REPORT_LIMITS: Record<string, number> = {
-  'standard-monthly': 15,
-  'pro-monthly': 30,
-  'max-monthly': 75,
+  'core-monthly': 15,
+  'core-annual': 15,
+  'pro-monthly': 45,
+  'pro-annual': 45,
+  'max-monthly': 90,
+  'max-annual': 90,
 } as const;
