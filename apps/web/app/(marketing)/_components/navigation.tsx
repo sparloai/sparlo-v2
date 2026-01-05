@@ -10,7 +10,6 @@ import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import type { JWTUserData } from '@kit/supabase/types';
 import { cn } from '@kit/ui/utils';
 
-import featuresFlagConfig from '~/config/feature-flags.config';
 import pathsConfig from '~/config/paths.config';
 
 /**

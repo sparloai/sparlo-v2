@@ -1,6 +1,12 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 
 const STORAGE_KEY = 'sparlo-sidebar-collapsed';
 const COLLAPSED_WIDTH = 64; // px
@@ -25,11 +31,19 @@ const SidebarContext = createContext<SidebarContextValue>({
   setMobileMenuOpen: () => {},
 });
 
-// Get initial collapsed state from localStorage (runs once on mount)
-function getInitialCollapsed(): boolean {
-  if (typeof window === 'undefined') return true;
+// Subscribe to localStorage changes for collapsed state
+function subscribeToStorage(callback: () => void) {
+  window.addEventListener('storage', callback);
+  return () => window.removeEventListener('storage', callback);
+}
+
+function getCollapsedSnapshot(): boolean {
   const stored = localStorage.getItem(STORAGE_KEY);
   return stored !== null ? stored === 'true' : true;
+}
+
+function getCollapsedServerSnapshot(): boolean {
+  return true; // Server-safe default
 }
 
 // Check if we're on mobile
@@ -39,21 +53,19 @@ function getIsMobile(): boolean {
 }
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-  // Initialize with server-safe defaults to avoid hydration mismatch
-  const [collapsed, setCollapsedState] = useState(true);
+  // Use useSyncExternalStore for localStorage to avoid hydration mismatches
+  const collapsedFromStorage = useSyncExternalStore(
+    subscribeToStorage,
+    getCollapsedSnapshot,
+    getCollapsedServerSnapshot,
+  );
+  const [collapsedOverride, setCollapsedOverride] = useState<boolean | null>(
+    null,
+  );
+  const collapsed = collapsedOverride ?? collapsedFromStorage;
+
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  // Hydrate client-side state after mount (avoids hydration mismatch)
-  useEffect(() => {
-    // Read persisted collapsed state from localStorage
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null) {
-      setCollapsedState(stored === 'true');
-    }
-    setIsHydrated(true);
-  }, []);
 
   // Check for mobile on mount and window resize
   useEffect(() => {
@@ -75,7 +87,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setCollapsed = (value: boolean) => {
-    setCollapsedState(value);
+    setCollapsedOverride(value);
     localStorage.setItem(STORAGE_KEY, String(value));
   };
 

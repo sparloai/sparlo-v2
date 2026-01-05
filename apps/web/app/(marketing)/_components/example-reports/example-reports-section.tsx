@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo, useState } from 'react';
 
 import { Lock } from 'lucide-react';
 
@@ -76,15 +76,18 @@ interface ExampleReportsSectionProps {
 
 export function ExampleReportsSection({ mode }: ExampleReportsSectionProps) {
   const [activeTab, setActiveTab] = useState(0);
+  const [prevMode, setPrevMode] = useState(mode);
 
   // Get the correct reports array based on mode
   const reports = mode === 'engineers' ? EXAMPLE_REPORTS : INVESTOR_REPORTS;
-  const report = reports[activeTab]!;
 
-  // Reset active tab when mode changes to avoid out-of-bounds
-  useEffect(() => {
+  // Reset active tab during render when mode changes (React recommended pattern)
+  if (prevMode !== mode) {
+    setPrevMode(mode);
     setActiveTab(0);
-  }, [mode]);
+  }
+
+  const report = reports[activeTab]!
 
   // Get the hybrid report data for current tab
   // For investors mode, map to existing reports via INVESTOR_REPORT_DATA_MAP
