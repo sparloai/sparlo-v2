@@ -139,7 +139,7 @@ export function ExampleReportsSection({ mode }: ExampleReportsSectionProps) {
       {/* Tab Navigation - Sticky below main nav */}
       <div
         id="example-reports-tabs"
-        className="sticky top-16 z-40 border-y border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95"
+        className="sticky top-16 z-40 overflow-x-hidden border-y border-zinc-200 bg-white/95 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95"
       >
         <div className="mx-auto max-w-7xl px-4 md:px-6">
           <div className="no-scrollbar flex gap-1 overflow-x-auto py-3">
