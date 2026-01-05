@@ -39,9 +39,21 @@ function getIsMobile(): boolean {
 }
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsedState] = useState(getInitialCollapsed);
+  // Initialize with server-safe defaults to avoid hydration mismatch
+  const [collapsed, setCollapsedState] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Hydrate client-side state after mount (avoids hydration mismatch)
+  useEffect(() => {
+    // Read persisted collapsed state from localStorage
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored !== null) {
+      setCollapsedState(stored === 'true');
+    }
+    setIsHydrated(true);
+  }, []);
 
   // Check for mobile on mount and window resize
   useEffect(() => {
