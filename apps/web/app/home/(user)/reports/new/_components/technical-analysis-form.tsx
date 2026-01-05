@@ -409,7 +409,7 @@ export function TechnicalAnalysisForm({
               autoFocus
               data-test="challenge-input"
               placeholder="Describe your technical challenge."
-              className="h-48 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:border-none focus:ring-0 focus:outline-none disabled:opacity-40"
+              className="h-64 w-full resize-none border-none bg-transparent p-0 text-[20px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:border-none focus:ring-0 focus:outline-none disabled:opacity-40"
               style={{ outline: 'none' }}
             />
 
@@ -448,28 +448,29 @@ export function TechnicalAnalysisForm({
                   Attach file
                   {attachments.length > 0 && ` (${attachments.length})`}
                 </button>
-              </div>
-
-              <div className="flex flex-col items-end gap-1">
-                <button
-                  onClick={handleContinue}
-                  disabled={!canSubmit || isSubmitting}
-                  data-test="challenge-submit"
-                  className={cn(
-                    'px-6 py-3 text-[15px] font-medium transition-colors',
-                    canSubmit && !isSubmitting
-                      ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                      : 'cursor-not-allowed bg-zinc-100 text-zinc-400',
-                  )}
-                >
-                  {isSubmitting ? 'Starting...' : 'Run Analysis'}
-                </button>
                 {!canSubmit && !isSubmitting && (
-                  <span className="text-[12px] tracking-[-0.02em] text-zinc-400">
-                    Min 50 characters
-                  </span>
+                  <>
+                    <span className="text-zinc-300">·</span>
+                    <span className="text-[13px] tracking-[-0.02em] text-zinc-400">
+                      Min 50 characters
+                    </span>
+                  </>
                 )}
               </div>
+
+              <button
+                onClick={handleContinue}
+                disabled={!canSubmit || isSubmitting}
+                data-test="challenge-submit"
+                className={cn(
+                  'px-6 py-3 text-[15px] font-medium transition-colors',
+                  canSubmit && !isSubmitting
+                    ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+                    : 'cursor-not-allowed bg-zinc-100 text-zinc-400',
+                )}
+              >
+                {isSubmitting ? 'Starting...' : 'Run Analysis'}
+              </button>
             </div>
 
             {displayError && (

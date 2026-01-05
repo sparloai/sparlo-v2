@@ -294,7 +294,7 @@ export function DueDiligenceAnalysisForm() {
               disabled={isSubmitting}
               autoFocus
               data-test="dd-materials-input"
-              placeholder="Paste the startup's pitch materials, technical claims, product description, and any relevant technical documentation..."
+              placeholder="Paste the startup's pitch materials, technical claims, product description, and any relevant technical documentation."
               className="h-64 w-full resize-none border-none bg-transparent p-0 text-[18px] leading-relaxed text-zinc-900 placeholder:text-zinc-400 focus:border-none focus:ring-0 focus:outline-none disabled:opacity-40"
               style={{ outline: 'none' }}
             />
