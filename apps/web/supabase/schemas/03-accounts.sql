@@ -522,6 +522,7 @@ create policy delete_team_account
 
 -- Functions "public.get_account_members"
 -- Function to get the members of an account by the account slug
+-- SECURITY: Only returns data if the caller is a member of the account
 create
 or replace function public.get_account_members (account_slug text) returns table (
   id uuid,
@@ -538,7 +539,31 @@ or replace function public.get_account_members (account_slug text) returns table
 ) language plpgsql
 set
   search_path = '' as $$
+declare
+  target_account_id uuid;
 begin
+    -- First, get the account ID from the slug
+    select a.id into target_account_id
+    from public.accounts a
+    where a.slug = account_slug
+    and a.is_personal_account = false;
+
+    -- If no account found, return empty result
+    if target_account_id is null then
+        return;
+    end if;
+
+    -- SECURITY: Verify the caller is a member of this account
+    if not exists (
+        select 1 from public.accounts_memberships
+        where account_id = target_account_id
+        and user_id = auth.uid()
+    ) then
+        -- User is not a member, return empty result (don't leak that account exists)
+        return;
+    end if;
+
+    -- User is verified as a member, return the members list
     return QUERY
     select
         acc.id,

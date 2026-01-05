@@ -92,6 +92,39 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
       // No dependencies - runs without authentication
     },
+    // UX Audit tests - run against production or staging
+    {
+      name: 'ux-audit',
+      testMatch: /team-usage-audit\/.*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.AUDIT_BASE_URL || 'https://sparlo.ai',
+        navigationTimeout: 30 * 1000,
+      },
+      // No dependencies - runs with its own login flow
+    },
+    // Team Accounts Comprehensive Audit - run against production
+    {
+      name: 'team-accounts-audit',
+      testMatch: /team-accounts-comprehensive\/.*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: process.env.AUDIT_BASE_URL || 'https://sparlo.ai',
+        navigationTimeout: 30 * 1000,
+      },
+      // No dependencies - runs with its own login flow
+    },
+    // Debug tests - run against production with own login
+    {
+      name: 'debug',
+      testMatch: /.*-debug\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: 'https://app.sparlo.ai',
+        navigationTimeout: 30 * 1000,
+      },
+      // No dependencies - runs with its own login flow
+    },
     /* Test against mobile viewports. */
     // {
     //   name: 'Mobile Chrome',

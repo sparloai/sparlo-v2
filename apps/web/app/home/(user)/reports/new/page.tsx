@@ -6,8 +6,8 @@ import { requireUserInServerComponent } from '~/lib/server/require-user-in-serve
 import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 
 import { checkUsageAllowed } from '../../_lib/server/usage.service';
-import { NewAnalysisForm } from './_components/new-analysis-form';
 import { PageSkeleton } from './_components/page-skeleton';
+import { ReportModeSelector } from './_components/report-mode-selector';
 import { TokenGateScreen } from './_components/token-gate-screen';
 
 export const metadata: Metadata = {
@@ -18,6 +18,7 @@ interface PageProps {
   searchParams: Promise<{
     prefill?: string;
     error?: string;
+    mode?: string;
   }>;
 }
 
@@ -51,8 +52,8 @@ async function UsageGatedContent({
     );
   }
 
-  // Show the analysis form
-  return <NewAnalysisForm prefill={prefill} error={error} />;
+  // Show the tabbed analysis mode selector
+  return <ReportModeSelector prefill={prefill} error={error} />;
 }
 
 export default async function NewReportPage({ searchParams }: PageProps) {

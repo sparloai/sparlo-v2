@@ -572,7 +572,7 @@ export default function DDNewReportPage() {
                 <div className="mt-10 flex items-center justify-between">
                   <div className="flex items-center gap-6">
                     <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
-                      ~25 min analysis
+                      ~40 min analysis
                     </p>
                     <span className="text-zinc-300">·</span>
                     <button

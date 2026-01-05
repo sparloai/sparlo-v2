@@ -6,12 +6,12 @@
  * Indexes documentation from /docs into Supabase help_docs table
  * Uses PostgreSQL full-text search (no external embedding service needed)
  */
+import { createClient } from '@supabase/supabase-js';
+
 import { config } from 'dotenv';
 import * as fs from 'fs';
 import matter from 'gray-matter';
 import * as path from 'path';
-
-import { createClient } from '@supabase/supabase-js';
 
 // Load environment variables from .env.local
 config({ path: path.join(process.cwd(), '.env.local') });

@@ -19,6 +19,10 @@ export interface TokenUsage {
   inputTokens: number;
   outputTokens: number;
   totalTokens: number;
+  /** Tokens written to cache on first request (cache creation) */
+  cacheCreationTokens?: number;
+  /** Tokens read from cache (cache hit) */
+  cacheReadTokens?: number;
 }
 
 /**
@@ -27,21 +31,28 @@ export interface TokenUsage {
 export interface ClaudeResult {
   content: string;
   usage: TokenUsage;
+  /** True if response was truncated due to max_tokens limit */
+  wasTruncated?: boolean;
 }
 
 /**
- * Claude pricing per million tokens (as of Dec 2024)
+ * Claude pricing per million tokens (as of Jan 2025)
  * Opus 4.5: $15 input, $75 output
+ * Cache: Write 1.25x, Read 0.1x base input price
+ *
+ * @see https://www.anthropic.com/pricing
  */
 export const CLAUDE_PRICING = {
   'claude-opus-4-5-20251101': {
     inputPerMillion: 15,
     outputPerMillion: 75,
+    cacheWritePerMillion: 18.75, // 1.25x input price
+    cacheReadPerMillion: 1.5, // 0.1x input price (90% savings!)
   },
 } as const;
 
 /**
- * Calculate cost from token usage
+ * Calculate cost from token usage (including cache costs)
  */
 export function calculateCost(
   usage: TokenUsage,
@@ -51,7 +62,36 @@ export function calculateCost(
   const inputCost = (usage.inputTokens / 1_000_000) * pricing.inputPerMillion;
   const outputCost =
     (usage.outputTokens / 1_000_000) * pricing.outputPerMillion;
-  return inputCost + outputCost;
+  const cacheWriteCost =
+    ((usage.cacheCreationTokens ?? 0) / 1_000_000) *
+    pricing.cacheWritePerMillion;
+  const cacheReadCost =
+    ((usage.cacheReadTokens ?? 0) / 1_000_000) * pricing.cacheReadPerMillion;
+  return inputCost + outputCost + cacheWriteCost + cacheReadCost;
+}
+
+/**
+ * Log cache performance metrics for observability
+ * Only logs when cache activity occurs (creation or read)
+ */
+function logCachePerformance(usage: TokenUsage): void {
+  const cacheRead = usage.cacheReadTokens ?? 0;
+  const cacheWrite = usage.cacheCreationTokens ?? 0;
+
+  // Only log if caching is active
+  if (cacheRead === 0 && cacheWrite === 0) return;
+
+  const totalInput = usage.inputTokens + cacheRead;
+  const cacheHitRate =
+    totalInput > 0 ? ((cacheRead / totalInput) * 100).toFixed(1) : '0.0';
+
+  console.log(
+    `[Claude Cache] Hit: ${cacheHitRate}% | ` +
+      `Read: ${cacheRead.toLocaleString()} | ` +
+      `Write: ${cacheWrite.toLocaleString()} | ` +
+      `Input: ${usage.inputTokens.toLocaleString()} | ` +
+      `Output: ${usage.outputTokens.toLocaleString()}`,
+  );
 }
 
 /**
@@ -220,8 +260,11 @@ export async function callClaude(params: {
         );
       }
 
+      // Track if response was truncated
+      const wasTruncated = finalMessage.stop_reason === 'max_tokens';
+
       // Log warning if truncated due to max_tokens
-      if (finalMessage.stop_reason === 'max_tokens') {
+      if (wasTruncated) {
         console.warn(
           `[Claude] Response truncated due to max_tokens limit. ` +
             `Used ${finalMessage.usage.output_tokens}/${maxTokens} tokens. ` +
@@ -237,15 +280,22 @@ export async function callClaude(params: {
         );
       }
 
-      // Extract usage from final message
+      // Extract usage from final message (including cache metrics)
       const usage: TokenUsage = {
         inputTokens: finalMessage.usage.input_tokens,
         outputTokens: finalMessage.usage.output_tokens,
         totalTokens:
           finalMessage.usage.input_tokens + finalMessage.usage.output_tokens,
+        cacheCreationTokens:
+          (finalMessage.usage as { cache_creation_input_tokens?: number })
+            .cache_creation_input_tokens ?? 0,
+        cacheReadTokens:
+          (finalMessage.usage as { cache_read_input_tokens?: number })
+            .cache_read_input_tokens ?? 0,
       };
 
-      return { content: result, usage };
+      logCachePerformance(usage);
+      return { content: result, usage, wasTruncated };
     }
 
     // Non-streaming for smaller requests
@@ -266,6 +316,16 @@ export async function callClaude(params: {
       );
     }
 
+    // Track if response was truncated
+    const wasTruncated = response.stop_reason === 'max_tokens';
+    if (wasTruncated) {
+      console.warn(
+        `[Claude] Response truncated due to max_tokens limit. ` +
+          `Used ${response.usage.output_tokens}/${maxTokens} tokens. ` +
+          `Model: ${response.model}`,
+      );
+    }
+
     // Extract text from response with detailed error context
     const textBlock = response.content.find((block) => block.type === 'text');
     if (!textBlock || textBlock.type !== 'text') {
@@ -278,14 +338,21 @@ export async function callClaude(params: {
       );
     }
 
-    // Extract usage from response
+    // Extract usage from response (including cache metrics)
     const usage: TokenUsage = {
       inputTokens: response.usage.input_tokens,
       outputTokens: response.usage.output_tokens,
       totalTokens: response.usage.input_tokens + response.usage.output_tokens,
+      cacheCreationTokens:
+        (response.usage as { cache_creation_input_tokens?: number })
+          .cache_creation_input_tokens ?? 0,
+      cacheReadTokens:
+        (response.usage as { cache_read_input_tokens?: number })
+          .cache_read_input_tokens ?? 0,
     };
 
-    return { content: textBlock.text, usage };
+    logCachePerformance(usage);
+    return { content: textBlock.text, usage, wasTruncated };
   } catch (error) {
     // Re-throw ClaudeRefusalError as-is (user-friendly message)
     if (error instanceof ClaudeRefusalError) {
@@ -300,14 +367,81 @@ export async function callClaude(params: {
 }
 
 /**
- * Attempt to repair truncated JSON by closing unclosed brackets/braces
- * This handles cases where LLM output is cut off mid-response
+ * Parse state for JSON repair
  */
-function repairTruncatedJson(jsonStr: string): string {
-  // Track state while parsing
+interface JsonParseState {
+  inString: boolean;
+  escapeNext: boolean;
+  depth: number;
+  openStack: ('{' | '[')[];
+}
+
+/**
+ * Scan JSON string and return parse state at given position
+ */
+function getJsonState(jsonStr: string, endPos?: number): JsonParseState {
+  const state: JsonParseState = {
+    inString: false,
+    escapeNext: false,
+    depth: 0,
+    openStack: [],
+  };
+
+  const end = endPos ?? jsonStr.length;
+  for (let i = 0; i < end; i++) {
+    const char = jsonStr[i];
+
+    if (state.escapeNext) {
+      state.escapeNext = false;
+      continue;
+    }
+    if (char === '\\' && state.inString) {
+      state.escapeNext = true;
+      continue;
+    }
+    if (char === '"') {
+      state.inString = !state.inString;
+      continue;
+    }
+    if (state.inString) continue;
+
+    if (char === '{') {
+      state.openStack.push('{');
+      state.depth++;
+    } else if (char === '[') {
+      state.openStack.push('[');
+      state.depth++;
+    } else if (char === '}') {
+      if (
+        state.openStack.length > 0 &&
+        state.openStack[state.openStack.length - 1] === '{'
+      ) {
+        state.openStack.pop();
+        state.depth--;
+      }
+    } else if (char === ']') {
+      if (
+        state.openStack.length > 0 &&
+        state.openStack[state.openStack.length - 1] === '['
+      ) {
+        state.openStack.pop();
+        state.depth--;
+      }
+    }
+  }
+
+  return state;
+}
+
+/**
+ * Find position of last complete value in JSON
+ * A complete value is: string, number, boolean, null, or closed object/array
+ */
+function findLastCompleteValue(jsonStr: string): number {
   let inString = false;
   let escapeNext = false;
-  let lastCompleteKeyValueEnd = 0; // Position after complete key-value pair (after value, at comma or before closing brace)
+  let depth = 0;
+  let lastCompletePos = -1;
 
   for (let i = 0; i < jsonStr.length; i++) {
     const char = jsonStr[i];
@@ -322,94 +456,152 @@ function repairTruncatedJson(jsonStr: string): string {
     }
     if (char === '"') {
       inString = !inString;
+      if (!inString) {
+        // Just closed a string - check if it's a value (not a key)
+        // Look ahead to see if followed by : (key) or not (value)
+        let j = i + 1;
+        while (j < jsonStr.length && /\s/.test(jsonStr[j] ?? '')) j++;
+        if (j >= jsonStr.length || jsonStr[j] !== ':') {
+          // It's a value, not a key
+          if (depth > 0) lastCompletePos = i;
+        }
+      }
       continue;
     }
     if (inString) continue;
 
-    if (char === '}' || char === ']') {
-      // A closing brace/bracket means previous key-value pairs are complete
-      lastCompleteKeyValueEnd = i;
-    } else if (char === ',') {
-      // Comma means the previous key-value pair is complete
-      lastCompleteKeyValueEnd = i;
+    if (char === '{' || char === '[') {
+      depth++;
+    } else if (char === '}' || char === ']') {
+      depth--;
+      lastCompletePos = i;
+    } else if (char === ',' || char === ':') {
+      // After comma or colon is typically valid
+    } else if (/[0-9.-]/.test(char ?? '')) {
+      // Could be a number - scan to end
+      let j = i;
+      while (j < jsonStr.length && /[0-9.eE\-+]/.test(jsonStr[j] ?? '')) j++;
+      if (j > i && depth > 0) {
+        lastCompletePos = j - 1;
+        i = j - 1;
+      }
+    } else if (jsonStr.substring(i, i + 4) === 'true') {
+      if (depth > 0) lastCompletePos = i + 3;
+      i += 3;
+    } else if (jsonStr.substring(i, i + 5) === 'false') {
+      if (depth > 0) lastCompletePos = i + 4;
+      i += 4;
+    } else if (jsonStr.substring(i, i + 4) === 'null') {
+      if (depth > 0) lastCompletePos = i + 3;
+      i += 3;
     }
   }
 
+  return lastCompletePos;
+}
+
+/**
+ * Attempt to repair truncated JSON by finding last complete structure
+ * This handles cases where LLM output is cut off mid-response
+ *
+ * ANTIFRAGILE DESIGN: Multiple fallback strategies
+ * 1. Find last complete value and close from there
+ * 2. Find last complete object/array at any depth
+ * 3. Progressive truncation until valid
+ */
+function repairTruncatedJson(jsonStr: string): string {
+  const state = getJsonState(jsonStr);
+
+  // If not in a string and balanced, might be valid already
+  if (!state.inString && state.depth === 0) {
+    return jsonStr;
+  }
+
+  // Strategy 1: Find last complete value position
+  const lastValuePos = findLastCompleteValue(jsonStr);
+  if (lastValuePos > 0) {
+    let repaired = jsonStr.substring(0, lastValuePos + 1);
+
+    // Clean up trailing artifacts
+    repaired = repaired.replace(/,\s*$/, '');
+    repaired = repaired.replace(/:\s*$/, '');
+    repaired = repaired.replace(/,\s*"[^"]*"\s*:\s*$/, '');
+    repaired = repaired.replace(/,\s*"[^"]*"\s*$/, '');
+
+    // Close remaining structures
+    const repairState = getJsonState(repaired);
+    for (let i = repairState.openStack.length - 1; i >= 0; i--) {
+      repaired += repairState.openStack[i] === '{' ? '}' : ']';
+    }
+
+    // Try to parse
+    try {
+      JSON.parse(repaired);
+      return repaired;
+    } catch {
+      // Continue to next strategy
+    }
+  }
+
+  // Strategy 2: Progressive truncation - find last valid parse point
+  for (let i = jsonStr.length - 1; i > 100; i--) {
+    const char = jsonStr[i];
+    if (char === '}' || char === ']' || char === '"') {
+      let candidate = jsonStr.substring(0, i + 1);
+
+      // Clean trailing commas
+      candidate = candidate.replace(/,\s*$/, '');
+
+      // Check state and close
+      const candidateState = getJsonState(candidate);
+      if (!candidateState.inString) {
+        let closed = candidate;
+        for (let j = candidateState.openStack.length - 1; j >= 0; j--) {
+          closed += candidateState.openStack[j] === '{' ? '}' : ']';
+        }
+
+        try {
+          JSON.parse(closed);
+          return closed;
+        } catch {
+          // Continue searching
+        }
+      }
+    }
+  }
+
+  // Strategy 3: Original simple repair as final fallback
   let repaired = jsonStr;
 
-  // If we're in a string, we're mid-value - truncate to last complete key-value
-  if (inString) {
-    if (lastCompleteKeyValueEnd > 0) {
-      // Truncate to just after the last complete key-value pair
-      // If it ends with comma, include it (will be removed later if trailing)
-      repaired = jsonStr.substring(0, lastCompleteKeyValueEnd + 1);
-    } else {
-      // No complete key-value found, just close the string
-      repaired = repaired + '"';
-    }
+  // If in string, close it
+  if (state.inString) {
+    repaired += '"';
   }
 
-  // Remove trailing comma if present (invalid JSON)
+  // Remove trailing partial content
   repaired = repaired.replace(/,\s*$/, '');
-
-  // Also remove incomplete key-value patterns like ,"key": or ,"key"
   repaired = repaired.replace(/,\s*"[^"]*"\s*:\s*$/, '');
   repaired = repaired.replace(/,\s*"[^"]*"\s*$/, '');
 
-  // Close any unclosed brackets/braces in correct order
-  // We need to track what was opened to close in reverse order
-  const openStack: string[] = [];
-  inString = false;
-  escapeNext = false;
-
-  for (const char of repaired) {
-    if (escapeNext) {
-      escapeNext = false;
-      continue;
-    }
-    if (char === '\\' && inString) {
-      escapeNext = true;
-      continue;
-    }
-    if (char === '"') {
-      inString = !inString;
-      continue;
-    }
-    if (inString) continue;
-
-    if (char === '{') openStack.push('{');
-    else if (char === '[') openStack.push('[');
-    else if (char === '}') {
-      if (openStack.length > 0 && openStack[openStack.length - 1] === '{') {
-        openStack.pop();
-      }
-    } else if (char === ']') {
-      if (openStack.length > 0 && openStack[openStack.length - 1] === '[') {
-        openStack.pop();
-      }
-    }
-  }
-
-  // Close in reverse order
-  while (openStack.length > 0) {
-    const open = openStack.pop();
-    if (open === '{') repaired += '}';
-    else if (open === '[') repaired += ']';
+  // Close all open structures
+  const finalState = getJsonState(repaired);
+  for (let i = finalState.openStack.length - 1; i >= 0; i--) {
+    repaired += finalState.openStack[i] === '{' ? '}' : ']';
   }
 
   return repaired;
 }
 
 /**
- * Aggressively truncate JSON to last complete object/array
+ * Aggressively truncate JSON to last complete object/array at depth 0 or 1
  * Used as final fallback when normal repair fails
  */
 function aggressiveTruncateJson(jsonStr: string): string {
-  // Find the last complete closing brace/bracket that balances
-  let depth = 0;
   let inString = false;
   let escapeNext = false;
+  let depth = 0;
   let lastBalancedEnd = -1;
+  let lastDepth1End = -1;
 
   for (let i = 0; i < jsonStr.length; i++) {
     const char = jsonStr[i];
@@ -434,22 +626,57 @@ function aggressiveTruncateJson(jsonStr: string): string {
       depth--;
       if (depth === 0) {
         lastBalancedEnd = i;
+      } else if (depth === 1) {
+        lastDepth1End = i;
       }
     }
   }
 
+  // Prefer depth 0 (complete root object)
   if (lastBalancedEnd > 0) {
     return jsonStr.substring(0, lastBalancedEnd + 1);
+  }
+
+  // Fall back to depth 1 and close root
+  if (lastDepth1End > 0) {
+    const truncated = jsonStr.substring(0, lastDepth1End + 1);
+    // Remove trailing comma and close root
+    const cleaned = truncated.replace(/,\s*$/, '');
+    // Determine if root is object or array
+    const firstChar = jsonStr.trim()[0];
+    return cleaned + (firstChar === '[' ? ']' : '}');
   }
 
   return jsonStr;
 }
 
 /**
- * Parse JSON from Claude response with proper error handling
+ * Options for JSON parsing with truncation awareness
  */
-export function parseJsonResponse<T>(response: string, context: string): T {
+export interface ParseJsonOptions {
+  /** If true, response is known to be truncated (max_tokens hit) */
+  wasTruncated?: boolean;
+  /** If parsing fails, return this default instead of throwing */
+  defaultOnError?: unknown;
+}
+
+/**
+ * Parse JSON from Claude response with proper error handling
+ * ANTIFRAGILE: Multiple repair strategies, detailed logging, graceful degradation
+ */
+export function parseJsonResponse<T>(
+  response: string,
+  context: string,
+  options?: ParseJsonOptions,
+): T {
   let jsonStr = response.trim();
+
+  // Log if we know response was truncated
+  if (options?.wasTruncated) {
+    console.warn(
+      `[JSON Parse] ${context}: Response was truncated, attempting repair...`,
+    );
+  }
 
   // Try to extract JSON from complete markdown code blocks
   const completeMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -460,48 +687,109 @@ export function parseJsonResponse<T>(response: string, context: string): T {
     const incompleteMatch = jsonStr.match(/^```(?:json)?\s*([\s\S]*)/);
     if (incompleteMatch?.[1]) {
       jsonStr = incompleteMatch[1].trim();
+      console.log(
+        `[JSON Parse] ${context}: Extracted from incomplete code fence`,
+      );
     }
   }
 
+  // Track which strategy succeeded for logging
+  let strategy = 'direct';
+
   // First attempt: parse as-is
   try {
-    return JSON.parse(jsonStr) as T;
+    const result = JSON.parse(jsonStr) as T;
+    if (options?.wasTruncated) {
+      console.log(
+        `[JSON Parse] ${context}: Parsed truncated response successfully (direct)`,
+      );
+    }
+    return result;
   } catch (firstError) {
     // Second attempt: try to repair truncated JSON
     try {
       const repaired = repairTruncatedJson(jsonStr);
-      console.log(`[JSON Repair] ${context}: Repaired truncated JSON`);
-      return JSON.parse(repaired) as T;
+      strategy = 'repair';
+      const result = JSON.parse(repaired) as T;
+      console.log(
+        `[JSON Repair] ${context}: Repaired truncated JSON successfully ` +
+          `(original: ${jsonStr.length} chars, repaired: ${repaired.length} chars)`,
+      );
+      return result;
     } catch (secondError) {
       // Third attempt: aggressive truncation to last valid structure
       try {
         const truncated = aggressiveTruncateJson(jsonStr);
-        console.log(`[JSON Repair] ${context}: Aggressive truncation applied`);
-        return JSON.parse(truncated) as T;
-      } catch (thirdError) {
-        // Log details for debugging
-        console.error(`[JSON Parse Error] ${context}:`, {
-          originalLength: response.length,
-          extractedLength: jsonStr.length,
-          firstError:
-            firstError instanceof Error
-              ? firstError.message
-              : String(firstError),
-          secondError:
-            secondError instanceof Error
-              ? secondError.message
-              : String(secondError),
-          thirdError:
-            thirdError instanceof Error
-              ? thirdError.message
-              : String(thirdError),
-          preview: jsonStr.slice(0, 500),
-          ending: jsonStr.slice(-200),
-        });
-
-        throw new Error(
-          `Failed to parse JSON from ${context}: ${jsonStr.slice(0, 200)}...`,
+        strategy = 'aggressive';
+        const result = JSON.parse(truncated) as T;
+        console.log(
+          `[JSON Repair] ${context}: Aggressive truncation succeeded ` +
+            `(original: ${jsonStr.length} chars, truncated: ${truncated.length} chars)`,
         );
+        return result;
+      } catch (thirdError) {
+        // Fourth attempt: Try to extract ANY valid JSON object from the response
+        try {
+          // Find the first { and try progressively shorter substrings
+          const firstBrace = jsonStr.indexOf('{');
+          if (firstBrace >= 0) {
+            for (
+              let endPos = jsonStr.length;
+              endPos > firstBrace + 100;
+              endPos -= 50
+            ) {
+              const slice = jsonStr.substring(firstBrace, endPos);
+              const repaired = repairTruncatedJson(slice);
+              try {
+                const result = JSON.parse(repaired) as T;
+                strategy = 'progressive';
+                console.log(
+                  `[JSON Repair] ${context}: Progressive repair succeeded at offset ${endPos}`,
+                );
+                return result;
+              } catch {
+                // Continue searching
+              }
+            }
+          }
+          throw thirdError; // Re-throw to hit the error handler below
+        } catch {
+          // All strategies failed
+
+          // If a default was provided, return it
+          if (options?.defaultOnError !== undefined) {
+            console.error(
+              `[JSON Parse] ${context}: All repair strategies failed, returning default`,
+            );
+            return options.defaultOnError as T;
+          }
+
+          // Log detailed error info
+          console.error(`[JSON Parse Error] ${context}:`, {
+            wasTruncated: options?.wasTruncated ?? false,
+            originalLength: response.length,
+            extractedLength: jsonStr.length,
+            strategy,
+            firstError:
+              firstError instanceof Error
+                ? firstError.message
+                : String(firstError),
+            secondError:
+              secondError instanceof Error
+                ? secondError.message
+                : String(secondError),
+            thirdError:
+              thirdError instanceof Error
+                ? thirdError.message
+                : String(thirdError),
+            preview: jsonStr.slice(0, 500),
+            ending: jsonStr.slice(-200),
+          });
+
+          throw new Error(
+            `Failed to parse JSON from ${context}: ${jsonStr.slice(0, 200)}...`,
+          );
+        }
       }
     }
   }

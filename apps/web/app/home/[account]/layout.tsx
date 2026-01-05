@@ -9,6 +9,7 @@ import { Page, PageMobileNavigation, PageNavigation } from '@kit/ui/page';
 import { SidebarProvider } from '@kit/ui/shadcn-sidebar';
 
 import { AppLogo } from '~/components/app-logo';
+import { HelpWidgetTrigger } from '~/components/help-widget';
 import { getTeamAccountSidebarConfig } from '~/config/team-account-navigation.config';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
@@ -75,6 +76,7 @@ function SidebarLayout({
 
           {children}
         </Page>
+        <HelpWidgetTrigger />
       </SidebarProvider>
     </TeamAccountWorkspaceContextProvider>
   );
@@ -115,6 +117,7 @@ function HeaderLayout({
 
         {children}
       </Page>
+      <HelpWidgetTrigger />
     </TeamAccountWorkspaceContextProvider>
   );
 }

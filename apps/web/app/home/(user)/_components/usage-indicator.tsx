@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-
 import { Progress } from '@kit/ui/progress';
 import {
   Tooltip,
@@ -10,6 +8,7 @@ import {
   TooltipTrigger,
 } from '@kit/ui/tooltip';
 
+import { AppLink } from '~/components/app-link';
 import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 
 interface UsageIndicatorProps {
@@ -77,12 +76,12 @@ export function UsageIndicator({
               <span className="text-muted-foreground">Resets in:</span>
               <span className="font-medium">{daysRemaining} days</span>
             </div>
-            <Link
+            <AppLink
               href="/home/billing"
               className="block w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-center text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
             >
               Upgrade
-            </Link>
+            </AppLink>
           </div>
         </TooltipContent>
       </Tooltip>

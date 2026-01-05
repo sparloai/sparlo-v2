@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import type { ComponentProps } from 'react';
+
+import Link from 'next/link';
 
 import { getAppPath } from '~/lib/hooks/use-app-path';
 
@@ -16,12 +17,14 @@ type AppLinkProps = ComponentProps<typeof Link>;
  * On sparlo.ai, this renders as `/home/reports`
  */
 export function AppLink({ href, ...props }: AppLinkProps) {
-  const hrefString = typeof href === 'string' ? href : href.pathname ?? '';
+  const hrefString = typeof href === 'string' ? href : (href.pathname ?? '');
   const convertedHref = getAppPath(hrefString);
 
   // If href was an object, preserve the other properties
   const finalHref =
-    typeof href === 'object' ? { ...href, pathname: convertedHref } : convertedHref;
+    typeof href === 'object'
+      ? { ...href, pathname: convertedHref }
+      : convertedHref;
 
   return <Link href={finalHref} {...props} />;
 }

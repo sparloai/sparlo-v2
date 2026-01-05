@@ -76,6 +76,9 @@ async function workspaceLoader() {
     // No subscription found, use default limit
   }
 
+  // Pro (50 reports) or Enterprise/Max (999 reports) are "paid" plans with Teams access
+  const isPaidPlan = reportLimit >= 50;
+
   return {
     accounts,
     workspace,
@@ -83,5 +86,6 @@ async function workspaceLoader() {
     reportLimit,
     reports,
     reportsUsed,
+    isPaidPlan,
   };
 }

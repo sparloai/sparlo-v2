@@ -67,7 +67,17 @@
     "profile": "Profile",
     "application": "Application",
     "newReport": "New Report",
-    "help": "Help Center"
+    "help": "Help Center",
+    "teams": "Teams"
+  },
+  "teams": {
+    "title": "Teams",
+    "description": "Manage your team members and invitations.",
+    "noTeams": "No teams yet",
+    "noTeamsDescription": "You're not a member of any teams. Teams allow you to share your subscription with others.",
+    "manageMembers": "Manage Members",
+    "memberCount": "{{count}} member",
+    "memberCount_plural": "{{count}} members"
   },
   "nav": {
     "usageThisMonth": "Usage This Month",

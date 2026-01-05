@@ -3,13 +3,30 @@ import 'server-only';
 import { getLogger } from '@kit/shared/logger';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-// Rate limit configurations per type (requests per hour)
+import { HELP_CENTER_CONFIG } from '~/lib/help/config';
+
+// Rate limit configurations per type (requests per window)
 const rateLimitConfigs = {
-  chat: { limit: 20, windowMinutes: 60 },
-  ticket: { limit: 5, windowMinutes: 1440 }, // 5 per day
-  feedback: { limit: 20, windowMinutes: 60 },
-  docsSearch: { limit: 60, windowMinutes: 1 }, // 60 per minute
+  chat: {
+    limit: HELP_CENTER_CONFIG.RATE_LIMITS.CHAT_PER_HOUR,
+    windowMinutes: 60,
+  },
+  ticket: {
+    limit: HELP_CENTER_CONFIG.RATE_LIMITS.TICKETS_PER_DAY,
+    windowMinutes: 1440,
+  },
+  feedback: {
+    limit: HELP_CENTER_CONFIG.RATE_LIMITS.FEEDBACK_PER_HOUR,
+    windowMinutes: 60,
+  },
+  docsSearch: {
+    limit: HELP_CENTER_CONFIG.RATE_LIMITS.DOCS_SEARCH_PER_MINUTE,
+    windowMinutes: 1,
+  },
 } as const;
+
+// Grace period for requests when rate limiting fails (fail-closed with small grace)
+const FAIL_CLOSED_GRACE = HELP_CENTER_CONFIG.RATE_LIMIT_FAIL_CLOSED_GRACE;
 
 export type RateLimitType = keyof typeof rateLimitConfigs;
 
@@ -50,12 +67,12 @@ export async function checkRateLimit(
 
     if (error) {
       logger.error({ type, identifier, error }, 'Rate limit check failed');
-      // Fail open - allow request if rate limiting fails
+      // P2 Fix: Fail closed with small grace period to prevent DoS via DB overload
       return {
-        success: true,
-        limit: config.limit,
-        remaining: config.limit,
-        reset: Date.now() + config.windowMinutes * 60000,
+        success: false,
+        limit: FAIL_CLOSED_GRACE,
+        remaining: 0,
+        reset: Date.now() + 60000, // 1 minute retry
       };
     }
 
@@ -73,12 +90,12 @@ export async function checkRateLimit(
     };
   } catch (error) {
     logger.error({ type, identifier, error }, 'Rate limit check error');
-    // Fail open
+    // P2 Fix: Fail closed with small grace period
     return {
-      success: true,
-      limit: config.limit,
-      remaining: config.limit,
-      reset: Date.now() + config.windowMinutes * 60000,
+      success: false,
+      limit: FAIL_CLOSED_GRACE,
+      remaining: 0,
+      reset: Date.now() + 60000, // 1 minute retry
     };
   }
 }
