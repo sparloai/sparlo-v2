@@ -82,10 +82,24 @@ const getUser = async (request: NextRequest, response: NextResponse) => {
   const supabase = createMiddlewareClient(request, response);
 
   try {
-    return await supabase.auth.getClaims();
+    const result = await supabase.auth.getClaims();
+
+    // Handle returned errors (not thrown)
+    if (result.error) {
+      const errorCode = (result.error as { code?: string })?.code;
+      if (
+        errorCode === 'refresh_token_already_used' ||
+        errorCode === 'invalid_refresh_token'
+      ) {
+        console.warn('[Middleware] Stale refresh token detected, clearing cookies');
+        clearAuthCookies(request, response);
+        return { data: { claims: null }, error: null };
+      }
+    }
+
+    return result;
   } catch (error) {
-    // Handle stale refresh tokens by clearing cookies
-    // This prevents infinite retry loops on already-used tokens
+    // Handle thrown errors
     if (
       error &&
       typeof error === 'object' &&
@@ -93,9 +107,8 @@ const getUser = async (request: NextRequest, response: NextResponse) => {
       (error.code === 'refresh_token_already_used' ||
        error.code === 'invalid_refresh_token')
     ) {
-      console.warn('[Middleware] Stale refresh token detected, clearing cookies');
+      console.warn('[Middleware] Stale refresh token detected (thrown), clearing cookies');
       clearAuthCookies(request, response);
-      // Return empty result to trigger fresh auth flow
       return { data: { claims: null }, error: null };
     }
 
