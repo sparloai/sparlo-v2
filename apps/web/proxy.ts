@@ -33,10 +33,65 @@ export const config = {
   matcher: ['/((?!_next/static|_next/image|images|locales|assets|api/*).*)'],
 };
 
-const getUser = (request: NextRequest, response: NextResponse) => {
+/**
+ * Auth cookie names that should be cleared when token refresh fails.
+ * Supabase uses chunked cookies for large tokens (sb-*-auth-token and sb-*-auth-token.0, .1, etc.)
+ */
+const AUTH_COOKIE_PATTERNS = [
+  'sb-',  // Matches all Supabase cookies
+];
+
+/**
+ * Clear all auth cookies from the response.
+ * This forces a clean re-authentication flow.
+ */
+function clearAuthCookies(request: NextRequest, response: NextResponse) {
+  const allCookies = request.cookies.getAll();
+
+  for (const cookie of allCookies) {
+    const isAuthCookie = AUTH_COOKIE_PATTERNS.some(pattern =>
+      cookie.name.startsWith(pattern)
+    );
+
+    if (isAuthCookie) {
+      // Clear the cookie by setting it to empty with immediate expiry
+      response.cookies.set(cookie.name, '', {
+        expires: new Date(0),
+        path: '/',
+        // Match the same settings used when setting cookies
+        ...(process.env.NODE_ENV === 'production' && { domain: '.sparlo.ai' }),
+        ...(process.env.NODE_ENV === 'production' && { secure: true }),
+        sameSite: 'lax',
+        httpOnly: true,
+      });
+    }
+  }
+}
+
+const getUser = async (request: NextRequest, response: NextResponse) => {
   const supabase = createMiddlewareClient(request, response);
 
-  return supabase.auth.getClaims();
+  try {
+    return await supabase.auth.getClaims();
+  } catch (error) {
+    // Handle stale refresh tokens by clearing cookies
+    // This prevents infinite retry loops on already-used tokens
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      (error.code === 'refresh_token_already_used' ||
+       error.code === 'invalid_refresh_token')
+    ) {
+      console.warn('[Middleware] Stale refresh token detected, clearing cookies');
+      clearAuthCookies(request, response);
+      // Return empty result to trigger fresh auth flow
+      return { data: { claims: null }, error: null };
+    }
+
+    // Re-throw other errors
+    throw error;
+  }
 };
 
 export async function proxy(request: NextRequest) {
