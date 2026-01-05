@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -53,6 +53,7 @@ export function ProcessingScreen({
   designChallenge,
 }: ProcessingScreenProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const prefersReducedMotion = usePrefersReducedMotion();
   const [clarificationAnswer, setClarificationAnswer] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -125,6 +126,24 @@ export function ProcessingScreen({
     }
 
     if (noClarificationNeeded) {
+      // Don't redirect if we're on a "new report" page - user should stay to see progress
+      const isNewReportPage =
+        pathname?.includes('/reports/new') ||
+        pathname?.includes('/reports/discovery/new') ||
+        pathname?.includes('/reports/hybrid/new') ||
+        pathname?.includes('/reports/dd/new');
+
+      if (isNewReportPage) {
+        console.log(
+          '[ProcessingScreen] Skipping redirect - on new report page:',
+          pathname,
+        );
+        return;
+      }
+
+      console.log(
+        '[ProcessingScreen] REDIRECTING TO /home because noClarificationNeeded=true',
+      );
       hasNavigatedRef.current = true;
       router.push('/home');
     }
@@ -136,6 +155,7 @@ export function ProcessingScreen({
     hasPendingClarification,
     onComplete,
     router,
+    pathname,
   ]);
 
   // Get the current clarification question (if any)
