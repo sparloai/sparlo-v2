@@ -44,9 +44,11 @@ const AUTH_COOKIE_PATTERNS = [
 /**
  * Clear all auth cookies from the response.
  * This forces a clean re-authentication flow.
+ * Clears cookies for both root domain and subdomains to ensure complete cleanup.
  */
 function clearAuthCookies(request: NextRequest, response: NextResponse) {
   const allCookies = request.cookies.getAll();
+  const isProduction = process.env.NODE_ENV === 'production';
 
   for (const cookie of allCookies) {
     const isAuthCookie = AUTH_COOKIE_PATTERNS.some(pattern =>
@@ -54,13 +56,21 @@ function clearAuthCookies(request: NextRequest, response: NextResponse) {
     );
 
     if (isAuthCookie) {
-      // Clear the cookie by setting it to empty with immediate expiry
+      // Clear for root domain (covers all subdomains)
       response.cookies.set(cookie.name, '', {
         expires: new Date(0),
         path: '/',
-        // Match the same settings used when setting cookies
-        ...(process.env.NODE_ENV === 'production' && { domain: '.sparlo.ai' }),
-        ...(process.env.NODE_ENV === 'production' && { secure: true }),
+        ...(isProduction && { domain: '.sparlo.ai' }),
+        ...(isProduction && { secure: true }),
+        sameSite: 'lax',
+        httpOnly: true,
+      });
+
+      // Also clear without domain (current host only) as fallback
+      response.cookies.set(cookie.name, '', {
+        expires: new Date(0),
+        path: '/',
+        ...(isProduction && { secure: true }),
         sameSite: 'lax',
         httpOnly: true,
       });
