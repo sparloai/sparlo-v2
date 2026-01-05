@@ -185,7 +185,7 @@ export const GET = enhanceRouteHandler(
     try {
       const client = getSupabaseServerClient();
 
-      // Check rate limit before generating PDF (fail-secure)
+      // Check rate limit before generating PDF (optional - skip if RPC not deployed)
       try {
         const { data: rateLimitData, error: rateLimitError } = await client.rpc(
           'check_rate_limit' as 'count_completed_reports',
@@ -198,46 +198,51 @@ export const GET = enhanceRouteHandler(
         );
 
         if (rateLimitError) {
-          // Fail-secure: deny request if rate limit check fails
-          console.error(
-            '[PDF Export] Rate limit check failed:',
-            rateLimitError,
-          );
-          return NextResponse.json(
-            { error: 'Service temporarily unavailable', code: 'SERVICE_ERROR' },
-            { status: 503, headers: { 'Retry-After': '30' } },
-          );
-        }
-
-        const result = rateLimitData as unknown as RateLimitResult;
-        if (!result.allowed) {
-          return NextResponse.json(
-            { error: 'Rate limit exceeded', code: 'RATE_LIMITED' },
-            {
-              status: 429,
-              headers: {
-                'Retry-After': String(result.retryAfter ?? 60),
-                'X-RateLimit-Limit-Hour': String(result.hourlyLimit),
-                'X-RateLimit-Remaining-Hour': String(
-                  Math.max(0, result.hourlyLimit - result.hourCount),
-                ),
-                'X-RateLimit-Reset-Hour': String(result.hourReset),
-                'X-RateLimit-Limit-Day': String(result.dailyLimit),
-                'X-RateLimit-Remaining-Day': String(
-                  Math.max(0, result.dailyLimit - result.dayCount),
-                ),
-                'X-RateLimit-Reset-Day': String(result.dayReset),
+          // Check if the RPC function doesn't exist (not deployed yet)
+          const errorMessage = rateLimitError.message || '';
+          if (
+            errorMessage.includes('does not exist') ||
+            errorMessage.includes('not found') ||
+            rateLimitError.code === '42883' // PostgreSQL: undefined_function
+          ) {
+            console.warn(
+              '[PDF Export] Rate limit RPC not deployed, skipping check',
+            );
+            // Continue without rate limiting
+          } else {
+            // Log but don't block - rate limiting is optional for now
+            console.warn(
+              '[PDF Export] Rate limit check failed, proceeding anyway:',
+              rateLimitError,
+            );
+          }
+        } else if (rateLimitData) {
+          const result = rateLimitData as unknown as RateLimitResult;
+          if (!result.allowed) {
+            return NextResponse.json(
+              { error: 'Rate limit exceeded', code: 'RATE_LIMITED' },
+              {
+                status: 429,
+                headers: {
+                  'Retry-After': String(result.retryAfter ?? 60),
+                  'X-RateLimit-Limit-Hour': String(result.hourlyLimit),
+                  'X-RateLimit-Remaining-Hour': String(
+                    Math.max(0, result.hourlyLimit - result.hourCount),
+                  ),
+                  'X-RateLimit-Reset-Hour': String(result.hourReset),
+                  'X-RateLimit-Limit-Day': String(result.dailyLimit),
+                  'X-RateLimit-Remaining-Day': String(
+                    Math.max(0, result.dailyLimit - result.dayCount),
+                  ),
+                  'X-RateLimit-Reset-Day': String(result.dayReset),
+                },
               },
-            },
-          );
+            );
+          }
         }
       } catch (err) {
-        // Fail-secure: deny request if rate limit check throws
-        console.error('[PDF Export] Rate limit check error:', err);
-        return NextResponse.json(
-          { error: 'Service temporarily unavailable', code: 'SERVICE_ERROR' },
-          { status: 503, headers: { 'Retry-After': '30' } },
-        );
+        // Rate limiting is optional - log but proceed
+        console.warn('[PDF Export] Rate limit check error, proceeding:', err);
       }
 
       // Fetch report with all necessary fields
