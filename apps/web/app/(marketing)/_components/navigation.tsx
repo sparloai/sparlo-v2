@@ -315,6 +315,16 @@ const UserAvatarDropdown = memo(function UserAvatarDropdown({
       >
         <DropdownMenuItem asChild>
           <Link
+            href={pathsConfig.app.home}
+            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
+          >
+            <DashboardIcon className="h-5 w-5 text-zinc-400" />
+            <span>Dashboard</span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem asChild>
+          <Link
             href={pathsConfig.app.personalAccountSettings}
             className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
           >
@@ -367,6 +377,25 @@ const UserAvatarDropdown = memo(function UserAvatarDropdown({
 });
 
 // Icons
+function DashboardIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="7" height="9" x="3" y="3" rx="1" />
+      <rect width="7" height="5" x="14" y="3" rx="1" />
+      <rect width="7" height="9" x="14" y="12" rx="1" />
+      <rect width="7" height="5" x="3" y="16" rx="1" />
+    </svg>
+  );
+}
+
 function SettingsIcon({ className }: { className?: string }) {
   return (
     <svg
