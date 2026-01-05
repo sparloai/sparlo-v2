@@ -27,11 +27,22 @@ export async function GET(request: NextRequest) {
 
     return redirect(nextPath);
   } catch (error) {
-    console.error('Auth callback error:', error);
-    const errorMessage =
-      error instanceof Error ? error.message : 'Authentication failed';
-    return redirect(
-      `/auth/callback/error?error=${encodeURIComponent(errorMessage)}`,
-    );
+    // Log detailed error for debugging
+    const errorDetails = {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      name: error instanceof Error ? error.name : 'Error',
+      code: (error as { code?: string })?.code,
+      status: (error as { status?: number })?.status,
+    };
+    console.error('Auth callback error:', JSON.stringify(errorDetails));
+
+    // Build error URL with debug info
+    const errorParams = new URLSearchParams();
+    errorParams.set('error', errorDetails.message);
+    if (errorDetails.code) {
+      errorParams.set('code', errorDetails.code);
+    }
+
+    return redirect(`/auth/callback/error?${errorParams.toString()}`);
   }
 }
