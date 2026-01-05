@@ -1,20 +1,23 @@
 import Anthropic from '@anthropic-ai/sdk';
+import type { MessageStreamEvent } from '@anthropic-ai/sdk/resources/messages';
 import { z } from 'zod';
 
 import { enhanceRouteHandler } from '@kit/next/routes';
 import { getLogger } from '@kit/shared/logger';
 
+import { HELP_CENTER_CONFIG, MARKER_LENGTH } from '~/lib/help/config';
 import { createKeywordSearchService } from '~/lib/rag/keyword-search-service';
-import {
-  buildSystemPrompt,
-  cleanEscalationMarkers,
-} from '~/lib/rag/prompt-builder';
+import { buildSystemPrompt } from '~/lib/rag/prompt-builder';
 import { validateNoPII } from '~/lib/security/pii-detector';
 import { checkRateLimit, getRateLimitHeaders } from '~/lib/security/rate-limit';
 import { sanitizeForPrompt } from '~/lib/security/sanitize';
 
-const STREAM_TIMEOUT_MS = 30000;
-const MAX_RESPONSE_BYTES = 50000;
+const {
+  ESCALATION_MARKER,
+  STREAM_TIMEOUT_MS,
+  MAX_RESPONSE_BYTES,
+  MAX_BUFFER_SIZE,
+} = HELP_CENTER_CONFIG;
 
 const RequestSchema = z.object({
   message: z
@@ -34,6 +37,10 @@ const RequestSchema = z.object({
       (arr) =>
         arr.every((item, i) => i === 0 || item.role !== arr[i - 1]?.role),
       'History must alternate between user and assistant',
+    )
+    .refine(
+      (arr) => arr.length === 0 || arr[arr.length - 1]?.role === 'assistant',
+      'Last message in history must be from assistant',
     ),
 });
 
@@ -125,15 +132,19 @@ export const POST = enhanceRouteHandler(
         );
       }
 
-      // Create streaming response with timeout and size limit
+      // Create streaming response with timeout, size limit, and buffered marker detection
       const encoder = new TextEncoder();
       const startTime = Date.now();
       let totalBytes = 0;
 
+      // Buffer to catch escalation markers that span chunks
+      let buffer = '';
+      let escalationDetected = false;
+
       const readable = new ReadableStream({
         async start(controller) {
           try {
-            for await (const event of stream) {
+            for await (const event of stream as AsyncIterable<MessageStreamEvent>) {
               // Check timeout
               if (Date.now() - startTime > STREAM_TIMEOUT_MS) {
                 controller.enqueue(
@@ -146,25 +157,58 @@ export const POST = enhanceRouteHandler(
                 event.type === 'content_block_delta' &&
                 event.delta.type === 'text_delta'
               ) {
-                let text = event.delta.text;
+                const deltaText = event.delta.text ?? '';
+                buffer += deltaText;
 
-                // Clean escalation markers before sending to client
-                text = cleanEscalationMarkers(text);
-
-                const chunk = encoder.encode(text);
-                totalBytes += chunk.length;
-
-                // Check size limit
-                if (totalBytes > MAX_RESPONSE_BYTES) {
+                // P1 Fix: Prevent unbounded buffer growth (DoS protection)
+                if (buffer.length > MAX_BUFFER_SIZE) {
+                  logger.warn({ ...ctx }, 'Buffer size exceeded, truncating');
                   controller.enqueue(
                     encoder.encode('\n\n[Response truncated]'),
                   );
                   break;
                 }
 
-                controller.enqueue(chunk);
+                // Check if buffer contains full marker
+                if (buffer.includes(ESCALATION_MARKER)) {
+                  escalationDetected = true;
+                  buffer = buffer.replace(ESCALATION_MARKER, '');
+                }
+
+                // Only emit when buffer is safely past marker length
+                if (buffer.length > MARKER_LENGTH) {
+                  const safeToEmit = buffer.slice(0, -MARKER_LENGTH);
+                  buffer = buffer.slice(-MARKER_LENGTH);
+
+                  const chunk = encoder.encode(safeToEmit);
+                  totalBytes += chunk.length;
+
+                  // Check size limit
+                  if (totalBytes > MAX_RESPONSE_BYTES) {
+                    controller.enqueue(
+                      encoder.encode('\n\n[Response truncated]'),
+                    );
+                    break;
+                  }
+
+                  controller.enqueue(chunk);
+                }
               }
             }
+
+            // Emit remaining buffer (cleaned of any partial markers)
+            if (buffer.length > 0) {
+              const cleanedBuffer = buffer.replace(ESCALATION_MARKER, '');
+              if (cleanedBuffer.length > 0) {
+                controller.enqueue(encoder.encode(cleanedBuffer));
+              }
+            }
+
+            // Log escalation for monitoring
+            if (escalationDetected) {
+              logger.info({ ...ctx }, 'User escalated to human support');
+            }
+
             controller.close();
           } catch (error) {
             logger.error({ ...ctx, error }, 'Stream processing error');
@@ -189,8 +233,14 @@ export const POST = enhanceRouteHandler(
       logger.error({ ...ctx, error }, 'Chat request failed');
 
       if (error instanceof z.ZodError) {
+        // P3 Fix: Don't leak validation schema in production
         return new Response(
-          JSON.stringify({ error: 'Invalid request', details: error.errors }),
+          JSON.stringify({
+            error: 'Invalid request format. Please check your input.',
+            ...(process.env.NODE_ENV === 'development' && {
+              details: error.errors,
+            }),
+          }),
           { status: 400, headers: { 'Content-Type': 'application/json' } },
         );
       }

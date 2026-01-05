@@ -1,10 +1,24 @@
 import 'server-only';
 
+// P2 Fix: Expanded PII patterns for comprehensive detection
 const PII_PATTERNS: Record<string, RegExp> = {
+  // Financial
   creditCard: /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g,
+  bankAccount: /\b\d{8,17}\b/g, // Bank account numbers (8-17 digits)
+
+  // Government IDs
   ssn: /\b\d{3}-\d{2}-\d{4}\b/g,
+  ein: /\b\d{2}-\d{7}\b/g, // Employer Identification Number
+
+  // Credentials
   password: /password\s*[:=]\s*['"]?([^\s'"]+)/gi,
-  apiKey: /\b(sk-|pk-|api[_-]?key)[a-z0-9_-]{20,}\b/gi,
+  apiKey: /\b(sk-|pk-|api[_-]?key|secret[_-]?key)[a-z0-9_-]{20,}\b/gi,
+  bearer: /bearer\s+[a-z0-9_-]{20,}/gi,
+  privateKey: /-----BEGIN\s+(RSA\s+)?PRIVATE KEY-----/gi,
+
+  // Contact info (basic patterns)
+  phoneUS: /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g,
+  email: /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/gi,
 };
 
 export interface PIIDetectionResult {

@@ -1,10 +1,12 @@
 import 'server-only';
 
+import { HELP_CENTER_CONFIG } from '~/lib/help/config';
 import { sanitizeForPrompt } from '~/lib/security/sanitize';
 
 import type { SearchResult } from './keyword-search-service';
 
-const ESCALATION_MARKER = '__SYSTEM_ESCALATE_7a8b9c__';
+// P2 Fix: Import from single source of truth instead of duplicating
+const { ESCALATION_MARKER } = HELP_CENTER_CONFIG;
 
 /**
  * Builds a safe system prompt with sanitized context
