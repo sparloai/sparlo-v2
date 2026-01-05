@@ -8,7 +8,7 @@ import { useSupabase } from './use-supabase';
 
 /**
  * @name PRIVATE_PATH_PREFIXES
- * @description A list of private path prefixes
+ * @description A list of private path prefixes for the main domain
  */
 const PRIVATE_PATH_PREFIXES = [
   '/home',
@@ -20,9 +20,47 @@ const PRIVATE_PATH_PREFIXES = [
 
 /**
  * @name AUTH_PATHS
- * @description A list of auth paths
+ * @description A list of auth paths (never reload on these)
  */
 const AUTH_PATHS = ['/auth'];
+
+/**
+ * @name PUBLIC_PATHS_ON_SUBDOMAIN
+ * @description Paths that are public on the app subdomain (don't require auth)
+ */
+const PUBLIC_PATHS_ON_SUBDOMAIN = [
+  '/auth',
+  '/api',
+  '/_next',
+  '/locales',
+  '/images',
+  '/assets',
+  '/healthcheck',
+];
+
+/**
+ * Check if we're on the app subdomain.
+ * Uses environment variables for domain configuration.
+ */
+function isAppSubdomain(): boolean {
+  if (typeof window === 'undefined') return false;
+
+  const hostname = window.location.hostname;
+  const appSubdomain = process.env.NEXT_PUBLIC_APP_SUBDOMAIN ?? 'app';
+  const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN ?? 'sparlo.ai';
+  const appSubdomainHost = `${appSubdomain}.${productionDomain}`;
+
+  return hostname === appSubdomainHost;
+}
+
+/**
+ * Check if a path is public on the app subdomain.
+ */
+function isPublicPathOnSubdomain(pathname: string): boolean {
+  return PUBLIC_PATHS_ON_SUBDOMAIN.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
 
 /**
  * @name useAuthChangeListener
@@ -67,9 +105,15 @@ export function useAuthChangeListener({
         !user && isPrivateRoute(pathName, privatePathPrefixes);
 
       if (shouldRedirectUser) {
-        // send user away when signed out
-        window.location.assign('/');
+        // On app subdomain, redirect to main domain for auth
+        if (isAppSubdomain()) {
+          const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN ?? 'sparlo.ai';
+          window.location.assign(`https://${productionDomain}/auth/sign-in`);
+          return;
+        }
 
+        // On main domain, redirect to home
+        window.location.assign('/');
         return;
       }
 
@@ -79,6 +123,14 @@ export function useAuthChangeListener({
         // sometimes Supabase sends SIGNED_OUT event
         // but in the auth path, so we ignore it
         if (AUTH_PATHS.some((path) => pathName.startsWith(path))) {
+          return;
+        }
+
+        // On app subdomain, redirect to main domain instead of reloading
+        // This prevents refresh loops caused by session desync between domains
+        if (isAppSubdomain()) {
+          const productionDomain = process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN ?? 'sparlo.ai';
+          window.location.assign(`https://${productionDomain}/auth/sign-in`);
           return;
         }
 
@@ -99,7 +151,15 @@ export function useAuthChangeListener({
 
 /**
  * Determines if a given path is a private route.
+ * On the app subdomain, all paths except public paths are private.
+ * On the main domain, uses the prefix list.
  */
-function isPrivateRoute(path: string, privatePathPrefixes: string[]) {
+function isPrivateRoute(path: string, privatePathPrefixes: string[]): boolean {
+  // On app subdomain, all paths except public paths are private
+  if (isAppSubdomain()) {
+    return !isPublicPathOnSubdomain(path);
+  }
+
+  // On main domain, use the prefix list
   return privatePathPrefixes.some((prefix) => path.startsWith(prefix));
 }
