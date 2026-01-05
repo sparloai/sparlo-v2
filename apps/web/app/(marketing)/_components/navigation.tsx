@@ -311,64 +311,63 @@ const UserAvatarDropdown = memo(function UserAvatarDropdown({
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="w-48 rounded-xl border border-zinc-200 bg-white p-1.5 shadow-lg"
+        className="w-56 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg"
       >
         <DropdownMenuItem asChild>
           <Link
-            href={pathsConfig.app.home}
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            <DashboardIcon className="h-[18px] w-[18px]" />
-            <span>Dashboard</span>
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild>
-          <Link
-            href={pathsConfig.app.personalAccountBilling}
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            <BillingIcon className="h-[18px] w-[18px]" />
-            <span>Billing</span>
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild>
-          <Link
             href={pathsConfig.app.personalAccountSettings}
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
           >
-            <SettingsIcon className="h-[18px] w-[18px]" />
+            <SettingsIcon className="h-5 w-5 text-zinc-400" />
             <span>Settings</span>
           </Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
           <Link
-            href="/docs"
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+            href={pathsConfig.app.personalAccountBilling}
+            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
           >
-            <SupportIcon className="h-[18px] w-[18px]" />
-            <span>Support</span>
+            <BillingIcon className="h-5 w-5 text-zinc-400" />
+            <span>Billing</span>
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator className="my-1.5 bg-zinc-100" />
+        <DropdownMenuItem asChild>
+          <Link
+            href="/docs"
+            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
+          >
+            <HelpIcon className="h-5 w-5 text-zinc-400" />
+            <span>Help</span>
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator className="my-2 bg-zinc-100" />
 
         <DropdownMenuItem
           onClick={() => signOut.mutateAsync()}
-          className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+          className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
         >
-          <SignOutIcon className="h-[18px] w-[18px]" />
-          <span>Sign Out</span>
+          <LogOutIcon className="h-5 w-5 text-zinc-400" />
+          <span>Log out</span>
         </DropdownMenuItem>
+
+        {user.email && (
+          <>
+            <DropdownMenuSeparator className="my-2 bg-zinc-100" />
+            <div className="px-3 py-2 text-[14px] text-zinc-400">
+              {user.email}
+            </div>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
 });
 
 // Icons
-function DashboardIcon({ className }: { className?: string }) {
+function SettingsIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -379,10 +378,8 @@ function DashboardIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <rect width="7" height="9" x="3" y="3" rx="1" />
-      <rect width="7" height="5" x="14" y="3" rx="1" />
-      <rect width="7" height="9" x="14" y="12" rx="1" />
-      <rect width="7" height="5" x="3" y="16" rx="1" />
+      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
@@ -404,24 +401,7 @@ function BillingIcon({ className }: { className?: string }) {
   );
 }
 
-function SettingsIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
-
-function SupportIcon({ className }: { className?: string }) {
+function HelpIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
@@ -439,7 +419,7 @@ function SupportIcon({ className }: { className?: string }) {
   );
 }
 
-function SignOutIcon({ className }: { className?: string }) {
+function LogOutIcon({ className }: { className?: string }) {
   return (
     <svg
       className={className}
