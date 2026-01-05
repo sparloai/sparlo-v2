@@ -1,6 +1,124 @@
+# Fix: Supabase Token Refresh Loop (429 Rate Limit)
+
+## Overview
+
+**Critical Bug**: The app is making 863+ token refresh requests to Supabase, hitting rate limits and triggering "Possible abuse attempt" alerts. This completely blocks authentication.
+
+**Root Cause**: The `use-auth-change-listener.ts` hook has a logic flaw where it doesn't properly recognize that ALL paths on `app.sparlo.ai` subdomain are private routes.
+
+## Problem Analysis
+
+### The Infinite Loop Sequence
+
+```
+1. User visits app.sparlo.ai/settings
+2. Middleware rewrites /settings → /home/settings (server-side)
+3. Browser URL remains /settings (rewrite is invisible to client)
+4. Supabase client initializes, fires INITIAL_SESSION
+5. Something triggers SIGNED_OUT (cookie parsing, token refresh race)
+6. Auth listener checks: is /settings private?
+   → isPrivateRoute('/settings') returns FALSE ← BUG
+   → /settings doesn't start with /home, /admin, etc.
+7. Falls through to: if (SIGNED_OUT && hadStableSession)
+8. On subdomain → triggers DEBOUNCE_SIGNED_OUT
+9. After 1500ms → redirects to main domain auth
+10. User signs in → redirects back to app.sparlo.ai/settings
+11. REPEAT from step 4 → INFINITE LOOP
+
+Each iteration: ~20 token refresh attempts × 43 iterations = 860 requests
+```
+
+### Code Location
+
+**File**: `packages/supabase/src/hooks/use-auth-change-listener.ts`
+
+**Problem Lines**:
+- Line 48: `PUBLIC_PATHS_ON_SUBDOMAIN = ['/auth', '/healthcheck']` - incomplete list
+- Lines 112-132: `isPrivateRoute()` - doesn't properly detect subdomain
+
+### Why SIGNED_OUT Keeps Firing
+
+- Cross-subdomain cookie parsing issues
+- Token refresh race conditions between middleware and browser client
+- Multiple tabs causing session conflicts
+- Stale refresh tokens from previous sessions
+
+## Solution
+
+### Fix 1: Complete PUBLIC_PATHS_ON_SUBDOMAIN List
+
+```typescript
+// Line 48 - Add all public paths
+const PUBLIC_PATHS_ON_SUBDOMAIN = [
+  '/auth',
+  '/api',
+  '/_next',
+  '/locales',
+  '/images',
+  '/assets',
+  '/healthcheck',
+];
+```
+
+### Fix 2: Fix isPrivateRoute to Properly Handle Subdomain
+
+The current logic already has subdomain detection but uses it incorrectly:
+
+```typescript
+// Current (BROKEN) - Line 112-132
+function isPrivateRoute(path: string, privatePathPrefixes: string[]): boolean {
+  const onAppSubdomain = isAppSubdomain();
+
+  if (onAppSubdomain) {
+    // This is correct but PUBLIC_PATHS_ON_SUBDOMAIN is incomplete
+    const isPrivate = !isPublicPathOnSubdomain(path);
+    return isPrivate;
+  }
+
+  // On main domain, use the prefix list
+  return privatePathPrefixes.some((prefix) => path.startsWith(prefix));
+}
+```
+
+The logic is correct, but `PUBLIC_PATHS_ON_SUBDOMAIN` is missing paths. Fix 1 resolves this.
+
+### Fix 3: Disable Debug Logging in Production
+
+```typescript
+// Line 60 - Change to false
+const DEBUG = false; // Was: true
+```
+
+### Fix 4: Add Rate Limit Protection
+
+Add a circuit breaker to prevent repeated redirects:
+
+```typescript
+// Add after line 278 (isRedirectingRef)
+const redirectCountRef = useRef(0);
+const lastRedirectTimeRef = useRef(0);
+
+// In the auth listener, before redirecting:
+const now = Date.now();
+if (now - lastRedirectTimeRef.current < 5000) {
+  redirectCountRef.current++;
+  if (redirectCountRef.current > 3) {
+    console.error('[AuthListener] Too many redirects, stopping to prevent loop');
+    return; // Stop the loop
+  }
+} else {
+  redirectCountRef.current = 0;
+}
+lastRedirectTimeRef.current = now;
+```
+
+## Implementation
+
+### File: `packages/supabase/src/hooks/use-auth-change-listener.ts`
+
+```typescript
 'use client';
 
-import type React from 'react';
 import { useEffect, useEffectEvent, useRef } from 'react';
 
 import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
@@ -45,12 +163,11 @@ const AUTH_PATHS = ['/auth'];
 
 /**
  * Public paths on app subdomain (don't require auth).
- * MUST match PUBLIC_PATHS in apps/web/config/subdomain.config.ts
+ * MUST match the excluded paths in proxy.ts/next.config.mjs
  */
 const PUBLIC_PATHS_ON_SUBDOMAIN = [
   '/auth',
   '/api',
-  '/share',
   '/_next',
   '/locales',
   '/images',
@@ -65,12 +182,10 @@ const PUBLIC_PATHS_ON_SUBDOMAIN = [
 const SIGNED_OUT_DEBOUNCE_MS = 1500;
 
 /**
- * Circuit breaker thresholds to prevent infinite redirect loops.
- * If more than MAX_REDIRECTS_IN_WINDOW occur within REDIRECT_WINDOW_MS,
- * further redirects are blocked until the window expires.
+ * Maximum redirects allowed within REDIRECT_WINDOW_MS to prevent loops.
  */
 const MAX_REDIRECTS_IN_WINDOW = 3;
-const REDIRECT_WINDOW_MS = 10_000; // 10 seconds
+const REDIRECT_WINDOW_MS = 10000;
 
 // ============================================================================
 // DEBUG LOGGING
@@ -109,9 +224,8 @@ function isAppSubdomain(): boolean {
     });
 
     return isApp;
-  } catch {
-    // Don't expose error details in production
-    console.error('[AuthListener] Failed to check subdomain');
+  } catch (error) {
+    console.error('[AuthListener] Failed to check subdomain:', error);
     return false;
   }
 }
@@ -120,7 +234,7 @@ function isAppSubdomain(): boolean {
  * Check if a path is public on the app subdomain.
  */
 function isPublicPathOnSubdomain(pathname: string): boolean {
-  const normalized = pathname.split('?')[0] ?? pathname; // Remove query string
+  const normalized = pathname.split('?')[0] ?? pathname;
   return PUBLIC_PATHS_ON_SUBDOMAIN.some(
     (prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`),
   );
@@ -164,14 +278,14 @@ function getMainDomainAuthUrl(): string {
 
   // Security: Validate domain against allowlist
   if (!ALLOWED_REDIRECT_DOMAINS.has(domain)) {
-    // Don't expose the invalid domain in production logs
-    console.error('[AuthListener] Invalid redirect domain configuration');
+    console.error(
+      `[AuthListener:SECURITY] Invalid domain: ${domain}, using fallback`,
+    );
     return 'https://sparlo.ai/auth/sign-in';
   }
 
-  // Use current protocol for localhost development (exact match for security)
-  const protocol =
-    domain === 'localhost' || domain === '127.0.0.1' ? 'http' : 'https';
+  // Use current protocol for localhost development
+  const protocol = domain.includes('localhost') ? 'http' : 'https';
   return `${protocol}://${domain}/auth/sign-in`;
 }
 
@@ -182,42 +296,6 @@ function redirectToMainDomainAuth(): void {
   const url = getMainDomainAuthUrl();
   debugLog('redirectToMainDomainAuth', { url });
   window.location.assign(url);
-}
-
-// ============================================================================
-// CIRCUIT BREAKER
-// ============================================================================
-
-/**
- * Circuit breaker to prevent infinite redirect loops.
- * Tracks redirect count within a time window and blocks when threshold exceeded.
- *
- * @param redirectCountRef - Ref tracking number of redirects in current window
- * @param lastRedirectTimeRef - Ref tracking timestamp of last redirect
- * @returns true if redirect is allowed, false if circuit breaker tripped
- */
-function checkRedirectAllowed(
-  redirectCountRef: React.MutableRefObject<number>,
-  lastRedirectTimeRef: React.MutableRefObject<number>,
-): boolean {
-  const now = Date.now();
-  const timeSinceLastRedirect = now - lastRedirectTimeRef.current;
-
-  if (timeSinceLastRedirect < REDIRECT_WINDOW_MS) {
-    redirectCountRef.current++;
-
-    if (redirectCountRef.current > MAX_REDIRECTS_IN_WINDOW) {
-      // Log without exposing internal config details (security)
-      console.error('[AuthListener] Circuit breaker: redirect loop detected');
-      return false; // Circuit breaker tripped
-    }
-  } else {
-    // New time window - reset counter
-    redirectCountRef.current = 1;
-  }
-
-  lastRedirectTimeRef.current = now;
-  return true; // OK to proceed
 }
 
 // ============================================================================
@@ -313,6 +391,7 @@ function determineAuthAction(params: {
  * - Security: Domain allowlist prevents open redirects
  * - Race-safe: State machine pattern prevents double redirects
  * - Debounced: Grace period for SIGNED_OUT allows token refresh to complete
+ * - Loop protection: Circuit breaker prevents infinite redirect loops
  */
 export function useAuthChangeListener({
   privatePathPrefixes = PRIVATE_PATH_PREFIXES,
@@ -334,8 +413,8 @@ export function useAuthChangeListener({
   const isRedirectingRef = useRef(false);
 
   // Circuit breaker: Track redirects to prevent infinite loops
-  const redirectCountRef = useRef<number>(0);
-  const lastRedirectTimeRef = useRef<number>(0);
+  const redirectCountRef = useRef(0);
+  const lastRedirectTimeRef = useRef(0);
 
   const setupAuthListener = useEffectEvent(() => {
     if (typeof window === 'undefined') {
@@ -393,26 +472,45 @@ export function useAuthChangeListener({
         privatePathPrefixes,
       });
 
+      // Circuit breaker: Check for redirect loops
+      const checkAndIncrementRedirectCount = (): boolean => {
+        const now = Date.now();
+        if (now - lastRedirectTimeRef.current < REDIRECT_WINDOW_MS) {
+          redirectCountRef.current++;
+          if (redirectCountRef.current > MAX_REDIRECTS_IN_WINDOW) {
+            console.error(
+              '[AuthListener] Circuit breaker: Too many redirects in short window, stopping to prevent loop',
+              {
+                redirectCount: redirectCountRef.current,
+                windowMs: REDIRECT_WINDOW_MS,
+              }
+            );
+            return false; // Stop - too many redirects
+          }
+        } else {
+          redirectCountRef.current = 1; // Reset count for new window
+        }
+        lastRedirectTimeRef.current = now;
+        return true; // OK to redirect
+      };
+
       // Execute action
       switch (action.type) {
         case 'REDIRECT_TO_MAIN_AUTH':
-          if (!checkRedirectAllowed(redirectCountRef, lastRedirectTimeRef))
-            return;
+          if (!checkAndIncrementRedirectCount()) return;
           isRedirectingRef.current = true;
           redirectToMainDomainAuth();
           break;
 
         case 'REDIRECT_TO_ROOT':
-          if (!checkRedirectAllowed(redirectCountRef, lastRedirectTimeRef))
-            return;
+          if (!checkAndIncrementRedirectCount()) return;
           isRedirectingRef.current = true;
           debugLog('redirectToRoot', {});
           window.location.assign('/');
           break;
 
         case 'RELOAD':
-          if (!checkRedirectAllowed(redirectCountRef, lastRedirectTimeRef))
-            return;
+          if (!checkAndIncrementRedirectCount()) return;
           isRedirectingRef.current = true;
           debugLog('reload', {});
           window.location.reload();
@@ -432,8 +530,7 @@ export function useAuthChangeListener({
             // Re-check if we should still redirect
             // (user might have been restored during debounce)
             if (!isRedirectingRef.current) {
-              if (!checkRedirectAllowed(redirectCountRef, lastRedirectTimeRef))
-                return;
+              if (!checkAndIncrementRedirectCount()) return;
               debugLog('debounceComplete', { action: 'redirectToMainAuth' });
               isRedirectingRef.current = true;
               redirectToMainDomainAuth();
@@ -463,3 +560,51 @@ export function useAuthChangeListener({
     };
   }, []);
 }
+```
+
+## Acceptance Criteria
+
+- [ ] No more 429 rate limit errors in Supabase logs
+- [ ] No "Possible abuse attempt" alerts
+- [ ] Users can sign in successfully on both main domain and app subdomain
+- [ ] Signing out redirects to main domain auth without loops
+- [ ] Circuit breaker prevents any future infinite loops
+- [ ] Debug logging is disabled in production
+
+## Testing Plan
+
+### Manual Testing
+
+1. Clear all browser storage for sparlo.ai
+2. Wait 30 minutes for rate limits to fully reset
+3. Test sign-in flow:
+   - Visit app.sparlo.ai/settings (unauthenticated) → should redirect to sign-in
+   - Sign in → should redirect back to app.sparlo.ai/settings
+   - No refresh loops should occur
+4. Test sign-out flow:
+   - Click sign out on app subdomain
+   - Should redirect to main domain auth without loops
+5. Monitor Supabase logs for any 429 errors
+
+### Verification Commands
+
+```bash
+# Watch Supabase auth logs for rate limits
+# In Supabase Dashboard > Logs > Auth
+
+# Check for token refresh requests in browser
+# DevTools > Network > Filter: token
+```
+
+## Risk Assessment
+
+- **Low**: Changes are isolated to auth listener hook
+- **Medium**: Circuit breaker might block legitimate redirects if threshold too low
+- **Mitigation**: Set MAX_REDIRECTS_IN_WINDOW = 3, REDIRECT_WINDOW_MS = 10000 (generous limits)
+
+## References
+
+- `packages/supabase/src/hooks/use-auth-change-listener.ts` - Auth listener hook
+- `apps/web/proxy.ts` - Middleware with subdomain routing
+- `apps/web/next.config.mjs` - Rewrite rules for subdomain
+- `plans/fix-app-subdomain-refresh-loop.md` - Previous related fix plan

@@ -23,9 +23,6 @@ export function AuthErrorAlert({
   const DefaultError = <Trans i18nKey="auth:errors.default" />;
   const errorCode = error instanceof Error ? error.message : error;
 
-  // Log error for debugging
-  console.error('[AuthErrorAlert] Auth error:', errorCode);
-
   return (
     <Alert variant={'destructive'}>
       <ExclamationTriangleIcon className={'w-4'} />
@@ -40,8 +37,6 @@ export function AuthErrorAlert({
           defaults={'<DefaultError />'}
           components={{ DefaultError }}
         />
-        {/* Show raw error for debugging - TODO: remove after fixing auth */}
-        <div className="mt-2 text-xs opacity-70">Error code: {errorCode}</div>
       </AlertDescription>
     </Alert>
   );
