@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -14,6 +13,9 @@ import {
 } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
+
+import { AppLink } from '~/components/app-link';
+import { getAppPath } from '~/lib/hooks/use-app-path';
 
 import { ArchiveToggleButton } from '../../_components/shared/archive-toggle-button';
 import { ModeLabel } from '../../_components/shared/mode-label';
@@ -39,7 +41,7 @@ function EmptyState() {
       >
         No archived reports
       </p>
-      <Link
+      <AppLink
         href="/home"
         className="mt-4 inline-block rounded-sm bg-[--text-primary] px-4 py-2 font-mono text-xs font-medium tracking-wider text-[--surface-base] uppercase transition-colors hover:opacity-90"
         style={{
@@ -47,7 +49,7 @@ function EmptyState() {
         }}
       >
         View All Reports
-      </Link>
+      </AppLink>
     </div>
   );
 }
@@ -110,12 +112,12 @@ export function ArchivedReportsDashboard({
       {/* Header Actions */}
       <div className="mb-6 flex items-end justify-between">
         <div className="flex items-center gap-4">
-          <Link
+          <AppLink
             href="/home"
             className="flex items-center gap-1 text-[--text-muted] transition-colors hover:text-[--text-secondary]"
           >
             <ArrowLeft className="h-4 w-4" />
-          </Link>
+          </AppLink>
           <h1
             className="font-mono text-xs font-medium tracking-[0.2em] text-[--text-muted] uppercase"
             style={{
@@ -170,7 +172,8 @@ export function ArchivedReportsDashboard({
                     !isLast && 'border-b border-[--border-subtle]',
                   )}
                   onClick={() =>
-                    isClickable && router.push(`/home/reports/${report.id}`)
+                    isClickable &&
+                    router.push(getAppPath(`/home/reports/${report.id}`))
                   }
                 >
                   {/* Status Dot - Gray for archived */}

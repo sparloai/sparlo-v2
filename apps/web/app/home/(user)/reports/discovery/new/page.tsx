@@ -20,6 +20,8 @@ import {
 import { Alert, AlertDescription } from '@kit/ui/alert';
 import { cn } from '@kit/ui/utils';
 
+import { getAppPath } from '~/lib/hooks/use-app-path';
+
 import { ProcessingScreen } from '../../../_components/processing-screen';
 import { startDiscoveryReportGeneration } from '../../../_lib/server/discovery-reports-server-actions';
 import { useReportProgress } from '../../../_lib/use-report-progress';
@@ -194,7 +196,7 @@ export default function DiscoveryNewReportPage() {
 
     // Clear params from URL without navigation
     if (prefill || errorType) {
-      window.history.replaceState({}, '', '/home/reports/discovery/new');
+      window.history.replaceState({}, '', getAppPath('/home/reports/discovery/new'));
     }
   }, [searchParams]);
 
@@ -278,7 +280,7 @@ export default function DiscoveryNewReportPage() {
 
   const handleViewReport = useCallback(() => {
     if (reportId) {
-      router.push(`/home/reports/${reportId}`);
+      router.push(getAppPath(`/home/reports/${reportId}`));
     }
   }, [reportId, router]);
 

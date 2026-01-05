@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useTransition } from 'react';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -17,6 +16,9 @@ import {
 
 import { Button } from '@kit/ui/button';
 import { cn } from '@kit/ui/utils';
+
+import { AppLink } from '~/components/app-link';
+import { getAppPath } from '~/lib/hooks/use-app-path';
 
 import { cancelReportGeneration } from '../_lib/server/sparlo-reports-server-actions';
 import type { ConversationStatus, DashboardReport } from '../_lib/types';
@@ -184,13 +186,13 @@ function EmptyState() {
       <p className="mt-2 text-[14px] tracking-[-0.02em] text-zinc-400 sm:text-[15px]">
         Get started by creating your first analysis
       </p>
-      <Link
+      <AppLink
         href="/home/reports/new"
         className="mt-6 inline-flex items-center gap-2 bg-zinc-900 px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800 active:bg-zinc-700 sm:mt-8 sm:px-6 sm:text-[15px]"
       >
         <Plus className="h-4 w-4" />
         New Analysis
-      </Link>
+      </AppLink>
     </div>
   );
 }
@@ -251,7 +253,7 @@ function ReportCard({
 
   const handleClick = () => {
     if (isClickable) {
-      router.push(`/home/reports/${report.id}`);
+      router.push(getAppPath(`/home/reports/${report.id}`));
     }
   };
 
@@ -404,22 +406,22 @@ export function ReportsDashboard({ reports }: ReportsDashboardProps) {
         </h1>
 
         <div className="flex items-center justify-between gap-4 sm:gap-6">
-          <Link
+          <AppLink
             href="/home/archived"
             className="flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
           >
             <Archive className="h-3.5 w-3.5" />
             Archived
-          </Link>
+          </AppLink>
 
-          <Link
+          <AppLink
             href="/home/reports/new"
             data-test="new-report-button"
             className="inline-flex items-center gap-2 bg-zinc-900 px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800 sm:px-5"
           >
             <Plus className="h-4 w-4" />
             <span className="xs:inline hidden">New</span> Analysis
-          </Link>
+          </AppLink>
         </div>
       </div>
 

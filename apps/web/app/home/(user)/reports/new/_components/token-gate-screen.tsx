@@ -1,6 +1,6 @@
-import Link from 'next/link';
-
 import { ArrowLeft, ArrowRight, Clock, Sparkles } from 'lucide-react';
+
+import { AppLink } from '~/components/app-link';
 
 interface TokenGateScreenProps {
   variant: 'subscription_required' | 'limit_exceeded';
@@ -34,13 +34,13 @@ export function TokenGateScreen({
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-3xl px-8 pt-24 pb-16">
         {/* Back Link */}
-        <Link
+        <AppLink
           href="/home/reports"
           className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Reports
-        </Link>
+        </AppLink>
 
         {/* Page Title */}
         <h1 className="font-heading mb-4 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
@@ -122,13 +122,13 @@ export function TokenGateScreen({
           </div>
 
           {/* Single Primary CTA */}
-          <Link
+          <AppLink
             href="/home/billing"
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-900 px-8 py-4 text-[15px] font-medium text-white transition-colors hover:bg-zinc-800"
           >
             {isLimitExceeded ? 'Upgrade Plan' : 'View Plans'}
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </AppLink>
         </div>
       </div>
     </main>

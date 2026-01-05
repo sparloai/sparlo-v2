@@ -1,9 +1,8 @@
-import Link from 'next/link';
-
 import { ArrowLeft, FileText, MessageSquare, Send } from 'lucide-react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@kit/ui/tabs';
 
+import { AppLink } from '~/components/app-link';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
 import { HelpChat } from './_components/help-chat';
@@ -21,13 +20,13 @@ function HelpPage() {
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-3xl px-8 pt-12 pb-16">
         {/* Back link */}
-        <Link
+        <AppLink
           href="/home"
           className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Dashboard
-        </Link>
+        </AppLink>
 
         {/* Page title with signature left border */}
         <div className="mb-12 border-l-4 border-zinc-950 py-1 pl-6">

@@ -3,12 +3,13 @@
 import { useCallback, useRef, useState } from 'react';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { cn } from '@kit/ui/utils';
 
+import { AppLink } from '~/components/app-link';
 import { isUsageError } from '~/lib/errors/usage-error';
+import { getAppPath } from '~/lib/hooks/use-app-path';
 
 import { ProcessingScreen } from '../../../_components/processing-screen';
 import { startReportGeneration } from '../../../_lib/server/sparlo-reports-server-actions';
@@ -361,7 +362,7 @@ export function NewAnalysisForm({
 
   const handleViewReport = useCallback(() => {
     if (reportId) {
-      router.push(`/home/reports/${reportId}`);
+      router.push(getAppPath(`/home/reports/${reportId}`));
     }
   }, [reportId, router]);
 
@@ -492,7 +493,7 @@ export function NewAnalysisForm({
       <div className="px-8 pt-24 pb-4">
         <div className="mx-auto w-full max-w-3xl">
           {/* Back link */}
-          <Link
+          <AppLink
             href="/home/reports"
             className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
           >
@@ -510,7 +511,7 @@ export function NewAnalysisForm({
               />
             </svg>
             All Reports
-          </Link>
+          </AppLink>
 
           {/* Page title - anchor element */}
           <h1 className="font-heading mb-12 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">

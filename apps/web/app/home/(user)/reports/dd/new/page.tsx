@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { cn } from '@kit/ui/utils';
 
+import { AppLink } from '~/components/app-link';
 import { isUsageError } from '~/lib/errors/usage-error';
+import { getAppPath } from '~/lib/hooks/use-app-path';
 
 import { ProcessingScreen } from '../../../_components/processing-screen';
 import { startDDReportGeneration } from '../../../_lib/server/dd-reports-server-actions';
@@ -240,7 +241,7 @@ export default function DDNewReportPage() {
   // Clear error params from URL after initial load
   useEffect(() => {
     if (initialErrorType) {
-      window.history.replaceState({}, '', '/home/reports/dd/new');
+      window.history.replaceState({}, '', getAppPath('/home/reports/dd/new'));
     }
     // Only run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -330,7 +331,7 @@ export default function DDNewReportPage() {
 
   const handleViewReport = useCallback(() => {
     if (reportId) {
-      router.push(`/home/reports/${reportId}`);
+      router.push(getAppPath(`/home/reports/${reportId}`));
     }
   }, [reportId, router]);
 
@@ -377,7 +378,7 @@ export default function DDNewReportPage() {
       <div className="px-8 pt-24 pb-4">
         <div className="mx-auto w-full max-w-3xl">
           {/* Back link */}
-          <Link
+          <AppLink
             href="/home/reports"
             className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
           >
@@ -395,7 +396,7 @@ export default function DDNewReportPage() {
               />
             </svg>
             All Reports
-          </Link>
+          </AppLink>
 
           {/* Page title - anchor element */}
           <h1 className="font-heading mb-4 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">

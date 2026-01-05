@@ -1,5 +1,7 @@
 'use client';
 
+import { AppLink } from '~/components/app-link';
+
 interface ReportErrorProps {
   errorCount: number;
   formattedErrors: unknown;
@@ -62,12 +64,12 @@ export function ReportError({
 
         {/* Actions */}
         <div className="flex flex-wrap gap-3">
-          <a
+          <AppLink
             href="/home/reports"
             className="inline-flex items-center rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
           >
             Back to Reports
-          </a>
+          </AppLink>
           <button
             onClick={() => window.location.reload()}
             className="inline-flex items-center rounded-lg border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"

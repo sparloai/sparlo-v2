@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-
 import { ArrowRight, Check, Sparkles, Zap } from 'lucide-react';
 
 import { Badge } from '@kit/ui/badge';
@@ -13,6 +11,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@kit/ui/dialog';
+
+import { AppLink } from '~/components/app-link';
 
 interface SubscriptionRequiredModalProps {
   open: boolean;
@@ -95,10 +95,10 @@ export function SubscriptionRequiredModal({
 
         <div className="flex flex-col gap-3">
           <Button asChild size="lg" className="w-full">
-            <Link href="/home/billing">
+            <AppLink href="/home/billing">
               {isSubscriptionRequired ? 'View Plans' : 'Upgrade Now'}
               <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
+            </AppLink>
           </Button>
           <Button
             variant="ghost"

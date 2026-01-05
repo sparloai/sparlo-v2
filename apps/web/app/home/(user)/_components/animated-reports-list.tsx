@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-
 import type { Variants } from 'framer-motion';
 import { motion } from 'framer-motion';
 import {
@@ -17,6 +15,8 @@ import {
 import { Button } from '@kit/ui/button';
 import { usePrefersReducedMotion } from '@kit/ui/hooks';
 import { cn } from '@kit/ui/utils';
+
+import { AppLink } from '~/components/app-link';
 
 import { DURATION, EASING, STAGGER } from '../_lib/animation-constants';
 import type { ConversationStatus } from '../_lib/types';
@@ -184,7 +184,7 @@ function ReportCard({
   if (shouldAnimate) {
     return (
       <motion.div variants={itemVariants}>
-        <Link
+        <AppLink
           href={`/home/reports/${report.id}`}
           className="group block"
           data-test={`report-card-${report.id}`}
@@ -198,19 +198,19 @@ function ReportCard({
           >
             {cardContent}
           </motion.div>
-        </Link>
+        </AppLink>
       </motion.div>
     );
   }
 
   return (
-    <Link
+    <AppLink
       href={`/home/reports/${report.id}`}
       data-test={`report-card-${report.id}`}
       className="group block rounded-xl border border-[--border-subtle] bg-[--surface-elevated] p-5 transition-colors hover:border-[--border-default]"
     >
       {cardContent}
-    </Link>
+    </AppLink>
   );
 }
 
@@ -230,12 +230,12 @@ function EmptyState() {
         Create your first report to get innovative solutions to your engineering
         challenges.
       </p>
-      <Link href="/home/reports/new" className="mt-6">
+      <AppLink href="/home/reports/new" className="mt-6">
         <Button className="bg-[--accent] text-white hover:bg-[--accent-hover]">
           <Plus className="mr-2 h-4 w-4" />
           New Report
         </Button>
-      </Link>
+      </AppLink>
     </div>
   );
 }

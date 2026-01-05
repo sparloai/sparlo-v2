@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-
 import { ArrowLeft, RefreshCw } from 'lucide-react';
+
+import { AppLink } from '~/components/app-link';
 
 interface ErrorBoundaryProps {
   error: Error & { digest?: string };
@@ -14,13 +14,13 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-3xl px-8 pt-24 pb-16">
         {/* Back Link */}
-        <Link
+        <AppLink
           href="/home/reports"
           className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to Reports
-        </Link>
+        </AppLink>
 
         {/* Page Title */}
         <h1 className="font-heading mb-4 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
@@ -62,12 +62,12 @@ export default function ErrorBoundary({ error, reset }: ErrorBoundaryProps) {
               Try Again
             </button>
 
-            <Link
+            <AppLink
               href="/home/reports"
               className="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-8 py-4 text-[15px] font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
             >
               Go to Reports
-            </Link>
+            </AppLink>
           </div>
         </div>
       </div>

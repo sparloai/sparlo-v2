@@ -12,6 +12,8 @@ import { getPrimaryLineItem } from '@kit/billing';
 import { useAppEvents } from '@kit/shared/events';
 import { cn } from '@kit/ui/utils';
 
+import { AppLink } from '~/components/app-link';
+
 import { createPersonalAccountCheckoutSession } from '../_lib/server/server-actions';
 
 const EmbeddedCheckout = dynamic(
@@ -130,7 +132,7 @@ export function SparloBillingPricing({
     return (
       <main className="min-h-screen bg-white">
         <div className="mx-auto max-w-4xl px-8 pt-24 pb-16">
-          <Link
+          <AppLink
             href="/home"
             className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 focus-visible:text-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
@@ -149,7 +151,7 @@ export function SparloBillingPricing({
               />
             </svg>
             Dashboard
-          </Link>
+          </AppLink>
 
           <h1 className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
             Plans
@@ -172,7 +174,7 @@ export function SparloBillingPricing({
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-8 pt-24 pb-16">
         {/* Back link */}
-        <Link
+        <AppLink
           href="/home"
           className="mb-6 inline-flex items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 focus-visible:text-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none active:text-zinc-700"
         >
@@ -191,7 +193,7 @@ export function SparloBillingPricing({
             />
           </svg>
           Dashboard
-        </Link>
+        </AppLink>
 
         {/* Page title */}
         <h1 className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
