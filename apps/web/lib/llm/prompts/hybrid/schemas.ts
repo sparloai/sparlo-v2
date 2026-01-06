@@ -3022,13 +3022,14 @@ export const AN5_M_OutputSchema = z
     follow_up_prompts: z.array(z.string()).default([]),
 
     // v4.0: references - inline citations used in report
+    // ANTIFRAGILE: Handle null URLs from LLM (nullish = null | undefined)
     references: z
       .array(
         z
           .object({
-            id: z.number(),
-            citation: z.string(),
-            url: z.string().optional(),
+            id: z.number().catch(0),
+            citation: z.string().catch(''),
+            url: z.string().nullish(), // Handle both null and undefined
           })
           .passthrough(),
       )

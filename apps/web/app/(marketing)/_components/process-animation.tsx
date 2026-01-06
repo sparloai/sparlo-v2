@@ -14,9 +14,8 @@ const CONTENT = {
   reframe: `"How do we make replacement so cheap that survival doesn't matter?"`,
   sourceIndustry: 'Desalination',
   technique: 'Electrodialysis Reversal',
-  insight: `Polarity switching every 15-30 minutes dissolves scale and kills biofilms before they mature.`,
   yearsProven: '30+ years proven',
-  executiveSummary: `Analysis of 47 technical domains identified electrodialysis reversal (EDR) from the desalination industry as a high-confidence solution to marine electrolyzer degradation. EDR's polarity-switching mechanism—proven over 30+ years in seawater environments—dissolves mineral scale and prevents biofilm maturation before either can compromise electrode surfaces. This approach sidesteps the traditional durability-vs-cost tradeoff by accepting controlled degradation while dramatically extending functional lifespan. Implementation requires electrode material compatibility assessment and integration of automated polarity control systems, both well-documented in existing literature.`,
+  executiveSummary: `The desalination industry solved seawater fouling decades ago with electrodialysis reversal—polarity switching every 15-30 minutes that dissolves scale and kills biofilms before they mature. Mikhaylin & Bazinet's 2016 review documents 5-10x membrane life extension with this single intervention. The adaptation to alkalinity production isn't research; it's engineering integration with a philosophy shift: design for managed degradation with modular hot-swap electrodes rather than fighting for 5-year component survival in an environment that destroys everything.`,
 };
 
 const DOMAINS_SEARCHED = [
@@ -189,7 +188,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
         <JourneyConnector />
 
         {/* ============================================ */}
-        {/* STEP 02: Search */}
+        {/* STEP 02: Reframe */}
         {/* ============================================ */}
         <motion.div
           initial="hidden"
@@ -197,7 +196,27 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           viewport={{ once: true, margin: '-50px' }}
           variants={fadeInUp}
         >
-          <StepLabel number="02" label="Search" />
+          <StepLabel number="02" label="Reframe" />
+
+          <div className="border-l-2 border-white/20 pl-8">
+            <p className="text-[24px] font-medium leading-snug text-white md:text-[28px]">
+              {CONTENT.reframe}
+            </p>
+          </div>
+        </motion.div>
+
+        <JourneyConnector />
+
+        {/* ============================================ */}
+        {/* STEP 03: Innovation Analysis */}
+        {/* ============================================ */}
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+          variants={fadeInUp}
+        >
+          <StepLabel number="03" label="Innovation Analysis" />
 
           {/* Domain pills */}
           <motion.div
@@ -230,35 +249,43 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
               +39 domains
             </motion.span>
           </motion.div>
-        </motion.div>
 
-        <JourneyConnector />
-
-        {/* ============================================ */}
-        {/* STEP 03: Insight */}
-        {/* ============================================ */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          variants={fadeInUp}
-        >
-          <StepLabel number="03" label="Reframe" />
-
-          <div className="border-l-2 border-white/20 pl-8">
-            <p className="text-[24px] font-medium leading-snug text-white md:text-[28px]">
-              {CONTENT.reframe}
-            </p>
-            <div className="mt-6 flex items-center gap-3 text-[14px]">
-              <span className="rounded bg-zinc-800 px-3 py-1.5 font-mono text-zinc-400">
+          {/* Key finding */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="mt-10 rounded-xl border border-zinc-800 bg-zinc-900/60 p-6"
+          >
+            <div className="flex items-center gap-3 text-[14px]">
+              <span className="rounded bg-white/10 px-3 py-1.5 font-mono text-white">
                 {CONTENT.technique}
               </span>
               <span className="text-zinc-600">from</span>
-              <span className="text-zinc-400">{CONTENT.sourceIndustry}</span>
+              <span className="text-zinc-300">{CONTENT.sourceIndustry}</span>
               <span className="text-zinc-700">·</span>
               <span className="text-zinc-500">{CONTENT.yearsProven}</span>
             </div>
-          </div>
+          </motion.div>
+
+          {/* Patents & Literature */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.4 }}
+            className="mt-6 flex items-center gap-8 text-[14px] text-zinc-500"
+          >
+            <div>
+              <span className="font-mono text-[18px] font-semibold text-zinc-300">14</span>
+              <span className="ml-2">patents analyzed</span>
+            </div>
+            <div>
+              <span className="font-mono text-[18px] font-semibold text-zinc-300">23</span>
+              <span className="ml-2">papers reviewed</span>
+            </div>
+          </motion.div>
         </motion.div>
 
         <JourneyConnector />
