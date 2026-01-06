@@ -121,21 +121,6 @@ function SettingsDropdown({
         collapsed ? 'left-full ml-3 w-56' : 'right-0 left-0 mx-2',
       )}
     >
-      {/* User Info Header with signature left border */}
-      {userEmail && (
-        <>
-          <div className="border-l-2 border-zinc-900 px-3 py-3 dark:border-zinc-100">
-            <span className="mb-1 block text-[11px] font-semibold tracking-[0.08em] text-zinc-400 uppercase dark:text-zinc-500">
-              Signed in as
-            </span>
-            <span className="block truncate text-[15px] font-medium tracking-[-0.01em] text-zinc-900 dark:text-white">
-              {userEmail}
-            </span>
-          </div>
-          <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
-        </>
-      )}
-
       <Link
         href={getPath(pathsConfig.app.personalAccountSettings)}
         onClick={onClose}
@@ -171,7 +156,7 @@ function SettingsDropdown({
         className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
         <HelpIcon className="h-[18px] w-[18px] flex-shrink-0" />
-        Help Center
+        Help
       </Link>
 
       <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
@@ -184,8 +169,20 @@ function SettingsDropdown({
         className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
       >
         <LogOutIcon className="h-[18px] w-[18px] flex-shrink-0" />
-        Sign out
+        Log out
       </button>
+
+      {/* Email at bottom */}
+      {userEmail && (
+        <>
+          <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
+          <div className="px-3 py-2">
+            <span className="block truncate text-[13px] text-zinc-400 dark:text-zinc-500">
+              {userEmail}
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 }

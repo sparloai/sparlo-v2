@@ -841,9 +841,9 @@ export const BrandSystemReport = memo(function BrandSystemReport({
           <div className="flex gap-8 py-10">
             {/* Sticky TOC Sidebar - z-30 ensures it goes behind the expanded app sidebar (z-50) */}
             {tocSections.length > 0 && (
-              <aside className="relative z-30 hidden w-56 shrink-0 lg:block">
+              <aside className="relative z-30 hidden w-56 shrink-0 self-start lg:block">
                 <nav
-                  className="sticky max-h-[calc(100vh-7rem)] overflow-y-auto"
+                  className="sticky max-h-[calc(100vh-5rem)] overflow-y-auto"
                   style={{ top: `${TOC_STICKY_TOP}px` }}
                 >
                   <p className="mb-4 text-[12px] font-medium tracking-[0.08em] text-zinc-400 uppercase">
@@ -864,7 +864,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
             )}
 
             {/* Main Content */}
-            <main className="min-w-0 flex-1">
+            <div className="min-w-0 flex-1">
               <div className="max-w-3xl">
                 <ReportContent
                   normalizedData={normalizedData}
@@ -877,7 +877,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
                   compactTitle={compactTitle}
                 />
               </div>
-            </main>
+            </div>
           </div>
         </div>
       </div>
@@ -899,7 +899,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
       )}
 
       {/* Main Content - adjust margin when TOC is shown (TOC is w-56 = 224px) */}
-      <main
+      <div
         className={`max-w-3xl px-6 py-16 ${showToc ? 'lg:ml-56 lg:pr-8' : 'mx-auto'}`}
       >
         <ReportContent
@@ -912,7 +912,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
           reportId={reportId}
           compactTitle={compactTitle}
         />
-      </main>
+      </div>
     </div>
   );
 });
