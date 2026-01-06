@@ -4,11 +4,11 @@ import { useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { AnalysisAnimation } from './_components/analysis-animation';
-import { EngineeringHero } from './_components/engineering-hero';
-import { ExampleReportsSection } from './_components/example-reports/example-reports-section';
-import { MethodologySection } from './_components/methodology-section';
-import { type Mode, ModeTabs } from './_components/mode-tabs';
+import { AnalysisAnimation } from '../_components/analysis-animation';
+import { EngineeringHero } from '../_components/engineering-hero';
+import { ExampleReportsSection } from '../_components/example-reports/example-reports-section';
+import { MethodologySection } from '../_components/methodology-section';
+import { type Mode, ModeTabs } from '../_components/mode-tabs';
 
 /**
  * Get initial mode from URL hash (client-side only)
@@ -21,14 +21,11 @@ function getInitialMode(): Mode {
 }
 
 /**
- * Landing Page
+ * Test Landing Page
  *
- * Features:
- * - Mode tabs for Engineers/Investors switching
- * - URL hash support for shareability (/#investors)
- * - Animated content transitions
+ * Mirror of the main landing page for testing at /testlp
  */
-function Home() {
+function TestLandingPage() {
   const [mode, setMode] = useState<Mode>(getInitialMode);
 
   // Update URL hash on mode change
@@ -62,4 +59,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default TestLandingPage;
