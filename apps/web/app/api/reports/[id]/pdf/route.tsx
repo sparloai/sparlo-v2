@@ -129,7 +129,9 @@ async function generatePdfFromHtml(html: string): Promise<Buffer> {
           document_content: html,
           prince_options: {
             media: 'print',
-            pdf_profile: 'PDF/A-1b',
+            // Removed PDF/A-1b profile - it restricts data URI images
+            // Enable base URL to help with relative resource resolution
+            baseurl: 'https://sparlo.ai/',
           },
         },
       }),

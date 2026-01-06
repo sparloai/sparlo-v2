@@ -179,7 +179,7 @@ code {
 
 .section {
   margin-top: 48px;
-  page-break-inside: avoid;
+  /* Allow page breaks inside sections to avoid mostly blank pages */
 }
 
 .section-title {
@@ -296,6 +296,14 @@ code {
   max-width: 60ch;
 }
 
+/* Superscript for citations */
+sup {
+  font-size: 0.75em;
+  vertical-align: super;
+  line-height: 0;
+  color: var(--zinc-500);
+}
+
 /* Lead/intro text */
 .lead-text {
   font-size: 14pt;
@@ -379,17 +387,27 @@ code {
 .viability-box {
   background: var(--zinc-900);
   color: white;
-  padding: 20px 24px;
+  padding: 16px 24px;
   margin-bottom: 24px;
   page-break-inside: avoid;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.viability-box .mono-label {
+.viability-label {
+  font-size: 9pt;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
   color: var(--zinc-400);
 }
 
-.viability-box .body-text-lg {
+.viability-badge {
+  font-size: 14pt;
+  font-weight: 600;
   color: white;
+  text-transform: uppercase;
 }
 
 .warning-box {
@@ -661,17 +679,21 @@ code {
 }
 
 .confidence {
-  font-weight: 500;
-  color: var(--zinc-700);
+  font-weight: 600;
+  color: var(--zinc-800);
+  background: var(--zinc-100);
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 9pt;
 }
 
 .confidence-badge {
   font-size: 9pt;
-  font-weight: 500;
-  color: var(--zinc-700);
+  font-weight: 600;
+  color: var(--zinc-800);
   background: var(--zinc-100);
-  padding: 2px 8px;
-  border-radius: 2px;
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
 .supporting-concepts,
@@ -1106,13 +1128,14 @@ code {
 
 .domain-tag {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 6px 14px;
   font-size: 9pt;
   font-weight: 500;
-  color: var(--zinc-700);
-  background: var(--zinc-50);
+  color: var(--zinc-600);
+  background: var(--zinc-100);
   border: 1px solid var(--zinc-200);
-  border-radius: 12px;
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 /* ============================================
@@ -1210,9 +1233,7 @@ code {
     background: white;
   }
 
-  .section {
-    page-break-inside: avoid;
-  }
+  /* Let sections flow naturally - only individual cards/boxes use page-break-inside: avoid */
 
   .section-title,
   .subsection-title {
