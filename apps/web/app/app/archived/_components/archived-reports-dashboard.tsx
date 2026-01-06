@@ -173,7 +173,7 @@ export function ArchivedReportsDashboard({
                   )}
                   onClick={() =>
                     isClickable &&
-                    router.push(getAppPath(`/home/reports/${report.id}`))
+                    router.push(getAppPath(`/app/reports/${report.id}`))
                   }
                 >
                   {/* Status Dot - Gray for archived */}

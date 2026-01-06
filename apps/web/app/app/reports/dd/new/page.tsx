@@ -331,7 +331,7 @@ export default function DDNewReportPage() {
 
   const handleViewReport = useCallback(() => {
     if (reportId) {
-      router.push(getAppPath(`/home/reports/${reportId}`));
+      router.push(getAppPath(`/app/reports/${reportId}`));
     }
   }, [reportId, router]);
 

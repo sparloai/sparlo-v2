@@ -315,7 +315,7 @@ export const DocsAppSidebar = memo(function DocsAppSidebar({
                 {recentReports.slice(0, 10).map((report) => (
                   <Link
                     key={report.id}
-                    href={`/home/reports/${report.id}`}
+                    href={`/app/reports/${report.id}`}
                     onClick={handleClose}
                     className="block truncate rounded px-3 py-1.5 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
                   >

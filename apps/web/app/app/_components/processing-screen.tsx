@@ -274,7 +274,7 @@ export function ProcessingScreen({
       if (isRefusalError) {
         params.set('error', 'refusal');
       }
-      router.push(`/home/reports/new?${params.toString()}`);
+      router.push(`/app/reports/new?${params.toString()}`);
     };
 
     return (

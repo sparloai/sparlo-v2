@@ -185,7 +185,7 @@ function ReportCard({
     return (
       <motion.div variants={itemVariants}>
         <AppLink
-          href={`/home/reports/${report.id}`}
+          href={`/app/reports/${report.id}`}
           className="group block"
           data-test={`report-card-${report.id}`}
         >
@@ -205,7 +205,7 @@ function ReportCard({
 
   return (
     <AppLink
-      href={`/home/reports/${report.id}`}
+      href={`/app/reports/${report.id}`}
       data-test={`report-card-${report.id}`}
       className="group block rounded-xl border border-[--border-subtle] bg-[--surface-elevated] p-5 transition-colors hover:border-[--border-default]"
     >

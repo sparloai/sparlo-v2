@@ -72,7 +72,7 @@ export function TeamsList({ teams }: TeamsListProps) {
                 </CardDescription>
               </div>
             </div>
-            <Link href={`/home/${team.slug}/members`}>
+            <Link href={`/app/${team.slug}/members`}>
               <Button variant="outline" size="sm">
                 <Trans i18nKey="common:teams.manageMembers" />
               </Button>

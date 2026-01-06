@@ -11,7 +11,7 @@ interface TeamAccountHomePageProps {
 async function TeamAccountHomePage({ params }: TeamAccountHomePageProps) {
   const account = (await params).account;
 
-  redirect(`/home/${account}/billing`);
+  redirect(`/app/${account}/billing`);
 }
 
 export default TeamAccountHomePage;

@@ -544,7 +544,7 @@ export const NavSidebar = memo(function NavSidebar({
                 {recentReports.slice(0, 10).map((report) => (
                   <Link
                     key={report.id}
-                    href={getPath(`/home/reports/${report.id}`)}
+                    href={getPath(`/app/reports/${report.id}`)}
                     onClick={handleLinkClick}
                     className="block min-h-[36px] truncate rounded px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
                   >
