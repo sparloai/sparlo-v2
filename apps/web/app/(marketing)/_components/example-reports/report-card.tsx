@@ -6,43 +6,50 @@ interface ReportCardProps {
   onClick: () => void;
 }
 
-const categoryColors = {
-  emerald: 'text-emerald-600',
-  blue: 'text-blue-600',
-  purple: 'text-purple-600',
-  amber: 'text-amber-600',
-  rose: 'text-rose-600',
-};
-
 export function ReportCard({ report, isActive, onClick }: ReportCardProps) {
   return (
     <button
       onClick={onClick}
       className={`
-        w-[200px] shrink-0 rounded-xl border p-5 text-left transition-all
+        group w-[280px] shrink-0 border-l-2 py-4 pl-6 pr-4 text-left transition-all
         ${
           isActive
-            ? 'border-blue-500 bg-white shadow-sm'
-            : 'border-zinc-200 bg-white hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-sm'
+            ? 'border-l-zinc-900 bg-zinc-50'
+            : 'border-l-zinc-200 hover:border-l-zinc-400 hover:bg-zinc-50/50'
         }
       `}
     >
-      <p
-        className={`mb-2 text-[11px] font-semibold uppercase tracking-wide ${categoryColors[report.categoryColor]}`}
+      {/* Category label */}
+      <span
+        className={`text-[13px] font-semibold uppercase tracking-[0.06em] ${
+          isActive ? 'text-zinc-900' : 'text-zinc-400'
+        }`}
       >
         {report.category}
-      </p>
-      <p className="mb-1 text-[14px] font-semibold leading-snug text-zinc-900">
+      </span>
+
+      {/* Title */}
+      <p
+        className={`mt-2 text-[18px] font-medium leading-[1.3] tracking-[-0.02em] ${
+          isActive ? 'text-zinc-900' : 'text-zinc-700'
+        }`}
+      >
         {report.title}
       </p>
-      <p className="mb-3 line-clamp-1 text-[12px] text-zinc-500">
+
+      {/* Subtitle */}
+      <p className="mt-1 text-[15px] leading-[1.4] tracking-[-0.02em] text-zinc-500">
         {report.subtitle}
       </p>
-      <p className="text-[11px] text-zinc-400">
-        {report.pages} pages · {report.patents} patents
-      </p>
 
-      {isActive && <div className="mt-4 h-0.5 rounded-full bg-blue-500" />}
+      {/* Metadata */}
+      <div className="mt-4 flex items-center gap-2 text-[13px] tracking-[-0.02em] text-zinc-400">
+        <span>{report.pages} pages</span>
+        <span className="text-zinc-300">·</span>
+        <span>{report.patents} patents</span>
+        <span className="text-zinc-300">·</span>
+        <span>{report.papers} papers</span>
+      </div>
     </button>
   );
 }

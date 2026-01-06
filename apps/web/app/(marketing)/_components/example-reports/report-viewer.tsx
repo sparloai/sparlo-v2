@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { ExternalLink } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 import { reportSections } from './data/reports';
 import type { ExampleReport } from './data/types';
@@ -54,10 +54,10 @@ export function ReportViewer({ report }: ReportViewerProps) {
 
   return (
     <div
-      className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm"
-      style={{ height: '70vh', maxHeight: '700px' }}
+      className="overflow-hidden border border-zinc-200 bg-white"
+      style={{ height: '75vh', maxHeight: '800px' }}
     >
-      <div className="grid h-full grid-cols-1 md:grid-cols-[200px_1fr]">
+      <div className="grid h-full grid-cols-1 md:grid-cols-[220px_1fr]">
         {/* Sidebar - Hidden on mobile */}
         <ReportSidebar
           report={report}
@@ -70,19 +70,16 @@ export function ReportViewer({ report }: ReportViewerProps) {
         <div className="flex flex-col overflow-hidden">
           {/* Mobile Section Tabs */}
           <div className="shrink-0 overflow-x-auto border-b border-zinc-200 md:hidden">
-            <div className="flex gap-2 px-4 py-2">
+            <div className="flex gap-1 px-4 py-2">
               {reportSections.map((section) => (
                 <button
                   key={section.id}
                   onClick={() => scrollToSection(section.id)}
-                  className={`
-                    shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-[12px] transition-colors
-                    ${
-                      activeSection === section.id
-                        ? 'bg-zinc-900 text-white'
-                        : 'bg-zinc-100 text-zinc-500'
-                    }
-                  `}
+                  className={`shrink-0 whitespace-nowrap px-3 py-2 text-[13px] tracking-[-0.02em] transition-colors ${
+                    activeSection === section.id
+                      ? 'border-b-2 border-zinc-900 font-medium text-zinc-900'
+                      : 'text-zinc-500'
+                  }`}
                 >
                   {section.title}
                 </button>
@@ -102,13 +99,16 @@ export function ReportViewer({ report }: ReportViewerProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex shrink-0 justify-center border-t border-zinc-100 px-6 py-4">
+          <div className="flex shrink-0 items-center justify-between border-t border-zinc-200 px-6 py-4">
+            <span className="text-[13px] tracking-[-0.02em] text-zinc-400">
+              Viewing preview · Full report available after sign up
+            </span>
             <a
-              href={`/reports/${report.slug}`}
-              className="flex items-center gap-1.5 text-[13px] text-zinc-400 transition-colors hover:text-blue-600"
+              href="/auth/sign-up"
+              className="flex items-center gap-2 text-[13px] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:text-zinc-600"
             >
-              Open full report
-              <ExternalLink className="h-3.5 w-3.5" />
+              Get full report
+              <ArrowRight className="h-3.5 w-3.5" />
             </a>
           </div>
         </div>
