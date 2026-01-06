@@ -83,4 +83,28 @@
   .shadow-accent {
     box-shadow: var(--shadow-accent);
   }
+
+  /* Hide scrollbar but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar for report content */
+  .report-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .report-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .report-scroll::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 3px;
+  }
+  .report-scroll::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
 }

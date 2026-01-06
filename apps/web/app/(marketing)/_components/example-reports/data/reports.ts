@@ -1,0 +1,61 @@
+import type { ExampleReport, ReportSection } from './types';
+
+export const reportSections: ReportSection[] = [
+  { id: 'executive-summary', title: 'Executive Summary' },
+  { id: 'problem-analysis', title: 'Problem Analysis' },
+  { id: 'solution-concepts', title: 'Solution Concepts' },
+  { id: 'innovation-concepts', title: 'Innovation Concepts' },
+  { id: 'risks', title: 'Risks & Watchouts' },
+  { id: 'recommendation', title: 'Recommendation' },
+];
+
+export const exampleReports: ExampleReport[] = [
+  {
+    id: 'marine-electrolyzer',
+    category: 'Carbon Removal',
+    categoryColor: 'emerald',
+    title: 'Marine Electrolyzer Architecture',
+    subtitle: '5+ year survival in seawater',
+    pages: 24,
+    patents: 14,
+    papers: 23,
+    readTime: '16 min',
+    slug: 'marine-electrolyzer-architecture',
+  },
+  {
+    id: 'green-h2-electrolyzer',
+    category: 'Green H2',
+    categoryColor: 'blue',
+    title: 'PEM vs AEM Electrolyzer Selection',
+    subtitle: 'Offshore wind integration',
+    pages: 18,
+    patents: 11,
+    papers: 19,
+    readTime: '12 min',
+    slug: 'pem-vs-aem-electrolyzer',
+  },
+  {
+    id: 'ceramic-coatings',
+    category: 'Advanced Materials',
+    categoryColor: 'purple',
+    title: 'High-Temperature Ceramic Coatings',
+    subtitle: 'Turbine blade protection',
+    pages: 22,
+    patents: 18,
+    papers: 27,
+    readTime: '14 min',
+    slug: 'high-temp-ceramic-coatings',
+  },
+  {
+    id: 'plastic-pyrolysis',
+    category: 'Waste',
+    categoryColor: 'amber',
+    title: 'Plastic Pyrolysis Catalyst Design',
+    subtitle: 'Mixed waste feedstock tolerance',
+    pages: 20,
+    patents: 9,
+    papers: 21,
+    readTime: '13 min',
+    slug: 'plastic-pyrolysis-catalyst',
+  },
+];

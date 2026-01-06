@@ -1,7 +1,7 @@
 'use client';
 
 import { EngineeringHero } from './_components/engineering-hero';
-import { ExampleReportsSection } from './_components/example-reports/example-reports-section';
+import { ExampleReportsSectionNew } from './_components/example-reports/example-reports-section-new';
 import { ProcessAnimation } from './_components/process-animation';
 
 /**
@@ -12,7 +12,7 @@ function Home() {
     <>
       <EngineeringHero />
       <ProcessAnimation />
-      <ExampleReportsSection mode="engineers" />
+      <ExampleReportsSectionNew />
     </>
   );
 }
