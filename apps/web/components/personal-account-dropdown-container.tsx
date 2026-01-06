@@ -35,7 +35,9 @@ export function ProfileAccountDropdownContainer(props: {
     dashboard: props.showDashboardLink ? pathsConfig.app.home : undefined,
     settings: pathsConfig.app.personalAccountSettings,
     billing: pathsConfig.app.personalAccountBilling,
-    teams: props.showTeamsLink ? pathsConfig.app.personalAccountTeams : undefined,
+    teams: props.showTeamsLink
+      ? pathsConfig.app.personalAccountTeams
+      : undefined,
     help: '/app/help',
   };
 

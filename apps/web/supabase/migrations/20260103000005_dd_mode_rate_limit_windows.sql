@@ -14,5 +14,6 @@ CREATE INDEX IF NOT EXISTS idx_rate_limit_windows_lookup
 
 ALTER TABLE public.rate_limit_windows ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role only" ON public.rate_limit_windows;
 CREATE POLICY "Service role only" ON public.rate_limit_windows
   FOR ALL USING (false);

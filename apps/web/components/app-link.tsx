@@ -14,7 +14,7 @@ type AppLinkProps = ComponentProps<typeof Link>;
  *
  * Usage: Replace `<Link href="/app/reports">` with `<AppLink href="/app/reports">`
  * On app.sparlo.ai, this renders as `/reports`
- * On sparlo.ai, this renders as `/home/reports`
+ * On sparlo.ai, this renders as `/app/reports`
  */
 export function AppLink({ href, ...props }: AppLinkProps) {
   const hrefString = typeof href === 'string' ? href : (href.pathname ?? '');

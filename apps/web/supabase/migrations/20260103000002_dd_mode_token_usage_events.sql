@@ -17,5 +17,6 @@ CREATE INDEX IF NOT EXISTS idx_token_usage_events_account_id
 
 ALTER TABLE public.token_usage_events ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role only" ON public.token_usage_events;
 CREATE POLICY "Service role only" ON public.token_usage_events
   FOR ALL USING (false);

@@ -117,6 +117,47 @@ interface DDReportEventData {
 }
 
 // =============================================================================
+// DD5 Format Helpers
+// =============================================================================
+
+/**
+ * Type guard to check if DD5 result is in the new format (with prose_report and quick_reference)
+ */
+function isDD5NewFormat(
+  result: DD5_M_Output,
+): result is Extract<
+  DD5_M_Output,
+  { report_metadata: unknown; prose_report: unknown; quick_reference: unknown }
+> {
+  return 'report_metadata' in result && 'quick_reference' in result;
+}
+
+/**
+ * Extract title/headline metadata from DD5 result, handling both old and new formats
+ */
+function extractDD5Metadata(result: DD5_M_Output): {
+  companyName: string;
+  verdict: string;
+  headline: string;
+} {
+  if (isDD5NewFormat(result)) {
+    // New format: report_metadata + quick_reference
+    return {
+      companyName: result.report_metadata.company_name,
+      verdict: result.quick_reference.one_page_summary.verdict_box.overall,
+      headline: result.quick_reference.one_page_summary.one_sentence,
+    };
+  }
+
+  // Old format: header + executive_summary
+  return {
+    companyName: result.header.company_name,
+    verdict: result.executive_summary.verdict,
+    headline: result.executive_summary.one_paragraph_summary,
+  };
+}
+
+// =============================================================================
 // Inngest Function
 // =============================================================================
 
@@ -1312,14 +1353,14 @@ Make the report 3-5x more valuable than traditional DD.`;
         const totalUsage = calculateTotalUsage(allUsages);
 
         await step.run('complete-dd-report', async () => {
+          // Extract metadata from DD5 result (handles both old and new formats)
+          const dd5Metadata = extractDD5Metadata(dd5Result.result);
+
           // Generate title from report
-          const generatedTitle = `DD: ${dd5Result.result.header.company_name} - ${dd5Result.result.executive_summary.verdict}`;
+          const generatedTitle = `DD: ${dd5Metadata.companyName} - ${dd5Metadata.verdict}`;
 
           // Build headline from executive summary
-          const headline =
-            dd5Result.result.executive_summary.one_paragraph_summary
-              .slice(0, 200)
-              .trim();
+          const headline = dd5Metadata.headline.slice(0, 200).trim();
 
           // Build report data
           const reportData = {
