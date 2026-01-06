@@ -6,8 +6,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { EngineeringHero } from './_components/engineering-hero';
 import { ExampleReportsSection } from './_components/example-reports/example-reports-section';
-import { MethodologySection } from './_components/methodology-section';
 import { type Mode, ModeTabs } from './_components/mode-tabs';
+import { ProcessAnimation } from './_components/process-animation';
 
 /**
  * Get initial mode from URL hash (client-side only)
@@ -44,6 +44,7 @@ function Home() {
     <>
       <EngineeringHero />
       <ModeTabs mode={mode} onModeChange={handleModeChange} />
+      <ProcessAnimation />
       <AnimatePresence mode="wait">
         <motion.div
           key={mode}
@@ -52,7 +53,6 @@ function Home() {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
-          <MethodologySection mode={mode} />
           <ExampleReportsSection mode={mode} />
         </motion.div>
       </AnimatePresence>

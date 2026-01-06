@@ -87,12 +87,12 @@ function JourneyConnector() {
       {/* The track */}
       <div className="relative h-32 w-px md:h-40">
         {/* Background track */}
-        <div className="absolute inset-0 bg-zinc-800/50" />
+        <div className="absolute inset-0 bg-zinc-200" />
 
         {/* Animated fill */}
         <motion.div
           style={{ height: lineHeight }}
-          className="absolute left-0 top-0 w-full bg-gradient-to-b from-zinc-600 via-zinc-500 to-white"
+          className="absolute left-0 top-0 w-full bg-gradient-to-b from-zinc-400 via-zinc-600 to-zinc-900"
         />
 
         {/* Glowing dot */}
@@ -101,8 +101,8 @@ function JourneyConnector() {
           className="absolute -bottom-2 left-1/2 -translate-x-1/2"
         >
           <span className="relative flex h-4 w-4">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/30" />
-            <span className="relative inline-flex h-4 w-4 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-zinc-400" />
+            <span className="relative inline-flex h-4 w-4 rounded-full bg-zinc-900 shadow-[0_0_12px_rgba(0,0,0,0.3)]" />
           </span>
         </motion.div>
       </div>
@@ -112,7 +112,7 @@ function JourneyConnector() {
         <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
           <path
             d="M1 1L7 8L13 1"
-            stroke="white"
+            stroke="#18181B"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -130,7 +130,7 @@ function JourneyConnector() {
 function StepLabel({ number, label }: { number: string; label: string }) {
   return (
     <div className="mb-8 flex items-center gap-4">
-      <span className="font-mono text-[13px] font-medium text-zinc-600">{number}</span>
+      <span className="font-mono text-[13px] font-medium text-zinc-400">{number}</span>
       <span className="text-[13px] font-medium uppercase tracking-[0.2em] text-zinc-500">
         {label}
       </span>
@@ -144,7 +144,7 @@ function StepLabel({ number, label }: { number: string; label: string }) {
 
 export const ProcessAnimation = memo(function ProcessAnimation() {
   return (
-    <section className="bg-zinc-950 px-6 py-32 md:py-40">
+    <section className="bg-zinc-50 px-6 py-32 md:py-40">
       <div className="mx-auto max-w-3xl">
 
         {/* Section Header */}
@@ -155,21 +155,16 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           variants={fadeInUp}
           className="mb-24 text-center md:mb-32"
         >
-          <p className="font-mono text-[12px] font-medium uppercase tracking-[0.3em] text-zinc-600">
-            Process
+          <p className="font-mono text-[12px] font-medium uppercase tracking-[0.3em] text-zinc-400">
+            The Process
           </p>
-          <h2 className="mt-6 text-[36px] font-semibold leading-[1.1] tracking-tight text-white sm:text-[48px]">
-            Cross-domain analysis
+          <h2 className="mt-4 text-[36px] font-normal leading-[1.1] tracking-tight text-zinc-900 sm:text-[48px]">
+            First Principles Innovation
           </h2>
-          <p className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-zinc-400">
-            47 technical domains. 12,847 patents. 34,291 papers.
-            <br />
-            One systematic search.
-          </p>
         </motion.div>
 
         {/* ============================================ */}
-        {/* STEP 01: Input */}
+        {/* STEP 01: Input - Matching actual form */}
         {/* ============================================ */}
         <motion.div
           initial="hidden"
@@ -177,11 +172,30 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           viewport={{ once: true, margin: '-50px' }}
           variants={fadeInUp}
         >
-          <StepLabel number="01" label="Input" />
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-8 md:p-10">
-            <p className="text-[20px] leading-relaxed text-zinc-100 md:text-[22px]">
-              {CONTENT.problem}
-            </p>
+          <StepLabel number="01" label="Input Engineering Challenge" />
+
+          {/* Card matching actual form styling */}
+          <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+            <div className="flex">
+              {/* Left border accent */}
+              <div className="w-0.5 bg-zinc-900" />
+              <div className="flex-1 p-8">
+                {/* Challenge text */}
+                <p className="text-[20px] leading-relaxed text-zinc-900">
+                  {CONTENT.problem}
+                </p>
+
+                {/* Footer with button */}
+                <div className="mt-10 flex items-center justify-between">
+                  <p className="text-[13px] tracking-[-0.02em] text-zinc-400">
+                    ~25 min analysis
+                  </p>
+                  <button className="bg-zinc-900 px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-zinc-800">
+                    Run Analysis
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </motion.div>
 
@@ -196,10 +210,10 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           viewport={{ once: true, margin: '-50px' }}
           variants={fadeInUp}
         >
-          <StepLabel number="02" label="Reframe" />
+          <StepLabel number="02" label="First Principles Reframe" />
 
-          <div className="border-l-2 border-white/20 pl-8">
-            <p className="text-[24px] font-medium leading-snug text-white md:text-[28px]">
+          <div className="border-l-2 border-zinc-900 pl-8">
+            <p className="text-[24px] font-medium leading-snug text-zinc-900 md:text-[28px]">
               {CONTENT.reframe}
             </p>
           </div>
@@ -234,8 +248,8 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
                   variants={domainPill}
                   className={`rounded-full px-4 py-2.5 text-[14px] font-medium ${
                     isMatch
-                      ? 'bg-white text-zinc-900'
-                      : 'bg-zinc-800/80 text-zinc-500'
+                      ? 'bg-zinc-900 text-white'
+                      : 'bg-zinc-200 text-zinc-600'
                   }`}
                 >
                   {domain}
@@ -244,7 +258,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
             })}
             <motion.span
               variants={domainPill}
-              className="rounded-full bg-zinc-900 px-4 py-2.5 text-[14px] text-zinc-600"
+              className="rounded-full bg-zinc-100 px-4 py-2.5 text-[14px] text-zinc-400"
             >
               +39 domains
             </motion.span>
@@ -256,15 +270,15 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="mt-10 rounded-xl border border-zinc-800 bg-zinc-900/60 p-6"
+            className="mt-10 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm"
           >
             <div className="flex items-center gap-3 text-[14px]">
-              <span className="rounded bg-white/10 px-3 py-1.5 font-mono text-white">
+              <span className="rounded bg-zinc-900 px-3 py-1.5 font-mono text-white">
                 {CONTENT.technique}
               </span>
-              <span className="text-zinc-600">from</span>
-              <span className="text-zinc-300">{CONTENT.sourceIndustry}</span>
-              <span className="text-zinc-700">·</span>
+              <span className="text-zinc-400">from</span>
+              <span className="text-zinc-700">{CONTENT.sourceIndustry}</span>
+              <span className="text-zinc-300">·</span>
               <span className="text-zinc-500">{CONTENT.yearsProven}</span>
             </div>
           </motion.div>
@@ -278,11 +292,11 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
             className="mt-6 flex items-center gap-8 text-[14px] text-zinc-500"
           >
             <div>
-              <span className="font-mono text-[18px] font-semibold text-zinc-300">14</span>
+              <span className="font-mono text-[18px] font-semibold text-zinc-700">14</span>
               <span className="ml-2">patents analyzed</span>
             </div>
             <div>
-              <span className="font-mono text-[18px] font-semibold text-zinc-300">23</span>
+              <span className="font-mono text-[18px] font-semibold text-zinc-700">23</span>
               <span className="ml-2">papers reviewed</span>
             </div>
           </motion.div>
@@ -291,7 +305,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
         <JourneyConnector />
 
         {/* ============================================ */}
-        {/* STEP 04: Output - Terminal Style */}
+        {/* STEP 04: Output */}
         {/* ============================================ */}
         <motion.div
           initial="hidden"
@@ -301,34 +315,34 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
         >
           <StepLabel number="04" label="Output" />
 
-          <div className="overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900">
+          <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm">
             {/* Terminal header */}
-            <div className="flex items-center gap-2 border-b border-zinc-800 px-6 py-4">
-              <div className="h-3 w-3 rounded-full bg-zinc-700" />
-              <div className="h-3 w-3 rounded-full bg-zinc-700" />
-              <div className="h-3 w-3 rounded-full bg-zinc-700" />
-              <span className="ml-4 font-mono text-[12px] text-zinc-500">
+            <div className="flex items-center gap-2 border-b border-zinc-100 px-6 py-4">
+              <div className="h-3 w-3 rounded-full bg-zinc-200" />
+              <div className="h-3 w-3 rounded-full bg-zinc-200" />
+              <div className="h-3 w-3 rounded-full bg-zinc-200" />
+              <span className="ml-4 font-mono text-[12px] text-zinc-400">
                 analysis_report.md
               </span>
             </div>
 
             {/* Executive Summary */}
-            <div className="border-b border-zinc-800 p-8 md:p-10">
-              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-600">
+            <div className="border-b border-zinc-100 p-8 md:p-10">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-400">
                 Executive Summary
               </p>
-              <p className="mt-6 text-[17px] leading-[1.8] text-zinc-300 md:text-[18px]">
+              <p className="mt-6 text-[17px] leading-[1.8] text-zinc-700 md:text-[18px]">
                 {CONTENT.executiveSummary}
               </p>
             </div>
 
             {/* Solutions Grid */}
             <div className="p-8 md:p-10">
-              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-600">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-400">
                 Ranked Solutions
               </p>
 
-              <div className="mt-6 space-y-4">
+              <div className="mt-6 space-y-3">
                 {SOLUTIONS_DATA.map((solution, index) => (
                   <motion.div
                     key={solution.rank}
@@ -338,13 +352,13 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
                     transition={{ delay: index * 0.1 }}
                     className={`flex items-center gap-6 rounded-lg p-4 ${
                       index === 0
-                        ? 'bg-white/5 ring-1 ring-white/10'
-                        : 'bg-zinc-800/30'
+                        ? 'bg-zinc-900 text-white'
+                        : 'bg-zinc-50'
                     }`}
                   >
                     {/* Rank */}
                     <span className={`font-mono text-[14px] ${
-                      index === 0 ? 'text-white' : 'text-zinc-600'
+                      index === 0 ? 'text-zinc-400' : 'text-zinc-400'
                     }`}>
                       {solution.rank}
                     </span>
@@ -352,11 +366,13 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
                     {/* Name & Source */}
                     <div className="flex-1">
                       <p className={`text-[15px] font-medium ${
-                        index === 0 ? 'text-white' : 'text-zinc-400'
+                        index === 0 ? 'text-white' : 'text-zinc-700'
                       }`}>
                         {solution.name}
                       </p>
-                      <p className="mt-0.5 text-[13px] text-zinc-600">
+                      <p className={`mt-0.5 text-[13px] ${
+                        index === 0 ? 'text-zinc-400' : 'text-zinc-400'
+                      }`}>
                         via {solution.source}
                       </p>
                     </div>
@@ -364,11 +380,13 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
                     {/* Confidence */}
                     <div className="text-right">
                       <p className={`font-mono text-[20px] font-semibold ${
-                        index === 0 ? 'text-white' : 'text-zinc-500'
+                        index === 0 ? 'text-white' : 'text-zinc-600'
                       }`}>
                         {solution.confidence}
                       </p>
-                      <p className="text-[11px] uppercase tracking-wider text-zinc-600">
+                      <p className={`text-[11px] uppercase tracking-wider ${
+                        index === 0 ? 'text-zinc-400' : 'text-zinc-400'
+                      }`}>
                         confidence
                       </p>
                     </div>
@@ -378,14 +396,14 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
             </div>
 
             {/* Report Stats Footer */}
-            <div className="grid grid-cols-3 gap-px border-t border-zinc-800 bg-zinc-800">
+            <div className="grid grid-cols-3 gap-px border-t border-zinc-100 bg-zinc-100">
               {[
                 { value: '24', label: 'Pages' },
                 { value: '14', label: 'Patents cited' },
                 { value: '23', label: 'Validations' },
               ].map((stat) => (
-                <div key={stat.label} className="bg-zinc-900 px-6 py-5 text-center">
-                  <p className="font-mono text-[24px] font-semibold text-white">
+                <div key={stat.label} className="bg-zinc-50 px-6 py-5 text-center">
+                  <p className="font-mono text-[24px] font-semibold text-zinc-900">
                     {stat.value}
                   </p>
                   <p className="mt-1 text-[12px] text-zinc-500">{stat.label}</p>
@@ -401,7 +419,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.3 }}
-            className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-8 py-5 text-[16px] font-semibold text-zinc-900 transition-all hover:bg-zinc-100"
+            className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-zinc-900 px-8 py-5 text-[16px] font-semibold text-white transition-all hover:bg-zinc-800"
           >
             View full example report
             <ArrowRight className="h-5 w-5" strokeWidth={2} />
