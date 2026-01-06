@@ -1118,7 +1118,7 @@ Map ${companyName}'s approach onto the solution space:
 
           // ANTIFRAGILE: Retry with escalating token limits
           const MAX_RETRIES = 2;
-          const TOKEN_LIMITS = [HYBRID_MAX_TOKENS, 96000, 128000]; // Escalate on retry
+          const TOKEN_LIMITS = [HYBRID_MAX_TOKENS]; // 64000 is max for Opus 4.5
 
           let lastError: Error | null = null;
           let totalUsage: TokenUsage = {
@@ -1255,7 +1255,7 @@ Make the report 3-5x more valuable than traditional DD.`;
 
             // ANTIFRAGILE: Retry with escalating token limits
             const MAX_RETRIES = 2;
-            const TOKEN_LIMITS = [HYBRID_MAX_TOKENS, 96000, 128000];
+            const TOKEN_LIMITS = [HYBRID_MAX_TOKENS]; // 64000 is max for Opus 4.5
 
             let lastError: Error | null = null;
             let totalUsage: TokenUsage = {
