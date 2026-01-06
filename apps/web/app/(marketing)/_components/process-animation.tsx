@@ -1,9 +1,9 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 
-import { motion } from 'framer-motion';
-import { ArrowRight, Check, FileText, Shield, Lightbulb } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 
 // ============================================================================
 // CONTENT
@@ -16,9 +16,7 @@ const CONTENT = {
   technique: 'Electrodialysis Reversal',
   insight: `Polarity switching every 15-30 minutes dissolves scale and kills biofilms before they mature.`,
   yearsProven: '30+ years proven',
-  solution: 'Polarity-Switching Electrolyzer',
-  patents: '14 patents',
-  papers: '23 validations',
+  executiveSummary: `Analysis of 47 technical domains identified electrodialysis reversal (EDR) from the desalination industry as a high-confidence solution to marine electrolyzer degradation. EDR's polarity-switching mechanism—proven over 30+ years in seawater environments—dissolves mineral scale and prevents biofilm maturation before either can compromise electrode surfaces. This approach sidesteps the traditional durability-vs-cost tradeoff by accepting controlled degradation while dramatically extending functional lifespan. Implementation requires electrode material compatibility assessment and integration of automated polarity control systems, both well-documented in existing literature.`,
 };
 
 const DOMAINS_SEARCHED = [
@@ -32,16 +30,23 @@ const DOMAINS_SEARCHED = [
   'Aerospace',
 ];
 
+const SOLUTIONS_DATA = [
+  { rank: '01', name: 'Polarity-Switching Electrolyzer', confidence: 94, source: 'Desalination' },
+  { rank: '02', name: 'Sacrificial Anode Arrays', confidence: 78, source: 'Marine Engineering' },
+  { rank: '03', name: 'Pulsed-Current Operation', confidence: 71, source: 'Electroplating' },
+  { rank: '04', name: 'Ceramic Membrane Barriers', confidence: 67, source: 'Semiconductor' },
+];
+
 // ============================================================================
 // ANIMATION VARIANTS
 // ============================================================================
 
 const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.1, 0.25, 1] as const },
+    transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] as const },
   },
 };
 
@@ -49,124 +54,85 @@ const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.06 },
+    transition: { staggerChildren: 0.05 },
   },
 };
 
 const domainPill = {
-  hidden: { opacity: 0, scale: 0.9, y: 10 },
+  hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    y: 0,
-    transition: { duration: 0.4 },
+    transition: { duration: 0.3 },
   },
 };
 
 // ============================================================================
-// ANIMATED JOURNEY CONNECTOR
+// SCROLL-DRIVEN JOURNEY CONNECTOR
 // ============================================================================
 
 function JourneyConnector() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  });
+
+  const lineHeight = useTransform(scrollYProgress, [0, 0.5], ['0%', '100%']);
+  const dotOpacity = useTransform(scrollYProgress, [0.4, 0.5], [0, 1]);
+  const dotScale = useTransform(scrollYProgress, [0.4, 0.55], [0, 1]);
+  const arrowOpacity = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
+
   return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: '-50px' }}
-      className="flex flex-col items-center py-8"
-    >
+    <div ref={ref} className="flex flex-col items-center py-16 md:py-24">
       {/* The track */}
-      <div className="relative h-24 w-px">
-        {/* Background line */}
+      <div className="relative h-32 w-px md:h-40">
+        {/* Background track */}
+        <div className="absolute inset-0 bg-zinc-800/50" />
+
+        {/* Animated fill */}
         <motion.div
-          variants={{
-            hidden: { scaleY: 0, originY: 0 },
-            visible: {
-              scaleY: 1,
-              transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const },
-            },
-          }}
-          className="absolute inset-0 bg-gradient-to-b from-zinc-800 via-zinc-700 to-zinc-800"
+          style={{ height: lineHeight }}
+          className="absolute left-0 top-0 w-full bg-gradient-to-b from-zinc-600 via-zinc-500 to-white"
         />
 
-        {/* Traveling pulse - the "journey" effect */}
+        {/* Glowing dot */}
         <motion.div
-          variants={{
-            hidden: { opacity: 0 },
-            visible: {
-              opacity: 1,
-              transition: { delay: 0.3 },
-            },
-          }}
-          className="absolute inset-0 overflow-hidden"
+          style={{ opacity: dotOpacity, scale: dotScale }}
+          className="absolute -bottom-2 left-1/2 -translate-x-1/2"
         >
-          <motion.div
-            animate={{
-              y: ['-100%', '200%'],
-            }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: 'linear',
-              repeatDelay: 0.5,
-            }}
-            className="absolute left-1/2 h-8 w-px -translate-x-1/2"
-            style={{
-              background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.6), transparent)',
-            }}
-          />
-        </motion.div>
-
-        {/* Glowing dot at the end */}
-        <motion.div
-          variants={{
-            hidden: { opacity: 0, scale: 0 },
-            visible: {
-              opacity: 1,
-              scale: 1,
-              transition: { delay: 0.6, type: 'spring', stiffness: 300 },
-            },
-          }}
-          className="absolute -bottom-1.5 left-1/2 -translate-x-1/2"
-        >
-          <span className="relative flex h-3 w-3">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/40" />
-            <span className="relative inline-flex h-3 w-3 rounded-full bg-white/80" />
+          <span className="relative flex h-4 w-4">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/30" />
+            <span className="relative inline-flex h-4 w-4 rounded-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.5)]" />
           </span>
         </motion.div>
       </div>
 
-      {/* Arrow head */}
-      <motion.div
-        variants={{
-          hidden: { opacity: 0, y: -5 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: { delay: 0.7, duration: 0.3 },
-          },
-        }}
-        className="mt-2"
-      >
-        <svg width="12" height="8" viewBox="0 0 12 8" fill="none" className="text-white/60">
-          <path d="M1 1L6 6L11 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+      {/* Arrow */}
+      <motion.div style={{ opacity: arrowOpacity }} className="mt-4">
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="none">
+          <path
+            d="M1 1L7 8L13 1"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 
 // ============================================================================
-// STEP LABEL COMPONENT
+// STEP LABEL
 // ============================================================================
 
-function StepLabel({ number, label }: { number: number; label: string }) {
+function StepLabel({ number, label }: { number: string; label: string }) {
   return (
-    <div className="mb-6 flex items-center gap-3">
-      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-zinc-800 text-[13px] font-medium text-zinc-400">
-        {number}
-      </span>
-      <span className="text-[13px] font-medium uppercase tracking-[0.15em] text-zinc-500">
+    <div className="mb-8 flex items-center gap-4">
+      <span className="font-mono text-[13px] font-medium text-zinc-600">{number}</span>
+      <span className="text-[13px] font-medium uppercase tracking-[0.2em] text-zinc-500">
         {label}
       </span>
     </div>
@@ -174,22 +140,12 @@ function StepLabel({ number, label }: { number: number; label: string }) {
 }
 
 // ============================================================================
-// REPORT PREVIEW METRICS
-// ============================================================================
-
-const REPORT_METRICS = [
-  { icon: Lightbulb, value: '4', label: 'Viable solutions' },
-  { icon: Shield, value: '12', label: 'Risk factors analyzed' },
-  { icon: FileText, value: '24', label: 'Pages of analysis' },
-];
-
-// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
 export const ProcessAnimation = memo(function ProcessAnimation() {
   return (
-    <section className="bg-zinc-950 px-6 py-24 md:py-32">
+    <section className="bg-zinc-950 px-6 py-32 md:py-40">
       <div className="mx-auto max-w-3xl">
 
         {/* Section Header */}
@@ -198,22 +154,23 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
           variants={fadeInUp}
-          className="mb-16 text-center"
+          className="mb-24 text-center md:mb-32"
         >
-          <p className="text-[12px] font-medium uppercase tracking-[0.2em] text-zinc-500">
-            How it works
+          <p className="font-mono text-[12px] font-medium uppercase tracking-[0.3em] text-zinc-600">
+            Process
           </p>
-          <h2 className="mt-4 text-[32px] font-semibold leading-tight text-white sm:text-[40px]">
-            Cross-domain innovation analysis
+          <h2 className="mt-6 text-[36px] font-semibold leading-[1.1] tracking-tight text-white sm:text-[48px]">
+            Cross-domain analysis
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-[17px] leading-relaxed text-zinc-400">
-            We search across 47 technical domains to find proven solutions
-            from unexpected industries.
+          <p className="mx-auto mt-6 max-w-lg text-[18px] leading-relaxed text-zinc-400">
+            47 technical domains. 12,847 patents. 34,291 papers.
+            <br />
+            One systematic search.
           </p>
         </motion.div>
 
         {/* ============================================ */}
-        {/* STEP 1: The Problem */}
+        {/* STEP 01: Input */}
         {/* ============================================ */}
         <motion.div
           initial="hidden"
@@ -221,9 +178,9 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           viewport={{ once: true, margin: '-50px' }}
           variants={fadeInUp}
         >
-          <StepLabel number={1} label="Your challenge" />
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-8">
-            <p className="text-[19px] leading-relaxed text-zinc-200">
+          <StepLabel number="01" label="Input" />
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-8 md:p-10">
+            <p className="text-[20px] leading-relaxed text-zinc-100 md:text-[22px]">
               {CONTENT.problem}
             </p>
           </div>
@@ -232,7 +189,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
         <JourneyConnector />
 
         {/* ============================================ */}
-        {/* STEP 2: The Search */}
+        {/* STEP 02: Search */}
         {/* ============================================ */}
         <motion.div
           initial="hidden"
@@ -240,14 +197,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           viewport={{ once: true, margin: '-50px' }}
           variants={fadeInUp}
         >
-          <StepLabel number={2} label="Cross-domain search" />
-
-          {/* Stats row */}
-          <div className="mb-6 flex items-center gap-6 text-[14px] text-zinc-500">
-            <span><span className="font-medium text-zinc-300">47</span> domains</span>
-            <span><span className="font-medium text-zinc-300">12,847</span> patents</span>
-            <span><span className="font-medium text-zinc-300">34,291</span> papers</span>
-          </div>
+          <StepLabel number="02" label="Search" />
 
           {/* Domain pills */}
           <motion.div
@@ -258,36 +208,26 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
             className="flex flex-wrap gap-2"
           >
             {DOMAINS_SEARCHED.map((domain) => {
-              const isWinner = domain === CONTENT.sourceIndustry;
+              const isMatch = domain === CONTENT.sourceIndustry;
               return (
                 <motion.span
                   key={domain}
                   variants={domainPill}
-                  className={`rounded-full px-4 py-2 text-[14px] font-medium transition-colors ${
-                    isWinner
-                      ? 'bg-emerald-500/20 text-emerald-400 ring-1 ring-emerald-500/30'
-                      : 'bg-zinc-800/80 text-zinc-400'
+                  className={`rounded-full px-4 py-2.5 text-[14px] font-medium ${
+                    isMatch
+                      ? 'bg-white text-zinc-900'
+                      : 'bg-zinc-800/80 text-zinc-500'
                   }`}
                 >
                   {domain}
-                  {isWinner && (
-                    <motion.span
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.8, type: 'spring', stiffness: 500 }}
-                      className="ml-2"
-                    >
-                      ✓
-                    </motion.span>
-                  )}
                 </motion.span>
               );
             })}
             <motion.span
               variants={domainPill}
-              className="rounded-full bg-zinc-800/50 px-4 py-2 text-[14px] text-zinc-600"
+              className="rounded-full bg-zinc-900 px-4 py-2.5 text-[14px] text-zinc-600"
             >
-              +39 more
+              +39 domains
             </motion.span>
           </motion.div>
         </motion.div>
@@ -295,7 +235,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
         <JourneyConnector />
 
         {/* ============================================ */}
-        {/* STEP 3: The Insight */}
+        {/* STEP 03: Insight */}
         {/* ============================================ */}
         <motion.div
           initial="hidden"
@@ -303,47 +243,28 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           viewport={{ once: true, margin: '-50px' }}
           variants={fadeInUp}
         >
-          <StepLabel number={3} label="The insight" />
+          <StepLabel number="03" label="Reframe" />
 
-          {/* Reframe quote */}
-          <div className="mb-8 rounded-xl border-l-2 border-zinc-600 bg-zinc-900/40 py-5 pl-6 pr-6">
-            <p className="text-[11px] font-medium uppercase tracking-[0.15em] text-zinc-600">
-              Reframing the problem
-            </p>
-            <p className="mt-3 text-[21px] font-medium leading-snug text-white sm:text-[24px]">
+          <div className="border-l-2 border-white/20 pl-8">
+            <p className="text-[24px] font-medium leading-snug text-white md:text-[28px]">
               {CONTENT.reframe}
             </p>
-          </div>
-
-          {/* Connection card */}
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6">
-            {/* Source badge */}
-            <div className="mb-5 flex items-center gap-3">
-              <span className="rounded-lg bg-emerald-500/15 px-3 py-1.5 text-[14px] font-medium text-emerald-400">
-                {CONTENT.sourceIndustry}
+            <div className="mt-6 flex items-center gap-3 text-[14px]">
+              <span className="rounded bg-zinc-800 px-3 py-1.5 font-mono text-zinc-400">
+                {CONTENT.technique}
               </span>
-              <span className="text-zinc-700">→</span>
-              <span className="text-[14px] text-zinc-500">
-                {CONTENT.yearsProven}
-              </span>
+              <span className="text-zinc-600">from</span>
+              <span className="text-zinc-400">{CONTENT.sourceIndustry}</span>
+              <span className="text-zinc-700">·</span>
+              <span className="text-zinc-500">{CONTENT.yearsProven}</span>
             </div>
-
-            {/* Technique name */}
-            <p className="mb-2 font-mono text-[14px] font-medium text-emerald-400">
-              {CONTENT.technique}
-            </p>
-
-            {/* Insight text */}
-            <p className="text-[17px] leading-relaxed text-zinc-300">
-              {CONTENT.insight}
-            </p>
           </div>
         </motion.div>
 
         <JourneyConnector />
 
         {/* ============================================ */}
-        {/* STEP 4: The Deliverable */}
+        {/* STEP 04: Output - Terminal Style */}
         {/* ============================================ */}
         <motion.div
           initial="hidden"
@@ -351,78 +272,113 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           viewport={{ once: true, margin: '-50px' }}
           variants={fadeInUp}
         >
-          <StepLabel number={4} label="Your deliverable" />
+          <StepLabel number="04" label="Output" />
 
-          <div className="overflow-hidden rounded-2xl bg-white">
-            {/* Executive Summary Header */}
-            <div className="border-b border-zinc-100 px-8 py-6">
-              <div className="flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.1em] text-zinc-400">
-                <Check className="h-4 w-4 text-emerald-500" strokeWidth={2.5} />
-                Analysis complete
-              </div>
+          <div className="overflow-hidden rounded-xl border border-zinc-700 bg-zinc-900">
+            {/* Terminal header */}
+            <div className="flex items-center gap-2 border-b border-zinc-800 px-6 py-4">
+              <div className="h-3 w-3 rounded-full bg-zinc-700" />
+              <div className="h-3 w-3 rounded-full bg-zinc-700" />
+              <div className="h-3 w-3 rounded-full bg-zinc-700" />
+              <span className="ml-4 font-mono text-[12px] text-zinc-500">
+                analysis_report.md
+              </span>
             </div>
 
-            {/* Main content */}
-            <div className="px-8 py-8">
-              {/* Lead recommendation */}
-              <p className="text-[13px] font-medium uppercase tracking-[0.1em] text-emerald-600">
-                Lead recommendation
+            {/* Executive Summary */}
+            <div className="border-b border-zinc-800 p-8 md:p-10">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-600">
+                Executive Summary
               </p>
-              <h3 className="mt-2 text-[28px] font-semibold leading-tight text-zinc-900 sm:text-[32px]">
-                {CONTENT.solution}
-              </h3>
-
-              {/* Executive summary */}
-              <p className="mt-4 text-[17px] leading-relaxed text-zinc-600">
-                Adapting electrodialysis reversal from desalination eliminates the corrosion-fouling
-                cycle that limits marine electrolyzer lifespan. This architecture has been validated
-                in seawater environments for 30+ years at industrial scale.
+              <p className="mt-6 text-[17px] leading-[1.8] text-zinc-300 md:text-[18px]">
+                {CONTENT.executiveSummary}
               </p>
-
-              {/* Evidence line */}
-              <div className="mt-4 flex items-center gap-4 text-[14px] text-zinc-500">
-                <span className="font-medium text-zinc-700">{CONTENT.patents}</span>
-                <span className="h-1 w-1 rounded-full bg-zinc-300" />
-                <span className="font-medium text-zinc-700">{CONTENT.papers}</span>
-                <span className="h-1 w-1 rounded-full bg-zinc-300" />
-                <span>Confidence: <span className="font-medium text-emerald-600">High</span></span>
-              </div>
             </div>
 
-            {/* Report metrics */}
-            <div className="border-t border-zinc-100 bg-zinc-50/50 px-8 py-6">
-              <p className="mb-4 text-[12px] font-medium uppercase tracking-[0.1em] text-zinc-400">
-                Full report includes
+            {/* Solutions Grid */}
+            <div className="p-8 md:p-10">
+              <p className="font-mono text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-600">
+                Ranked Solutions
               </p>
-              <div className="grid grid-cols-3 gap-4">
-                {REPORT_METRICS.map((metric) => (
+
+              <div className="mt-6 space-y-4">
+                {SOLUTIONS_DATA.map((solution, index) => (
                   <motion.div
-                    key={metric.label}
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    key={solution.rank}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true }}
-                    transition={{ delay: 0.2 }}
-                    className="text-center"
+                    transition={{ delay: index * 0.1 }}
+                    className={`flex items-center gap-6 rounded-lg p-4 ${
+                      index === 0
+                        ? 'bg-white/5 ring-1 ring-white/10'
+                        : 'bg-zinc-800/30'
+                    }`}
                   >
-                    <metric.icon className="mx-auto h-5 w-5 text-zinc-400" strokeWidth={1.5} />
-                    <p className="mt-2 text-[24px] font-semibold text-zinc-900">{metric.value}</p>
-                    <p className="text-[13px] text-zinc-500">{metric.label}</p>
+                    {/* Rank */}
+                    <span className={`font-mono text-[14px] ${
+                      index === 0 ? 'text-white' : 'text-zinc-600'
+                    }`}>
+                      {solution.rank}
+                    </span>
+
+                    {/* Name & Source */}
+                    <div className="flex-1">
+                      <p className={`text-[15px] font-medium ${
+                        index === 0 ? 'text-white' : 'text-zinc-400'
+                      }`}>
+                        {solution.name}
+                      </p>
+                      <p className="mt-0.5 text-[13px] text-zinc-600">
+                        via {solution.source}
+                      </p>
+                    </div>
+
+                    {/* Confidence */}
+                    <div className="text-right">
+                      <p className={`font-mono text-[20px] font-semibold ${
+                        index === 0 ? 'text-white' : 'text-zinc-500'
+                      }`}>
+                        {solution.confidence}
+                      </p>
+                      <p className="text-[11px] uppercase tracking-wider text-zinc-600">
+                        confidence
+                      </p>
+                    </div>
                   </motion.div>
                 ))}
               </div>
             </div>
 
-            {/* CTA */}
-            <div className="border-t border-zinc-100 px-8 py-6">
-              <a
-                href="#example-reports"
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-6 py-3.5 text-[15px] font-medium text-white transition-all hover:bg-zinc-800"
-              >
-                View full example report
-                <ArrowRight className="h-4 w-4" strokeWidth={2} />
-              </a>
+            {/* Report Stats Footer */}
+            <div className="grid grid-cols-3 gap-px border-t border-zinc-800 bg-zinc-800">
+              {[
+                { value: '24', label: 'Pages' },
+                { value: '14', label: 'Patents cited' },
+                { value: '23', label: 'Validations' },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-zinc-900 px-6 py-5 text-center">
+                  <p className="font-mono text-[24px] font-semibold text-white">
+                    {stat.value}
+                  </p>
+                  <p className="mt-1 text-[12px] text-zinc-500">{stat.label}</p>
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* CTA */}
+          <motion.a
+            href="#example-reports"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+            className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl bg-white px-8 py-5 text-[16px] font-semibold text-zinc-900 transition-all hover:bg-zinc-100"
+          >
+            View full example report
+            <ArrowRight className="h-5 w-5" strokeWidth={2} />
+          </motion.a>
         </motion.div>
 
       </div>
