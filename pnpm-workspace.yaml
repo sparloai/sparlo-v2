@@ -25,4 +25,4 @@ catalog:
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
   - '@sentry/cli'
-  - supabase
+  # supabase CLI is excluded - only needed for local development, not production builds
