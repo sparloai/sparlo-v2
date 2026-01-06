@@ -465,176 +465,176 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
       "key_strength": "The strongest technical element"
     },
 
-  "physics_validation": [
-    {
-      "claim_id": "claim-X",
-      "claim_text": "The claim being validated",
-      "governing_physics": {
-        "principle": "The physics that applies",
-        "equation": "Relevant equation if applicable",
-        "theoretical_limit": "What physics says is possible"
+    "physics_validation": [
+      {
+        "claim_id": "claim-X",
+        "claim_text": "The claim being validated",
+        "governing_physics": {
+          "principle": "The physics that applies",
+          "equation": "Relevant equation if applicable",
+          "theoretical_limit": "What physics says is possible"
+        },
+        "validation_analysis": {
+          "claim_vs_limit": "How claim compares to theoretical limit",
+          "assumptions_required": ["Assumptions needed for claim to hold"],
+          "assumption_validity": "Are these assumptions reasonable?"
+        },
+        "verdict": "VALIDATED | PLAUSIBLE | QUESTIONABLE | IMPLAUSIBLE | INVALID",
+        "confidence": "HIGH | MEDIUM | LOW",
+        "confidence_percent": 75,
+        "reasoning": "2-3 sentences explaining verdict"
+      }
+    ],
+
+    "mechanism_validation": {
+      "claimed_mechanism": "What they say makes it work",
+      "actual_physics": "What the physics actually says",
+      "accuracy_assessment": "ACCURATE | OVERSIMPLIFIED | PARTIALLY_WRONG | FUNDAMENTALLY_WRONG",
+
+      "mechanism_deep_dive": {
+        "working_principle": "How this actually works at molecular/physical level",
+        "rate_limiting_step": "What fundamentally limits performance",
+        "key_parameters": [
+          {
+            "parameter": "Parameter name",
+            "startup_claim": "What they claim or imply",
+            "validated_range": "What evidence supports",
+            "gap": "Discrepancy if any"
+          }
+        ],
+        "failure_modes": [
+          {
+            "mode": "How it could fail",
+            "trigger": "What causes this failure",
+            "startup_addresses": true,
+            "mitigation_quality": "STRONG | ADEQUATE | WEAK | MISSING"
+          }
+        ]
       },
-      "validation_analysis": {
-        "claim_vs_limit": "How claim compares to theoretical limit",
-        "assumptions_required": ["Assumptions needed for claim to hold"],
-        "assumption_validity": "Are these assumptions reasonable?"
+
+      "mechanism_precedent": {
+        "demonstrated_elsewhere": true,
+        "where": "Where this mechanism has worked",
+        "at_what_scale": "Scale of demonstration",
+        "key_differences": "What's different in startup's application"
       },
-      "verdict": "VALIDATED | PLAUSIBLE | QUESTIONABLE | IMPLAUSIBLE | INVALID",
+
+      "verdict": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
       "confidence": "HIGH | MEDIUM | LOW",
-      "confidence_percent": 75,
-      "reasoning": "2-3 sentences explaining verdict"
-    }
-  ],
+      "reasoning": "Paragraph explaining mechanism assessment"
+    },
 
-  "mechanism_validation": {
-    "claimed_mechanism": "What they say makes it work",
-    "actual_physics": "What the physics actually says",
-    "accuracy_assessment": "ACCURATE | OVERSIMPLIFIED | PARTIALLY_WRONG | FUNDAMENTALLY_WRONG",
-
-    "mechanism_deep_dive": {
-      "working_principle": "How this actually works at molecular/physical level",
-      "rate_limiting_step": "What fundamentally limits performance",
-      "key_parameters": [
+    "triz_analysis": {
+      "problem_contradictions": [
         {
-          "parameter": "Parameter name",
-          "startup_claim": "What they claim or imply",
-          "validated_range": "What evidence supports",
-          "gap": "Discrepancy if any"
+          "contradiction": "The fundamental tradeoff",
+          "type": "TECHNICAL | PHYSICAL",
+          "improving_parameter": "What they want to improve",
+          "worsening_parameter": "What typically degrades",
+          "startup_awareness": "IDENTIFIED | PARTIALLY_AWARE | UNAWARE",
+          "startup_resolution": "How they claim to resolve it (if at all)",
+          "resolution_validity": "RESOLVED | PARTIALLY_RESOLVED | UNRESOLVED | IGNORED",
+          "standard_resolution": "How TRIZ suggests resolving this",
+          "inventive_principles_applicable": ["Principle 1", "Principle 2"]
         }
       ],
-      "failure_modes": [
+
+      "missed_contradictions": [
         {
-          "mode": "How it could fail",
-          "trigger": "What causes this failure",
-          "startup_addresses": true,
-          "mitigation_quality": "STRONG | ADEQUATE | WEAK | MISSING"
+          "contradiction": "Tradeoff they haven't addressed",
+          "why_it_matters": "Impact on their solution",
+          "likely_manifestation": "How this will show up"
+        }
+      ],
+
+      "triz_assessment": {
+        "contradiction_awareness": "HIGH | MEDIUM | LOW",
+        "resolution_quality": "ELEGANT | ADEQUATE | PARTIAL | POOR",
+        "inventive_level": "1-5 (Altshuller scale)",
+        "inventive_level_rationale": "Why this rating"
+      }
+    },
+
+    "feasibility_validation": {
+      "scale_assessment": {
+        "current_demonstrated_scale": "What they've shown",
+        "claimed_target_scale": "What they claim they can reach",
+        "scaling_challenges": [
+          {
+            "challenge": "What gets harder at scale",
+            "nonlinearity": "How it scales (linear, quadratic, exponential)",
+            "startup_addresses": true,
+            "assessment": "MANAGEABLE | SIGNIFICANT | SEVERE"
+          }
+        ],
+        "scale_verdict": "FEASIBLE | CHALLENGING | UNLIKELY"
+      },
+
+      "cost_assessment": {
+        "claimed_cost": "Their cost claim",
+        "cost_basis_provided": "How they derived it",
+        "cost_basis_quality": "DETAILED | REASONABLE | SUPERFICIAL | MISSING",
+        "hidden_costs_identified": [
+          {
+            "cost": "Cost they may have missed",
+            "estimated_impact": "How much this adds",
+            "basis": "Why we think this"
+          }
+        ],
+        "realistic_cost_range": "Our estimate of actual cost",
+        "cost_verdict": "REALISTIC | OPTIMISTIC | UNREALISTIC"
+      },
+
+      "timeline_assessment": {
+        "claimed_timeline": "Their timeline claims",
+        "trl_current": "Current TRL based on evidence",
+        "trl_claimed": "TRL they imply",
+        "timeline_verdict": "REALISTIC | AGGRESSIVE | UNREALISTIC",
+        "realistic_timeline": "Our estimate"
+      }
+    },
+
+    "internal_consistency": {
+      "consistent": true,
+      "inconsistencies": [
+        {
+          "claim_1": "First claim",
+          "claim_2": "Conflicting claim",
+          "conflict": "How they conflict",
+          "severity": "CRITICAL | MODERATE | MINOR"
         }
       ]
     },
 
-    "mechanism_precedent": {
-      "demonstrated_elsewhere": true,
-      "where": "Where this mechanism has worked",
-      "at_what_scale": "Scale of demonstration",
-      "key_differences": "What's different in startup's application"
-    },
-
-    "verdict": "SOUND | PLAUSIBLE | QUESTIONABLE | FLAWED",
-    "confidence": "HIGH | MEDIUM | LOW",
-    "reasoning": "Paragraph explaining mechanism assessment"
-  },
-
-  "triz_analysis": {
-    "problem_contradictions": [
+    "validation_verdicts": [
       {
-        "contradiction": "The fundamental tradeoff",
-        "type": "TECHNICAL | PHYSICAL",
-        "improving_parameter": "What they want to improve",
-        "worsening_parameter": "What typically degrades",
-        "startup_awareness": "IDENTIFIED | PARTIALLY_AWARE | UNAWARE",
-        "startup_resolution": "How they claim to resolve it (if at all)",
-        "resolution_validity": "RESOLVED | PARTIALLY_RESOLVED | UNRESOLVED | IGNORED",
-        "standard_resolution": "How TRIZ suggests resolving this",
-        "inventive_principles_applicable": ["Principle 1", "Principle 2"]
+        "claim_id": "claim-X",
+        "claim_summary": "Short version of claim",
+        "verdict": "VALIDATED | PLAUSIBLE | QUESTIONABLE | IMPLAUSIBLE | INVALID",
+        "confidence": "HIGH | MEDIUM | LOW",
+        "one_line_reasoning": "Why this verdict"
       }
     ],
 
-    "missed_contradictions": [
+    "critical_questions_for_founders": [
       {
-        "contradiction": "Tradeoff they haven't addressed",
-        "why_it_matters": "Impact on their solution",
-        "likely_manifestation": "How this will show up"
+        "question": "Specific question to ask",
+        "why_critical": "What this reveals",
+        "good_answer_looks_like": "What would increase confidence",
+        "bad_answer_looks_like": "What would decrease confidence"
       }
     ],
 
-    "triz_assessment": {
-      "contradiction_awareness": "HIGH | MEDIUM | LOW",
-      "resolution_quality": "ELEGANT | ADEQUATE | PARTIAL | POOR",
-      "inventive_level": "1-5 (Altshuller scale)",
-      "inventive_level_rationale": "Why this rating"
-    }
-  },
-
-  "feasibility_validation": {
-    "scale_assessment": {
-      "current_demonstrated_scale": "What they've shown",
-      "claimed_target_scale": "What they claim they can reach",
-      "scaling_challenges": [
-        {
-          "challenge": "What gets harder at scale",
-          "nonlinearity": "How it scales (linear, quadratic, exponential)",
-          "startup_addresses": true,
-          "assessment": "MANAGEABLE | SIGNIFICANT | SEVERE"
-        }
-      ],
-      "scale_verdict": "FEASIBLE | CHALLENGING | UNLIKELY"
-    },
-
-    "cost_assessment": {
-      "claimed_cost": "Their cost claim",
-      "cost_basis_provided": "How they derived it",
-      "cost_basis_quality": "DETAILED | REASONABLE | SUPERFICIAL | MISSING",
-      "hidden_costs_identified": [
-        {
-          "cost": "Cost they may have missed",
-          "estimated_impact": "How much this adds",
-          "basis": "Why we think this"
-        }
-      ],
-      "realistic_cost_range": "Our estimate of actual cost",
-      "cost_verdict": "REALISTIC | OPTIMISTIC | UNREALISTIC"
-    },
-
-    "timeline_assessment": {
-      "claimed_timeline": "Their timeline claims",
-      "trl_current": "Current TRL based on evidence",
-      "trl_claimed": "TRL they imply",
-      "timeline_verdict": "REALISTIC | AGGRESSIVE | UNREALISTIC",
-      "realistic_timeline": "Our estimate"
-    }
-  },
-
-  "internal_consistency": {
-    "consistent": true,
-    "inconsistencies": [
-      {
-        "claim_1": "First claim",
-        "claim_2": "Conflicting claim",
-        "conflict": "How they conflict",
-        "severity": "CRITICAL | MODERATE | MINOR"
-      }
-    ]
-  },
-
-  "validation_verdicts": [
-    {
-      "claim_id": "claim-X",
-      "claim_summary": "Short version of claim",
-      "verdict": "VALIDATED | PLAUSIBLE | QUESTIONABLE | IMPLAUSIBLE | INVALID",
-      "confidence": "HIGH | MEDIUM | LOW",
-      "one_line_reasoning": "Why this verdict"
-    }
-  ],
-
-  "critical_questions_for_founders": [
-    {
-      "question": "Specific question to ask",
-      "why_critical": "What this reveals",
-      "good_answer_looks_like": "What would increase confidence",
-      "bad_answer_looks_like": "What would decrease confidence"
-    }
-  ],
-
-  "technical_credibility_score": {
-    "score": 7,
-    "out_of": 10,
-    "breakdown": {
-      "physics_validity": 8,
-      "mechanism_soundness": 7,
-      "feasibility_realism": 6,
-      "internal_consistency": 8
-    },
-    "rationale": "Paragraph explaining the score"
+    "technical_credibility_score": {
+      "score": 7,
+      "out_of": 10,
+      "breakdown": {
+        "physics_validity": 8,
+        "mechanism_soundness": 7,
+        "feasibility_realism": 6,
+        "internal_consistency": 8
+      },
+      "rationale": "Paragraph explaining the score"
     }
   }
 }
@@ -993,533 +993,533 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
 
   "detailed_analysis": {
     "commercialization_summary": {
-    "overall_verdict": "CLEAR_PATH | CHALLENGING_BUT_VIABLE | SIGNIFICANT_OBSTACLES | UNLIKELY_TO_COMMERCIALIZE",
-    "confidence": "HIGH | MEDIUM | LOW",
-    "one_paragraph": "Plain English summary of commercial viability. What's the path? What's hard? What's the timeline?",
-    "critical_commercial_risk": "The single biggest commercial risk",
-    "secondary_commercial_risks": ["Risk 2", "Risk 3"],
-    "timeline_to_meaningful_revenue": "Realistic estimate with basis",
-    "capital_to_commercial_scale": "$ estimate with basis",
-    "vc_timeline_fit": "FITS | STRETCHED | MISALIGNED"
-  },
-
-  "unit_economics_analysis": {
-    "current_unit_cost": {
-      "value": "$X/unit",
-      "basis": "How we know (pilot data, estimates)",
-      "confidence": "HIGH | MEDIUM | LOW"
-    },
-    "claimed_scale_cost": {
-      "value": "$Y/unit",
-      "basis": "Their stated projection"
-    },
-    "gap_factor": "X divided by Y",
-    "cost_reduction_assessment": {
-      "learning_curve": {
-        "assumption": "X% per doubling",
-        "verdict": "REALISTIC | OPTIMISTIC | UNREALISTIC",
-        "reasoning": "Why"
-      },
-      "scale_effects": {
-        "what_scales": ["Things that get cheaper"],
-        "what_doesnt": ["Things that don't"],
-        "verdict": "REALISTIC | OPTIMISTIC | UNREALISTIC"
-      },
-      "magic_assumptions": [
-        {
-          "assumption": "Breakthrough required",
-          "probability": "X%",
-          "impact_if_wrong": "What happens"
-        }
-      ]
-    },
-    "ten_x_analysis": {
-      "comparison_metric": "The metric customers care about",
-      "startup_performance": "Their value",
-      "incumbent_performance": "Alternative value",
-      "multiple": "Nx better/worse",
-      "switching_cost": "What customers give up to switch",
-      "sufficient_for_adoption": true,
-      "reasoning": "Why this multiple is/isn't enough"
-    },
-    "margin_structure": {
-      "gross_margin_at_scale": "X%",
-      "basis": "How derived",
-      "capital_intensity": "$/unit capacity",
-      "years_to_cash_flow_positive": "X years",
-      "total_capital_to_profitability": "$X"
-    },
-    "verdict": "VIABLE | CHALLENGING | UNLIKELY",
-    "reasoning": "Summary"
-  },
-
-  "unit_economics_bridge": {
-    "applicability": "REQUIRED if company claims >30% cost reduction at scale",
-    "current_state": {
-      "cost": "$X/unit",
-      "scale": "Current production volume",
-      "basis": "Pilot data / estimates / claims"
-    },
-    "target_state": {
-      "cost": "$Y/unit",
-      "scale": "Target production volume",
-      "basis": "Their projection"
-    },
-    "gap_to_close": {
-      "absolute": "$X - $Y = $Z reduction needed",
-      "percentage": "X% reduction required"
-    },
-    "cost_reduction_drivers": [
-      {
-        "driver": "Specific cost reduction driver (e.g., 'Scale economies on labor')",
-        "line_item": "Which cost component this affects",
-        "current_cost": "$X/unit",
-        "projected_cost": "$Y/unit",
-        "reduction": "$Z/unit",
-        "reduction_percent": "X%",
-        "mechanism": "HOW this reduction happens (not just 'scale')",
-        "assumption_required": "What must be true for this to work",
-        "assumption_validity": "VALIDATED | REASONABLE | OPTIMISTIC | AGGRESSIVE | UNREALISTIC",
-        "confidence": "HIGH | MEDIUM | LOW",
-        "evidence": "What supports this"
-      }
-    ],
-    "bridge_summary": {
-      "total_reduction_explained": "$X/unit from identified drivers",
-      "total_reduction_claimed": "$Y/unit claimed",
-      "unexplained_gap": "$Z/unit (gap between explained and claimed)",
-      "gap_assessment": "FULLY_EXPLAINED | MOSTLY_EXPLAINED | CONTAINS_MAGIC_ASSUMPTIONS"
-    },
-    "sensitivity_analysis": {
-      "if_scale_economies_50_percent_of_projected": "Cost becomes $X/unit",
-      "if_no_improvement_in_largest_driver": "Cost becomes $X/unit",
-      "realistic_range": "$X - $Y/unit (vs. $Z claimed)"
-    },
-    "verdict": {
-      "claimed_achievable": true,
-      "realistic_estimate": "$X/unit",
+      "overall_verdict": "CLEAR_PATH | CHALLENGING_BUT_VIABLE | SIGNIFICANT_OBSTACLES | UNLIKELY_TO_COMMERCIALIZE",
       "confidence": "HIGH | MEDIUM | LOW",
-      "key_risk": "The assumption most likely to fail"
-    }
-  },
+      "one_paragraph": "Plain English summary of commercial viability. What's the path? What's hard? What's the timeline?",
+      "critical_commercial_risk": "The single biggest commercial risk",
+      "secondary_commercial_risks": ["Risk 2", "Risk 3"],
+      "timeline_to_meaningful_revenue": "Realistic estimate with basis",
+      "capital_to_commercial_scale": "$ estimate with basis",
+      "vc_timeline_fit": "FITS | STRETCHED | MISALIGNED"
+    },
 
-  "market_reality": {
-    "customer_identification": {
-      "stated_customer": "Who they say",
-      "actual_buyer": "Who writes checks (may differ)",
-      "specificity": "SPECIFIC_NAMES | CATEGORIES_ONLY | VAGUE",
-      "evidence_of_demand": {
-        "lois_signed": 0,
-        "pilots_active": 1,
-        "conversations_claimed": "X",
-        "revenue_to_date": "$0",
-        "assessment": "VALIDATED | PARTIALLY_VALIDATED | UNVALIDATED"
+    "unit_economics_analysis": {
+      "current_unit_cost": {
+        "value": "$X/unit",
+        "basis": "How we know (pilot data, estimates)",
+        "confidence": "HIGH | MEDIUM | LOW"
       },
-      "willingness_to_pay": {
-        "claimed": "$X",
-        "evidence": "What supports this",
-        "market_alternatives_cost": "$Y",
-        "premium_or_discount": "X% premium/discount to alternatives",
-        "credibility": "HIGH | MEDIUM | LOW"
-      }
+      "claimed_scale_cost": {
+        "value": "$Y/unit",
+        "basis": "Their stated projection"
+      },
+      "gap_factor": "X divided by Y",
+      "cost_reduction_assessment": {
+        "learning_curve": {
+          "assumption": "X% per doubling",
+          "verdict": "REALISTIC | OPTIMISTIC | UNREALISTIC",
+          "reasoning": "Why"
+        },
+        "scale_effects": {
+          "what_scales": ["Things that get cheaper"],
+          "what_doesnt": ["Things that don't"],
+          "verdict": "REALISTIC | OPTIMISTIC | UNREALISTIC"
+        },
+        "magic_assumptions": [
+          {
+            "assumption": "Breakthrough required",
+            "probability": "X%",
+            "impact_if_wrong": "What happens"
+          }
+        ]
+      },
+      "ten_x_analysis": {
+        "comparison_metric": "The metric customers care about",
+        "startup_performance": "Their value",
+        "incumbent_performance": "Alternative value",
+        "multiple": "Nx better/worse",
+        "switching_cost": "What customers give up to switch",
+        "sufficient_for_adoption": true,
+        "reasoning": "Why this multiple is/isn't enough"
+      },
+      "margin_structure": {
+        "gross_margin_at_scale": "X%",
+        "basis": "How derived",
+        "capital_intensity": "$/unit capacity",
+        "years_to_cash_flow_positive": "X years",
+        "total_capital_to_profitability": "$X"
+      },
+      "verdict": "VIABLE | CHALLENGING | UNLIKELY",
+      "reasoning": "Summary"
     },
-    "market_timing": {
-      "market_exists_today": true,
-      "current_market_size": "$X",
-      "projected_market_size": "$Y by YEAR",
-      "growth_driver": "What causes growth",
-      "timing_assessment": "RIGHT_TIME | 2_YEARS_EARLY | 5_PLUS_YEARS_EARLY | TOO_LATE",
-      "timing_reasoning": "Why"
-    },
-    "vitamin_or_painkiller": {
-      "assessment": "PAINKILLER | VITAMIN | UNCLEAR",
-      "forcing_function": "What makes customers HAVE to buy",
-      "what_happens_if_they_dont_buy": "Consequence for customer"
-    },
-    "competitive_position": {
-      "current_alternative": "What customers do today",
-      "switching_cost": "What customers give up",
-      "risk_for_customer": "What customer risks by switching",
-      "why_choose_startup": "Compelling reason to switch"
-    },
-    "verdict": "CLEAR_DEMAND | EMERGING_DEMAND | SPECULATIVE_DEMAND",
-    "reasoning": "Summary"
-  },
 
-  "gtm_reality": {
-    "sales_cycle": {
-      "estimated_months": 24,
-      "basis": "Industry typical / their data",
-      "runway_vs_cycle": "X months runway, Y month cycle",
-      "parallel_opportunities": "How many they can pursue",
-      "verdict": "SUSTAINABLE | TIGHT | UNSUSTAINABLE"
-    },
-    "path_to_scale": [
-      {
-        "stage": "0 → 1 customers",
-        "key_challenge": "What's hard",
-        "timeline_months": 12,
-        "capital_required": "$X",
-        "key_dependencies": ["What must happen"]
+    "unit_economics_bridge": {
+      "applicability": "REQUIRED if company claims >30% cost reduction at scale",
+      "current_state": {
+        "cost": "$X/unit",
+        "scale": "Current production volume",
+        "basis": "Pilot data / estimates / claims"
       },
-      {
-        "stage": "1 → 10 customers",
-        "key_challenge": "What's hard",
-        "timeline_months": 24,
-        "capital_required": "$X",
-        "key_dependencies": ["What must happen"]
+      "target_state": {
+        "cost": "$Y/unit",
+        "scale": "Target production volume",
+        "basis": "Their projection"
       },
-      {
-        "stage": "10 → 100 customers",
-        "key_challenge": "What's hard",
-        "timeline_months": 36,
-        "capital_required": "$X",
-        "key_dependencies": ["What must happen"]
-      }
-    ],
-    "channel_strategy": {
-      "stated_approach": "Their plan",
-      "realistic_assessment": "What's actually feasible",
-      "critical_partnerships": ["Must-have partners"],
-      "partnership_status": "SIGNED | IN_DISCUSSION | IDENTIFIED | UNCLEAR"
-    },
-    "verdict": "CLEAR_PATH | CHALLENGING | UNCLEAR",
-    "reasoning": "Summary"
-  },
-
-  "timeline_reality": {
-    "critical_path": [
-      {
-        "milestone": "Description",
-        "their_timeline": "When they say",
-        "realistic_timeline": "Our assessment",
-        "dependencies": ["What must happen first"],
-        "risk_factors": ["What could delay"]
-      }
-    ],
-    "total_time_to_scale": {
-      "their_estimate": "X months",
-      "realistic_estimate": "Y months",
-      "gap_reasoning": "Why different"
-    },
-    "vc_math": {
-      "years_from_series_a_to_scale": "X years",
-      "fits_fund_timeline": true,
-      "exit_path_visibility": "CLEAR | EMERGING | UNCLEAR",
-      "likely_exit_type": "ACQUISITION | IPO | SECONDARY | UNCLEAR"
-    },
-    "too_early_assessment": {
-      "verdict": "RIGHT_TIME | 2_YEARS_EARLY | 5_PLUS_YEARS_EARLY",
-      "enabling_conditions_status": [
+      "gap_to_close": {
+        "absolute": "$X - $Y = $Z reduction needed",
+        "percentage": "X% reduction required"
+      },
+      "cost_reduction_drivers": [
         {
-          "condition": "What must be true",
-          "status": "MET | EMERGING | NOT_MET",
-          "timeline_to_met": "When it will be ready"
+          "driver": "Specific cost reduction driver (e.g., 'Scale economies on labor')",
+          "line_item": "Which cost component this affects",
+          "current_cost": "$X/unit",
+          "projected_cost": "$Y/unit",
+          "reduction": "$Z/unit",
+          "reduction_percent": "X%",
+          "mechanism": "HOW this reduction happens (not just 'scale')",
+          "assumption_required": "What must be true for this to work",
+          "assumption_validity": "VALIDATED | REASONABLE | OPTIMISTIC | AGGRESSIVE | UNREALISTIC",
+          "confidence": "HIGH | MEDIUM | LOW",
+          "evidence": "What supports this"
         }
       ],
-      "early_mover_tradeoff": "Does being early help or hurt?"
-    },
-    "verdict": "ALIGNED | STRETCHED | MISALIGNED",
-    "reasoning": "Summary"
-  },
-
-  "scaleup_reality": {
-    "pilot_to_commercial_gap": {
-      "what_changes": ["Things that break at scale"],
-      "known_hard_problems": ["Identified scale challenges"],
-      "unknown_unknowns_risk": "HIGH | MEDIUM | LOW",
-      "discovery_cost": "$ to find out what breaks"
-    },
-    "manufacturing": {
-      "can_be_manufactured": true,
-      "by_whom": "Who makes this at scale",
-      "equipment_exists": true,
-      "equipment_gap": "What must be built/bought",
-      "supply_chain_risks": ["Key risks"],
-      "verdict": "READY | NEEDS_DEVELOPMENT | MAJOR_GAPS"
-    },
-    "valley_of_death": {
-      "capital_required": "$X",
-      "time_required_months": 30,
-      "stranding_risk": "HIGH | MEDIUM | LOW",
-      "what_unlocks_next_capital": "Milestone that de-risks",
-      "fallback_if_stuck": "Options if they stall"
-    },
-    "verdict": "MANAGEABLE | CHALLENGING | SEVERE",
-    "reasoning": "Summary"
-  },
-
-  "ecosystem_dependencies": {
-    "infrastructure": [
-      {
-        "requirement": "What must exist",
-        "exists_today": false,
-        "who_builds": "Who",
-        "who_pays": "Who",
-        "timeline": "When ready",
-        "startup_can_succeed_without": false,
-        "chicken_egg_problem": "The coordination challenge"
+      "bridge_summary": {
+        "total_reduction_explained": "$X/unit from identified drivers",
+        "total_reduction_claimed": "$Y/unit claimed",
+        "unexplained_gap": "$Z/unit (gap between explained and claimed)",
+        "gap_assessment": "FULLY_EXPLAINED | MOSTLY_EXPLAINED | CONTAINS_MAGIC_ASSUMPTIONS"
+      },
+      "sensitivity_analysis": {
+        "if_scale_economies_50_percent_of_projected": "Cost becomes $X/unit",
+        "if_no_improvement_in_largest_driver": "Cost becomes $X/unit",
+        "realistic_range": "$X - $Y/unit (vs. $Z claimed)"
+      },
+      "verdict": {
+        "claimed_achievable": true,
+        "realistic_estimate": "$X/unit",
+        "confidence": "HIGH | MEDIUM | LOW",
+        "key_risk": "The assumption most likely to fail"
       }
-    ],
-    "regulatory": {
-      "approvals_needed": ["List"],
-      "typical_timeline_months": 18,
-      "fast_track_available": false,
-      "regulatory_risk": "HIGH | MEDIUM | LOW",
-      "adverse_change_probability": "X%"
     },
-    "complementary_tech": [
-      {
-        "technology": "What must mature",
-        "current_readiness": "TRL X",
-        "needed_readiness": "TRL Y",
-        "timeline_to_ready": "When",
-        "owner": "Who's developing it",
-        "risk_if_delayed": "Impact"
-      }
-    ],
-    "verdict": "FEW_DEPENDENCIES | MANAGEABLE | HEAVILY_DEPENDENT",
-    "reasoning": "Summary"
-  },
 
-  "policy_dependency": {
-    "critical_policies": [
-      {
-        "policy": "Name (e.g., 45Q tax credit)",
-        "what_it_provides": "Benefit",
-        "current_value": "$X/unit",
-        "dependency_level": "CRITICAL | HIGH | MEDIUM | LOW",
-        "economics_without_it": "What happens to margins",
-        "sunset_date": "When it expires (if any)",
-        "change_probability": "X% chance of adverse change in 5 years",
-        "change_impact": "What happens if reduced/eliminated"
-      }
-    ],
-    "regulatory_tailwinds": ["Helpful trends"],
-    "regulatory_headwinds": ["Concerning trends"],
-    "policy_scenario_analysis": {
-      "base_case": "Current policy continues - impact on economics",
-      "bear_case": "Policy reduced/eliminated - impact on economics",
-      "bull_case": "Policy expanded - impact on economics"
-    },
-    "verdict": "LOW_EXPOSURE | MODERATE_EXPOSURE | HIGH_EXPOSURE",
-    "reasoning": "Summary"
-  },
-
-  "policy_deep_dive": {
-    "applicability": "REQUIRED if policy_dependency is HIGH or CRITICAL",
-    "policy_dependency_level": "CRITICAL | HIGH | MEDIUM | LOW",
-    "dependency_explanation": "How policy affects economics (quantified)",
-
-    "critical_policies": [
-      {
-        "policy_name": "e.g., IRA Section 45V Clean Hydrogen Production Tax Credit",
-        "what_it_provides": "Specific benefit ($X/unit, Y% tax credit, etc.)",
-        "current_status": "Enacted / Proposed / Under rulemaking",
-
-        "economics_analysis": {
-          "with_full_benefit": {
-            "unit_economics": "$X/unit cost, Y% margin",
-            "irr": "X%",
-            "payback": "Y years"
-          },
-          "without_benefit": {
-            "unit_economics": "$X/unit cost, Y% margin",
-            "irr": "X%",
-            "payback": "Y years"
-          },
-          "delta": "Policy worth $X/unit to economics"
+    "market_reality": {
+      "customer_identification": {
+        "stated_customer": "Who they say",
+        "actual_buyer": "Who writes checks (may differ)",
+        "specificity": "SPECIFIC_NAMES | CATEGORIES_ONLY | VAGUE",
+        "evidence_of_demand": {
+          "lois_signed": 0,
+          "pilots_active": 1,
+          "conversations_claimed": "X",
+          "revenue_to_date": "$0",
+          "assessment": "VALIDATED | PARTIALLY_VALIDATED | UNVALIDATED"
         },
-
-        "qualification_requirements": {
-          "stated_requirements": ["Requirement 1", "Requirement 2"],
-          "company_status": "QUALIFIES | LIKELY_QUALIFIES | UNCERTAIN | UNLIKELY",
-          "gaps_to_qualification": ["What they need to do to qualify"],
-          "qualification_risk": "HIGH | MEDIUM | LOW"
-        },
-
-        "regulatory_uncertainty": {
-          "pending_rules": ["Specific rules/guidance still pending"],
-          "decision_timeline": "When final rules expected",
-          "range_of_outcomes": {
-            "favorable": "What favorable interpretation looks like",
-            "neutral": "What neutral interpretation looks like",
-            "unfavorable": "What unfavorable interpretation looks like"
-          },
-          "company_assumption": "Which interpretation they're assuming",
-          "our_assessment": "Which interpretation is most likely"
-        },
-
-        "sunset_risk": {
-          "expiration_date": "When policy expires (if applicable)",
-          "extension_likelihood": "HIGH | MEDIUM | LOW",
-          "impact_if_not_extended": "What happens to economics"
-        },
-
-        "political_risk": {
-          "vulnerability_to_administration_change": "HIGH | MEDIUM | LOW",
-          "repeal_likelihood_next_5_years": "X%",
-          "modification_likelihood": "X%",
-          "most_likely_modification": "What might change"
+        "willingness_to_pay": {
+          "claimed": "$X",
+          "evidence": "What supports this",
+          "market_alternatives_cost": "$Y",
+          "premium_or_discount": "X% premium/discount to alternatives",
+          "credibility": "HIGH | MEDIUM | LOW"
         }
-      }
-    ],
+      },
+      "market_timing": {
+        "market_exists_today": true,
+        "current_market_size": "$X",
+        "projected_market_size": "$Y by YEAR",
+        "growth_driver": "What causes growth",
+        "timing_assessment": "RIGHT_TIME | 2_YEARS_EARLY | 5_PLUS_YEARS_EARLY | TOO_LATE",
+        "timing_reasoning": "Why"
+      },
+      "vitamin_or_painkiller": {
+        "assessment": "PAINKILLER | VITAMIN | UNCLEAR",
+        "forcing_function": "What makes customers HAVE to buy",
+        "what_happens_if_they_dont_buy": "Consequence for customer"
+      },
+      "competitive_position": {
+        "current_alternative": "What customers do today",
+        "switching_cost": "What customers give up",
+        "risk_for_customer": "What customer risks by switching",
+        "why_choose_startup": "Compelling reason to switch"
+      },
+      "verdict": "CLEAR_DEMAND | EMERGING_DEMAND | SPECULATIVE_DEMAND",
+      "reasoning": "Summary"
+    },
 
-    "scenario_matrix": {
-      "scenarios": [
+    "gtm_reality": {
+      "sales_cycle": {
+        "estimated_months": 24,
+        "basis": "Industry typical / their data",
+        "runway_vs_cycle": "X months runway, Y month cycle",
+        "parallel_opportunities": "How many they can pursue",
+        "verdict": "SUSTAINABLE | TIGHT | UNSUSTAINABLE"
+      },
+      "path_to_scale": [
         {
-          "name": "Policy Bull Case",
-          "description": "Favorable rule interpretation + extension + expansion",
-          "probability": "X%",
-          "economics_impact": "IRR becomes X%, payback Y years"
+          "stage": "0 → 1 customers",
+          "key_challenge": "What's hard",
+          "timeline_months": 12,
+          "capital_required": "$X",
+          "key_dependencies": ["What must happen"]
         },
         {
-          "name": "Policy Base Case",
-          "description": "Neutral interpretation, current policy continues",
-          "probability": "X%",
-          "economics_impact": "IRR becomes X%, payback Y years"
+          "stage": "1 → 10 customers",
+          "key_challenge": "What's hard",
+          "timeline_months": 24,
+          "capital_required": "$X",
+          "key_dependencies": ["What must happen"]
         },
         {
-          "name": "Policy Bear Case",
-          "description": "Unfavorable interpretation or policy reduction",
-          "probability": "X%",
-          "economics_impact": "IRR becomes X%, payback Y years"
+          "stage": "10 → 100 customers",
+          "key_challenge": "What's hard",
+          "timeline_months": 36,
+          "capital_required": "$X",
+          "key_dependencies": ["What must happen"]
         }
       ],
-      "policy_expected_value": "Probability-weighted economics"
-    },
-
-    "business_viability_without_policy": {
-      "viable": true,
-      "explanation": "Whether business works without policy support",
-      "margin_of_safety": "How much policy can degrade before business fails"
-    }
-  },
-
-  "incumbent_response": {
-    "likely_response": "ACQUIRE | COPY | CRUSH | IGNORE | PARTNER",
-    "response_reasoning": "Why this response expected",
-    "timeline_to_response_months": 24,
-    "startup_defense": "How they survive/win",
-    "replication_difficulty": {
-      "time_to_replicate_months": 24,
-      "capital_to_replicate": "$X",
-      "expertise_to_replicate": "What's needed",
-      "verdict": "HARD | MODERATE | EASY"
-    },
-    "acquisition_analysis": {
-      "likely_acquirers": ["Company 1", "Company 2"],
-      "acquisition_trigger": "What prompts acquisition interest",
-      "likely_timing": "When in company lifecycle",
-      "valuation_range": "$X-Y based on comps",
-      "acquirer_motivation": "Why they'd buy vs build"
-    }
-  },
-
-  "byproduct_analysis": {
-    "applicability": "REQUIRED if byproduct is >10% of unit economics",
-    "byproduct_materiality": {
-      "byproduct": "e.g., Solid carbon",
-      "revenue_contribution": "$X/unit of primary product",
-      "percentage_of_economics": "X% of unit economics",
-      "is_material": true
-    },
-
-    "market_analysis": {
-      "total_addressable_market": {
-        "volume": "X tons/year",
-        "value": "$X billion",
-        "source": "How estimated"
+      "channel_strategy": {
+        "stated_approach": "Their plan",
+        "realistic_assessment": "What's actually feasible",
+        "critical_partnerships": ["Must-have partners"],
+        "partnership_status": "SIGNED | IN_DISCUSSION | IDENTIFIED | UNCLEAR"
       },
-      "company_volume_at_scale": "X tons/year",
-      "market_share_implied": "X%",
-      "market_share_realistic": "Is this achievable?"
+      "verdict": "CLEAR_PATH | CHALLENGING | UNCLEAR",
+      "reasoning": "Summary"
     },
 
-    "pricing_analysis": {
-      "claimed_price": "$X/ton",
-      "current_market_price_range": "$X - $Y/ton",
-      "price_basis": "What grade/quality commands this price",
-      "company_product_quality": "Does their product meet this spec?",
-      "quality_validation": "VALIDATED | CLAIMED | UNVALIDATED",
+    "timeline_reality": {
+      "critical_path": [
+        {
+          "milestone": "Description",
+          "their_timeline": "When they say",
+          "realistic_timeline": "Our assessment",
+          "dependencies": ["What must happen first"],
+          "risk_factors": ["What could delay"]
+        }
+      ],
+      "total_time_to_scale": {
+        "their_estimate": "X months",
+        "realistic_estimate": "Y months",
+        "gap_reasoning": "Why different"
+      },
+      "vc_math": {
+        "years_from_series_a_to_scale": "X years",
+        "fits_fund_timeline": true,
+        "exit_path_visibility": "CLEAR | EMERGING | UNCLEAR",
+        "likely_exit_type": "ACQUISITION | IPO | SECONDARY | UNCLEAR"
+      },
+      "too_early_assessment": {
+        "verdict": "RIGHT_TIME | 2_YEARS_EARLY | 5_PLUS_YEARS_EARLY",
+        "enabling_conditions_status": [
+          {
+            "condition": "What must be true",
+            "status": "MET | EMERGING | NOT_MET",
+            "timeline_to_met": "When it will be ready"
+          }
+        ],
+        "early_mover_tradeoff": "Does being early help or hurt?"
+      },
+      "verdict": "ALIGNED | STRETCHED | MISALIGNED",
+      "reasoning": "Summary"
+    },
 
-      "price_at_volume_concern": {
-        "current_market_volume": "X tons/year",
-        "company_volume_at_scale": "Y tons/year",
-        "volume_increase": "X%",
-        "price_impact_if_flooded": "What happens to price if they add Y tons",
-        "price_elasticity_assessment": "HIGH | MEDIUM | LOW"
+    "scaleup_reality": {
+      "pilot_to_commercial_gap": {
+        "what_changes": ["Things that break at scale"],
+        "known_hard_problems": ["Identified scale challenges"],
+        "unknown_unknowns_risk": "HIGH | MEDIUM | LOW",
+        "discovery_cost": "$ to find out what breaks"
+      },
+      "manufacturing": {
+        "can_be_manufactured": true,
+        "by_whom": "Who makes this at scale",
+        "equipment_exists": true,
+        "equipment_gap": "What must be built/bought",
+        "supply_chain_risks": ["Key risks"],
+        "verdict": "READY | NEEDS_DEVELOPMENT | MAJOR_GAPS"
+      },
+      "valley_of_death": {
+        "capital_required": "$X",
+        "time_required_months": 30,
+        "stranding_risk": "HIGH | MEDIUM | LOW",
+        "what_unlocks_next_capital": "Milestone that de-risks",
+        "fallback_if_stuck": "Options if they stall"
+      },
+      "verdict": "MANAGEABLE | CHALLENGING | SEVERE",
+      "reasoning": "Summary"
+    },
+
+    "ecosystem_dependencies": {
+      "infrastructure": [
+        {
+          "requirement": "What must exist",
+          "exists_today": false,
+          "who_builds": "Who",
+          "who_pays": "Who",
+          "timeline": "When ready",
+          "startup_can_succeed_without": false,
+          "chicken_egg_problem": "The coordination challenge"
+        }
+      ],
+      "regulatory": {
+        "approvals_needed": ["List"],
+        "typical_timeline_months": 18,
+        "fast_track_available": false,
+        "regulatory_risk": "HIGH | MEDIUM | LOW",
+        "adverse_change_probability": "X%"
+      },
+      "complementary_tech": [
+        {
+          "technology": "What must mature",
+          "current_readiness": "TRL X",
+          "needed_readiness": "TRL Y",
+          "timeline_to_ready": "When",
+          "owner": "Who's developing it",
+          "risk_if_delayed": "Impact"
+        }
+      ],
+      "verdict": "FEW_DEPENDENCIES | MANAGEABLE | HEAVILY_DEPENDENT",
+      "reasoning": "Summary"
+    },
+
+    "policy_dependency": {
+      "critical_policies": [
+        {
+          "policy": "Name (e.g., 45Q tax credit)",
+          "what_it_provides": "Benefit",
+          "current_value": "$X/unit",
+          "dependency_level": "CRITICAL | HIGH | MEDIUM | LOW",
+          "economics_without_it": "What happens to margins",
+          "sunset_date": "When it expires (if any)",
+          "change_probability": "X% chance of adverse change in 5 years",
+          "change_impact": "What happens if reduced/eliminated"
+        }
+      ],
+      "regulatory_tailwinds": ["Helpful trends"],
+      "regulatory_headwinds": ["Concerning trends"],
+      "policy_scenario_analysis": {
+        "base_case": "Current policy continues - impact on economics",
+        "bear_case": "Policy reduced/eliminated - impact on economics",
+        "bull_case": "Policy expanded - impact on economics"
+      },
+      "verdict": "LOW_EXPOSURE | MODERATE_EXPOSURE | HIGH_EXPOSURE",
+      "reasoning": "Summary"
+    },
+
+    "policy_deep_dive": {
+      "applicability": "REQUIRED if policy_dependency is HIGH or CRITICAL",
+      "policy_dependency_level": "CRITICAL | HIGH | MEDIUM | LOW",
+      "dependency_explanation": "How policy affects economics (quantified)",
+
+      "critical_policies": [
+        {
+          "policy_name": "e.g., IRA Section 45V Clean Hydrogen Production Tax Credit",
+          "what_it_provides": "Specific benefit ($X/unit, Y% tax credit, etc.)",
+          "current_status": "Enacted / Proposed / Under rulemaking",
+
+          "economics_analysis": {
+            "with_full_benefit": {
+              "unit_economics": "$X/unit cost, Y% margin",
+              "irr": "X%",
+              "payback": "Y years"
+            },
+            "without_benefit": {
+              "unit_economics": "$X/unit cost, Y% margin",
+              "irr": "X%",
+              "payback": "Y years"
+            },
+            "delta": "Policy worth $X/unit to economics"
+          },
+
+          "qualification_requirements": {
+            "stated_requirements": ["Requirement 1", "Requirement 2"],
+            "company_status": "QUALIFIES | LIKELY_QUALIFIES | UNCERTAIN | UNLIKELY",
+            "gaps_to_qualification": ["What they need to do to qualify"],
+            "qualification_risk": "HIGH | MEDIUM | LOW"
+          },
+
+          "regulatory_uncertainty": {
+            "pending_rules": ["Specific rules/guidance still pending"],
+            "decision_timeline": "When final rules expected",
+            "range_of_outcomes": {
+              "favorable": "What favorable interpretation looks like",
+              "neutral": "What neutral interpretation looks like",
+              "unfavorable": "What unfavorable interpretation looks like"
+            },
+            "company_assumption": "Which interpretation they're assuming",
+            "our_assessment": "Which interpretation is most likely"
+          },
+
+          "sunset_risk": {
+            "expiration_date": "When policy expires (if applicable)",
+            "extension_likelihood": "HIGH | MEDIUM | LOW",
+            "impact_if_not_extended": "What happens to economics"
+          },
+
+          "political_risk": {
+            "vulnerability_to_administration_change": "HIGH | MEDIUM | LOW",
+            "repeal_likelihood_next_5_years": "X%",
+            "modification_likelihood": "X%",
+            "most_likely_modification": "What might change"
+          }
+        }
+      ],
+
+      "scenario_matrix": {
+        "scenarios": [
+          {
+            "name": "Policy Bull Case",
+            "description": "Favorable rule interpretation + extension + expansion",
+            "probability": "X%",
+            "economics_impact": "IRR becomes X%, payback Y years"
+          },
+          {
+            "name": "Policy Base Case",
+            "description": "Neutral interpretation, current policy continues",
+            "probability": "X%",
+            "economics_impact": "IRR becomes X%, payback Y years"
+          },
+          {
+            "name": "Policy Bear Case",
+            "description": "Unfavorable interpretation or policy reduction",
+            "probability": "X%",
+            "economics_impact": "IRR becomes X%, payback Y years"
+          }
+        ],
+        "policy_expected_value": "Probability-weighted economics"
+      },
+
+      "business_viability_without_policy": {
+        "viable": true,
+        "explanation": "Whether business works without policy support",
+        "margin_of_safety": "How much policy can degrade before business fails"
       }
     },
 
-    "customer_analysis": {
-      "target_customers": ["Customer segment 1", "Customer segment 2"],
-      "customer_evidence": {
-        "contracts_signed": 0,
-        "lois_signed": 0,
-        "discussions": "X",
-        "pilot_sales": "X tons at $Y/ton to [customer type]"
+    "incumbent_response": {
+      "likely_response": "ACQUIRE | COPY | CRUSH | IGNORE | PARTNER",
+      "response_reasoning": "Why this response expected",
+      "timeline_to_response_months": 24,
+      "startup_defense": "How they survive/win",
+      "replication_difficulty": {
+        "time_to_replicate_months": 24,
+        "capital_to_replicate": "$X",
+        "expertise_to_replicate": "What's needed",
+        "verdict": "HARD | MODERATE | EASY"
       },
-      "customer_qualification_requirements": ["Spec 1", "Spec 2"],
-      "company_meets_requirements": "YES | PARTIALLY | NO | UNKNOWN"
+      "acquisition_analysis": {
+        "likely_acquirers": ["Company 1", "Company 2"],
+        "acquisition_trigger": "What prompts acquisition interest",
+        "likely_timing": "When in company lifecycle",
+        "valuation_range": "$X-Y based on comps",
+        "acquirer_motivation": "Why they'd buy vs build"
+      }
     },
 
-    "competitive_supply": {
-      "existing_supply_sources": ["Source 1", "Source 2"],
-      "existing_supply_volume": "X tons/year",
-      "existing_supply_price": "$X/ton",
-      "company_competitive_position": "Premium | Parity | Discount"
+    "byproduct_analysis": {
+      "applicability": "REQUIRED if byproduct is >10% of unit economics",
+      "byproduct_materiality": {
+        "byproduct": "e.g., Solid carbon",
+        "revenue_contribution": "$X/unit of primary product",
+        "percentage_of_economics": "X% of unit economics",
+        "is_material": true
+      },
+
+      "market_analysis": {
+        "total_addressable_market": {
+          "volume": "X tons/year",
+          "value": "$X billion",
+          "source": "How estimated"
+        },
+        "company_volume_at_scale": "X tons/year",
+        "market_share_implied": "X%",
+        "market_share_realistic": "Is this achievable?"
+      },
+
+      "pricing_analysis": {
+        "claimed_price": "$X/ton",
+        "current_market_price_range": "$X - $Y/ton",
+        "price_basis": "What grade/quality commands this price",
+        "company_product_quality": "Does their product meet this spec?",
+        "quality_validation": "VALIDATED | CLAIMED | UNVALIDATED",
+
+        "price_at_volume_concern": {
+          "current_market_volume": "X tons/year",
+          "company_volume_at_scale": "Y tons/year",
+          "volume_increase": "X%",
+          "price_impact_if_flooded": "What happens to price if they add Y tons",
+          "price_elasticity_assessment": "HIGH | MEDIUM | LOW"
+        }
+      },
+
+      "customer_analysis": {
+        "target_customers": ["Customer segment 1", "Customer segment 2"],
+        "customer_evidence": {
+          "contracts_signed": 0,
+          "lois_signed": 0,
+          "discussions": "X",
+          "pilot_sales": "X tons at $Y/ton to [customer type]"
+        },
+        "customer_qualification_requirements": ["Spec 1", "Spec 2"],
+        "company_meets_requirements": "YES | PARTIALLY | NO | UNKNOWN"
+      },
+
+      "competitive_supply": {
+        "existing_supply_sources": ["Source 1", "Source 2"],
+        "existing_supply_volume": "X tons/year",
+        "existing_supply_price": "$X/ton",
+        "company_competitive_position": "Premium | Parity | Discount"
+      },
+
+      "scenario_analysis": {
+        "bull_case": {
+          "price": "$X/ton",
+          "volume": "X tons",
+          "revenue": "$X",
+          "probability": "X%"
+        },
+        "base_case": {
+          "price": "$X/ton",
+          "volume": "X tons",
+          "revenue": "$X",
+          "probability": "X%"
+        },
+        "bear_case": {
+          "price": "$X/ton",
+          "volume": "X tons",
+          "revenue": "$X",
+          "probability": "X%"
+        },
+        "expected_value": "$X revenue, $Y/unit contribution"
+      },
+
+      "verdict": {
+        "revenue_assumption_credibility": "VALIDATED | REASONABLE | OPTIMISTIC | UNREALISTIC",
+        "realistic_estimate": "$X/ton at Y tons → $Z contribution/unit",
+        "variance_from_claimed": "X% below claimed",
+        "risk_to_thesis": "How much does thesis depend on this revenue"
+      }
     },
 
-    "scenario_analysis": {
-      "bull_case": {
-        "price": "$X/ton",
-        "volume": "X tons",
-        "revenue": "$X",
-        "probability": "X%"
-      },
-      "base_case": {
-        "price": "$X/ton",
-        "volume": "X tons",
-        "revenue": "$X",
-        "probability": "X%"
-      },
-      "bear_case": {
-        "price": "$X/ton",
-        "volume": "X tons",
-        "revenue": "$X",
-        "probability": "X%"
-      },
-      "expected_value": "$X revenue, $Y/unit contribution"
-    },
+    "commercial_red_flags": [
+      {
+        "flag": "The concern",
+        "severity": "CRITICAL | HIGH | MEDIUM",
+        "evidence": "Why we're concerned",
+        "what_would_resolve": "Evidence that would address this",
+        "question_for_founders": "What to ask"
+      }
+    ],
 
-    "verdict": {
-      "revenue_assumption_credibility": "VALIDATED | REASONABLE | OPTIMISTIC | UNREALISTIC",
-      "realistic_estimate": "$X/ton at Y tons → $Z contribution/unit",
-      "variance_from_claimed": "X% below claimed",
-      "risk_to_thesis": "How much does thesis depend on this revenue"
-    }
-  },
-
-  "commercial_red_flags": [
-    {
-      "flag": "The concern",
-      "severity": "CRITICAL | HIGH | MEDIUM",
-      "evidence": "Why we're concerned",
-      "what_would_resolve": "Evidence that would address this",
-      "question_for_founders": "What to ask"
-    }
-  ],
-
-  "commercial_questions_for_founders": [
-    {
-      "question": "Specific question",
-      "category": "UNIT_ECONOMICS | MARKET | GTM | TIMELINE | ECOSYSTEM | POLICY",
-      "why_critical": "What this reveals",
-      "good_answer": "Response that builds confidence",
-      "bad_answer": "Response that kills the deal"
-    }
-  ]
+    "commercial_questions_for_founders": [
+      {
+        "question": "Specific question",
+        "category": "UNIT_ECONOMICS | MARKET | GTM | TIMELINE | ECOSYSTEM | POLICY",
+        "why_critical": "What this reveals",
+        "good_answer": "Response that builds confidence",
+        "bad_answer": "Response that kills the deal"
+      }
+    ]
   }
 }
 
@@ -1827,424 +1827,424 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
       "track_rationale": "Why this classification",
 
       "fit_assessment": {
-      "optimal_for_problem": true,
-      "explanation": "Whether this is the best approach for their stated problem",
-      "what_first_principles_suggests": "What AN0-M analysis would recommend",
-      "alignment": "ALIGNED | PARTIALLY_ALIGNED | MISALIGNED"
-    },
-
-    "problem_framing_assessment": {
-      "their_framing": "How they frame the problem",
-      "optimal_framing": "How AN0-M frames it",
-      "framing_quality": "OPTIMAL | GOOD | SUBOPTIMAL | WRONG_PROBLEM",
-      "implications": "How this changes the solution approach"
-    }
-  },
-
-  "missed_alternatives": [
-    {
-      "concept_from_an3": "Concept ID or name from solution space",
-      "concept_summary": "What this approach is",
-      "track": "Which track it came from",
-      "why_potentially_better": "Advantages over startup's approach",
-      "why_startup_might_have_missed": "Likely reason for blind spot",
-      "competitive_threat_level": "HIGH | MEDIUM | LOW",
-      "who_might_pursue": "Who could execute this"
-    }
-  ],
-
-  "novelty_assessment": {
-    "claimed_novelty": "What they claim is novel",
-
-    "prior_art_findings": [
-      {
-        "source_type": "PATENT | ACADEMIC | COMMERCIAL | ABANDONED",
-        "reference": "Specific citation",
-        "relevance": "How closely it matches",
-        "what_it_covers": "What aspect of their approach",
-        "implications": "Impact on novelty claim"
-      }
-    ],
-
-    "novelty_verdict": {
-      "classification": "GENUINELY_NOVEL | NOVEL_COMBINATION | NOVEL_APPLICATION | INCREMENTAL | NOT_NOVEL",
-      "what_is_actually_novel": "The specific element that IS new (if any)",
-      "what_is_not_novel": "Elements that exist in prior art",
-      "confidence": "HIGH | MEDIUM | LOW",
-      "reasoning": "Explanation of verdict"
-    },
-
-    "novelty_vs_claimed": {
-      "claimed_accurate": true,
-      "overclaim": "Where they claim more novelty than exists",
-      "underclaim": "Novel elements they didn't emphasize"
-    }
-  },
-
-  "moat_assessment": {
-    "technical_moat": {
-      "patentability": "STRONG | MODERATE | WEAK | NONE",
-      "patent_rationale": "Why this assessment",
-      "trade_secret_potential": "STRONG | MODERATE | WEAK",
-      "replication_difficulty": "VERY_HARD | HARD | MODERATE | EASY",
-      "time_to_replicate": "X months for well-funded competitor",
-      "key_barriers": ["Specific barriers to replication"]
-    },
-
-    "execution_moat": {
-      "expertise_rarity": "How rare is the required expertise",
-      "data_advantage": "Do they have/build proprietary data",
-      "network_effects": "Are there network effects",
-      "regulatory_barrier": "Does regulation create barriers",
-      "switching_costs": "Customer switching costs"
-    },
-
-    "overall_moat": {
-      "strength": "STRONG | MODERATE | WEAK | NONE",
-      "durability": "Years before significant erosion",
-      "primary_source": "Where moat primarily comes from",
-      "key_vulnerabilities": ["Main moat risks"]
-    }
-  },
-
-  "competitive_risk_analysis": {
-    "threats_from_solution_space": [
-      {
-        "threat_source": "Concept from AN3-M or known competitor",
-        "threat_type": "DIRECT_COMPETITION | SUBSTITUTION | DISRUPTION",
-        "threat_level": "CRITICAL | HIGH | MEDIUM | LOW",
-        "time_horizon": "When this could materialize",
-        "likelihood": "HIGH | MEDIUM | LOW",
-        "startup_vulnerability": "Why this is a threat to them specifically",
-        "mitigation_possible": "Can they defend against this"
-      }
-    ],
-
-    "simpler_path_risk": {
-      "simpler_alternatives_exist": true,
-      "could_be_good_enough": true,
-      "explanation": "Whether simpler approaches could win"
-    },
-
-    "paradigm_shift_risk": {
-      "disruptive_approaches_emerging": true,
-      "threats": ["Specific paradigm shifts that could disrupt"],
-      "timeline": "When these could mature"
-    },
-
-    "timing_assessment": {
-      "market_timing": "EARLY | RIGHT | LATE",
-      "technology_timing": "Are enabling technologies ready",
-      "dependencies": ["What they depend on maturing"],
-      "risk": "Timing risk assessment"
-    }
-  },
-
-  "key_insights": [
-    {
-      "insight": "Important finding",
-      "type": "STRENGTH | WEAKNESS | OPPORTUNITY | THREAT",
-      "investment_implication": "What this means for investment decision"
-    }
-  ],
-
-  "strategic_questions": [
-    {
-      "question": "Question investor should consider",
-      "why_it_matters": "Strategic importance",
-      "what_good_looks_like": "Favorable answer"
-    }
-  ],
-
-  "the_one_bet": {
-    "core_bet_statement": "If you invest, you are betting that [one sentence]",
-
-    "technical_bet": {
-      "bet": "What must be true technically for this to work",
-      "current_evidence_for": "What supports this bet",
-      "current_evidence_against": "What contradicts this bet",
-      "when_resolved": "When we'll know if this bet pays off",
-      "resolution_milestone": "Specific milestone that proves/disproves"
-    },
-
-    "commercial_bet": {
-      "bet": "What must be true commercially",
-      "current_evidence_for": "Supporting evidence",
-      "current_evidence_against": "Contradicting evidence",
-      "when_resolved": "When we'll know"
-    },
-
-    "timing_bet": {
-      "bet": "Why now is the right time",
-      "too_early_scenario": "What happens if market isn't ready",
-      "too_late_scenario": "What happens if others get there first",
-      "timing_evidence": "Why we think timing is right/wrong"
-    },
-
-    "implicit_dismissals": [
-      {
-        "dismissed_alternative": "What they're implicitly betting against",
-        "their_implicit_reasoning": "Why they think it won't work",
-        "our_assessment": "Whether we agree"
-      }
-    ],
-
-    "bet_quality": {
-      "assessment": "GOOD_BET | REASONABLE_BET | QUESTIONABLE_BET | BAD_BET",
-      "expected_value_reasoning": "Why this is/isn't a good risk-adjusted bet",
-      "what_makes_it_worth_it": "The upside that justifies the risk"
-    }
-  },
-
-  "pre_mortem": {
-    "framing": "It's 2030. [Company] has shut down. What happened?",
-
-    "most_likely_failure_mode": {
-      "scenario": "Narrative of most likely failure",
-      "probability": "X%",
-      "timeline": "When failure becomes apparent",
-      "early_warning_signs": ["Signs to watch for"],
-      "could_be_prevented_by": "Due diligence that would catch this",
-      "key_decision_point": "When the fate was sealed"
-    },
-
-    "second_most_likely_failure": {
-      "scenario": "Narrative",
-      "probability": "X%",
-      "timeline": "When apparent",
-      "early_warning_signs": ["Signs"],
-      "could_be_prevented_by": "Prevention"
-    },
-
-    "black_swan_failure": {
-      "scenario": "Low probability, high impact failure",
-      "probability": "X%",
-      "trigger": "What would cause this",
-      "warning_signs": ["Early indicators"]
-    },
-
-    "pattern_from_comparables": {
-      "what_usually_kills_companies_like_this": "The typical failure mode",
-      "is_this_company_different": true,
-      "why_or_why_not": "Evidence"
-    },
-
-    "failure_modes_by_category": {
-      "technical_failure_probability": "X%",
-      "commercial_failure_probability": "Y%",
-      "execution_failure_probability": "Z%",
-      "market_timing_failure_probability": "W%",
-      "primary_risk_category": "Where failure most likely comes from"
-    }
-  },
-
-  "comparable_analysis": {
-    "selection_criteria": "Why these companies are comparable",
-
-    "closest_comparables": [
-      {
-        "company": "Company name",
-        "similarity": "Why it's comparable (technology, market, stage, approach)",
-        "funding_raised": "$X",
-        "timeline": "Years from founding to outcome",
-        "outcome": "SUCCESS | ACQUIRED | PIVOT | ZOMBIE | SHUTDOWN",
-        "outcome_details": "What happened",
-        "valuation_at_outcome": "$X or N/A",
-        "key_success_factors": ["What they did right (if successful)"],
-        "key_failure_factors": ["What went wrong (if failed)"],
-        "lessons_for_this_deal": "What we learn",
-        "key_differences": "Why this startup might have different outcome"
-      }
-    ],
-
-    "pattern_analysis": {
-      "companies_in_category": "X companies attempted similar approach",
-      "success_rate": "Y% reached meaningful scale",
-      "median_outcome": "What typically happens",
-      "top_decile_outcome": "Best case scenario",
-      "bottom_decile_outcome": "Worst case scenario",
-      "time_to_outcome": "How long it typically takes"
-    },
-
-    "base_rate": {
-      "category": "Deep tech [specific domain] Series A",
-      "historical_success_rate": "X%",
-      "median_return_multiple": "X.Xx",
-      "definition_of_success": "What counts as success"
-    },
-
-    "this_company_vs_base_rate": {
-      "better_than_base_rate_because": ["Reasons for optimism"],
-      "worse_than_base_rate_because": ["Reasons for concern"],
-      "adjusted_probability": "X% (vs Y% base rate)"
-    }
-  },
-
-  "comparable_pattern_synthesis": {
-    "sample_analyzed": {
-      "total_companies": 8,
-      "directly_comparable": 4,
-      "adjacent_comparable": 4,
-      "selection_criteria": "How comparables were selected"
-    },
-
-    "outcome_distribution": {
-      "reached_commercial_scale": {
-        "count": 2,
-        "percentage": "25%",
-        "examples": ["Company A", "Company B"],
-        "time_to_scale_range": "8-18 years",
-        "capital_to_scale_range": "$300M - $1B+"
+        "optimal_for_problem": true,
+        "explanation": "Whether this is the best approach for their stated problem",
+        "what_first_principles_suggests": "What AN0-M analysis would recommend",
+        "alignment": "ALIGNED | PARTIALLY_ALIGNED | MISALIGNED"
       },
-      "struggling_or_delayed": {
-        "count": 3,
-        "percentage": "37.5%",
-        "examples": ["Company C", "Company D"],
-        "common_issues": ["Commissioning delays", "Cost overruns", "Market timing"]
-      },
-      "failed_or_pivoted": {
-        "count": 2,
-        "percentage": "25%",
-        "examples": ["Company E"],
-        "common_failure_modes": ["Scale-up failure", "Unit economics never worked"]
-      },
-      "too_early_to_tell": {
-        "count": 1,
-        "percentage": "12.5%",
-        "examples": ["Company F"]
+
+      "problem_framing_assessment": {
+        "their_framing": "How they frame the problem",
+        "optimal_framing": "How AN0-M frames it",
+        "framing_quality": "OPTIMAL | GOOD | SUBOPTIMAL | WRONG_PROBLEM",
+        "implications": "How this changes the solution approach"
       }
     },
 
-    "quantified_patterns": {
-      "median_time_to_commercial": "X years from Series A",
-      "median_capital_to_commercial": "$X",
-      "first_of_kind_delay_frequency": "X% experienced >12 month delays",
-      "first_of_kind_cost_overrun_frequency": "X% experienced >30% cost overruns",
-      "median_cost_overrun": "X%",
-      "acquisition_rate": "X% were acquired",
-      "median_acquisition_multiple": "X.Xx on invested capital"
-    },
-
-    "most_common_failure_modes": [
+    "missed_alternatives": [
       {
-        "failure_mode": "e.g., Scale-up didn't work as expected",
-        "frequency": "X% of failures",
-        "typical_manifestation": "How this shows up",
-        "early_warning_signs": ["Sign 1", "Sign 2"],
-        "applies_to_this_company": true,
-        "mitigation_in_place": "What they're doing about it"
+        "concept_from_an3": "Concept ID or name from solution space",
+        "concept_summary": "What this approach is",
+        "track": "Which track it came from",
+        "why_potentially_better": "Advantages over startup's approach",
+        "why_startup_might_have_missed": "Likely reason for blind spot",
+        "competitive_threat_level": "HIGH | MEDIUM | LOW",
+        "who_might_pursue": "Who could execute this"
       }
     ],
 
-    "success_factor_analysis": {
-      "common_success_factors": [
+    "novelty_assessment": {
+      "claimed_novelty": "What they claim is novel",
+
+      "prior_art_findings": [
         {
-          "factor": "e.g., Intermediate scale validation before commercial",
-          "present_in_successes": "4 of 4",
-          "present_in_failures": "1 of 4",
-          "this_company_has": false,
-          "implication": "Consider requiring intermediate demo"
+          "source_type": "PATENT | ACADEMIC | COMMERCIAL | ABANDONED",
+          "reference": "Specific citation",
+          "relevance": "How closely it matches",
+          "what_it_covers": "What aspect of their approach",
+          "implications": "Impact on novelty claim"
+        }
+      ],
+
+      "novelty_verdict": {
+        "classification": "GENUINELY_NOVEL | NOVEL_COMBINATION | NOVEL_APPLICATION | INCREMENTAL | NOT_NOVEL",
+        "what_is_actually_novel": "The specific element that IS new (if any)",
+        "what_is_not_novel": "Elements that exist in prior art",
+        "confidence": "HIGH | MEDIUM | LOW",
+        "reasoning": "Explanation of verdict"
+      },
+
+      "novelty_vs_claimed": {
+        "claimed_accurate": true,
+        "overclaim": "Where they claim more novelty than exists",
+        "underclaim": "Novel elements they didn't emphasize"
+      }
+    },
+
+    "moat_assessment": {
+      "technical_moat": {
+        "patentability": "STRONG | MODERATE | WEAK | NONE",
+        "patent_rationale": "Why this assessment",
+        "trade_secret_potential": "STRONG | MODERATE | WEAK",
+        "replication_difficulty": "VERY_HARD | HARD | MODERATE | EASY",
+        "time_to_replicate": "X months for well-funded competitor",
+        "key_barriers": ["Specific barriers to replication"]
+      },
+
+      "execution_moat": {
+        "expertise_rarity": "How rare is the required expertise",
+        "data_advantage": "Do they have/build proprietary data",
+        "network_effects": "Are there network effects",
+        "regulatory_barrier": "Does regulation create barriers",
+        "switching_costs": "Customer switching costs"
+      },
+
+      "overall_moat": {
+        "strength": "STRONG | MODERATE | WEAK | NONE",
+        "durability": "Years before significant erosion",
+        "primary_source": "Where moat primarily comes from",
+        "key_vulnerabilities": ["Main moat risks"]
+      }
+    },
+
+    "competitive_risk_analysis": {
+      "threats_from_solution_space": [
+        {
+          "threat_source": "Concept from AN3-M or known competitor",
+          "threat_type": "DIRECT_COMPETITION | SUBSTITUTION | DISRUPTION",
+          "threat_level": "CRITICAL | HIGH | MEDIUM | LOW",
+          "time_horizon": "When this could materialize",
+          "likelihood": "HIGH | MEDIUM | LOW",
+          "startup_vulnerability": "Why this is a threat to them specifically",
+          "mitigation_possible": "Can they defend against this"
+        }
+      ],
+
+      "simpler_path_risk": {
+        "simpler_alternatives_exist": true,
+        "could_be_good_enough": true,
+        "explanation": "Whether simpler approaches could win"
+      },
+
+      "paradigm_shift_risk": {
+        "disruptive_approaches_emerging": true,
+        "threats": ["Specific paradigm shifts that could disrupt"],
+        "timeline": "When these could mature"
+      },
+
+      "timing_assessment": {
+        "market_timing": "EARLY | RIGHT | LATE",
+        "technology_timing": "Are enabling technologies ready",
+        "dependencies": ["What they depend on maturing"],
+        "risk": "Timing risk assessment"
+      }
+    },
+
+    "key_insights": [
+      {
+        "insight": "Important finding",
+        "type": "STRENGTH | WEAKNESS | OPPORTUNITY | THREAT",
+        "investment_implication": "What this means for investment decision"
+      }
+    ],
+
+    "strategic_questions": [
+      {
+        "question": "Question investor should consider",
+        "why_it_matters": "Strategic importance",
+        "what_good_looks_like": "Favorable answer"
+      }
+    ],
+
+    "the_one_bet": {
+      "core_bet_statement": "If you invest, you are betting that [one sentence]",
+
+      "technical_bet": {
+        "bet": "What must be true technically for this to work",
+        "current_evidence_for": "What supports this bet",
+        "current_evidence_against": "What contradicts this bet",
+        "when_resolved": "When we'll know if this bet pays off",
+        "resolution_milestone": "Specific milestone that proves/disproves"
+      },
+
+      "commercial_bet": {
+        "bet": "What must be true commercially",
+        "current_evidence_for": "Supporting evidence",
+        "current_evidence_against": "Contradicting evidence",
+        "when_resolved": "When we'll know"
+      },
+
+      "timing_bet": {
+        "bet": "Why now is the right time",
+        "too_early_scenario": "What happens if market isn't ready",
+        "too_late_scenario": "What happens if others get there first",
+        "timing_evidence": "Why we think timing is right/wrong"
+      },
+
+      "implicit_dismissals": [
+        {
+          "dismissed_alternative": "What they're implicitly betting against",
+          "their_implicit_reasoning": "Why they think it won't work",
+          "our_assessment": "Whether we agree"
+        }
+      ],
+
+      "bet_quality": {
+        "assessment": "GOOD_BET | REASONABLE_BET | QUESTIONABLE_BET | BAD_BET",
+        "expected_value_reasoning": "Why this is/isn't a good risk-adjusted bet",
+        "what_makes_it_worth_it": "The upside that justifies the risk"
+      }
+    },
+
+    "pre_mortem": {
+      "framing": "It's 2030. [Company] has shut down. What happened?",
+
+      "most_likely_failure_mode": {
+        "scenario": "Narrative of most likely failure",
+        "probability": "X%",
+        "timeline": "When failure becomes apparent",
+        "early_warning_signs": ["Signs to watch for"],
+        "could_be_prevented_by": "Due diligence that would catch this",
+        "key_decision_point": "When the fate was sealed"
+      },
+
+      "second_most_likely_failure": {
+        "scenario": "Narrative",
+        "probability": "X%",
+        "timeline": "When apparent",
+        "early_warning_signs": ["Signs"],
+        "could_be_prevented_by": "Prevention"
+      },
+
+      "black_swan_failure": {
+        "scenario": "Low probability, high impact failure",
+        "probability": "X%",
+        "trigger": "What would cause this",
+        "warning_signs": ["Early indicators"]
+      },
+
+      "pattern_from_comparables": {
+        "what_usually_kills_companies_like_this": "The typical failure mode",
+        "is_this_company_different": true,
+        "why_or_why_not": "Evidence"
+      },
+
+      "failure_modes_by_category": {
+        "technical_failure_probability": "X%",
+        "commercial_failure_probability": "Y%",
+        "execution_failure_probability": "Z%",
+        "market_timing_failure_probability": "W%",
+        "primary_risk_category": "Where failure most likely comes from"
+      }
+    },
+
+    "comparable_analysis": {
+      "selection_criteria": "Why these companies are comparable",
+
+      "closest_comparables": [
+        {
+          "company": "Company name",
+          "similarity": "Why it's comparable (technology, market, stage, approach)",
+          "funding_raised": "$X",
+          "timeline": "Years from founding to outcome",
+          "outcome": "SUCCESS | ACQUIRED | PIVOT | ZOMBIE | SHUTDOWN",
+          "outcome_details": "What happened",
+          "valuation_at_outcome": "$X or N/A",
+          "key_success_factors": ["What they did right (if successful)"],
+          "key_failure_factors": ["What went wrong (if failed)"],
+          "lessons_for_this_deal": "What we learn",
+          "key_differences": "Why this startup might have different outcome"
+        }
+      ],
+
+      "pattern_analysis": {
+        "companies_in_category": "X companies attempted similar approach",
+        "success_rate": "Y% reached meaningful scale",
+        "median_outcome": "What typically happens",
+        "top_decile_outcome": "Best case scenario",
+        "bottom_decile_outcome": "Worst case scenario",
+        "time_to_outcome": "How long it typically takes"
+      },
+
+      "base_rate": {
+        "category": "Deep tech [specific domain] Series A",
+        "historical_success_rate": "X%",
+        "median_return_multiple": "X.Xx",
+        "definition_of_success": "What counts as success"
+      },
+
+      "this_company_vs_base_rate": {
+        "better_than_base_rate_because": ["Reasons for optimism"],
+        "worse_than_base_rate_because": ["Reasons for concern"],
+        "adjusted_probability": "X% (vs Y% base rate)"
+      }
+    },
+
+    "comparable_pattern_synthesis": {
+      "sample_analyzed": {
+        "total_companies": 8,
+        "directly_comparable": 4,
+        "adjacent_comparable": 4,
+        "selection_criteria": "How comparables were selected"
+      },
+
+      "outcome_distribution": {
+        "reached_commercial_scale": {
+          "count": 2,
+          "percentage": "25%",
+          "examples": ["Company A", "Company B"],
+          "time_to_scale_range": "8-18 years",
+          "capital_to_scale_range": "$300M - $1B+"
+        },
+        "struggling_or_delayed": {
+          "count": 3,
+          "percentage": "37.5%",
+          "examples": ["Company C", "Company D"],
+          "common_issues": ["Commissioning delays", "Cost overruns", "Market timing"]
+        },
+        "failed_or_pivoted": {
+          "count": 2,
+          "percentage": "25%",
+          "examples": ["Company E"],
+          "common_failure_modes": ["Scale-up failure", "Unit economics never worked"]
+        },
+        "too_early_to_tell": {
+          "count": 1,
+          "percentage": "12.5%",
+          "examples": ["Company F"]
+        }
+      },
+
+      "quantified_patterns": {
+        "median_time_to_commercial": "X years from Series A",
+        "median_capital_to_commercial": "$X",
+        "first_of_kind_delay_frequency": "X% experienced >12 month delays",
+        "first_of_kind_cost_overrun_frequency": "X% experienced >30% cost overruns",
+        "median_cost_overrun": "X%",
+        "acquisition_rate": "X% were acquired",
+        "median_acquisition_multiple": "X.Xx on invested capital"
+      },
+
+      "most_common_failure_modes": [
+        {
+          "failure_mode": "e.g., Scale-up didn't work as expected",
+          "frequency": "X% of failures",
+          "typical_manifestation": "How this shows up",
+          "early_warning_signs": ["Sign 1", "Sign 2"],
+          "applies_to_this_company": true,
+          "mitigation_in_place": "What they're doing about it"
+        }
+      ],
+
+      "success_factor_analysis": {
+        "common_success_factors": [
+          {
+            "factor": "e.g., Intermediate scale validation before commercial",
+            "present_in_successes": "4 of 4",
+            "present_in_failures": "1 of 4",
+            "this_company_has": false,
+            "implication": "Consider requiring intermediate demo"
+          }
+        ]
+      },
+
+      "this_company_vs_pattern": {
+        "better_than_average_because": ["Reason 1", "Reason 2"],
+        "worse_than_average_because": ["Reason 1", "Reason 2"],
+        "adjusted_success_probability": "X% (vs Y% base rate)",
+        "adjustment_reasoning": "Why we think they'll beat/miss the base rate"
+      }
+    },
+
+    "scenario_analysis": {
+      "probability_methodology": "Explain how probabilities were derived - must trace to specific conditions",
+
+      "key_conditions": [
+        {
+          "condition": "e.g., Scale-up achieves >80% of nameplate capacity",
+          "probability": "X%",
+          "basis": "How this probability was estimated",
+          "historical_reference": "Base rate from comparable situations"
+        }
+      ],
+
+      "bull_case": {
+        "requires": [
+          {"condition": "Condition 1", "probability": "X%"},
+          {"condition": "Condition 2", "probability": "Y%"},
+          {"condition": "Condition 3", "probability": "Z%"}
+        ],
+        "joint_probability_calculation": "X% × Y% × Z% = W% (assuming independence) or adjusted calculation if correlated",
+        "correlation_adjustment": "If conditions are correlated, explain adjustment",
+        "final_probability": "X%",
+        "narrative": "What happens in the good scenario (2-3 sentences)",
+        "key_events": ["What must go right"],
+        "timeline_years": 5,
+        "exit_type": "IPO | ACQUISITION",
+        "exit_valuation": "$X",
+        "return_multiple": "15-25x",
+        "what_you_believe_in_this_scenario": "Implicit assumption"
+      },
+
+      "base_case": {
+        "requires": [
+          {"condition": "Condition 1", "probability": "X%"},
+          {"condition": "Condition 2", "probability": "Y%"}
+        ],
+        "joint_probability_calculation": "Derivation",
+        "final_probability": "X%",
+        "narrative": "What typically happens (2-3 sentences)",
+        "key_events": ["Realistic path"],
+        "timeline_years": 6,
+        "exit_type": "ACQUISITION | SECONDARY",
+        "exit_valuation": "$X",
+        "return_multiple": "2-5x",
+        "what_you_believe_in_this_scenario": "Implicit assumption"
+      },
+
+      "bear_case": {
+        "requires": [
+          {"condition": "Condition 1", "probability": "X%"}
+        ],
+        "joint_probability_calculation": "Derivation",
+        "final_probability": "X%",
+        "narrative": "What happens if things go wrong (2-3 sentences)",
+        "key_events": ["What goes wrong"],
+        "timeline_years": 4,
+        "exit_type": "ACQUI_HIRE | SHUTDOWN | ZOMBIE",
+        "exit_valuation": "$X or write-off",
+        "return_multiple": "0-0.5x",
+        "what_you_believe_in_this_scenario": "Implicit assumption"
+      },
+
+      "probability_sanity_check": {
+        "probabilities_sum_to": "X% (should be ~100%)",
+        "adjustment_if_needed": "How residual probability is allocated"
+      },
+
+      "expected_value": {
+        "calculation": "(Bull prob × Bull return) + (Base prob × Base return) + (Bear prob × Bear return)",
+        "weighted_return_multiple": "X.Xx",
+        "confidence_in_ev": "HIGH | MEDIUM | LOW",
+        "key_sensitivity": "Which probability assumption most affects EV"
+      },
+
+      "base_rate_comparison": {
+        "category": "e.g., Deep tech climate Series B",
+        "historical_success_rate": "X%",
+        "historical_median_return": "X.Xx",
+        "this_company_vs_base_rate": "Above/below average because..."
+      },
+
+      "scenario_sensitivities": [
+        {
+          "variable": "Key variable that swings outcomes",
+          "bull_assumption": "Value in bull case",
+          "bear_assumption": "Value in bear case",
+          "current_best_estimate": "Most likely value",
+          "how_to_derisk": "How to reduce uncertainty"
         }
       ]
-    },
-
-    "this_company_vs_pattern": {
-      "better_than_average_because": ["Reason 1", "Reason 2"],
-      "worse_than_average_because": ["Reason 1", "Reason 2"],
-      "adjusted_success_probability": "X% (vs Y% base rate)",
-      "adjustment_reasoning": "Why we think they'll beat/miss the base rate"
-    }
-  },
-
-  "scenario_analysis": {
-    "probability_methodology": "Explain how probabilities were derived - must trace to specific conditions",
-
-    "key_conditions": [
-      {
-        "condition": "e.g., Scale-up achieves >80% of nameplate capacity",
-        "probability": "X%",
-        "basis": "How this probability was estimated",
-        "historical_reference": "Base rate from comparable situations"
-      }
-    ],
-
-    "bull_case": {
-      "requires": [
-        {"condition": "Condition 1", "probability": "X%"},
-        {"condition": "Condition 2", "probability": "Y%"},
-        {"condition": "Condition 3", "probability": "Z%"}
-      ],
-      "joint_probability_calculation": "X% × Y% × Z% = W% (assuming independence) or adjusted calculation if correlated",
-      "correlation_adjustment": "If conditions are correlated, explain adjustment",
-      "final_probability": "X%",
-      "narrative": "What happens in the good scenario (2-3 sentences)",
-      "key_events": ["What must go right"],
-      "timeline_years": 5,
-      "exit_type": "IPO | ACQUISITION",
-      "exit_valuation": "$X",
-      "return_multiple": "15-25x",
-      "what_you_believe_in_this_scenario": "Implicit assumption"
-    },
-
-    "base_case": {
-      "requires": [
-        {"condition": "Condition 1", "probability": "X%"},
-        {"condition": "Condition 2", "probability": "Y%"}
-      ],
-      "joint_probability_calculation": "Derivation",
-      "final_probability": "X%",
-      "narrative": "What typically happens (2-3 sentences)",
-      "key_events": ["Realistic path"],
-      "timeline_years": 6,
-      "exit_type": "ACQUISITION | SECONDARY",
-      "exit_valuation": "$X",
-      "return_multiple": "2-5x",
-      "what_you_believe_in_this_scenario": "Implicit assumption"
-    },
-
-    "bear_case": {
-      "requires": [
-        {"condition": "Condition 1", "probability": "X%"}
-      ],
-      "joint_probability_calculation": "Derivation",
-      "final_probability": "X%",
-      "narrative": "What happens if things go wrong (2-3 sentences)",
-      "key_events": ["What goes wrong"],
-      "timeline_years": 4,
-      "exit_type": "ACQUI_HIRE | SHUTDOWN | ZOMBIE",
-      "exit_valuation": "$X or write-off",
-      "return_multiple": "0-0.5x",
-      "what_you_believe_in_this_scenario": "Implicit assumption"
-    },
-
-    "probability_sanity_check": {
-      "probabilities_sum_to": "X% (should be ~100%)",
-      "adjustment_if_needed": "How residual probability is allocated"
-    },
-
-    "expected_value": {
-      "calculation": "(Bull prob × Bull return) + (Base prob × Base return) + (Bear prob × Bear return)",
-      "weighted_return_multiple": "X.Xx",
-      "confidence_in_ev": "HIGH | MEDIUM | LOW",
-      "key_sensitivity": "Which probability assumption most affects EV"
-    },
-
-    "base_rate_comparison": {
-      "category": "e.g., Deep tech climate Series B",
-      "historical_success_rate": "X%",
-      "historical_median_return": "X.Xx",
-      "this_company_vs_base_rate": "Above/below average because..."
-    },
-
-    "scenario_sensitivities": [
-      {
-        "variable": "Key variable that swings outcomes",
-        "bull_assumption": "Value in bull case",
-        "bear_assumption": "Value in bear case",
-        "current_best_estimate": "Most likely value",
-        "how_to_derisk": "How to reduce uncertainty"
-      }
-    ]
     }
   }
 }
