@@ -205,10 +205,14 @@ function AnimatedContent({
   // Section fade
   const sectionOpacity = useTransform(scrollYProgress, [0.92, 1.0], [1, 0.5]);
 
+  // Content vertical shift - moves content up as animation progresses
+  // This keeps the active content in view as more elements appear
+  const contentY = useTransform(scrollYProgress, [0.5, 0.95], [0, -180]);
+
   return (
     <motion.div
       className="w-full max-w-[680px] text-center"
-      style={{ opacity: sectionOpacity }}
+      style={{ opacity: sectionOpacity, y: contentY }}
     >
       {/* Problem */}
       <p className="text-base leading-relaxed text-[#FAFAFA] md:text-lg">
@@ -318,7 +322,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
       >
         Skip animation section
       </a>
-      <div className="sticky top-0 flex h-screen items-center justify-center px-4 md:px-6">
+      <div className="sticky top-0 flex h-screen items-start justify-center overflow-hidden px-4 pt-[15vh] md:px-6">
         <AnimatedContent scrollYProgress={scrollYProgress} />
       </div>
       <div id="after-process-animation" />

@@ -44,7 +44,7 @@
   html,
   body {
     scroll-padding-top: 64px;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   html {
