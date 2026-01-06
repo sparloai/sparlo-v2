@@ -223,6 +223,46 @@ Please use the Task tool to delegate suitable tasks to specialized sub-agents fo
 
 LLM outputs are unpredictable. Schemas validating LLM responses MUST be antifragile.
 
+### ⚠️ PROMPTS AND SCHEMAS ARE COUPLED - ALWAYS UPDATE BOTH
+
+**When you modify ANY prompt in `apps/web/lib/llm/prompts/*/prompts.ts`, you MUST also update the corresponding schema in `apps/web/lib/llm/prompts/*/schemas.ts`.**
+
+The prompt defines the OUTPUT FORMAT (JSON structure) that the LLM will produce. The schema validates that output. If they don't match, production breaks with ZodErrors.
+
+**Prompt-Schema Pairs:**
+| Prompt File | Schema File | Schemas to Update |
+|-------------|-------------|-------------------|
+| `dd/prompts.ts` (DD0-M) | `dd/schemas.ts` | `DD0_M_OutputSchema` |
+| `dd/prompts.ts` (DD3-M) | `dd/schemas.ts` | `DD3_M_OutputSchema` |
+| `dd/prompts.ts` (DD3.5-M) | `dd/schemas.ts` | `DD3_5_M_OutputSchema` |
+| `dd/prompts.ts` (DD4-M) | `dd/schemas.ts` | `DD4_M_OutputSchema` |
+| `dd/prompts.ts` (DD5-M) | `dd/schemas.ts` | `DD5_M_OutputSchema` |
+| `an/prompts.ts` | `an/schemas.ts` | Corresponding AN schemas |
+
+**Before committing prompt changes:**
+1. Compare the `## OUTPUT FORMAT` section in the prompt with the schema
+2. If you added/removed/renamed fields → update the schema
+3. If you wrapped fields in a new object (e.g., `prose_output`, `quick_reference`) → update the schema to handle both old and new formats for backwards compatibility
+4. Test with existing data to ensure old format still parses
+
+**Making schemas backwards-compatible:**
+```typescript
+// Use z.unknown().transform() to detect format and handle both
+export const DD3_M_OutputSchema = z
+  .unknown()
+  .transform((val) => {
+    const input = val as Record<string, unknown>;
+
+    // New format detection
+    if (input.prose_output && input.quick_reference) {
+      return parseNewFormat(val);
+    }
+
+    // Old format fallback
+    return parseOldFormat(val);
+  });
+```
+
 ### NEVER use raw `z.enum()` for LLM outputs
 
 ```typescript
