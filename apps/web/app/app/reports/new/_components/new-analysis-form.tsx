@@ -303,12 +303,8 @@ export function NewAnalysisForm({
           attachments.forEach((a) => URL.revokeObjectURL(a.preview));
           setAttachments([]);
 
-          setFormState((prev) => ({
-            ...prev,
-            reportId: result.reportId,
-            step: 'processing',
-            isSubmitting: false,
-          }));
+          // Redirect to report page immediately - it will show its own processing screen
+          router.push(getAppPath(`/app/reports/${result.reportId}`));
         }
       } catch (err) {
         console.error('Failed to start report:', err);
