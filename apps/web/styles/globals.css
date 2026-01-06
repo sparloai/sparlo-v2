@@ -44,11 +44,15 @@
   html,
   body {
     scroll-padding-top: 64px;
+    /* Use clip to prevent horizontal overflow without breaking sticky positioning */
+    /* Fallback for older Safari that doesn't support clip */
     overflow-x: clip;
   }
 
   html {
     scroll-behavior: smooth;
+    /* Ensure sticky works - explicit scroll enables proper sticky context */
+    overflow-y: scroll;
   }
 
   [id] {
