@@ -24,83 +24,130 @@ The codebase already has several resilience features:
 | Step-based functions | `lib/inngest/functions/*.ts` | All functions use `step.run()` |
 | Health check | `railway.json` | `/api/health` with 120s timeout |
 | Durable execution | Inngest architecture | State persisted externally |
+| Token usage idempotency | `token_usage_events` table | Uses idempotency keys |
 
 **Key insight**: Inngest's durable execution means completed steps are **never re-executed**. If a deployment interrupts a function between steps, Inngest automatically resumes from the last checkpoint on the new instance.
 
+> ⚠️ **Research Finding**: The existing architecture may already handle deployments gracefully. Before implementing changes, test the current behavior by deploying during an active report to validate whether changes are actually needed.
+
 ## Proposed Solution
 
-### Phase 1: Railway Grace Periods (Quick Fix)
+### Phase 0: Validate Current Behavior (RECOMMENDED FIRST STEP)
 
-Add environment variables to Railway:
+Before implementing any changes, validate whether the current Inngest setup already handles deployments:
+
+1. Start a report generation
+2. Trigger a Railway deployment mid-execution
+3. Monitor Inngest dashboard for automatic retry/resume behavior
+4. Check if report completes successfully
+
+**Why**: Inngest's durable execution + `streaming: 'allow'` may already provide sufficient resilience. The DNS error observed was transient and may have self-resolved through Inngest's built-in retry mechanism.
+
+### Phase 1: Railway Grace Periods
+
+Add environment variables to Railway **only if Phase 0 shows failures**:
 
 ```bash
-# Keep old instance alive for 5 minutes during transition
+# Keep old instance alive during transition
 RAILWAY_DEPLOYMENT_OVERLAP_SECONDS=300
 
-# Allow 10 minutes for graceful shutdown after SIGTERM
-RAILWAY_DEPLOYMENT_DRAINING_SECONDS=600
+# Allow time for graceful shutdown after SIGTERM
+# Longest step is ~6 minutes, so 900s (15 min) provides 2.5x safety margin
+RAILWAY_DEPLOYMENT_DRAINING_SECONDS=900
 ```
 
-**Why these values:**
-- 300s overlap ensures new instance is fully ready before old receives SIGTERM
-- 600s drain allows most in-progress steps to complete
-- Total deployment time increases by ~15 minutes max
+**Revised rationale** (from architecture review):
+- 900s is sufficient because we're protecting **individual steps**, not entire functions
+- Longest steps take ~6 minutes (360s) - 900s provides 2.5x safety margin
+- Inngest automatically resumes from the last completed step on the new instance
+- Formula: `drain_seconds = longest_step_duration * 2.5`
 
 **Implementation**:
 1. Add env vars in Railway dashboard (Settings → Variables)
 2. No code changes required
 3. Test with a deployment during active report generation
 
-### Phase 2: Monitoring & Validation
+**Potential issues to monitor**:
+- Database connection pool exhaustion during overlap (two instances sharing pool)
+- Memory usage if old instance holds large report data in memory
+- API rate limits if both instances make concurrent external calls
 
-Add metrics to validate the solution works:
+### Phase 2: Idempotency Audit (Security Critical)
+
+The codebase has `token_usage_events` with idempotency keys, but verify ALL step operations are idempotent:
 
 ```typescript
-// In function completion handlers
-await step.run('track-completion', async () => {
-  await analytics.track('report_completed', {
-    reportId,
-    durationMs: Date.now() - startTime,
-    wasResumed: attempt > 0, // Inngest provides attempt number
-    deploymentDuringExecution: checkDeploymentWindow()
+// ✅ Already safe - token tracking uses idempotency
+await step.run('track-usage', async () => {
+  await trackTokenUsage({
+    accountId,
+    tokens,
+    idempotencyKey: `${reportId}-${stepName}`,  // Prevents double-counting
+    reportId
   });
+});
+
+// ✅ Safe - Supabase update with WHERE clause
+await step.run('save-result', async () => {
+  await supabase.from('sparlo_reports')
+    .update({ report_data: result })
+    .eq('id', reportId);  // Idempotent: same result on retry
+});
+
+// ⚠️ AUDIT: Check all external API calls
+await step.run('send-notification', async () => {
+  // If using email/Slack APIs, ensure they handle duplicates
+  // Or add idempotency key if API supports it
 });
 ```
 
-**Success metrics:**
-- Function success rate during deployment windows
-- Resume/retry rate (should be near zero with grace periods)
-- User-reported failures (should drop to zero)
+**Audit checklist**:
+- [ ] All database writes use UPDATE (not INSERT) or have conflict handling
+- [ ] External API calls use idempotency keys where available
+- [ ] No side effects outside of step.run() blocks
+- [ ] Token/credit tracking has idempotency protection (already done ✅)
 
-### Phase 3: Separate Worker Service (Optional, for Maximum Isolation)
+### Phase 3: Monitoring (Optional)
 
-If Phase 1 is insufficient for very long functions:
+Add lightweight monitoring only if Phase 1 is implemented:
 
+```typescript
+// Simple logging approach (no new analytics dependency)
+const logger = await getLogger();
+
+await step.run('complete-report', async () => {
+  logger.info({
+    name: 'report-completion',
+    reportId,
+    attempt: event.data.attempt ?? 0,
+    instanceId: process.env.RAILWAY_REPLICA_ID
+  }, 'Report generation completed');
+
+  // Your completion logic
+});
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Web Service   │────▶│  Inngest Cloud  │────▶│ Worker Service  │
-│ (deploys often) │     │   (routes jobs) │     │(deploys rarely) │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-        │                                               │
-        └───────────── Shared Database ─────────────────┘
-```
 
-**Benefits:**
-- Web deployments don't affect running reports
-- Worker has independent, longer grace periods (15+ minutes)
-- Can scale workers independently
+**Success indicators**:
+- Inngest dashboard shows no function failures during deployments
+- `attempt > 0` logs are rare (indicates retries happened)
+- User-reported failures drop to zero
 
-**Trade-offs:**
-- Additional Railway service cost (~$5-10/month)
-- Slightly more complex deployment coordination
-- Requires code reorganization
+### Phase 4: Separate Worker Service (DEFERRED)
+
+> ⚠️ **Not recommended initially**. Only consider if:
+> - Phase 1 proves insufficient after extended testing
+> - Report generation regularly exceeds 2 hours
+> - You need completely independent scaling for workers
+
+The added complexity and cost ($5-10/month) isn't justified until simpler solutions fail.
 
 ## Acceptance Criteria
 
-- [ ] Railway env vars configured: `RAILWAY_DEPLOYMENT_OVERLAP_SECONDS=300`, `RAILWAY_DEPLOYMENT_DRAINING_SECONDS=600`
+- [ ] Phase 0: Tested deployment during active report - documented current behavior
+- [ ] Phase 1: Railway env vars configured: `OVERLAP=300`, `DRAINING=900` (if needed based on Phase 0)
+- [ ] Phase 2: Idempotency audit completed for all step.run() operations
 - [ ] Zero user-visible report failures during deployments (validated over 1 week)
-- [ ] Inngest dashboard shows no function failures correlated with deployment times
-- [ ] Documentation updated with deployment best practices
+- [ ] Inngest dashboard shows automatic recovery (if interruptions occur)
 
 ## Technical Considerations
 
@@ -120,33 +167,51 @@ const an1Result = await step.run('an1-solution-mapping', async () => {
 });
 ```
 
-### Idempotency Check (Important)
+### Instance Overlap Considerations
 
-Ensure all `step.run()` operations are idempotent:
+When `RAILWAY_DEPLOYMENT_OVERLAP_SECONDS` is set, two instances run simultaneously:
 
-```typescript
-// ✅ Safe - Supabase upsert
-await step.run('save-result', async () => {
-  await supabase.from('sparlo_reports')
-    .update({ report_data: result })
-    .eq('id', reportId);  // Update, not insert - idempotent
-});
-
-// ⚠️ Check external APIs
-await step.run('track-usage', async () => {
-  // Should use idempotency key if available
-  await trackUsage(reportId, tokens);
-});
-```
+1. **Database connections**: Supabase connection pooling handles this, but monitor for exhaustion
+2. **Memory**: Old instance may hold report data in memory - ensure adequate RAM
+3. **Rate limits**: Both instances may hit external APIs - Inngest's step-based execution naturally staggers calls
 
 ### Healthcheck Behavior During Drain
 
 Current healthcheck at `/api/health` should continue returning 200 during drain to allow Inngest callbacks to complete. No changes needed.
 
+### Graceful Shutdown Signal Handling
+
+Next.js handles SIGTERM automatically. Verify no custom signal handlers interfere:
+
+```typescript
+// DON'T add custom handlers that exit immediately
+// process.on('SIGTERM', () => process.exit(0)); // BAD
+
+// Next.js will gracefully drain connections
+```
+
+## Deployment Verification Checklist
+
+### Pre-Deployment (When Reports May Be Running)
+- [ ] Check Inngest dashboard for active function runs
+- [ ] Note function IDs of in-progress reports
+- [ ] Have rollback plan ready (Railway instant rollback)
+
+### Post-Deployment
+- [ ] Verify noted functions completed or resumed successfully
+- [ ] Check Inngest for any new function failures
+- [ ] Monitor for user-reported issues for 24 hours
+
+### Rollback Triggers
+- Multiple function failures immediately after deployment
+- DNS errors persisting beyond 5 minutes
+- Users reporting stuck/failed reports
+
 ## References
 
 - `apps/web/app/api/inngest/route.ts` - Inngest serve configuration
 - `apps/web/lib/inngest/functions/generate-dd-report.ts` - DD report function (longest running)
+- `apps/web/supabase/migrations/20260103000002_dd_mode_token_usage_events.sql` - Idempotency table
 - `railway.json` - Current Railway configuration
 - [Inngest Durable Execution Docs](https://www.inngest.com/docs/learn/how-functions-are-executed)
 - [Railway Deployment Teardown Guide](https://docs.railway.com/guides/deployment-teardown)

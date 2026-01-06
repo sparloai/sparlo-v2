@@ -1656,15 +1656,15 @@ const DD4_M_StructuredDataSchema = z.object({
   }),
 
   scenario_analysis: z.object({
-    probability_methodology: z.string(),
+    probability_methodology: z.string().default(''),
     key_conditions: z.array(
       z.object({
         condition: z.string(),
         probability: z.string(),
-        basis: z.string(),
-        confidence: Confidence,
+        basis: z.string().default(''),
+        confidence: Confidence.optional().default('MEDIUM'),
       }),
-    ),
+    ).default([]),
     bull_case: z.object({
       requires: z.array(
         z.object({
@@ -1743,30 +1743,55 @@ const DD4_M_StructuredDataSchema = z.object({
     ),
   }),
 
-  // Comparable pattern synthesis (Patch 5)
-  comparable_pattern_synthesis: z.object({
-    methodology: z.string(),
-    quantified_patterns: z.array(
-      z.object({
-        pattern: z.string(),
-        n_companies: flexibleNumber(0),
-        success_rate_if_present: z.string(),
-        success_rate_if_absent: z.string(),
-        this_company_status: flexibleEnum(
-          ['PRESENT', 'ABSENT', 'PARTIAL'],
-          'PARTIAL',
-        ),
-        implication: z.string(),
-      }),
-    ),
-    pattern_scorecard: z.object({
-      positive_indicators_count: flexibleNumber(0),
-      negative_indicators_count: flexibleNumber(0),
-      net_score: z.string(),
-      interpretation: z.string(),
+  // Comparable pattern synthesis (Patch 5) - Made antifragile with defaults
+  comparable_pattern_synthesis: z
+    .object({
+      methodology: z.string().default('Pattern analysis across comparable companies'),
+      quantified_patterns: z
+        .union([
+          z.array(
+            z.object({
+              pattern: z.string(),
+              n_companies: flexibleNumber(0),
+              success_rate_if_present: z.string().default('N/A'),
+              success_rate_if_absent: z.string().default('N/A'),
+              this_company_status: flexibleEnum(
+                ['PRESENT', 'ABSENT', 'PARTIAL'],
+                'PARTIAL',
+              ),
+              implication: z.string().default(''),
+            }),
+          ),
+          // Handle case where LLM returns object instead of array
+          z.object({}).transform(() => []),
+        ])
+        .default([]),
+      pattern_scorecard: z
+        .object({
+          positive_indicators_count: flexibleNumber(0),
+          negative_indicators_count: flexibleNumber(0),
+          net_score: z.string().default('0'),
+          interpretation: z.string().default('Insufficient data for pattern analysis'),
+        })
+        .default({
+          positive_indicators_count: 0,
+          negative_indicators_count: 0,
+          net_score: '0',
+          interpretation: 'Insufficient data for pattern analysis',
+        }),
+      differentiated_insight: z.string().default('See comparable analysis section for detailed insights'),
+    })
+    .default({
+      methodology: 'Pattern analysis across comparable companies',
+      quantified_patterns: [],
+      pattern_scorecard: {
+        positive_indicators_count: 0,
+        negative_indicators_count: 0,
+        net_score: '0',
+        interpretation: 'Insufficient data for pattern analysis',
+      },
+      differentiated_insight: 'See comparable analysis section for detailed insights',
     }),
-    differentiated_insight: z.string(),
-  }),
 });
 
 // Prose output schema for DD4-M (new format)
