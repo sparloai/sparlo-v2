@@ -43,7 +43,14 @@ const config = {
       fullUrl: true,
     },
   },
-  serverExternalPackages: ['pino', 'thread-stream', '@react-pdf/renderer'],
+  serverExternalPackages: [
+    'pino',
+    'thread-stream',
+    '@react-pdf/renderer',
+    // Prevent Supabase SDK from being bundled to avoid initialization issues
+    '@supabase/supabase-js',
+    '@supabase/ssr',
+  ],
   // needed for supporting dynamic imports for local content
   outputFileTracingIncludes: {
     '/*': ['./content/**/*'],
