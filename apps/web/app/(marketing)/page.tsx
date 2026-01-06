@@ -4,7 +4,6 @@ import { useState } from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { AnalysisAnimation } from './_components/analysis-animation';
 import { EngineeringHero } from './_components/engineering-hero';
 import { ExampleReportsSection } from './_components/example-reports/example-reports-section';
 import { MethodologySection } from './_components/methodology-section';
@@ -44,7 +43,6 @@ function Home() {
   return (
     <>
       <EngineeringHero />
-      <AnalysisAnimation />
       <ModeTabs mode={mode} onModeChange={handleModeChange} />
       <AnimatePresence mode="wait">
         <motion.div
