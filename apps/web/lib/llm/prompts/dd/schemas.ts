@@ -1393,7 +1393,7 @@ export type DD3_5_M_Output = z.infer<typeof DD3_5_M_StructuredDataSchema> & {
 // ============================================
 
 // Inner schema for DD4 structured data (used in both old and new formats)
-// ANTIFRAGILE: All fields have sensible defaults
+// ANTIFRAGILE: All fields have sensible defaults and are optional
 const DD4_M_StructuredDataSchema = z.object({
   solution_space_position: z.object({
     primary_track: Track,
@@ -1418,7 +1418,7 @@ const DD4_M_StructuredDataSchema = z.object({
       ),
       implications: z.string().default(''),
     }),
-  }),
+  }).optional(),
 
   missed_alternatives: z.array(
     z.object({
@@ -1461,7 +1461,7 @@ const DD4_M_StructuredDataSchema = z.object({
       overclaim: z.string().default(''),
       underclaim: z.string().default(''),
     }),
-  }),
+  }).optional(),
 
   moat_assessment: z.object({
     technical_moat: z.object({
@@ -1493,7 +1493,7 @@ const DD4_M_StructuredDataSchema = z.object({
       primary_source: z.string().default(''),
       key_vulnerabilities: z.array(z.string()).default([]),
     }),
-  }),
+  }).optional(),
 
   competitive_risk_analysis: z.object({
     threats_from_solution_space: z.array(
@@ -1529,7 +1529,7 @@ const DD4_M_StructuredDataSchema = z.object({
       dependencies: z.array(z.string()).default([]),
       risk: z.string().default(''),
     }),
-  }),
+  }).optional(),
 
   key_insights: z.array(
     z.object({
@@ -1581,7 +1581,7 @@ const DD4_M_StructuredDataSchema = z.object({
       expected_value_reasoning: z.string().default(''),
       what_makes_it_worth_it: z.string().default(''),
     }),
-  }),
+  }).optional(),
 
   pre_mortem: z.object({
     framing: z.string().default(''),
@@ -1618,7 +1618,7 @@ const DD4_M_StructuredDataSchema = z.object({
       market_timing_failure_probability: z.string().default('Unknown'),
       primary_risk_category: z.string().default('Unknown'),
     }),
-  }),
+  }).optional(),
 
   comparable_analysis: z.object({
     selection_criteria: z.string().default(''),
@@ -1656,7 +1656,7 @@ const DD4_M_StructuredDataSchema = z.object({
       worse_than_base_rate_because: z.array(z.string()).default([]),
       adjusted_probability: z.string().default('Unknown'),
     }),
-  }),
+  }).optional(),
 
   scenario_analysis: z.object({
     probability_methodology: z.string().default(''),
