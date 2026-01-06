@@ -2,6 +2,9 @@
 
 import { useEffect, useRef } from 'react';
 
+import { motion } from 'framer-motion';
+import { AlertTriangle, CheckCircle2, Lightbulb, Target, Zap } from 'lucide-react';
+
 import { cn } from '@kit/ui/utils';
 
 import type { ExampleReport } from './data/types';
@@ -12,7 +15,115 @@ interface ReportContentProps {
 }
 
 // ============================================
-// TYPOGRAPHY PRIMITIVES (matching brand system)
+// VISUAL COMPONENTS
+// ============================================
+
+function ConfidenceMeter({ value, label }: { value: number; label: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="relative h-2 w-24 overflow-hidden rounded-full bg-zinc-200">
+        <motion.div
+          className="absolute inset-y-0 left-0 rounded-full bg-zinc-900"
+          initial={{ width: 0 }}
+          whileInView={{ width: `${value}%` }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
+        />
+      </div>
+      <span className="text-[14px] font-semibold text-zinc-900">{value}%</span>
+      <span className="text-[13px] text-zinc-500">{label}</span>
+    </div>
+  );
+}
+
+function InsightCard({
+  icon,
+  title,
+  description,
+  variant = 'default',
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  variant?: 'default' | 'highlight';
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.5 }}
+      className={cn(
+        'rounded-xl border p-6',
+        variant === 'highlight'
+          ? 'border-zinc-900 bg-zinc-900 text-white'
+          : 'border-zinc-200 bg-white',
+      )}
+    >
+      <div
+        className={cn(
+          'mb-4 flex h-10 w-10 items-center justify-center rounded-lg',
+          variant === 'highlight' ? 'bg-white/10' : 'bg-zinc-100',
+        )}
+      >
+        {icon}
+      </div>
+      <h4
+        className={cn(
+          'text-[16px] font-semibold',
+          variant === 'highlight' ? 'text-white' : 'text-zinc-900',
+        )}
+      >
+        {title}
+      </h4>
+      <p
+        className={cn(
+          'mt-2 text-[15px] leading-relaxed',
+          variant === 'highlight' ? 'text-zinc-300' : 'text-zinc-600',
+        )}
+      >
+        {description}
+      </p>
+    </motion.div>
+  );
+}
+
+function StatBox({
+  value,
+  label,
+  subtext,
+}: {
+  value: string;
+  label: string;
+  subtext?: string;
+}) {
+  return (
+    <div className="text-center">
+      <motion.p
+        className="text-[32px] font-bold tracking-tight text-zinc-900"
+        initial={{ opacity: 0, scale: 0.8 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
+      >
+        {value}
+      </motion.p>
+      <p className="mt-1 text-[14px] font-medium text-zinc-700">{label}</p>
+      {subtext && <p className="mt-0.5 text-[12px] text-zinc-400">{subtext}</p>}
+    </div>
+  );
+}
+
+function SectionDivider() {
+  return (
+    <div className="my-16 flex items-center gap-4">
+      <div className="h-px flex-1 bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
+    </div>
+  );
+}
+
+// ============================================
+// TYPOGRAPHY PRIMITIVES
 // ============================================
 
 function MonoLabel({
@@ -25,7 +136,7 @@ function MonoLabel({
   return (
     <span
       className={cn(
-        'text-[13px] font-semibold uppercase tracking-[0.06em]',
+        'text-[12px] font-semibold uppercase tracking-[0.08em]',
         variant === 'default' ? 'text-zinc-500' : 'text-zinc-400',
       )}
     >
@@ -46,13 +157,13 @@ function BodyText({
   variant?: 'primary' | 'secondary' | 'muted';
 }) {
   const sizeClasses = {
-    lg: 'text-[22px]',
-    md: 'text-[18px]',
-    sm: 'text-[16px]',
+    lg: 'text-[20px]',
+    md: 'text-[17px]',
+    sm: 'text-[15px]',
   };
 
   const variantClasses = {
-    primary: 'text-[#1e1e1e]',
+    primary: 'text-zinc-800',
     secondary: 'text-zinc-600',
     muted: 'text-zinc-500',
   };
@@ -62,7 +173,7 @@ function BodyText({
       className={cn(
         sizeClasses[size],
         variantClasses[variant],
-        'leading-[1.3] tracking-[-0.02em]',
+        'leading-[1.6] tracking-[-0.01em]',
         className,
       )}
     >
@@ -71,39 +182,33 @@ function BodyText({
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-[36px] font-semibold tracking-tight text-zinc-900">
-      {children}
-    </h2>
-  );
-}
-
-function ContentBlock({
-  children,
-  withBorder = false,
+function SectionHeader({
+  label,
+  title,
+  description,
 }: {
-  children: React.ReactNode;
-  withBorder?: boolean;
+  label: string;
+  title: string;
+  description?: string;
 }) {
   return (
-    <div className={cn(withBorder && 'mt-12 border-t border-zinc-200 pt-8')}>
-      {children}
-    </div>
-  );
-}
-
-function AccentBorder({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="mt-10 border-l-4 border-zinc-900 pl-6">{children}</div>
-  );
-}
-
-function HighlightBox({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-none border border-zinc-200 bg-zinc-50 p-8">
-      {children}
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-50px' }}
+      transition={{ duration: 0.5 }}
+      className="mb-10"
+    >
+      <MonoLabel>{label}</MonoLabel>
+      <h2 className="mt-3 text-[32px] font-semibold tracking-tight text-zinc-900">
+        {title}
+      </h2>
+      {description && (
+        <p className="mt-3 max-w-[55ch] text-[17px] leading-relaxed text-zinc-500">
+          {description}
+        </p>
+      )}
+    </motion.div>
   );
 }
 
@@ -139,26 +244,35 @@ export function ReportContent({
   };
 
   return (
-    <div className="max-w-[70ch] px-6 py-10 md:px-10 md:py-12">
+    <div className="px-6 py-10 md:px-10 md:py-12">
       {/* Report Header */}
-      <header className="mb-16">
-        <span className="text-[13px] font-semibold uppercase tracking-[0.06em] text-zinc-400">
-          {report.category}
-        </span>
-        <h1 className="mt-3 text-[36px] font-semibold leading-[1.1] tracking-tight text-zinc-900 lg:text-[42px]">
-          {report.title}
-        </h1>
-        <p className="mt-3 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-500">
-          {report.subtitle}
-        </p>
-        <div className="mt-4 flex items-center gap-3 text-[13px] tracking-[-0.02em] text-zinc-400">
-          <span>{report.readTime}</span>
-          <span className="text-zinc-300">·</span>
-          <span>{report.pages} pages</span>
-          <span className="text-zinc-300">·</span>
-          <span>{report.patents} patents cited</span>
-        </div>
+      <header className="mb-12 max-w-[65ch]">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <MonoLabel variant="muted">{report.category}</MonoLabel>
+          <h1 className="mt-3 text-[36px] font-semibold leading-[1.1] tracking-tight text-zinc-900 lg:text-[42px]">
+            {report.title}
+          </h1>
+          <p className="mt-4 text-[18px] leading-relaxed text-zinc-500">
+            {report.subtitle}
+          </p>
+        </motion.div>
       </header>
+
+      {/* Key Stats Banner */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="mb-16 grid grid-cols-3 gap-6 rounded-2xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-8"
+      >
+        <StatBox value="5-10x" label="Membrane Life" subtext="improvement" />
+        <StatBox value="$60-80" label="Per Ton CO₂" subtext="target cost" />
+        <StatBox value="85%" label="Confidence" subtext="in primary solution" />
+      </motion.div>
 
       {/* ============================================ */}
       {/* EXECUTIVE SUMMARY */}
@@ -166,39 +280,50 @@ export function ReportContent({
       <section
         id={`${report.id}-executive-summary`}
         ref={setSectionRef('executive-summary')}
-        className="mt-24"
+        className="scroll-mt-8"
       >
-        <SectionTitle>Executive Summary</SectionTitle>
+        <SectionHeader
+          label="Section 01"
+          title="Executive Summary"
+          description="The bottom line on marine electrolyzer viability."
+        />
 
-        <article className="mt-12 md:border-l-2 md:border-zinc-900 md:pl-10">
-          <MonoLabel>The Assessment</MonoLabel>
-          <BodyText size="lg" className="mt-8">
-            The desalination industry solved seawater fouling decades ago with
-            electrodialysis reversal—polarity switching every 15-30 minutes that
-            dissolves scale and kills biofilms before they mature. Mikhaylin &
-            Bazinet&apos;s 2016 review documents 5-10x membrane life extension
-            with this single intervention.
+        <div className="space-y-8">
+          <InsightCard
+            icon={<CheckCircle2 className="h-5 w-5 text-emerald-600" />}
+            title="Viable with High Confidence"
+            description="The desalination industry solved seawater fouling decades ago with electrodialysis reversal—polarity switching every 15-30 minutes that dissolves scale and kills biofilms."
+            variant="highlight"
+          />
+
+          <BodyText>
+            Mikhaylin & Bazinet&apos;s 2016 review documents 5-10x membrane life
+            extension with this single intervention. The electrolyzer industry
+            inherited chlor-alkali assumptions about continuous operation and
+            missed this entirely.
           </BodyText>
 
-          <ContentBlock withBorder>
-            <MonoLabel>Viability</MonoLabel>
-            <p className="mt-8 text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
-              Viable with high confidence using proven technologies
-            </p>
-          </ContentBlock>
-
-          <ContentBlock withBorder>
+          <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-6">
             <MonoLabel>Primary Recommendation</MonoLabel>
-            <BodyText className="mt-8">
+            <BodyText className="mt-3">
               Implement polarity reversal (5-15 minute cycles for seawater)
               combined with modular cartridge electrodes designed for 6-12 month
               hot-swap replacement. Target $60-80/ton CO₂ equivalent with 70%+
-              capacity factor. First validation: 3-month seawater exposure test,
-              $50-100K.
+              capacity factor.
             </BodyText>
-          </ContentBlock>
-        </article>
+            <div className="mt-4 flex items-center gap-4 text-[14px]">
+              <span className="rounded-full bg-zinc-200 px-3 py-1 font-medium text-zinc-700">
+                First validation: $50-100K
+              </span>
+              <span className="rounded-full bg-zinc-200 px-3 py-1 font-medium text-zinc-700">
+                3-month seawater test
+              </span>
+            </div>
+          </div>
+        </div>
       </section>
+
+      <SectionDivider />
 
       {/* ============================================ */}
       {/* PROBLEM ANALYSIS */}
@@ -206,44 +331,56 @@ export function ReportContent({
       <section
         id={`${report.id}-problem-analysis`}
         ref={setSectionRef('problem-analysis')}
-        className="mt-24"
+        className="scroll-mt-8"
       >
-        <SectionTitle>Problem Analysis</SectionTitle>
+        <SectionHeader
+          label="Section 02"
+          title="Problem Analysis"
+          description="Understanding why seawater destroys electrochemical systems."
+        />
 
-        <article className="mt-12 md:border-l-2 md:border-zinc-900 md:pl-10">
-          <MonoLabel>What&apos;s Wrong</MonoLabel>
-          <BodyText className="mt-8">
-            Seawater destroys electrochemical systems through three simultaneous
-            attack vectors: chloride ions corrode metals and degrade membranes
-            within weeks; biofilms establish within 24-48 hours; and mineral
-            scale precipitates directly onto electrode surfaces. Current
-            approaches designed for purified brine fail catastrophically.
-          </BodyText>
+        <div className="grid gap-4 md:grid-cols-3">
+          <InsightCard
+            icon={<AlertTriangle className="h-5 w-5 text-amber-600" />}
+            title="Chloride Corrosion"
+            description="Chloride ions corrode metals and degrade membranes within weeks of exposure."
+          />
+          <InsightCard
+            icon={<AlertTriangle className="h-5 w-5 text-amber-600" />}
+            title="Biofilm Formation"
+            description="Biofilms establish within 24-48 hours, creating persistent fouling layers."
+          />
+          <InsightCard
+            icon={<AlertTriangle className="h-5 w-5 text-amber-600" />}
+            title="Mineral Scale"
+            description="Mg(OH)₂ and CaCO₃ precipitate directly onto electrode surfaces."
+          />
+        </div>
 
-          <ContentBlock withBorder>
-            <MonoLabel>Why It&apos;s Hard</MonoLabel>
-            <BodyText className="mt-8">
-              The fundamental challenge is thermodynamic: chlorine evolution is
-              kinetically favored over oxygen evolution on most catalysts in
-              chloride-rich solutions. The 490mV window exists but requires
-              precisely engineered catalyst surfaces to exploit.
-            </BodyText>
-          </ContentBlock>
-
-          <AccentBorder>
-            <MonoLabel variant="muted">First Principles Insight</MonoLabel>
-            <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
-              Optimize for $/kg-NaOH-lifetime, not component longevity
-            </p>
-            <BodyText className="mt-4" variant="secondary">
-              The 5-year electrode life target may be self-imposed rather than
-              economically optimal. If electrode replacement is cheap and fast
-              enough, designing for 6-12 month disposable electrodes might beat
-              5-year hardened electrodes on total cost.
-            </BodyText>
-          </AccentBorder>
-        </article>
+        <div className="mt-10 rounded-xl border-l-4 border-zinc-900 bg-zinc-50 p-6">
+          <div className="flex items-start gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white">
+              <Lightbulb className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="text-[16px] font-semibold text-zinc-900">
+                First Principles Insight
+              </h4>
+              <p className="mt-2 text-[18px] font-medium leading-snug text-zinc-800">
+                Optimize for $/kg-NaOH-lifetime, not component longevity
+              </p>
+              <BodyText className="mt-3" variant="secondary">
+                The 5-year electrode life target may be self-imposed rather than
+                economically optimal. If electrode replacement is cheap and fast
+                enough, designing for 6-12 month disposable electrodes might beat
+                5-year hardened electrodes on total cost.
+              </BodyText>
+            </div>
+          </div>
+        </div>
       </section>
+
+      <SectionDivider />
 
       {/* ============================================ */}
       {/* SOLUTION CONCEPTS */}
@@ -251,142 +388,109 @@ export function ReportContent({
       <section
         id={`${report.id}-solution-concepts`}
         ref={setSectionRef('solution-concepts')}
-        className="mt-24"
+        className="scroll-mt-8"
       >
-        <SectionTitle>Solution Concepts</SectionTitle>
+        <SectionHeader
+          label="Section 03"
+          title="Solution Concepts"
+          description="Proven technologies requiring integration, not invention."
+        />
 
-        <BodyText className="mt-6" variant="secondary">
-          Solution concepts use proven technologies requiring integration, not
-          invention. These represent the lowest-risk path to meeting the $80/ton
-          CO₂ target.
-        </BodyText>
-
-        {/* Primary Recommendation */}
-        <article className="mt-12 space-y-12 md:border-l-2 md:border-zinc-900 md:pl-10">
-          <header className="space-y-4">
-            <MonoLabel>Primary Recommendation</MonoLabel>
-            <h3 className="text-[28px] font-semibold leading-tight tracking-tight text-zinc-900">
+        {/* Primary Recommendation Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5 }}
+          className="mb-10 overflow-hidden rounded-2xl border border-zinc-900 bg-zinc-900"
+        >
+          <div className="p-8">
+            <div className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-zinc-400" />
+              <MonoLabel>Primary Recommendation</MonoLabel>
+            </div>
+            <h3 className="mt-4 text-[24px] font-semibold text-white">
               Polarity Reversal + Modular Cartridge Architecture
             </h3>
-            <div className="flex flex-wrap items-center gap-3 text-[13px]">
-              <span className="text-zinc-500">Catalog Solution</span>
-              <span className="text-zinc-300">·</span>
-              <span className="text-zinc-500">Desalination Industry</span>
-              <span className="text-zinc-300">·</span>
-              <span className="font-medium text-zinc-700">85% confidence</span>
-            </div>
-          </header>
-
-          <div>
-            <MonoLabel>Bottom Line</MonoLabel>
-            <BodyText className="mt-4">
+            <p className="mt-3 text-[16px] leading-relaxed text-zinc-400">
               Combine proven EDR-style polarity reversal (5-15 minute cycles)
               with modular cartridge electrodes designed for 6-12 month hot-swap
               replacement.
+            </p>
+
+            <div className="mt-6">
+              <ConfidenceMeter value={85} label="confidence" />
+            </div>
+
+            <div className="mt-8 grid grid-cols-3 gap-4 border-t border-zinc-800 pt-6">
+              <div>
+                <p className="text-[12px] uppercase tracking-wide text-zinc-500">
+                  Investment
+                </p>
+                <p className="mt-1 text-[20px] font-semibold text-white">
+                  $0.5-2M
+                </p>
+              </div>
+              <div>
+                <p className="text-[12px] uppercase tracking-wide text-zinc-500">
+                  Timeline
+                </p>
+                <p className="mt-1 text-[20px] font-semibold text-white">
+                  6-12 months
+                </p>
+              </div>
+              <div>
+                <p className="text-[12px] uppercase tracking-wide text-zinc-500">
+                  Expected Improvement
+                </p>
+                <p className="mt-1 text-[20px] font-semibold text-white">
+                  5-10x life
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Supporting Concepts */}
+        <h3 className="mb-6 text-[20px] font-semibold text-zinc-900">
+          Supporting Concepts
+        </h3>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-xl border border-zinc-200 bg-white p-6">
+            <div className="flex items-center justify-between">
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-600">
+                Fallback
+              </span>
+              <ConfidenceMeter value={75} label="" />
+            </div>
+            <h4 className="mt-4 text-[17px] font-semibold text-zinc-900">
+              Accept Chlorine + Downstream Mineral Neutralization
+            </h4>
+            <BodyText className="mt-2" size="sm" variant="secondary">
+              Stop fighting chlorine evolution. Accept mixed Cl₂/O₂ production
+              and react chlorine with olivine slurry downstream.
             </BodyText>
           </div>
 
-          <AccentBorder>
-            <MonoLabel variant="muted">The Insight</MonoLabel>
-            <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
-              Periodic electrochemical stress disrupts fouling equilibrium
-            </p>
-            <div className="mt-4 space-y-2 text-[16px] text-zinc-600">
-              <p>
-                <span className="font-medium text-zinc-500">Domain:</span>{' '}
-                Desalination industry (EDR)
-              </p>
-              <p>
-                <span className="font-medium text-zinc-500">
-                  Why industry missed it:
-                </span>{' '}
-                The electrolyzer industry inherited chlor-alkali assumptions
-                about continuous operation.
-              </p>
+          <div className="rounded-xl border border-zinc-200 bg-white p-6">
+            <div className="flex items-center justify-between">
+              <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-600">
+                Complementary
+              </span>
+              <ConfidenceMeter value={80} label="" />
             </div>
-          </AccentBorder>
-
-          <ContentBlock withBorder>
-            <HighlightBox>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                <div>
-                  <MonoLabel variant="muted">Investment</MonoLabel>
-                  <p className="mt-2 text-[18px] font-medium text-zinc-900">
-                    $0.5-2M
-                  </p>
-                </div>
-                <div>
-                  <MonoLabel variant="muted">Timeline</MonoLabel>
-                  <p className="mt-2 text-[18px] font-medium text-zinc-900">
-                    6-12 months
-                  </p>
-                </div>
-                <div>
-                  <MonoLabel variant="muted">Expected Improvement</MonoLabel>
-                  <p className="mt-2 text-[18px] font-medium text-zinc-900">
-                    5-10x membrane life
-                  </p>
-                </div>
-              </div>
-            </HighlightBox>
-          </ContentBlock>
-        </article>
-
-        {/* Supporting Concepts */}
-        <div className="mt-20">
-          <h3 className="text-[28px] font-semibold tracking-tight text-zinc-900">
-            Supporting Concepts
-          </h3>
-
-          <div className="mt-10 space-y-16">
-            {/* Fallback */}
-            <div className="max-w-[70ch]">
-              <div className="flex items-baseline justify-between gap-4">
-                <h4 className="text-[20px] font-semibold tracking-tight text-zinc-900">
-                  Accept Chlorine + Downstream Mineral Neutralization
-                </h4>
-                <span className="text-[13px] uppercase tracking-wide text-zinc-400">
-                  Fallback
-                </span>
-              </div>
-              <p className="mt-3 text-[18px] italic leading-[1.3] tracking-[-0.02em] text-zinc-600">
-                75% confidence · $1-3M · 12-18 months
-              </p>
-              <div className="mt-6">
-                <MonoLabel>What It Is</MonoLabel>
-                <BodyText className="mt-2">
-                  Stop fighting chlorine evolution. Accept mixed Cl₂/O₂
-                  production and react chlorine with olivine slurry downstream.
-                  This is the Equatic approach.
-                </BodyText>
-              </div>
-            </div>
-
-            {/* Complementary */}
-            <div className="max-w-[70ch]">
-              <div className="flex items-baseline justify-between gap-4">
-                <h4 className="text-[20px] font-semibold tracking-tight text-zinc-900">
-                  Geothermal-Inspired Precipitation Steering
-                </h4>
-                <span className="text-[13px] uppercase tracking-wide text-zinc-400">
-                  Complementary
-                </span>
-              </div>
-              <p className="mt-3 text-[18px] italic leading-[1.3] tracking-[-0.02em] text-zinc-600">
-                80% confidence · $50-200K · 3-6 months
-              </p>
-              <div className="mt-6">
-                <MonoLabel>What It Is</MonoLabel>
-                <BodyText className="mt-2">
-                  Install sacrificial &quot;scaling targets&quot; upstream of
-                  electrodes that preferentially nucleate Mg(OH)₂ and CaCO₃.
-                  Standard practice in geothermal plants.
-                </BodyText>
-              </div>
-            </div>
+            <h4 className="mt-4 text-[17px] font-semibold text-zinc-900">
+              Geothermal-Inspired Precipitation Steering
+            </h4>
+            <BodyText className="mt-2" size="sm" variant="secondary">
+              Install sacrificial &quot;scaling targets&quot; upstream of electrodes
+              that preferentially nucleate Mg(OH)₂ and CaCO₃.
+            </BodyText>
           </div>
         </div>
       </section>
+
+      <SectionDivider />
 
       {/* ============================================ */}
       {/* INNOVATION CONCEPTS */}
@@ -394,49 +498,52 @@ export function ReportContent({
       <section
         id={`${report.id}-innovation-concepts`}
         ref={setSectionRef('innovation-concepts')}
-        className="mt-24"
+        className="scroll-mt-8"
       >
-        <SectionTitle>Innovation Concepts</SectionTitle>
+        <SectionHeader
+          label="Section 04"
+          title="Innovation Concepts"
+          description="Higher-risk explorations with breakthrough potential."
+        />
 
-        <BodyText className="mt-6" variant="secondary">
-          Higher-risk explorations with breakthrough potential. These are
-          parallel bets that could transform the economics if successful.
-        </BodyText>
-
-        <div className="mt-10 max-w-[70ch]">
-          <div className="flex items-baseline justify-between gap-4">
-            <h4 className="text-[20px] font-semibold tracking-tight text-zinc-900">
-              Sacrificial Magnesium Anode Architecture
-            </h4>
-            <span className="text-[13px] uppercase tracking-wide text-zinc-400">
-              Paradigm
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5 }}
+          className="rounded-2xl border border-dashed border-zinc-300 bg-gradient-to-br from-zinc-50 to-white p-8"
+        >
+          <div className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-amber-500" />
+            <span className="text-[12px] font-semibold uppercase tracking-wide text-amber-600">
+              Paradigm Shift
             </span>
           </div>
-          <p className="mt-3 text-[18px] italic leading-[1.3] tracking-[-0.02em] text-zinc-600">
-            50% confidence · $20-40K · 8-12 weeks
-          </p>
-          <div className="mt-6">
-            <MonoLabel>What It Is</MonoLabel>
-            <BodyText className="mt-2">
-              Flip the paradigm: design the anode to corrode productively.
-              Magnesium anodes dissolve to produce Mg(OH)₂ directly—the anode IS
-              the alkalinity product.
-            </BodyText>
+          <h4 className="mt-4 text-[20px] font-semibold text-zinc-900">
+            Sacrificial Magnesium Anode Architecture
+          </h4>
+          <BodyText className="mt-3" variant="secondary">
+            Flip the paradigm: design the anode to corrode productively.
+            Magnesium anodes dissolve to produce Mg(OH)₂ directly—the anode IS
+            the alkalinity product.
+          </BodyText>
+
+          <div className="mt-6 flex items-center gap-6">
+            <ConfidenceMeter value={50} label="confidence" />
+            <div className="h-4 w-px bg-zinc-200" />
+            <span className="text-[14px] text-zinc-500">$20-40K · 8-12 weeks</span>
           </div>
 
-          <AccentBorder>
-            <MonoLabel variant="muted">The Insight</MonoLabel>
-            <p className="mt-3 text-[20px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900">
-              The electrode can BE the product—dissolution is production, not
-              failure
+          <div className="mt-6 rounded-lg bg-zinc-100 p-4">
+            <p className="text-[14px] font-medium text-zinc-700">
+              Breakthrough potential: Energy consumption could drop from 2.5-3.5
+              kWh/kg to &lt;0.5 kWh/kg
             </p>
-            <BodyText className="mt-4" variant="secondary">
-              <strong>Breakthrough potential:</strong> Energy consumption could
-              drop from 2.5-3.5 kWh/kg to &lt;0.5 kWh/kg.
-            </BodyText>
-          </AccentBorder>
-        </div>
+          </div>
+        </motion.div>
       </section>
+
+      <SectionDivider />
 
       {/* ============================================ */}
       {/* RISKS & WATCHOUTS */}
@@ -444,21 +551,21 @@ export function ReportContent({
       <section
         id={`${report.id}-risks`}
         ref={setSectionRef('risks')}
-        className="mt-24"
+        className="scroll-mt-8"
       >
-        <h2 className="text-[28px] font-semibold tracking-tight text-zinc-900">
-          Risks & Watchouts
-        </h2>
-        <p className="mt-2 text-[18px] text-zinc-500">What could go wrong.</p>
+        <SectionHeader
+          label="Section 05"
+          title="Risks & Watchouts"
+          description="What could go wrong and how to mitigate."
+        />
 
-        <div className="mt-10 max-w-[70ch] space-y-10">
+        <div className="space-y-4">
           {[
             {
               risk: 'Seawater variability may cause performance inconsistency',
               category: 'Technical',
               severity: 'medium' as const,
-              mitigation:
-                'Design for operational flexibility; test across multiple sites',
+              mitigation: 'Design for operational flexibility; test across multiple sites',
             },
             {
               risk: 'Carbon credit pricing may not support $60-80/ton CO₂',
@@ -472,49 +579,52 @@ export function ReportContent({
               severity: 'high' as const,
               mitigation: 'Engage regulators early; develop robust MRV',
             },
-            {
-              risk: 'Polarity reversal energy penalty may exceed 20%',
-              category: 'Technical',
-              severity: 'medium' as const,
-              mitigation: 'Validate early; have fallback architecture',
-            },
           ].map((item, idx) => (
-            <div
+            <motion.div
               key={idx}
-              className={`md:border-l-2 md:pl-6 ${
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.4, delay: idx * 0.1 }}
+              className={cn(
+                'rounded-xl border p-6',
                 item.severity === 'high'
-                  ? 'md:border-zinc-400'
-                  : 'md:border-zinc-200'
-              }`}
+                  ? 'border-zinc-300 bg-zinc-50'
+                  : 'border-zinc-200 bg-white',
+              )}
             >
-              <p className="text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]">
-                {item.risk}
-              </p>
-              <div className="mt-2 flex items-center gap-3 text-[13px]">
-                <span className="text-zinc-500">{item.category}</span>
-                <span className="text-zinc-300">·</span>
-                <span
-                  className={
-                    item.severity === 'high'
-                      ? 'font-medium text-zinc-700'
-                      : 'text-zinc-500'
-                  }
-                >
-                  {item.severity.charAt(0).toUpperCase() +
-                    item.severity.slice(1)}{' '}
-                  severity
-                </span>
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        'rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide',
+                        item.severity === 'high'
+                          ? 'bg-zinc-900 text-white'
+                          : 'bg-zinc-200 text-zinc-600',
+                      )}
+                    >
+                      {item.severity}
+                    </span>
+                    <span className="text-[12px] text-zinc-400">{item.category}</span>
+                  </div>
+                  <p className="mt-3 text-[17px] font-medium text-zinc-900">
+                    {item.risk}
+                  </p>
+                  <div className="mt-4">
+                    <MonoLabel variant="muted">Mitigation</MonoLabel>
+                    <BodyText className="mt-1" size="sm" variant="secondary">
+                      {item.mitigation}
+                    </BodyText>
+                  </div>
+                </div>
               </div>
-              <div className="mt-4">
-                <MonoLabel variant="muted">Mitigation</MonoLabel>
-                <BodyText className="mt-2" variant="secondary">
-                  {item.mitigation}
-                </BodyText>
-              </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
+
+      <SectionDivider />
 
       {/* ============================================ */}
       {/* RECOMMENDATION */}
@@ -522,26 +632,47 @@ export function ReportContent({
       <section
         id={`${report.id}-recommendation`}
         ref={setSectionRef('recommendation')}
-        className="mt-24"
+        className="scroll-mt-8"
       >
-        <SectionTitle>Recommendation</SectionTitle>
+        <SectionHeader
+          label="Section 06"
+          title="Recommendation"
+          description="If this were my project, here's what I'd do."
+        />
 
-        <article className="mt-12 md:border-l-2 md:border-zinc-900 md:pl-10">
-          <MonoLabel>If This Were My Project</MonoLabel>
-          <BodyText className="mt-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.5 }}
+          className="rounded-2xl border border-zinc-200 bg-gradient-to-br from-white to-zinc-50 p-8"
+        >
+          <BodyText size="lg">
             I&apos;d start with the boring stuff that works. Get an EDR system
             from Evoqua or Suez, modify it for seawater with more frequent
             polarity reversal, and add precipitation steering targets upstream.
+          </BodyText>
+          <BodyText className="mt-6" size="lg">
             Run it for 3 months in real seawater and measure everything.
             That&apos;s your baseline.
           </BodyText>
-          <BodyText className="mt-6">
+          <BodyText className="mt-6" variant="secondary">
             While that&apos;s running, set up a parallel bench test on
             sacrificial Mg anodes. The one thing I would NOT do is chase exotic
             materials until the simpler approaches hit a wall.
           </BodyText>
-        </article>
+
+          <div className="mt-8 flex items-center gap-4">
+            <div className="h-1 w-12 rounded-full bg-zinc-900" />
+            <span className="text-[14px] font-medium text-zinc-700">
+              Start simple. Measure everything. Then iterate.
+            </span>
+          </div>
+        </motion.div>
       </section>
+
+      {/* End spacer */}
+      <div className="h-12" />
     </div>
   );
 }

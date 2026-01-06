@@ -1,55 +1,145 @@
+'use client';
+
+import { motion } from 'framer-motion';
+import { ArrowRight, FileText, FlaskConical, Lightbulb } from 'lucide-react';
+
 import type { ExampleReport } from './data/types';
 
 interface ReportCardProps {
   report: ExampleReport;
   isActive: boolean;
   onClick: () => void;
+  index: number;
 }
 
-export function ReportCard({ report, isActive, onClick }: ReportCardProps) {
+const categoryIcons: Record<string, React.ReactNode> = {
+  'Carbon Removal': <FlaskConical className="h-5 w-5" />,
+  'Green H2': <Lightbulb className="h-5 w-5" />,
+  'Advanced Materials': <FileText className="h-5 w-5" />,
+  Waste: <FileText className="h-5 w-5" />,
+};
+
+export function ReportCard({
+  report,
+  isActive,
+  onClick,
+  index,
+}: ReportCardProps) {
   return (
-    <button
+    <motion.button
       onClick={onClick}
-      className={`
-        group w-[280px] shrink-0 border-l-2 py-4 pl-6 pr-4 text-left transition-all
-        ${
-          isActive
-            ? 'border-l-zinc-900 bg-zinc-50'
-            : 'border-l-zinc-200 hover:border-l-zinc-400 hover:bg-zinc-50/50'
-        }
-      `}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
+      className="group relative w-full text-left"
     >
-      {/* Category label */}
-      <span
-        className={`text-[13px] font-semibold uppercase tracking-[0.06em] ${
-          isActive ? 'text-zinc-900' : 'text-zinc-400'
-        }`}
+      {/* Card container */}
+      <div
+        className={`
+          relative overflow-hidden rounded-xl border p-6 transition-all duration-300
+          ${
+            isActive
+              ? 'border-zinc-900 bg-zinc-900 text-white shadow-2xl shadow-zinc-900/20'
+              : 'border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-lg'
+          }
+        `}
       >
-        {report.category}
-      </span>
+        {/* Subtle gradient overlay for active state */}
+        {isActive && (
+          <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900" />
+        )}
 
-      {/* Title */}
-      <p
-        className={`mt-2 text-[18px] font-medium leading-[1.3] tracking-[-0.02em] ${
-          isActive ? 'text-zinc-900' : 'text-zinc-700'
-        }`}
-      >
-        {report.title}
-      </p>
+        {/* Content */}
+        <div className="relative">
+          {/* Category with icon */}
+          <div className="flex items-center gap-2">
+            <span
+              className={`${isActive ? 'text-zinc-400' : 'text-zinc-400'}`}
+            >
+              {categoryIcons[report.category] || <FileText className="h-5 w-5" />}
+            </span>
+            <span
+              className={`text-[12px] font-semibold uppercase tracking-[0.08em] ${
+                isActive ? 'text-zinc-400' : 'text-zinc-500'
+              }`}
+            >
+              {report.category}
+            </span>
+          </div>
 
-      {/* Subtitle */}
-      <p className="mt-1 text-[15px] leading-[1.4] tracking-[-0.02em] text-zinc-500">
-        {report.subtitle}
-      </p>
+          {/* Title */}
+          <h3
+            className={`mt-4 text-[20px] font-semibold leading-tight tracking-[-0.02em] ${
+              isActive ? 'text-white' : 'text-zinc-900'
+            }`}
+          >
+            {report.title}
+          </h3>
 
-      {/* Metadata */}
-      <div className="mt-4 flex items-center gap-2 text-[13px] tracking-[-0.02em] text-zinc-400">
-        <span>{report.pages} pages</span>
-        <span className="text-zinc-300">·</span>
-        <span>{report.patents} patents</span>
-        <span className="text-zinc-300">·</span>
-        <span>{report.papers} papers</span>
+          {/* Subtitle */}
+          <p
+            className={`mt-2 text-[15px] leading-relaxed ${
+              isActive ? 'text-zinc-400' : 'text-zinc-500'
+            }`}
+          >
+            {report.subtitle}
+          </p>
+
+          {/* Stats row */}
+          <div
+            className={`mt-6 flex items-center gap-4 text-[13px] ${
+              isActive ? 'text-zinc-500' : 'text-zinc-400'
+            }`}
+          >
+            <div className="flex items-center gap-1.5">
+              <div
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isActive ? 'bg-zinc-500' : 'bg-zinc-300'
+                }`}
+              />
+              <span>{report.patents} patents</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isActive ? 'bg-zinc-500' : 'bg-zinc-300'
+                }`}
+              />
+              <span>{report.papers} papers</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div
+                className={`h-1.5 w-1.5 rounded-full ${
+                  isActive ? 'bg-zinc-500' : 'bg-zinc-300'
+                }`}
+              />
+              <span>{report.readTime}</span>
+            </div>
+          </div>
+
+          {/* Arrow indicator */}
+          <div
+            className={`absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-300 ${
+              isActive
+                ? 'translate-x-0 opacity-100'
+                : 'translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-50'
+            }`}
+          >
+            <ArrowRight
+              className={`h-5 w-5 ${isActive ? 'text-white' : 'text-zinc-400'}`}
+            />
+          </div>
+        </div>
       </div>
-    </button>
+
+      {/* Active indicator line */}
+      {isActive && (
+        <motion.div
+          layoutId="activeIndicator"
+          className="absolute -bottom-3 left-1/2 h-1 w-12 -translate-x-1/2 rounded-full bg-zinc-900"
+          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        />
+      )}
+    </motion.button>
   );
 }
