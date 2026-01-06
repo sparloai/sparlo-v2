@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { enhanceRouteHandler } from '@kit/next/routes';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import { renderReportToHtml } from '../print/_lib/render-report-html';
 

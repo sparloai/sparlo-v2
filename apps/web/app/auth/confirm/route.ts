@@ -5,11 +5,18 @@ import { createAuthCallbackService } from '@kit/supabase/auth';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import pathsConfig from '~/config/paths.config';
-import {
-  getAppSubdomainUrl,
-  isAppPath,
-  isValidRedirectPath,
-} from '~/config/subdomain.config';
+
+/**
+ * Validate redirect path to prevent open redirect vulnerabilities.
+ * Only allows relative paths starting with /.
+ */
+function isValidRedirectPath(path: string): boolean {
+  if (typeof path !== 'string') return false;
+  if (!path.startsWith('/')) return false;
+  if (path.startsWith('//')) return false;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(path)) return false;
+  return true;
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,19 +35,12 @@ export async function GET(request: NextRequest) {
         ? callbackRedirect
         : pathsConfig.app.home;
 
-    const isProduction = process.env.NODE_ENV === 'production';
-
     if (authCode) {
       // PKCE flow - use exchangeCodeForSession
       const { nextPath } = await service.exchangeCodeForSession(request, {
         joinTeamPath: pathsConfig.app.joinTeam,
         redirectPath,
       });
-
-      // Redirect to app subdomain in production for app paths
-      if (isProduction && isAppPath(nextPath)) {
-        return redirect(getAppSubdomainUrl(nextPath));
-      }
 
       return redirect(nextPath);
     } else if (tokenHash) {
@@ -49,17 +49,6 @@ export async function GET(request: NextRequest) {
         joinTeamPath: pathsConfig.app.joinTeam,
         redirectPath,
       });
-
-      // Redirect to app subdomain in production for app paths
-      if (isProduction && isAppPath(url.pathname)) {
-        const appUrl = getAppSubdomainUrl(url.pathname);
-        const finalUrl = new URL(appUrl);
-        // Preserve query params
-        url.searchParams.forEach((value, key) => {
-          finalUrl.searchParams.set(key, value);
-        });
-        return NextResponse.redirect(finalUrl);
-      }
 
       return NextResponse.redirect(url);
     } else {

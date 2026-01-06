@@ -265,7 +265,11 @@ function determineAuthAction(params: {
 
   // Priority 1: No user on private route - redirect to auth
   // Only act on SIGNED_OUT events, not transient states
-  if (!user && event === 'SIGNED_OUT' && isPrivateRoute(pathname, privatePathPrefixes)) {
+  if (
+    !user &&
+    event === 'SIGNED_OUT' &&
+    isPrivateRoute(pathname, privatePathPrefixes)
+  ) {
     const action: AuthAction = onAppSubdomain
       ? { type: 'REDIRECT_TO_MAIN_AUTH' }
       : { type: 'REDIRECT_TO_ROOT' };

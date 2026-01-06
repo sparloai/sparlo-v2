@@ -12,7 +12,7 @@ type AppLinkProps = ComponentProps<typeof Link>;
  * A Link component that automatically converts /home/* paths to clean paths
  * when on the app subdomain (app.sparlo.ai).
  *
- * Usage: Replace `<Link href="/home/reports">` with `<AppLink href="/home/reports">`
+ * Usage: Replace `<Link href="/app/reports">` with `<AppLink href="/app/reports">`
  * On app.sparlo.ai, this renders as `/reports`
  * On sparlo.ai, this renders as `/home/reports`
  */

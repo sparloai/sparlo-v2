@@ -9,10 +9,12 @@ This file contains instructions specific to the main Next.js web application.
 ```
 app/
 ├── (marketing)/          # Public pages (landing, blog, docs)
-├── (auth)/              # Authentication pages
-├── home/
-│   ├── (user)/          # Personal account context
-│   └── [account]/       # Team account context ([account] = team slug)
+├── auth/                 # Authentication pages
+├── app/                  # Protected application routes
+│   ├── page.tsx          # Personal dashboard (default)
+│   ├── reports/          # Personal reports
+│   ├── settings/         # Personal settings
+│   └── [account]/        # Team account context ([account] = team slug)
 ├── admin/               # Super admin section
 └── api/                 # API routes
 ```
@@ -20,8 +22,8 @@ app/
 Key Examples:
 
 - Marketing layout: `app/(marketing)/layout.tsx`
-- Personal dashboard: `app/home/(user)/page.tsx`
-- Team workspace: `app/home/[account]/page.tsx`
+- Personal dashboard: `app/app/page.tsx`
+- Team workspace: `app/app/[account]/page.tsx`
 - Admin section: `app/admin/page.tsx`
 
 ### Component Organization
@@ -32,8 +34,8 @@ Key Examples:
 
 Example:
 
-- Team components: `app/home/[account]/_components/`
-- Team server utils: `app/home/[account]/_lib/server/`
+- Team components: `app/app/[account]/_components/`
+- Team server utils: `app/app/[account]/_lib/server/`
 - Marketing components: `app/(marketing)/_components/`
 
 The `[account]` parameter is the `accounts.slug` property, not the ID
@@ -212,7 +214,7 @@ import { Trans } from '@kit/ui/trans';
 
 ## Workspace Contexts 🏢
 
-### Personal Account Context (`app/home/(user)`)
+### Personal Account Context (`app/app/`)
 
 ```tsx
 import { useUserWorkspace } from '@kit/accounts/hooks/use-user-workspace';
@@ -225,7 +227,7 @@ function PersonalComponent() {
 
 Context provider: `@packages/features/accounts/src/components/user-workspace-context-provider.tsx`
 
-### Team Account Context (`app/home/[account]`)
+### Team Account Context (`app/app/[account]`)
 
 ```tsx
 import { useTeamAccountWorkspace } from '@kit/team-accounts/hooks/use-team-account-workspace';
@@ -299,8 +301,8 @@ export const POST = enhanceRouteHandler(
 ```typescript
 // config/paths.config.ts
 app: {
-  yourFeaturePath: '/home/your-feature',
-  yourTeamFeaturePath: '/home/[account]/your-feature',
+  yourFeaturePath: '/app/your-feature',
+  yourTeamFeaturePath: '/app/[account]/your-feature',
 }
 ```
 

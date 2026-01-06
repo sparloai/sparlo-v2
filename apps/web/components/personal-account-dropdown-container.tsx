@@ -12,7 +12,7 @@ const paths = {
   home: pathsConfig.app.home,
   settings: pathsConfig.app.personalAccountSettings,
   billing: pathsConfig.app.personalAccountBilling,
-  help: '/home/help',
+  help: '/app/help',
 };
 
 const features = {

@@ -1,4 +1,4 @@
-import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 export const ENERGY_HYBRID_REPORT: HybridReportData = {
   title: '8-Hour Refrigerated EV Routes on 5-8 kWh Total Draw',

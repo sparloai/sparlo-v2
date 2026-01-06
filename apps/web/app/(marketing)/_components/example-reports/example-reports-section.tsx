@@ -11,12 +11,12 @@ import {
   BrandSystemReport,
   type TocSection,
   generateTocSections,
-} from '~/home/(user)/reports/[id]/_components/brand-system';
+} from '~/app/reports/[id]/_components/brand-system';
 import {
   flattenSectionIds,
   useTocScroll,
-} from '~/home/(user)/reports/[id]/_lib/hooks/use-toc-scroll';
-import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+} from '~/app/reports/[id]/_lib/hooks/use-toc-scroll';
+import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import type { Mode } from '../mode-tabs';
 import { BIOTECH_HYBRID_REPORT } from './biotech-hybrid-data';
@@ -87,7 +87,7 @@ export function ExampleReportsSection({ mode }: ExampleReportsSectionProps) {
     setActiveTab(0);
   }
 
-  const report = reports[activeTab]!
+  const report = reports[activeTab]!;
 
   // Get the hybrid report data for current tab
   // For investors mode, map to existing reports via INVESTOR_REPORT_DATA_MAP

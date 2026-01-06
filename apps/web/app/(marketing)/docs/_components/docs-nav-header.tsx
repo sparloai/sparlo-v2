@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { RecentReport } from '~/home/(user)/_lib/server/recent-reports.loader';
+import type { RecentReport } from '~/app/_lib/server/recent-reports.loader';
 
 import { DocsAppSidebar } from './docs-app-sidebar';
 
@@ -34,7 +34,7 @@ export function DocsNavHeader({
         />
 
         {/* Sparlo logo */}
-        <Link href="/home" className="transition-opacity hover:opacity-70">
+        <Link href="/app" className="transition-opacity hover:opacity-70">
           <Image
             src="/images/sparlo-logo.png"
             alt="Sparlo"
