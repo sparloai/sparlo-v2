@@ -30,7 +30,7 @@ export const generateRootMetadata = async (): Promise<Metadata> => {
           url: '/images/og-image.png',
           width: 1200,
           height: 630,
-          alt: 'Sparlo - Engineering Intelligence Model. Innovative solutions to complex technical challenges.',
+          alt: 'Sparlo - Solve engineering problems.',
         },
       ],
     },
