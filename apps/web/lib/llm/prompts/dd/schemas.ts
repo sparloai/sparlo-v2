@@ -544,7 +544,8 @@ export type DD0_M_Output = z.infer<typeof DD0_M_OutputSchema>;
 // DD3 Output Schema - Claim Validation
 // ============================================
 
-export const DD3_M_OutputSchema = z.object({
+// Inner schema for DD3 structured data (used in both old and new formats)
+const DD3_M_StructuredDataSchema = z.object({
   validation_summary: z.object({
     overall_technical_assessment: z.string(),
     critical_claims_status: z.string(),
@@ -756,13 +757,74 @@ export const DD3_M_OutputSchema = z.object({
   }),
 });
 
-export type DD3_M_Output = z.infer<typeof DD3_M_OutputSchema>;
+// Prose output schema for DD3-M (new format)
+const DD3_M_ProseOutputSchema = z.object({
+  technical_deep_dive: z.string(),
+  mechanism_explanation: z.string(),
+});
+
+/**
+ * DD3-M Output Schema - Antifragile
+ *
+ * Accepts BOTH old format (flat structure) AND new format (prose_output + quick_reference).
+ * Uses transform to normalize to a consistent structure.
+ */
+export const DD3_M_OutputSchema = z
+  .unknown()
+  .transform((val): z.infer<typeof DD3_M_StructuredDataSchema> & { prose_output?: z.infer<typeof DD3_M_ProseOutputSchema> } => {
+    if (!val || typeof val !== 'object') {
+      throw new Error('DD3-M output must be an object');
+    }
+
+    const input = val as Record<string, unknown>;
+
+    // Check if new format (has prose_output and quick_reference)
+    if (input.prose_output && input.quick_reference) {
+      console.log('[DD3-M Schema] Detected new format with prose_output + quick_reference');
+      const proseResult = DD3_M_ProseOutputSchema.safeParse(input.prose_output);
+      const structuredResult = DD3_M_StructuredDataSchema.safeParse(input.quick_reference);
+
+      if (!structuredResult.success) {
+        console.warn('[DD3-M Schema] quick_reference validation failed, trying to extract fields:', structuredResult.error.errors.map(e => e.path.join('.')));
+        // Try to parse directly - maybe it's wrapped differently
+        const directResult = DD3_M_StructuredDataSchema.safeParse(val);
+        if (directResult.success) {
+          return {
+            ...directResult.data,
+            prose_output: proseResult.success ? proseResult.data : undefined,
+          };
+        }
+        throw structuredResult.error;
+      }
+
+      return {
+        ...structuredResult.data,
+        prose_output: proseResult.success ? proseResult.data : undefined,
+      };
+    }
+
+    // Old format - parse directly
+    console.log('[DD3-M Schema] Detected old format (flat structure)');
+    const result = DD3_M_StructuredDataSchema.safeParse(val);
+    if (!result.success) {
+      throw result.error;
+    }
+    return result.data;
+  });
+
+export type DD3_M_Output = z.infer<typeof DD3_M_StructuredDataSchema> & {
+  prose_output?: {
+    technical_deep_dive: string;
+    mechanism_explanation: string;
+  };
+};
 
 // ============================================
 // DD3.5 Output Schema - Commercialization Reality Check
 // ============================================
 
-export const DD3_5_M_OutputSchema = z.object({
+// Inner schema for DD3.5 structured data (used in both old and new formats)
+const DD3_5_M_StructuredDataSchema = z.object({
   commercialization_summary: z.object({
     overall_verdict: CommercialViabilityVerdict,
     confidence: Confidence,
@@ -1234,13 +1296,72 @@ export const DD3_5_M_OutputSchema = z.object({
   }),
 });
 
-export type DD3_5_M_Output = z.infer<typeof DD3_5_M_OutputSchema>;
+// Prose output schema for DD3.5-M (new format)
+const DD3_5_M_ProseOutputSchema = z.object({
+  commercialization_narrative: z.string(),
+});
+
+/**
+ * DD3.5-M Output Schema - Antifragile
+ *
+ * Accepts BOTH old format (flat structure) AND new format (prose_output + detailed_analysis).
+ * Uses transform to normalize to a consistent structure.
+ */
+export const DD3_5_M_OutputSchema = z
+  .unknown()
+  .transform((val): z.infer<typeof DD3_5_M_StructuredDataSchema> & { prose_output?: z.infer<typeof DD3_5_M_ProseOutputSchema> } => {
+    if (!val || typeof val !== 'object') {
+      throw new Error('DD3.5-M output must be an object');
+    }
+
+    const input = val as Record<string, unknown>;
+
+    // Check if new format (has prose_output and detailed_analysis)
+    if (input.prose_output && input.detailed_analysis) {
+      console.log('[DD3.5-M Schema] Detected new format with prose_output + detailed_analysis');
+      const proseResult = DD3_5_M_ProseOutputSchema.safeParse(input.prose_output);
+      const structuredResult = DD3_5_M_StructuredDataSchema.safeParse(input.detailed_analysis);
+
+      if (!structuredResult.success) {
+        console.warn('[DD3.5-M Schema] detailed_analysis validation failed:', structuredResult.error.errors.map(e => e.path.join('.')));
+        // Try to parse directly
+        const directResult = DD3_5_M_StructuredDataSchema.safeParse(val);
+        if (directResult.success) {
+          return {
+            ...directResult.data,
+            prose_output: proseResult.success ? proseResult.data : undefined,
+          };
+        }
+        throw structuredResult.error;
+      }
+
+      return {
+        ...structuredResult.data,
+        prose_output: proseResult.success ? proseResult.data : undefined,
+      };
+    }
+
+    // Old format - parse directly
+    console.log('[DD3.5-M Schema] Detected old format (flat structure)');
+    const result = DD3_5_M_StructuredDataSchema.safeParse(val);
+    if (!result.success) {
+      throw result.error;
+    }
+    return result.data;
+  });
+
+export type DD3_5_M_Output = z.infer<typeof DD3_5_M_StructuredDataSchema> & {
+  prose_output?: {
+    commercialization_narrative: string;
+  };
+};
 
 // ============================================
 // DD4 Output Schema - Solution Space Mapping
 // ============================================
 
-export const DD4_M_OutputSchema = z.object({
+// Inner schema for DD4 structured data (used in both old and new formats)
+const DD4_M_StructuredDataSchema = z.object({
   solution_space_position: z.object({
     primary_track: Track,
     track_rationale: z.string(),
@@ -1618,15 +1739,76 @@ export const DD4_M_OutputSchema = z.object({
   }),
 });
 
-export type DD4_M_Output = z.infer<typeof DD4_M_OutputSchema>;
+// Prose output schema for DD4-M (new format)
+const DD4_M_ProseOutputSchema = z.object({
+  solution_landscape_narrative: z.string(),
+  strategic_synthesis: z.string(),
+});
+
+/**
+ * DD4-M Output Schema - Antifragile
+ *
+ * Accepts BOTH old format (flat structure) AND new format (prose_output + detailed_analysis).
+ * Uses transform to normalize to a consistent structure.
+ */
+export const DD4_M_OutputSchema = z
+  .unknown()
+  .transform((val): z.infer<typeof DD4_M_StructuredDataSchema> & { prose_output?: z.infer<typeof DD4_M_ProseOutputSchema> } => {
+    if (!val || typeof val !== 'object') {
+      throw new Error('DD4-M output must be an object');
+    }
+
+    const input = val as Record<string, unknown>;
+
+    // Check if new format (has prose_output and detailed_analysis)
+    if (input.prose_output && input.detailed_analysis) {
+      console.log('[DD4-M Schema] Detected new format with prose_output + detailed_analysis');
+      const proseResult = DD4_M_ProseOutputSchema.safeParse(input.prose_output);
+      const structuredResult = DD4_M_StructuredDataSchema.safeParse(input.detailed_analysis);
+
+      if (!structuredResult.success) {
+        console.warn('[DD4-M Schema] detailed_analysis validation failed:', structuredResult.error.errors.map(e => e.path.join('.')));
+        // Try to parse directly
+        const directResult = DD4_M_StructuredDataSchema.safeParse(val);
+        if (directResult.success) {
+          return {
+            ...directResult.data,
+            prose_output: proseResult.success ? proseResult.data : undefined,
+          };
+        }
+        throw structuredResult.error;
+      }
+
+      return {
+        ...structuredResult.data,
+        prose_output: proseResult.success ? proseResult.data : undefined,
+      };
+    }
+
+    // Old format - parse directly
+    console.log('[DD4-M Schema] Detected old format (flat structure)');
+    const result = DD4_M_StructuredDataSchema.safeParse(val);
+    if (!result.success) {
+      throw result.error;
+    }
+    return result.data;
+  });
+
+export type DD4_M_Output = z.infer<typeof DD4_M_StructuredDataSchema> & {
+  prose_output?: {
+    solution_landscape_narrative: string;
+    strategic_synthesis: string;
+  };
+};
 
 // ============================================
 // DD5 Output Schema - DD Report (V2 Comprehensive)
 // ============================================
 
-export const DD5_M_OutputSchema = z.object({
+// Inner schema for DD5 old format structured data
+const DD5_M_OldFormatSchema = z.object({
   header: z.object({
-    report_type: z.literal('Technical Due Diligence Report'),
+    report_type: z.string(), // Made flexible - was z.literal('Technical Due Diligence Report')
     company_name: z.string(),
     technology_domain: z.string(),
     date: z.string(),
@@ -2192,4 +2374,197 @@ export const DD5_M_OutputSchema = z.object({
   }),
 });
 
-export type DD5_M_Output = z.infer<typeof DD5_M_OutputSchema>;
+// New format prose report schema for DD5-M
+const DD5_M_ProseReportSchema = z.object({
+  problem_primer: z.object({
+    content: z.string(),
+    source: z.string(),
+  }),
+  technical_deep_dive: z.object({
+    content: z.string(),
+    source: z.string(),
+  }),
+  solution_landscape: z.object({
+    content: z.string(),
+    source: z.string(),
+  }),
+  commercialization_reality: z.object({
+    content: z.string(),
+    source: z.string(),
+  }),
+  investment_synthesis: z.object({
+    content: z.string(),
+    source: z.string(),
+  }),
+});
+
+// New format quick reference schema for DD5-M
+const DD5_M_QuickReferenceSchema = z.object({
+  one_page_summary: z.object({
+    company: z.string(),
+    sector: z.string(),
+    stage: z.string(),
+    ask: z.string(),
+    one_sentence: z.string(),
+    verdict_box: z.object({
+      technical_validity: z.object({
+        verdict: MechanismVerdict,
+        symbol: z.string(),
+      }),
+      commercial_viability: z.object({
+        verdict: flexibleEnum(['CLEAR_PATH', 'CHALLENGING', 'UNLIKELY'], 'CHALLENGING'),
+        symbol: z.string(),
+      }),
+      solution_space_position: z.object({
+        verdict: flexibleEnum(['OPTIMAL', 'REASONABLE', 'SUBOPTIMAL'], 'REASONABLE'),
+        symbol: z.string(),
+      }),
+      moat_strength: z.object({
+        verdict: MoatStrength,
+        symbol: z.string(),
+      }),
+      timing: z.object({
+        verdict: flexibleEnum(['RIGHT_TIME', 'EARLY', 'LATE'], 'EARLY'),
+        symbol: z.string(),
+      }),
+      overall: OverallVerdict,
+    }),
+    the_bet: z.string(),
+    bull_case_2_sentences: z.string(),
+    bear_case_2_sentences: z.string(),
+    key_strength: z.string(),
+    key_risk: z.string(),
+    key_question: z.string(),
+    expected_return: z.string(),
+    closest_comparable: z.string(),
+    if_you_do_one_thing: z.string(),
+    executive_paragraph: z.string(),
+  }),
+  scores: z.object({
+    technical_credibility: z.object({
+      score: flexibleNumber(0),
+      out_of: flexibleNumber(0),
+      one_liner: z.string(),
+    }),
+    commercial_viability: z.object({
+      score: flexibleNumber(0),
+      out_of: flexibleNumber(0),
+      one_liner: z.string(),
+    }),
+    moat_strength: z.object({
+      score: flexibleNumber(0),
+      out_of: flexibleNumber(0),
+      one_liner: z.string(),
+    }),
+  }),
+  scenarios: z.object({
+    bull_case: z.object({
+      probability: z.string(),
+      narrative: z.string(),
+      return: z.string(),
+    }),
+    base_case: z.object({
+      probability: z.string(),
+      narrative: z.string(),
+      return: z.string(),
+    }),
+    bear_case: z.object({
+      probability: z.string(),
+      narrative: z.string(),
+      return: z.string(),
+    }),
+    expected_value: z.object({
+      weighted_multiple: z.string(),
+      assessment: z.string(),
+    }),
+  }),
+  key_risks: z.array(z.object({
+    risk: z.string(),
+    severity: Severity,
+    mitigation: z.string(),
+  })),
+  founder_questions: z.array(z.object({
+    question: z.string(),
+    why_critical: z.string(),
+    good_answer: z.string(),
+    bad_answer: z.string(),
+  })),
+  diligence_roadmap: z.array(z.object({
+    action: z.string(),
+    purpose: z.string(),
+    priority: ValidationPriority,
+  })),
+});
+
+// New format appendix schema for DD5-M (flexible - many fields optional)
+const DD5_M_AppendixSchema = z.object({
+  detailed_claim_validation: z.array(z.object({
+    claim: z.string(),
+    verdict: z.string(),
+    confidence: z.string(),
+    plain_english: z.string(),
+    full_reasoning: z.string(),
+  })).optional(),
+  detailed_solution_space: z.object({
+    simpler_path: z.array(z.unknown()),
+    best_fit: z.array(z.unknown()),
+    paradigm_shift: z.array(z.unknown()),
+    frontier_transfer: z.array(z.unknown()),
+  }).optional(),
+  detailed_commercial_analysis: z.unknown().optional(),
+  comparable_details: z.array(z.unknown()).optional(),
+  all_founder_questions: z.unknown().optional(),
+  full_diligence_roadmap: z.unknown().optional(),
+}).passthrough(); // Allow additional fields
+
+// New format schema for DD5-M
+const DD5_M_NewFormatSchema = z.object({
+  report_metadata: z.object({
+    company_name: z.string(),
+    date: z.string(),
+    version: z.string(),
+  }),
+  prose_report: DD5_M_ProseReportSchema,
+  quick_reference: DD5_M_QuickReferenceSchema,
+  appendix: DD5_M_AppendixSchema.optional(),
+});
+
+/**
+ * DD5-M Output Schema - Antifragile
+ *
+ * Accepts BOTH old format (comprehensive flat structure) AND new format (prose_report + quick_reference + appendix).
+ * Uses transform to normalize and pass through.
+ */
+export const DD5_M_OutputSchema = z
+  .unknown()
+  .transform((val): z.infer<typeof DD5_M_OldFormatSchema> | z.infer<typeof DD5_M_NewFormatSchema> => {
+    if (!val || typeof val !== 'object') {
+      throw new Error('DD5-M output must be an object');
+    }
+
+    const input = val as Record<string, unknown>;
+
+    // Check if new format (has prose_report and quick_reference)
+    if (input.prose_report && input.quick_reference) {
+      console.log('[DD5-M Schema] Detected new format with prose_report + quick_reference');
+      const newFormatResult = DD5_M_NewFormatSchema.safeParse(val);
+      if (newFormatResult.success) {
+        return newFormatResult.data;
+      }
+      console.warn('[DD5-M Schema] New format validation failed:', newFormatResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).slice(0, 5));
+      // Fall through to try old format
+    }
+
+    // Try old format
+    console.log('[DD5-M Schema] Trying old format (comprehensive structure)');
+    const oldFormatResult = DD5_M_OldFormatSchema.safeParse(val);
+    if (oldFormatResult.success) {
+      return oldFormatResult.data;
+    }
+
+    // If both fail, throw the old format error (more descriptive for existing reports)
+    console.error('[DD5-M Schema] Both formats failed');
+    throw oldFormatResult.error;
+  });
+
+export type DD5_M_Output = z.infer<typeof DD5_M_OldFormatSchema> | z.infer<typeof DD5_M_NewFormatSchema>;
