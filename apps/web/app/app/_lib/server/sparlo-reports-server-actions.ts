@@ -630,13 +630,16 @@ export const answerClarification = enhanceAction(
     type ClarificationEventName =
       | 'report/clarification-answered'
       | 'report/discovery-clarification-answered'
-      | 'report/hybrid-clarification-answered';
+      | 'report/hybrid-clarification-answered'
+      | 'report/dd-clarification-answered';
 
     let eventName: ClarificationEventName = 'report/clarification-answered';
     if (mode === 'discovery') {
       eventName = 'report/discovery-clarification-answered';
     } else if (mode === 'hybrid') {
       eventName = 'report/hybrid-clarification-answered';
+    } else if (mode === 'dd') {
+      eventName = 'report/dd-clarification-answered';
     }
 
     console.log('[Clarify Server Action] Report ID:', data.reportId);
