@@ -45,7 +45,6 @@ import {
   createInitialChainState,
 } from '../../llm/schemas/chain-state';
 import { inngest } from '../client';
-import { handleReportFailure } from '../utils/report-failure-handler';
 import { persistStepTokens, billCompletedStepsOnFailure } from '../utils/step-tokens';
 
 /**
@@ -71,7 +70,7 @@ export const generateReport = inngest.createFunction(
         match: 'data.reportId',
       },
     ],
-    onFailure: async ({ error, event, step }) => {
+    onFailure: async ({ error: _error, event, step }) => {
       const failureEvent = event as unknown as {
         event: { data: { reportId: string; accountId: string } };
       };
