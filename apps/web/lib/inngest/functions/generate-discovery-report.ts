@@ -110,7 +110,7 @@ export const generateDiscoveryReport = inngest.createFunction(
           data: a.data,
         }));
 
-      const supabase = getSupabaseServerAdminClient();
+      const _supabase = getSupabaseServerAdminClient();
       console.log('[Discovery Function] Supabase client initialized');
 
       // Handle ClaudeRefusalError at the top level

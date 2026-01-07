@@ -46,6 +46,7 @@ import {
 } from '../../llm/schemas/chain-state';
 import { inngest } from '../client';
 import { handleReportFailure } from '../utils/report-failure-handler';
+import { persistStepTokens, billCompletedStepsOnFailure } from '../utils/step-tokens';
 
 /**
  * Generate Report - Inngest Durable Function (v10)
@@ -72,10 +73,18 @@ export const generateReport = inngest.createFunction(
     ],
     onFailure: async ({ error, event, step }) => {
       const failureEvent = event as unknown as {
-        event: { data: { reportId: string } };
+        event: { data: { reportId: string; accountId: string } };
       };
-      const reportId = failureEvent.event.data.reportId;
-      await handleReportFailure(reportId, error, step);
+      const { reportId, accountId } = failureEvent.event.data;
+
+      // Bill for completed steps (partial billing on failure)
+      await step.run('bill-completed-steps', async () => {
+        await billCompletedStepsOnFailure(
+          reportId,
+          accountId,
+          'Your report failed. You were only charged for completed steps. Please try again or contact support.',
+        );
+      });
     },
   },
   { event: 'report/generate' },
@@ -101,7 +110,7 @@ export const generateReport = inngest.createFunction(
         attachments,
       } = event.data;
 
-      const supabase = getSupabaseServerAdminClient();
+      const _supabase = getSupabaseServerAdminClient();
 
       // Convert attachments to ImageAttachment format for Claude vision
       type ImageAttachment = {
@@ -229,6 +238,9 @@ export const generateReport = inngest.createFunction(
           const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
           const validated = AN0OutputSchema.parse(parsed);
 
+          // Persist step tokens for partial billing
+          await persistStepTokens(reportId, 'an0', usage);
+
           await updateProgress({ phase_progress: 100 });
 
           return { result: validated, usage };
@@ -311,6 +323,10 @@ export const generateReport = inngest.createFunction(
                 });
 
                 const parsed = parseJsonResponse<AN0Output>(content, 'AN0');
+
+                // Persist retry tokens (updates an0 with combined usage)
+                await persistStepTokens(reportId, 'an0-retry', usage);
+
                 return { result: AN0OutputSchema.parse(parsed), usage };
               },
             );
@@ -433,6 +449,9 @@ export const generateReport = inngest.createFunction(
               const parsed = parseJsonResponse<AN1_5_Output>(content, 'AN1.5');
               const validated = AN1_5_OutputSchema.parse(parsed);
 
+              // Persist step tokens for partial billing
+              await persistStepTokens(reportId, 'an1.5', usage);
+
               await updateProgress({ phase_progress: 100 });
 
               return { result: validated, usage };
@@ -482,6 +501,9 @@ export const generateReport = inngest.createFunction(
           const parsed = parseJsonResponse<AN1_7_Output>(content, 'AN1.7');
           const validated = AN1_7_OutputSchema.parse(parsed);
 
+          // Persist step tokens for partial billing
+          await persistStepTokens(reportId, 'an1.7', usage);
+
           await updateProgress({ phase_progress: 100 });
 
           return { result: validated, usage };
@@ -525,6 +547,9 @@ export const generateReport = inngest.createFunction(
             const parsed = parseJsonResponse<AN2Output>(content, 'AN2');
             const validated = AN2OutputSchema.parse(parsed);
 
+            // Persist step tokens for partial billing
+            await persistStepTokens(reportId, 'an2', usage);
+
             await updateProgress({ phase_progress: 100 });
 
             return { result: validated, usage };
@@ -566,6 +591,9 @@ export const generateReport = inngest.createFunction(
           const parsed = parseJsonResponse<AN3Output>(content, 'AN3');
           const validated = AN3OutputSchema.parse(parsed);
 
+          // Persist step tokens for partial billing
+          await persistStepTokens(reportId, 'an3', usage);
+
           await updateProgress({ phase_progress: 100 });
 
           return { result: validated, usage };
@@ -606,6 +634,9 @@ export const generateReport = inngest.createFunction(
 
           const parsed = parseJsonResponse<AN4Output>(content, 'AN4');
           const validated = AN4OutputSchema.parse(parsed);
+
+          // Persist step tokens for partial billing
+          await persistStepTokens(reportId, 'an4', usage);
 
           await updateProgress({ phase_progress: 100 });
 
@@ -650,6 +681,9 @@ export const generateReport = inngest.createFunction(
           const parsed = parseJsonResponse<AN5Output>(content, 'AN5');
           const validated = AN5OutputSchema.parse(parsed);
 
+          // Persist step tokens for partial billing
+          await persistStepTokens(reportId, 'an5', usage);
+
           await updateProgress({ phase_progress: 100 });
 
           return { result: validated, usage };
@@ -680,15 +714,30 @@ export const generateReport = inngest.createFunction(
         const totalUsage = calculateTotalUsage(allUsages, stepNames);
 
         await step.run('complete-report', async () => {
-          // Persist token usage to database (P0-081 fix)
-          // P1 FIX: Use fresh client to avoid stale reference issues in nested async callbacks
+          // Bill for tokens using step_tokens (source of truth for partial billing)
+          // Falls back to in-memory totalUsage if step_tokens fails
+          const freshSupabase = getSupabaseServerAdminClient();
+
+          // Read step_tokens to get actual persisted usage
+          const { data: report } = await freshSupabase
+            .from('sparlo_reports')
+            .select('step_tokens')
+            .eq('id', reportId)
+            .single();
+
+          // Type assertion needed until types are regenerated after migration
+          const stepTokens = ((report as { step_tokens?: Record<string, number> } | null)?.step_tokens) ?? {};
+          const persistedTotal = Object.values(stepTokens).reduce((sum, t) => sum + (t || 0), 0);
+
+          // Use persisted tokens if available, otherwise fall back to in-memory
+          const tokensToCharge = persistedTotal > 0 ? persistedTotal : totalUsage.totalTokens;
+
           try {
-            const freshSupabase = getSupabaseServerAdminClient();
             const { error: usageError } = await freshSupabase.rpc(
               'increment_usage',
               {
                 p_account_id: accountId,
-                p_tokens: totalUsage.totalTokens,
+                p_tokens: tokensToCharge,
                 p_is_report: true,
                 p_is_chat: false,
               },
@@ -698,7 +747,8 @@ export const generateReport = inngest.createFunction(
             } else {
               console.log('[Usage] Persisted:', {
                 accountId,
-                tokens: totalUsage.totalTokens,
+                tokens: tokensToCharge,
+                source: persistedTotal > 0 ? 'step_tokens' : 'in_memory',
                 costUsd: totalUsage.costUsd,
               });
             }

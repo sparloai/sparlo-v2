@@ -20,7 +20,7 @@
  */
 import { lazy, memo, Suspense, useMemo } from 'react';
 
-import { ChevronDown, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 import {

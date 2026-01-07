@@ -11,12 +11,12 @@ import {
   useScroll,
   useTransform,
 } from 'framer-motion';
-import { ArrowRight, ChevronDown, List, X } from 'lucide-react';
+import { ArrowRight, List, X } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
 
 import BrandSystemReport from '~/app/reports/[id]/_components/brand-system/brand-system-report';
-import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
+import type { HybridReportData as _HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import { exampleReportsConfig } from './data/example-reports-data';
 

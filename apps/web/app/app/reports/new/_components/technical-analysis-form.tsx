@@ -155,7 +155,7 @@ export function TechnicalAnalysisForm({
     problemText,
     clarificationResponse,
     clarifyingQuestion,
-    reportId,
+    reportId: _reportId,
     isSubmitting,
     error,
     showRefusalWarning,

@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import type { Variants } from 'framer-motion';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertTriangle, ArrowRight, Check, Loader2, Send } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Check, Loader2 } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
 import { usePrefersReducedMotion } from '@kit/ui/hooks';

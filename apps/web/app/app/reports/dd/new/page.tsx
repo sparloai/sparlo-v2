@@ -157,11 +157,11 @@ export default function DDNewReportPage() {
   const [attachments, setAttachments] = useState<Attachment[]>([]);
 
   const {
-    step,
+    step: _step,
     companyName,
     startupMaterials,
     vcNotes,
-    reportId,
+    reportId: _reportId,
     isSubmitting,
     error,
     showRefusalWarning,

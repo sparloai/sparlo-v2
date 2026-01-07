@@ -26,8 +26,10 @@ module.exports = {
       },
     ],
 
+    // Consolidated no-restricted-syntax rule (all selectors in one array)
     'no-restricted-syntax': [
       'error',
+      // ISSUE 1: Console statements
       {
         selector: 'CallExpression[callee.object.name="console"][callee.property.name="log"]',
         message:
@@ -66,6 +68,19 @@ module.exports = {
         message:
           'Design challenge should not be logged to console. Use logger.debug() with redaction.',
       },
+      // ISSUE 2: Double type casts
+      {
+        selector: 'TSAsExpression > TSAsExpression',
+        message:
+          'Double type casts (as X as Y) bypass type safety. Use type guards, Zod validation, or proper type definitions instead. Common pattern: use z.safeParse() for runtime validation.',
+      },
+      // ISSUE 5: Large default objects
+      {
+        selector:
+          'VariableDeclarator[id.name=/^[A-Z_]+_DEFAULTS?$/] > ObjectExpression',
+        message:
+          'Large default objects should be derived from schemas using factory functions. Define a Zod schema and use z.infer<> for types.',
+      },
     ],
 
     // =================================================================
@@ -91,16 +106,6 @@ module.exports = {
     '@typescript-eslint/no-unsafe-assignment': 'error',
 
     '@typescript-eslint/strict-boolean-expressions': 'error',
-
-    // Custom rule: Forbid double type casts
-    'no-restricted-syntax': [
-      'error',
-      {
-        selector: 'TSAsExpression > TSAsExpression',
-        message:
-          'Double type casts (as X as Y) bypass type safety. Use type guards, Zod validation, or proper type definitions instead. Common pattern: use z.safeParse() for runtime validation.',
-      },
-    ],
 
     // =================================================================
     // ISSUE 3: Duplicated Code Across Schemas
@@ -184,16 +189,6 @@ module.exports = {
       },
     ],
 
-    // Warn on deprecated functions that still exist
-    'no-restricted-syntax': [
-      'warn',
-      {
-        selector: 'JSDocBlock:has(JSDocTag[tag.name="deprecated"])',
-        message:
-          'Deprecated function detected. Verify expiration date is set and remove after deadline.',
-      },
-    ],
-
     // =================================================================
     // ISSUE 5: Large Default Objects
     // =================================================================
@@ -206,17 +201,6 @@ module.exports = {
         ignoreArrayIndexes: true,
         ignoreTypeIndexes: true,
         ignoreDefaultValues: true,
-      },
-    ],
-
-    // Prevent large hardcoded objects
-    'no-restricted-syntax': [
-      'error',
-      {
-        selector:
-          'VariableDeclarator[id.name=/^[A-Z_]+_DEFAULTS?$/] > ObjectExpression',
-        message:
-          'Large default objects should be derived from schemas using factory functions. Define a Zod schema and use z.infer<> for types.',
       },
     ],
 

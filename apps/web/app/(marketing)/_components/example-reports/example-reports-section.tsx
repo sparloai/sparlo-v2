@@ -23,7 +23,6 @@ import { ShowcaseGallery } from '../showcase-gallery';
 import { BIOTECH_HYBRID_REPORT } from './biotech-hybrid-data';
 import { CARBON_REMOVAL_HYBRID_REPORT } from './carbon-removal-hybrid-data';
 import {
-  EXAMPLE_REPORTS,
   INVESTOR_REPORTS,
   INVESTOR_REPORT_DATA_MAP,
 } from './example-reports-data';
