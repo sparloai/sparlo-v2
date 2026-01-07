@@ -103,9 +103,9 @@ function JourneyConnector() {
   const arrowOpacity = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
 
   return (
-    <div ref={ref} className="flex flex-col items-center py-16 md:py-24">
+    <div ref={ref} className="flex flex-col items-center py-10 md:py-24">
       {/* The track */}
-      <div className="relative h-32 w-px md:h-40">
+      <div className="relative h-20 w-px md:h-40">
         {/* Background track */}
         <div className="absolute inset-0 bg-zinc-200" />
 
@@ -166,7 +166,7 @@ function StepLabel({ number, label }: { number: string; label: string }) {
 
 export const ProcessAnimation = memo(function ProcessAnimation() {
   return (
-    <section className="bg-zinc-50 px-6 py-32 md:py-40">
+    <section className="bg-zinc-50 px-6 py-20 md:py-40">
       <div className="mx-auto max-w-3xl">
         {/* Section Header */}
         <motion.div
@@ -174,7 +174,7 @@ export const ProcessAnimation = memo(function ProcessAnimation() {
           whileInView="visible"
           viewport={{ once: true, margin: '-100px' }}
           variants={fadeInUp}
-          className="mb-24 text-center md:mb-32"
+          className="mb-16 text-center md:mb-32"
         >
           <p className="font-mono text-[12px] font-medium tracking-[0.3em] text-zinc-400 uppercase">
             The Process

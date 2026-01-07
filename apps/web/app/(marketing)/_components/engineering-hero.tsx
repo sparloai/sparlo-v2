@@ -99,13 +99,13 @@ export const EngineeringHero = memo(function EngineeringHero() {
         {/* CTA */}
         <Link
           href="/app"
-          className="font-heading mt-10 inline-flex min-h-[44px] items-center bg-white px-8 py-3.5 text-base leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:bg-zinc-100"
+          className="font-heading mt-10 inline-flex min-h-[44px] items-center rounded-md bg-white px-8 py-3.5 text-base leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 shadow-lg transition-all hover:bg-zinc-100 hover:shadow-xl"
         >
           Run Analysis
         </Link>
 
-        {/* Value Prop */}
-        <p className="mt-3 text-base tracking-[-0.02em] text-white/50">
+        {/* Value Prop - More prominent */}
+        <p className="mt-4 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium tracking-[-0.02em] text-white/80 backdrop-blur-sm">
           First Report Free
         </p>
       </div>

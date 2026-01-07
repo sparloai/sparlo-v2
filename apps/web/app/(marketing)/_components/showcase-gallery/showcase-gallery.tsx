@@ -132,21 +132,30 @@ function SectionPreviewContent({
 
 /**
  * Section Card Component - Individual expandable card
+ *
+ * Technical document aesthetic:
+ * - Left border accent (Sparlo signature pattern)
+ * - Monospace metrics for data precision
+ * - Section numbering for document structure
+ * - Sharp corners on left, rounded on right
  */
 const SectionCard = memo(function SectionCard({
   section,
   data,
+  index,
 }: {
   section: SectionConfig;
   data: HybridReportData;
+  index: number;
 }) {
   const headline = section.getHeadline(data);
   const metrics = section.getMetrics(data);
+  const sectionNumber = String(index + 1).padStart(2, '0');
 
   return (
     <AccordionItem
       value={section.id}
-      className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm"
+      className="group overflow-hidden rounded-r-lg border border-l-2 border-zinc-200 border-l-zinc-300 bg-white transition-colors data-[state=open]:border-l-zinc-900"
     >
       <AccordionTrigger
         className={cn(
@@ -158,26 +167,31 @@ const SectionCard = memo(function SectionCard({
         )}
       >
         <div className="min-w-0 flex-1 text-left">
-          {/* Section Title */}
-          <span className="text-[13px] font-semibold uppercase tracking-[0.06em] text-zinc-500">
-            {section.title}
-          </span>
+          {/* Section Header with Number */}
+          <div className="flex items-baseline gap-3">
+            <span className="font-mono text-[11px] font-medium text-zinc-400">
+              {sectionNumber}
+            </span>
+            <span className="text-[13px] font-semibold uppercase tracking-[0.06em] text-zinc-500">
+              {section.title}
+            </span>
+          </div>
 
           {/* Headline Preview */}
-          <p className="mt-1.5 line-clamp-2 text-[15px] leading-snug text-zinc-900">
+          <p className="mt-2 line-clamp-2 text-[15px] leading-snug text-zinc-900">
             {headline}
           </p>
 
-          {/* Metrics */}
+          {/* Metrics - Monospace for technical precision */}
           {metrics.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-3">
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
               {metrics.map((metric, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1.5 text-[13px] text-zinc-500"
+                  className="inline-flex items-center gap-1.5 text-[12px] text-zinc-500"
                 >
-                  <span className="font-medium text-zinc-700">{metric.value}</span>
-                  {metric.label && <span>{metric.label}</span>}
+                  <span className="font-mono font-semibold text-zinc-700">{metric.value}</span>
+                  {metric.label && <span className="text-zinc-400">{metric.label}</span>}
                 </span>
               ))}
             </div>
@@ -185,7 +199,7 @@ const SectionCard = memo(function SectionCard({
         </div>
       </AccordionTrigger>
 
-      <AccordionContent className="border-t border-zinc-100 px-6 pb-6 pt-4">
+      <AccordionContent className="border-t border-zinc-100 bg-zinc-50/30 px-6 pb-6 pt-4">
         <SectionPreviewContent sectionId={section.id} data={data} />
       </AccordionContent>
     </AccordionItem>
@@ -290,8 +304,8 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
           className="sticky top-16 z-40 h-auto w-full justify-start rounded-none border-y border-zinc-200 bg-white/95 px-0 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95"
           aria-label="Select a report"
         >
-          <div className="mx-auto max-w-4xl w-full px-4">
-            <div className="no-scrollbar flex gap-1 overflow-x-auto py-3">
+          <div className="relative mx-auto max-w-4xl w-full">
+            <div className="no-scrollbar flex gap-1 overflow-x-auto px-4 py-3">
               {REPORTS_CONFIG.map((report) => {
                 const isActive = state.activeReportId === report.id;
                 return (
@@ -324,15 +338,26 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
                 );
               })}
             </div>
+            {/* Scroll fade indicator - hints at more content */}
+            <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-white via-white/80 to-transparent lg:hidden" />
           </div>
         </TabsList>
       </Tabs>
 
       {/* Main Content Area */}
       <div className="mx-auto max-w-4xl px-4 py-10">
-        {/* Report Title */}
-        <div className="mb-8">
-          <h3 className="text-[24px] font-semibold tracking-[-0.02em] text-zinc-900 md:text-[28px]">
+        {/* Report Header - Technical document style */}
+        <div className="mb-10 border-l-2 border-zinc-900 pl-6">
+          {/* Document metadata bar */}
+          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-zinc-400">
+            <span>INNOVATION INTELLIGENCE REPORT</span>
+            <span className="text-zinc-300">·</span>
+            <span>~25 min analysis</span>
+            <span className="text-zinc-300">·</span>
+            <span>47 domains searched</span>
+          </div>
+
+          <h3 className="text-[22px] font-semibold leading-tight tracking-[-0.02em] text-zinc-900 md:text-[26px]">
             {reportData.title}
           </h3>
           {reportData.brief && (
@@ -348,52 +373,61 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
           value={expandedSection ?? undefined}
           onValueChange={(v: string) => actions.expandSection(v as SectionId)}
           collapsible
-          className="space-y-4"
+          className="space-y-3"
         >
-          {availableSections.map((section) => (
+          {availableSections.map((section, index) => (
             <SectionCard
               key={section.id}
               section={section}
               data={reportData}
+              index={index}
             />
           ))}
         </Accordion>
 
         {/* View Full Report CTA */}
-        <div className="mt-10 flex flex-col items-center gap-4 border-t border-zinc-200 pt-10">
-          <p className="text-center text-[15px] text-zinc-600">
-            Want to see the complete analysis with all details?
-          </p>
-          <Button
-            onClick={() => actions.openModal()}
-            className="inline-flex items-center gap-2"
-          >
-            View Full Report
-            <ExternalLink className="h-4 w-4" />
-          </Button>
+        <div className="mt-8 border-t border-zinc-200 pt-8">
+          <div className="flex items-center justify-between">
+            <div className="font-mono text-[11px] text-zinc-400">
+              <span>10 SECTIONS</span>
+              <span className="mx-2 text-zinc-300">·</span>
+              <span>~24 PAGES</span>
+            </div>
+            <Button
+              onClick={() => actions.openModal()}
+              variant="outline"
+              className="inline-flex items-center gap-2 font-mono text-[13px]"
+            >
+              OPEN FULL REPORT
+              <ExternalLink className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
 
         {/* Exit Ramp CTA */}
-        <div className="mt-16 rounded-xl border border-zinc-200 bg-zinc-50 p-8 text-center">
-          <h4 className="text-[20px] font-semibold tracking-[-0.02em] text-zinc-900">
-            Ready to get reports like this for your challenges?
+        <div className="mt-16 rounded-r-lg border border-l-2 border-zinc-200 border-l-zinc-900 bg-zinc-50 p-8">
+          <div className="font-mono text-[11px] tracking-wide text-zinc-400">
+            RUN YOUR OWN ANALYSIS
+          </div>
+          <h4 className="mt-2 text-[20px] font-semibold tracking-[-0.02em] text-zinc-900">
+            Get reports like this for your technical challenges
           </h4>
-          <p className="mx-auto mt-3 max-w-md text-[15px] text-zinc-600">
-            Sparlo delivers in-depth innovation intelligence tailored to your
-            specific technical problems.
+          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-zinc-600">
+            Sparlo searches 47+ technical domains, analyzes patents and papers,
+            and delivers first-principles recommendations in ~25 minutes.
           </p>
-          <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <a
               href="/auth/sign-up"
               className="inline-flex min-h-[44px] items-center rounded-md bg-zinc-900 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-zinc-800"
             >
-              Get Started Free
+              Start Free Analysis
             </a>
             <a
               href="#methodology"
               className="inline-flex min-h-[44px] items-center rounded-md border border-zinc-300 bg-white px-6 py-3 text-base font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
             >
-              Learn How It Works
+              View Methodology
             </a>
           </div>
         </div>
