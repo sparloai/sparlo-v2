@@ -28,8 +28,8 @@ grant execute on function public.is_aal2() to authenticated;
 
 /*
 * public.is_super_admin
-* Check if the user is a super admin. 
-* A Super Admin is a user that has the role 'super-admin' and has MFA enabled.
+* Check if the user is a super admin.
+* A Super Admin is a user that has the role 'super-admin'.
 */
 create
     or replace function public.is_super_admin() returns boolean
@@ -39,10 +39,6 @@ $$
 declare
     is_super_admin boolean;
 begin
-    if not public.is_aal2() then
-        return false;
-    end if;
-
     select (auth.jwt() ->> 'app_metadata')::jsonb ->> 'role' = 'super-admin' into is_super_admin;
 
     return coalesce(is_super_admin, false);

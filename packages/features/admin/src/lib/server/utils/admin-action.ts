@@ -1,5 +1,3 @@
-import { notFound } from 'next/navigation';
-
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { isSuperAdmin } from './is-super-admin';
@@ -14,7 +12,7 @@ export function adminAction<Args, Response>(fn: (params: Args) => Response) {
     const isAdmin = await isSuperAdmin(getSupabaseServerClient());
 
     if (!isAdmin) {
-      notFound();
+      throw new Error('Unauthorized: Admin access required');
     }
 
     return fn(params);
