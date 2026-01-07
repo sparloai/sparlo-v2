@@ -841,7 +841,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
           <div className="flex gap-8 py-10">
             {/* Sticky TOC Sidebar - z-30 ensures it goes behind the expanded app sidebar (z-50) */}
             {tocSections.length > 0 && (
-              <aside className="relative z-30 hidden w-56 shrink-0 self-start lg:block">
+              <aside className="relative z-30 hidden w-56 shrink-0 lg:block">
                 <nav
                   className="sticky max-h-[calc(100vh-5rem)] overflow-y-auto"
                   style={{ top: `${TOC_STICKY_TOP}px` }}
