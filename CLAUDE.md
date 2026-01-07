@@ -217,6 +217,8 @@ Do NOT reference archived design docs in `docs/archive/`.
 
 Please use the Task tool to delegate suitable tasks to specialized sub-agents for best handling the task at hand.
 
+**Always use `model: "opus"` when launching subagents** - This ensures high-quality output for complex tasks.
+
 ## LLM Output Schemas (CRITICAL)
 
 **Location**: `apps/web/lib/llm/prompts/*/schemas.ts`
