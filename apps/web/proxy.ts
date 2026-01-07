@@ -5,6 +5,7 @@ import { CsrfError, createCsrfProtect } from '@edge-csrf/nextjs';
 
 import { isSuperAdmin } from '@kit/admin';
 import { getSafeRedirectPath } from '@kit/shared/utils';
+import { checkRequiresMultiFactorAuthentication } from '@kit/supabase/check-requires-mfa';
 import { createMiddlewareClient } from '@kit/supabase/middleware-client';
 
 import appConfig from '~/config/app.config';

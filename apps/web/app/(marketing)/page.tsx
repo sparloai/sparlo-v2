@@ -5,11 +5,14 @@ import { ExampleReportsSection } from './_components/example-reports/example-rep
 import { MethodologySection } from './_components/methodology-section';
 
 function Home() {
+  // Default to 'engineers' mode - mode switching can be added later if needed
+  const mode = 'engineers' as const;
+
   return (
     <>
       <EngineeringHero />
-      <MethodologySection />
-      <ExampleReportsSection />
+      <MethodologySection mode={mode} />
+      <ExampleReportsSection mode={mode} />
     </>
   );
 }
