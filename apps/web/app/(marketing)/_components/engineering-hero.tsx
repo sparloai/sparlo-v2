@@ -93,7 +93,7 @@ export const EngineeringHero = memo(function EngineeringHero() {
 
         {/* Subtitle */}
         <p className="font-heading mt-6 max-w-[45ch] text-[18px] leading-[1.2] font-light tracking-[-0.02em] text-white/70 md:text-[22px]">
-          Sparlo analyzes and solves deep tech problems.
+          Sparlo solves deep tech problems with rigorous first principles thinking.
         </p>
 
         {/* CTA */}
