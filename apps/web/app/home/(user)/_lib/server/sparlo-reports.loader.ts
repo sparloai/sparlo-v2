@@ -45,16 +45,31 @@ export const loadUserReports = cache(async (userId: string) => {
 });
 
 /**
- * Count completed reports for a user
+ * Count completed reports for a user in their current billing period.
+ * For paid users, only counts reports created since period_starts_at.
+ * For free users, counts all reports.
  */
 export const countCompletedReports = cache(async (userId: string) => {
   const client = getSupabaseServerClient();
+
+  // Get subscription's billing period start
+  const { data: sub } = await client
+    .from('subscriptions')
+    .select('period_starts_at')
+    .eq('account_id', userId)
+    .eq('active', true)
+    .single();
+
+  // Free users: count all time. Paid users: count since period start.
+  const periodStart = sub?.period_starts_at || '1970-01-01';
 
   const { count, error } = await client
     .from('sparlo_reports')
     .select('*', { count: 'exact', head: true })
     .eq('account_id', userId)
-    .eq('status', 'complete');
+    .eq('status', 'complete')
+    .eq('archived', false)
+    .gte('created_at', periodStart);
 
   if (error) {
     console.error('Failed to count completed reports:', error);

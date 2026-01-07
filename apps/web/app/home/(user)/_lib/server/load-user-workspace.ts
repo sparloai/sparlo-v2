@@ -16,7 +16,7 @@ const shouldLoadAccounts = featureFlagsConfig.enableTeamAccounts;
 export type UserWorkspace = Awaited<ReturnType<typeof loadUserWorkspace>>;
 
 // Report limits per plan variant ID
-const PLAN_REPORT_LIMITS: Record<string, number> = {
+export const PLAN_REPORT_LIMITS: Record<string, number> = {
   // Free/no subscription
   free: 3,
   // Starter plans
@@ -30,7 +30,17 @@ const PLAN_REPORT_LIMITS: Record<string, number> = {
   price_enterprise_yearly: 999,
 };
 
-const DEFAULT_REPORT_LIMIT = 3;
+export const DEFAULT_REPORT_LIMIT = 3;
+
+/**
+ * Get the report limit for a variant ID
+ */
+export function getReportLimitForVariant(
+  variantId: string | undefined,
+): number {
+  if (!variantId) return DEFAULT_REPORT_LIMIT;
+  return PLAN_REPORT_LIMITS[variantId] ?? DEFAULT_REPORT_LIMIT;
+}
 
 /**
  * @name loadUserWorkspace

@@ -275,6 +275,34 @@ async function getPatterns(request: NextRequest) {
         return protectedRouteHandler(req, res);
       },
     },
+    {
+      // Handle /app/* URLs with same auth logic as /home/*
+      pattern: new URLPattern({ pathname: '/app/*?' }),
+      handler: async (req: NextRequest, res: NextResponse) => {
+        const { data } = await getUser(req, res);
+        const { origin, pathname: next } = req.nextUrl;
+
+        // If user is not logged in, redirect to sign in page.
+        if (!data?.claims) {
+          const signIn = pathsConfig.auth.signIn;
+          const redirectPath = `${signIn}?next=${next}`;
+
+          return NextResponse.redirect(new URL(redirectPath, origin).href);
+        }
+
+        const supabase = createMiddlewareClient(req, res);
+
+        const requiresMultiFactorAuthentication =
+          await checkRequiresMultiFactorAuthentication(supabase);
+
+        // If user requires multi-factor authentication, redirect to MFA page.
+        if (requiresMultiFactorAuthentication) {
+          return NextResponse.redirect(
+            new URL(pathsConfig.auth.verifyMfa, origin).href,
+          );
+        }
+      },
+    },
   ];
 
   // On app subdomain, add a catch-all pattern for protected routes

@@ -142,6 +142,41 @@ async function getRedirects() {
   ];
 }
 
+async function getRewrites() {
+  return [
+    // App URL rewrites - map /app/* to /home/* routes
+    // Keep browser URL as /app/* while serving /home/* content
+    {
+      source: '/app',
+      destination: '/home',
+    },
+    {
+      source: '/app/reports',
+      destination: '/home',
+    },
+    {
+      source: '/app/reports/new',
+      destination: '/home',
+    },
+    {
+      source: '/app/settings',
+      destination: '/home/settings',
+    },
+    {
+      source: '/app/billing',
+      destination: '/home/billing',
+    },
+    {
+      source: '/app/billing/return',
+      destination: '/home/billing/return',
+    },
+    {
+      source: '/app/support',
+      destination: '/home/settings', // Support page - maps to settings for now
+    },
+  ];
+}
+
 /**
  * Paths that should NOT be rewritten on the app subdomain.
  * These are public/system paths that exist at the root level.
