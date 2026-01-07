@@ -19,7 +19,7 @@ import type {
   RiskClassification,
   SupportingConcept,
   ValidationGate,
-} from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+} from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,

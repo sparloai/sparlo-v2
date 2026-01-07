@@ -8,7 +8,7 @@
  */
 import { memo } from 'react';
 
-import type { HonestAssessment } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { HonestAssessment } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,

@@ -4,7 +4,7 @@ import 'server-only';
 export type {
   ReportForPDF,
   ReportData as ReportPDFData,
-} from '~/app/app/reports/_lib/types/report-data.types';
+} from '~/app/reports/_lib/types/report-data.types';
 
 // Re-export hybrid report types for comprehensive PDF rendering
 export type {
@@ -35,4 +35,4 @@ export type {
   HonestAssessment,
   CrossDomainSearch,
   StrategicIntegration,
-} from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+} from '~/app/reports/_lib/types/hybrid-report-display.types';

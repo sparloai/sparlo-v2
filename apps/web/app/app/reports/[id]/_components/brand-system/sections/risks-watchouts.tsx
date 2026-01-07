@@ -14,7 +14,7 @@
  */
 import { memo } from 'react';
 
-import type { RiskAndWatchout } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { RiskAndWatchout } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   BodyText,

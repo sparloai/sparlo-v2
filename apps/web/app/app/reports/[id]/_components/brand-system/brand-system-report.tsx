@@ -21,7 +21,7 @@ import { Download, Loader2, Share2 } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
 
-import type { HybridReportData } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import { CHAT_DRAWER_WIDTH } from '../../_lib/constants';
 import { useReportActions } from '../../_lib/hooks/use-report-actions';

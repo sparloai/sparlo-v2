@@ -8,7 +8,7 @@
  */
 import { memo } from 'react';
 
-import type { CrossDomainSearch } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { CrossDomainSearch } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,

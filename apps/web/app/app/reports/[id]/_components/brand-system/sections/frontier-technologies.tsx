@@ -8,7 +8,7 @@
  */
 import { memo } from 'react';
 
-import type { FrontierWatch } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { FrontierWatch } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,

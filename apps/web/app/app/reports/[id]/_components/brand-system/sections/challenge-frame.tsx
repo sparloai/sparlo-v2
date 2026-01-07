@@ -8,7 +8,7 @@
  */
 import { memo } from 'react';
 
-import type { ChallengeTheFrame } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { ChallengeTheFrame } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,

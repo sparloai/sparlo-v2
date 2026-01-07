@@ -9,7 +9,7 @@
  */
 import { memo } from 'react';
 
-import type { InnovationAnalysis } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { InnovationAnalysis } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,

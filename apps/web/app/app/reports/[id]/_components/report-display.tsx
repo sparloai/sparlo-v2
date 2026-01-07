@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { Loader2, MessageSquare } from 'lucide-react';
 
-import type { HybridReportData } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 import { TrackReportViewed } from '~/components/analytics-events';
 
 import { ProcessingScreen } from '../../../_components/processing-screen';

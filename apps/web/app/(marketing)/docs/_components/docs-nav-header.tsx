@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import type { RecentReport } from '~/app/app/_lib/server/recent-reports.loader';
+import type { RecentReport } from '~/app/_lib/server/recent-reports.loader';
 
 import { DocsAppSidebar } from './docs-app-sidebar';
 

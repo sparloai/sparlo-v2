@@ -15,8 +15,8 @@ import { ArrowRight, ChevronDown, List, X } from 'lucide-react';
 
 import { cn } from '@kit/ui/utils';
 
-import BrandSystemReport from '~/app/app/reports/[id]/_components/brand-system/brand-system-report';
-import type { HybridReportData } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import BrandSystemReport from '~/app/reports/[id]/_components/brand-system/brand-system-report';
+import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import { exampleReportsConfig } from './data/example-reports-data';
 

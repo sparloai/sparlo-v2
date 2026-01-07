@@ -15,7 +15,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { usePrefersReducedMotion } from '@kit/ui/hooks';
 
-import { DURATION, EASING } from '~/app/app/_lib/animation-constants';
+import { DURATION, EASING } from '~/app/_lib/animation-constants';
 
 // ============================================================================
 // TYPES

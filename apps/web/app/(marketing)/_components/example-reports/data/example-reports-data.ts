@@ -1,4 +1,4 @@
-import type { HybridReportData } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import { CARBON_REMOVAL_HYBRID_REPORT } from '../carbon-removal-hybrid-data';
 import { ENERGY_HYBRID_REPORT } from '../energy-hybrid-data';

@@ -8,7 +8,7 @@
  */
 import { memo } from 'react';
 
-import type { SelfCritique } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { SelfCritique } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   AccentBorder,

@@ -8,7 +8,7 @@
  */
 import { memo } from 'react';
 
-import type { StructuredExecutiveSummary } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { StructuredExecutiveSummary } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import {
   ArticleBlock,

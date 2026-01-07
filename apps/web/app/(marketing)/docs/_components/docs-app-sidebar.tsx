@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { cn } from '@kit/ui/utils';
 
-import type { RecentReport } from '~/app/app/_lib/server/recent-reports.loader';
+import type { RecentReport } from '~/app/_lib/server/recent-reports.loader';
 import pathsConfig from '~/config/paths.config';
 
 /**

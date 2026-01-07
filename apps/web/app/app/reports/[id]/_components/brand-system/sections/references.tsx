@@ -10,7 +10,7 @@ import { memo } from 'react';
 
 import { ExternalLink } from 'lucide-react';
 
-import type { Reference } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
+import type { Reference } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import { ContentBlock, MonoLabel, Section, SectionTitle } from '../primitives';
 
