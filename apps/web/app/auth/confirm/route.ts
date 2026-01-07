@@ -1,3 +1,4 @@
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { redirect } from 'next/navigation';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -58,6 +59,11 @@ export async function GET(request: NextRequest) {
       );
     }
   } catch (error) {
+    // Re-throw redirect errors - they're expected behavior, not actual errors
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
     console.error('Auth confirm error:', error);
     const errorMessage =
       error instanceof Error ? error.message : 'Authentication failed';

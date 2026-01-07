@@ -1,3 +1,4 @@
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { redirect } from 'next/navigation';
 import type { NextRequest } from 'next/server';
 
@@ -17,6 +18,11 @@ export async function GET(request: NextRequest) {
 
     return redirect(nextPath);
   } catch (error) {
+    // Re-throw redirect errors - they're expected behavior, not actual errors
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
     // Log detailed error for debugging
     const errorDetails = {
       message: error instanceof Error ? error.message : 'Unknown error',
