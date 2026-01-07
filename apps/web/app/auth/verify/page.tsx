@@ -6,7 +6,6 @@ import { checkRequiresMultiFactorAuthentication } from '@kit/supabase/check-requ
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import pathsConfig from '~/config/paths.config';
-import { getAppSubdomainUrl, isAppPath } from '~/config/subdomain.config';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
@@ -40,14 +39,7 @@ async function VerifyPage(props: Props) {
   }
 
   const nextPath = (await props.searchParams).next;
-  const safePath = getSafeRedirectPath(nextPath, pathsConfig.app.home);
-
-  // In production, redirect app paths to app subdomain
-  const isProduction = process.env.NODE_ENV === 'production';
-  const redirectPath =
-    isProduction && isAppPath(safePath)
-      ? getAppSubdomainUrl(safePath)
-      : safePath;
+  const redirectPath = getSafeRedirectPath(nextPath, pathsConfig.app.home);
 
   return (
     <MultiFactorChallengeContainer

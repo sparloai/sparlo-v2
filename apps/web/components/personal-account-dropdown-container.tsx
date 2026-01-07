@@ -8,20 +8,13 @@ import { JWTUserData } from '@kit/supabase/types';
 import featuresFlagConfig from '~/config/feature-flags.config';
 import pathsConfig from '~/config/paths.config';
 
-const paths = {
-  home: pathsConfig.app.home,
-  settings: pathsConfig.app.personalAccountSettings,
-  billing: pathsConfig.app.personalAccountBilling,
-  help: '/home/help',
-};
-
-const features = {
-  enableBilling: featuresFlagConfig.enablePersonalAccountBilling,
-};
-
 export function ProfileAccountDropdownContainer(props: {
   user?: JWTUserData | null;
   showProfileName?: boolean;
+  /** Show dashboard link (for marketing/landing pages) */
+  showDashboardLink?: boolean;
+  /** Show teams link (for users with team access) */
+  showTeamsLink?: boolean;
 
   account?: {
     id: string | null;
@@ -36,6 +29,22 @@ export function ProfileAccountDropdownContainer(props: {
   if (!userData) {
     return null;
   }
+
+  const paths = {
+    home: pathsConfig.app.home,
+    dashboard: props.showDashboardLink ? pathsConfig.app.home : undefined,
+    settings: pathsConfig.app.personalAccountSettings,
+    billing: pathsConfig.app.personalAccountBilling,
+    teams: props.showTeamsLink
+      ? pathsConfig.app.personalAccountTeams
+      : undefined,
+    help: '/app/help',
+  };
+
+  const features = {
+    enableBilling: featuresFlagConfig.enablePersonalAccountBilling,
+    enableTeams: props.showTeamsLink,
+  };
 
   return (
     <PersonalAccountDropdown

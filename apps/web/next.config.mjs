@@ -4,13 +4,6 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const ENABLE_REACT_COMPILER = process.env.ENABLE_REACT_COMPILER === 'true';
 
-/**
- * App subdomain for authenticated users.
- * Routes on app.sparlo.ai are rewritten to /home/* internally.
- */
-const APP_SUBDOMAIN = 'app';
-const PRODUCTION_DOMAIN = 'sparlo.ai';
-
 const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -50,7 +43,14 @@ const config = {
       fullUrl: true,
     },
   },
-  serverExternalPackages: ['pino', 'thread-stream', '@react-pdf/renderer'],
+  serverExternalPackages: [
+    'pino',
+    'thread-stream',
+    '@react-pdf/renderer',
+    // Prevent Supabase SDK from being bundled to avoid initialization issues
+    '@supabase/supabase-js',
+    '@supabase/ssr',
+  ],
   // needed for supporting dynamic imports for local content
   outputFileTracingIncludes: {
     '/*': ['./content/**/*'],
@@ -134,6 +134,17 @@ function getImagesConfig() {
 
 async function getRedirects() {
   return [
+    // Redirect old /home/* URLs to new /app/* URLs
+    {
+      source: '/home/:path*',
+      destination: '/app/:path*',
+      permanent: true,
+    },
+    {
+      source: '/home',
+      destination: '/app',
+      permanent: true,
+    },
     {
       source: '/server-sitemap.xml',
       destination: '/sitemap.xml',
@@ -178,62 +189,10 @@ async function getRewrites() {
 }
 
 /**
- * Paths that should NOT be rewritten on the app subdomain.
- * These are public/system paths that exist at the root level.
- */
-const APP_SUBDOMAIN_EXCLUDED_PATHS = [
-  'home', // Already at /home, no rewrite needed
-  'auth', // Auth routes stay at /auth
-  'api', // API routes
-  'share', // Public share pages
-  'healthcheck', // Health check endpoint
-  '_next', // Next.js internals
-  'locales', // i18n files
-  'images', // Static images
-  'assets', // Static assets
-];
-
-/**
- * Rewrites for app subdomain routing.
- * On app.sparlo.ai, root-level paths are rewritten to /home/* internally.
- * This allows the file structure to remain at /home/* while URLs are clean.
- *
- * Examples:
- * - app.sparlo.ai/ → /home/ (personal dashboard)
- * - app.sparlo.ai/settings → /home/settings
- * - app.sparlo.ai/team-slug → /home/team-slug
- * - app.sparlo.ai/team-slug/reports → /home/team-slug/reports
- *
- * Excluded paths (not rewritten):
- * - app.sparlo.ai/auth/* → /auth/* (auth routes)
- * - app.sparlo.ai/api/* → /api/* (API routes)
- * - app.sparlo.ai/home/* → /home/* (already prefixed)
+ * No rewrites needed - routes are at /app/* directly.
  */
 async function getRewrites() {
-  // Only apply rewrites in production on the app subdomain
-  if (!IS_PRODUCTION) {
-    return [];
-  }
-
-  // Build negative lookahead regex for excluded paths
-  const excludePattern = APP_SUBDOMAIN_EXCLUDED_PATHS.join('|');
-
-  return {
-    beforeFiles: [
-      // Rewrite app subdomain requests to /home/* routes
-      // Excludes: home, auth, api, share, healthcheck, _next, locales, images, assets
-      {
-        source: `/((?!${excludePattern}).*)`,
-        has: [
-          {
-            type: 'host',
-            value: `${APP_SUBDOMAIN}.${PRODUCTION_DOMAIN}`,
-          },
-        ],
-        destination: '/home/$1',
-      },
-    ],
-  };
+  return [];
 }
 
 async function getSecurityHeaders() {

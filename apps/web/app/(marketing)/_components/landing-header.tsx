@@ -30,25 +30,42 @@ const MobileModeToggle = dynamic(
   { ssr: false },
 );
 
-const paths = {
-  home: pathsConfig.app.home,
-};
-
 const features = {
   enableThemeToggle: featuresFlagConfig.enableThemeToggle,
 };
 
-export function LandingHeader({ user }: { user?: JWTUserData | null }) {
+export function LandingHeader({
+  user,
+  hasTeams = false,
+}: {
+  user?: JWTUserData | null;
+  hasTeams?: boolean;
+}) {
   const signOut = useSignOut();
 
   if (user) {
+    const paths = {
+      home: pathsConfig.app.home,
+      dashboard: pathsConfig.app.home,
+      settings: pathsConfig.app.personalAccountSettings,
+      billing: pathsConfig.app.personalAccountBilling,
+      teams: hasTeams ? pathsConfig.app.personalAccountTeams : undefined,
+      help: '/app/help',
+    };
+
+    const userFeatures = {
+      enableThemeToggle: featuresFlagConfig.enableThemeToggle,
+      enableBilling: featuresFlagConfig.enablePersonalAccountBilling,
+      enableTeams: hasTeams,
+    };
+
     return (
       <LandingNavHeader
         actions={
           <PersonalAccountDropdown
             showProfileName={false}
             paths={paths}
-            features={features}
+            features={userFeatures}
             user={user}
             signOutRequested={() => signOut.mutateAsync()}
           />

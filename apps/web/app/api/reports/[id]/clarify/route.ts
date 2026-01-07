@@ -93,12 +93,15 @@ export const POST = enhanceRouteHandler(
     let eventName:
       | 'report/clarification-answered'
       | 'report/discovery-clarification-answered'
-      | 'report/hybrid-clarification-answered' =
+      | 'report/hybrid-clarification-answered'
+      | 'report/dd-clarification-answered' =
       'report/clarification-answered';
     if (mode === 'discovery') {
       eventName = 'report/discovery-clarification-answered';
     } else if (mode === 'hybrid') {
       eventName = 'report/hybrid-clarification-answered';
+    } else if (mode === 'dd') {
+      eventName = 'report/dd-clarification-answered';
     }
 
     console.log('[Clarify] Sending event:', eventName);

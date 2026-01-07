@@ -661,6 +661,59 @@ export interface ParseJsonOptions {
 }
 
 /**
+ * Sanitize control characters inside JSON strings
+ * LLMs sometimes output literal newlines/tabs inside string values,
+ * which are invalid JSON (they need to be escaped as \n, \t, etc.)
+ */
+function sanitizeJsonControlChars(jsonStr: string): string {
+  let result = '';
+  let inString = false;
+  let escapeNext = false;
+
+  for (let i = 0; i < jsonStr.length; i++) {
+    const char = jsonStr[i]!;
+    const code = char.charCodeAt(0);
+
+    if (escapeNext) {
+      escapeNext = false;
+      result += char;
+      continue;
+    }
+
+    if (char === '\\' && inString) {
+      escapeNext = true;
+      result += char;
+      continue;
+    }
+
+    if (char === '"') {
+      inString = !inString;
+      result += char;
+      continue;
+    }
+
+    // If inside a string and we hit a control character, escape it
+    if (inString && code < 32) {
+      if (code === 10) {
+        result += '\\n'; // newline
+      } else if (code === 13) {
+        result += '\\r'; // carriage return
+      } else if (code === 9) {
+        result += '\\t'; // tab
+      } else {
+        // Other control chars: use unicode escape
+        result += '\\u' + code.toString(16).padStart(4, '0');
+      }
+      continue;
+    }
+
+    result += char;
+  }
+
+  return result;
+}
+
+/**
  * Parse JSON from Claude response with proper error handling
  * ANTIFRAGILE: Multiple repair strategies, detailed logging, graceful degradation
  */
@@ -692,6 +745,9 @@ export function parseJsonResponse<T>(
       );
     }
   }
+
+  // Sanitize control characters inside JSON strings (LLMs often output literal newlines)
+  jsonStr = sanitizeJsonControlChars(jsonStr);
 
   // Track which strategy succeeded for logging
   let strategy = 'direct';

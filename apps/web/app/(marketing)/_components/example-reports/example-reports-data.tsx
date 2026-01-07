@@ -20,6 +20,7 @@ interface ExampleReport {
   sections: ReportSection[];
 }
 
+// Engineers mode report tabs
 export const EXAMPLE_REPORTS: ExampleReport[] = [
   {
     id: 'carbon-removal',
@@ -98,3 +99,89 @@ export const EXAMPLE_REPORTS: ExampleReport[] = [
     sections: [],
   },
 ];
+
+// Investors mode report tabs - reuses existing reports until DD reports are ready
+export const INVESTOR_REPORTS: ExampleReport[] = [
+  {
+    id: 'thermal-storage',
+    title: 'Thermal Storage',
+    headline: 'ThermalStore Energy: Series B Due Diligence',
+    subtitle: 'Industrial Decarbonization — Thermal Energy Storage',
+    locked: false,
+    metadata: {
+      readTime: '12 min read',
+      dataPoints: '2.1M data points',
+    },
+    sections: [],
+  },
+  {
+    id: 'geothermal',
+    title: 'Geothermal',
+    headline: 'Enhanced Geothermal Systems: Technical Due Diligence',
+    subtitle: 'Deep Earth Heat Extraction at Scale',
+    locked: false,
+    metadata: {
+      readTime: '15 min read',
+      dataPoints: '2.8M data points',
+    },
+    sections: [],
+  },
+  {
+    id: 'low-carbon-cement',
+    title: 'Low-Carbon Cement',
+    headline: 'Novel Binder Chemistry: Series A Due Diligence',
+    subtitle: 'Decarbonizing the Built Environment',
+    locked: false,
+    metadata: {
+      readTime: '18 min read',
+      dataPoints: '3.2M data points',
+    },
+    sections: [],
+  },
+  {
+    id: 'hydrogen-dd',
+    title: 'Hydrogen',
+    headline: 'Electrolyzer Scale-Up: Growth Equity Due Diligence',
+    subtitle: 'Green Hydrogen Production Economics',
+    locked: false,
+    metadata: {
+      readTime: '16 min read',
+      dataPoints: '2.9M data points',
+    },
+    sections: [],
+  },
+  {
+    id: 'dac',
+    title: 'DAC',
+    headline: 'Direct Air Capture: Series B Due Diligence',
+    subtitle: 'Atmospheric Carbon Removal at Scale',
+    locked: false,
+    metadata: {
+      readTime: '20 min read',
+      dataPoints: '3.5M data points',
+    },
+    sections: [],
+  },
+  {
+    id: 'biotech-dd',
+    title: 'Biotech',
+    headline: 'Synthetic Biology Platform: Series A Due Diligence',
+    subtitle: 'Novel Pathway Engineering for Industrial Biotech',
+    locked: false,
+    metadata: {
+      readTime: '22 min read',
+      dataPoints: '4.0M data points',
+    },
+    sections: [],
+  },
+];
+
+// Map investor report IDs to existing report data (temporary until DD reports ready)
+export const INVESTOR_REPORT_DATA_MAP: Record<string, string> = {
+  'thermal-storage': 'green-h2',
+  geothermal: 'carbon-removal',
+  'low-carbon-cement': 'materials-science',
+  'hydrogen-dd': 'green-h2',
+  dac: 'carbon-removal',
+  'biotech-dd': 'biotech',
+};

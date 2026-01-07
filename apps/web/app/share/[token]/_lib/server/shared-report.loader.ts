@@ -4,7 +4,7 @@ import { cache } from 'react';
 
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 
-import type { SharedReport } from '~/home/(user)/reports/_lib/types/report-data.types';
+import type { SharedReport } from '~/app/reports/_lib/types/report-data.types';
 
 // UUID v4 regex for token validation
 const UUID_REGEX =

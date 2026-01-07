@@ -721,7 +721,25 @@ export const generateDDReport = inngest.createFunction(
 
 This is a Due Diligence analysis for a startup called "${companyName}".
 The problem statement above was extracted from their pitch materials.
-Please frame this problem from first principles, independent of their proposed solution.`;
+Please frame this problem from first principles, independent of their proposed solution.
+
+## DD-Specific Clarification Triggers
+
+In addition to standard clarification protocol, for DD mode consider these CATEGORY 1 triggers:
+
+**MUST CLARIFY for DD:**
+- Contradictory technical claims (e.g., "10x better efficiency" without explanation of mechanism)
+- Problem scope ambiguity that affects market sizing (e.g., unclear if B2B vs B2C, enterprise vs SMB)
+- Missing critical specs needed for feasibility assessment (e.g., scale, throughput, accuracy targets)
+- Claims that contradict known physics or engineering limits without explanation
+- Differentiator claims that match existing commercial solutions (may indicate misunderstanding of market)
+
+**ASSUME AND DOCUMENT for DD:**
+- Industry segment details when reasonable defaults exist
+- Geographic scope if not specified
+- Timeline assumptions based on typical startup trajectories
+
+When you detect a DD-specific clarification trigger, frame the question to help us validate the startup's core value proposition.`;
 
           const { content, usage } = await callClaude({
             model: MODELS.OPUS,
@@ -741,7 +759,112 @@ Please frame this problem from first principles, independent of their proposed s
           return { result: validated, usage };
         });
 
-        // Type assertion for problem analysis (skip clarification in DD mode)
+        // Handle clarification if needed
+        if (
+          an0mResult.result.needs_clarification === true &&
+          an0mResult.result.clarification_request
+        ) {
+          const clarificationRequest = an0mResult.result.clarification_request;
+          const clarificationQuestion = clarificationRequest.question;
+
+          await step.run('store-dd-clarification', async () => {
+            await updateProgress({
+              status: 'clarifying',
+              clarifications: [
+                {
+                  question: clarificationQuestion,
+                  context: clarificationRequest.context,
+                  options: clarificationRequest.options,
+                  allows_freetext: clarificationRequest.allows_freetext,
+                  freetext_prompt: clarificationRequest.freetext_prompt,
+                  askedAt: new Date().toISOString(),
+                },
+              ],
+            });
+          });
+
+          // Wait for user to answer (up to 24 hours)
+          const clarificationEvent = await step.waitForEvent(
+            'wait-for-dd-clarification',
+            {
+              event: 'report/dd-clarification-answered',
+              match: 'data.reportId',
+              timeout: '24h',
+            },
+          );
+
+          if (!clarificationEvent?.data) {
+            await updateProgress({
+              status: 'error',
+              error_message:
+                'Due diligence report expired: No clarification response received within 24 hours. Please start a new report.',
+            });
+            return {
+              success: false,
+              reportId,
+              error: 'Clarification timed out',
+            };
+          }
+
+          // Re-run AN0-M with clarification
+          const clarifiedResult = await step.run(
+            'an0-m-with-clarification',
+            async () => {
+              const clarifiedMessage = `${problemStatementForAnalysis}
+
+## DD Context
+
+This is a Due Diligence analysis for a startup called "${companyName}".
+The problem statement above was extracted from their pitch materials.
+Please frame this problem from first principles, independent of their proposed solution.
+
+## User Clarification Response
+
+The user has answered your clarification question:
+
+${clarificationEvent.data.answer}
+
+Based on this clarification, please proceed with full problem analysis. Set needs_clarification: false and provide the complete problem_analysis, constraint_analysis, landscape_map, discovery_seeds, physics_essence, and industry_blind_spots.`;
+
+              const { content, usage } = await callClaude({
+                model: MODELS.OPUS,
+                system: AN0_M_PROMPT,
+                userMessage: clarifiedMessage,
+                maxTokens: HYBRID_MAX_TOKENS,
+                temperature: HYBRID_TEMPERATURES.default,
+                cacheablePrefix: HYBRID_CACHED_PREFIX,
+              });
+
+              const parsed = parseJsonResponse<AN0_M_Output>(content, 'AN0-M');
+              return { result: AN0_M_OutputSchema.parse(parsed), usage };
+            },
+          );
+
+          if (clarifiedResult.result.needs_clarification === true) {
+            await updateProgress({
+              status: 'error',
+              error_message: 'Unable to proceed after clarification',
+            });
+            return {
+              success: false,
+              reportId,
+              error: 'Unable to proceed after clarification',
+            };
+          }
+
+          // Use clarified result (merge usage)
+          an0mResult.result = clarifiedResult.result;
+          an0mResult.usage = {
+            inputTokens:
+              an0mResult.usage.inputTokens + clarifiedResult.usage.inputTokens,
+            outputTokens:
+              an0mResult.usage.outputTokens + clarifiedResult.usage.outputTokens,
+            totalTokens:
+              an0mResult.usage.totalTokens + clarifiedResult.usage.totalTokens,
+          };
+        }
+
+        // Type guard: we now have a full analysis
         const _an0mAnalysis = an0mResult.result as Extract<
           AN0_M_Output,
           { needs_clarification: false }

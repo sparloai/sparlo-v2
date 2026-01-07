@@ -25,7 +25,7 @@ async function findReportWithGreekChars(
   page: import('playwright').Page,
 ): Promise<string | null> {
   // Navigate to reports list to find a report
-  await page.goto(`${BASE_URL}/home/reports`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/app/reports`, { waitUntil: 'networkidle' });
 
   // Look for any report link
   const reportLink = await page.$('a[href*="/reports/"][href*="rpt_"]');
@@ -60,7 +60,7 @@ async function exportPdfAndAnalyze(
 
   try {
     // First, let's check the report page itself
-    await page.goto(`${BASE_URL}/home/reports/${reportId}`, {
+    await page.goto(`${BASE_URL}/app/reports/${reportId}`, {
       waitUntil: 'networkidle',
       timeout: 30000,
     });

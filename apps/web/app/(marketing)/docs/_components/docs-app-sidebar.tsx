@@ -8,8 +8,8 @@ import Link from 'next/link';
 import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { cn } from '@kit/ui/utils';
 
+import type { RecentReport } from '~/app/_lib/server/recent-reports.loader';
 import pathsConfig from '~/config/paths.config';
-import type { RecentReport } from '~/home/(user)/_lib/server/recent-reports.loader';
 
 /**
  * DocsAppSidebar - Slide-out sidebar for logged-in users on docs pages
@@ -251,7 +251,7 @@ export const DocsAppSidebar = memo(function DocsAppSidebar({
         {/* Header */}
         <div className="flex h-14 items-center justify-between border-b border-zinc-200 px-4 dark:border-zinc-800">
           <Link
-            href="/home"
+            href="/app"
             className="transition-opacity hover:opacity-70"
             onClick={handleClose}
           >
@@ -284,7 +284,7 @@ export const DocsAppSidebar = memo(function DocsAppSidebar({
           {/* New Analysis */}
           <div className="mb-1 px-3">
             <Link
-              href="/home/reports/new"
+              href="/app/reports/new"
               onClick={handleClose}
               className="flex w-full items-center gap-3 rounded-lg bg-zinc-900 px-3 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
             >
@@ -296,7 +296,7 @@ export const DocsAppSidebar = memo(function DocsAppSidebar({
           {/* All Reports */}
           <div className="mb-4 px-3">
             <Link
-              href="/home/reports"
+              href="/app/reports"
               onClick={handleClose}
               className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
             >
@@ -315,7 +315,7 @@ export const DocsAppSidebar = memo(function DocsAppSidebar({
                 {recentReports.slice(0, 10).map((report) => (
                   <Link
                     key={report.id}
-                    href={`/home/reports/${report.id}`}
+                    href={`/app/reports/${report.id}`}
                     onClick={handleClose}
                     className="block truncate rounded px-3 py-1.5 text-[13px] text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
                   >

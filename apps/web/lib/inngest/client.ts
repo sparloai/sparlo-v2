@@ -75,6 +75,10 @@ export const HybridClarificationAnsweredEventSchema = z.object({
 });
 
 // DD Mode event schemas (Due Diligence for investor technical analysis)
+export const DDClarificationAnsweredEventSchema = z.object({
+  reportId: z.string().uuid(),
+  answer: z.string().min(1),
+});
 export const DDReportGenerateEventSchema = z.object({
   reportId: z.string().uuid(),
   accountId: z.string().uuid(),
@@ -111,6 +115,9 @@ export type HybridClarificationAnsweredEvent = z.infer<
   typeof HybridClarificationAnsweredEventSchema
 >;
 export type DDReportGenerateEvent = z.infer<typeof DDReportGenerateEventSchema>;
+export type DDClarificationAnsweredEvent = z.infer<
+  typeof DDClarificationAnsweredEventSchema
+>;
 
 /**
  * Type-safe event definitions for Inngest
@@ -130,6 +137,7 @@ type Events = {
   };
   // DD Mode events (Due Diligence)
   'report/generate-dd': { data: DDReportGenerateEvent };
+  'report/dd-clarification-answered': { data: DDClarificationAnsweredEvent };
   // Cancel event (works for all report types)
   'report/cancel.requested': { data: ReportCancelEvent };
 };
