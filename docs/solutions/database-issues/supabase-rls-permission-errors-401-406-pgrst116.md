@@ -566,4 +566,10 @@ COMMIT;
 
 ---
 
+## Related Issues
+
+- [Supabase 406 Error - Stale Schema Cache](./supabase-406-stale-schema-cache-20260107.md) - Different cause: stale PostgREST schema cache (no PGRST error code)
+
+---
+
 **Version**: 1.0 | **Date Solved**: 2026-01-06 | **Severity**: High
