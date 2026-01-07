@@ -117,6 +117,47 @@ interface DDReportEventData {
 }
 
 // =============================================================================
+// DD5 Format Helpers
+// =============================================================================
+
+/**
+ * Type guard to check if DD5 result is in the new format (with prose_report and quick_reference)
+ */
+function isDD5NewFormat(
+  result: DD5_M_Output,
+): result is Extract<
+  DD5_M_Output,
+  { report_metadata: unknown; prose_report: unknown; quick_reference: unknown }
+> {
+  return 'report_metadata' in result && 'quick_reference' in result;
+}
+
+/**
+ * Extract title/headline metadata from DD5 result, handling both old and new formats
+ */
+function extractDD5Metadata(result: DD5_M_Output): {
+  companyName: string;
+  verdict: string;
+  headline: string;
+} {
+  if (isDD5NewFormat(result)) {
+    // New format: report_metadata + quick_reference
+    return {
+      companyName: result.report_metadata.company_name,
+      verdict: result.quick_reference.one_page_summary.verdict_box.overall,
+      headline: result.quick_reference.one_page_summary.one_sentence,
+    };
+  }
+
+  // Old format: header + executive_summary
+  return {
+    companyName: result.header.company_name,
+    verdict: result.executive_summary.verdict,
+    headline: result.executive_summary.one_paragraph_summary,
+  };
+}
+
+// =============================================================================
 // Inngest Function
 // =============================================================================
 
@@ -527,9 +568,11 @@ export const generateDDReport = inngest.createFunction(
         /**
          * Helper: Update report progress in Supabase
          * P1 FIX (143): Now throws on error instead of silent logging
+         * P1 FIX: Use fresh client to avoid stale reference in step.run callbacks
          */
         async function updateProgress(updates: Record<string, unknown>) {
-          const { error } = await supabase
+          const freshSupabase = getSupabaseServerAdminClient();
+          const { error } = await freshSupabase
             .from('sparlo_reports')
             .update({
               ...updates,
@@ -1077,7 +1120,7 @@ Map ${companyName}'s approach onto the solution space:
 
           // ANTIFRAGILE: Retry with escalating token limits
           const MAX_RETRIES = 2;
-          const TOKEN_LIMITS = [HYBRID_MAX_TOKENS, 96000, 128000]; // Escalate on retry
+          const TOKEN_LIMITS = [HYBRID_MAX_TOKENS]; // 64000 is max for Opus 4.5
 
           let lastError: Error | null = null;
           let totalUsage: TokenUsage = {
@@ -1214,7 +1257,7 @@ Make the report 3-5x more valuable than traditional DD.`;
 
             // ANTIFRAGILE: Retry with escalating token limits
             const MAX_RETRIES = 2;
-            const TOKEN_LIMITS = [HYBRID_MAX_TOKENS, 96000, 128000];
+            const TOKEN_LIMITS = [HYBRID_MAX_TOKENS]; // 64000 is max for Opus 4.5
 
             let lastError: Error | null = null;
             let totalUsage: TokenUsage = {
@@ -1312,14 +1355,14 @@ Make the report 3-5x more valuable than traditional DD.`;
         const totalUsage = calculateTotalUsage(allUsages);
 
         await step.run('complete-dd-report', async () => {
+          // Extract metadata from DD5 result (handles both old and new formats)
+          const dd5Metadata = extractDD5Metadata(dd5Result.result);
+
           // Generate title from report
-          const generatedTitle = `DD: ${dd5Result.result.header.company_name} - ${dd5Result.result.executive_summary.verdict}`;
+          const generatedTitle = `DD: ${dd5Metadata.companyName} - ${dd5Metadata.verdict}`;
 
           // Build headline from executive summary
-          const headline =
-            dd5Result.result.executive_summary.one_paragraph_summary
-              .slice(0, 200)
-              .trim();
+          const headline = dd5Metadata.headline.slice(0, 200).trim();
 
           // Build report data
           const reportData = {
@@ -1341,8 +1384,10 @@ Make the report 3-5x more valuable than traditional DD.`;
           // P1 FIX (143, 145): Use atomic completion function with idempotency
           // Note: Uses type assertion because the RPC function is added by migration
           // that may not have been applied yet. Regenerate types after migration.
+          // P1 FIX: Get fresh client to avoid stale reference issues in nested async callbacks
+          const completionSupabase = getSupabaseServerAdminClient();
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const rpc = supabase.rpc as any;
+          const rpc = completionSupabase.rpc as any;
           const { data, error } = await rpc('complete_dd_report_atomic', {
             p_report_id: reportId,
             p_report_data: reportData,
@@ -1363,8 +1408,9 @@ Make the report 3-5x more valuable than traditional DD.`;
                 '[DD Function] Atomic completion not available, using fallback',
               );
 
-              // Non-atomic fallback
-              const { error: updateError } = await supabase
+              // Non-atomic fallback - use fresh client
+              const fallbackSupabase = getSupabaseServerAdminClient();
+              const { error: updateError } = await fallbackSupabase
                 .from('sparlo_reports')
                 .update({
                   status: 'complete',
@@ -1386,12 +1432,22 @@ Make the report 3-5x more valuable than traditional DD.`;
               }
 
               // Track token usage (non-idempotent fallback)
-              await supabase.rpc('increment_usage', {
-                p_account_id: accountId,
-                p_tokens: totalUsage.totalTokens,
-                p_is_report: true,
-                p_is_chat: false,
-              });
+              // P1 FIX: Wrap in try-catch to prevent crash if client is in invalid state
+              try {
+                const freshSupabase = getSupabaseServerAdminClient();
+                await freshSupabase.rpc('increment_usage', {
+                  p_account_id: accountId,
+                  p_tokens: totalUsage.totalTokens,
+                  p_is_report: true,
+                  p_is_chat: false,
+                });
+              } catch (usageError) {
+                // Log but don't fail - report completion is more important than usage tracking
+                console.warn(
+                  '[DD Function] Failed to track token usage in fallback:',
+                  usageError,
+                );
+              }
             } else {
               console.error('[DD Function] Atomic completion failed:', error);
               throw new Error(`Failed to complete report: ${error.message}`);

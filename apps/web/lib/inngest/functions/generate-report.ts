@@ -122,8 +122,9 @@ export const generateReport = inngest.createFunction(
         return await runReportGeneration();
       } catch (error) {
         if (error instanceof ClaudeRefusalError) {
-          // Update report with user-friendly error
-          await supabase
+          // P1 FIX: Use fresh client to avoid stale reference
+          const freshSupabase = getSupabaseServerAdminClient();
+          await freshSupabase
             .from('sparlo_reports')
             .update({
               status: 'failed',
@@ -185,9 +186,11 @@ export const generateReport = inngest.createFunction(
 
         /**
          * Helper: Update report progress in Supabase
+         * P1 FIX: Use fresh client to avoid stale reference in step.run callbacks
          */
         async function updateProgress(updates: Record<string, unknown>) {
-          const { error } = await supabase
+          const freshSupabase = getSupabaseServerAdminClient();
+          const { error } = await freshSupabase
             .from('sparlo_reports')
             .update({
               ...updates,
@@ -678,20 +681,29 @@ export const generateReport = inngest.createFunction(
 
         await step.run('complete-report', async () => {
           // Persist token usage to database (P0-081 fix)
-          const { error: usageError } = await supabase.rpc('increment_usage', {
-            p_account_id: accountId,
-            p_tokens: totalUsage.totalTokens,
-            p_is_report: true,
-            p_is_chat: false,
-          });
-          if (usageError) {
-            console.error('[Usage] Failed to persist usage:', usageError);
-          } else {
-            console.log('[Usage] Persisted:', {
-              accountId,
-              tokens: totalUsage.totalTokens,
-              costUsd: totalUsage.costUsd,
-            });
+          // P1 FIX: Use fresh client to avoid stale reference issues in nested async callbacks
+          try {
+            const freshSupabase = getSupabaseServerAdminClient();
+            const { error: usageError } = await freshSupabase.rpc(
+              'increment_usage',
+              {
+                p_account_id: accountId,
+                p_tokens: totalUsage.totalTokens,
+                p_is_report: true,
+                p_is_chat: false,
+              },
+            );
+            if (usageError) {
+              console.error('[Usage] Failed to persist usage:', usageError);
+            } else {
+              console.log('[Usage] Persisted:', {
+                accountId,
+                tokens: totalUsage.totalTokens,
+                costUsd: totalUsage.costUsd,
+              });
+            }
+          } catch (usageError) {
+            console.warn('[Usage] Failed to track token usage:', usageError);
           }
 
           // Get the user's original input for the brief section
