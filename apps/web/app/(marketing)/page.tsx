@@ -2,7 +2,7 @@ import { withI18n } from '~/lib/i18n/with-i18n';
 
 import { EngineeringHero } from './_components/engineering-hero';
 import { ExampleReportsSection } from './_components/example-reports/example-reports-section';
-import { MethodologySection } from './_components/methodology-section';
+import { ProcessAnimation } from './_components/process-animation';
 
 function Home() {
   // Default to 'engineers' mode - mode switching can be added later if needed
@@ -11,7 +11,7 @@ function Home() {
   return (
     <>
       <EngineeringHero />
-      <MethodologySection mode={mode} />
+      <ProcessAnimation />
       <ExampleReportsSection mode={mode} />
     </>
   );
