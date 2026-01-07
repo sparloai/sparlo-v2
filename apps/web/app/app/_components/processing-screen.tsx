@@ -322,34 +322,34 @@ export function ProcessingScreen({
     );
   }
 
-  // Handle clarification status - Premium Air Company design
+  // Handle clarification status - Sparlo Design System
   if (progress.status === 'clarifying' && pendingClarification) {
     const hasOptions =
       pendingClarification.options && pendingClarification.options.length > 0;
 
     return (
       <motion.div
-        className="relative flex min-h-screen flex-col items-center justify-center bg-white px-6 py-16"
+        className="min-h-screen bg-white"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        <div className="w-full max-w-xl">
-          {/* Context label - small, uppercase, structured */}
-          {pendingClarification.context && (
-            <motion.p
-              className="mb-6 text-center text-[11px] font-medium tracking-[0.1em] text-zinc-400 uppercase"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.3 }}
-            >
-              {pendingClarification.context}
-            </motion.p>
-          )}
+        <div className="mx-auto max-w-3xl px-8 pt-24 pb-16">
+          {/* Section Label */}
+          <motion.div
+            className="mb-6"
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.3 }}
+          >
+            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+              Clarification Required
+            </span>
+          </motion.div>
 
-          {/* Main Question - Bold, commanding presence */}
+          {/* Page Title - matches New Analysis style */}
           <motion.h1
-            className="mb-16 text-center text-[28px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900 md:text-[36px]"
+            className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900 mb-8"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.4 }}
@@ -357,155 +357,166 @@ export function ProcessingScreen({
             {pendingClarification.question}
           </motion.h1>
 
-          {/* Options - Premium card design */}
-          {hasOptions && (
-            <motion.div
-              className="flex flex-col gap-3"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25, duration: 0.4 }}
-            >
-              {pendingClarification.options?.map((option, index) => (
-                <motion.button
-                  key={option.id}
-                  onClick={() => handleSelectOption(option.label)}
-                  disabled={isSubmitting}
-                  data-test={`clarification-option-${option.id}`}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + index * 0.05, duration: 0.3 }}
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.995 }}
-                  className={cn(
-                    'group relative w-full rounded-lg border px-5 py-4 text-left',
-                    'border-zinc-200 bg-white',
-                    'transition-all duration-200 ease-out',
-                    'hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.08)]',
-                    'focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 focus:outline-none',
-                    'active:bg-zinc-100',
-                    'disabled:cursor-not-allowed disabled:opacity-40',
-                  )}
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Letter indicator - clean, visible */}
-                    <span
-                      className={cn(
-                        'flex h-7 w-7 shrink-0 items-center justify-center rounded-md',
-                        'bg-zinc-100 font-mono text-[13px] font-medium text-zinc-500',
-                        'transition-all duration-200',
-                        'group-hover:bg-zinc-900 group-hover:text-white',
-                      )}
-                    >
-                      {String.fromCharCode(65 + index)}
-                    </span>
+          {/* Content with signature left border */}
+          <div className="border-l-2 border-zinc-900 pl-10">
+            {/* Context - body text style, not all caps */}
+            {pendingClarification.context && (
+              <motion.p
+                className="text-[18px] leading-[1.5] tracking-[-0.02em] text-zinc-600 mb-10"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
+              >
+                {pendingClarification.context}
+              </motion.p>
+            )}
 
-                    {/* Option text */}
-                    <span className="flex-1 text-[15px] leading-snug font-normal text-zinc-800">
-                      {option.label}
-                    </span>
-
-                    {/* Arrow indicator */}
-                    <ArrowRight
-                      className={cn(
-                        'h-4 w-4 text-zinc-300',
-                        'transition-all duration-200',
-                        'group-hover:translate-x-0.5 group-hover:text-zinc-500',
-                      )}
-                    />
-                  </div>
-                </motion.button>
-              ))}
-            </motion.div>
-          )}
-
-          {/* Freetext section - refined design */}
-          {pendingClarification.allows_freetext && (
-            <motion.div
-              className="mt-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, duration: 0.3 }}
-            >
-              {/* Divider with label */}
-              <div className="relative mb-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-zinc-100" />
-                </div>
-                <div className="relative flex justify-center">
-                  <span className="bg-white px-4 text-[12px] font-medium tracking-wide text-zinc-400 uppercase">
-                    {pendingClarification.freetext_prompt || 'Or type your own'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Textarea - minimal, elegant */}
-              <div className="relative">
-                <Textarea
-                  value={clarificationAnswer}
-                  onChange={(e) => setClarificationAnswer(e.target.value)}
-                  placeholder="Describe your specific situation..."
-                  data-test="clarification-input"
-                  className={cn(
-                    'min-h-[100px] w-full resize-none rounded-lg border px-4 py-3.5',
-                    'border-zinc-200 bg-white text-[15px] text-zinc-800 placeholder-zinc-400',
-                    'transition-all duration-200',
-                    'focus:border-zinc-400 focus:ring-0 focus:outline-none',
-                    'disabled:opacity-40',
-                  )}
-                  disabled={isSubmitting}
-                  onKeyDown={(e) => {
-                    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-                      e.preventDefault();
-                      handleSubmitClarification();
-                    }
-                  }}
-                />
-
-                {/* Submit button - appears when typing */}
-                <AnimatePresence>
-                  {clarificationAnswer.trim() && (
-                    <motion.div
-                      className="mt-4 flex justify-end"
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <button
-                        onClick={handleSubmitClarification}
-                        disabled={isSubmitting}
-                        data-test="clarification-submit"
+            {/* Options - Card pattern */}
+            {hasOptions && (
+              <motion.div
+                className="flex flex-col gap-4"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.4 }}
+              >
+                {pendingClarification.options?.map((option, index) => (
+                  <motion.button
+                    key={option.id}
+                    onClick={() => handleSelectOption(option.label)}
+                    disabled={isSubmitting}
+                    data-test={`clarification-option-${option.id}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 + index * 0.06, duration: 0.3 }}
+                    className={cn(
+                      'group relative w-full text-left',
+                      'rounded-xl border border-zinc-200 bg-white p-6',
+                      'transition-all duration-200',
+                      'hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm',
+                      'focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 focus:outline-none',
+                      'disabled:cursor-not-allowed disabled:opacity-40',
+                    )}
+                  >
+                    <div className="flex items-start gap-5">
+                      {/* Letter indicator */}
+                      <span
                         className={cn(
-                          'flex items-center gap-2 rounded-md px-5 py-2.5',
-                          'bg-zinc-900 text-[14px] font-medium text-white',
-                          'transition-all duration-150',
-                          'hover:bg-zinc-800',
-                          'active:scale-[0.98]',
-                          'disabled:cursor-not-allowed disabled:opacity-50',
+                          'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+                          'bg-zinc-100 font-mono text-[14px] font-medium text-zinc-500',
+                          'transition-all duration-200',
+                          'group-hover:bg-zinc-900 group-hover:text-white',
                         )}
                       >
-                        {isSubmitting ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Send className="h-3.5 w-3.5" />
-                        )}
-                        <span>Submit</span>
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </motion.div>
-          )}
+                        {String.fromCharCode(65 + index)}
+                      </span>
 
-          {/* Elapsed time - subtle footer */}
+                      {/* Option content */}
+                      <div className="flex-1 pt-0.5">
+                        <span className="text-[16px] leading-relaxed text-zinc-800">
+                          {option.label}
+                        </span>
+                      </div>
+
+                      {/* Arrow indicator */}
+                      <ArrowRight
+                        className={cn(
+                          'h-5 w-5 mt-1.5 text-zinc-300 shrink-0',
+                          'transition-all duration-200',
+                          'group-hover:translate-x-1 group-hover:text-zinc-500',
+                        )}
+                      />
+                    </div>
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
+
+            {/* Freetext section */}
+            {pendingClarification.allows_freetext && (
+              <motion.div
+                className="mt-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.3 }}
+              >
+                {/* Label */}
+                <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500 mb-4 block">
+                  {pendingClarification.freetext_prompt ||
+                    'Or describe your situation'}
+                </span>
+
+                {/* Textarea - card style */}
+                <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+                  <Textarea
+                    value={clarificationAnswer}
+                    onChange={(e) => setClarificationAnswer(e.target.value)}
+                    placeholder="Type your response here..."
+                    data-test="clarification-input"
+                    className={cn(
+                      'min-h-[120px] w-full resize-none border-0 px-6 py-5',
+                      'bg-transparent text-[16px] text-zinc-800 placeholder-zinc-400',
+                      'focus:ring-0 focus:outline-none',
+                      'disabled:opacity-40',
+                    )}
+                    disabled={isSubmitting}
+                    onKeyDown={(e) => {
+                      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSubmitClarification();
+                      }
+                    }}
+                  />
+
+                  {/* Submit button - inside card footer */}
+                  <AnimatePresence>
+                    {clarificationAnswer.trim() && (
+                      <motion.div
+                        className="border-t border-zinc-100 bg-zinc-50/50 px-6 py-4 flex justify-between items-center"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <span className="text-[13px] text-zinc-400">
+                          ⌘ + Enter to submit
+                        </span>
+                        <button
+                          onClick={handleSubmitClarification}
+                          disabled={isSubmitting}
+                          data-test="clarification-submit"
+                          className={cn(
+                            'flex items-center gap-2 rounded-lg px-6 py-3',
+                            'bg-zinc-900 text-[15px] font-medium text-white',
+                            'transition-all duration-150',
+                            'hover:bg-zinc-800',
+                            'disabled:cursor-not-allowed disabled:opacity-50',
+                          )}
+                        >
+                          {isSubmitting ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <>
+                              Submit
+                              <ArrowRight className="h-4 w-4" />
+                            </>
+                          )}
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Elapsed time - subtle metadata */}
           <motion.p
-            className="mt-12 text-center text-[12px] tracking-wide text-zinc-300 tabular-nums"
+            className="mt-16 text-[13px] tracking-[-0.02em] text-zinc-400 tabular-nums"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.3 }}
           >
-            {formatElapsed(elapsedSeconds)}
+            Analysis paused · {formatElapsed(elapsedSeconds)}
           </motion.p>
         </div>
       </motion.div>
