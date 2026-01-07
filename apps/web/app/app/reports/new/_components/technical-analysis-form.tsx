@@ -9,9 +9,7 @@ import { cn } from '@kit/ui/utils';
 import { isUsageError } from '~/lib/errors/usage-error';
 import { getAppPath } from '~/lib/hooks/use-app-path';
 
-import { ProcessingScreen } from '../../../_components/processing-screen';
 import { startReportGeneration } from '../../../_lib/server/sparlo-reports-server-actions';
-import { useReportProgress } from '../../../_lib/use-report-progress';
 import { sanitizeErrorMessage } from '../_lib/sanitize-error';
 import { useFileAttachments } from '../_lib/use-file-attachments';
 import { AttachmentList } from './shared/attachment-list';
@@ -174,9 +172,6 @@ export function TechnicalAnalysisForm({
     [deferredText],
   );
 
-  // Track progress once we have a report ID
-  const { progress } = useReportProgress(reportId);
-
   const canSubmit = problemText.trim().length >= MIN_CHARS;
 
   // Combine errors from form and attachments
@@ -214,13 +209,8 @@ export function TechnicalAnalysisForm({
 
         if (result.reportId) {
           clearAttachments();
-
-          setFormState((prev) => ({
-            ...prev,
-            reportId: result.reportId,
-            step: 'processing',
-            isSubmitting: false,
-          }));
+          // Redirect to report page immediately - it will show the processing screen
+          router.push(getAppPath(`/app/reports/${result.reportId}`));
         }
       } catch (err) {
         console.error('Failed to start report:', err);
@@ -270,12 +260,6 @@ export function TechnicalAnalysisForm({
     [step, handleContinue, handleRunAnalysis],
   );
 
-  const handleViewReport = useCallback(() => {
-    if (reportId) {
-      router.push(getAppPath(`/app/reports/${reportId}`));
-    }
-  }, [reportId, router]);
-
   const goBackToInput = useCallback(() => {
     setFormState((prev) => ({
       ...prev,
@@ -283,19 +267,6 @@ export function TechnicalAnalysisForm({
       clarifyingQuestion: null,
     }));
   }, []);
-
-  // Show processing screen when we have a report in progress
-  if (step === 'processing' && progress) {
-    return (
-      <div className="min-h-[calc(100vh-120px)] bg-white">
-        <ProcessingScreen
-          progress={progress}
-          onComplete={handleViewReport}
-          designChallenge={problemText}
-        />
-      </div>
-    );
-  }
 
   // Clarification step
   if (step === 'clarification' && clarifyingQuestion) {

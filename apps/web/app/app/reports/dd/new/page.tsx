@@ -11,9 +11,7 @@ import { AppLink } from '~/components/app-link';
 import { isUsageError } from '~/lib/errors/usage-error';
 import { getAppPath } from '~/lib/hooks/use-app-path';
 
-import { ProcessingScreen } from '../../../_components/processing-screen';
 import { startDDReportGeneration } from '../../../_lib/server/dd-reports-server-actions';
-import { useReportProgress } from '../../../_lib/use-report-progress';
 import {
   ALLOWED_ATTACHMENT_TYPES,
   MAX_ATTACHMENTS,
@@ -247,9 +245,6 @@ export default function DDNewReportPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Track progress once we have a report ID
-  const { progress } = useReportProgress(reportId);
-
   const canSubmit =
     companyName.trim().length > 0 &&
     startupMaterials.trim().length >= MIN_MATERIALS_LENGTH;
@@ -283,13 +278,8 @@ export default function DDNewReportPage() {
         // Clean up attachment previews
         attachments.forEach((a) => URL.revokeObjectURL(a.preview));
         setAttachments([]);
-
-        setFormState((prev) => ({
-          ...prev,
-          reportId: result.reportId,
-          step: 'processing',
-          isSubmitting: false,
-        }));
+        // Redirect to report page immediately - it will show the processing screen
+        router.push(getAppPath(`/app/reports/${result.reportId}`));
       }
     } catch (err) {
       console.error('Failed to start DD report:', err);
@@ -328,25 +318,6 @@ export default function DDNewReportPage() {
     },
     [handleSubmit],
   );
-
-  const handleViewReport = useCallback(() => {
-    if (reportId) {
-      router.push(getAppPath(`/app/reports/${reportId}`));
-    }
-  }, [reportId, router]);
-
-  // Show processing screen when we have a report in progress
-  if (step === 'processing' && progress) {
-    return (
-      <div className="min-h-[calc(100vh-120px)] bg-white">
-        <ProcessingScreen
-          progress={progress}
-          onComplete={handleViewReport}
-          designChallenge={`DD: ${companyName}`}
-        />
-      </div>
-    );
-  }
 
   // Input step - Matches regular new analysis page styling
   return (

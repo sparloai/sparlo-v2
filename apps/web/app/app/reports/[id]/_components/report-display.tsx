@@ -121,8 +121,26 @@ export function ReportDisplay({
   }, [isChatOpen, isChatLoading, cancelStream]);
 
   // Show processing screen if still in progress
-  if (isProcessing && progress) {
-    return <ProcessingScreen progress={progress} onComplete={handleComplete} />;
+  // Use real-time progress if available, otherwise construct from server-side report data
+  // This fixes the race condition where progress is null on first render
+  if (isProcessing) {
+    const displayProgress = progress ?? {
+      id: report.id,
+      status: report.status as 'clarifying' | 'processing' | 'complete' | 'error' | 'failed' | 'cancelled' | 'confirm_rerun',
+      currentStep: report.current_step,
+      phaseProgress: report.phase_progress ?? 0,
+      title: report.title,
+      clarifications: (report.clarifications ?? []).map((c) => ({
+        question: c.question,
+        answer: c.answer,
+        askedAt: c.askedAt,
+        answeredAt: undefined,
+      })),
+      reportData: report.report_data,
+      errorMessage: report.last_message,
+      createdAt: report.created_at,
+    };
+    return <ProcessingScreen progress={displayProgress} onComplete={handleComplete} />;
   }
 
   // Check if we have valid report content

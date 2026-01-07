@@ -9,9 +9,7 @@ import { cn } from '@kit/ui/utils';
 import { isUsageError } from '~/lib/errors/usage-error';
 import { getAppPath } from '~/lib/hooks/use-app-path';
 
-import { ProcessingScreen } from '../../../_components/processing-screen';
 import { startDDReportGeneration } from '../../../_lib/server/dd-reports-server-actions';
-import { useReportProgress } from '../../../_lib/use-report-progress';
 import { sanitizeErrorMessage } from '../_lib/sanitize-error';
 import { useFileAttachments } from '../_lib/use-file-attachments';
 import { AttachmentList } from './shared/attachment-list';
@@ -165,9 +163,6 @@ export function DueDiligenceAnalysisForm() {
     [deferredMaterials],
   );
 
-  // Track progress once we have a report ID
-  const { progress } = useReportProgress(reportId);
-
   const charCount = materials.length;
   const canSubmit = charCount >= MIN_CHARS;
 
@@ -202,13 +197,8 @@ export function DueDiligenceAnalysisForm() {
 
       if (result.reportId) {
         clearAttachments();
-
-        setFormState((prev) => ({
-          ...prev,
-          reportId: result.reportId,
-          step: 'processing',
-          isSubmitting: false,
-        }));
+        // Redirect to report page immediately - it will show the processing screen
+        router.push(getAppPath(`/app/reports/${result.reportId}`));
       }
     } catch (err) {
       console.error('Failed to start DD report:', err);
@@ -244,25 +234,6 @@ export function DueDiligenceAnalysisForm() {
     },
     [handleSubmit],
   );
-
-  const handleViewReport = useCallback(() => {
-    if (reportId) {
-      router.push(getAppPath(`/app/reports/${reportId}`));
-    }
-  }, [reportId, router]);
-
-  // Show processing screen when we have a report in progress
-  if (step === 'processing' && progress) {
-    return (
-      <div className="min-h-[calc(100vh-120px)] bg-white">
-        <ProcessingScreen
-          progress={progress}
-          onComplete={handleViewReport}
-          designChallenge={`DD: ${extractCompanyName(materials)}`}
-        />
-      </div>
-    );
-  }
 
   // Input step
   return (
