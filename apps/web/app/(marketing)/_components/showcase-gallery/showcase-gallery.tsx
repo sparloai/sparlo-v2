@@ -18,10 +18,10 @@
  * - Reuses existing section components with preview variant
  * - State managed via useShowcaseState hook with race condition protection
  */
-import { lazy, memo, Suspense, useMemo } from 'react';
+import { Suspense, lazy, memo, useMemo } from 'react';
 
-import { ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ExternalLink } from 'lucide-react';
 
 import {
   Accordion,
@@ -51,16 +51,19 @@ import { SelfCritiqueSection } from '~/app/reports/[id]/_components/brand-system
 import { SolutionConceptsSection } from '~/app/reports/[id]/_components/brand-system/sections/solution-concepts';
 import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
-import { getAvailableSections, REPORTS_CONFIG, type SectionConfig } from './config';
+import {
+  REPORTS_CONFIG,
+  type SectionConfig,
+  getAvailableSections,
+} from './config';
 import type { ReportId, SectionId } from './types';
 import { useShowcaseState } from './use-showcase-state';
 
 // Lazy load the full report modal for better initial load performance
-const BrandSystemReport = lazy(
-  () =>
-    import('~/app/reports/[id]/_components/brand-system/brand-system-report').then(
-      (mod) => ({ default: mod.BrandSystemReport }),
-    ),
+const BrandSystemReport = lazy(() =>
+  import('~/app/reports/[id]/_components/brand-system/brand-system-report').then(
+    (mod) => ({ default: mod.BrandSystemReport }),
+  ),
 );
 
 /**
@@ -109,7 +112,9 @@ function SectionPreviewContent({
     case 'recommendation':
       return (
         <RecommendationSection
-          personalRecommendation={data.strategic_integration?.personal_recommendation}
+          personalRecommendation={
+            data.strategic_integration?.personal_recommendation
+          }
         />
       );
     default:
@@ -150,7 +155,7 @@ const SectionCard = memo(function SectionCard({
           'flex items-start justify-between gap-6',
           'transition-colors duration-200',
           'hover:bg-zinc-50/50 hover:no-underline',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-900',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-inset',
           // Custom chevron styling - make it more prominent
           '[&>svg]:h-5 [&>svg]:w-5 [&>svg]:text-zinc-400 [&>svg]:transition-transform [&>svg]:duration-200',
           'group-data-[state=open]:[&>svg]:text-zinc-900',
@@ -162,13 +167,13 @@ const SectionCard = memo(function SectionCard({
             <span className="font-mono text-[12px] font-medium text-zinc-400">
               {sectionNumber}
             </span>
-            <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-zinc-400 group-data-[state=open]:text-zinc-600">
+            <span className="text-[12px] font-semibold tracking-[0.08em] text-zinc-400 uppercase group-data-[state=open]:text-zinc-600">
               {section.title}
             </span>
           </div>
 
           {/* Headline - Large, captivating, brand font */}
-          <p className="font-heading mt-3 line-clamp-2 text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900 md:text-[20px]">
+          <p className="font-heading mt-3 line-clamp-2 text-[18px] leading-[1.3] font-medium tracking-[-0.02em] text-zinc-900 md:text-[20px]">
             {headline}
           </p>
 
@@ -180,8 +185,12 @@ const SectionCard = memo(function SectionCard({
                   key={idx}
                   className="inline-flex items-center gap-1.5 text-[13px]"
                 >
-                  <span className="font-mono font-semibold text-zinc-600">{metric.value}</span>
-                  {metric.label && <span className="text-zinc-400">{metric.label}</span>}
+                  <span className="font-mono font-semibold text-zinc-600">
+                    {metric.value}
+                  </span>
+                  {metric.label && (
+                    <span className="text-zinc-400">{metric.label}</span>
+                  )}
                 </span>
               ))}
             </div>
@@ -189,9 +198,9 @@ const SectionCard = memo(function SectionCard({
         </div>
       </AccordionTrigger>
 
-      <AccordionContent className="border-t border-zinc-100 bg-zinc-50/50 px-6 pb-8 pt-6">
-        {/* Strip section chrome - show content directly */}
-        <div className="showcase-section-content [&_[data-section-title]]:hidden [&>section]:pt-0 [&>section>h2]:hidden [&>section]:space-y-6 [&_article]:space-y-6 [&_article>div:first-child]:hidden">
+      <AccordionContent className="border-t border-zinc-100 bg-zinc-50/50 px-6 pt-0 pb-6">
+        {/* Strip section chrome - hide ALL h1 titles, remove section margins, compact article spacing */}
+        <div className="showcase-section-content [&_section]:!mt-0 [&_section]:!pt-0 [&_h1]:!hidden [&_article]:!mt-4 [&_.mt-12]:!mt-6 [&_.mt-24]:!mt-0">
           <SectionPreviewContent sectionId={section.id} data={data} />
         </div>
       </AccordionContent>
@@ -240,6 +249,7 @@ const FullReportModal = memo(function FullReportModal({
               hasAppSidebar={false}
               showActions={false}
               compactTitle={true}
+              isEmbedded={true}
             />
           </Suspense>
         </div>
@@ -297,7 +307,7 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
           className="sticky top-16 z-40 h-auto w-full justify-start rounded-none border-y border-zinc-200 bg-white/95 px-0 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95"
           aria-label="Select a report"
         >
-          <div className="relative mx-auto max-w-4xl w-full">
+          <div className="relative mx-auto w-full max-w-4xl">
             <div className="no-scrollbar flex gap-1 overflow-x-auto px-4 py-3">
               {REPORTS_CONFIG.map((report) => {
                 const isActive = state.activeReportId === report.id;
@@ -324,7 +334,11 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
                       <motion.div
                         layoutId="showcaseActiveTab"
                         className="absolute inset-0 -z-10 rounded-lg bg-zinc-100"
-                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                        transition={{
+                          type: 'spring',
+                          stiffness: 500,
+                          damping: 30,
+                        }}
                       />
                     )}
                   </TabsTrigger>
@@ -332,7 +346,7 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
               })}
             </div>
             {/* Scroll fade indicator - hints at more content */}
-            <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-white via-white/80 to-transparent lg:hidden" />
+            <div className="pointer-events-none absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-white via-white/80 to-transparent lg:hidden" />
           </div>
         </TabsList>
       </Tabs>
@@ -350,7 +364,7 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
             <span>47 domains searched</span>
           </div>
 
-          <h3 className="text-[22px] font-semibold leading-tight tracking-[-0.02em] text-zinc-900 md:text-[26px]">
+          <h3 className="text-[22px] leading-tight font-semibold tracking-[-0.02em] text-zinc-900 md:text-[26px]">
             {reportData.title}
           </h3>
           {reportData.brief && (

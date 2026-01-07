@@ -89,6 +89,12 @@ interface BrandSystemReportProps {
    * @default false
    */
   compactTitle?: boolean;
+  /**
+   * Whether the report is embedded in a modal or other compact container.
+   * When true, removes min-h-screen and reduces padding.
+   * @default false
+   */
+  isEmbedded?: boolean;
 }
 
 // Reading speed constants (words per minute)
@@ -796,6 +802,7 @@ export const BrandSystemReport = memo(function BrandSystemReport({
   showActions = true,
   reportId,
   compactTitle = false,
+  isEmbedded = false,
 }: BrandSystemReportProps) {
   // Normalize field names for backward compatibility
   const normalizedData = normalizeReportData(reportData);
@@ -886,7 +893,10 @@ export const BrandSystemReport = memo(function BrandSystemReport({
 
   return (
     <div
-      className="relative min-h-screen bg-white transition-transform duration-300 ease-out"
+      className={cn(
+        'relative bg-white transition-transform duration-300 ease-out',
+        !isEmbedded && 'min-h-screen',
+      )}
       style={{
         transform: isChatOpen
           ? `translateX(-${CHAT_DRAWER_WIDTH / 2}px)`
@@ -894,13 +904,17 @@ export const BrandSystemReport = memo(function BrandSystemReport({
       }}
     >
       {/* Table of Contents - fixed sidebar for pages without app sidebar */}
-      {showToc && (
+      {showToc && !isEmbedded && (
         <TableOfContents sections={tocSections} hasAppSidebar={hasAppSidebar} />
       )}
 
       {/* Main Content - adjust margin when TOC is shown (TOC is w-56 = 224px) */}
       <div
-        className={`max-w-3xl px-6 py-16 ${showToc ? 'lg:ml-56 lg:pr-8' : 'mx-auto'}`}
+        className={cn(
+          'max-w-3xl',
+          isEmbedded ? 'px-0 py-4' : 'px-6 py-16',
+          showToc && !isEmbedded ? 'lg:ml-56 lg:pr-8' : 'mx-auto',
+        )}
       >
         <ReportContent
           normalizedData={normalizedData}
