@@ -162,7 +162,7 @@ function MultiFactorAuthSetupForm({
   );
 
   if (state.error) {
-    return <ErrorAlert />;
+    return <ErrorAlert errorMessage={state.error} />;
   }
 
   return (
@@ -497,7 +497,7 @@ function useVerifyCodeMutation(userId: string) {
   });
 }
 
-function ErrorAlert() {
+function ErrorAlert({ errorMessage }: { errorMessage?: string }) {
   return (
     <Alert variant={'destructive'}>
       <ExclamationTriangleIcon className={'h-4'} />
@@ -507,7 +507,11 @@ function ErrorAlert() {
       </AlertTitle>
 
       <AlertDescription>
-        <Trans i18nKey={'account:multiFactorSetupErrorDescription'} />
+        {errorMessage ? (
+          <span>{errorMessage}</span>
+        ) : (
+          <Trans i18nKey={'account:multiFactorSetupErrorDescription'} />
+        )}
       </AlertDescription>
     </Alert>
   );
