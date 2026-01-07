@@ -1,0 +1,56 @@
+import 'server-only';
+
+import { getSupabaseServerClient } from '@kit/supabase/server-client';
+
+import type { DashboardReportData, ReportMode } from '../types';
+import { extractReportMode } from '../utils/report-utils';
+
+export interface RecentReport {
+  id: string;
+  title: string;
+  created_at: string;
+  mode: ReportMode;
+}
+
+interface RawRecentReport {
+  id: string;
+  title: string;
+  created_at: string;
+  report_data: DashboardReportData | null;
+}
+
+/**
+ * Load the 5 most recent non-archived reports for a user.
+ * Returns empty array on error to gracefully degrade.
+ *
+ * Note: Uses idx_sparlo_reports_active partial index for performance.
+ */
+export async function loadRecentReports(
+  userId: string,
+): Promise<RecentReport[]> {
+  const client = getSupabaseServerClient();
+
+  const { data, error } = await client
+    .from('sparlo_reports')
+    .select('id, title, created_at, report_data')
+    .eq('account_id', userId)
+    .eq('archived', false)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  if (error) {
+    console.error('[Reports] Failed to load recent:', error);
+    return [];
+  }
+
+  const rows = data as unknown as RawRecentReport[] | null;
+
+  return (
+    rows?.map((row) => ({
+      id: row.id,
+      title: row.title,
+      created_at: row.created_at,
+      mode: extractReportMode(row.report_data),
+    })) ?? []
+  );
+}

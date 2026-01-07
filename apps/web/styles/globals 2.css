@@ -1,0 +1,110 @@
+/*
+* global.css
+*
+* Global styles for the entire application
+ */
+
+/* Tailwind CSS */
+@import 'tailwindcss';
+
+/* local styles - update the below if you add a new style */
+@import './theme.css';
+@import './theme.utilities.css';
+@import './shadcn-ui.css';
+@import './sparlo-tokens.css';
+@import './markdoc.css';
+@import './makerkit.css';
+@import './sparlo-animations.css';
+@import 'tw-animate-css';
+
+/* Report Intelligence Briefing Theme
+ * CSS is now imported in apps/web/app/home/(user)/reports/layout.tsx
+ * for code-splitting optimization (only loaded on report pages)
+ */
+
+/* content sources - update the below if you add a new path */
+@source '../../../packages/*/src/**/*.{ts,tsx}';
+@source '../../../packages/features/*/src/**/*.{ts,tsx}';
+@source '../../../packages/billing/*/src/**/*.{ts,tsx}';
+@source '../../../packages/plugins/*/src/**/*.{ts,tsx}';
+@source '../../../packages/cms/*/src/**/*.{ts,tsx}';
+@source '../{app,components,config,lib}/**/*.{ts,tsx}';
+
+/* variants - update the below if you add a new variant */
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+
+  html,
+  body {
+    scroll-padding-top: 64px;
+    /* Use clip to prevent horizontal overflow without breaking sticky positioning */
+    /* Fallback for older Safari that doesn't support clip */
+    overflow-x: clip;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Ensure sticky works - explicit scroll enables proper sticky context */
+    overflow-y: scroll;
+  }
+
+  [id] {
+    scroll-margin-top: 64px;
+  }
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border, currentColor);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: theme(--color-muted-foreground);
+  }
+
+  /* Remove default focus ring from textareas */
+  textarea:focus {
+    outline: none;
+    box-shadow: none;
+  }
+}
+
+@layer utilities {
+  .shadow-accent {
+    box-shadow: var(--shadow-accent);
+  }
+
+  /* Hide scrollbar but allow scrolling */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom scrollbar for report content */
+  .report-scroll::-webkit-scrollbar {
+    width: 6px;
+  }
+  .report-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .report-scroll::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 3px;
+  }
+  .report-scroll::-webkit-scrollbar-thumb:hover {
+    background: #d1d5db;
+  }
+}
