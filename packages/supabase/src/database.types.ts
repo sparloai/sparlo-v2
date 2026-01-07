@@ -793,6 +793,7 @@ export type Database = {
           inngest_run_id: string | null;
           last_message: string | null;
           messages: Json | null;
+          mode: string | null;
           phase_progress: number | null;
           report_data: Json | null;
           status: string;
@@ -815,6 +816,7 @@ export type Database = {
           inngest_run_id?: string | null;
           last_message?: string | null;
           messages?: Json | null;
+          mode?: string | null;
           phase_progress?: number | null;
           report_data?: Json | null;
           status?: string;
@@ -837,6 +839,7 @@ export type Database = {
           inngest_run_id?: string | null;
           last_message?: string | null;
           messages?: Json | null;
+          mode?: string | null;
           phase_progress?: number | null;
           report_data?: Json | null;
           status?: string;
@@ -994,6 +997,53 @@ export type Database = {
             columns: ['billing_customer_id'];
             isOneToOne: false;
             referencedRelation: 'billing_customers';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      token_limit_adjustments: {
+        Row: {
+          account_id: string;
+          admin_user_id: string;
+          created_at: string;
+          id: string;
+          new_limit: number;
+          old_limit: number;
+          reason_details: string | null;
+          reason_type: string;
+          tokens_added: number;
+          usage_period_id: string;
+        };
+        Insert: {
+          account_id: string;
+          admin_user_id: string;
+          created_at?: string;
+          id?: string;
+          new_limit: number;
+          old_limit: number;
+          reason_details?: string | null;
+          reason_type: string;
+          tokens_added: number;
+          usage_period_id: string;
+        };
+        Update: {
+          account_id?: string;
+          admin_user_id?: string;
+          created_at?: string;
+          id?: string;
+          new_limit?: number;
+          old_limit?: number;
+          reason_details?: string | null;
+          reason_type?: string;
+          tokens_added?: number;
+          usage_period_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'token_limit_adjustments_usage_period_id_fkey';
+            columns: ['usage_period_id'];
+            isOneToOne: false;
+            referencedRelation: 'usage_periods';
             referencedColumns: ['id'];
           },
         ];
@@ -1162,6 +1212,32 @@ export type Database = {
         };
         Returns: Database['public']['Tables']['invitations']['Row'][];
       };
+      adjust_usage_period_limit: {
+        Args: {
+          p_account_id: string;
+          p_additional_tokens: number;
+          p_admin_user_id: string;
+          p_reason_details?: string;
+          p_reason_type: string;
+        };
+        Returns: Json;
+      };
+      admin_search_users_by_email: {
+        Args: { p_email: string };
+        Returns: {
+          account_id: string;
+          account_name: string;
+          created_at: string;
+          email: string;
+          is_personal_account: boolean;
+          period_end: string;
+          period_start: string;
+          subscription_status: string;
+          tokens_limit: number;
+          tokens_used: number;
+          user_id: string;
+        }[];
+      };
       append_chat_messages: {
         Args: { p_messages: Json; p_report_id: string };
         Returns: Json;
@@ -1169,6 +1245,10 @@ export type Database = {
       can_action_account_member: {
         Args: { target_team_account_id: string; target_user_id: string };
         Returns: boolean;
+      };
+      check_admin_adjustment_rate_limit: {
+        Args: { p_admin_user_id: string };
+        Returns: undefined;
       };
       check_rate_limit: {
         Args: {
