@@ -7,8 +7,9 @@ import { z } from 'zod';
 import { enhanceAction } from '@kit/next/actions';
 import { getLogger } from '@kit/shared/logger';
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
+import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-import { adminAction } from './utils/admin-action';
+import { isSuperAdmin } from './utils/is-super-admin';
 
 // Explicit types (not inferred from ReturnType)
 export type AdminUserSearchResult = {
@@ -87,26 +88,30 @@ export type AdjustTokenLimitInput = z.infer<typeof AdjustTokenLimitSchema>;
 /**
  * Search for a user by email
  */
-export const searchUserByEmailAction = adminAction(
-  enhanceAction(
-    async (data: z.infer<typeof SearchUserSchema>) => {
-      const adminClient = getSupabaseServerAdminClient();
+export const searchUserByEmailAction = enhanceAction(
+  async (data: z.infer<typeof SearchUserSchema>) => {
+    // Check admin status
+    const isAdmin = await isSuperAdmin(getSupabaseServerClient());
+    if (!isAdmin) {
+      throw new Error('Unauthorized: Admin access required');
+    }
 
-      const { data: users, error } = await adminClient.rpc(
-        'admin_search_users_by_email',
-        {
-          p_email: data.email,
-        },
-      );
+    const adminClient = getSupabaseServerAdminClient();
 
-      if (error) {
-        throw new Error('Failed to search for user');
-      }
+    const { data: users, error } = await adminClient.rpc(
+      'admin_search_users_by_email',
+      {
+        p_email: data.email,
+      },
+    );
 
-      return { users: (users ?? []) as AdminUserSearchResult[] };
-    },
-    { schema: SearchUserSchema },
-  ),
+    if (error) {
+      throw new Error('Failed to search for user');
+    }
+
+    return { users: (users ?? []) as AdminUserSearchResult[] };
+  },
+  { schema: SearchUserSchema },
 );
 
 // Type for the RPC response
@@ -121,81 +126,85 @@ type AdjustUsagePeriodLimitResult = {
 /**
  * Increase token limit for a user's current usage period
  */
-export const increaseTokenLimitAction = adminAction(
-  enhanceAction(
-    async (data: AdjustTokenLimitInput, user) => {
-      const logger = await getLogger();
-      const adminClient = getSupabaseServerAdminClient();
+export const increaseTokenLimitAction = enhanceAction(
+  async (data: AdjustTokenLimitInput, user) => {
+    // Check admin status
+    const isAdmin = await isSuperAdmin(getSupabaseServerClient());
+    if (!isAdmin) {
+      throw new Error('Unauthorized: Admin access required');
+    }
 
-      logger.info(
-        {
-          accountId: data.accountId,
-          additionalTokens: data.additionalTokens,
-          reasonType: data.reasonType,
-          adminUserId: user.id,
-        },
-        'Admin increasing token limit',
+    const logger = await getLogger();
+    const adminClient = getSupabaseServerAdminClient();
+
+    logger.info(
+      {
+        accountId: data.accountId,
+        additionalTokens: data.additionalTokens,
+        reasonType: data.reasonType,
+        adminUserId: user.id,
+      },
+      'Admin increasing token limit',
+    );
+
+    const { data: result, error } = await adminClient.rpc(
+      'adjust_usage_period_limit',
+      {
+        p_account_id: data.accountId,
+        p_additional_tokens: data.additionalTokens,
+        p_admin_user_id: user.id,
+        p_reason_type: data.reasonType,
+        p_reason_details: data.reasonDetails,
+      },
+    );
+
+    if (error) {
+      logger.error(
+        { error, accountId: data.accountId },
+        'Failed to adjust token limit',
       );
 
-      const { data: result, error } = await adminClient.rpc(
-        'adjust_usage_period_limit',
-        {
-          p_account_id: data.accountId,
-          p_additional_tokens: data.additionalTokens,
-          p_admin_user_id: user.id,
-          p_reason_type: data.reasonType,
-          p_reason_details: data.reasonDetails,
-        },
-      );
-
-      if (error) {
-        logger.error(
-          { error, accountId: data.accountId },
-          'Failed to adjust token limit',
+      // User-friendly error messages
+      if (error.message.includes('Rate limit exceeded')) {
+        throw new Error(
+          'Too many adjustments. Please wait before making more changes.',
         );
-
-        // User-friendly error messages
-        if (error.message.includes('Rate limit exceeded')) {
-          throw new Error(
-            'Too many adjustments. Please wait before making more changes.',
-          );
-        }
-        if (error.message.includes('No active usage period')) {
-          throw new Error('This user does not have an active billing period.');
-        }
-        if (error.message.includes('safety limit')) {
-          throw new Error(
-            'This would exceed the safety limit for adjustments this period.',
-          );
-        }
-        if (error.message.includes('cannot be less than')) {
-          throw new Error(
-            'Token limit cannot be less than tokens already used.',
-          );
-        }
-
-        throw new Error('Failed to adjust token limit. Please try again.');
+      }
+      if (error.message.includes('No active usage period')) {
+        throw new Error('This user does not have an active billing period.');
+      }
+      if (error.message.includes('safety limit')) {
+        throw new Error(
+          'This would exceed the safety limit for adjustments this period.',
+        );
+      }
+      if (error.message.includes('cannot be less than')) {
+        throw new Error(
+          'Token limit cannot be less than tokens already used.',
+        );
       }
 
-      const typedResult = result as AdjustUsagePeriodLimitResult;
+      throw new Error('Failed to adjust token limit. Please try again.');
+    }
 
-      logger.info(
-        {
-          accountId: data.accountId,
-          oldLimit: typedResult.old_limit,
-          newLimit: typedResult.new_limit,
-        },
-        'Token limit increased successfully',
-      );
+    const typedResult = result as AdjustUsagePeriodLimitResult;
 
-      revalidatePath('/admin/usage');
-
-      return {
+    logger.info(
+      {
+        accountId: data.accountId,
         oldLimit: typedResult.old_limit,
         newLimit: typedResult.new_limit,
-        tokensUsed: typedResult.tokens_used,
-      };
-    },
-    { schema: AdjustTokenLimitSchema },
-  ),
+      },
+      'Token limit increased successfully',
+    );
+
+    revalidatePath('/admin/usage');
+
+    return {
+      oldLimit: typedResult.old_limit,
+      newLimit: typedResult.new_limit,
+      tokensUsed: typedResult.tokens_used,
+    };
+  },
+  { schema: AdjustTokenLimitSchema },
 );
