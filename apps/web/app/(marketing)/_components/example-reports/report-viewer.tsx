@@ -84,11 +84,14 @@ export function ReportViewer({ report }: ReportViewerProps) {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   // Reset scroll when report changes
+  // Using requestAnimationFrame to avoid synchronous setState in effect
   useEffect(() => {
     if (contentRef.current) {
       contentRef.current.scrollTop = 0;
-      setScrollProgress(0);
-      setActiveSection('executive-summary');
+      requestAnimationFrame(() => {
+        setScrollProgress(0);
+        setActiveSection('executive-summary');
+      });
     }
   }, [report.id]);
 
