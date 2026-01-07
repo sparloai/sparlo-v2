@@ -23,13 +23,55 @@ import {
 interface ExecutiveSummarySectionProps {
   data?: string | StructuredExecutiveSummary;
   brief?: string;
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const ExecutiveSummarySection = memo(function ExecutiveSummarySection({
   data,
   brief,
+  variant = 'full',
 }: ExecutiveSummarySectionProps) {
   if (!data && !brief) return null;
+
+  // Preview variant: condensed view for showcase gallery
+  if (variant === 'preview') {
+    const structured = typeof data === 'string' ? null : data;
+    const narrativeLead = structured?.narrative_lead || (typeof data === 'string' ? data : brief);
+    const viability = structured?.viability_label || structured?.viability;
+
+    return (
+      <div className="space-y-4">
+        {/* Viability badge */}
+        {viability && (
+          <div className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1">
+            <span className="text-sm font-medium text-zinc-700">{viability}</span>
+          </div>
+        )}
+
+        {/* Lead narrative */}
+        {narrativeLead && (
+          <p className="text-[15px] leading-relaxed text-zinc-700">
+            {narrativeLead.slice(0, 300)}
+            {narrativeLead.length > 300 ? '...' : ''}
+          </p>
+        )}
+
+        {/* Core insight if available */}
+        {structured?.core_insight?.headline && (
+          <div className="border-l-2 border-zinc-900 pl-4">
+            <p className="text-[15px] font-medium text-zinc-900">
+              {structured.core_insight.headline}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // Handle string format (legacy)
   if (typeof data === 'string') {

@@ -20,12 +20,49 @@ import {
 
 interface ChallengeFrameSectionProps {
   data?: ChallengeTheFrame[];
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const ChallengeFrameSection = memo(function ChallengeFrameSection({
   data,
+  variant = 'full',
 }: ChallengeFrameSectionProps) {
   if (!data || data.length === 0) return null;
+
+  // Preview variant: condensed view for showcase gallery
+  if (variant === 'preview') {
+    const firstItem = data[0];
+
+    return (
+      <div className="space-y-4">
+        {/* First assumption challenged */}
+        {firstItem && (
+          <div className="border-l-2 border-zinc-900 pl-4">
+            <p className="text-[15px] font-medium text-zinc-900">
+              {firstItem.assumption}
+            </p>
+            {firstItem.challenge && (
+              <p className="mt-2 text-[14px] text-zinc-600">
+                <span className="font-medium">Challenge:</span> {firstItem.challenge}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Count if more items */}
+        {data.length > 1 && (
+          <p className="text-[14px] text-zinc-500">
+            <span className="font-medium text-zinc-700">{data.length}</span> assumptions challenged
+          </p>
+        )}
+      </div>
+    );
+  }
 
   return (
     <Section id="challenge-the-frame">

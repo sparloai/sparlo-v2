@@ -286,15 +286,61 @@ const InnovationReadinessBlock = memo(function InnovationReadinessBlock({
 
 interface InnovationConceptsSectionProps {
   data?: InnovationPortfolio;
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const InnovationConceptsSection = memo(
-  function InnovationConceptsSection({ data }: InnovationConceptsSectionProps) {
+  function InnovationConceptsSection({ data, variant = 'full' }: InnovationConceptsSectionProps) {
     if (!data) return null;
 
     const hasContent =
       data.recommended_innovation ||
       (data.parallel_investigations && data.parallel_investigations.length > 0);
+
+    // Preview variant: condensed view for showcase gallery
+    if (variant === 'preview') {
+      const recommended = data.recommended_innovation;
+      const parallelCount = data.parallel_investigations?.length || 0;
+
+      return (
+        <div className="space-y-4">
+          {/* Recommended innovation title */}
+          {recommended?.title && (
+            <div className="border-l-2 border-zinc-900 pl-4">
+              <p className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">
+                Recommended Innovation
+              </p>
+              <p className="mt-1 text-[16px] font-medium text-zinc-900">
+                {recommended.title}
+              </p>
+            </div>
+          )}
+
+          {/* What it is */}
+          {recommended?.what_it_is && (
+            <p className="text-[15px] leading-relaxed text-zinc-700">
+              {recommended.what_it_is.slice(0, 200)}
+              {recommended.what_it_is.length > 200 ? '...' : ''}
+            </p>
+          )}
+
+          {/* Summary counts */}
+          <div className="flex flex-wrap gap-3 text-[14px]">
+            {parallelCount > 0 && (
+              <span>
+                <span className="font-medium text-zinc-700">{parallelCount}</span>{' '}
+                <span className="text-zinc-500">parallel investigations</span>
+              </span>
+            )}
+          </div>
+        </div>
+      );
+    }
 
     if (!hasContent) return null;
 
