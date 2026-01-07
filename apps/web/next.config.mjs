@@ -134,12 +134,6 @@ function getImagesConfig() {
 
 async function getRedirects() {
   return [
-    // Redirect root to app
-    {
-      source: '/',
-      destination: '/app',
-      permanent: false,
-    },
     // Redirect old /home/* URLs to new /app/* URLs
     {
       source: '/home/:path*',
