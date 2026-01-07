@@ -222,7 +222,7 @@ const FullReportModal = memo(function FullReportModal({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
-      <DialogContent className="fixed inset-4 h-auto max-h-[calc(100vh-2rem)] max-w-none overflow-y-auto rounded-xl bg-white p-0 shadow-2xl md:inset-8 lg:inset-12">
+      <DialogContent className="!fixed !top-4 !right-4 !bottom-4 !left-4 !translate-x-0 !translate-y-0 h-auto max-h-[calc(100vh-2rem)] !max-w-none w-auto overflow-y-auto rounded-xl bg-white p-0 shadow-2xl md:!inset-8 lg:!inset-12">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-4">
           <DialogTitle className="text-lg font-semibold text-zinc-900">
             {data.title}
