@@ -366,9 +366,10 @@ export const generateDDReport = inngest.createFunction(
       // that may not have been applied yet. Regenerate types after migration.
       const rateLimitResult = await step.run('check-rate-limit', async () => {
         try {
+          // Get fresh client inside step.run to avoid stale references
+          const rateLimitSupabase = getSupabaseServerAdminClient();
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const rpc = supabase.rpc as any;
-          const { data, error } = await rpc('check_rate_limit', {
+          const { data, error } = await (rateLimitSupabase as any).rpc('check_rate_limit', {
             p_account_id: accountId,
             p_resource_type: 'dd_report',
             p_limit: RATE_LIMIT_REPORTS_PER_HOUR,
@@ -1508,10 +1509,10 @@ Make the report 3-5x more valuable than traditional DD.`;
           // Note: Uses type assertion because the RPC function is added by migration
           // that may not have been applied yet. Regenerate types after migration.
           // P1 FIX: Get fresh client to avoid stale reference issues in nested async callbacks
+          // FIX: Call rpc as method (not extracted) to preserve 'this' context
           const completionSupabase = getSupabaseServerAdminClient();
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const rpc = completionSupabase.rpc as any;
-          const { data, error } = await rpc('complete_dd_report_atomic', {
+          const { data, error } = await (completionSupabase as any).rpc('complete_dd_report_atomic', {
             p_report_id: reportId,
             p_report_data: reportData,
             p_title: generatedTitle,
