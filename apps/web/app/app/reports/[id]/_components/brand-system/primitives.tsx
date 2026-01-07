@@ -617,3 +617,242 @@ export const UnknownFieldRenderer = memo(function UnknownFieldRenderer({
 
   return null;
 });
+
+// ============================================
+// DD REPORT SPECIFIC PRIMITIVES
+// Typography-based verdict/severity indicators
+// ============================================
+
+/**
+ * Verdict Display - Typography-based verdict indicator
+ * Replaces colored boxes with weight/size hierarchy
+ * Larger + bolder + thicker border = more positive verdict
+ */
+type VerdictLevel =
+  | 'COMPELLING'
+  | 'PROMISING'
+  | 'MIXED'
+  | 'CAUTION'
+  | 'CONCERNING'
+  | 'PASS';
+
+interface VerdictDisplayProps {
+  verdict: string;
+  confidence?: string;
+  className?: string;
+}
+
+const VERDICT_STYLES: Record<string, { text: string; border: string }> = {
+  COMPELLING: {
+    text: 'text-[28px] font-semibold text-zinc-900',
+    border: 'border-l-4 border-zinc-900',
+  },
+  PROMISING: {
+    text: 'text-[24px] font-medium text-zinc-800',
+    border: 'border-l-4 border-zinc-700',
+  },
+  MIXED: {
+    text: 'text-[22px] font-medium text-zinc-700',
+    border: 'border-l-2 border-zinc-500',
+  },
+  CAUTION: {
+    text: 'text-[20px] font-normal text-zinc-600',
+    border: 'border-l-2 border-zinc-400',
+  },
+  CONCERNING: {
+    text: 'text-[20px] font-normal text-zinc-500',
+    border: 'border-l-2 border-zinc-300',
+  },
+  PASS: {
+    text: 'text-[18px] font-normal text-zinc-500',
+    border: 'border-l border-zinc-200',
+  },
+};
+
+const DEFAULT_VERDICT_STYLE = {
+  text: 'text-[22px] font-medium text-zinc-700',
+  border: 'border-l-2 border-zinc-500',
+};
+
+function normalizeVerdict(verdict: string | undefined): VerdictLevel {
+  if (!verdict) return 'MIXED';
+  // Strip annotations like "WEAK - needs improvement" → "WEAK"
+  const cleaned = verdict
+    .toUpperCase()
+    .replace(/\s*-.*$/, '')
+    .trim();
+  if (cleaned in VERDICT_STYLES) return cleaned as VerdictLevel;
+  return 'MIXED';
+}
+
+export const VerdictDisplay = memo(function VerdictDisplay({
+  verdict,
+  confidence,
+  className,
+}: VerdictDisplayProps) {
+  const normalizedVerdict = normalizeVerdict(verdict);
+  // Get style with guaranteed fallback
+  const lookupStyle = VERDICT_STYLES[normalizedVerdict];
+  const text = lookupStyle ? lookupStyle.text : DEFAULT_VERDICT_STYLE.text;
+  const border = lookupStyle
+    ? lookupStyle.border
+    : DEFAULT_VERDICT_STYLE.border;
+
+  return (
+    <div
+      className={cn('py-4 pl-6', border, className)}
+      role="status"
+      aria-label={`Verdict: ${normalizedVerdict}${confidence ? `, ${confidence} confidence` : ''}`}
+    >
+      <span className={text}>{normalizedVerdict}</span>
+      {confidence && (
+        <span className="ml-3 text-[14px] text-zinc-400">
+          ({confidence} confidence)
+        </span>
+      )}
+    </div>
+  );
+});
+
+/**
+ * Risk Severity Indicator - Typography-based with dots
+ * Replaces colored badges with weight/size hierarchy
+ */
+interface RiskSeverityIndicatorProps {
+  severity: string;
+  label?: string;
+  className?: string;
+}
+
+const SEVERITY_STYLES: Record<string, { dot: string; text: string }> = {
+  CRITICAL: { dot: 'bg-zinc-900', text: 'font-semibold text-zinc-900' },
+  HIGH: { dot: 'bg-zinc-700', text: 'font-medium text-zinc-700' },
+  MEDIUM: { dot: 'bg-zinc-500', text: 'font-normal text-zinc-600' },
+  LOW: { dot: 'bg-zinc-300', text: 'font-normal text-zinc-400' },
+};
+
+const DEFAULT_SEVERITY_STYLE = {
+  dot: 'bg-zinc-500',
+  text: 'font-normal text-zinc-600',
+};
+
+function normalizeSeverity(
+  severity: string | undefined,
+): keyof typeof SEVERITY_STYLES {
+  if (!severity) return 'MEDIUM';
+  const cleaned = severity.toUpperCase().trim();
+  if (cleaned in SEVERITY_STYLES)
+    return cleaned as keyof typeof SEVERITY_STYLES;
+  return 'MEDIUM';
+}
+
+export const RiskSeverityIndicator = memo(function RiskSeverityIndicator({
+  severity,
+  label,
+  className,
+}: RiskSeverityIndicatorProps) {
+  const normalizedSeverity = normalizeSeverity(severity);
+  // Get style with guaranteed fallback
+  const lookupStyle = SEVERITY_STYLES[normalizedSeverity];
+  const dot = lookupStyle ? lookupStyle.dot : DEFAULT_SEVERITY_STYLE.dot;
+  const textClass = lookupStyle
+    ? lookupStyle.text
+    : DEFAULT_SEVERITY_STYLE.text;
+
+  return (
+    <span className={cn('inline-flex items-center gap-2', className)}>
+      <span className={cn('h-1.5 w-1.5 rounded-full', dot)} />
+      <span className={cn('text-[13px]', textClass)}>
+        {label || normalizedSeverity}
+      </span>
+    </span>
+  );
+});
+
+/**
+ * Score Display - For ratings like 6.5/10
+ * Clean card with large number and optional one-liner
+ */
+interface ScoreDisplayProps {
+  score: number | string;
+  outOf: number;
+  label?: string;
+  oneLiner?: string;
+  className?: string;
+}
+
+export const ScoreDisplay = memo(function ScoreDisplay({
+  score,
+  outOf,
+  label,
+  oneLiner,
+  className,
+}: ScoreDisplayProps) {
+  // Handle string scores like "6.5" → 6.5
+  const numericScore =
+    typeof score === 'string' ? parseFloat(score) || 0 : score;
+
+  return (
+    <div className={cn('rounded-lg border border-zinc-200 p-4', className)}>
+      <div className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
+        {label || 'Score'}
+      </div>
+      <div className="mt-1 text-[32px] font-semibold text-zinc-900">
+        {numericScore}
+        <span className="text-[18px] text-zinc-400">/{outOf}</span>
+      </div>
+      {oneLiner && <p className="mt-2 text-[14px] text-zinc-500">{oneLiner}</p>}
+    </div>
+  );
+});
+
+/**
+ * Verdict Indicator - Compact version for grid display
+ * Shows label + verdict in a small card
+ */
+interface VerdictIndicatorProps {
+  label: string;
+  verdict: string;
+  symbol?: string;
+  className?: string;
+}
+
+const INDICATOR_VERDICT_STYLES: Record<string, string> = {
+  SOUND: 'text-zinc-900 font-medium',
+  STRONG: 'text-zinc-900 font-medium',
+  GOOD: 'text-zinc-800',
+  REASONABLE: 'text-zinc-700',
+  CHALLENGING: 'text-zinc-600',
+  WEAK: 'text-zinc-500',
+  RIGHT_TIME: 'text-zinc-800 font-medium',
+};
+
+export const VerdictIndicator = memo(function VerdictIndicator({
+  label,
+  verdict,
+  symbol,
+  className,
+}: VerdictIndicatorProps) {
+  if (!verdict) return null;
+
+  const normalizedVerdict = verdict
+    .toUpperCase()
+    .replace(/\s*-.*$/, '')
+    .trim();
+  const textStyle =
+    INDICATOR_VERDICT_STYLES[normalizedVerdict] || 'text-zinc-600';
+
+  return (
+    <div className={cn('rounded-lg border border-zinc-200 p-3', className)}>
+      <div className="text-[11px] font-medium tracking-[0.06em] text-zinc-400 uppercase">
+        {label}
+      </div>
+      <div
+        className={cn('mt-1 flex items-center gap-1 text-[14px]', textStyle)}
+      >
+        {symbol && <span className="text-[12px]">{symbol}</span>}
+        <span>{verdict}</span>
+      </div>
+    </div>
+  );
+});
