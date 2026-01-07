@@ -97,12 +97,6 @@ import { trackReportCompleted } from '../utils/analytics';
 /** Token budget limit for safety */
 const TOKEN_BUDGET_LIMIT = 250000; // 250K tokens max per DD report
 
-/** Rate limit: max reports per hour per account */
-const RATE_LIMIT_REPORTS_PER_HOUR = 5;
-
-/** Rate limit window in minutes */
-const RATE_LIMIT_WINDOW_MINUTES = 60;
-
 // =============================================================================
 // Types
 // =============================================================================
@@ -311,9 +305,6 @@ export const generateDDReport = inngest.createFunction(
     ).__inngestActiveExecutions;
     tracker?.increment();
 
-    // Generate idempotency key from event ID for token tracking
-    const idempotencyKey = `dd-report-${event.data.reportId}-${event.id || Date.now()}`;
-
     try {
       console.log('[DD Function] Starting with event:', {
         name: event.name,
@@ -357,58 +348,6 @@ export const generateDDReport = inngest.createFunction(
             eventAccountId: event.data.accountId,
           },
         );
-      }
-
-      // =========================================
-      // P1 FIX (142): Rate Limiting Check
-      // =========================================
-      // Note: Uses type assertion because the RPC function is added by migration
-      // that may not have been applied yet. Regenerate types after migration.
-      const rateLimitResult = await step.run('check-rate-limit', async () => {
-        try {
-          // Get fresh client inside step.run to avoid stale references
-          const rateLimitSupabase = getSupabaseServerAdminClient();
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data, error } = await (rateLimitSupabase as any).rpc('check_rate_limit', {
-            p_account_id: accountId,
-            p_resource_type: 'dd_report',
-            p_limit: RATE_LIMIT_REPORTS_PER_HOUR,
-            p_window_minutes: RATE_LIMIT_WINDOW_MINUTES,
-          });
-
-          if (error) {
-            console.warn('[DD Function] Rate limit check failed:', error);
-            // Don't fail the report if rate limiting check fails
-            return { allowed: true, reset_at: null };
-          }
-
-          return data as {
-            allowed: boolean;
-            current_count: number;
-            limit: number;
-            reset_at: string | null;
-          };
-        } catch {
-          // Function may not exist yet - allow the request
-          console.warn('[DD Function] Rate limit function not available');
-          return { allowed: true, reset_at: null };
-        }
-      });
-
-      if (!rateLimitResult.allowed && rateLimitResult.reset_at) {
-        const resetAt = new Date(rateLimitResult.reset_at);
-        const errorMessage = `Rate limit exceeded. You can generate ${RATE_LIMIT_REPORTS_PER_HOUR} reports per hour. Try again at ${resetAt.toLocaleTimeString()}.`;
-
-        await supabase
-          .from('sparlo_reports')
-          .update({
-            status: 'failed',
-            error_message: errorMessage,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', reportId);
-
-        return { success: false, reportId, error: errorMessage };
       }
 
       // =========================================
@@ -1505,87 +1444,41 @@ Make the report 3-5x more valuable than traditional DD.`;
             tokenUsage: totalUsage,
           };
 
-          // P1 FIX (143, 145): Use atomic completion function with idempotency
-          // Note: Uses type assertion because the RPC function is added by migration
-          // that may not have been applied yet. Regenerate types after migration.
-          // P1 FIX: Get fresh client to avoid stale reference issues in nested async callbacks
-          // FIX: Call rpc as method (not extracted) to preserve 'this' context
+          // Complete the report
           const completionSupabase = getSupabaseServerAdminClient();
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data, error } = await (completionSupabase as any).rpc('complete_dd_report_atomic', {
-            p_report_id: reportId,
-            p_report_data: reportData,
-            p_title: generatedTitle,
-            p_headline: headline,
-            p_account_id: accountId,
-            p_total_tokens: totalUsage.totalTokens,
-            p_idempotency_key: idempotencyKey,
-          });
+          const { error: updateError } = await completionSupabase
+            .from('sparlo_reports')
+            .update({
+              status: 'complete',
+              current_step: 'complete',
+              phase_progress: 100,
+              title: generatedTitle,
+              headline,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              report_data: reportData as any,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', reportId)
+            .eq('account_id', accountId);
 
-          if (error) {
-            // Fallback to non-atomic update if function doesn't exist
-            if (
-              error.message?.includes('function') &&
-              error.message?.includes('does not exist')
-            ) {
-              console.warn(
-                '[DD Function] Atomic completion not available, using fallback',
-              );
-
-              // Non-atomic fallback - use fresh client
-              const fallbackSupabase = getSupabaseServerAdminClient();
-              const { error: updateError } = await fallbackSupabase
-                .from('sparlo_reports')
-                .update({
-                  status: 'complete',
-                  current_step: 'complete',
-                  phase_progress: 100,
-                  title: generatedTitle,
-                  headline,
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  report_data: reportData as any,
-                  updated_at: new Date().toISOString(),
-                })
-                .eq('id', reportId)
-                .eq('account_id', accountId);
-
-              if (updateError) {
-                throw new Error(
-                  `Failed to update report: ${updateError.message}`,
-                );
-              }
-
-              // Track token usage (non-idempotent fallback)
-              // P1 FIX: Wrap in try-catch to prevent crash if client is in invalid state
-              try {
-                const freshSupabase = getSupabaseServerAdminClient();
-                await freshSupabase.rpc('increment_usage', {
-                  p_account_id: accountId,
-                  p_tokens: totalUsage.totalTokens,
-                  p_is_report: true,
-                  p_is_chat: false,
-                });
-              } catch (usageError) {
-                // Log but don't fail - report completion is more important than usage tracking
-                console.warn(
-                  '[DD Function] Failed to track token usage in fallback:',
-                  usageError,
-                );
-              }
-            } else {
-              console.error('[DD Function] Atomic completion failed:', error);
-              throw new Error(`Failed to complete report: ${error.message}`);
-            }
-          } else {
-            const result = data as { success: boolean; error?: string };
-            if (!result.success) {
-              throw new Error(
-                result.error || 'Unknown error completing report',
-              );
-            }
+          if (updateError) {
+            throw new Error(`Failed to update report: ${updateError.message}`);
           }
 
-          console.log('[DD Function] Report completed atomically:', {
+          // Track token usage
+          try {
+            await completionSupabase.rpc('increment_usage', {
+              p_account_id: accountId,
+              p_tokens: totalUsage.totalTokens,
+              p_is_report: true,
+              p_is_chat: false,
+            });
+          } catch (usageError) {
+            // Log but don't fail - report completion is more important than usage tracking
+            console.warn('[DD Function] Failed to track token usage:', usageError);
+          }
+
+          console.log('[DD Function] Report completed:', {
             reportId,
             tokens: totalUsage.totalTokens,
             costUsd: totalUsage.costUsd,
