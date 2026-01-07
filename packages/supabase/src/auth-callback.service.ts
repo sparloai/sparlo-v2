@@ -189,10 +189,10 @@ class AuthCallbackService {
   /**
    * Allowed hosts for production environment.
    * Prevents host header injection attacks.
+   * NOTE: app.sparlo.ai subdomain is deprecated - all traffic stays on sparlo.ai
    */
   private static readonly ALLOWED_HOSTS = new Set([
     'sparlo.ai',
-    'app.sparlo.ai',
     'www.sparlo.ai',
   ]);
 

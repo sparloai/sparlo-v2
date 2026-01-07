@@ -1,10 +1,13 @@
 /**
  * Centralized subdomain and routing configuration.
  * Single source of truth for subdomain detection, path validation, and URL generation.
+ *
+ * NOTE: app.sparlo.ai subdomain is DEPRECATED. All traffic stays on sparlo.ai.
  */
 
 /**
- * App subdomain for authenticated users (e.g., app.sparlo.ai).
+ * App subdomain for authenticated users.
+ * @deprecated app.sparlo.ai is no longer used - all traffic stays on main domain
  */
 export const APP_SUBDOMAIN = process.env.NEXT_PUBLIC_APP_SUBDOMAIN || 'app';
 
@@ -42,10 +45,10 @@ export const PUBLIC_PATHS = [
 /**
  * Allowed hostnames for the app subdomain.
  * Used for exact hostname matching to prevent host header injection attacks.
+ * NOTE: app.sparlo.ai removed - subdomain is deprecated
  */
 const ALLOWED_APP_HOSTS = new Set([
-  `${APP_SUBDOMAIN}.${PRODUCTION_DOMAIN}`,
-  // Add localhost variants for development
+  // Only localhost for development
   'localhost',
   '127.0.0.1',
 ]);

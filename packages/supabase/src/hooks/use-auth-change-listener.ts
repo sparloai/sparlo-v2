@@ -14,8 +14,9 @@ import { useSupabase } from './use-supabase';
 /**
  * Allowed hostnames for the app subdomain.
  * Uses exact match to prevent host header injection attacks.
+ * NOTE: app.sparlo.ai subdomain is deprecated - all traffic stays on sparlo.ai
  */
-const ALLOWED_APP_HOSTS = new Set(['app.sparlo.ai', 'localhost', '127.0.0.1']);
+const ALLOWED_APP_HOSTS = new Set(['localhost', '127.0.0.1']);
 
 /**
  * Allowed production domains for redirects.
