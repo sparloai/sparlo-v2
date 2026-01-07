@@ -120,11 +120,11 @@ function SectionPreviewContent({
 /**
  * Section Card Component - Individual expandable card
  *
- * Technical document aesthetic:
- * - Left border accent (Sparlo signature pattern)
- * - Monospace metrics for data precision
- * - Section numbering for document structure
- * - Sharp corners on left, rounded on right
+ * Captivating accordion design:
+ * - Large, readable headlines that invite exploration
+ * - Clear visual expand/collapse indicator
+ * - Left border accent darkens when expanded
+ * - Brand fonts (font-heading) for headlines
  */
 const SectionCard = memo(function SectionCard({
   section,
@@ -142,42 +142,45 @@ const SectionCard = memo(function SectionCard({
   return (
     <AccordionItem
       value={section.id}
-      className="group overflow-hidden rounded-r-lg border border-l-2 border-zinc-200 border-l-zinc-300 bg-white transition-colors data-[state=open]:border-l-zinc-900"
+      className="group overflow-hidden rounded-r-lg border border-l-[3px] border-zinc-200 border-l-zinc-200 bg-white transition-all duration-200 hover:border-l-zinc-400 data-[state=open]:border-l-zinc-900 data-[state=open]:shadow-sm"
     >
       <AccordionTrigger
         className={cn(
-          'w-full px-6 py-5 text-left',
-          'flex items-start justify-between gap-4',
+          'w-full px-6 py-6 text-left',
+          'flex items-start justify-between gap-6',
           'transition-colors duration-200',
           'hover:bg-zinc-50/50 hover:no-underline',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-zinc-900',
+          // Custom chevron styling - make it more prominent
+          '[&>svg]:h-5 [&>svg]:w-5 [&>svg]:text-zinc-400 [&>svg]:transition-transform [&>svg]:duration-200',
+          'group-data-[state=open]:[&>svg]:text-zinc-900',
         )}
       >
         <div className="min-w-0 flex-1 text-left">
-          {/* Section Header with Number */}
-          <div className="flex items-baseline gap-3">
-            <span className="font-mono text-[11px] font-medium text-zinc-400">
+          {/* Section Label */}
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[12px] font-medium text-zinc-400">
               {sectionNumber}
             </span>
-            <span className="text-[13px] font-semibold uppercase tracking-[0.06em] text-zinc-500">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.08em] text-zinc-400 group-data-[state=open]:text-zinc-600">
               {section.title}
             </span>
           </div>
 
-          {/* Headline Preview */}
-          <p className="mt-2 line-clamp-2 text-[15px] leading-snug text-zinc-900">
+          {/* Headline - Large, captivating, brand font */}
+          <p className="font-heading mt-3 line-clamp-2 text-[18px] font-medium leading-[1.3] tracking-[-0.02em] text-zinc-900 md:text-[20px]">
             {headline}
           </p>
 
-          {/* Metrics - Monospace for technical precision */}
+          {/* Metrics - Compact row */}
           {metrics.length > 0 && (
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
               {metrics.map((metric, idx) => (
                 <span
                   key={idx}
-                  className="inline-flex items-center gap-1.5 text-[12px] text-zinc-500"
+                  className="inline-flex items-center gap-1.5 text-[13px]"
                 >
-                  <span className="font-mono font-semibold text-zinc-700">{metric.value}</span>
+                  <span className="font-mono font-semibold text-zinc-600">{metric.value}</span>
                   {metric.label && <span className="text-zinc-400">{metric.label}</span>}
                 </span>
               ))}
@@ -186,9 +189,9 @@ const SectionCard = memo(function SectionCard({
         </div>
       </AccordionTrigger>
 
-      <AccordionContent className="border-t border-zinc-100 bg-zinc-50/30 px-6 pb-8 pt-6">
-        {/* Hide section titles since they're already in the card header */}
-        <div className="showcase-section-content [&_[data-section-title]]:hidden [&>section>h2]:hidden [&>section]:pt-0">
+      <AccordionContent className="border-t border-zinc-100 bg-zinc-50/50 px-6 pb-8 pt-6">
+        {/* Strip section chrome - show content directly */}
+        <div className="showcase-section-content [&_[data-section-title]]:hidden [&>section]:pt-0 [&>section>h2]:hidden [&>section]:space-y-6 [&_article]:space-y-6 [&_article>div:first-child]:hidden">
           <SectionPreviewContent sectionId={section.id} data={data} />
         </div>
       </AccordionContent>
@@ -265,8 +268,8 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
     [reportData],
   );
 
-  // Default to first section expanded
-  const expandedSection = state.expandedSectionId || availableSections[0]?.id || null;
+  // Allow all sections to be closed - no default expansion
+  const expandedSection = state.expandedSectionId || null;
 
   return (
     <section
