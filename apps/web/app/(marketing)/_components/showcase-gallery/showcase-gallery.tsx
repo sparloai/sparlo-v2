@@ -64,7 +64,10 @@ const BrandSystemReport = lazy(
 );
 
 /**
- * Render section preview content based on section ID
+ * Render section content based on section ID
+ *
+ * Shows full section content (not preview) to demonstrate the depth
+ * of analysis in each report section.
  */
 function SectionPreviewContent({
   sectionId,
@@ -73,56 +76,40 @@ function SectionPreviewContent({
   sectionId: SectionId;
   data: HybridReportData;
 }) {
+  // Use full variant to show complete section content
+  // This demonstrates the technical depth of the reports
   switch (sectionId) {
     case 'executive-summary':
       return (
         <ExecutiveSummarySection
           data={data.executive_summary}
           brief={data.brief}
-          variant="preview"
         />
       );
     case 'problem-analysis':
-      return (
-        <ProblemAnalysisSection data={data.problem_analysis} variant="preview" />
-      );
+      return <ProblemAnalysisSection data={data.problem_analysis} />;
     case 'constraints':
-      return (
-        <ConstraintsSection data={data.constraints_and_metrics} variant="preview" />
-      );
+      return <ConstraintsSection data={data.constraints_and_metrics} />;
     case 'challenge-frame':
-      return (
-        <ChallengeFrameSection data={data.challenge_the_frame} variant="preview" />
-      );
+      return <ChallengeFrameSection data={data.challenge_the_frame} />;
     case 'solution-concepts':
-      return (
-        <SolutionConceptsSection data={data.execution_track} variant="preview" />
-      );
+      return <SolutionConceptsSection data={data.execution_track} />;
     case 'innovation-concepts':
-      return (
-        <InnovationConceptsSection
-          data={data.innovation_portfolio}
-          variant="preview"
-        />
-      );
+      return <InnovationConceptsSection data={data.innovation_portfolio} />;
     case 'frontier-tech':
       return (
         <FrontierTechnologiesSection
           data={data.innovation_portfolio?.frontier_watch}
-          variant="preview"
         />
       );
     case 'risks':
-      return (
-        <RisksWatchoutsSection data={data.risks_and_watchouts} variant="preview" />
-      );
+      return <RisksWatchoutsSection data={data.risks_and_watchouts} />;
     case 'self-critique':
-      return <SelfCritiqueSection data={data.self_critique} variant="preview" />;
+      return <SelfCritiqueSection data={data.self_critique} />;
     case 'recommendation':
       return (
         <RecommendationSection
           personalRecommendation={data.strategic_integration?.personal_recommendation}
-          variant="preview"
         />
       );
     default:
@@ -199,8 +186,11 @@ const SectionCard = memo(function SectionCard({
         </div>
       </AccordionTrigger>
 
-      <AccordionContent className="border-t border-zinc-100 bg-zinc-50/30 px-6 pb-6 pt-4">
-        <SectionPreviewContent sectionId={section.id} data={data} />
+      <AccordionContent className="border-t border-zinc-100 bg-zinc-50/30 px-6 pb-8 pt-6">
+        {/* Hide section titles since they're already in the card header */}
+        <div className="showcase-section-content [&_[data-section-title]]:hidden [&>section>h2]:hidden [&>section]:pt-0">
+          <SectionPreviewContent sectionId={section.id} data={data} />
+        </div>
       </AccordionContent>
     </AccordionItem>
   );
