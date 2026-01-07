@@ -1,4 +1,4 @@
-import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
+import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 export const MATERIALS_SCIENCE_HYBRID_REPORT: HybridReportData = {
   title: '$40/ft² Transparent Wood: Continuous Processing for 2m² Panels',

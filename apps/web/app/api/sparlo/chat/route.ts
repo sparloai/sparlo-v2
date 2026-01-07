@@ -6,8 +6,8 @@ import { z } from 'zod';
 import { enhanceRouteHandler } from '@kit/next/routes';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-import { reportToMarkdown } from '~/app/reports/_lib/report-to-markdown';
-import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
+import { reportToMarkdown } from '~/home/(user)/reports/_lib/report-to-markdown';
+import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 import { MODELS } from '~/lib/llm/client';
 
 // Validation schemas

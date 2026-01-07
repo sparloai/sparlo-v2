@@ -128,7 +128,7 @@ export class AuthPageObject {
 
     // Complete MFA verification
     await this.submitMFAVerification(MFA_KEY);
-    await this.page.waitForURL(params.next ?? '**/app');
+    await this.page.waitForURL(params.next ?? '/home');
   }
 
   async bootstrapUser({
@@ -173,6 +173,6 @@ export class AuthPageObject {
       password: params.password || 'testingpassword',
     });
 
-    await this.page.waitForURL(params.next ?? '**/app');
+    await this.page.waitForURL(params.next ?? '**/home');
   }
 }

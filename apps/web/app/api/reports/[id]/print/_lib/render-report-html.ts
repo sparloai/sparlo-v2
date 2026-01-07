@@ -18,7 +18,7 @@ import type {
   StructuredExecutiveSummary,
   SupportingConcept,
   ValidationGate,
-} from '~/app/reports/_lib/types/hybrid-report-display.types';
+} from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 import { LOGO_BASE64, PRINT_STYLES } from './print-styles';
 
@@ -445,32 +445,23 @@ function formatDate(isoString: string): string {
   });
 }
 
-function escapeHtml(text: unknown, allowSup = false): string {
+function escapeHtml(text: unknown): string {
   if (text === null || text === undefined) return '';
   // Handle non-string types (objects, arrays, numbers)
   if (typeof text !== 'string') {
     // For objects/arrays, stringify them
     if (typeof text === 'object') {
-      return escapeHtml(JSON.stringify(text), allowSup);
+      return escapeHtml(JSON.stringify(text));
     }
     // For numbers, booleans, etc.
-    return escapeHtml(String(text), allowSup);
+    return escapeHtml(String(text));
   }
-  let escaped = text
+  return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
-
-  // Restore superscript tags if allowed (used for citations like [1], [2])
-  if (allowSup) {
-    escaped = escaped
-      .replace(/&lt;sup&gt;/gi, '<sup>')
-      .replace(/&lt;\/sup&gt;/gi, '</sup>');
-  }
-
-  return escaped;
 }
 
 /**
@@ -600,11 +591,11 @@ function renderExecutiveSummary(
       ${data.narrative_lead ? `<p class="lead-text">${escapeHtml(data.narrative_lead)}</p>` : ''}
 
       ${
-        data.viability || data.viability_label
+        data.viability
           ? `
         <div class="viability-box">
-          ${data.viability_label ? `<span class="viability-label">${escapeHtml(toTitleCase(data.viability_label))}</span>` : ''}
-          ${data.viability ? `<span class="viability-badge">${escapeHtml(toTitleCase(data.viability))}</span>` : ''}
+          ${data.viability_label ? `<span class="mono-label">${escapeHtml(toTitleCase(data.viability_label))}</span>` : ''}
+          <p class="body-text-lg">${escapeHtml(data.viability)}</p>
         </div>
       `
           : ''
@@ -883,19 +874,19 @@ function renderInsightBlock(insight?: InsightBlock): string {
   return `
     <div class="insight-block">
       <span class="mono-label-muted">The Insight</span>
-      ${insight.what ? `<p class="insight-what">${escapeHtml(insight.what, true)}</p>` : ''}
+      ${insight.what ? `<p class="insight-what">${escapeHtml(insight.what)}</p>` : ''}
       ${
         insight.where_we_found_it
           ? `
         <div class="insight-source">
           ${insight.where_we_found_it.domain ? `<p><span class="label">Domain:</span> ${escapeHtml(insight.where_we_found_it.domain)}</p>` : ''}
-          ${insight.where_we_found_it.how_they_use_it ? `<p><span class="label">How they use it:</span> ${escapeHtml(insight.where_we_found_it.how_they_use_it, true)}</p>` : ''}
-          ${insight.where_we_found_it.why_it_transfers ? `<p><span class="label">Why it transfers:</span> ${escapeHtml(insight.where_we_found_it.why_it_transfers, true)}</p>` : ''}
+          ${insight.where_we_found_it.how_they_use_it ? `<p><span class="label">How they use it:</span> ${escapeHtml(insight.where_we_found_it.how_they_use_it)}</p>` : ''}
+          ${insight.where_we_found_it.why_it_transfers ? `<p><span class="label">Why it transfers:</span> ${escapeHtml(insight.where_we_found_it.why_it_transfers)}</p>` : ''}
         </div>
       `
           : ''
       }
-      ${insight.why_industry_missed_it ? `<p class="insight-missed"><em>Why industry missed it:</em> ${escapeHtml(insight.why_industry_missed_it, true)}</p>` : ''}
+      ${insight.why_industry_missed_it ? `<p class="insight-missed"><em>Why industry missed it:</em> ${escapeHtml(insight.why_industry_missed_it)}</p>` : ''}
       ${insight.physics ? `<div class="physics-box"><span class="label">Physics</span><code>${escapeHtml(insight.physics)}</code></div>` : ''}
     </div>
   `;
@@ -946,11 +937,11 @@ function renderPrimaryRecommendation(data?: ExecutionTrackPrimary): string {
         </div>
       </header>
 
-      ${data.bottom_line ? `<div class="content-block"><span class="mono-label">Bottom Line</span><p class="body-text">${escapeHtml(data.bottom_line, true)}</p></div>` : ''}
+      ${data.bottom_line ? `<div class="content-block"><span class="mono-label">Bottom Line</span><p class="body-text">${escapeHtml(data.bottom_line)}</p></div>` : ''}
 
-      ${data.what_it_is ? `<div class="content-block"><span class="mono-label">What It Is</span><p class="body-text">${escapeHtml(data.what_it_is, true)}</p></div>` : ''}
+      ${data.what_it_is ? `<div class="content-block"><span class="mono-label">What It Is</span><p class="body-text">${escapeHtml(data.what_it_is)}</p></div>` : ''}
 
-      ${data.why_it_works ? `<div class="content-block"><span class="mono-label">Why It Works</span><p class="body-text">${escapeHtml(data.why_it_works, true)}</p></div>` : ''}
+      ${data.why_it_works ? `<div class="content-block"><span class="mono-label">Why It Works</span><p class="body-text">${escapeHtml(data.why_it_works)}</p></div>` : ''}
 
       ${renderInsightBlock(data.the_insight)}
 
@@ -999,10 +990,10 @@ function renderSupportingConcepts(concepts?: SupportingConcept[]): string {
               <h4 class="concept-title">${escapeHtml(concept.title)}</h4>
               ${concept.relationship ? `<span class="concept-relationship">${escapeHtml(concept.relationship)}</span>` : ''}
             </div>
-            ${concept.one_liner ? `<p class="concept-oneliner">${escapeHtml(concept.one_liner, true)}</p>` : ''}
-            ${concept.what_it_is ? `<div class="concept-detail"><span class="mono-label">What It Is</span><p class="body-text">${escapeHtml(concept.what_it_is, true)}</p></div>` : ''}
-            ${concept.why_it_works ? `<div class="concept-detail"><span class="mono-label">Why It Works</span><p class="body-text">${escapeHtml(concept.why_it_works, true)}</p></div>` : ''}
-            ${concept.when_to_use_instead ? `<div class="concept-when"><span class="mono-label-muted">When to Use Instead</span><p class="body-text-secondary">${escapeHtml(concept.when_to_use_instead, true)}</p></div>` : ''}
+            ${concept.one_liner ? `<p class="concept-oneliner">${escapeHtml(concept.one_liner)}</p>` : ''}
+            ${concept.what_it_is ? `<div class="concept-detail"><span class="mono-label">What It Is</span><p class="body-text">${escapeHtml(concept.what_it_is)}</p></div>` : ''}
+            ${concept.why_it_works ? `<div class="concept-detail"><span class="mono-label">Why It Works</span><p class="body-text">${escapeHtml(concept.why_it_works)}</p></div>` : ''}
+            ${concept.when_to_use_instead ? `<div class="concept-when"><span class="mono-label-muted">When to Use Instead</span><p class="body-text-secondary">${escapeHtml(concept.when_to_use_instead)}</p></div>` : ''}
           </div>
         `,
           )
@@ -1043,9 +1034,9 @@ function renderRecommendedInnovation(data?: RecommendedInnovation): string {
         </div>
       </header>
 
-      ${data.what_it_is ? `<div class="content-block"><span class="mono-label">What It Is</span><p class="body-text">${escapeHtml(data.what_it_is, true)}</p></div>` : ''}
+      ${data.what_it_is ? `<div class="content-block"><span class="mono-label">What It Is</span><p class="body-text">${escapeHtml(data.what_it_is)}</p></div>` : ''}
 
-      ${data.why_it_works ? `<div class="content-block"><span class="mono-label">Why It Works</span><p class="body-text">${escapeHtml(data.why_it_works, true)}</p></div>` : ''}
+      ${data.why_it_works ? `<div class="content-block"><span class="mono-label">Why It Works</span><p class="body-text">${escapeHtml(data.why_it_works)}</p></div>` : ''}
 
       ${renderInsightBlock(data.the_insight)}
 
@@ -1054,7 +1045,7 @@ function renderRecommendedInnovation(data?: RecommendedInnovation): string {
           ? `
         <div class="breakthrough-box">
           <span class="mono-label">Breakthrough Potential</span>
-          ${data.breakthrough_potential.if_it_works ? `<p class="body-text">${escapeHtml(data.breakthrough_potential.if_it_works, true)}</p>` : ''}
+          ${data.breakthrough_potential.if_it_works ? `<p class="body-text">${escapeHtml(data.breakthrough_potential.if_it_works)}</p>` : ''}
           ${data.breakthrough_potential.estimated_improvement ? `<p class="metric-highlight">${escapeHtml(data.breakthrough_potential.estimated_improvement)}</p>` : ''}
         </div>
       `

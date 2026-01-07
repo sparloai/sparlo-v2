@@ -22,17 +22,7 @@ export function getSupabaseServerClient<GenericSchema = Database>() {
   const keys = getSupabaseClientKeys();
   const isProduction = process.env.NODE_ENV === 'production';
 
-  // Validate keys before creating client to catch configuration issues early
-  if (!keys.url || !keys.publicKey) {
-    console.error(
-      '[Supabase] Missing configuration:',
-      !keys.url ? 'NEXT_PUBLIC_SUPABASE_URL' : '',
-      !keys.publicKey ? 'NEXT_PUBLIC_SUPABASE_PUBLIC_KEY' : '',
-    );
-    throw new Error('Supabase client configuration is incomplete');
-  }
-
-  const client = createServerClient<GenericSchema>(keys.url, keys.publicKey, {
+  return createServerClient<GenericSchema>(keys.url, keys.publicKey, {
     cookies: {
       async getAll() {
         const cookieStore = await cookies();
@@ -64,12 +54,4 @@ export function getSupabaseServerClient<GenericSchema = Database>() {
       },
     },
   });
-
-  // Validate client was properly initialized
-  if (!client || typeof client.from !== 'function') {
-    console.error('[Supabase] Client initialization failed - invalid client object');
-    throw new Error('Supabase client initialization failed');
-  }
-
-  return client;
 }

@@ -25,13 +25,6 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 Data associates with accounts via foreign keys for proper access control.
 
-## Browser Testing Credentials
-
-For all browser-based testing (dev-browser, Playwright, manual QA):
-- **Email**: alijangbar@gmail.com
-- **Password**: Linguine2025
-- **Login URL**: http://localhost:3000/auth/sign-in
-
 ## Essential Commands
 
 ### Development Workflow
@@ -224,53 +217,11 @@ Do NOT reference archived design docs in `docs/archive/`.
 
 Please use the Task tool to delegate suitable tasks to specialized sub-agents for best handling the task at hand.
 
-**Always use `model: "opus"` when launching subagents** - This ensures high-quality output for complex tasks.
-
 ## LLM Output Schemas (CRITICAL)
 
 **Location**: `apps/web/lib/llm/prompts/*/schemas.ts`
 
 LLM outputs are unpredictable. Schemas validating LLM responses MUST be antifragile.
-
-### ⚠️ PROMPTS AND SCHEMAS ARE COUPLED - ALWAYS UPDATE BOTH
-
-**When you modify ANY prompt in `apps/web/lib/llm/prompts/*/prompts.ts`, you MUST also update the corresponding schema in `apps/web/lib/llm/prompts/*/schemas.ts`.**
-
-The prompt defines the OUTPUT FORMAT (JSON structure) that the LLM will produce. The schema validates that output. If they don't match, production breaks with ZodErrors.
-
-**Prompt-Schema Pairs:**
-| Prompt File | Schema File | Schemas to Update |
-|-------------|-------------|-------------------|
-| `dd/prompts.ts` (DD0-M) | `dd/schemas.ts` | `DD0_M_OutputSchema` |
-| `dd/prompts.ts` (DD3-M) | `dd/schemas.ts` | `DD3_M_OutputSchema` |
-| `dd/prompts.ts` (DD3.5-M) | `dd/schemas.ts` | `DD3_5_M_OutputSchema` |
-| `dd/prompts.ts` (DD4-M) | `dd/schemas.ts` | `DD4_M_OutputSchema` |
-| `dd/prompts.ts` (DD5-M) | `dd/schemas.ts` | `DD5_M_OutputSchema` |
-| `an/prompts.ts` | `an/schemas.ts` | Corresponding AN schemas |
-
-**Before committing prompt changes:**
-1. Compare the `## OUTPUT FORMAT` section in the prompt with the schema
-2. If you added/removed/renamed fields → update the schema
-3. If you wrapped fields in a new object (e.g., `prose_output`, `quick_reference`) → update the schema to handle both old and new formats for backwards compatibility
-4. Test with existing data to ensure old format still parses
-
-**Making schemas backwards-compatible:**
-```typescript
-// Use z.unknown().transform() to detect format and handle both
-export const DD3_M_OutputSchema = z
-  .unknown()
-  .transform((val) => {
-    const input = val as Record<string, unknown>;
-
-    // New format detection
-    if (input.prose_output && input.quick_reference) {
-      return parseNewFormat(val);
-    }
-
-    // Old format fallback
-    return parseOldFormat(val);
-  });
-```
 
 ### NEVER use raw `z.enum()` for LLM outputs
 

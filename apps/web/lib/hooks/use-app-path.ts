@@ -27,7 +27,7 @@ export function getAppPath(path: string): string {
   }
 
   // Strip /home prefix for clean app subdomain URLs
-  if (path.startsWith('/app')) {
+  if (path.startsWith('/home')) {
     return path.replace(/^\/home/, '') || '/';
   }
 
@@ -52,7 +52,7 @@ export function useAppPath() {
        */
       getPath: (path: string): string => {
         if (!onAppSubdomain) return path;
-        if (path.startsWith('/app')) {
+        if (path.startsWith('/home')) {
           return path.replace(/^\/home/, '') || '/';
         }
         return path;

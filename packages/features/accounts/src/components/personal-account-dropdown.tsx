@@ -110,44 +110,6 @@ function ChevronIcon({ className }: { className?: string }) {
   );
 }
 
-function DashboardIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="7" height="9" x="3" y="3" rx="1" />
-      <rect width="7" height="5" x="14" y="3" rx="1" />
-      <rect width="7" height="9" x="14" y="12" rx="1" />
-      <rect width="7" height="5" x="3" y="16" rx="1" />
-    </svg>
-  );
-}
-
-function TeamsIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-      <circle cx="9" cy="7" r="4" />
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-    </svg>
-  );
-}
-
 export function PersonalAccountDropdown({
   className,
   user,
@@ -169,16 +131,13 @@ export function PersonalAccountDropdown({
 
   paths: {
     home: string;
-    dashboard?: string;
     settings?: string;
     billing?: string;
-    teams?: string;
     help?: string;
   };
 
   features: {
     enableBilling?: boolean;
-    enableTeams?: boolean;
     enableThemeToggle?: boolean; // Kept for backwards compatibility
   };
 
@@ -254,20 +213,17 @@ export function PersonalAccountDropdown({
         sideOffset={8}
         className="w-64 rounded-xl border border-zinc-200 bg-white p-1.5 shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
       >
-        {/* Dashboard - only show on marketing pages */}
-        <If condition={!!paths.dashboard}>
-          <DropdownMenuItem asChild>
-            <Link
-              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white dark:focus:bg-zinc-800"
-              href={paths.dashboard!}
-            >
-              <DashboardIcon className="h-[18px] w-[18px] flex-shrink-0" />
-              <span>Dashboard</span>
-            </Link>
-          </DropdownMenuItem>
+        {/* User Info Header */}
+        <div className="border-l-2 border-zinc-900 px-3 py-3 dark:border-zinc-100">
+          <span className="mb-1 block text-[11px] font-semibold tracking-[0.08em] text-zinc-400 uppercase dark:text-zinc-500">
+            <Trans i18nKey={'common:signedInAs'} />
+          </span>
+          <span className="block truncate text-[15px] font-medium tracking-[-0.01em] text-zinc-900 dark:text-white">
+            {signedInAsLabel}
+          </span>
+        </div>
 
-          <DropdownMenuSeparator className="my-1.5 bg-zinc-100 dark:bg-zinc-800" />
-        </If>
+        <DropdownMenuSeparator className="my-1.5 bg-zinc-100 dark:bg-zinc-800" />
 
         {/* Navigation Items */}
         <If condition={!!paths.settings}>
@@ -294,18 +250,6 @@ export function PersonalAccountDropdown({
           </DropdownMenuItem>
         </If>
 
-        <If condition={features.enableTeams && !!paths.teams}>
-          <DropdownMenuItem asChild>
-            <Link
-              className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 focus:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white dark:focus:bg-zinc-800"
-              href={paths.teams!}
-            >
-              <TeamsIcon className="h-[18px] w-[18px] flex-shrink-0" />
-              <span>Teams</span>
-            </Link>
-          </DropdownMenuItem>
-        </If>
-
         <If condition={!!paths.help}>
           <DropdownMenuItem asChild>
             <Link
@@ -313,7 +257,7 @@ export function PersonalAccountDropdown({
               href={paths.help!}
             >
               <HelpIcon className="h-[18px] w-[18px] flex-shrink-0" />
-              <span>Help</span>
+              <span>Help Center</span>
             </Link>
           </DropdownMenuItem>
         </If>
@@ -343,16 +287,10 @@ export function PersonalAccountDropdown({
           onClick={signOutRequested}
         >
           <SignOutIcon className="h-[18px] w-[18px] flex-shrink-0" />
-          <span>Log out</span>
-        </DropdownMenuItem>
-
-        {/* Email at bottom */}
-        <DropdownMenuSeparator className="my-1.5 bg-zinc-100 dark:bg-zinc-800" />
-        <div className="px-3 py-2">
-          <span className="block truncate text-[13px] text-zinc-400 dark:text-zinc-500">
-            {signedInAsLabel}
+          <span>
+            <Trans i18nKey={'auth:signOut'} />
           </span>
-        </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -5,20 +5,12 @@ import { AppLogo } from '~/components/app-logo';
 
 import { SiteHeaderAccountSection } from './site-header-account-section';
 
-export function SiteHeader(props: {
-  user?: JWTUserData | null;
-  hasTeams?: boolean;
-}) {
+export function SiteHeader(props: { user?: JWTUserData | null }) {
   return (
     <Header
       logo={<AppLogo />}
       navigation={null}
-      actions={
-        <SiteHeaderAccountSection
-          user={props.user ?? null}
-          hasTeams={props.hasTeams}
-        />
-      }
+      actions={<SiteHeaderAccountSection user={props.user ?? null} />}
     />
   );
 }

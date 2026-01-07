@@ -709,14 +709,14 @@ const AN0_M_AnalysisSchema = z
 
 // Clarification option schema
 const ClarificationOptionSchema = z.object({
-  id: z.string().catch(''),
-  label: z.string().catch(''),
+  id: z.string(),
+  label: z.string(),
 });
 
 // Structured clarification request schema
 const ClarificationRequestSchema = z.object({
-  context: z.string().catch(''),
-  question: z.string().catch(''),
+  context: z.string(),
+  question: z.string(),
   options: z
     .array(ClarificationOptionSchema)
     .min(2)
@@ -733,20 +733,19 @@ const ClarificationRequestSchema = z.object({
         message:
           'Options must include a "proceed with best interpretation" fallback',
       },
-    )
-    .catch([]),
-  allows_freetext: z.boolean().default(true).catch(true),
-  freetext_prompt: z.string().optional().catch(''),
+    ),
+  allows_freetext: z.boolean().default(true),
+  freetext_prompt: z.string().optional(),
 });
 
 // Preliminary analysis shown during clarification
 const PreliminaryClarificationAnalysisSchema = z
   .object({
-    core_challenge: z.string().optional().catch(''),
+    core_challenge: z.string().optional(),
     physics_essence: z
       .object({
         governing_principles: z.array(z.string()).catch([]),
-        rate_limiting_factor: z.string().optional().catch(''),
+        rate_limiting_factor: z.string().optional(),
       })
       .optional(),
   })
@@ -757,8 +756,8 @@ const AN0_M_ClarificationSchema = z.object({
   clarification_request: ClarificationRequestSchema,
   preliminary_analysis: PreliminaryClarificationAnalysisSchema.optional(),
   // Legacy fields for backward compatibility
-  clarification_question: z.string().optional().catch(''),
-  what_understood_so_far: z.string().optional().catch(''),
+  clarification_question: z.string().optional(),
+  what_understood_so_far: z.string().optional(),
 });
 
 export const AN0_M_OutputSchema = z.discriminatedUnion('needs_clarification', [
@@ -1231,7 +1230,7 @@ export type SolutionClassification = z.infer<
 const FeasibilityAssessmentSchema = z
   .object({
     score: flexibleNumber(5, { min: 1, max: 10 }),
-    analysis: z.string().catch(''),
+    analysis: z.string(),
     blockers: z.array(z.string()).catch([]),
   })
   .passthrough();
@@ -1246,23 +1245,23 @@ const ParadigmSignificance = flexibleEnum(
 const ParadigmAssessmentSchema = z
   .object({
     paradigm_significance: ParadigmSignificance.catch('INCREMENTAL'),
-    what_it_challenges: z.string().optional().catch(''),
-    why_industry_missed_it: z.string().optional().catch(''),
+    what_it_challenges: z.string().optional(),
+    why_industry_missed_it: z.string().optional(),
     strategic_insight_flag: z.boolean().catch(false),
-    first_mover_opportunity: z.string().optional().catch(''),
-    strategic_rationale: z.string().optional().catch(''),
+    first_mover_opportunity: z.string().optional(),
+    strategic_rationale: z.string().optional(),
   })
   .passthrough();
 
 const ValidationResultSchema = z
   .object({
-    concept_id: z.string().catch(''),
+    concept_id: z.string(),
     physics_feasibility: FeasibilityAssessmentSchema,
     engineering_feasibility: FeasibilityAssessmentSchema,
     economic_viability: z
       .object({
         score: flexibleNumber(5, { min: 1, max: 10 }),
-        analysis: z.string().catch(''),
+        analysis: z.string(),
       })
       .passthrough(),
     overall_merit_score: flexibleNumber(5, { min: 1, max: 10 }),
@@ -1279,9 +1278,9 @@ const ValidationResultSchema = z
 
 const RankingItemSchema = z
   .object({
-    concept_id: z.string().catch(''),
-    rank: flexibleNumber(0, { min: 0, max: 100 }),
-    rationale: z.string().catch(''),
+    concept_id: z.string(),
+    rank: z.number(),
+    rationale: z.string(),
   })
   .passthrough();
 
@@ -1296,15 +1295,15 @@ const SelfCritiqueSchema = z
 // Paradigm insights identified during evaluation
 const ParadigmInsightIdentifiedSchema = z
   .object({
-    concept_id: z.string().catch(''),
-    insight_name: z.string().catch(''),
-    the_assumption: z.string().catch(''),
-    the_reality: z.string().catch(''),
-    years_missed: z.string().optional().catch(''),
-    why_missed: z.string().catch(''),
-    opportunity: z.string().catch(''),
+    concept_id: z.string(),
+    insight_name: z.string(),
+    the_assumption: z.string(),
+    the_reality: z.string(),
+    years_missed: z.string().optional(),
+    why_missed: z.string(),
+    opportunity: z.string(),
     evidence_strength: SeverityLevel.catch('medium'),
-    recommendation: z.string().catch(''),
+    recommendation: z.string(),
   })
   .passthrough();
 
@@ -1556,24 +1555,24 @@ export type NewSupportingConcept = z.infer<typeof NewSupportingConceptSchema>;
  */
 export const ExecutionTrackPrimarySchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().catch(''),
+    id: z.string(),
+    title: z.string(),
     score: z.number().int().min(0).max(100).catch(50),
     confidence: z.number().int().min(0).max(100).catch(50),
 
     source_type: SourceType,
-    source: z.string().catch(''),
+    source: z.string(),
 
-    bottom_line: z.string().catch(''),
-    expected_improvement: z.string().catch(''),
-    timeline: z.string().catch(''),
-    investment: z.string().catch(''),
+    bottom_line: z.string(),
+    expected_improvement: z.string(),
+    timeline: z.string(),
+    investment: z.string(),
 
     why_safe: WhySafeSchema.optional(),
 
     the_insight: NewInsightBlockSchema,
-    what_it_is: z.string().catch(''),
-    why_it_works: z.string().catch(''),
+    what_it_is: z.string(),
+    why_it_works: z.string(),
     why_it_might_fail: z.array(z.string()).default([]),
 
     // ValidationGateSchema is defined later - use inline definition here
@@ -1581,12 +1580,12 @@ export const ExecutionTrackPrimarySchema = z
       .array(
         z
           .object({
-            week: z.string().catch(''),
-            test: z.string().catch(''),
-            method: z.string().catch(''),
-            success_criteria: z.string().catch(''),
-            cost: z.string().nullish(),
-            decision_point: z.string().nullish(),
+            week: z.string(),
+            test: z.string(),
+            method: z.string(),
+            success_criteria: z.string(),
+            cost: z.string().optional(),
+            decision_point: z.string().optional(),
           })
           .passthrough(),
       )
@@ -1600,10 +1599,10 @@ export type ExecutionTrackPrimary = z.infer<typeof ExecutionTrackPrimarySchema>;
  */
 export const RootCauseSatisfactionSchema = z
   .object({
-    root_cause: z.string().catch(''),
-    constraint_derived: z.string().catch(''),
-    how_recommendation_satisfies: z.string().catch(''),
-    explicit_link: z.string().catch(''), // The physics/engineering connection
+    root_cause: z.string(),
+    constraint_derived: z.string(),
+    how_recommendation_satisfies: z.string(),
+    explicit_link: z.string(), // The physics/engineering connection
   })
   .passthrough();
 export type RootCauseSatisfaction = z.infer<typeof RootCauseSatisfactionSchema>;
@@ -1613,7 +1612,7 @@ export type RootCauseSatisfaction = z.infer<typeof RootCauseSatisfactionSchema>;
  */
 export const ExecutionTrackSchema = z
   .object({
-    intro: z.string().catch(''),
+    intro: z.string(),
     root_cause_satisfaction: RootCauseSatisfactionSchema.optional(),
     primary: ExecutionTrackPrimarySchema,
     supplier_arbitrage: SupplierArbitrageSchema.optional(), // When source_type === CATALOG
@@ -1700,15 +1699,15 @@ export type RelationshipToExecution = z.infer<
  */
 export const RecommendedInnovationSchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().catch(''),
+    id: z.string(),
+    title: z.string(),
     score: z.number().int().min(0).max(100).catch(50),
     confidence: z.number().int().min(0).max(100).catch(50),
 
     selection_rationale: SelectionRationaleSchema,
 
     innovation_type: PortfolioInnovationType,
-    source_domain: z.string().catch(''),
+    source_domain: z.string(),
 
     the_insight: NewInsightBlockSchema,
     how_it_works: z.array(z.string()).default([]),
@@ -1727,31 +1726,31 @@ export type RecommendedInnovation = z.infer<typeof RecommendedInnovationSchema>;
  */
 export const ParallelInvestigationSchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().catch(''),
+    id: z.string(),
+    title: z.string(),
     score: z.number().int().min(0).max(100).catch(50),
     confidence: z.number().int().min(0).max(100).catch(50),
 
     innovation_type: PortfolioInnovationType,
-    source_domain: z.string().catch(''),
+    source_domain: z.string(),
 
-    one_liner: z.string().catch(''),
+    one_liner: z.string(),
     the_insight: NewInsightBlockSchema,
 
-    ceiling: z.string().catch(''),
-    key_uncertainty: z.string().catch(''),
+    ceiling: z.string(),
+    key_uncertainty: z.string(),
 
     validation_approach: z
       .object({
-        test: z.string().catch(''),
-        cost: z.string().catch(''),
-        timeline: z.string().catch(''),
-        go_no_go: z.string().catch(''),
+        test: z.string(),
+        cost: z.string(),
+        timeline: z.string(),
+        go_no_go: z.string(),
       })
       .passthrough(),
 
-    when_to_elevate: z.string().catch(''),
-    investment_recommendation: z.string().catch(''),
+    when_to_elevate: z.string(),
+    investment_recommendation: z.string(),
   })
   .passthrough();
 export type ParallelInvestigation = z.infer<typeof ParallelInvestigationSchema>;
@@ -1762,24 +1761,24 @@ export type ParallelInvestigation = z.infer<typeof ParallelInvestigationSchema>;
  */
 export const FrontierWatchSchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().catch(''),
-    one_liner: z.string().catch(''),
+    id: z.string(),
+    title: z.string(),
+    one_liner: z.string(),
 
     innovation_type: PortfolioInnovationType,
-    source_domain: z.string().catch(''),
+    source_domain: z.string(),
 
-    why_interesting: z.string().catch(''),
-    why_not_now: z.string().catch(''),
+    why_interesting: z.string(),
+    why_not_now: z.string(),
 
-    trigger_to_revisit: z.string().catch(''),
-    who_to_monitor: z.string().catch(''),
-    earliest_viability: z.string().catch(''),
+    trigger_to_revisit: z.string(),
+    who_to_monitor: z.string(),
+    earliest_viability: z.string(),
 
     // Web search enhanced fields (optional)
-    recent_developments: z.string().nullish(),
+    recent_developments: z.string().optional(),
     trl_estimate: z.number().int().min(1).max(9).optional(),
-    competitive_activity: z.string().nullish(),
+    competitive_activity: z.string().optional(),
   })
   .passthrough();
 export type FrontierWatch = z.infer<typeof FrontierWatchSchema>;
@@ -1789,7 +1788,7 @@ export type FrontierWatch = z.infer<typeof FrontierWatchSchema>;
  */
 export const InnovationPortfolioSchema = z
   .object({
-    intro: z.string().catch(''),
+    intro: z.string(),
     recommended_innovation: RecommendedInnovationSchema.optional(),
     parallel_investigations: z.array(ParallelInvestigationSchema).default([]),
     frontier_watch: z.array(FrontierWatchSchema).default([]),
@@ -1802,9 +1801,9 @@ export type InnovationPortfolio = z.infer<typeof InnovationPortfolioSchema>;
  */
 export const PortfolioViewSchema = z
   .object({
-    execution_track_role: z.string().catch(''),
-    innovation_portfolio_role: z.string().catch(''),
-    combined_strategy: z.string().catch(''),
+    execution_track_role: z.string(),
+    innovation_portfolio_role: z.string(),
+    combined_strategy: z.string(),
   })
   .passthrough();
 export type PortfolioView = z.infer<typeof PortfolioViewSchema>;
@@ -1814,11 +1813,11 @@ export type PortfolioView = z.infer<typeof PortfolioViewSchema>;
  */
 export const ResourceAllocationSchema = z
   .object({
-    execution_track_percent: flexibleNumber(60, { min: 0, max: 100 }),
-    recommended_innovation_percent: flexibleNumber(25, { min: 0, max: 100 }),
-    parallel_investigations_percent: flexibleNumber(10, { min: 0, max: 100 }),
-    frontier_watch_percent: flexibleNumber(5, { min: 0, max: 100 }),
-    rationale: z.string().catch(''),
+    execution_track_percent: z.number().default(60),
+    recommended_innovation_percent: z.number().default(25),
+    parallel_investigations_percent: z.number().default(10),
+    frontier_watch_percent: z.number().default(5),
+    rationale: z.string(),
   })
   .passthrough();
 export type ResourceAllocation = z.infer<typeof ResourceAllocationSchema>;
@@ -1828,24 +1827,24 @@ export type ResourceAllocation = z.infer<typeof ResourceAllocationSchema>;
  */
 export const PrimaryTradeoffSchema = z
   .object({
-    question: z.string().catch(''),
+    question: z.string(),
     option_a: z
       .object({
-        condition: z.string().catch(''),
-        path: z.string().catch(''),
-        what_you_get: z.string().catch(''),
-        what_you_give_up: z.string().catch(''),
+        condition: z.string(),
+        path: z.string(),
+        what_you_get: z.string(),
+        what_you_give_up: z.string(),
       })
       .passthrough(),
     option_b: z
       .object({
-        condition: z.string().catch(''),
-        path: z.string().catch(''),
-        what_you_get: z.string().catch(''),
-        what_you_give_up: z.string().catch(''),
+        condition: z.string(),
+        path: z.string(),
+        what_you_get: z.string(),
+        what_you_give_up: z.string(),
       })
       .passthrough(),
-    if_uncertain: z.string().catch(''),
+    if_uncertain: z.string(),
   })
   .passthrough();
 export type PrimaryTradeoff = z.infer<typeof PrimaryTradeoffSchema>;
@@ -1856,8 +1855,8 @@ export type PrimaryTradeoff = z.infer<typeof PrimaryTradeoffSchema>;
 export const NewDecisionArchitectureSchema = z
   .object({
     primary_tradeoff: PrimaryTradeoffSchema.optional(),
-    flowchart: z.string().catch(''),
-    summary: z.string().catch(''),
+    flowchart: z.string(),
+    summary: z.string(),
   })
   .passthrough();
 export type NewDecisionArchitecture = z.infer<
@@ -1869,10 +1868,10 @@ export type NewDecisionArchitecture = z.infer<
  */
 export const NewActionPlanStepSchema = z
   .object({
-    timeframe: z.string().catch(''),
-    actions: z.array(z.string()).default([]).catch([]),
-    rationale: z.string().optional().catch(''),
-    decision_gate: z.string().optional().catch(''),
+    timeframe: z.string(),
+    actions: z.array(z.string()).default([]),
+    rationale: z.string().optional(),
+    decision_gate: z.string().optional(),
   })
   .passthrough();
 export type NewActionPlanStep = z.infer<typeof NewActionPlanStepSchema>;
@@ -1882,9 +1881,9 @@ export type NewActionPlanStep = z.infer<typeof NewActionPlanStepSchema>;
  */
 export const NewPersonalRecommendationSchema = z
   .object({
-    intro: z.string().catch(''),
-    action_plan: z.array(NewActionPlanStepSchema).default([]).catch([]),
-    key_insight: z.string().catch(''),
+    intro: z.string(),
+    action_plan: z.array(NewActionPlanStepSchema).default([]),
+    key_insight: z.string(),
   })
   .passthrough();
 export type NewPersonalRecommendation = z.infer<
@@ -1896,12 +1895,12 @@ export type NewPersonalRecommendation = z.infer<
  */
 const StrategicOperationalAlternativeSchema = z
   .object({
-    title: z.string().catch(''),
-    what_changes: z.string().catch(''),
-    cost: z.string().catch(''),
-    expected_benefit: z.string().catch(''),
-    vs_capital_solutions: z.string().catch(''),
-    validation: z.string().catch(''),
+    title: z.string(),
+    what_changes: z.string(),
+    cost: z.string(),
+    expected_benefit: z.string(),
+    vs_capital_solutions: z.string(),
+    validation: z.string(),
   })
   .passthrough();
 
@@ -1910,12 +1909,9 @@ const StrategicOperationalAlternativeSchema = z
  */
 export const OperationalAlternativesSectionSchema = z
   .object({
-    intro: z.string().catch(''), // "Before capital investment, consider..."
-    alternatives: z
-      .array(StrategicOperationalAlternativeSchema)
-      .default([])
-      .catch([]),
-    recommendation: z.string().catch(''), // "Try X first, then Y if insufficient"
+    intro: z.string(), // "Before capital investment, consider..."
+    alternatives: z.array(StrategicOperationalAlternativeSchema).default([]),
+    recommendation: z.string(), // "Try X first, then Y if insufficient"
   })
   .passthrough();
 export type OperationalAlternativesSection = z.infer<
@@ -1950,9 +1946,9 @@ export type ProblemType = z.infer<typeof ProblemType>;
  */
 export const WhatYouCouldGetElsewhereSchema = z
   .object({
-    from_supplier_call: z.array(z.string()).default([]).catch([]),
-    from_literature_search: z.array(z.string()).default([]).catch([]),
-    from_industry_consultant: z.array(z.string()).default([]).catch([]),
+    from_supplier_call: z.array(z.string()).default([]),
+    from_literature_search: z.array(z.string()).default([]),
+    from_industry_consultant: z.array(z.string()).default([]),
   })
   .passthrough();
 export type WhatYouCouldGetElsewhere = z.infer<
@@ -1964,10 +1960,10 @@ export type WhatYouCouldGetElsewhere = z.infer<
  */
 export const WhatSparloProvidesSchema = z
   .object({
-    unique_contributions: z.array(z.string()).default([]).catch([]),
-    integration_value: z.string().optional().catch(''),
-    decision_framework_value: z.string().optional().catch(''),
-    cross_domain_value: z.string().optional().catch(''),
+    unique_contributions: z.array(z.string()).default([]),
+    integration_value: z.string().optional(),
+    decision_framework_value: z.string().optional(),
+    cross_domain_value: z.string().optional(),
   })
   .passthrough();
 export type WhatSparloProvides = z.infer<typeof WhatSparloProvidesSchema>;
@@ -2022,7 +2018,7 @@ export const HonestAssessmentSchema = z
     problem_type: ProblemType.optional(),
     // P1 FIX: Removed union type ambiguity - use structured format only
     what_you_could_get_elsewhere: WhatYouCouldGetElsewhereSchema.optional(),
-    what_we_provide_beyond_that: z.array(z.string()).default([]).catch([]),
+    what_we_provide_beyond_that: z.array(z.string()).default([]),
 
     // New structured format
     what_sparlo_provides: WhatSparloProvidesSchema.optional(),
@@ -2034,10 +2030,10 @@ export const HonestAssessmentSchema = z
     supplier_arbitrage: HonestSupplierArbitrageSchema.optional(),
 
     // Self-honesty
-    the_question_you_should_be_asking: z.string().optional().catch(''),
-    the_question_you_should_ask_us: z.string().optional().catch(''),
-    if_we_were_wrong: z.string().optional().catch(''),
-    if_we_were_wrong_about_this: z.string().optional().catch(''),
+    the_question_you_should_be_asking: z.string().optional(),
+    the_question_you_should_ask_us: z.string().optional(),
+    if_we_were_wrong: z.string().optional(),
+    if_we_were_wrong_about_this: z.string().optional(),
   })
   .passthrough();
 export type HonestAssessment = z.infer<typeof HonestAssessmentSchema>;
@@ -2061,7 +2057,7 @@ export type FromScratchRevelation = z.infer<typeof FromScratchRevelationSchema>;
  */
 export const CrossDomainSearchSchema = z
   .object({
-    intro: z.string().optional().catch(''),
+    intro: z.string().optional(),
     domains_searched: z
       .array(
         z.union([
@@ -2072,8 +2068,7 @@ export const CrossDomainSearchSchema = z
             .transform((obj) => JSON.stringify(obj)),
         ]),
       )
-      .default([])
-      .catch([]),
+      .default([]),
   })
   .passthrough();
 export type CrossDomainSearch = z.infer<typeof CrossDomainSearchSchema>;
@@ -2087,8 +2082,8 @@ export const EnhancedChallengeFrameSchema = z
     assumption: z.string().catch(''),
     challenge: z.string().catch(''),
     implication: z.string().catch(''),
-    constraint_questioned: z.string().nullish().catch(''),
-    what_if_relaxed: z.string().nullish().catch(''),
+    constraint_questioned: z.string().nullable().optional(),
+    what_if_relaxed: z.string().nullable().optional(),
   })
   .passthrough();
 export type EnhancedChallengeFrame = z.infer<
@@ -2118,23 +2113,22 @@ export type InnovationAnalysis = z.infer<typeof InnovationAnalysisSchema>;
  */
 export const ConstraintsAndMetricsSchema = z
   .object({
-    hard_constraints: z.array(z.string()).default([]).catch([]),
-    soft_constraints: z.array(z.string()).default([]).catch([]),
-    assumptions: z.array(z.string()).default([]).catch([]),
+    hard_constraints: z.array(z.string()).default([]),
+    soft_constraints: z.array(z.string()).default([]),
+    assumptions: z.array(z.string()).default([]),
     success_metrics: z
       .array(
         z
           .object({
-            metric: z.string().catch(''),
-            target: z.string().catch(''),
-            minimum_viable: z.string().catch(''),
-            stretch: z.string().catch(''),
-            unit: z.string().optional().catch(''),
+            metric: z.string(),
+            target: z.string(),
+            minimum_viable: z.string(),
+            stretch: z.string(),
+            unit: z.string().optional(),
           })
           .passthrough(),
       )
-      .default([])
-      .catch([]),
+      .default([]),
   })
   .passthrough();
 export type ConstraintsAndMetrics = z.infer<typeof ConstraintsAndMetricsSchema>;
@@ -2258,9 +2252,9 @@ export type SupportingSolutionConcept = z.infer<
  */
 export const SolutionConceptsV4Schema = z
   .object({
-    intro: z.string().optional().catch(''),
+    intro: z.string().optional(),
     primary: PrimarySolutionConceptSchema,
-    supporting: z.array(SupportingSolutionConceptSchema).default([]).catch([]),
+    supporting: z.array(SupportingSolutionConceptSchema).default([]),
   })
   .passthrough();
 export type SolutionConceptsV4 = z.infer<typeof SolutionConceptsV4Schema>;
@@ -2388,9 +2382,9 @@ export const FrontierWatchV4Schema = z
       z.array(z.string()).default([]).catch([]),
     ),
     trigger_to_revisit: z.string().catch(''),
-    recent_developments: z.string().nullish().catch(''),
-    trl_estimate: flexibleNumber(5, { min: 1, max: 9 }),
-    competitive_activity: z.string().nullish().catch(''),
+    recent_developments: z.string().nullable().optional(),
+    trl_estimate: z.number().int().min(1).max(9).optional(),
+    competitive_activity: z.string().nullable().optional(),
   })
   .passthrough();
 export type FrontierWatchV4 = z.infer<typeof FrontierWatchV4Schema>;
@@ -2400,10 +2394,10 @@ export type FrontierWatchV4 = z.infer<typeof FrontierWatchV4Schema>;
  */
 export const InnovationConceptsV4Schema = z
   .object({
-    intro: z.string().optional().catch(''),
+    intro: z.string().optional(),
     recommended: RecommendedInnovationConceptSchema.optional(),
-    parallel: z.array(ParallelInnovationConceptSchema).default([]).catch([]),
-    frontier_watch: z.array(FrontierWatchV4Schema).default([]).catch([]),
+    parallel: z.array(ParallelInnovationConceptSchema).default([]),
+    frontier_watch: z.array(FrontierWatchV4Schema).default([]),
   })
   .passthrough();
 export type InnovationConceptsV4 = z.infer<typeof InnovationConceptsV4Schema>;
@@ -2415,35 +2409,35 @@ export type InnovationConceptsV4 = z.infer<typeof InnovationConceptsV4Schema>;
 // --- Header ---
 const HeaderSchema = z
   .object({
-    title: z.string().catch(''),
-    date: z.string().optional().catch(''),
-    version: z.string().optional().catch(''),
+    title: z.string(),
+    date: z.string().optional(),
+    version: z.string().optional(),
   })
   .passthrough();
 
 // --- Executive Summary (Enhanced) ---
 const RecommendedPathStepSchema = z
   .object({
-    step: flexibleNumber(1, { min: 0, max: 100 }),
-    action: z.string().catch(''),
-    rationale: z.string().optional().catch(''),
+    step: z.number(),
+    action: z.string(),
+    rationale: z.string().optional(),
   })
   .passthrough();
 
 const ExecutiveSummarySchema = z
   .object({
-    narrative_lead: z.string().catch(''), // Opening paragraph with voice
+    narrative_lead: z.string(), // Opening paragraph with voice
     viability: ViabilityVerdict.catch('uncertain'),
-    viability_label: z.string().optional().catch(''),
-    the_problem: z.string().optional().catch(''),
+    viability_label: z.string().optional(),
+    the_problem: z.string().optional(),
     core_insight: z
       .object({
-        headline: z.string().catch(''),
-        explanation: z.string().catch(''),
+        headline: z.string(),
+        explanation: z.string(),
       })
       .passthrough()
       .optional(),
-    primary_recommendation: z.string().optional().catch(''), // One sentence with confidence
+    primary_recommendation: z.string().optional(), // One sentence with confidence
     recommended_path: z.array(RecommendedPathStepSchema).catch([]),
   })
   .passthrough();
@@ -2460,20 +2454,20 @@ const ConstraintsSchema = z
 // --- Problem Analysis (Enhanced) ---
 const RootCauseHypothesisSchema = z
   .object({
-    id: flexibleNumber(1, { min: 0, max: 1000 }),
-    name: z.string().catch(''),
-    confidence_percent: flexibleNumber(50, { min: 0, max: 100 }),
-    explanation: z.string().catch(''),
+    id: z.number().int().positive(),
+    name: z.string(),
+    confidence_percent: z.number().int().min(0).max(100).catch(50),
+    explanation: z.string(),
   })
   .passthrough();
 
 const SuccessMetricSchema = z
   .object({
-    metric: z.string().catch(''),
-    minimum_viable: z.string().catch(''),
-    target: z.string().catch(''),
-    stretch: z.string().catch(''),
-    unit: z.string().optional().catch(''),
+    metric: z.string(),
+    minimum_viable: z.string(),
+    target: z.string(),
+    stretch: z.string(),
+    unit: z.string().optional(),
   })
   .passthrough();
 
@@ -2481,11 +2475,11 @@ const ReportProblemAnalysisSchema = z
   .object({
     whats_wrong: z
       .object({
-        prose: z.string().catch(''), // Can include inline equations
+        prose: z.string(), // Can include inline equations
         technical_note: z
           .object({
-            equation: z.string().optional().catch(''),
-            explanation: z.string().catch(''),
+            equation: z.string().optional(),
+            explanation: z.string(),
           })
           .passthrough()
           .optional(),
@@ -2494,15 +2488,15 @@ const ReportProblemAnalysisSchema = z
       .optional(),
     why_its_hard: z
       .object({
-        prose: z.string().catch(''),
+        prose: z.string(),
         factors: z.array(z.string()).catch([]),
       })
       .passthrough()
       .optional(),
     first_principles_insight: z
       .object({
-        headline: z.string().catch(''),
-        explanation: z.string().catch(''),
+        headline: z.string(),
+        explanation: z.string(),
       })
       .passthrough()
       .optional(),
@@ -2514,9 +2508,9 @@ const ReportProblemAnalysisSchema = z
 // --- What Industry Missed (Enhanced) ---
 const BlindSpotSchema = z
   .object({
-    assumption: z.string().catch(''),
-    challenge: z.string().catch(''),
-    opportunity: z.string().catch(''),
+    assumption: z.string(),
+    challenge: z.string(),
+    opportunity: z.string(),
   })
   .passthrough();
 
@@ -2526,13 +2520,13 @@ const WhatIndustryMissedSectionSchema = z
       .array(
         z
           .object({
-            approach: z.string().catch(''),
-            limitation: z.string().catch(''),
+            approach: z.string(),
+            limitation: z.string(),
           })
           .passthrough(),
       )
       .catch([]),
-    why_they_do_it: z.string().catch(''), // Paradigm history paragraph
+    why_they_do_it: z.string(), // Paradigm history paragraph
     blind_spots: z.array(BlindSpotSchema).catch([]),
   })
   .passthrough();
@@ -2540,26 +2534,26 @@ const WhatIndustryMissedSectionSchema = z
 // Legacy format for backward compatibility
 const LegacyWhatIndustryMissedSchema = z
   .object({
-    the_assumption: z.string().catch(''),
-    how_long_held: z.string().optional().catch(''),
-    the_reality: z.string().catch(''),
-    evidence: z.string().catch(''),
-    opportunity_created: z.string().catch(''),
-    first_mover_advantage: z.string().optional().catch(''),
+    the_assumption: z.string(),
+    how_long_held: z.string().optional(),
+    the_reality: z.string(),
+    evidence: z.string(),
+    opportunity_created: z.string(),
+    first_mover_advantage: z.string().optional(),
   })
   .passthrough();
 
 // --- Key Patterns (Enhanced) ---
 const KeyPatternSchema = z
   .object({
-    id: z.string().catch(''),
-    name: z.string().catch(''),
-    origin: z.string().catch(''), // Where this pattern comes from
-    description: z.string().catch(''),
-    why_it_matters: z.string().catch(''),
-    precedent: z.string().catch(''), // Specific papers, patents, companies
-    application_hint: z.string().optional().catch(''), // How it applies here
-    patent_refs: z.array(z.string()).optional().catch([]),
+    id: z.string(),
+    name: z.string(),
+    origin: z.string(), // Where this pattern comes from
+    description: z.string(),
+    why_it_matters: z.string(),
+    precedent: z.string(), // Specific papers, patents, companies
+    application_hint: z.string().optional(), // How it applies here
+    patent_refs: z.array(z.string()).optional(),
   })
   .passthrough();
 
@@ -2594,17 +2588,17 @@ const ConceptTagsSchema = z
 
 const InsightBlockSchema = z
   .object({
-    what: z.string().catch(''),
-    why_new: z.string().catch(''), // Include search evidence
-    physics: z.string().catch(''), // Mechanism with specifics
+    what: z.string(),
+    why_new: z.string(), // Include search evidence
+    physics: z.string(), // Mechanism with specifics
   })
   .passthrough();
 
 const BreakthroughPotentialSchema = z
   .object({
-    if_it_works: z.string().catch(''),
-    estimated_improvement: z.string().catch(''), // Quantified with uncertainty
-    industry_impact: z.string().catch(''),
+    if_it_works: z.string(),
+    estimated_improvement: z.string(), // Quantified with uncertainty
+    industry_impact: z.string(),
   })
   .passthrough();
 
@@ -2618,43 +2612,43 @@ const ConceptRisksSchema = z
 
 const ValidationApproachSchema = z
   .object({
-    first_test: z.string().catch(''),
-    timeline: z.string().catch(''),
-    cost: z.string().catch(''),
-    go_no_go: z.string().catch(''),
+    first_test: z.string(),
+    timeline: z.string(),
+    cost: z.string(),
+    go_no_go: z.string(),
   })
   .passthrough();
 
 // Enhanced validation gates with decision points
 const ValidationGateSchema = z
   .object({
-    week: z.string().catch(''),
-    test: z.string().catch(''),
-    method: z.string().catch(''),
-    success_criteria: z.string().catch(''),
-    cost: z.string().optional().catch(''),
-    decision_point: z.string().optional().catch(''), // "If X, pivot to Y"
+    week: z.string(),
+    test: z.string(),
+    method: z.string(),
+    success_criteria: z.string(),
+    cost: z.string().optional(),
+    decision_point: z.string().optional(), // "If X, pivot to Y"
   })
   .passthrough();
 
 // Full parallel exploration block (replaces other_concepts)
 const ParallelExplorationSchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().catch(''),
+    id: z.string(),
+    title: z.string(),
     tags: ConceptTagsSchema,
-    source_domain: z.string().catch(''),
+    source_domain: z.string(),
 
     the_insight: InsightBlockSchema,
     how_it_works: z.array(z.string()).catch([]), // Numbered steps
     components: z.array(z.string()).catch([]),
-    enabling_factors: z.string().catch(''),
+    enabling_factors: z.string(),
 
     breakthrough_potential: BreakthroughPotentialSchema,
     risks: ConceptRisksSchema,
 
-    why_parallel_not_primary: z.string().catch(''),
-    when_to_elevate: z.string().catch(''),
+    why_parallel_not_primary: z.string(),
+    when_to_elevate: z.string(),
 
     validation_approach: ValidationApproachSchema,
   })
@@ -2663,25 +2657,25 @@ const ParallelExplorationSchema = z
 // Enhanced lead concept with validation gates
 const LeadConceptSchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().max(500).catch(''),
+    id: z.string(),
+    title: z.string().max(500),
     track: TrackSchema,
-    track_label: z.string().optional().catch(''),
-    score: flexibleNumber(50, { min: 0, max: 100 }),
+    track_label: z.string().optional(),
+    score: z.number().int().min(0).max(100).catch(50),
     confidence: ConfidenceLevel.catch('medium'),
 
-    bottom_line: z.string().optional().catch(''),
-    what_it_is: z.string().optional().catch(''),
-    why_it_works: z.string().optional().catch(''),
+    bottom_line: z.string().optional(),
+    what_it_is: z.string().optional(),
+    why_it_works: z.string().optional(),
     why_it_might_fail: z.array(z.string()).catch([]),
 
     // Legacy fields for backward compatibility
-    executive_summary: z.string().optional().catch(''),
-    why_it_wins: z.string().optional().catch(''),
+    executive_summary: z.string().optional(),
+    why_it_wins: z.string().optional(),
 
-    patterns_referenced: z.array(z.string()).optional().catch([]),
-    confidence_rationale: z.string().optional().catch(''),
-    what_would_change_this: z.string().optional().catch(''),
+    patterns_referenced: z.array(z.string()).optional(),
+    confidence_rationale: z.string().optional(),
+    what_would_change_this: z.string().optional(),
     key_risks: z.array(RiskItemSchema).catch([]),
 
     validation_gates: z.array(ValidationGateSchema).catch([]),
@@ -2689,81 +2683,80 @@ const LeadConceptSchema = z
     how_to_test: z.array(TestGateSchema).catch([]),
 
     prior_art_summary: z.array(PriorArtSchema).catch([]),
-    estimated_timeline: z.string().optional().catch(''),
-    estimated_investment: z.string().optional().catch(''),
+    estimated_timeline: z.string().optional(),
+    estimated_investment: z.string().optional(),
   })
   .passthrough();
 
 // Enhanced spark concept (renamed from innovation_concept)
 const SparkConceptSchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().catch(''),
-    score: flexibleNumber(50, { min: 0, max: 100 }),
+    id: z.string(),
+    title: z.string(),
+    score: z.number().int().min(0).max(100).catch(50),
     confidence: ConfidenceLevel.catch('medium'),
     tags: ConceptTagsSchema.optional(),
-    source_domain: z.string().catch(''),
+    source_domain: z.string(),
 
     the_insight: InsightBlockSchema.optional(),
     how_it_works: z.array(z.string()).catch([]),
     components: z.array(z.string()).catch([]),
-    enabling_factors: z.string().optional().catch(''),
+    enabling_factors: z.string().optional(),
 
     breakthrough_potential: BreakthroughPotentialSchema.optional(),
     risks: ConceptRisksSchema.optional(),
 
-    recommended_parallel_action: z.string().optional().catch(''),
+    recommended_parallel_action: z.string().optional(),
     validation_approach: ValidationApproachSchema.optional(),
 
     // Legacy fields
-    one_liner: z.string().optional().catch(''),
-    when_to_consider: z.string().optional().catch(''),
+    one_liner: z.string().optional(),
+    when_to_consider: z.string().optional(),
   })
   .passthrough();
 
 // Legacy OtherConceptSchema for backward compatibility
 const OtherConceptSchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().catch(''),
+    id: z.string(),
+    title: z.string(),
     track: TrackSchema,
-    one_liner: z.string().catch(''),
-    when_to_consider: z.string().catch(''),
-    merit_score: flexibleNumber(5, { min: 1, max: 10 }),
+    one_liner: z.string(),
+    when_to_consider: z.string(),
+    merit_score: z.number().min(1).max(10).catch(5),
   })
   .passthrough();
 
 // Enhanced comparison table
 const ComparisonRowSchema = z
   .object({
-    id: z.string().catch(''),
-    title: z.string().catch(''),
-    score: flexibleNumber(50, { min: 0, max: 100 }),
+    id: z.string(),
+    title: z.string(),
+    score: z.number().int().min(0).max(100).catch(50),
     confidence: ConfidenceLevel.catch('medium'),
-    time_to_first_data: z.string().optional().catch(''),
-    expected_performance: z.string().optional().catch(''),
-    key_risk: z.string().catch(''),
+    time_to_first_data: z.string().optional(),
+    expected_performance: z.string().optional(),
+    key_risk: z.string(),
     capital_required: CapitalRequirement.catch('medium'),
-    timeline: z.string().catch(''),
+    timeline: z.string(),
   })
   .passthrough();
 
 // Complete solution concepts structure
 const SolutionConceptsSchema = z
   .object({
-    lead_concepts: z.array(LeadConceptSchema).max(10).default([]).catch([]),
+    lead_concepts: z.array(LeadConceptSchema).max(10).default([]),
 
-    parallel_explorations_intro: z.string().optional().catch(''),
+    parallel_explorations_intro: z.string().optional(),
     parallel_explorations: z
       .array(ParallelExplorationSchema)
       .max(20)
-      .default([])
-      .catch([]),
+      .default([]),
 
     spark_concept: SparkConceptSchema.optional(),
 
-    comparison_table: z.array(ComparisonRowSchema).max(20).default([]).catch([]),
-    comparison_insight: z.string().optional().catch(''),
+    comparison_table: z.array(ComparisonRowSchema).max(20).default([]),
+    comparison_insight: z.string().optional(),
   })
   .passthrough();
 
@@ -2772,22 +2765,22 @@ const SolutionConceptsSchema = z
 const ParadigmInsightSectionSchema = z
   .object({
     exists: z.boolean().catch(false),
-    insight_name: z.string().nullish().catch(''),
-    the_assumption: z.string().nullish().catch(''),
-    the_reality: z.string().nullish().catch(''),
-    the_disconnect: z.string().nullish().catch(''),
-    years_of_blind_spot: z.string().nullish().catch(''),
-    why_missed: z.string().nullish().catch(''),
-    evidence_base: z.string().nullish().catch(''),
-    magnitude_of_opportunity: z.string().nullish().catch(''),
-    first_mover_advantage: z.string().nullish().catch(''),
+    insight_name: z.string().nullable().optional(),
+    the_assumption: z.string().nullable().optional(),
+    the_reality: z.string().nullable().optional(),
+    the_disconnect: z.string().nullable().optional(),
+    years_of_blind_spot: z.string().nullable().optional(),
+    why_missed: z.string().nullable().optional(),
+    evidence_base: z.string().nullable().optional(),
+    magnitude_of_opportunity: z.string().nullable().optional(),
+    first_mover_advantage: z.string().nullable().optional(),
 
     // Legacy fields for backward compatibility
-    insight_headline: z.string().nullish().catch(''),
-    the_conventional_wisdom: z.string().nullish().catch(''),
-    what_we_discovered: z.string().nullish().catch(''),
+    insight_headline: z.string().nullable().optional(),
+    the_conventional_wisdom: z.string().nullable().optional(),
+    what_we_discovered: z.string().nullable().optional(),
     evidence_sources: z.array(z.string()).catch([]),
-    why_it_matters: z.string().nullish().catch(''),
+    why_it_matters: z.string().nullable().optional(),
     who_should_care: z.array(z.string()).catch([]),
     related_concepts: z.array(z.string()).catch([]),
   })
@@ -2796,8 +2789,8 @@ const ParadigmInsightSectionSchema = z
 // --- Decision Architecture Section (ASCII flowchart) ---
 const DecisionFlowchartSchema = z
   .object({
-    flowchart: z.string().catch(''), // ASCII or Mermaid format
-    summary: z.string().catch(''),
+    flowchart: z.string(), // ASCII or Mermaid format
+    summary: z.string(),
   })
   .passthrough();
 
@@ -2813,31 +2806,31 @@ const LegacyDecisionArchitectureSchema = z
 // --- Personal Recommendation Section ---
 const ActionPlanStepSchema = z
   .object({
-    timeframe: z.string().catch(''),
+    timeframe: z.string(),
     actions: z.array(z.string()).catch([]),
-    rationale: z.string().optional().catch(''),
-    decision_gate: z.string().optional().catch(''),
+    rationale: z.string().optional(),
+    decision_gate: z.string().optional(),
   })
   .passthrough();
 
 const PersonalRecommendationSchema = z
   .object({
-    intro: z.string().catch(''), // "If this were my project..."
+    intro: z.string(), // "If this were my project..."
     action_plan: z.array(ActionPlanStepSchema).catch([]),
-    key_insight: z.string().catch(''),
+    key_insight: z.string(),
   })
   .passthrough();
 
 // --- Strategic Implications Section ---
 const StrategicTimeframeSchema = z
   .object({
-    timeframe: z.string().catch(''),
-    action: z.string().optional().catch(''),
-    expected_outcome: z.string().optional().catch(''),
-    why_parallel: z.string().optional().catch(''),
-    paradigm_bet: z.string().optional().catch(''),
-    why_now: z.string().optional().catch(''),
-    competitive_implications: z.string().optional().catch(''),
+    timeframe: z.string(),
+    action: z.string().optional(),
+    expected_outcome: z.string().optional(),
+    why_parallel: z.string().optional(),
+    paradigm_bet: z.string().optional(),
+    why_now: z.string().optional(),
+    competitive_implications: z.string().optional(),
   })
   .passthrough();
 
@@ -2846,14 +2839,14 @@ const StrategicImplicationsSchema = z
     near_term: StrategicTimeframeSchema.optional(),
     medium_term: StrategicTimeframeSchema.optional(),
     long_term: StrategicTimeframeSchema.optional(),
-    portfolio_view: z.string().optional().catch(''),
+    portfolio_view: z.string().optional(),
 
     // Legacy fields
     for_incumbents: z.array(z.string()).catch([]),
     for_startups: z.array(z.string()).catch([]),
     for_investors: z.array(z.string()).catch([]),
-    timing_considerations: z.string().optional().catch(''),
-    competitive_dynamics: z.string().optional().catch(''),
+    timing_considerations: z.string().optional(),
+    competitive_dynamics: z.string().optional(),
   })
   .passthrough();
 
@@ -2869,9 +2862,9 @@ const ValidationSummarySchema = z
 // --- Challenge the Frame ---
 const ChallengeFrameSchema = z
   .object({
-    assumption: z.string().catch(''),
-    challenge: z.string().catch(''),
-    implication: z.string().catch(''),
+    assumption: z.string(),
+    challenge: z.string(),
+    implication: z.string(),
   })
   .passthrough();
 
@@ -2879,10 +2872,10 @@ const ChallengeFrameSchema = z
 // Note: Legacy schema, v4.0 uses enhanced inline schema in AN5_M_OutputSchema
 const _RiskWatchoutSchema = z
   .object({
-    category: z.string().catch(''),
-    risk: z.string().catch(''),
+    category: z.string(),
+    risk: z.string(),
     severity: flexibleEnum(['low', 'medium', 'high'] as const, 'medium'),
-    mitigation: z.string().optional().catch(''),
+    mitigation: z.string().optional(),
   })
   .passthrough();
 
@@ -2895,23 +2888,22 @@ const ReportSelfCritiqueSchema = z
     overall_confidence: ConfidenceLevel.optional(),
     // Legacy: confidence_level kept for backward compatibility
     confidence_level: ConfidenceLevel.catch('medium'),
-    confidence_rationale: z.string().catch(''),
+    confidence_rationale: z.string(),
     // v4.0: validation_gaps array
     validation_gaps: z
       .array(
         z
           .object({
-            concern: z.string().catch(''),
+            concern: z.string(),
             status: flexibleEnum(
               ['ADDRESSED', 'EXTENDED_NEEDED', 'ACCEPTED_RISK'] as const,
               'ACCEPTED_RISK',
             ),
-            rationale: z.string().catch(''),
+            rationale: z.string(),
           })
           .passthrough(),
       )
-      .default([])
-      .catch([]),
+      .default([]),
   })
   .passthrough();
 
@@ -2924,9 +2916,9 @@ const NextStepsGranularSchema = z
     week_4_plus: z.array(z.string()).catch([]),
     decision_point: z
       .object({
-        title: z.string().catch(''),
-        description: z.string().catch(''),
-        cta_label: z.string().optional().catch(''),
+        title: z.string(),
+        description: z.string(),
+        cta_label: z.string().optional(),
       })
       .passthrough()
       .optional(),
@@ -2945,10 +2937,10 @@ const AppendixSchema = z
 // Note: Legacy schema, v4.0 uses enhanced inline schema in AN5_M_OutputSchema
 const _MetadataSchema = z
   .object({
-    generated_at: z.string().optional().catch(''),
-    model_version: z.string().optional().catch(''),
-    chain_version: z.string().optional().catch(''),
-    total_concepts_generated: flexibleNumber(0, { min: 0, max: 1000 }),
+    generated_at: z.string().optional(),
+    model_version: z.string().optional(),
+    chain_version: z.string().optional(),
+    total_concepts_generated: z.number().optional(),
     tracks_covered: z.array(TrackSchema).catch([]),
   })
   .passthrough();
@@ -2963,9 +2955,9 @@ export const AN5_M_OutputSchema = z
     header: HeaderSchema.optional(),
 
     // v4.0: brief - one paragraph executive summary
-    brief: z.string().optional().catch(''),
+    brief: z.string().optional(),
 
-    executive_summary: z.union([ExecutiveSummarySchema, z.string().catch('')]),
+    executive_summary: z.union([ExecutiveSummarySchema, z.string()]),
 
     // v4.0: constraints_and_metrics (new canonical name)
     constraints_and_metrics: ConstraintsAndMetricsSchema.optional(),
@@ -3010,35 +3002,33 @@ export const AN5_M_OutputSchema = z
       .array(
         z
           .object({
-            category: z.string().catch(''),
-            risk: z.string().catch(''),
+            category: z.string(),
+            risk: z.string(),
             severity: SeverityLevel.catch('medium'),
-            mitigation: z.string().optional().catch(''),
-            requires_resolution_before_proceeding: z.boolean().optional().catch(false),
+            mitigation: z.string().optional(),
+            requires_resolution_before_proceeding: z.boolean().optional(),
           })
           .passthrough(),
       )
       .max(20)
-      .default([])
-      .catch([]),
+      .default([]),
 
     // v4.0: what_id_actually_do - personal recommendation prose
-    what_id_actually_do: z.string().optional().catch(''),
+    what_id_actually_do: z.string().optional(),
 
     self_critique: ReportSelfCritiqueSchema,
 
     // v4.0: follow_up_prompts - suggested next questions
-    follow_up_prompts: z.array(z.string()).default([]).catch([]),
+    follow_up_prompts: z.array(z.string()).default([]),
 
     // v4.0: references - inline citations used in report
-    // ANTIFRAGILE: Handle null URLs from LLM (nullish = null | undefined)
     references: z
       .array(
         z
           .object({
-            id: z.number().catch(0),
-            citation: z.string().catch(''),
-            url: z.string().nullish(), // Handle both null and undefined
+            id: z.number(),
+            citation: z.string(),
+            url: z.string().optional(),
           })
           .passthrough(),
       )
@@ -3046,32 +3036,32 @@ export const AN5_M_OutputSchema = z
 
     metadata: z
       .object({
-        generated_at: z.string().catch(''),
-        model_version: z.string().catch(''),
-        chain_version: z.string().catch(''),
-        framework: z.string().optional().catch(''),
-        total_concepts_generated: flexibleNumber(0, { min: 0, max: 1000 }),
+        generated_at: z.string(),
+        model_version: z.string(),
+        chain_version: z.string(),
+        framework: z.string().optional(),
+        total_concepts_generated: z.number().optional(),
         tracks_covered: z.array(TrackSchema).catch([]),
       })
       .passthrough()
       .optional(),
 
     // === Legacy fields for backward compatibility ===
-    key_patterns: z.array(KeyPatternSchema).max(20).default([]).catch([]),
+    key_patterns: z.array(KeyPatternSchema).max(20).default([]),
     paradigm_insight: ParadigmInsightSectionSchema.optional(),
     decision_flowchart: DecisionFlowchartSchema.optional(),
     personal_recommendation: PersonalRecommendationSchema.optional(),
     validation_summary: ValidationSummarySchema.optional(),
     strategic_implications: StrategicImplicationsSchema.optional(),
     next_steps: z
-      .union([NextStepsGranularSchema, z.array(z.string()).max(20).catch([])])
+      .union([NextStepsGranularSchema, z.array(z.string()).max(20)])
       .optional(),
     appendix: AppendixSchema.optional(),
-    report_title: z.string().max(100).optional().catch(''),
+    report_title: z.string().max(100).optional(),
     decision_architecture: LegacyDecisionArchitectureSchema.optional(),
-    other_concepts: z.array(OtherConceptSchema).max(30).default([]).catch([]),
-    problem_restatement: z.string().optional().catch(''),
-    key_insights: z.array(z.string()).max(20).default([]).catch([]),
+    other_concepts: z.array(OtherConceptSchema).max(30).default([]),
+    problem_restatement: z.string().optional(),
+    key_insights: z.array(z.string()).max(20).default([]),
   })
   .passthrough();
 

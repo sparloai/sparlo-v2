@@ -88,17 +88,17 @@ export const EngineeringHero = memo(function EngineeringHero() {
       <div className="relative z-10 flex flex-col items-center px-8 text-center">
         {/* Headline */}
         <h1 className="font-heading text-[40px] leading-[1.2] font-light tracking-[-0.02em] text-white md:text-[64px] lg:text-[80px]">
-          Engineering AI
+          Engineering Intelligence Model
         </h1>
 
         {/* Subtitle */}
         <p className="font-heading mt-6 max-w-[45ch] text-[18px] leading-[1.2] font-light tracking-[-0.02em] text-white/70 md:text-[22px]">
-          Sparlo analyzes and solves deep tech problems.
+          Innovative solutions to complex technical challenges.
         </p>
 
         {/* CTA */}
         <Link
-          href="/app"
+          href="/home"
           className="font-heading mt-10 inline-flex min-h-[44px] items-center bg-white px-8 py-3.5 text-base leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:bg-zinc-100"
         >
           Run Analysis

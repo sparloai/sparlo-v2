@@ -1,20 +1,17 @@
-'use client';
+import { withI18n } from '~/lib/i18n/with-i18n';
 
 import { EngineeringHero } from './_components/engineering-hero';
-import { ExampleReportsSectionNew } from './_components/example-reports/example-reports-section-new';
-import { ProcessAnimation } from './_components/process-animation';
+import { ExampleReportsSection } from './_components/example-reports/example-reports-section';
+import { MethodologySection } from './_components/methodology-section';
 
-/**
- * Landing Page
- */
 function Home() {
   return (
     <>
       <EngineeringHero />
-      <ProcessAnimation />
-      <ExampleReportsSectionNew />
+      <MethodologySection />
+      <ExampleReportsSection />
     </>
   );
 }
 
-export default Home;
+export default withI18n(Home);

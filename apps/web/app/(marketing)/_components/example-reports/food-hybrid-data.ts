@@ -1,4 +1,4 @@
-import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
+import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
 
 /**
  * Food Waste Processing Hybrid Report Example Data

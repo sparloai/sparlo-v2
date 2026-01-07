@@ -110,7 +110,7 @@ export function OtpSignInContainer(props: OtpSignInContainerProps) {
 
     // In production, redirect app paths to app subdomain
     if (isProduction && isAppPath(next)) {
-      window.location.assign(getAppSubdomainUrl(next));
+      window.location.href = getAppSubdomainUrl(next);
       return;
     }
 

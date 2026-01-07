@@ -1,8 +1,8 @@
 'use client';
 
-import { BrandSystemReport } from '~/app/reports/[id]/_components/brand-system/brand-system-report';
-import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
-import type { SharedReport } from '~/app/reports/_lib/types/report-data.types';
+import { BrandSystemReport } from '~/home/(user)/reports/[id]/_components/brand-system/brand-system-report';
+import type { HybridReportData } from '~/home/(user)/reports/_lib/types/hybrid-report-display.types';
+import type { SharedReport } from '~/home/(user)/reports/_lib/types/report-data.types';
 
 interface PublicReportDisplayProps {
   report: SharedReport;
