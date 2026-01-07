@@ -22,10 +22,17 @@ import {
 
 interface ConstraintsSectionProps {
   data?: ConstraintsAndMetrics;
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const ConstraintsSection = memo(function ConstraintsSection({
   data,
+  variant = 'full',
 }: ConstraintsSectionProps) {
   if (!data) return null;
 
@@ -36,6 +43,63 @@ export const ConstraintsSection = memo(function ConstraintsSection({
     (data.success_metrics && data.success_metrics.length > 0);
 
   if (!hasContent) return null;
+
+  // Preview variant: condensed view for showcase gallery
+  if (variant === 'preview') {
+    const hardCount = data.hard_constraints?.length || 0;
+    const softCount = data.soft_constraints?.length || 0;
+    const metricsCount = data.success_metrics?.length || 0;
+
+    return (
+      <div className="space-y-4">
+        {/* First hard constraint */}
+        {data.hard_constraints && data.hard_constraints.length > 0 && (
+          <div className="border-l-2 border-zinc-900 pl-4">
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">
+              Hard Constraint
+            </p>
+            <p className="mt-1 text-[15px] font-medium text-zinc-900">
+              {data.hard_constraints[0]}
+            </p>
+          </div>
+        )}
+
+        {/* First soft constraint */}
+        {data.soft_constraints && data.soft_constraints.length > 0 && (
+          <div className="pl-4">
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">
+              Soft Constraint
+            </p>
+            <p className="mt-1 text-[15px] text-zinc-700">
+              {data.soft_constraints[0]}
+            </p>
+          </div>
+        )}
+
+        {/* Summary counts */}
+        <div className="flex flex-wrap gap-3 text-[14px]">
+          {hardCount > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">{hardCount}</span>{' '}
+              <span className="text-zinc-500">hard</span>
+            </span>
+          )}
+          {softCount > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">{softCount}</span>{' '}
+              <span className="text-zinc-500">soft</span>
+            </span>
+          )}
+          {metricsCount > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">{metricsCount}</span>{' '}
+              <span className="text-zinc-500">metrics</span>
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Section id="constraints">

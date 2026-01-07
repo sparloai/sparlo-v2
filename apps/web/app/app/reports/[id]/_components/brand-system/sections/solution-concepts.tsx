@@ -724,12 +724,64 @@ const SupportingConceptsSection = memo(function SupportingConceptsSection({
 
 interface SolutionConceptsSectionProps {
   data?: ExecutionTrack;
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const SolutionConceptsSection = memo(function SolutionConceptsSection({
   data,
+  variant = 'full',
 }: SolutionConceptsSectionProps) {
   if (!data) return null;
+
+  // Preview variant: condensed view for showcase gallery
+  if (variant === 'preview') {
+    const primary = data.primary;
+    const supportingCount = data.supporting_concepts?.length || 0;
+
+    return (
+      <div className="space-y-4">
+        {/* Primary recommendation title */}
+        {primary?.title && (
+          <div className="border-l-2 border-zinc-900 pl-4">
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">
+              Primary Recommendation
+            </p>
+            <p className="mt-1 text-[16px] font-medium text-zinc-900">
+              {primary.title}
+            </p>
+          </div>
+        )}
+
+        {/* Bottom line if available */}
+        {primary?.bottom_line && (
+          <p className="text-[15px] leading-relaxed text-zinc-700">
+            {primary.bottom_line.slice(0, 200)}
+            {primary.bottom_line.length > 200 ? '...' : ''}
+          </p>
+        )}
+
+        {/* Confidence and alternatives summary */}
+        <div className="flex flex-wrap gap-3 text-[14px]">
+          {primary?.confidence_detail?.level && (
+            <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-zinc-700">
+              {primary.confidence_detail.level} confidence
+            </span>
+          )}
+          {supportingCount > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">{supportingCount}</span>{' '}
+              <span className="text-zinc-500">alternatives</span>
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Section id="solution-concepts">

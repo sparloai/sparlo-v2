@@ -19,6 +19,7 @@ import {
 import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
 
 import type { Mode } from '../mode-tabs';
+import { ShowcaseGallery } from '../showcase-gallery';
 import { BIOTECH_HYBRID_REPORT } from './biotech-hybrid-data';
 import { CARBON_REMOVAL_HYBRID_REPORT } from './carbon-removal-hybrid-data';
 import {
@@ -75,29 +76,35 @@ interface ExampleReportsSectionProps {
 }
 
 export function ExampleReportsSection({ mode }: ExampleReportsSectionProps) {
-  const [activeTab, setActiveTab] = useState(0);
-  const [prevMode, setPrevMode] = useState(mode);
-
-  // Get the correct reports array based on mode
-  const reports = mode === 'engineers' ? EXAMPLE_REPORTS : INVESTOR_REPORTS;
-
-  // Reset active tab during render when mode changes (React recommended pattern)
-  if (prevMode !== mode) {
-    setPrevMode(mode);
-    setActiveTab(0);
+  // Engineers mode uses the new ShowcaseGallery with card-based progressive disclosure
+  if (mode === 'engineers') {
+    return <ShowcaseGallery />;
   }
+
+  // Investors mode uses the legacy full-report display
+  return <InvestorReportsSection />;
+}
+
+/**
+ * Investor Reports Section
+ *
+ * Legacy full-report display for investors mode.
+ * Uses BrandSystemReport with sticky TOC sidebar.
+ */
+function InvestorReportsSection() {
+  const [activeTab, setActiveTab] = useState(0);
+
+  // Investors mode only
+  const reports = INVESTOR_REPORTS;
 
   const report = reports[activeTab]!;
 
   // Get the hybrid report data for current tab
-  // For investors mode, map to existing reports via INVESTOR_REPORT_DATA_MAP
+  // Map investor report IDs to existing hybrid reports
   const reportData = useMemo(() => {
-    if (mode === 'investors') {
-      const mappedId = INVESTOR_REPORT_DATA_MAP[report.id];
-      return mappedId ? REPORT_DATA_MAP[mappedId] : undefined;
-    }
-    return REPORT_DATA_MAP[report.id];
-  }, [mode, report.id]);
+    const mappedId = INVESTOR_REPORT_DATA_MAP[report.id];
+    return mappedId ? REPORT_DATA_MAP[mappedId] : undefined;
+  }, [report.id]);
 
   // Generate TOC sections from report data
   const tocSections = useMemo(() => {
@@ -117,7 +124,7 @@ export function ExampleReportsSection({ mode }: ExampleReportsSectionProps) {
     scrollOffset: LP_SCROLL_OFFSET,
   });
 
-  const sectionContent = SECTION_CONTENT[mode];
+  const sectionContent = SECTION_CONTENT.investors;
 
   return (
     <section

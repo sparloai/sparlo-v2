@@ -27,12 +27,58 @@ import {
 
 interface RisksWatchoutsSectionProps {
   data?: RiskAndWatchout[];
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const RisksWatchoutsSection = memo(function RisksWatchoutsSection({
   data,
+  variant = 'full',
 }: RisksWatchoutsSectionProps) {
   if (!data || data.length === 0) return null;
+
+  // Preview variant: condensed view for showcase gallery
+  if (variant === 'preview') {
+    const firstRisk = data[0];
+    const highRiskCount = data.filter((r) => r.severity === 'high').length;
+
+    return (
+      <div className="space-y-4">
+        {/* First risk */}
+        {firstRisk && (
+          <div className="border-l-2 border-zinc-900 pl-4">
+            <p className="text-[15px] font-medium text-zinc-900">
+              {firstRisk.risk}
+            </p>
+            {firstRisk.mitigation && (
+              <p className="mt-1 text-[14px] text-zinc-600">
+                <span className="font-medium">Mitigation:</span> {firstRisk.mitigation.slice(0, 100)}
+                {firstRisk.mitigation.length > 100 ? '...' : ''}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Summary counts */}
+        <div className="flex flex-wrap gap-3 text-[14px]">
+          <span>
+            <span className="font-medium text-zinc-700">{data.length}</span>{' '}
+            <span className="text-zinc-500">risks identified</span>
+          </span>
+          {highRiskCount > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">{highRiskCount}</span>{' '}
+              <span className="text-zinc-500">high severity</span>
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Section id="risks-watchouts" className="mt-20">

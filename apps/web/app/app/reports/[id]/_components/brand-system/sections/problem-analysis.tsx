@@ -31,13 +31,67 @@ interface FromScratchRevelation {
 interface ProblemAnalysisSectionProps {
   data?: ProblemAnalysis;
   fromScratchRevelations?: FromScratchRevelation[];
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
   data,
   fromScratchRevelations,
+  variant = 'full',
 }: ProblemAnalysisSectionProps) {
   if (!data) return null;
+
+  // Preview variant: condensed view for showcase gallery
+  if (variant === 'preview') {
+    const whatsWrong = data.whats_wrong?.prose;
+    const factorCount = data.why_its_hard?.factors?.length || 0;
+    const benchmarkCount = data.current_state_of_art?.benchmarks?.length || 0;
+
+    return (
+      <div className="space-y-4">
+        {/* What's wrong summary */}
+        {whatsWrong && (
+          <p className="text-[15px] leading-relaxed text-zinc-700">
+            {whatsWrong.slice(0, 250)}
+            {whatsWrong.length > 250 ? '...' : ''}
+          </p>
+        )}
+
+        {/* Key factors preview */}
+        {data.why_its_hard?.factors && data.why_its_hard.factors.length > 0 && (
+          <div className="border-l-2 border-zinc-900 pl-4">
+            <p className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">
+              Key Difficulty
+            </p>
+            <p className="mt-1 text-[15px] font-medium text-zinc-900">
+              {data.why_its_hard.factors[0]?.factor}
+            </p>
+          </div>
+        )}
+
+        {/* Summary counts */}
+        <div className="flex flex-wrap gap-3 text-[14px]">
+          {factorCount > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">{factorCount}</span>{' '}
+              <span className="text-zinc-500">difficulty factors</span>
+            </span>
+          )}
+          {benchmarkCount > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">{benchmarkCount}</span>{' '}
+              <span className="text-zinc-500">industry benchmarks</span>
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Section id="problem-analysis">

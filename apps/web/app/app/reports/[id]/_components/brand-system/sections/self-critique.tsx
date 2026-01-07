@@ -28,10 +28,17 @@ function titleCase(str: string): string {
 
 interface SelfCritiqueSectionProps {
   data?: SelfCritique;
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const SelfCritiqueSection = memo(function SelfCritiqueSection({
   data,
+  variant = 'full',
 }: SelfCritiqueSectionProps) {
   if (!data) return null;
 
@@ -44,6 +51,56 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
     (data.validation_gaps && data.validation_gaps.length > 0);
 
   if (!hasContent) return null;
+
+  // Preview variant: condensed view for showcase gallery
+  if (variant === 'preview') {
+    const confidenceLevel = data.overall_confidence || data.confidence_level;
+    const firstDoubt = data.what_we_might_be_wrong_about?.[0];
+
+    return (
+      <div className="space-y-4">
+        {/* Confidence level badge */}
+        {confidenceLevel && (
+          <div className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1">
+            <span className="text-sm font-medium text-zinc-700">
+              {confidenceLevel.charAt(0).toUpperCase() + confidenceLevel.slice(1).toLowerCase()} Confidence
+            </span>
+          </div>
+        )}
+
+        {/* First thing we might be wrong about */}
+        {firstDoubt && (
+          <div className="border-l-2 border-zinc-900 pl-4">
+            <p className="text-[15px] font-medium text-zinc-900">
+              Potential Blind Spot
+            </p>
+            <p className="mt-1 text-[15px] text-zinc-600">{firstDoubt}</p>
+          </div>
+        )}
+
+        {/* Summary counts */}
+        <div className="flex flex-wrap gap-3 text-[14px]">
+          {data.what_we_might_be_wrong_about &&
+            data.what_we_might_be_wrong_about.length > 1 && (
+              <span>
+                <span className="font-medium text-zinc-700">
+                  {data.what_we_might_be_wrong_about.length}
+                </span>{' '}
+                <span className="text-zinc-500">potential blind spots</span>
+              </span>
+            )}
+          {data.validation_gaps && data.validation_gaps.length > 0 && (
+            <span>
+              <span className="font-medium text-zinc-700">
+                {data.validation_gaps.length}
+              </span>{' '}
+              <span className="text-zinc-500">validation gaps</span>
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Section id="self-critique" className="mt-20">

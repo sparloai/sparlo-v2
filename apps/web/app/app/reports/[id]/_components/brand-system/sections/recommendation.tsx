@@ -28,15 +28,52 @@ import {
 interface RecommendationSectionProps {
   content?: string;
   personalRecommendation?: StrategicIntegration['personal_recommendation'];
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const RecommendationSection = memo(function RecommendationSection({
   content,
   personalRecommendation,
+  variant = 'full',
 }: RecommendationSectionProps) {
   const hasContent = content || personalRecommendation?.key_insight;
 
   if (!hasContent) return null;
+
+  // Preview variant: condensed view for showcase gallery
+  if (variant === 'preview') {
+    const keyInsight = personalRecommendation?.key_insight;
+    const firstParagraph = content?.split(/\n\n+/)[0];
+
+    return (
+      <div className="space-y-4">
+        {/* Key insight or first paragraph */}
+        {keyInsight ? (
+          <div className="border-l-2 border-zinc-900 pl-4">
+            <p className="text-[17px] font-medium leading-relaxed text-zinc-900">
+              {keyInsight}
+            </p>
+          </div>
+        ) : firstParagraph ? (
+          <p className="text-[17px] leading-relaxed text-zinc-700">
+            {firstParagraph}
+          </p>
+        ) : null}
+
+        {/* Intro if available */}
+        {personalRecommendation?.intro && !keyInsight && (
+          <p className="text-[15px] text-zinc-600">
+            {personalRecommendation.intro}
+          </p>
+        )}
+      </div>
+    );
+  }
 
   // If we have a string content, split into paragraphs
   const paragraphs = content ? content.split(/\n\n+/).filter(Boolean) : [];

@@ -22,13 +22,57 @@ import {
 
 interface FrontierTechnologiesSectionProps {
   data?: FrontierWatch[];
+  /**
+   * Render variant:
+   * - 'full': Complete section with all fields (default)
+   * - 'preview': Condensed version for showcase gallery cards
+   */
+  variant?: 'full' | 'preview';
 }
 
 export const FrontierTechnologiesSection = memo(
   function FrontierTechnologiesSection({
     data,
+    variant = 'full',
   }: FrontierTechnologiesSectionProps) {
     if (!data || data.length === 0) return null;
+
+    // Preview variant: condensed view for showcase gallery
+    if (variant === 'preview') {
+      const firstTech = data[0];
+
+      return (
+        <div className="space-y-4">
+          {/* First technology */}
+          {firstTech && (
+            <div className="border-l-2 border-zinc-900 pl-4">
+              <div className="flex items-center justify-between">
+                <p className="text-[16px] font-medium text-zinc-900">
+                  {firstTech.title}
+                </p>
+                {firstTech.trl_estimate && (
+                  <span className="text-[14px] text-zinc-500">
+                    TRL {firstTech.trl_estimate}
+                  </span>
+                )}
+              </div>
+              {firstTech.one_liner && (
+                <p className="mt-1 text-[14px] text-zinc-600">
+                  {firstTech.one_liner}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Count if more */}
+          {data.length > 1 && (
+            <p className="text-[14px] text-zinc-500">
+              <span className="font-medium text-zinc-700">{data.length}</span> technologies to monitor
+            </p>
+          )}
+        </div>
+      );
+    }
 
     return (
       <Section id="frontier-technologies" className="mt-20">
