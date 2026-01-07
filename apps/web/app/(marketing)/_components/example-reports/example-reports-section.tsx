@@ -11,12 +11,12 @@ import {
   BrandSystemReport,
   type TocSection,
   generateTocSections,
-} from '~/app/reports/[id]/_components/brand-system';
+} from '~/app/app/reports/[id]/_components/brand-system';
 import {
   flattenSectionIds,
   useTocScroll,
-} from '~/app/reports/[id]/_lib/hooks/use-toc-scroll';
-import type { HybridReportData } from '~/app/reports/_lib/types/hybrid-report-display.types';
+} from '~/app/app/reports/[id]/_lib/hooks/use-toc-scroll';
+import type { HybridReportData } from '~/app/app/reports/_lib/types/hybrid-report-display.types';
 
 import type { Mode } from '../mode-tabs';
 import { BIOTECH_HYBRID_REPORT } from './biotech-hybrid-data';

@@ -2,7 +2,7 @@ import { requireUser } from '@kit/supabase/require-user';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 import { SidebarProvider } from '@kit/ui/shadcn-sidebar';
 
-import { loadRecentReports } from '~/app/_lib/server/recent-reports.loader';
+import { loadRecentReports } from '~/app/app/_lib/server/recent-reports.loader';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
 
 // local imports
