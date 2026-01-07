@@ -95,11 +95,15 @@ export function ProcessingScreen({
     if (hasNavigatedRef.current) return;
 
     // DEBUG: Log progress state to understand AN0 redirect timing
+    const isStillInInitial = isInitialPhase(progress.currentStep);
     console.log('[ProcessingScreen] Progress state:', {
       status: progress.status,
       currentStep: progress.currentStep,
+      isInitialPhase: isStillInInitial,
       clarifications: progress.clarifications?.length ?? 0,
+      hasPendingClarification,
       id: progress.id,
+      pathname,
     });
 
     // Priority 1: Report complete - navigate to report
