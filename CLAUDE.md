@@ -25,6 +25,13 @@ This file provides guidance to Claude Code when working with code in this reposi
 
 Data associates with accounts via foreign keys for proper access control.
 
+## Browser Testing Credentials
+
+For all browser-based testing (dev-browser, Playwright, manual QA):
+- **Email**: alijangbar@gmail.com
+- **Password**: Linguine2025
+- **Login URL**: http://localhost:3000/auth/sign-in
+
 ## Essential Commands
 
 ### Development Workflow

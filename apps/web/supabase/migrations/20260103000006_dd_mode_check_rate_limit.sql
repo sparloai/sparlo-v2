@@ -1,6 +1,7 @@
 -- DD Mode v2: Rate Limit Check Function
+-- Named check_dd_rate_limit to avoid conflict with existing check_rate_limit function
 
-CREATE OR REPLACE FUNCTION public.check_rate_limit(
+CREATE OR REPLACE FUNCTION public.check_dd_rate_limit(
   p_account_id uuid,
   p_resource_type text,
   p_limit integer,
@@ -9,7 +10,7 @@ CREATE OR REPLACE FUNCTION public.check_rate_limit(
 RETURNS jsonb
 LANGUAGE plpgsql
 SECURITY DEFINER
-AS $check_rate_limit$
+AS $check_dd_rate_limit$
 DECLARE
   v_window_start timestamptz;
   v_current_count integer;
@@ -43,6 +44,6 @@ BEGIN
     'reset_at', v_window_start + (p_window_minutes * interval '1 minute')
   );
 END;
-$check_rate_limit$;
+$check_dd_rate_limit$;
 
-GRANT EXECUTE ON FUNCTION public.check_rate_limit(uuid, text, integer, integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.check_dd_rate_limit(uuid, text, integer, integer) TO authenticated;
