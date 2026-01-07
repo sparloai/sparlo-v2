@@ -63,12 +63,16 @@ export function ProcessingScreen({
   // Use database timestamp for elapsed time (persists across refresh)
   const elapsedSeconds = useElapsedTime(progress.createdAt);
 
+  // Helper to check if still in initial review phase (AN0 for technical, DD0 for due diligence)
+  const isInitialPhase = (step: string | null) =>
+    !step || step.startsWith('an0') || step.startsWith('dd0');
+
   // Cycle through status messages
   useEffect(() => {
-    // Don't cycle messages during AN0 phase (any variant)
+    // Don't cycle messages during initial review phase (AN0 or DD0)
     if (
       progress.status !== 'processing' ||
-      progress.currentStep?.startsWith('an0') ||
+      isInitialPhase(progress.currentStep) ||
       prefersReducedMotion
     )
       return;
@@ -105,19 +109,20 @@ export function ProcessingScreen({
       return;
     }
 
-    // Priority 2: AN0 bypass - redirect to dashboard when no clarification needed
-    // Check for any AN0 variant (an0, an0-d for discovery, etc.)
-    const isStillInAN0 =
-      progress.currentStep === null || progress.currentStep.startsWith('an0');
-    const movedPastAN0 = progress.status === 'processing' && !isStillInAN0;
-    const noClarificationNeeded = movedPastAN0 && !hasPendingClarification;
+    // Priority 2: Initial phase bypass - redirect to dashboard when no clarification needed
+    // Check for initial review phase (AN0 for technical, DD0 for due diligence)
+    const isStillInInitialPhase = isInitialPhase(progress.currentStep);
+    const movedPastInitialPhase =
+      progress.status === 'processing' && !isStillInInitialPhase;
+    const noClarificationNeeded =
+      movedPastInitialPhase && !hasPendingClarification;
 
     // DEBUG: Log redirect decision
-    if (movedPastAN0) {
+    if (movedPastInitialPhase) {
       console.log(
-        '[ProcessingScreen] Moved past AN0, checking clarifications:',
+        '[ProcessingScreen] Moved past initial phase, checking clarifications:',
         {
-          movedPastAN0,
+          movedPastInitialPhase,
           hasPendingClarification,
           noClarificationNeeded,
           willRedirect: noClarificationNeeded,
@@ -507,10 +512,8 @@ export function ProcessingScreen({
     );
   }
 
-  // Determine if we're in the initial review phase (AN0) or main analysis
-  // Handle any AN0 variant (an0, an0-d for discovery, etc.)
-  const isInitialReview =
-    !progress.currentStep || progress.currentStep.startsWith('an0');
+  // Determine if we're in the initial review phase (AN0/DD0) or main analysis
+  const isInitialReview = isInitialPhase(progress.currentStep);
 
   // Default: Processing status - two states based on current phase
   // Air Company inspired: clean, bold, minimal
