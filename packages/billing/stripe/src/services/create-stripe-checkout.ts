@@ -70,9 +70,6 @@ export async function createStripeCheckout(
     returnUrl: params.returnUrl,
   });
 
-  // we use the embedded mode, so the user does not leave the page
-  const uiMode = 'embedded';
-
   const customerData = customer
     ? {
         customer,
@@ -116,7 +113,6 @@ export async function createStripeCheckout(
   return stripe.checkout.sessions.create({
     mode,
     allow_promotion_codes: params.enableDiscountField,
-    ui_mode: uiMode,
     line_items: lineItems,
     client_reference_id: clientReferenceId,
     subscription_data: subscriptionData,
@@ -128,9 +124,12 @@ export async function createStripeCheckout(
 }
 
 function getUrls(params: { returnUrl: string }) {
-  const returnUrl = `${params.returnUrl}?session_id={CHECKOUT_SESSION_ID}`;
+  const successUrl = `${params.returnUrl}?session_id={CHECKOUT_SESSION_ID}`;
+  // Cancel URL goes back to the billing page without the session_id
+  const cancelUrl = params.returnUrl.replace(/\/return$/, '');
 
   return {
-    return_url: returnUrl,
+    success_url: successUrl,
+    cancel_url: cancelUrl,
   };
 }

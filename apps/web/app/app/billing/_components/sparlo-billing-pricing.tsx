@@ -2,7 +2,7 @@
 
 import { useCallback, useState, useTransition } from 'react';
 
-import dynamic from 'next/dynamic';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import Link from 'next/link';
 
 import { Check } from 'lucide-react';
@@ -14,14 +14,6 @@ import { cn } from '@kit/ui/utils';
 
 import { createPersonalAccountCheckoutSession } from '../_lib/server/server-actions';
 
-const EmbeddedCheckout = dynamic(
-  async () => {
-    const { EmbeddedCheckout } = await import('@kit/billing-gateway/checkout');
-    return { default: EmbeddedCheckout };
-  },
-  { ssr: false },
-);
-
 interface SparloBillingPricingProps {
   config: BillingConfig;
   customerId: string | null | undefined;
@@ -30,13 +22,11 @@ interface SparloBillingPricingProps {
 
 interface CheckoutState {
   selectedPlan: string | null;
-  checkoutToken: string | undefined;
   error: string | null;
 }
 
 const initialCheckoutState: CheckoutState = {
   selectedPlan: null,
-  checkoutToken: undefined,
   error: null,
 };
 
@@ -80,12 +70,16 @@ export function SparloBillingPricing({
       startTransition(async () => {
         try {
           appEvents.emit({ type: 'checkout.started', payload: { planId } });
-          const { checkoutToken } = await createPersonalAccountCheckoutSession({
+          // Server action redirects to Stripe checkout page
+          await createPersonalAccountCheckoutSession({
             planId,
             productId,
           });
-          setCheckout((prev) => ({ ...prev, checkoutToken }));
-        } catch {
+        } catch (error) {
+          // redirect() throws an error, so we need to rethrow it
+          if (isRedirectError(error)) {
+            throw error;
+          }
           setCheckout((prev) => ({
             ...prev,
             selectedPlan: null,
@@ -97,52 +91,6 @@ export function SparloBillingPricing({
     },
     [appEvents],
   );
-
-  const resetCheckout = useCallback(() => {
-    setCheckout(initialCheckoutState);
-  }, []);
-
-  // Show embedded checkout when token is available
-  if (checkout.checkoutToken) {
-    return (
-      <main className="min-h-screen bg-white">
-        <div className="mx-auto max-w-3xl px-8 pt-24 pb-16">
-          {/* Back link */}
-          <button
-            onClick={resetCheckout}
-            className="mb-6 inline-flex cursor-pointer items-center gap-1.5 text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 focus-visible:text-zinc-600 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none active:text-zinc-700"
-          >
-            <svg
-              className="h-3.5 w-3.5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
-              />
-            </svg>
-            Back to plans
-          </button>
-
-          {/* Page title */}
-          <h1 className="font-heading mb-12 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
-            Checkout
-          </h1>
-
-          <EmbeddedCheckout
-            checkoutToken={checkout.checkoutToken}
-            provider={config.provider}
-            onClose={resetCheckout}
-          />
-        </div>
-      </main>
-    );
-  }
 
   // Get visible products
   const visibleProducts = config.products.filter((p) => !p.hidden);

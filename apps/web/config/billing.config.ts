@@ -10,7 +10,7 @@ export default createBillingSchema({
     {
       id: 'lite',
       name: 'Lite',
-      description: 'For individuals getting started',
+      description: 'Occasional use',
       currency: 'USD',
       plans: [
         {
@@ -42,17 +42,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: [
-        '~3 problems/month',
-        '1 seat',
-        'Email support',
-        'Basic analytics',
-      ],
+      features: ['~3 problems/month', '1 seat', 'Email support'],
     },
     {
       id: 'core',
       name: 'Core',
-      description: 'For growing research needs',
+      description: 'For individuals',
       currency: 'USD',
       plans: [
         {
@@ -84,17 +79,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: [
-        '~10 problems/month',
-        '1 seat',
-        'Priority email support',
-        'Advanced analytics',
-      ],
+      features: ['~10 problems/month', '1 seat', 'Email support'],
     },
     {
       id: 'pro',
       name: 'Pro',
-      description: 'For teams and power users',
+      description: 'For small teams',
       currency: 'USD',
       highlighted: true,
       plans: [
@@ -127,17 +117,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: [
-        '~25 problems/month',
-        '5 team seats',
-        'Priority support',
-        'Team collaboration',
-      ],
+      features: ['~25 problems/month', '5 team seats', 'Priority support'],
     },
     {
       id: 'max',
       name: 'Max',
-      description: 'For organizations at scale',
+      description: 'For organizations',
       currency: 'USD',
       plans: [
         {
@@ -169,13 +154,7 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: [
-        '~50 problems/month',
-        '10 team seats',
-        'Dedicated support',
-        'API access',
-        'SSO',
-      ],
+      features: ['~50 problems/month', '10 team seats', 'Dedicated support'],
     },
   ],
 });

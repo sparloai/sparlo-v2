@@ -22,7 +22,7 @@ const enabled = featureFlagsConfig.enableTeamAccountBilling;
 
 /**
  * @name createTeamAccountCheckoutSession
- * @description Creates a checkout session for a team account.
+ * @description Creates a checkout session for a team account and redirects to Stripe.
  */
 export const createTeamAccountCheckoutSession = enhanceAction(
   async (data) => {
@@ -33,7 +33,9 @@ export const createTeamAccountCheckoutSession = enhanceAction(
     const client = getSupabaseServerClient();
     const service = createTeamBillingService(client);
 
-    return service.createCheckout(data);
+    const { checkoutToken: checkoutUrl } = await service.createCheckout(data);
+
+    return redirect(checkoutUrl);
   },
   {
     schema: TeamCheckoutSchema,

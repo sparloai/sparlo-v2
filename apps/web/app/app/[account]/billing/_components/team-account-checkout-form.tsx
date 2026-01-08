@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useTransition } from 'react';
 
-import dynamic from 'next/dynamic';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { useParams } from 'next/navigation';
 
 import { PlanPicker } from '@kit/billing-gateway/components';
@@ -20,19 +20,6 @@ import billingConfig from '~/config/billing.config';
 
 import { createTeamAccountCheckoutSession } from '../_lib/server/server-actions';
 
-const EmbeddedCheckout = dynamic(
-  async () => {
-    const { EmbeddedCheckout } = await import('@kit/billing-gateway/checkout');
-
-    return {
-      default: EmbeddedCheckout,
-    };
-  },
-  {
-    ssr: false,
-  },
-);
-
 export function TeamAccountCheckoutForm(params: {
   accountId: string;
   customerId: string | null | undefined;
@@ -41,25 +28,9 @@ export function TeamAccountCheckoutForm(params: {
   const [pending, startTransition] = useTransition();
   const appEvents = useAppEvents();
 
-  const [checkoutToken, setCheckoutToken] = useState<string | undefined>(
-    undefined,
-  );
-
-  // If the checkout token is set, render the embedded checkout component
-  if (checkoutToken) {
-    return (
-      <EmbeddedCheckout
-        checkoutToken={checkoutToken}
-        provider={billingConfig.provider}
-        onClose={() => setCheckoutToken(undefined)}
-      />
-    );
-  }
-
   // only allow trial if the user is not already a customer
   const canStartTrial = !params.customerId;
 
-  // Otherwise, render the plan picker component
   return (
     <Card>
       <CardHeader>
@@ -89,14 +60,21 @@ export function TeamAccountCheckoutForm(params: {
                 },
               });
 
-              const { checkoutToken } = await createTeamAccountCheckoutSession({
-                planId,
-                productId,
-                slug,
-                accountId: params.accountId,
-              });
-
-              setCheckoutToken(checkoutToken);
+              try {
+                // Server action redirects to Stripe checkout page
+                await createTeamAccountCheckoutSession({
+                  planId,
+                  productId,
+                  slug,
+                  accountId: params.accountId,
+                });
+              } catch (error) {
+                // redirect() throws an error, so we need to rethrow it
+                if (isRedirectError(error)) {
+                  throw error;
+                }
+                // Handle other errors silently or show toast
+              }
             });
           }}
         />

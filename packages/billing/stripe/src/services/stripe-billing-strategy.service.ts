@@ -48,9 +48,9 @@ export class StripeBillingStrategyService implements BillingStrategyProviderServ
 
     logger.info(ctx, 'Creating checkout session...');
 
-    const { client_secret } = await createStripeCheckout(stripe, params);
+    const session = await createStripeCheckout(stripe, params);
 
-    if (!client_secret) {
+    if (!session.url) {
       logger.error(ctx, 'Failed to create checkout session');
 
       throw new Error('Failed to create checkout session');
@@ -58,7 +58,7 @@ export class StripeBillingStrategyService implements BillingStrategyProviderServ
 
     logger.info(ctx, 'Checkout session created successfully');
 
-    return { checkoutToken: client_secret };
+    return { checkoutToken: session.url };
   }
 
   /**

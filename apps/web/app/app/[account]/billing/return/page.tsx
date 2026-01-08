@@ -1,65 +1,89 @@
 import { notFound, redirect } from 'next/navigation';
 
+import { Check, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+
 import { getBillingGatewayProvider } from '@kit/billing-gateway';
-import { BillingSessionStatus } from '@kit/billing-gateway/components';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
-import billingConfig from '~/config/billing.config';
 import { withI18n } from '~/lib/i18n/with-i18n';
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 
-import { EmbeddedCheckoutForm } from '../_components/embedded-checkout-form';
-
 interface SessionPageProps {
+  params: Promise<{
+    account: string;
+  }>;
   searchParams: Promise<{
     session_id: string;
   }>;
 }
 
-async function ReturnCheckoutSessionPage({ searchParams }: SessionPageProps) {
+async function ReturnCheckoutSessionPage({
+  params,
+  searchParams,
+}: SessionPageProps) {
+  const { account } = await params;
   const sessionId = (await searchParams).session_id;
 
   if (!sessionId) {
-    redirect('../');
+    redirect(`/app/${account}/billing`);
   }
 
-  const { customerEmail, checkoutToken } = await loadCheckoutSession(sessionId);
+  const { status, customerEmail } = await loadCheckoutSession(sessionId);
 
-  if (checkoutToken) {
-    return (
-      <EmbeddedCheckoutForm
-        checkoutToken={checkoutToken}
-        provider={billingConfig.provider}
-      />
-    );
+  // If session is still open/incomplete, redirect back to billing
+  if (status === 'open') {
+    redirect(`/app/${account}/billing`);
   }
 
   return (
-    <>
-      <div className={'fixed top-48 left-0 z-50 mx-auto w-full'}>
-        <BillingSessionStatus
-          redirectPath={'../billing'}
-          customerEmail={customerEmail ?? ''}
-        />
-      </div>
+    <main className="flex min-h-screen items-center justify-center bg-white px-4">
+      <div className="w-full max-w-md text-center">
+        {/* Success icon */}
+        <div className="mx-auto mb-8 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-900">
+          <Check className="h-8 w-8 text-white" strokeWidth={2.5} />
+        </div>
 
-      <BlurryBackdrop />
-    </>
+        {/* Heading */}
+        <h1 className="mb-3 text-[32px] font-normal tracking-[-0.02em] text-zinc-900">
+          You're all set
+        </h1>
+
+        {/* Description */}
+        <p className="mb-8 text-[16px] leading-relaxed text-zinc-500">
+          Your subscription is now active.
+          {customerEmail && (
+            <>
+              <br />A receipt has been sent to{' '}
+              <span className="text-zinc-700">{customerEmail}</span>
+            </>
+          )}
+        </p>
+
+        {/* CTA */}
+        <Link
+          href={`/app/${account}`}
+          className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-zinc-800"
+        >
+          Run Analysis
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+
+        {/* Secondary link */}
+        <p className="mt-6 text-[14px] text-zinc-400">
+          <Link
+            href={`/app/${account}/billing`}
+            className="underline transition-colors hover:text-zinc-600"
+          >
+            View billing details
+          </Link>
+        </p>
+      </div>
+    </main>
   );
 }
 
 export default withI18n(ReturnCheckoutSessionPage);
-
-function BlurryBackdrop() {
-  return (
-    <div
-      className={
-        'bg-background/30 fixed top-0 left-0 w-full backdrop-blur-sm' +
-        ' !m-0 h-full'
-      }
-    />
-  );
-}
 
 async function loadCheckoutSession(sessionId: string) {
   await requireUserInServerComponent();
@@ -75,13 +99,8 @@ async function loadCheckoutSession(sessionId: string) {
     notFound();
   }
 
-  const checkoutToken = session.isSessionOpen ? session.checkoutToken : null;
-
-  // otherwise - we show the user the return page
-  // and display the details of the session
   return {
     status: session.status,
     customerEmail: session.customer.email,
-    checkoutToken,
   };
 }

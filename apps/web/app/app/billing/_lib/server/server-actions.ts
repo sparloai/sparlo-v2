@@ -18,7 +18,7 @@ const enabled = featureFlagsConfig.enablePersonalAccountBilling;
 
 /**
  * @name createPersonalAccountCheckoutSession
- * @description Creates a checkout session for a personal account.
+ * @description Creates a checkout session for a personal account and redirects to Stripe.
  */
 export const createPersonalAccountCheckoutSession = enhanceAction(
   async function (data) {
@@ -29,7 +29,10 @@ export const createPersonalAccountCheckoutSession = enhanceAction(
     const client = getSupabaseServerClient();
     const service = createUserBillingService(client);
 
-    return await service.createCheckoutSession(data);
+    const { checkoutToken: checkoutUrl } =
+      await service.createCheckoutSession(data);
+
+    return redirect(checkoutUrl);
   },
   {
     schema: PersonalAccountCheckoutSchema,
