@@ -173,9 +173,21 @@ on conflict (
         period_starts_at = excluded.period_starts_at,
         period_ends_at = excluded.period_ends_at,
         trial_starts_at = excluded.trial_starts_at,
-        trial_ends_at = excluded.trial_ends_at
+        trial_ends_at = excluded.trial_ends_at,
+        updated_at = current_timestamp
+    -- Only update if incoming period_ends_at is >= existing (prevents stale data overwrite)
+    -- This ensures the most recent subscription state from Stripe wins
+    where subscriptions.period_ends_at <= excluded.period_ends_at
     returning
         * into new_subscription;
+
+    -- Handle case where update was skipped due to WHERE clause
+    -- Fetch existing record if new_subscription is null
+    if new_subscription is null then
+        select * into new_subscription
+        from public.subscriptions
+        where id = target_subscription_id;
+    end if;
 
     -- Upsert subscription items and delete ones that are not in the line_items array
     with item_data as (

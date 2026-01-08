@@ -162,6 +162,8 @@ export class StripeBillingStrategyService implements BillingStrategyProviderServ
         isSessionOpen,
         status: session.status ?? 'complete',
         subscriptionId: typeof session.subscription === 'string' ? session.subscription : session.subscription?.id ?? null,
+        // clientReferenceId contains the account ID that initiated checkout - used for ownership validation
+        clientReferenceId: session.client_reference_id ?? null,
         customer: {
           id: typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null,
           email: session.customer_details?.email ?? null,

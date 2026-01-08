@@ -99,6 +99,18 @@ async function loadCheckoutSession(sessionId: string) {
     notFound();
   }
 
+  // SECURITY: Validate session ownership to prevent subscription hijacking
+  // clientReferenceId contains the account ID that initiated checkout
+  if (session.clientReferenceId && session.clientReferenceId !== user.id) {
+    console.error('[Billing Security] Session ownership mismatch - potential hijacking attempt', {
+      sessionId,
+      currentUserId: user.id,
+      sessionOwnerId: session.clientReferenceId,
+    });
+    // Redirect to billing with error - don't expose details to potential attacker
+    redirect('/app/billing?error=session_invalid');
+  }
+
   // If session is complete and has a subscription, ensure it's synced to database
   // This handles race condition where webhook hasn't fired yet
   let subscriptionSynced = false;
@@ -116,12 +128,22 @@ async function loadCheckoutSession(sessionId: string) {
         const subscriptionData = await gateway.getSubscription(session.subscriptionId);
 
         if (subscriptionData) {
-          // The gateway returns UpsertSubscriptionParams format, but we need to ensure
-          // the account_id is set correctly (it may be undefined from Stripe metadata)
+          // SECURITY: Validate subscription ownership from Stripe metadata
+          // If Stripe has an account_id in metadata, it MUST match current user
+          if (subscriptionData.target_account_id &&
+              subscriptionData.target_account_id !== user.id) {
+            console.error('[Billing Security] Subscription account mismatch', {
+              sessionId,
+              currentUserId: user.id,
+              subscriptionAccountId: subscriptionData.target_account_id,
+            });
+            redirect('/app/billing?error=subscription_mismatch');
+          }
+
           const { error } = await client.rpc('upsert_subscription', {
             ...subscriptionData,
-            target_account_id: user.id, // Override with current user's ID
-            // Use session customer ID if available, otherwise keep the one from subscription data
+            // Use current user's ID - we've validated ownership above
+            target_account_id: user.id,
             target_customer_id: session.customer.id ?? subscriptionData.target_customer_id,
           });
 

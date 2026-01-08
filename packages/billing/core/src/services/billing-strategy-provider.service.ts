@@ -25,6 +25,8 @@ export abstract class BillingStrategyProviderService {
     status: 'complete' | 'expired' | 'open';
     isSessionOpen: boolean;
     subscriptionId?: string | null;
+    // clientReferenceId contains the account ID that initiated checkout - used for ownership validation
+    clientReferenceId?: string | null;
 
     customer: {
       id?: string | null;
