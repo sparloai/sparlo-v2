@@ -35,7 +35,6 @@ import { EmailInput } from './email-input';
 
 // Animation transition settings
 const ENTER_TRANSITION = { duration: 0.3 };
-const EXIT_TRANSITION = { duration: 0.2 };
 
 const EmailSchema = z.object({ email: z.string().email() });
 const OtpSchema = z.object({ token: z.string().min(6).max(6) });

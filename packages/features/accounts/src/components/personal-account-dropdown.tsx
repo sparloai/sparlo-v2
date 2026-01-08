@@ -14,7 +14,6 @@ import {
 } from '@kit/ui/dropdown-menu';
 import { If } from '@kit/ui/if';
 import { ProfileAvatar } from '@kit/ui/profile-avatar';
-import { Trans } from '@kit/ui/trans';
 import { cn } from '@kit/ui/utils';
 
 import { usePersonalAccountData } from '../hooks/use-personal-account-data';

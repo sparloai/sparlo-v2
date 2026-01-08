@@ -149,7 +149,7 @@ interface DiligenceRoadmapItem {
 type CompetitorRow = z.infer<typeof CompetitorRowSchema>;
 type ClaimValidationRow = z.infer<typeof ClaimValidationRowSchema>;
 type SolutionConceptRow = z.infer<typeof SolutionConceptRowSchema>;
-type EconomicsBridgeRow = z.infer<typeof EconomicsBridgeRowSchema>;
+type _EconomicsBridgeRow = z.infer<typeof EconomicsBridgeRowSchema>;
 type EconomicsBridge = z.infer<typeof EconomicsBridgeSchema>;
 type RiskTableRow = z.infer<typeof RiskTableRowSchema>;
 type ValidationGapRow = z.infer<typeof ValidationGapRowSchema>;
@@ -1149,7 +1149,7 @@ const DevelopedConceptCard = memo(function DevelopedConceptCard({
             <Badge className={track.style}>{track.label}</Badge>
             {concept.innovation_type &&
               concept.innovation_type !== 'CATALOG' && (
-                <Badge className="bg-zinc-100 text-zinc-600">
+                <Badge className="border border-zinc-300 bg-white text-zinc-600">
                   {concept.innovation_type.replace(/_/g, ' ')}
                 </Badge>
               )}
@@ -1366,11 +1366,11 @@ const CrossDomainInsightsSection = memo(function CrossDomainInsightsSection({
         </BodyText>
       </ArticleBlock>
 
-      <div className="space-y-4">
+      <div className="space-y-5">
         {insights.map((insight, i) => (
           <div
             key={`xdomain-${i}`}
-            className="border-l-2 border-zinc-700 py-2 pl-4"
+            className="border-l-2 border-zinc-700 py-3 pl-5"
           >
             <div className="mb-2 flex items-center gap-2">
               <Badge className="bg-zinc-900 text-white">
