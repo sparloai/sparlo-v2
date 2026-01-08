@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 
 import { Users } from 'lucide-react';
 
-import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { cn } from '@kit/ui/utils';
 
 import pathsConfig from '~/config/paths.config';
@@ -71,7 +70,6 @@ function Tooltip({
 function SettingsDropdown({
   isOpen,
   onClose,
-  onSignOut,
   collapsed,
   userEmail,
   getPath,
@@ -79,7 +77,6 @@ function SettingsDropdown({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSignOut: () => void;
   collapsed: boolean;
   userEmail?: string | null;
   getPath: (path: string) => string;
@@ -161,16 +158,16 @@ function SettingsDropdown({
 
       <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
 
-      <button
-        onClick={() => {
-          onSignOut();
-          onClose();
-        }}
-        className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
-      >
-        <LogOutIcon className="h-[18px] w-[18px] flex-shrink-0" />
-        Log out
-      </button>
+      {/* Form-based logout bypasses React hydration issues */}
+      <form action="/auth/signout" method="POST">
+        <button
+          type="submit"
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+        >
+          <LogOutIcon className="h-[18px] w-[18px] flex-shrink-0" />
+          Log out
+        </button>
+      </form>
 
       {/* Email at bottom */}
       {userEmail && (
@@ -370,7 +367,6 @@ export const NavSidebar = memo(function NavSidebar({
   workspace,
 }: NavSidebarProps) {
   const router = useRouter();
-  const signOut = useSignOut();
   const { getPath } = useAppPath();
   const { isPaidPlan } = useAppWorkspace();
   const {
@@ -393,10 +389,6 @@ export const NavSidebar = memo(function NavSidebar({
     if (isMobile) setMobileMenuOpen(false);
     router.push(getPath('/app/reports/new'));
   }, [router, isMobile, setMobileMenuOpen, getPath]);
-
-  const handleSignOut = useCallback(async () => {
-    await signOut.mutateAsync();
-  }, [signOut]);
 
   const handleLinkClick = useCallback(() => {
     if (isMobile) setMobileMenuOpen(false);
@@ -558,7 +550,6 @@ export const NavSidebar = memo(function NavSidebar({
           <SettingsDropdown
             isOpen={settingsOpen}
             onClose={() => setSettingsOpen(false)}
-            onSignOut={handleSignOut}
             collapsed={collapsed && !isMobile}
             userEmail={user.email}
             getPath={getPath}
