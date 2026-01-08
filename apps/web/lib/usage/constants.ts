@@ -9,7 +9,7 @@
 
 export const USAGE_CONSTANTS = {
   /** Default token limit for Standard tier / no subscription */
-  DEFAULT_TOKEN_LIMIT: 2_700_000,
+  DEFAULT_TOKEN_LIMIT: 3_000_000,
 
   /** Estimated tokens consumed per full report generation */
   ESTIMATED_TOKENS_PER_REPORT: 180_000,
@@ -35,23 +35,27 @@ export const USAGE_CONSTANTS = {
 
 /**
  * Token limits per subscription plan.
- * Plan IDs must match billing.config.ts (core, pro, max).
+ * Plan IDs must match billing.config.ts (lite, core, pro, max).
  *
- * Calculated based on Claude Opus 4.5 pricing (~$33/1M tokens blended):
- * - Core: $90/month  → 2,700,000 tokens (~15 reports)
- * - Pro:  $270/month → 8,100,000 tokens (~45 reports)
- * - Max:  $540/month → 16,200,000 tokens (~90 reports)
+ * Token allocations per plan:
+ * - Lite: 1,000,000 tokens (~5 reports)
+ * - Core: 3,000,000 tokens (~16 reports)
+ * - Pro:  10,000,000 tokens (~55 reports)
+ * - Max:  20,000,000 tokens (~111 reports)
  */
 export const PLAN_TOKEN_LIMITS: Record<string, number> = {
-  // Core tier (~$90/month in token costs)
-  'core-monthly': 2_700_000,
-  'core-annual': 2_700_000,
-  // Pro tier (~$270/month in token costs)
-  'pro-monthly': 8_100_000,
-  'pro-annual': 8_100_000,
-  // Max tier (~$540/month in token costs)
-  'max-monthly': 16_200_000,
-  'max-annual': 16_200_000,
+  // Lite tier
+  'lite-monthly': 1_000_000,
+  'lite-annual': 1_000_000,
+  // Core tier
+  'core-monthly': 3_000_000,
+  'core-annual': 3_000_000,
+  // Pro tier
+  'pro-monthly': 10_000_000,
+  'pro-annual': 10_000_000,
+  // Max tier
+  'max-monthly': 20_000_000,
+  'max-annual': 20_000_000,
 } as const;
 
 /**
@@ -59,10 +63,12 @@ export const PLAN_TOKEN_LIMITS: Record<string, number> = {
  * Based on ~180,000 tokens per report.
  */
 export const PLAN_REPORT_LIMITS: Record<string, number> = {
-  'core-monthly': 15,
-  'core-annual': 15,
-  'pro-monthly': 45,
-  'pro-annual': 45,
-  'max-monthly': 90,
-  'max-annual': 90,
+  'lite-monthly': 5,
+  'lite-annual': 5,
+  'core-monthly': 16,
+  'core-annual': 16,
+  'pro-monthly': 55,
+  'pro-annual': 55,
+  'max-monthly': 111,
+  'max-annual': 111,
 } as const;

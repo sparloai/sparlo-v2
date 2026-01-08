@@ -7,6 +7,7 @@ import { getLogger } from '@kit/shared/logger';
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 
 import billingConfig from '~/config/billing.config';
+import { handleInvoicePaid } from '~/lib/billing/handle-invoice-paid';
 
 /**
  * Track subscription activation for analytics (fire-and-forget)
@@ -60,6 +61,10 @@ export const POST = enhanceRouteHandler(
           if (!('target_order_id' in payload)) {
             trackSubscriptionActivated(payload as UpsertSubscriptionParams);
           }
+        },
+        // Create/reset usage period when invoice is paid
+        onInvoicePaid: async (payload) => {
+          await handleInvoicePaid(payload);
         },
       });
 
