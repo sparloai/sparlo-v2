@@ -131,13 +131,23 @@ export const Navigation = memo(function Navigation({
                 <Link
                   href={pathsConfig.auth.signUp}
                   className={cn(
-                    'inline-flex min-h-[44px] items-center rounded px-6 py-2 text-base leading-[1.2] font-medium tracking-[-0.02em] transition-all duration-500',
+                    'inline-flex min-h-[44px] flex-col items-center justify-center rounded px-6 py-2 transition-all duration-500',
                     useLightUI
                       ? 'bg-white text-zinc-900 hover:bg-zinc-100 hover:shadow-md'
                       : 'bg-zinc-900 text-white hover:bg-zinc-800 hover:shadow-md',
                   )}
                 >
-                  Get Started
+                  <span className="text-base leading-[1.2] font-medium tracking-[-0.02em]">
+                    Run Analysis
+                  </span>
+                  <span
+                    className={cn(
+                      'text-[10px] font-normal tracking-wide',
+                      useLightUI ? 'text-zinc-500' : 'text-zinc-400',
+                    )}
+                  >
+                    First Report Free
+                  </span>
                 </Link>
               </>
             ) : null}
@@ -264,9 +274,14 @@ const MobileMenu = memo(function MobileMenu({
               <Link
                 href={pathsConfig.auth.signUp}
                 onClick={onClose}
-                className="inline-flex min-h-[44px] items-center rounded bg-white px-6 py-3 text-base leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 transition-colors hover:bg-zinc-100"
+                className="inline-flex min-h-[44px] flex-col items-center rounded bg-white px-6 py-3 text-zinc-900 transition-colors hover:bg-zinc-100"
               >
-                Get Started
+                <span className="text-base leading-[1.2] font-medium tracking-[-0.02em]">
+                  Run Analysis
+                </span>
+                <span className="text-[10px] font-normal tracking-wide text-zinc-500">
+                  First Report Free
+                </span>
               </Link>
             </>
           )}
