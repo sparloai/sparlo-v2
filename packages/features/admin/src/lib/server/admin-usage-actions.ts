@@ -90,9 +90,24 @@ export type AdjustTokenLimitInput = z.infer<typeof AdjustTokenLimitSchema>;
  */
 export const searchUserByEmailAction = enhanceAction(
   async (data: z.infer<typeof SearchUserSchema>) => {
-    // Check admin status
-    const isAdmin = await isSuperAdmin(getSupabaseServerClient());
+    const logger = await getLogger();
+    const client = getSupabaseServerClient();
+
+    // Check admin status with logging
+    const isAdmin = await isSuperAdmin(client);
+    logger.info({ isAdmin, email: data.email }, 'Admin search attempt');
+
     if (!isAdmin) {
+      // Get more info about why admin check failed
+      const { data: userData } = await client.auth.getUser();
+      logger.warn(
+        {
+          userId: userData?.user?.id,
+          userEmail: userData?.user?.email,
+          appMetadata: userData?.user?.app_metadata,
+        },
+        'Admin check failed - user not super admin',
+      );
       throw new Error('Unauthorized: Admin access required');
     }
 
@@ -106,7 +121,8 @@ export const searchUserByEmailAction = enhanceAction(
     );
 
     if (error) {
-      throw new Error('Failed to search for user');
+      logger.error({ error, email: data.email }, 'Failed to search for user');
+      throw new Error(`Failed to search for user: ${error.message}`);
     }
 
     return { users: (users ?? []) as AdminUserSearchResult[] };
