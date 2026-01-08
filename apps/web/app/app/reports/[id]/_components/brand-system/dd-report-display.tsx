@@ -19,13 +19,17 @@ import { cn } from '@kit/ui/utils';
 
 import {
   ClaimValidationRowSchema,
+  CommercializationDetailSchema,
   CompetitorRowSchema,
   CrossDomainInsightSchema,
   DiligenceActionSchema,
   EconomicsBridgeRowSchema,
   EconomicsBridgeSchema,
+  FailureAnalysisSchema,
   FullyDevelopedConceptSchema,
+  HistoricalPrecedentSchema,
   ProblemBreakdownSchema,
+  ReferenceSchema,
   RiskTableRowSchema,
   SolutionConceptRowSchema,
   ValidationGapRowSchema,
@@ -160,6 +164,12 @@ type ProblemBreakdown = z.infer<typeof ProblemBreakdownSchema>;
 type FullyDevelopedConcept = z.infer<typeof FullyDevelopedConceptSchema>;
 type CrossDomainInsight = z.infer<typeof CrossDomainInsightSchema>;
 
+// NEW: Commercialization and failure analysis types
+type CommercializationDetail = z.infer<typeof CommercializationDetailSchema>;
+type FailureAnalysis = z.infer<typeof FailureAnalysisSchema>;
+type HistoricalPrecedent = z.infer<typeof HistoricalPrecedentSchema>;
+type Reference = z.infer<typeof ReferenceSchema>;
+
 interface QuickReference {
   one_page_summary?: OnePageSummary;
   scores?: Scores;
@@ -178,14 +188,21 @@ interface QuickReference {
   // NEW: Key insight highlights
   first_principles_insight?: string;
   the_bet_statement?: string;
-  // NEW: Personal recommendation
-  if_this_were_my_deal?: string;
+  // NEW: Problem reframe - the "aha" insight
+  problem_reframe?: string;
+  // NEW: Synthesis & Recommendation (renamed from if_this_were_my_deal)
+  synthesis_recommendation?: string;
+  if_this_were_my_deal?: string; // Backwards compat
   // NEW: Problem breakdown (deep problem education)
   problem_breakdown?: ProblemBreakdown;
   // NEW: Fully developed concepts (deep solution education)
   developed_concepts?: FullyDevelopedConcept[];
-  // NEW: Cross-domain insights
+  // NEW: Cross-domain insights (deprecated - now integrated into developed_concepts)
   cross_domain_insights?: CrossDomainInsight[];
+  // NEW: Expanded commercialization detail
+  commercialization_detail?: CommercializationDetail;
+  // NEW: Failure analysis with historical precedents
+  failure_analysis?: FailureAnalysis;
 }
 
 interface ProseSection {
@@ -202,6 +219,7 @@ interface ProseReport {
 }
 
 interface Appendix {
+  references?: Reference[];
   detailed_claim_validation?: unknown[];
   comparable_details?: unknown[];
   all_founder_questions?: unknown;
@@ -612,6 +630,27 @@ const VALIDITY_STYLES: Record<string, string> = {
   UNREALISTIC: 'text-zinc-400',
 };
 
+// NEW: Innovation type styles for simplified 3-tier system
+const INNOVATION_TYPE_STYLES: Record<string, { label: string; style: string }> = {
+  FRONTIER: { label: 'Frontier', style: 'bg-zinc-900 text-white' },
+  EMERGING: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
+  ESTABLISHED: { label: 'Established', style: 'border border-zinc-400 bg-white text-zinc-700' },
+  // Backwards compat for old values (mapped via flexibleEnum, but defensive rendering)
+  CATALOG: { label: 'Established', style: 'border border-zinc-400 bg-white text-zinc-700' },
+  EMERGING_PRACTICE: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
+  CROSS_DOMAIN: { label: 'Established', style: 'border border-zinc-400 bg-white text-zinc-700' },
+  PARADIGM: { label: 'Frontier', style: 'bg-zinc-900 text-white' },
+  TECHNOLOGY_REVIVAL: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
+};
+
+// NEW: Failure type styles for historical precedents
+const FAILURE_TYPE_STYLES: Record<string, { label: string; style: string }> = {
+  TECHNICAL: { label: 'Technical', style: 'bg-zinc-800 text-white' },
+  COMMERCIAL: { label: 'Commercial', style: 'bg-zinc-700 text-white' },
+  MARKET: { label: 'Market', style: 'bg-zinc-600 text-white' },
+  EXECUTION: { label: 'Execution', style: 'bg-zinc-500 text-white' },
+};
+
 // Generic Badge component (zinc-scale)
 const Badge = memo(function Badge({
   children,
@@ -968,16 +1007,16 @@ const DiligenceActionsList = memo(function DiligenceActionsList({
   );
 });
 
-// If This Were My Deal (personal voice section)
-const IfThisWereMyDealSection = memo(function IfThisWereMyDealSection({
+// Synthesis & Recommendation (renamed from "If This Were My Deal")
+const SynthesisRecommendationSection = memo(function SynthesisRecommendationSection({
   content,
 }: {
   content?: string;
 }) {
   if (!content) return null;
   return (
-    <Section id="if-this-were-my-deal">
-      <SectionTitle>If This Were My Deal</SectionTitle>
+    <Section id="synthesis-recommendation">
+      <SectionTitle>Synthesis &amp; Recommendation</SectionTitle>
       <ArticleBlock className="mt-8">
         <div className="border-l-4 border-zinc-900 pl-6">
           <BodyText size="lg" className="text-zinc-700 italic">
@@ -996,17 +1035,33 @@ const IfThisWereMyDealSection = memo(function IfThisWereMyDealSection({
 // Problem Breakdown Section (structured from AN0-M)
 const ProblemBreakdownSection = memo(function ProblemBreakdownSection({
   breakdown,
+  problemReframe,
+  firstPrinciplesInsight,
 }: {
   breakdown?: ProblemBreakdown;
+  problemReframe?: string;
+  firstPrinciplesInsight?: string;
 }) {
-  if (!breakdown) return null;
+  // Only render if we have at least breakdown or problemReframe
+  if (!breakdown && !problemReframe) return null;
 
   return (
     <Section id="problem-breakdown">
       <SectionTitle>Understanding the Problem</SectionTitle>
 
+      {/* Problem Reframe - the "aha" insight that changes how you think */}
+      {problemReframe && (
+        <ArticleBlock className="mt-6">
+          <div className="border-l-4 border-zinc-900 bg-zinc-50 p-6">
+            <BodyText size="lg" className="text-zinc-800 italic">
+              {problemReframe}
+            </BodyText>
+          </div>
+        </ArticleBlock>
+      )}
+
       {/* What's Wrong - visceral */}
-      {breakdown.whats_wrong && (
+      {breakdown?.whats_wrong && (
         <ArticleBlock className="mt-8">
           <MonoLabel variant="strong" className="mb-2 block">
             What&apos;s Broken
@@ -1018,14 +1073,14 @@ const ProblemBreakdownSection = memo(function ProblemBreakdownSection({
       )}
 
       {/* Why It's Hard - physics */}
-      {breakdown.why_its_hard?.prose && (
+      {breakdown?.why_its_hard?.prose && (
         <ArticleBlock className="mt-8">
           <MonoLabel variant="strong" className="mb-2 block">
             Why It&apos;s Hard
           </MonoLabel>
           <BodyText>{breakdown.why_its_hard.prose}</BodyText>
 
-          {breakdown.why_its_hard.governing_equation?.equation && (
+          {breakdown?.why_its_hard?.governing_equation?.equation && (
             <div className="mt-4 rounded-r border-l-2 border-zinc-900 bg-zinc-50 p-4">
               <code className="mb-2 block font-mono text-sm text-zinc-800">
                 {breakdown.why_its_hard.governing_equation.equation}
@@ -1036,7 +1091,7 @@ const ProblemBreakdownSection = memo(function ProblemBreakdownSection({
             </div>
           )}
 
-          {breakdown.why_its_hard.factors &&
+          {breakdown?.why_its_hard?.factors &&
             breakdown.why_its_hard.factors.length > 0 && (
               <ul className="mt-4 space-y-2">
                 {breakdown.why_its_hard.factors.map((factor, i) => (
@@ -1051,7 +1106,7 @@ const ProblemBreakdownSection = memo(function ProblemBreakdownSection({
       )}
 
       {/* Root Cause Hypotheses */}
-      {breakdown.root_cause_hypotheses &&
+      {breakdown?.root_cause_hypotheses &&
         breakdown.root_cause_hypotheses.length > 0 && (
           <ArticleBlock className="mt-8">
             <MonoLabel variant="strong" className="mb-4 block">
@@ -1081,7 +1136,7 @@ const ProblemBreakdownSection = memo(function ProblemBreakdownSection({
         )}
 
       {/* What Industry Does Today */}
-      {breakdown.what_industry_does_today &&
+      {breakdown?.what_industry_does_today &&
         breakdown.what_industry_does_today.length > 0 && (
           <ArticleBlock className="mt-8">
             <MonoLabel variant="strong" className="mb-4 block">
@@ -1114,6 +1169,20 @@ const ProblemBreakdownSection = memo(function ProblemBreakdownSection({
             </div>
           </ArticleBlock>
         )}
+
+      {/* First Principles Insight - capstone */}
+      {firstPrinciplesInsight && (
+        <ArticleBlock className="mt-8">
+          <div className="rounded-lg border border-zinc-300 bg-zinc-50 p-6">
+            <MonoLabel variant="strong" className="mb-3 block">
+              First Principles Insight
+            </MonoLabel>
+            <BodyText size="lg" className="text-zinc-800 font-medium">
+              {firstPrinciplesInsight}
+            </BodyText>
+          </div>
+        </ArticleBlock>
+      )}
     </Section>
   );
 });
@@ -1133,6 +1202,14 @@ const DevelopedConceptCard = memo(function DevelopedConceptCard({
     style: 'bg-zinc-100 text-zinc-700',
   };
 
+  // Use new INNOVATION_TYPE_STYLES for consistent badge rendering
+  const innovationType = concept.innovation_type
+    ? INNOVATION_TYPE_STYLES[concept.innovation_type] || {
+        label: concept.innovation_type.replace(/_/g, ' '),
+        style: 'border border-zinc-300 bg-white text-zinc-600',
+      }
+    : null;
+
   return (
     <div
       className={cn(
@@ -1147,12 +1224,17 @@ const DevelopedConceptCard = memo(function DevelopedConceptCard({
         <div>
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <Badge className={track.style}>{track.label}</Badge>
-            {concept.innovation_type &&
-              concept.innovation_type !== 'CATALOG' && (
-                <Badge className="border border-zinc-300 bg-white text-zinc-600">
-                  {concept.innovation_type.replace(/_/g, ' ')}
-                </Badge>
-              )}
+            {innovationType && (
+              <Badge className={innovationType.style}>
+                {innovationType.label}
+              </Badge>
+            )}
+            {/* Source domain for cross-domain transfers */}
+            {concept.source_domain && (
+              <Badge className="border border-zinc-200 bg-zinc-50 text-zinc-500 text-xs">
+                from {concept.source_domain}
+              </Badge>
+            )}
             {concept.startup_approach && (
               <Badge className="bg-zinc-900 text-white">
                 Startup&apos;s Approach
@@ -1313,11 +1395,13 @@ const DevelopedConceptCard = memo(function DevelopedConceptCard({
   );
 });
 
-// Container for all developed concepts
+// Container for all developed concepts (includes cross-domain research)
 const DevelopedConceptsSection = memo(function DevelopedConceptsSection({
   concepts,
+  crossDomainInsights,
 }: {
   concepts?: FullyDevelopedConcept[];
+  crossDomainInsights?: CrossDomainInsight[];
 }) {
   if (!concepts?.length) return null;
 
@@ -1340,6 +1424,9 @@ const DevelopedConceptsSection = memo(function DevelopedConceptsSection({
           />
         ))}
       </div>
+
+      {/* Cross-domain research - shows provenance of where ideas came from */}
+      <CrossDomainInsightsSubsection insights={crossDomainInsights} />
     </Section>
   );
 });
@@ -1348,8 +1435,9 @@ const DevelopedConceptsSection = memo(function DevelopedConceptsSection({
 // NEW: Cross-Domain Insights Components
 // ============================================
 
-// Cross-Domain Insights Section
-const CrossDomainInsightsSection = memo(function CrossDomainInsightsSection({
+// Cross-Domain Insights Subsection (integrated into Solution Landscape)
+// Shows the research provenance - where solution ideas came from
+const CrossDomainInsightsSubsection = memo(function CrossDomainInsightsSubsection({
   insights,
 }: {
   insights?: CrossDomainInsight[];
@@ -1357,14 +1445,13 @@ const CrossDomainInsightsSection = memo(function CrossDomainInsightsSection({
   if (!insights?.length) return null;
 
   return (
-    <Section id="cross-domain-insights">
-      <SectionTitle>Cross-Domain Innovations</SectionTitle>
-      <ArticleBlock className="mt-4 mb-6">
-        <BodyText variant="muted">
-          Solutions from adjacent industries that haven&apos;t yet been applied
-          to this problem space.
-        </BodyText>
-      </ArticleBlock>
+    <ArticleBlock className="mt-10">
+      <MonoLabel variant="strong" className="mb-4 block">
+        Cross-Domain Research
+      </MonoLabel>
+      <BodyText variant="muted" size="sm" className="mb-6">
+        Ideas from adjacent industries that inform these solutions.
+      </BodyText>
 
       <div className="space-y-5">
         {insights.map((insight, i) => (
@@ -1398,6 +1485,302 @@ const CrossDomainInsightsSection = memo(function CrossDomainInsightsSection({
           </div>
         ))}
       </div>
+    </ArticleBlock>
+  );
+});
+
+// ============================================
+// NEW: Commercialization Detail Component
+// ============================================
+
+const CommercializationDetailSection = memo(function CommercializationDetailSection({
+  detail,
+}: {
+  detail?: CommercializationDetail;
+}) {
+  if (!detail) return null;
+
+  // Check if there's any meaningful content
+  const hasContent =
+    detail.unit_economics_current ||
+    detail.unit_economics_target ||
+    detail.path_to_economics ||
+    (detail.key_assumptions && detail.key_assumptions.length > 0) ||
+    detail.go_to_market_path ||
+    (detail.customer_segments && detail.customer_segments.length > 0) ||
+    detail.sales_complexity ||
+    (detail.commercialization_obstacles && detail.commercialization_obstacles.length > 0) ||
+    detail.revenue_timeline;
+
+  if (!hasContent) return null;
+
+  return (
+    <Section id="commercialization-detail">
+      <SectionTitle>Commercialization Reality</SectionTitle>
+
+      {/* Unit Economics */}
+      {(detail.unit_economics_current || detail.unit_economics_target) && (
+        <ArticleBlock className="mt-8">
+          <MonoLabel variant="strong" className="mb-4 block">
+            Unit Economics
+          </MonoLabel>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {detail.unit_economics_current && (
+              <div className="rounded border border-zinc-200 bg-zinc-50 p-4">
+                <BodyText variant="muted" size="sm" className="mb-1">
+                  Current State
+                </BodyText>
+                <BodyText>{detail.unit_economics_current}</BodyText>
+              </div>
+            )}
+            {detail.unit_economics_target && (
+              <div className="rounded border border-zinc-300 bg-white p-4">
+                <BodyText variant="muted" size="sm" className="mb-1">
+                  Target State
+                </BodyText>
+                <BodyText>{detail.unit_economics_target}</BodyText>
+              </div>
+            )}
+          </div>
+          {detail.path_to_economics && (
+            <div className="mt-4 border-l-2 border-zinc-400 pl-4">
+              <BodyText variant="muted" size="sm" className="mb-1">
+                Path to Target
+              </BodyText>
+              <BodyText>{detail.path_to_economics}</BodyText>
+            </div>
+          )}
+          {detail.key_assumptions && detail.key_assumptions.length > 0 && (
+            <div className="mt-4">
+              <BodyText variant="muted" size="sm" className="mb-2">
+                Key Assumptions
+              </BodyText>
+              <ul className="space-y-1">
+                {detail.key_assumptions.map((assumption, i) => (
+                  <li key={`assumption-${i}`} className="flex items-start gap-2">
+                    <span className="mt-1 text-zinc-400">•</span>
+                    <BodyText size="sm">{assumption}</BodyText>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </ArticleBlock>
+      )}
+
+      {/* Go-to-Market Path */}
+      {(detail.go_to_market_path || (detail.customer_segments && detail.customer_segments.length > 0) || detail.sales_complexity) && (
+        <ArticleBlock className="mt-8">
+          <MonoLabel variant="strong" className="mb-4 block">
+            Go-to-Market Path
+          </MonoLabel>
+          {detail.go_to_market_path && (
+            <BodyText className="mb-4">{detail.go_to_market_path}</BodyText>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {detail.customer_segments && detail.customer_segments.length > 0 && (
+              <div>
+                <BodyText variant="muted" size="sm" className="mb-2">
+                  Customer Segments
+                </BodyText>
+                <div className="flex flex-wrap gap-2">
+                  {detail.customer_segments.map((segment, i) => (
+                    <Badge key={`segment-${i}`} className="bg-zinc-100 text-zinc-700">
+                      {segment}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {detail.sales_complexity && (
+              <div>
+                <BodyText variant="muted" size="sm" className="mb-2">
+                  Sales Complexity
+                </BodyText>
+                <BodyText>{detail.sales_complexity}</BodyText>
+              </div>
+            )}
+          </div>
+        </ArticleBlock>
+      )}
+
+      {/* Commercialization Obstacles */}
+      {detail.commercialization_obstacles && detail.commercialization_obstacles.length > 0 && (
+        <ArticleBlock className="mt-8">
+          <MonoLabel variant="strong" className="mb-4 block">
+            Commercialization Obstacles
+          </MonoLabel>
+          <div className="space-y-3">
+            {detail.commercialization_obstacles.map((obstacle, i) => (
+              <div
+                key={`obstacle-${i}`}
+                className="border-l-2 border-zinc-300 py-1 pl-4"
+              >
+                <BodyText>{obstacle}</BodyText>
+              </div>
+            ))}
+          </div>
+        </ArticleBlock>
+      )}
+
+      {/* Revenue Timeline */}
+      {detail.revenue_timeline && (
+        <ArticleBlock className="mt-8">
+          <MonoLabel variant="strong" className="mb-2 block">
+            Path to Revenue
+          </MonoLabel>
+          <BodyText>{detail.revenue_timeline}</BodyText>
+        </ArticleBlock>
+      )}
+    </Section>
+  );
+});
+
+// ============================================
+// NEW: Failure Analysis Component
+// ============================================
+
+const FailureAnalysisSection = memo(function FailureAnalysisSection({
+  analysis,
+}: {
+  analysis?: FailureAnalysis;
+}) {
+  if (!analysis) return null;
+
+  // Check if there's any meaningful content
+  const hasContent =
+    analysis.pre_mortem ||
+    (analysis.historical_precedents && analysis.historical_precedents.length > 0) ||
+    analysis.how_startup_differs;
+
+  if (!hasContent) return null;
+
+  return (
+    <Section id="failure-analysis">
+      <SectionTitle>Failure Analysis</SectionTitle>
+
+      {/* Pre-Mortem */}
+      {analysis.pre_mortem && (
+        <ArticleBlock className="mt-6">
+          <div className="border-l-4 border-zinc-700 bg-zinc-100 p-6">
+            <MonoLabel variant="strong" className="mb-3 block text-xs">
+              Pre-Mortem: If This Startup Failed...
+            </MonoLabel>
+            <BodyText size="lg" className="text-zinc-800 italic">
+              {analysis.pre_mortem}
+            </BodyText>
+          </div>
+        </ArticleBlock>
+      )}
+
+      {/* Historical Precedents */}
+      {analysis.historical_precedents && analysis.historical_precedents.length > 0 && (
+        <ArticleBlock className="mt-8">
+          <MonoLabel variant="strong" className="mb-4 block">
+            Historical Precedents
+          </MonoLabel>
+          <div className="space-y-4">
+            {analysis.historical_precedents.map((precedent, i) => {
+              const failureType = precedent.failure_type
+                ? FAILURE_TYPE_STYLES[precedent.failure_type] || {
+                    label: precedent.failure_type,
+                    style: 'bg-zinc-500 text-white',
+                  }
+                : null;
+
+              return (
+                <div
+                  key={`precedent-${i}`}
+                  className="rounded-lg border border-zinc-200 bg-white p-4"
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="font-semibold text-zinc-900">
+                      {precedent.company || 'Unknown Company'}
+                    </span>
+                    {failureType && (
+                      <Badge className={failureType.style}>
+                        {failureType.label}
+                      </Badge>
+                    )}
+                  </div>
+                  {precedent.what_happened && (
+                    <BodyText className="mb-2">{precedent.what_happened}</BodyText>
+                  )}
+                  {precedent.lessons && (
+                    <div className="border-l-2 border-zinc-300 pl-3">
+                      <BodyText variant="muted" size="sm">
+                        <strong>Lesson:</strong> {precedent.lessons}
+                      </BodyText>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </ArticleBlock>
+      )}
+
+      {/* How This Startup Differs */}
+      {analysis.how_startup_differs && (
+        <ArticleBlock className="mt-8">
+          <div className="rounded-lg border border-zinc-300 bg-zinc-50 p-5">
+            <MonoLabel variant="strong" className="mb-2 block">
+              How This Startup Differs
+            </MonoLabel>
+            <BodyText>{analysis.how_startup_differs}</BodyText>
+          </div>
+        </ArticleBlock>
+      )}
+    </Section>
+  );
+});
+
+// ============================================
+// NEW: Appendix/References Section
+// ============================================
+
+const AppendixReferencesSection = memo(function AppendixReferencesSection({
+  references,
+}: {
+  references?: Reference[];
+}) {
+  if (!references?.length) return null;
+
+  return (
+    <Section id="appendix" className="mt-16 border-t border-zinc-200 pt-12">
+      <SectionTitle>Appendix: References</SectionTitle>
+      <ArticleBlock className="mt-6">
+        <BodyText variant="muted" size="sm" className="mb-6">
+          Sources cited throughout this report.
+        </BodyText>
+        <ol className="space-y-4">
+          {references.map((ref) => (
+            <li key={ref.id} className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center text-[13px] font-medium text-zinc-500">
+                [{ref.id}]
+              </span>
+              <div className="flex-1">
+                <BodyText size="sm">{ref.citation}</BodyText>
+                {ref.url && (
+                  <a
+                    href={ref.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 inline-flex items-center gap-1 text-[14px] text-zinc-500 transition-colors hover:text-zinc-900"
+                  >
+                    <span className="max-w-[400px] truncate">{ref.url}</span>
+                  </a>
+                )}
+                {ref.source_type && (
+                  <Badge className="ml-2 bg-zinc-100 text-zinc-600 text-xs">
+                    {ref.source_type}
+                  </Badge>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </ArticleBlock>
     </Section>
   );
 });
@@ -1697,19 +2080,23 @@ export const DDReportDisplay = memo(function DDReportDisplay({
 
         {/* PROSE SECTIONS - Moved up for narrative flow (hybrid pattern) */}
 
-        {/* Problem Breakdown (structured from AN0-M) - before prose primer */}
-        {quickRef?.problem_breakdown && (
-          <ProblemBreakdownSection breakdown={quickRef.problem_breakdown} />
+        {/* Understanding the Problem - unified section with problem_reframe, breakdown, and first_principles_insight */}
+        {(quickRef?.problem_breakdown || quickRef?.problem_reframe) && (
+          <ProblemBreakdownSection
+            breakdown={quickRef.problem_breakdown}
+            problemReframe={quickRef.problem_reframe}
+            firstPrinciplesInsight={quickRef.first_principles_insight}
+          />
         )}
 
-        {/* Problem Primer with First Principles Insight embedded */}
-        {prose?.problem_primer?.content && (
+        {/* Problem Primer (legacy prose section) - only show if no structured breakdown */}
+        {!quickRef?.problem_breakdown && prose?.problem_primer?.content && (
           <Section id="problem-primer">
             <SectionTitle>Problem Primer</SectionTitle>
             <ArticleBlock className="mt-8">
               <BodyText parseCited>{prose.problem_primer.content}</BodyText>
             </ArticleBlock>
-            {/* First Principles Insight - embedded in Problem Primer */}
+            {/* First Principles Insight - embedded in Problem Primer (fallback) */}
             {quickRef?.first_principles_insight && (
               <InsightBlockquote insight={quickRef.first_principles_insight} />
             )}
@@ -1721,14 +2108,20 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           <TheBetHighlight bet={quickRef.the_bet_statement} />
         )}
 
-        {/* Technical Deep Dive with claim validation context */}
+        {/* Startup Claims (renamed from Technical Deep Dive) */}
         {prose?.technical_deep_dive?.content && (
-          <Section id="technical-deep-dive">
-            <SectionTitle>Technical Deep Dive</SectionTitle>
-            <ArticleBlock className="mt-8">
-              <BodyText parseCited>
-                {prose.technical_deep_dive.content}
-              </BodyText>
+          <Section id="startup-claims">
+            <SectionTitle>Startup Claims</SectionTitle>
+            {/* Split content into paragraphs for better readability */}
+            <ArticleBlock className="mt-8 space-y-6">
+              {prose.technical_deep_dive.content
+                .split(/\n\n+/)
+                .filter((p: string) => p.trim())
+                .map((paragraph: string, idx: number) => (
+                  <BodyText key={`tech-p-${idx}`} parseCited>
+                    {paragraph.trim()}
+                  </BodyText>
+                ))}
             </ArticleBlock>
             {/* Claim validation summary - inline after technical prose */}
             {quickRef?.claim_validation_table &&
@@ -1745,19 +2138,13 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           </Section>
         )}
 
-        {/* Solution Landscape - prefer developed_concepts if available, otherwise prose + brief concepts */}
+        {/* Solution Landscape - unified section with cross-domain research integrated */}
         {quickRef?.developed_concepts &&
         quickRef.developed_concepts.length > 0 ? (
-          <>
-            <DevelopedConceptsSection concepts={quickRef.developed_concepts} />
-            {/* Cross-domain insights - after developed concepts */}
-            {quickRef?.cross_domain_insights &&
-              quickRef.cross_domain_insights.length > 0 && (
-                <CrossDomainInsightsSection
-                  insights={quickRef.cross_domain_insights}
-                />
-              )}
-          </>
+          <DevelopedConceptsSection
+            concepts={quickRef.developed_concepts}
+            crossDomainInsights={quickRef.cross_domain_insights}
+          />
         ) : prose?.solution_landscape?.content ? (
           <Section id="solution-landscape">
             <SectionTitle>Solution Landscape</SectionTitle>
@@ -1786,20 +2173,17 @@ export const DDReportDisplay = memo(function DDReportDisplay({
                   <SolutionConceptsList concepts={quickRef.solution_concepts} />
                 </div>
               )}
-            {/* Cross-domain insights - after brief solution concepts */}
-            {quickRef?.cross_domain_insights &&
-              quickRef.cross_domain_insights.length > 0 && (
-                <div className="mt-8">
-                  <CrossDomainInsightsSection
-                    insights={quickRef.cross_domain_insights}
-                  />
-                </div>
-              )}
+            {/* Cross-domain research - after brief solution concepts */}
+            <CrossDomainInsightsSubsection
+              insights={quickRef?.cross_domain_insights}
+            />
           </Section>
         ) : null}
 
-        {/* Commercialization Reality with economics context */}
-        {prose?.commercialization_reality?.content && (
+        {/* Commercialization Reality - prefer structured commercialization_detail, fallback to prose */}
+        {quickRef?.commercialization_detail ? (
+          <CommercializationDetailSection detail={quickRef.commercialization_detail} />
+        ) : prose?.commercialization_reality?.content ? (
           <Section id="commercialization">
             <SectionTitle>Commercialization Reality</SectionTitle>
             <ArticleBlock className="mt-8">
@@ -1818,16 +2202,27 @@ export const DDReportDisplay = memo(function DDReportDisplay({
                 </div>
               )}
           </Section>
+        ) : null}
+
+        {/* Failure Analysis - NEW: pre-mortem, historical precedents, how startup differs */}
+        {quickRef?.failure_analysis && (
+          <FailureAnalysisSection analysis={quickRef.failure_analysis} />
         )}
 
         {/* Investment Synthesis */}
         {prose?.investment_synthesis?.content && (
           <Section id="investment-synthesis">
             <SectionTitle>Investment Synthesis</SectionTitle>
-            <ArticleBlock className="mt-8">
-              <BodyText parseCited>
-                {prose.investment_synthesis.content}
-              </BodyText>
+            {/* Split content into paragraphs for better readability */}
+            <ArticleBlock className="mt-8 space-y-6">
+              {prose.investment_synthesis.content
+                .split(/\n\n+/)
+                .filter((p: string) => p.trim())
+                .map((paragraph: string, idx: number) => (
+                  <BodyText key={`synth-p-${idx}`} parseCited>
+                    {paragraph.trim()}
+                  </BodyText>
+                ))}
             </ArticleBlock>
           </Section>
         )}
@@ -1920,9 +2315,11 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           </Section>
         )}
 
-        {/* If This Were My Deal - personal voice final section */}
-        {quickRef?.if_this_were_my_deal && (
-          <IfThisWereMyDealSection content={quickRef.if_this_were_my_deal} />
+        {/* Synthesis & Recommendation (renamed from "If This Were My Deal") */}
+        {(quickRef?.synthesis_recommendation || quickRef?.if_this_were_my_deal) && (
+          <SynthesisRecommendationSection
+            content={quickRef.synthesis_recommendation || quickRef.if_this_were_my_deal}
+          />
         )}
 
         {/* Founder Questions */}
@@ -2038,6 +2435,9 @@ export const DDReportDisplay = memo(function DDReportDisplay({
             )}
           </Section>
         )}
+
+        {/* Appendix: References - always at the very end */}
+        <AppendixReferencesSection references={appendix?.references} />
       </main>
     </article>
   );

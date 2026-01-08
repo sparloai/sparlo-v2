@@ -55,6 +55,12 @@ const ENUM_SYNONYMS: Record<string, string> = {
   // Boolean-like
   TRUE: 'YES',
   FALSE: 'NO',
+  // Innovation type mappings (old → new)
+  CATALOG: 'ESTABLISHED',
+  EMERGING_PRACTICE: 'EMERGING',
+  CROSS_DOMAIN: 'ESTABLISHED',
+  PARADIGM: 'FRONTIER',
+  TECHNOLOGY_REVIVAL: 'EMERGING',
 };
 
 /**
@@ -2920,16 +2926,17 @@ export const ConceptValidationStepSchema = z
   })
   .catch({ test: '' });
 
-// Innovation type enum
+// Innovation type enum - simplified 3-tier system
+// Old values (CATALOG, EMERGING_PRACTICE, etc.) map via ENUM_SYNONYMS
 export const InnovationType = flexibleEnum(
-  [
-    'CATALOG',
-    'EMERGING_PRACTICE',
-    'CROSS_DOMAIN',
-    'PARADIGM',
-    'TECHNOLOGY_REVIVAL',
-  ],
-  'CATALOG',
+  ['FRONTIER', 'EMERGING', 'ESTABLISHED'],
+  'EMERGING',
+);
+
+// Failure type enum for historical precedents
+export const FailureType = flexibleEnum(
+  ['TECHNICAL', 'COMMERCIAL', 'MARKET', 'EXECUTION'],
+  'EXECUTION',
 );
 
 // Fully developed concept (matching hybrid depth)
@@ -2939,6 +2946,8 @@ export const FullyDevelopedConceptSchema = z
     title: z.string().catch(''),
     track: Track,
     innovation_type: InnovationType.optional(),
+    // Source domain for cross-domain transfers (e.g., "Semiconductor manufacturing")
+    source_domain: z.string().optional().catch(undefined),
 
     // Full development (hybrid pattern)
     what_it_is: z.string().catch(''),
@@ -2972,6 +2981,55 @@ export const CrossDomainInsightSchema = z
     validation_approach: z.string().optional(),
   })
   .catch({ source_domain: '', mechanism: '', who_pursuing: [] });
+
+// ============================================
+// NEW: Commercialization Detail Schema
+// ============================================
+
+export const CommercializationDetailSchema = z
+  .object({
+    unit_economics_current: z.string().catch(''),
+    unit_economics_target: z.string().catch(''),
+    path_to_economics: z.string().catch(''),
+    key_assumptions: z.array(z.string()).default([]).catch([]),
+    go_to_market_path: z.string().catch(''),
+    customer_segments: z.array(z.string()).default([]).catch([]),
+    sales_complexity: z.string().catch(''),
+    commercialization_obstacles: z.array(z.string()).default([]).catch([]),
+    revenue_timeline: z.string().catch(''),
+  })
+  .optional()
+  .catch(undefined);
+
+// ============================================
+// NEW: Failure Analysis Schemas
+// ============================================
+
+export const HistoricalPrecedentSchema = z
+  .object({
+    company: z.string().catch(''),
+    what_happened: z.string().catch(''),
+    failure_type: FailureType,
+    lessons: z.string().catch(''),
+  })
+  .catch({
+    company: '',
+    what_happened: '',
+    failure_type: 'EXECUTION',
+    lessons: '',
+  });
+
+export const FailureAnalysisSchema = z
+  .object({
+    pre_mortem: z.string().catch(''),
+    historical_precedents: z
+      .array(HistoricalPrecedentSchema)
+      .default([])
+      .catch([]),
+    how_startup_differs: z.string().catch(''),
+  })
+  .optional()
+  .catch(undefined);
 
 // New format prose report schema for DD5-M
 // ANTIFRAGILE: All fields have sensible defaults
@@ -3130,8 +3188,14 @@ const DD5_M_QuickReferenceSchema = z.object({
   first_principles_insight: z.string().optional(),
   the_bet_statement: z.string().optional(),
 
-  // NEW: Personal recommendation (first person)
+  // NEW: Personal recommendation (first person) - backwards compat
   if_this_were_my_deal: z.string().optional(),
+
+  // NEW: Problem reframe - the "aha" insight that changes thinking
+  problem_reframe: z.string().optional().catch(undefined),
+
+  // NEW: Synthesis & Recommendation (renamed from if_this_were_my_deal)
+  synthesis_recommendation: z.string().optional().catch(undefined),
 
   // NEW: Problem breakdown (structured from AN0-M) - deep problem education
   problem_breakdown: ProblemBreakdownSchema,
@@ -3143,15 +3207,34 @@ const DD5_M_QuickReferenceSchema = z.object({
     .default([]),
 
   // NEW: Cross-domain insights (explicit cross-domain innovations)
+  // Note: Cross-domain solutions now integrated into developed_concepts with source_domain
   cross_domain_insights: z
     .array(CrossDomainInsightSchema)
     .optional()
     .default([]),
+
+  // NEW: Expanded commercialization detail
+  commercialization_detail: CommercializationDetailSchema,
+
+  // NEW: Failure analysis with historical precedents
+  failure_analysis: FailureAnalysisSchema,
 });
+
+// Reference/citation schema for appendix
+export const ReferenceSchema = z
+  .object({
+    id: z.union([z.string(), z.number()]).transform((v) => String(v)),
+    citation: z.string().catch(''),
+    url: z.string().optional().catch(undefined),
+    source_type: z.string().optional().catch(undefined),
+  })
+  .catch({ id: '0', citation: '' });
 
 // New format appendix schema for DD5-M (flexible - many fields optional)
 const DD5_M_AppendixSchema = z
   .object({
+    // References/citations used throughout the report
+    references: z.array(ReferenceSchema).optional().default([]).catch([]),
     detailed_claim_validation: z
       .array(
         z.object({

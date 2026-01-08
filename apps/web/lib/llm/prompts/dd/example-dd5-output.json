@@ -247,6 +247,10 @@
     "the_bet_statement": "If you invest, you are betting that skutterudite thermoelectrics can achieve commercial-scale manufacturing with stable performance, AND that industrial decarbonization mandates will accelerate waste heat recovery adoption faster than competing ORC and TPV approaches.",
     "if_this_were_my_deal": "I'd want to believe this one—the team is strong, the market is real, and the timing feels right with industrial decarbonization mandates. But I've seen this movie before with Alphabet Energy. Before I'd write a check, I'd need to see 5,000+ hours of module stability data validated by a third party. If they have it, this is a strong Series A. If they're still generating it, I'd wait for the next round. The technology risk is binary: either skutterudites work at scale or they don't. No amount of financial engineering changes that physics.",
 
+    "problem_reframe": "We've been thinking about waste heat wrong. The question isn't 'how do we recover heat more efficiently?' but rather 'how do we make heat recovery economics work within industrial capital allocation constraints?' The physics has been solved for decades. What's broken is the payback math—and that's fundamentally a materials cost problem, not a thermodynamics problem.",
+
+    "synthesis_recommendation": "This is a classic deep tech bet with binary technical risk. The team is credible, the market timing is right with industrial decarbonization mandates, and if skutterudites work at scale, ThermoCapture could define a new category. But the ghost of Alphabet Energy looms large. My recommendation: proceed to diligence with a hard gate on 5,000-hour stability data. If they have it and it validates, this is a compelling Series A. If they're still generating it, the risk-adjusted return doesn't justify the valuation. Don't let FOMO on the climate tech wave override physics-based discipline.",
+
     "problem_breakdown": {
       "whats_wrong": "Industrial facilities waste 3,000 TWh of thermal energy annually in the U.S. alone—equivalent to Germany's entire electricity consumption. Hot exhaust gases from steel mills, cement plants, and glass factories exit at 300-600°C and simply dissipate into the atmosphere. This isn't ignorance; it's economics. Current heat recovery systems have 7-12 year paybacks, far beyond the 3-year threshold industrial CFOs require.",
       "why_its_hard": {
@@ -307,7 +311,7 @@
       {
         "title": "Skutterudite Thermoelectric Generators",
         "track": "best_fit",
-        "innovation_type": "EMERGING_PRACTICE",
+        "innovation_type": "EMERGING",
         "what_it_is": "Thermoelectric generators using skutterudite compounds (CoSb3 variants) instead of traditional bismuth telluride. Skutterudites offer higher ZT values (1.5-2.0 vs 0.8-1.0) at mid-range temperatures (300-600°C), enabling solid-state conversion at efficiencies approaching 15%.\n\nThe key innovation is in the material structure: skutterudites have a cage-like crystal lattice that scatters phonons (heat carriers) while allowing electrons to flow freely. This 'phonon glass, electron crystal' behavior is the holy grail of thermoelectrics—and skutterudites are the closest anyone has come to achieving it at practical temperatures.\n\nThermoCapture's specific approach adds a roll-to-roll manufacturing process that deposits skutterudite thin films on flexible substrates, potentially reducing manufacturing costs from $200-500/m² to $50/m². If proven, this would fundamentally change the economics of thermoelectric heat recovery.",
         "the_insight": {
           "what": "Skutterudites achieve high ZT through their unique cage structure, but only if antimony sublimation is controlled through encapsulation.",
@@ -340,7 +344,7 @@
       {
         "title": "Thermophotovoltaics (TPV)",
         "track": "paradigm_shift",
-        "innovation_type": "PARADIGM",
+        "innovation_type": "FRONTIER",
         "what_it_is": "Thermophotovoltaic systems convert heat to electricity using infrared-optimized photovoltaic cells. Unlike thermoelectrics (which use temperature differentials) or heat engines (which use pressure differentials), TPV uses thermal radiation—the same physics as solar panels, but tuned for lower-frequency infrared light.\n\nRecent breakthroughs have pushed TPV efficiency above 40% in laboratory conditions, far exceeding any other solid-state conversion method. Antora Energy is commercializing TPV for thermal battery applications, targeting $20/kWh storage costs that would undercut lithium-ion.\n\nThe paradigm shift is fundamental: TPV treats heat as light, not as a temperature gradient. This sidesteps the thermodynamic scaling limits that plague heat exchangers and thermoelectrics. A TPV cell 10 meters from a heat source performs nearly as well as one 1 meter away—the inverse-square law applies, but there's no exponential surface area penalty.",
         "the_insight": {
           "what": "Thermal radiation is just low-frequency light. By tuning photovoltaic bandgaps to match thermal emission spectra, you can achieve >40% conversion efficiency.",
@@ -373,7 +377,8 @@
       {
         "title": "Electrochemical Heat Engines (Thermo-Electrochemical Cells)",
         "track": "frontier_transfer",
-        "innovation_type": "CROSS_DOMAIN",
+        "innovation_type": "ESTABLISHED",
+        "source_domain": "Battery and flow battery research",
         "what_it_is": "Electrochemical heat engines convert thermal energy to electricity using the temperature-dependent redox potential of ionic solutions. Unlike solid-state thermoelectrics, these systems use liquid electrolytes—typically ionic liquids or aqueous solutions containing redox couples like ferri/ferrocyanide.\n\nThe key advantage is performance at low temperature differentials. While thermoelectrics and heat engines struggle below 100°C ΔT, electrochemical cells can operate efficiently at ΔT as low as 20-50°C. This opens up vast sources of low-grade waste heat that are currently uneconomical to capture.\n\nStanford's Cui group has demonstrated 3% efficiency at ΔT=50°C—sounds low, but it's 10x higher than any thermoelectric at these conditions. More importantly, the theoretical ceiling is 15-20%, limited only by electrolyte engineering.",
         "the_insight": {
           "what": "The Seebeck effect works in liquids too. Ionic solutions have temperature-dependent electrode potentials that can drive current flow.",
@@ -542,9 +547,98 @@
         "cost": "$15-25k consulting",
         "timeline": "4-6 weeks"
       }
-    ]
+    ],
+
+    "commercialization_detail": {
+      "unit_economics_current": "At pilot scale: $2,000/kW installed cost, 10% system efficiency, 12-15 year payback at $0.08/kWh industrial rates. Economics don't pencil for most industrial applications.",
+      "unit_economics_target": "At scale: $500/kW installed cost, 15% system efficiency, 5-year payback. This crosses the industrial adoption threshold of 3-5 year payback required by most CFOs.",
+      "path_to_economics": "Three levers: (1) Material cost reduction from $150/m² to $30/m² through supplier negotiations and process optimization, (2) Roll-to-roll manufacturing yield improvements from 60% to 90%, (3) System efficiency gains from 10% to 15% through improved thermal management. Each lever is aggressive but directionally achievable.",
+      "key_assumptions": [
+        "Skutterudite material costs follow typical learning curve (~20% reduction per doubling of volume)",
+        "Roll-to-roll defect rates can be reduced to semiconductor-like levels (<5%)",
+        "Balance of system costs scale with conventional industrial equipment",
+        "Industrial electricity prices remain stable or increase with carbon pricing"
+      ],
+      "go_to_market_path": "Land-and-expand strategy starting with steel industry, where waste heat temperatures (400-600°C) match skutterudite optimal range. Use pilot deployments to validate economics, then expand to cement, glass, and petrochemical sectors.",
+      "customer_segments": [
+        "Steel mills (primary target) - highest temperature waste heat, strong sustainability mandates",
+        "Cement plants - second priority, similar temperature profiles",
+        "Glass manufacturing - attractive temperatures but smaller facility scale",
+        "Petrochemical refineries - massive opportunity but complex regulatory environment"
+      ],
+      "sales_complexity": "Enterprise sales with 18-36 month cycles. Requires executive sponsor (typically VP Operations or Sustainability Officer), pilot validation period, and multi-stakeholder approval including EHS, finance, and operations. Decision-makers are conservative and reference-dependent.",
+      "commercialization_obstacles": [
+        "Long industrial sales cycles (18-36 months) vs. limited runway (18 months)",
+        "Conservative buyer behavior—industrial CFOs need proven technology and reference customers",
+        "Installation complexity in existing facilities—retrofitting is never as simple as greenfield",
+        "Regulatory uncertainty around waste heat incentives and carbon credits"
+      ],
+      "revenue_timeline": "Year 1: Complete 3 pilot deployments, close 1-2 commercial orders ($2-5M). Year 2: Scale to 5-10 commercial installations ($10-20M). Year 3: Expand beyond steel industry, reach $30-50M ARR. Profitability target: Year 4-5."
+    },
+
+    "failure_analysis": {
+      "pre_mortem": "If ThermoCapture failed, it would be because the skutterudite thermal stability problem proved fundamentally unsolvable at industrial operating conditions—just like it was for Alphabet Energy. The encapsulation technology that works at lab scale would degrade under real-world thermal cycling, and module replacement costs would destroy the economics that made the investment thesis attractive.",
+      "historical_precedents": [
+        {
+          "company": "Alphabet Energy",
+          "what_happened": "Raised $30M for skutterudite thermoelectric generators targeting industrial waste heat. Achieved promising lab results but couldn't solve thermal stability at scale. Antimony sublimation caused rapid performance degradation in field deployments. Shut down in 2018 after failing to convert pilots to commercial orders.",
+          "failure_type": "TECHNICAL",
+          "lessons": "Lab ZT values don't translate to field performance. Thermal cycling stability is the key risk, not conversion efficiency. The 'last 10%' of industrialization often proves impossible."
+        },
+        {
+          "company": "Gentherm (formerly Amerigon)",
+          "what_happened": "Successfully commercialized thermoelectric heating/cooling for automotive seats. Pivoted away from waste heat recovery after years of development because industrial economics never penciled at their efficiency levels (5-7%). Now focused entirely on automotive climate control.",
+          "failure_type": "COMMERCIAL",
+          "lessons": "Even proven thermoelectric technology can't compete in waste heat recovery without breakthrough efficiency improvements. The efficiency-cost tradeoff is brutal."
+        },
+        {
+          "company": "BSST (subsidiary of Gentherm)",
+          "what_happened": "Developed advanced thermoelectric systems for automotive waste heat recovery with BMW and Ford partnerships. Despite $50M+ investment and OEM relationships, couldn't achieve cost targets. Projects wound down as automotive partners lost patience.",
+          "failure_type": "MARKET",
+          "lessons": "Even with deep-pocketed partners and clear market demand, the fundamental physics of thermoelectric cost/performance may not support mainstream adoption."
+        }
+      ],
+      "how_startup_differs": "ThermoCapture claims three key differentiators vs. Alphabet Energy: (1) Proprietary ALD encapsulation layer developed with MIT that allegedly solves the sublimation problem, (2) Roll-to-roll manufacturing process that reduces costs below hand-assembled modules, (3) Targeting industrial stationary applications where thermal cycling is less severe than automotive. The first claim is the critical one—if the encapsulation works, they've solved the core problem. But we haven't seen long-term validation data."
+    }
   },
   "appendix": {
+    "references": [
+      {
+        "id": "1",
+        "citation": "Snyder, G.J. & Toberer, E.S. (2008). Complex thermoelectric materials. Nature Materials, 7(2), 105-114.",
+        "url": "https://doi.org/10.1038/nmat2090",
+        "source_type": "Academic Paper"
+      },
+      {
+        "id": "2",
+        "citation": "Rogl, G. et al. (2014). Skutterudites: Progress and challenges. Science and Technology of Advanced Materials, 15(4).",
+        "url": "https://doi.org/10.1088/1468-6996/15/4/044801",
+        "source_type": "Academic Paper"
+      },
+      {
+        "id": "3",
+        "citation": "U.S. Department of Energy. (2016). Waste Heat Recovery: Technology and Opportunities in U.S. Industry.",
+        "url": "https://www.energy.gov/sites/prod/files/2016/04/f30/Waste%20Heat%20Recovery%20Report.pdf",
+        "source_type": "Government Report"
+      },
+      {
+        "id": "4",
+        "citation": "Alphabet Energy company filings and news coverage (2012-2018). Crunchbase, TechCrunch archives.",
+        "source_type": "Industry Sources"
+      },
+      {
+        "id": "5",
+        "citation": "JPL Thermoelectric Materials Group. Multi-mission radioisotope thermoelectric generator (MMRTG) performance data.",
+        "url": "https://rps.nasa.gov/power-and-thermal-systems/",
+        "source_type": "NASA/JPL"
+      },
+      {
+        "id": "6",
+        "citation": "Antora Energy corporate materials and press releases (2023-2024).",
+        "url": "https://antoraenergy.com",
+        "source_type": "Company Source"
+      }
+    ],
     "detailed_claim_validation": [],
     "detailed_solution_space": {
       "simpler_path": [],
