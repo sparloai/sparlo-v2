@@ -8,11 +8,48 @@ export default createBillingSchema({
   provider,
   products: [
     {
+      id: 'lite',
+      name: 'Lite',
+      description: '~3 Problems/Mo',
+      currency: 'USD',
+      badge: 'Starter',
+      plans: [
+        {
+          name: 'Lite Monthly',
+          id: 'lite-monthly',
+          paymentType: 'recurring',
+          interval: 'month',
+          lineItems: [
+            {
+              id: 'price_1SnILKEe4gCtTPhv1Hv6KAhV',
+              name: 'Lite',
+              cost: 9900,
+              type: 'flat' as const,
+            },
+          ],
+        },
+        {
+          name: 'Lite Annual',
+          id: 'lite-annual',
+          paymentType: 'recurring',
+          interval: 'year',
+          lineItems: [
+            {
+              id: 'price_1SnIM1Ee4gCtTPhvm0oISMPo',
+              name: 'Lite',
+              cost: 99000,
+              type: 'flat' as const,
+            },
+          ],
+        },
+      ],
+      features: ['~3 problems/month'],
+    },
+    {
       id: 'core',
       name: 'Core',
       description: 'For individuals and small teams.',
       currency: 'USD',
-      badge: 'Starter',
       plans: [
         {
           name: 'Core Monthly',
