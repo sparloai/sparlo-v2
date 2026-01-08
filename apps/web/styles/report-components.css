@@ -1721,8 +1721,8 @@
 }
 
 .report-ask-input:focus {
-  border-color: rgba(139, 92, 246, 0.5);
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1);
+  border-color: rgba(24, 24, 27, 0.3);
+  box-shadow: 0 0 0 2px rgba(24, 24, 27, 0.05);
 }
 
 .report-ask-submit {
@@ -1732,9 +1732,9 @@
   width: 36px;
   height: 36px;
   background: var(--accent-muted);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(24, 24, 27, 0.15);
   border-radius: var(--radius-sm);
-  color: var(--violet-400);
+  color: var(--text-secondary);
   cursor: pointer;
   transition:
     background-color var(--interaction-fast, 100ms) var(--ease-spring, cubic-bezier(0.4, 0, 0.2, 1)),
@@ -1742,7 +1742,7 @@
 }
 
 .report-ask-submit:hover {
-  background: rgba(139, 92, 246, 0.25);
+  background: rgba(24, 24, 27, 0.1);
   transform: scale(1.05);
 }
 
@@ -1785,8 +1785,8 @@
 }
 
 .inline-ask:hover {
-  background: rgba(139, 92, 246, 0.1);
-  color: var(--violet-400);
+  background: rgba(24, 24, 27, 0.08);
+  color: var(--text-primary);
 }
 
 .inline-ask-icon {
@@ -1819,9 +1819,9 @@
 }
 
 .ask-prompt:hover {
-  background: rgba(139, 92, 246, 0.08);
-  border-color: rgba(139, 92, 246, 0.2);
-  color: var(--violet-400);
+  background: rgba(24, 24, 27, 0.06);
+  border-color: rgba(24, 24, 27, 0.15);
+  color: var(--text-primary);
 }
 
 /* ============================================
