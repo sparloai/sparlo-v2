@@ -70,7 +70,9 @@ export interface SectionConfigItem {
   title: string;
   dataKey: keyof HybridReportData;
   getHeadline: (data: HybridReportData) => string;
-  getMetrics: (data: HybridReportData) => Array<{ label: string; value: string | number }>;
+  getMetrics: (
+    data: HybridReportData,
+  ) => Array<{ label: string; value: string | number }>;
 }
 
 // Metric display type

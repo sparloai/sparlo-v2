@@ -42,7 +42,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: ['~3 problems/month', '1 seat', 'Email support', 'Basic analytics'],
+      features: [
+        '~3 problems/month',
+        '1 seat',
+        'Email support',
+        'Basic analytics',
+      ],
     },
     {
       id: 'core',
@@ -79,7 +84,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: ['~10 problems/month', '1 seat', 'Priority email support', 'Advanced analytics'],
+      features: [
+        '~10 problems/month',
+        '1 seat',
+        'Priority email support',
+        'Advanced analytics',
+      ],
     },
     {
       id: 'pro',
@@ -117,7 +127,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: ['~25 problems/month', '5 team seats', 'Priority support', 'Team collaboration'],
+      features: [
+        '~25 problems/month',
+        '5 team seats',
+        'Priority support',
+        'Team collaboration',
+      ],
     },
     {
       id: 'max',
@@ -154,7 +169,13 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: ['~50 problems/month', '10 team seats', 'Dedicated support', 'API access', 'SSO'],
+      features: [
+        '~50 problems/month',
+        '10 team seats',
+        'Dedicated support',
+        'API access',
+        'SSO',
+      ],
     },
   ],
 });

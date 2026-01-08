@@ -1,13 +1,8 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
-import type {
-  ReportId,
-  SectionId,
-  CardState,
-  ShowcaseState,
-} from './types';
+import type { CardState, ReportId, SectionId, ShowcaseState } from './types';
 import { ALL_SECTION_IDS } from './types';
 
 const DEFAULT_SECTION: SectionId = 'executive-summary';

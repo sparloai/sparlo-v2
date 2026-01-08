@@ -94,8 +94,7 @@ export const POST = enhanceRouteHandler(
       | 'report/clarification-answered'
       | 'report/discovery-clarification-answered'
       | 'report/hybrid-clarification-answered'
-      | 'report/dd-clarification-answered' =
-      'report/clarification-answered';
+      | 'report/dd-clarification-answered' = 'report/clarification-answered';
     if (mode === 'discovery') {
       eventName = 'report/discovery-clarification-answered';
     } else if (mode === 'hybrid') {

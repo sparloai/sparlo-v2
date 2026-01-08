@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -23,6 +24,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from '@kit/ui/input-otp';
+import { toast } from '@kit/ui/sonner';
 import { Spinner } from '@kit/ui/spinner';
 import { Trans } from '@kit/ui/trans';
 
@@ -30,6 +32,10 @@ import { useCaptcha } from '../captcha/client';
 import { useLastAuthMethod } from '../hooks/use-last-auth-method';
 import { AuthErrorAlert } from './auth-error-alert';
 import { EmailInput } from './email-input';
+
+// Animation transition settings
+const ENTER_TRANSITION = { duration: 0.3 };
+const EXIT_TRANSITION = { duration: 0.2 };
 
 const EmailSchema = z.object({ email: z.string().email() });
 const OtpSchema = z.object({ token: z.string().min(6).max(6) });
@@ -84,92 +90,108 @@ export function OtpSignInContainer(props: OtpSignInContainerProps) {
     router.replace(next);
   };
 
-  if (isEmailStep) {
-    return (
-      <OtpEmailForm
-        shouldCreateUser={shouldCreateUser}
-        captchaSiteKey={props.captchaSiteKey}
-        onSendOtp={(email) => {
-          otpForm.setValue('email', email, {
-            shouldValidate: true,
-          });
-        }}
-      />
-    );
-  }
-
   return (
-    <Form {...otpForm}>
-      <form
-        className="flex w-full flex-col items-center space-y-8"
-        onSubmit={otpForm.handleSubmit(handleVerifyOtp)}
-      >
-        <AuthErrorAlert error={verifyMutation.error} />
-
-        <FormField
-          name="token"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <InputOTP
-                  maxLength={6}
-                  {...field}
-                  disabled={verifyMutation.isPending}
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} data-slot="0" />
-                    <InputOTPSlot index={1} data-slot="1" />
-                    <InputOTPSlot index={2} data-slot="2" />
-                  </InputOTPGroup>
-                  <InputOTPSeparator />
-                  <InputOTPGroup>
-                    <InputOTPSlot index={3} data-slot="3" />
-                    <InputOTPSlot index={4} data-slot="4" />
-                    <InputOTPSlot index={5} data-slot="5" />
-                  </InputOTPGroup>
-                </InputOTP>
-              </FormControl>
-
-              <FormDescription>
-                <Trans i18nKey="common:otp.enterCodeFromEmail" />
-              </FormDescription>
-
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex w-full flex-col gap-y-2">
-          <Button
-            type="submit"
-            disabled={verifyMutation.isPending}
-            data-test="otp-verify-button"
-          >
-            {verifyMutation.isPending ? (
-              <>
-                <Spinner className="mr-2 h-4 w-4" />
-                <Trans i18nKey="common:otp.verifying" />
-              </>
-            ) : (
-              <Trans i18nKey="common:otp.verifyCode" />
-            )}
-          </Button>
-
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={verifyMutation.isPending}
-            onClick={() => {
-              otpForm.setValue('email', '', {
+    <AnimatePresence mode="wait">
+      {isEmailStep ? (
+        <motion.div
+          key="email-form"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={ENTER_TRANSITION}
+        >
+          <OtpEmailForm
+            shouldCreateUser={shouldCreateUser}
+            captchaSiteKey={props.captchaSiteKey}
+            onSendOtp={(email) => {
+              otpForm.setValue('email', email, {
                 shouldValidate: true,
               });
             }}
-          >
-            <Trans i18nKey="common:otp.requestNewCode" />
-          </Button>
-        </div>
-      </form>
-    </Form>
+          />
+        </motion.div>
+      ) : (
+        <motion.div
+          key="otp-form"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={ENTER_TRANSITION}
+        >
+          <Form {...otpForm}>
+            <form
+              className="flex w-full flex-col items-center space-y-8"
+              onSubmit={otpForm.handleSubmit(handleVerifyOtp)}
+            >
+              <AuthErrorAlert error={verifyMutation.error} />
+
+              <FormField
+                name="token"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <InputOTP
+                        maxLength={6}
+                        {...field}
+                        disabled={verifyMutation.isPending}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} data-slot="0" />
+                          <InputOTPSlot index={1} data-slot="1" />
+                          <InputOTPSlot index={2} data-slot="2" />
+                        </InputOTPGroup>
+                        <InputOTPSeparator />
+                        <InputOTPGroup>
+                          <InputOTPSlot index={3} data-slot="3" />
+                          <InputOTPSlot index={4} data-slot="4" />
+                          <InputOTPSlot index={5} data-slot="5" />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </FormControl>
+
+                    <FormDescription>
+                      <Trans i18nKey="common:otp.enterCodeFromEmail" />
+                    </FormDescription>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex w-full flex-col gap-y-2">
+                <Button
+                  type="submit"
+                  disabled={verifyMutation.isPending}
+                  data-test="otp-verify-button"
+                >
+                  {verifyMutation.isPending ? (
+                    <>
+                      <Spinner className="mr-2 h-4 w-4" />
+                      <Trans i18nKey="common:otp.verifying" />
+                    </>
+                  ) : (
+                    <Trans i18nKey="common:otp.verifyCode" />
+                  )}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  disabled={verifyMutation.isPending}
+                  onClick={() => {
+                    otpForm.setValue('email', '', {
+                      shouldValidate: true,
+                    });
+                  }}
+                >
+                  <Trans i18nKey="common:otp.requestNewCode" />
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -197,6 +219,7 @@ function OtpEmailForm({
     });
 
     captcha.reset();
+    toast.success('Code sent to your email');
     onSendOtp(email);
   };
 

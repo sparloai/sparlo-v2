@@ -2,7 +2,11 @@
 
 import 'server-only';
 
-import type { ReportMode } from '~/lib/types';
+/**
+ * Report modes that have clarification events.
+ * This is specific to event routing and may differ from the UI-facing ReportMode type.
+ */
+type ClarificationReportMode = 'discovery' | 'hybrid' | 'dd';
 
 /**
  * Type-safe mapping of report modes to clarification events.
@@ -10,10 +14,10 @@ import type { ReportMode } from '~/lib/types';
  * This is the SINGLE SOURCE OF TRUTH for event routing.
  * When adding a new report mode, you MUST update this mapping.
  *
- * CRITICAL: If you add a new mode to ReportMode type, it MUST appear here.
- * The TypeScript compiler will help catch this if ReportMode is a union type.
+ * CRITICAL: If you add a new mode to ClarificationReportMode type, it MUST appear here.
+ * The TypeScript compiler will help catch this if the type is a union type.
  */
-const CLARIFICATION_EVENT_MAP: Record<ReportMode, string> = {
+const CLARIFICATION_EVENT_MAP: Record<ClarificationReportMode, string> = {
   discovery: 'report/discovery-clarification-answered',
   hybrid: 'report/hybrid-clarification-answered',
   dd: 'report/dd-clarification-answered',
@@ -49,7 +53,7 @@ export function getClarificationEventName(mode: string | undefined): string {
     );
   }
 
-  return CLARIFICATION_EVENT_MAP[mode as ReportMode];
+  return CLARIFICATION_EVENT_MAP[mode as ClarificationReportMode];
 }
 
 /**
@@ -64,13 +68,13 @@ export function getClarificationEventName(mode: string | undefined): string {
  * console.log(modes); // ['discovery', 'hybrid', 'dd']
  * ```
  */
-export function getSupportedReportModes(): ReportMode[] {
-  return Object.keys(CLARIFICATION_EVENT_MAP) as ReportMode[];
+export function getSupportedReportModes(): ClarificationReportMode[] {
+  return Object.keys(CLARIFICATION_EVENT_MAP) as ClarificationReportMode[];
 }
 
 /**
  * Validate that a report mode is supported.
- * This is a type guard - narrows unknown to ReportMode if true.
+ * This is a type guard - narrows unknown to ClarificationReportMode if true.
  *
  * @param mode - The mode to validate
  * @returns true if mode is supported, false otherwise
@@ -78,12 +82,14 @@ export function getSupportedReportModes(): ReportMode[] {
  * @example
  * ```typescript
  * if (isSupportedReportMode(mode)) {
- *   // mode is now typed as ReportMode
+ *   // mode is now typed as ClarificationReportMode
  *   const event = getClarificationEventName(mode);
  * }
  * ```
  */
-export function isSupportedReportMode(mode: unknown): mode is ReportMode {
+export function isSupportedReportMode(
+  mode: unknown,
+): mode is ClarificationReportMode {
   return typeof mode === 'string' && mode in CLARIFICATION_EVENT_MAP;
 }
 
@@ -100,7 +106,7 @@ export function isSupportedReportMode(mode: unknown): mode is ReportMode {
  * // { clarificationEvent: 'report/hybrid-clarification-answered', ... }
  * ```
  */
-export function getModeEventNames(mode: ReportMode): {
+export function getModeEventNames(mode: ClarificationReportMode): {
   clarificationEvent: string;
   generateEvent: string;
 } {

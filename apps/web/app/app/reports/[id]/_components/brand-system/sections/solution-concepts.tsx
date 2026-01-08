@@ -748,7 +748,7 @@ export const SolutionConceptsSection = memo(function SolutionConceptsSection({
         {/* Primary recommendation title */}
         {primary?.title && (
           <div className="border-l-2 border-zinc-900 pl-4">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">
+            <p className="text-[13px] font-semibold tracking-wider text-zinc-500 uppercase">
               Primary Recommendation
             </p>
             <p className="mt-1 text-[16px] font-medium text-zinc-900">
@@ -774,7 +774,9 @@ export const SolutionConceptsSection = memo(function SolutionConceptsSection({
           )}
           {supportingCount > 0 && (
             <span>
-              <span className="font-medium text-zinc-700">{supportingCount}</span>{' '}
+              <span className="font-medium text-zinc-700">
+                {supportingCount}
+              </span>{' '}
               <span className="text-zinc-500">alternatives</span>
             </span>
           )}

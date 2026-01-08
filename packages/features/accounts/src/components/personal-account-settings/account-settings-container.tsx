@@ -109,7 +109,7 @@ export function PersonalAccountSettingsContainer(
       {/* Security Section */}
       <div className="space-y-6">
         <div className="mb-8 border-l-4 border-zinc-950 py-1 pl-6">
-          <span className="text-[13px] font-semibold uppercase tracking-[0.06em] text-zinc-500">
+          <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
             <Trans i18nKey={'account:securitySection'} defaults="Security" />
           </span>
         </div>
@@ -128,9 +128,7 @@ export function PersonalAccountSettingsContainer(
               <Trans i18nKey={'account:updatePasswordCardDescription'} />
             }
           >
-            <UpdatePasswordFormContainer
-              callbackPath={props.paths.callback}
-            />
+            <UpdatePasswordFormContainer callbackPath={props.paths.callback} />
           </SettingsSection>
         </If>
 

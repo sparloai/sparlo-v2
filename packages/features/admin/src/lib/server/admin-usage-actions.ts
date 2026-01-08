@@ -195,9 +195,7 @@ export const increaseTokenLimitAction = enhanceAction(
         );
       }
       if (error.message.includes('cannot be less than')) {
-        throw new Error(
-          'Token limit cannot be less than tokens already used.',
-        );
+        throw new Error('Token limit cannot be less than tokens already used.');
       }
 
       throw new Error('Failed to adjust token limit. Please try again.');

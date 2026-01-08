@@ -41,7 +41,8 @@ export const ExecutiveSummarySection = memo(function ExecutiveSummarySection({
   // Preview variant: condensed view for showcase gallery
   if (variant === 'preview') {
     const structured = typeof data === 'string' ? null : data;
-    const narrativeLead = structured?.narrative_lead || (typeof data === 'string' ? data : brief);
+    const narrativeLead =
+      structured?.narrative_lead || (typeof data === 'string' ? data : brief);
     const viability = structured?.viability_label || structured?.viability;
 
     return (
@@ -49,7 +50,9 @@ export const ExecutiveSummarySection = memo(function ExecutiveSummarySection({
         {/* Viability badge */}
         {viability && (
           <div className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1">
-            <span className="text-sm font-medium text-zinc-700">{viability}</span>
+            <span className="text-sm font-medium text-zinc-700">
+              {viability}
+            </span>
           </div>
         )}
 

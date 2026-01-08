@@ -20,13 +20,17 @@ import { cn } from '@kit/ui/utils';
 import {
   ClaimValidationRowSchema,
   CompetitorRowSchema,
+  CrossDomainInsightSchema,
   DiligenceActionSchema,
   EconomicsBridgeRowSchema,
   EconomicsBridgeSchema,
+  FullyDevelopedConceptSchema,
+  ProblemBreakdownSchema,
   RiskTableRowSchema,
   SolutionConceptRowSchema,
   ValidationGapRowSchema,
 } from '~/lib/llm/prompts/dd/schemas';
+
 import { useReportActions } from '../../_lib/hooks/use-report-actions';
 import {
   ArticleBlock,
@@ -151,6 +155,11 @@ type RiskTableRow = z.infer<typeof RiskTableRowSchema>;
 type ValidationGapRow = z.infer<typeof ValidationGapRowSchema>;
 type DiligenceAction = z.infer<typeof DiligenceActionSchema>;
 
+// NEW: Problem breakdown and developed concept types
+type ProblemBreakdown = z.infer<typeof ProblemBreakdownSchema>;
+type FullyDevelopedConcept = z.infer<typeof FullyDevelopedConceptSchema>;
+type CrossDomainInsight = z.infer<typeof CrossDomainInsightSchema>;
+
 interface QuickReference {
   one_page_summary?: OnePageSummary;
   scores?: Scores;
@@ -171,6 +180,12 @@ interface QuickReference {
   the_bet_statement?: string;
   // NEW: Personal recommendation
   if_this_were_my_deal?: string;
+  // NEW: Problem breakdown (deep problem education)
+  problem_breakdown?: ProblemBreakdown;
+  // NEW: Fully developed concepts (deep solution education)
+  developed_concepts?: FullyDevelopedConcept[];
+  // NEW: Cross-domain insights
+  cross_domain_insights?: CrossDomainInsight[];
 }
 
 interface ProseSection {
@@ -608,7 +623,7 @@ const Badge = memo(function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded',
+        'inline-flex items-center rounded px-2 py-0.5 text-xs font-medium',
         className || 'bg-zinc-100 text-zinc-700',
       )}
     >
@@ -629,18 +644,32 @@ const CompetitorLandscapeTable = memo(function CompetitorLandscapeTable({
       <table className="w-full text-sm">
         <thead className="border-b border-zinc-200">
           <tr className="text-left text-zinc-500">
-            <th scope="col" className="py-2 pr-4 font-medium">Entity</th>
-            <th scope="col" className="py-2 pr-4 font-medium">Approach</th>
-            <th scope="col" className="py-2 pr-4 font-medium">Performance</th>
-            <th scope="col" className="py-2 font-medium">Limitation</th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Entity
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Approach
+            </th>
+            <th scope="col" className="py-2 pr-4 font-medium">
+              Performance
+            </th>
+            <th scope="col" className="py-2 font-medium">
+              Limitation
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-zinc-100">
           {competitors.map((row, i) => (
             <tr key={`${row.entity}-${i}`}>
-              <td className="py-3 pr-4 font-medium text-zinc-900">{row.entity}</td>
-              <td className="py-3 pr-4 text-zinc-600 max-w-xs">{row.approach}</td>
-              <td className="py-3 pr-4 text-zinc-600">{row.performance || '—'}</td>
+              <td className="py-3 pr-4 font-medium text-zinc-900">
+                {row.entity}
+              </td>
+              <td className="max-w-xs py-3 pr-4 text-zinc-600">
+                {row.approach}
+              </td>
+              <td className="py-3 pr-4 text-zinc-600">
+                {row.performance || '—'}
+              </td>
               <td className="py-3 text-zinc-500">{row.limitation || '—'}</td>
             </tr>
           ))}
@@ -660,17 +689,27 @@ const ClaimValidationList = memo(function ClaimValidationList({
   return (
     <div className="space-y-4">
       {claims.map((claim, i) => (
-        <div key={`claim-${i}`} className="border-l-2 border-zinc-200 pl-4 py-2">
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <Badge className={VERDICT_BADGE_STYLES[claim.verdict] || 'bg-zinc-100 text-zinc-700'}>
+        <div
+          key={`claim-${i}`}
+          className="border-l-2 border-zinc-200 py-2 pl-4"
+        >
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <Badge
+              className={
+                VERDICT_BADGE_STYLES[claim.verdict] ||
+                'bg-zinc-100 text-zinc-700'
+              }
+            >
               {claim.verdict}
             </Badge>
             {claim.confidence && (
-              <span className="text-xs text-zinc-400 font-mono">{claim.confidence}</span>
+              <span className="font-mono text-xs text-zinc-400">
+                {claim.confidence}
+              </span>
             )}
           </div>
           <p className="font-medium text-zinc-900">{claim.claim}</p>
-          <p className="text-sm text-zinc-600 mt-1">{claim.reasoning}</p>
+          <p className="mt-1 text-sm text-zinc-600">{claim.reasoning}</p>
         </div>
       ))}
     </div>
@@ -685,7 +724,7 @@ const InsightBlockquote = memo(function InsightBlockquote({
 }) {
   if (!insight) return null;
   return (
-    <blockquote className="border-l-4 border-zinc-900 pl-4 py-2 my-6 bg-zinc-50 rounded-r-lg">
+    <blockquote className="my-6 rounded-r-lg border-l-4 border-zinc-900 bg-zinc-50 py-2 pl-4">
       <p className="text-lg font-medium text-zinc-900 italic">{insight}</p>
     </blockquote>
   );
@@ -699,8 +738,8 @@ const TheBetHighlight = memo(function TheBetHighlight({
 }) {
   if (!bet) return null;
   return (
-    <div className="bg-zinc-900 text-white p-6 rounded-lg my-6">
-      <p className="text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2">
+    <div className="my-6 rounded-lg bg-zinc-900 p-6 text-white">
+      <p className="mb-2 font-mono text-xs tracking-wider text-zinc-400 uppercase">
         The Bet
       </p>
       <p className="text-lg leading-relaxed">{bet}</p>
@@ -726,13 +765,13 @@ const SolutionConceptsList = memo(function SolutionConceptsList({
           <div
             key={`concept-${i}`}
             className={cn(
-              'border-l-2 pl-4 py-2',
+              'border-l-2 py-2 pl-4',
               concept.startup_approach
-                ? 'border-zinc-900 bg-zinc-50 rounded-r-lg'
+                ? 'rounded-r-lg border-zinc-900 bg-zinc-50'
                 : 'border-zinc-200',
             )}
           >
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <div className="mb-1 flex flex-wrap items-center gap-2">
               <Badge className={track.style}>{track.label}</Badge>
               <span className="font-medium text-zinc-900">{concept.title}</span>
               {concept.startup_approach && (
@@ -740,9 +779,13 @@ const SolutionConceptsList = memo(function SolutionConceptsList({
               )}
             </div>
             <p className="text-sm text-zinc-600">{concept.description}</p>
-            {(concept.feasibility || concept.impact || concept.who_pursuing?.length) && (
-              <div className="flex gap-4 mt-2 text-xs text-zinc-500 flex-wrap">
-                {concept.feasibility && <span>Feasibility: {concept.feasibility}/10</span>}
+            {(concept.feasibility ||
+              concept.impact ||
+              concept.who_pursuing?.length) && (
+              <div className="mt-2 flex flex-wrap gap-4 text-xs text-zinc-500">
+                {concept.feasibility && (
+                  <span>Feasibility: {concept.feasibility}/10</span>
+                )}
                 {concept.impact && <span>Impact: {concept.impact}/10</span>}
                 {concept.who_pursuing?.length ? (
                   <span>Also: {concept.who_pursuing.join(', ')}</span>
@@ -764,9 +807,9 @@ const EconomicsBridgeTable = memo(function EconomicsBridgeTable({
 }) {
   if (!bridge?.rows?.length) return null;
   return (
-    <div className="border border-zinc-200 rounded-lg overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-zinc-200">
       {(bridge.current_state || bridge.target_state) && (
-        <div className="bg-zinc-50 px-4 py-3 border-b border-zinc-200">
+        <div className="border-b border-zinc-200 bg-zinc-50 px-4 py-3">
           <div className="flex justify-between text-sm">
             {bridge.current_state && (
               <span>
@@ -803,14 +846,16 @@ const EconomicsBridgeTable = memo(function EconomicsBridgeTable({
         </tbody>
       </table>
       {(bridge.realistic_estimate || bridge.verdict) && (
-        <div className="bg-zinc-50 px-4 py-3 border-t border-zinc-200">
+        <div className="border-t border-zinc-200 bg-zinc-50 px-4 py-3">
           <div className="flex justify-between text-sm">
             {bridge.realistic_estimate && (
               <span>
                 Realistic: <strong>{bridge.realistic_estimate}</strong>
               </span>
             )}
-            {bridge.verdict && <span className="text-zinc-500">{bridge.verdict}</span>}
+            {bridge.verdict && (
+              <span className="text-zinc-500">{bridge.verdict}</span>
+            )}
           </div>
         </div>
       )}
@@ -828,9 +873,17 @@ const RisksTableDisplay = memo(function RisksTableDisplay({
   return (
     <div className="space-y-4">
       {risks.map((risk, idx) => (
-        <div key={`risk-${idx}`} className="border-l-2 border-zinc-200 pl-4 py-2">
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <Badge className={CATEGORY_BADGE_STYLES[risk.category] || 'bg-zinc-100 text-zinc-700'}>
+        <div
+          key={`risk-${idx}`}
+          className="border-l-2 border-zinc-200 py-2 pl-4"
+        >
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <Badge
+              className={
+                CATEGORY_BADGE_STYLES[risk.category] ||
+                'bg-zinc-100 text-zinc-700'
+              }
+            >
               {risk.category}
             </Badge>
             <RiskSeverityIndicator severity={risk.severity || 'MEDIUM'} />
@@ -861,14 +914,20 @@ const ValidationGapsList = memo(function ValidationGapsList({
       {gaps.map((gap, i) => (
         <div
           key={`gap-${i}`}
-          className="flex items-start gap-3 border-l-2 border-zinc-200 pl-4 py-2"
+          className="flex items-start gap-3 border-l-2 border-zinc-200 py-2 pl-4"
         >
-          <Badge className={STATUS_BADGE_STYLES[gap.status] || 'bg-zinc-100 text-zinc-700'}>
+          <Badge
+            className={
+              STATUS_BADGE_STYLES[gap.status] || 'bg-zinc-100 text-zinc-700'
+            }
+          >
             {gap.status.replace(/_/g, ' ')}
           </Badge>
           <div>
             <p className="text-zinc-900">{gap.concern}</p>
-            {gap.rationale && <p className="text-sm text-zinc-500 mt-1">{gap.rationale}</p>}
+            {gap.rationale && (
+              <p className="mt-1 text-sm text-zinc-500">{gap.rationale}</p>
+            )}
           </div>
         </div>
       ))}
@@ -886,12 +945,18 @@ const DiligenceActionsList = memo(function DiligenceActionsList({
   return (
     <div className="space-y-3">
       {actions.map((action, i) => (
-        <div key={`action-${i}`} className="flex items-start gap-4 border-l-2 border-zinc-200 pl-4 py-2">
-          <RiskSeverityIndicator severity={action.priority || 'MEDIUM'} label={action.priority} />
+        <div
+          key={`action-${i}`}
+          className="flex items-start gap-4 border-l-2 border-zinc-200 py-2 pl-4"
+        >
+          <RiskSeverityIndicator
+            severity={action.priority || 'MEDIUM'}
+            label={action.priority}
+          />
           <div className="flex-1">
-            <p className="text-zinc-900 font-medium">{action.action}</p>
+            <p className="font-medium text-zinc-900">{action.action}</p>
             {(action.cost || action.timeline) && (
-              <div className="flex gap-4 mt-1 text-xs text-zinc-500">
+              <div className="mt-1 flex gap-4 text-xs text-zinc-500">
                 {action.cost && <span>Cost: {action.cost}</span>}
                 {action.timeline && <span>Timeline: {action.timeline}</span>}
               </div>
@@ -915,11 +980,424 @@ const IfThisWereMyDealSection = memo(function IfThisWereMyDealSection({
       <SectionTitle>If This Were My Deal</SectionTitle>
       <ArticleBlock className="mt-8">
         <div className="border-l-4 border-zinc-900 pl-6">
-          <BodyText size="lg" className="italic text-zinc-700">
+          <BodyText size="lg" className="text-zinc-700 italic">
             {content}
           </BodyText>
         </div>
       </ArticleBlock>
+    </Section>
+  );
+});
+
+// ============================================
+// NEW: Problem Breakdown Components (Deep Problem Education)
+// ============================================
+
+// Problem Breakdown Section (structured from AN0-M)
+const ProblemBreakdownSection = memo(function ProblemBreakdownSection({
+  breakdown,
+}: {
+  breakdown?: ProblemBreakdown;
+}) {
+  if (!breakdown) return null;
+
+  return (
+    <Section id="problem-breakdown">
+      <SectionTitle>Understanding the Problem</SectionTitle>
+
+      {/* What's Wrong - visceral */}
+      {breakdown.whats_wrong && (
+        <ArticleBlock className="mt-8">
+          <MonoLabel variant="strong" className="mb-2 block">
+            What&apos;s Broken
+          </MonoLabel>
+          <BodyText size="lg" className="text-zinc-800">
+            {breakdown.whats_wrong}
+          </BodyText>
+        </ArticleBlock>
+      )}
+
+      {/* Why It's Hard - physics */}
+      {breakdown.why_its_hard?.prose && (
+        <ArticleBlock className="mt-8">
+          <MonoLabel variant="strong" className="mb-2 block">
+            Why It&apos;s Hard
+          </MonoLabel>
+          <BodyText>{breakdown.why_its_hard.prose}</BodyText>
+
+          {breakdown.why_its_hard.governing_equation?.equation && (
+            <div className="mt-4 rounded-r border-l-2 border-zinc-900 bg-zinc-50 p-4">
+              <code className="mb-2 block font-mono text-sm text-zinc-800">
+                {breakdown.why_its_hard.governing_equation.equation}
+              </code>
+              <BodyText variant="muted" size="sm">
+                {breakdown.why_its_hard.governing_equation.explanation}
+              </BodyText>
+            </div>
+          )}
+
+          {breakdown.why_its_hard.factors &&
+            breakdown.why_its_hard.factors.length > 0 && (
+              <ul className="mt-4 space-y-2">
+                {breakdown.why_its_hard.factors.map((factor, i) => (
+                  <li key={`factor-${i}`} className="flex items-start gap-2">
+                    <span className="mt-1 text-zinc-400">•</span>
+                    <BodyText>{factor}</BodyText>
+                  </li>
+                ))}
+              </ul>
+            )}
+        </ArticleBlock>
+      )}
+
+      {/* Root Cause Hypotheses */}
+      {breakdown.root_cause_hypotheses &&
+        breakdown.root_cause_hypotheses.length > 0 && (
+          <ArticleBlock className="mt-8">
+            <MonoLabel variant="strong" className="mb-4 block">
+              Root Causes
+            </MonoLabel>
+            <div className="space-y-4">
+              {breakdown.root_cause_hypotheses.map((hypothesis, i) => (
+                <div
+                  key={`hypothesis-${i}`}
+                  className="border-l-2 border-zinc-200 pl-4"
+                >
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="font-medium text-zinc-900">
+                      {hypothesis.name}
+                    </span>
+                    <span className="rounded bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-600">
+                      {hypothesis.confidence_percent}% confidence
+                    </span>
+                  </div>
+                  <BodyText variant="muted" size="sm">
+                    {hypothesis.explanation}
+                  </BodyText>
+                </div>
+              ))}
+            </div>
+          </ArticleBlock>
+        )}
+
+      {/* What Industry Does Today */}
+      {breakdown.what_industry_does_today &&
+        breakdown.what_industry_does_today.length > 0 && (
+          <ArticleBlock className="mt-8">
+            <MonoLabel variant="strong" className="mb-4 block">
+              Current Approaches
+            </MonoLabel>
+            <div className="space-y-3">
+              {breakdown.what_industry_does_today.map((approach, i) => (
+                <div
+                  key={`approach-${i}`}
+                  className="border-l-2 border-zinc-200 py-1 pl-4"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <BodyText className="font-medium">
+                        {approach.approach}
+                      </BodyText>
+                      <BodyText variant="muted" size="sm">
+                        {approach.limitation}
+                      </BodyText>
+                    </div>
+                    {approach.who_does_it &&
+                      approach.who_does_it.length > 0 && (
+                        <span className="shrink-0 text-xs text-zinc-400">
+                          {approach.who_does_it.join(', ')}
+                        </span>
+                      )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </ArticleBlock>
+        )}
+    </Section>
+  );
+});
+
+// ============================================
+// NEW: Fully Developed Concept Components
+// ============================================
+
+// Single Developed Concept Card (full development, not summary)
+const DevelopedConceptCard = memo(function DevelopedConceptCard({
+  concept,
+}: {
+  concept: FullyDevelopedConcept;
+}) {
+  const track = TRACK_BADGE_STYLES[concept.track] || {
+    label: concept.track,
+    style: 'bg-zinc-100 text-zinc-700',
+  };
+
+  return (
+    <div
+      className={cn(
+        'rounded-lg border p-6',
+        concept.startup_approach
+          ? 'border-zinc-900 bg-zinc-50'
+          : 'border-zinc-200 bg-white',
+      )}
+    >
+      {/* Header */}
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <Badge className={track.style}>{track.label}</Badge>
+            {concept.innovation_type &&
+              concept.innovation_type !== 'CATALOG' && (
+                <Badge className="bg-zinc-100 text-zinc-600">
+                  {concept.innovation_type.replace(/_/g, ' ')}
+                </Badge>
+              )}
+            {concept.startup_approach && (
+              <Badge className="bg-zinc-900 text-white">
+                Startup&apos;s Approach
+              </Badge>
+            )}
+          </div>
+          <h4 className="text-lg font-semibold text-zinc-900">
+            {concept.title}
+          </h4>
+        </div>
+        {(concept.feasibility || concept.impact) && (
+          <div className="shrink-0 text-right text-xs text-zinc-500">
+            {concept.feasibility && (
+              <div>Feasibility: {concept.feasibility}/10</div>
+            )}
+            {concept.impact && <div>Impact: {concept.impact}/10</div>}
+          </div>
+        )}
+      </div>
+
+      {/* What It Is (full development) */}
+      {concept.what_it_is && (
+        <div className="mb-6">
+          <BodyText className="whitespace-pre-wrap text-zinc-700">
+            {concept.what_it_is}
+          </BodyText>
+        </div>
+      )}
+
+      {/* The Insight */}
+      {concept.the_insight?.what && (
+        <div className="mb-6 rounded-lg border-l-2 border-zinc-400 bg-zinc-50 p-4">
+          <MonoLabel variant="strong" className="mb-2 block text-xs">
+            The Insight
+          </MonoLabel>
+          <BodyText className="mb-2 font-medium">
+            {concept.the_insight.what}
+          </BodyText>
+
+          {concept.the_insight.where_we_found_it && (
+            <div className="space-y-1 text-sm text-zinc-600">
+              <div>
+                <strong>Source:</strong>{' '}
+                {concept.the_insight.where_we_found_it.domain}
+              </div>
+              {concept.the_insight.where_we_found_it.how_they_use_it && (
+                <div>
+                  <strong>Original use:</strong>{' '}
+                  {concept.the_insight.where_we_found_it.how_they_use_it}
+                </div>
+              )}
+              {concept.the_insight.where_we_found_it.why_it_transfers && (
+                <div>
+                  <strong>Why it transfers:</strong>{' '}
+                  {concept.the_insight.where_we_found_it.why_it_transfers}
+                </div>
+              )}
+            </div>
+          )}
+
+          {concept.the_insight.why_industry_missed_it && (
+            <div className="mt-2 text-sm text-zinc-500 italic">
+              Why missed: {concept.the_insight.why_industry_missed_it}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Why It Works */}
+      {concept.why_it_works && (
+        <div className="mb-6">
+          <MonoLabel variant="strong" className="mb-2 block text-xs">
+            Why It Works
+          </MonoLabel>
+          <BodyText variant="muted">{concept.why_it_works}</BodyText>
+        </div>
+      )}
+
+      {/* Economics + Key Risk */}
+      <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        {concept.economics &&
+          (concept.economics.investment ||
+            concept.economics.expected_outcome) && (
+            <div className="rounded bg-zinc-50 p-3">
+              <MonoLabel variant="strong" className="mb-2 block text-xs">
+                Economics
+              </MonoLabel>
+              <div className="space-y-1 text-sm">
+                {concept.economics.investment && (
+                  <div>
+                    <strong>Investment:</strong> {concept.economics.investment}
+                  </div>
+                )}
+                {concept.economics.expected_outcome && (
+                  <div>
+                    <strong>Outcome:</strong>{' '}
+                    {concept.economics.expected_outcome}
+                  </div>
+                )}
+                {concept.economics.timeline && (
+                  <div>
+                    <strong>Timeline:</strong> {concept.economics.timeline}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+        {concept.key_risk && (
+          <div className="rounded bg-zinc-50 p-3">
+            <MonoLabel variant="strong" className="mb-2 block text-xs">
+              Key Risk
+            </MonoLabel>
+            <BodyText size="sm">{concept.key_risk}</BodyText>
+          </div>
+        )}
+      </div>
+
+      {/* First Validation Step */}
+      {concept.first_validation_step?.test && (
+        <div className="mt-4 border-t border-zinc-200 pt-4">
+          <MonoLabel variant="strong" className="mb-2 block text-xs">
+            First Validation Step
+          </MonoLabel>
+          <div className="text-sm">
+            <div className="mb-1 font-medium text-zinc-900">
+              {concept.first_validation_step.test}
+            </div>
+            <div className="flex flex-wrap gap-4 text-zinc-500">
+              {concept.first_validation_step.cost && (
+                <span>Cost: {concept.first_validation_step.cost}</span>
+              )}
+              {concept.first_validation_step.timeline && (
+                <span>Timeline: {concept.first_validation_step.timeline}</span>
+              )}
+            </div>
+            {concept.first_validation_step.go_criteria && (
+              <div className="mt-2 text-xs text-green-700">
+                ✓ Go if: {concept.first_validation_step.go_criteria}
+              </div>
+            )}
+            {concept.first_validation_step.no_go_criteria && (
+              <div className="text-xs text-red-700">
+                ✗ No-go if: {concept.first_validation_step.no_go_criteria}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Who's Pursuing */}
+      {concept.who_pursuing && concept.who_pursuing.length > 0 && (
+        <div className="mt-4 text-xs text-zinc-400">
+          Also pursuing: {concept.who_pursuing.join(', ')}
+        </div>
+      )}
+    </div>
+  );
+});
+
+// Container for all developed concepts
+const DevelopedConceptsSection = memo(function DevelopedConceptsSection({
+  concepts,
+}: {
+  concepts?: FullyDevelopedConcept[];
+}) {
+  if (!concepts?.length) return null;
+
+  return (
+    <Section id="solution-landscape-developed">
+      <SectionTitle>Solution Landscape</SectionTitle>
+      <ArticleBlock className="mt-4 mb-8">
+        <BodyText variant="muted">
+          The following approaches represent the full spectrum of solutions to
+          this problem. Each is developed in depth to help evaluate not just
+          this startup, but any company in this space.
+        </BodyText>
+      </ArticleBlock>
+
+      <div className="space-y-6">
+        {concepts.map((concept, i) => (
+          <DevelopedConceptCard
+            key={concept.id || `concept-${i}`}
+            concept={concept}
+          />
+        ))}
+      </div>
+    </Section>
+  );
+});
+
+// ============================================
+// NEW: Cross-Domain Insights Components
+// ============================================
+
+// Cross-Domain Insights Section
+const CrossDomainInsightsSection = memo(function CrossDomainInsightsSection({
+  insights,
+}: {
+  insights?: CrossDomainInsight[];
+}) {
+  if (!insights?.length) return null;
+
+  return (
+    <Section id="cross-domain-insights">
+      <SectionTitle>Cross-Domain Innovations</SectionTitle>
+      <ArticleBlock className="mt-4 mb-6">
+        <BodyText variant="muted">
+          Solutions from adjacent industries that haven&apos;t yet been applied
+          to this problem space.
+        </BodyText>
+      </ArticleBlock>
+
+      <div className="space-y-4">
+        {insights.map((insight, i) => (
+          <div
+            key={`xdomain-${i}`}
+            className="border-l-2 border-zinc-700 py-2 pl-4"
+          >
+            <div className="mb-2 flex items-center gap-2">
+              <Badge className="bg-zinc-900 text-white">
+                {insight.source_domain}
+              </Badge>
+              <span className="text-zinc-400">→</span>
+              <span className="text-sm text-zinc-600">This problem</span>
+            </div>
+            <BodyText className="mb-1 font-medium">
+              {insight.mechanism}
+            </BodyText>
+            {insight.why_it_transfers && (
+              <BodyText variant="muted" size="sm">
+                {insight.why_it_transfers}
+              </BodyText>
+            )}
+            <div className="mt-2 flex flex-wrap gap-4 text-xs text-zinc-400">
+              {insight.who_pursuing && insight.who_pursuing.length > 0 && (
+                <span>Pursuing: {insight.who_pursuing.join(', ')}</span>
+              )}
+              {insight.validation_approach && (
+                <span>Validation: {insight.validation_approach}</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </Section>
   );
 });
@@ -1219,6 +1697,11 @@ export const DDReportDisplay = memo(function DDReportDisplay({
 
         {/* PROSE SECTIONS - Moved up for narrative flow (hybrid pattern) */}
 
+        {/* Problem Breakdown (structured from AN0-M) - before prose primer */}
+        {quickRef?.problem_breakdown && (
+          <ProblemBreakdownSection breakdown={quickRef.problem_breakdown} />
+        )}
+
         {/* Problem Primer with First Principles Insight embedded */}
         {prose?.problem_primer?.content && (
           <Section id="problem-primer">
@@ -1243,56 +1726,97 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           <Section id="technical-deep-dive">
             <SectionTitle>Technical Deep Dive</SectionTitle>
             <ArticleBlock className="mt-8">
-              <BodyText parseCited>{prose.technical_deep_dive.content}</BodyText>
+              <BodyText parseCited>
+                {prose.technical_deep_dive.content}
+              </BodyText>
             </ArticleBlock>
             {/* Claim validation summary - inline after technical prose */}
-            {quickRef?.claim_validation_table && quickRef.claim_validation_table.length > 0 && (
-              <div className="mt-8">
-                <MonoLabel variant="strong" className="mb-4 block">Claim Validation Summary</MonoLabel>
-                <ClaimValidationList claims={quickRef.claim_validation_table} />
-              </div>
-            )}
+            {quickRef?.claim_validation_table &&
+              quickRef.claim_validation_table.length > 0 && (
+                <div className="mt-8">
+                  <MonoLabel variant="strong" className="mb-4 block">
+                    Claim Validation Summary
+                  </MonoLabel>
+                  <ClaimValidationList
+                    claims={quickRef.claim_validation_table}
+                  />
+                </div>
+              )}
           </Section>
         )}
 
-        {/* Solution Landscape with competitor context */}
-        {prose?.solution_landscape?.content && (
+        {/* Solution Landscape - prefer developed_concepts if available, otherwise prose + brief concepts */}
+        {quickRef?.developed_concepts &&
+        quickRef.developed_concepts.length > 0 ? (
+          <>
+            <DevelopedConceptsSection concepts={quickRef.developed_concepts} />
+            {/* Cross-domain insights - after developed concepts */}
+            {quickRef?.cross_domain_insights &&
+              quickRef.cross_domain_insights.length > 0 && (
+                <CrossDomainInsightsSection
+                  insights={quickRef.cross_domain_insights}
+                />
+              )}
+          </>
+        ) : prose?.solution_landscape?.content ? (
           <Section id="solution-landscape">
             <SectionTitle>Solution Landscape</SectionTitle>
             <ArticleBlock className="mt-8">
               <BodyText parseCited>{prose.solution_landscape.content}</BodyText>
             </ArticleBlock>
             {/* Competitor table - inline within solution landscape */}
-            {quickRef?.competitor_landscape && quickRef.competitor_landscape.length > 0 && (
-              <div className="mt-8">
-                <MonoLabel variant="strong" className="mb-4 block">State of the Art</MonoLabel>
-                <CompetitorLandscapeTable competitors={quickRef.competitor_landscape} />
-              </div>
-            )}
+            {quickRef?.competitor_landscape &&
+              quickRef.competitor_landscape.length > 0 && (
+                <div className="mt-8">
+                  <MonoLabel variant="strong" className="mb-4 block">
+                    State of the Art
+                  </MonoLabel>
+                  <CompetitorLandscapeTable
+                    competitors={quickRef.competitor_landscape}
+                  />
+                </div>
+              )}
             {/* Solution concepts - inline within solution landscape */}
-            {quickRef?.solution_concepts && quickRef.solution_concepts.length > 0 && (
-              <div className="mt-8">
-                <MonoLabel variant="strong" className="mb-4 block">Alternative Approaches</MonoLabel>
-                <SolutionConceptsList concepts={quickRef.solution_concepts} />
-              </div>
-            )}
+            {quickRef?.solution_concepts &&
+              quickRef.solution_concepts.length > 0 && (
+                <div className="mt-8">
+                  <MonoLabel variant="strong" className="mb-4 block">
+                    Alternative Approaches
+                  </MonoLabel>
+                  <SolutionConceptsList concepts={quickRef.solution_concepts} />
+                </div>
+              )}
+            {/* Cross-domain insights - after brief solution concepts */}
+            {quickRef?.cross_domain_insights &&
+              quickRef.cross_domain_insights.length > 0 && (
+                <div className="mt-8">
+                  <CrossDomainInsightsSection
+                    insights={quickRef.cross_domain_insights}
+                  />
+                </div>
+              )}
           </Section>
-        )}
+        ) : null}
 
         {/* Commercialization Reality with economics context */}
         {prose?.commercialization_reality?.content && (
           <Section id="commercialization">
             <SectionTitle>Commercialization Reality</SectionTitle>
             <ArticleBlock className="mt-8">
-              <BodyText parseCited>{prose.commercialization_reality.content}</BodyText>
+              <BodyText parseCited>
+                {prose.commercialization_reality.content}
+              </BodyText>
             </ArticleBlock>
             {/* Economics bridge - inline within commercialization */}
-            {quickRef?.economics_bridge && quickRef.economics_bridge.rows?.length > 0 && (
-              <div className="mt-8">
-                <MonoLabel variant="strong" className="mb-4 block">Unit Economics Bridge</MonoLabel>
-                <EconomicsBridgeTable bridge={quickRef.economics_bridge} />
-              </div>
-            )}
+            {quickRef?.economics_bridge &&
+              quickRef.economics_bridge.rows?.length > 0 && (
+                <div className="mt-8">
+                  <MonoLabel variant="strong" className="mb-4 block">
+                    Unit Economics Bridge
+                  </MonoLabel>
+                  <EconomicsBridgeTable bridge={quickRef.economics_bridge} />
+                </div>
+              )}
           </Section>
         )}
 
@@ -1301,7 +1825,9 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           <Section id="investment-synthesis">
             <SectionTitle>Investment Synthesis</SectionTitle>
             <ArticleBlock className="mt-8">
-              <BodyText parseCited>{prose.investment_synthesis.content}</BodyText>
+              <BodyText parseCited>
+                {prose.investment_synthesis.content}
+              </BodyText>
             </ArticleBlock>
           </Section>
         )}
@@ -1364,9 +1890,13 @@ export const DDReportDisplay = memo(function DDReportDisplay({
                   {quickRef.key_risks.map((risk, idx) => (
                     <div key={idx} className="border-l-2 border-zinc-200 pl-6">
                       <div className="mb-2 flex items-center gap-3">
-                        <RiskSeverityIndicator severity={risk.severity || 'MEDIUM'} />
+                        <RiskSeverityIndicator
+                          severity={risk.severity || 'MEDIUM'}
+                        />
                       </div>
-                      <BodyText variant="primary" className="font-medium">{risk.risk}</BodyText>
+                      <BodyText variant="primary" className="font-medium">
+                        {risk.risk}
+                      </BodyText>
                       {risk.mitigation && (
                         <BodyText variant="muted" size="sm" className="mt-2">
                           Mitigation: {risk.mitigation}
@@ -1396,25 +1926,29 @@ export const DDReportDisplay = memo(function DDReportDisplay({
         )}
 
         {/* Founder Questions */}
-        {quickRef?.founder_questions && quickRef.founder_questions.length > 0 && (
-          <Section id="founder-questions">
-            <SectionTitle>Founder Questions</SectionTitle>
-            <div className="mt-8 space-y-6">
-              {quickRef.founder_questions.map((q, idx) => (
-                <FounderQuestionCard key={idx} question={q} />
-              ))}
-            </div>
-          </Section>
-        )}
+        {quickRef?.founder_questions &&
+          quickRef.founder_questions.length > 0 && (
+            <Section id="founder-questions">
+              <SectionTitle>Founder Questions</SectionTitle>
+              <div className="mt-8 space-y-6">
+                {quickRef.founder_questions.map((q, idx) => (
+                  <FounderQuestionCard key={idx} question={q} />
+                ))}
+              </div>
+            </Section>
+          )}
 
         {/* Diligence Roadmap - use enhanced if available */}
-        {(quickRef?.diligence_actions?.length || quickRef?.diligence_roadmap?.length) && (
+        {(quickRef?.diligence_actions?.length ||
+          quickRef?.diligence_roadmap?.length) && (
           <Section id="diligence-roadmap">
             <SectionTitle>Diligence Roadmap</SectionTitle>
             <div className="mt-8">
-              {quickRef?.diligence_actions && quickRef.diligence_actions.length > 0 ? (
+              {quickRef?.diligence_actions &&
+              quickRef.diligence_actions.length > 0 ? (
                 <DiligenceActionsList actions={quickRef.diligence_actions} />
-              ) : quickRef?.diligence_roadmap && quickRef.diligence_roadmap.length > 0 ? (
+              ) : quickRef?.diligence_roadmap &&
+                quickRef.diligence_roadmap.length > 0 ? (
                 <div className="space-y-4">
                   {quickRef.diligence_roadmap.map((item, idx) => (
                     <DiligenceRoadmapCard key={idx} item={item} index={idx} />

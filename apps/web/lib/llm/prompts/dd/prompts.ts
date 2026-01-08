@@ -2390,18 +2390,37 @@ This report has THREE layers:
 #### 1. PROBLEM PRIMER (800-1200 words)
 
 Synthesize AN0-M and AN1.7 into an educational narrative that TEACHES the investor about this problem space.
+**This section should be REUSABLE** - a VC should be able to apply this knowledge to ANY company in this space.
 
-**Required content:**
-- What is the problem in plain English? (2-3 sentences)
-- Why does this problem matter? (market size, impact, urgency)
-- What are the fundamental physics/chemistry/biology constraints?
-- Include governing equations or thermodynamic limits where they build intuition
-- What has been tried before? Why did it fail or succeed partially?
-- What would a solution HAVE to achieve to be viable?
+**Required Structure (Pull from AN0-M output):**
+
+1. **WHAT'S WRONG** (visceral failure mode)
+   - What is the pain point in plain English?
+   - What fails? What breaks? What's frustrating?
+   - Make the reader FEEL the problem
+
+2. **WHY IT'S HARD** (physics/chemistry/biology constraints)
+   - What are the fundamental constraints?
+   - Include governing equations or thermodynamic limits where they build intuition
+   - Example: "Heat recovery efficiency is capped by ΔT between streams—the smaller the difference, the larger (and more expensive) the heat exchanger."
+
+3. **ROOT CAUSE HYPOTHESES** (from AN0-M root_cause_hypotheses)
+   - What are the 2-4 fundamental reasons this problem persists?
+   - Assign confidence levels
+   - This teaches VCs HOW TO THINK about the problem
+
+4. **WHAT INDUSTRY DOES TODAY** (current approaches + limitations)
+   - 3-5 current approaches with specific limitations
+   - WHO does each approach (named companies)
+   - WHY each falls short
+
+5. **FIRST PRINCIPLES INSIGHT** (the reframe)
+   - The "aha" that changes how you think about solutions
+   - Pull from AN0-M first_principles_insight
 
 **Voice:** Write like a patient expert teaching a smart non-expert. Use specific numbers. Explain WHY constraints exist, not just THAT they exist.
 
-**Test:** Could an investor read ONLY this section and understand the problem space well enough to ask good questions?
+**Test:** Could an investor read ONLY this section and evaluate ANY startup in this space more intelligently?
 
 #### 2. TECHNICAL DEEP DIVE (800-1200 words)
 
@@ -2415,18 +2434,66 @@ Synthesize DD3-M into a narrative explaining their specific technology.
 
 **Voice:** Rigorous but accessible. Show your reasoning.
 
-#### 3. SOLUTION LANDSCAPE (600-800 words)
+#### 3. SOLUTION LANDSCAPE (800-1200 words) — EXPANDED
 
-Synthesize AN3-M and DD4-M into a narrative mapping the full solution space.
+This is Sparlo's CORE VALUE. Synthesize AN3-M into an educational map of ALL approaches.
+**This section is REUSABLE** - a VC should understand the full landscape regardless of THIS startup.
 
-**Required content:**
-- What are ALL the approaches to this problem? (from AN3-M)
-- Where does this startup's approach sit in the landscape?
-- What did they choose NOT to pursue? Was that the right call?
-- What cross-domain innovations exist? (from AN3-M frontier_transfer)
-- Who are the competitive threats and why?
+**Required Structure:**
+
+1. **THE LANDSCAPE OVERVIEW** (150-200 words)
+   - How many fundamentally different approaches exist?
+   - What are the major tracks? (simpler_path, best_fit, paradigm_shift, frontier_transfer)
+   - What does first-principles analysis reveal about where value is created?
+
+2. **FULLY DEVELOPED KEY APPROACHES** (400-600 words)
+
+   For the 3-4 most important approaches (INCLUDING cross-domain innovations from AN3-M):
+
+   Each approach gets FULL DEVELOPMENT (not a summary):
+
+   **[Approach Title]** (Track: paradigm_shift / frontier_transfer / etc.)
+
+   **What It Is** (2-3 paragraphs)
+   - Full explanation, not a teaser
+   - Enough detail that a reader could explain it to someone else
+
+   **The Insight**
+   - What: The core mechanism or principle
+   - Where We Found It: Source domain + how they use it
+   - Why Industry Missed It: The gap that prevented connection
+
+   **Why It Works** (physics explanation)
+   - The engineering/physics basis
+   - What makes this approach viable
+
+   **Economics** (brief)
+   - Investment required
+   - Expected outcome
+   - Timeline to validation
+
+   **Who's Pursuing This**
+   - Named companies/labs
+   - Stage of development
+
+   **First Validation Step**
+   - What to test
+   - What success looks like
+
+3. **STARTUP POSITIONING** (150-200 words)
+   - Which approach did they choose?
+   - Is this optimal based on first-principles?
+   - What are they implicitly betting against?
+   - What approaches from AN3-M did they NOT consider?
+
+4. **CROSS-DOMAIN INNOVATIONS** (100-150 words)
+   - What frontier_transfer concepts from AN3-M apply here?
+   - What adjacent industries have solved similar physics?
+   - Why hasn't transfer happened yet?
 
 **Voice:** Strategic. Show the investor the whole landscape, not just this company.
+
+**Test:** Could an investor use this section to evaluate MULTIPLE startups in this space?
 
 #### 4. COMMERCIALIZATION REALITY (600-800 words)
 
@@ -2475,37 +2542,76 @@ Model this on the engineering report: educational prose FIRST, visual elements e
 3. Tables only where comparison genuinely helps (NOT walls of tables)
 4. Callouts for key insights embedded in narrative
 
-**Visual Elements (Populate to support narrative, not replace it):**
+**Structured Data Elements (POPULATE to enable deep education):**
 
-1. **first_principles_insight**: One reframing sentence.
-   → Appears as blockquote WITHIN Problem Primer prose.
+**PROBLEM BREAKDOWN (CRITICAL - deep problem education)**
 
-2. **the_bet_statement**: "If you invest, you are betting that [specific compound bet]"
-   → Appears as highlight box AFTER Problem Primer.
+problem_breakdown: {
+  whats_wrong: "Visceral problem description - what fails, what's frustrating",
+  why_its_hard: {
+    prose: "Physics/engineering constraints explanation",
+    factors: ["Factor 1", "Factor 2", "Factor 3"],
+    governing_equation: {
+      equation: "Optional: η = 1 - (T_cold/T_hot)",
+      explanation: "What this means and why it matters"
+    }
+  },
+  what_industry_does_today: [
+    { approach: "Current approach", limitation: "Why it falls short", who_does_it: ["Company A"] }
+  ],
+  root_cause_hypotheses: [
+    { name: "Hypothesis name", confidence_percent: 75, explanation: "2-3 sentences" }
+  ]
+}
 
-3. **competitor_landscape** (3-5 rows): State-of-art benchmarking.
-   → Appears WITHIN Solution Landscape prose. Only if comparison adds value.
+**FULLY DEVELOPED CONCEPTS (CRITICAL - deep solution education)**
 
-4. **claim_validation_table** (3-5 key claims): Claims with verdicts.
-   → Appears as summary WITHIN Technical Deep Dive. Prose should reference.
+developed_concepts: [
+  {
+    title: "Approach name",
+    track: "paradigm_shift | frontier_transfer | best_fit | simpler_path",
+    innovation_type: "CROSS_DOMAIN | PARADIGM | TECHNOLOGY_REVIVAL | CATALOG",
+    what_it_is: "2-3 paragraphs fully explaining the approach",
+    the_insight: {
+      what: "The core mechanism",
+      where_we_found_it: { domain: "Source domain", how_they_use_it: "...", why_it_transfers: "..." },
+      why_industry_missed_it: "The gap"
+    },
+    why_it_works: "Physics explanation",
+    economics: { investment: "$X", expected_outcome: "Y improvement", timeline: "Z months" },
+    key_risk: "Main risk",
+    first_validation_step: { test: "What to test", cost: "$X", timeline: "X weeks", go_criteria: "Success", no_go_criteria: "Failure" },
+    who_pursuing: ["Company A", "Lab B"],
+    startup_approach: true or false
+  }
+]
 
-5. **solution_concepts** (4-6 approaches): Alternative approaches.
-   → Appears WITHIN Solution Landscape. Mark startup_approach: true.
+**CROSS-DOMAIN INSIGHTS (from AN3-M frontier_transfer)**
 
-6. **economics_bridge**: Unit economics gap.
-   → Appears WITHIN Commercialization Reality. Only if >30% cost reduction claimed.
+cross_domain_insights: [
+  {
+    source_domain: "Domain name",
+    mechanism: "What mechanism transfers",
+    why_it_transfers: "Why it applies here",
+    who_pursuing: ["Companies/labs"],
+    validation_approach: "How to test"
+  }
+]
 
-7. **risks_table**: Enhanced risks with category + severity.
-   → Appears in Key Risks section. Prose in Investment Synthesis should reference.
+**Visual Elements (Support narrative, don't replace it):**
 
-8. **validation_gaps** (2-4 items): Self-critique.
-   → Appears as Self-Critique section after main narrative.
+1. **first_principles_insight**: One reframing sentence → blockquote in Problem Primer
+2. **the_bet_statement**: "If you invest, you are betting that..." → highlight box
+3. **competitor_landscape** (3-5 rows): State-of-art benchmarking
+4. **claim_validation_table** (3-5 key claims): Claims with verdicts
+5. **solution_concepts** (4-6 approaches): Brief summaries (use developed_concepts for depth)
+6. **economics_bridge**: Unit economics gap (only if >30% cost reduction claimed)
+7. **risks_table**: Enhanced risks with category + severity
+8. **validation_gaps** (2-4 items): Self-critique
+9. **if_this_were_my_deal**: 2-3 sentences, first person, opinionated
 
-9. **if_this_were_my_deal**: 2-3 sentences, first person, opinionated.
-   → Final personal voice section before Founder Questions.
-
-**Key Principle**: Write PROSE FIRST that teaches. Visual elements SUPPORT the narrative.
-Do NOT create walls of tables. Educational prose naturally leads into visual summaries.
+**Key Principle**: Write PROSE FIRST that teaches. Structured data enables rendering of educational content.
+The problem_breakdown and developed_concepts fields are PRIMARY - they power the educational value.
 
 ### APPENDIX
 
@@ -2729,7 +2835,79 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
 
     "the_bet_statement": "If you invest, you are betting that [specific compound bet]",
 
-    "if_this_were_my_deal": "Personal recommendation paragraph in first person. Be opinionated, not hedged. Example: 'If this were my deal, I'd...'"
+    "if_this_were_my_deal": "Personal recommendation paragraph in first person. Be opinionated, not hedged. Example: 'If this were my deal, I'd...'",
+
+    "problem_breakdown": {
+      "whats_wrong": "Visceral problem description - what fails, what's frustrating",
+      "why_its_hard": {
+        "prose": "Physics/engineering constraints explanation",
+        "factors": ["Factor 1 making this hard", "Factor 2", "Factor 3"],
+        "governing_equation": {
+          "equation": "η = 1 - (T_cold/T_hot)",
+          "explanation": "What this means and why it matters for the problem"
+        }
+      },
+      "what_industry_does_today": [
+        {
+          "approach": "Current approach name",
+          "limitation": "Why it falls short",
+          "who_does_it": ["Company A", "Company B"]
+        }
+      ],
+      "root_cause_hypotheses": [
+        {
+          "name": "Hypothesis name",
+          "confidence_percent": 75,
+          "explanation": "2-3 sentences explaining this root cause and why it matters"
+        }
+      ]
+    },
+
+    "developed_concepts": [
+      {
+        "title": "Approach name",
+        "track": "paradigm_shift | frontier_transfer | best_fit | simpler_path",
+        "innovation_type": "CROSS_DOMAIN | PARADIGM | TECHNOLOGY_REVIVAL | CATALOG | EMERGING_PRACTICE",
+        "what_it_is": "2-3 paragraphs fully explaining the approach - enough detail to teach someone",
+        "the_insight": {
+          "what": "The core mechanism or principle",
+          "where_we_found_it": {
+            "domain": "Source domain (e.g., 'Chlor-alkali industry')",
+            "how_they_use_it": "How the source domain applies this",
+            "why_it_transfers": "Why it applies to this problem"
+          },
+          "why_industry_missed_it": "The gap that prevented connection"
+        },
+        "why_it_works": "Physics/engineering explanation of why this approach is viable",
+        "economics": {
+          "investment": "$X-Y for validation/pilot",
+          "expected_outcome": "Quantified improvement (e.g., '40% cost reduction')",
+          "timeline": "Months to validation"
+        },
+        "key_risk": "The main thing that could go wrong",
+        "first_validation_step": {
+          "test": "What to test first",
+          "cost": "$X",
+          "timeline": "X weeks",
+          "go_criteria": "What success looks like",
+          "no_go_criteria": "What failure looks like"
+        },
+        "who_pursuing": ["Company A", "Lab B"],
+        "startup_approach": false,
+        "feasibility": 7,
+        "impact": 8
+      }
+    ],
+
+    "cross_domain_insights": [
+      {
+        "source_domain": "Domain name (e.g., 'Semiconductor manufacturing')",
+        "mechanism": "What mechanism or technique transfers",
+        "why_it_transfers": "Why it applies to this problem domain",
+        "who_pursuing": ["Companies or labs exploring this transfer"],
+        "validation_approach": "How to test whether this transfer works"
+      }
+    ]
   },
 
   "appendix": {

@@ -93,19 +93,19 @@ export const EngineeringHero = memo(function EngineeringHero() {
 
         {/* Subtitle */}
         <p className="font-heading mt-6 max-w-[45ch] text-[18px] leading-[1.2] font-light tracking-[-0.02em] text-white/70 md:text-[22px]">
-          Sparlo solves deep tech problems with rigorous first principles thinking.
+          Solve deep tech problems with rigorous first principles thinking.
         </p>
 
         {/* CTA */}
         <Link
-          href="/app"
+          href="/auth/sign-up"
           className="font-heading mt-10 inline-flex min-h-[44px] items-center rounded-md bg-white px-8 py-3.5 text-base leading-[1.2] font-medium tracking-[-0.02em] text-zinc-900 shadow-lg transition-all hover:bg-zinc-100 hover:shadow-xl"
         >
           Run Analysis
         </Link>
 
-        {/* Value Prop - More prominent */}
-        <p className="mt-4 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-medium tracking-[-0.02em] text-white/80 backdrop-blur-sm">
+        {/* Value Prop - Simple text, not a button */}
+        <p className="mt-4 text-sm tracking-[-0.02em] text-white/60">
           First Report Free
         </p>
       </div>

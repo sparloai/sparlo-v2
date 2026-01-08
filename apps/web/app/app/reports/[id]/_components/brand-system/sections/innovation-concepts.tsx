@@ -295,7 +295,10 @@ interface InnovationConceptsSectionProps {
 }
 
 export const InnovationConceptsSection = memo(
-  function InnovationConceptsSection({ data, variant = 'full' }: InnovationConceptsSectionProps) {
+  function InnovationConceptsSection({
+    data,
+    variant = 'full',
+  }: InnovationConceptsSectionProps) {
     if (!data) return null;
 
     const hasContent =
@@ -312,7 +315,7 @@ export const InnovationConceptsSection = memo(
           {/* Recommended innovation title */}
           {recommended?.title && (
             <div className="border-l-2 border-zinc-900 pl-4">
-              <p className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">
+              <p className="text-[13px] font-semibold tracking-wider text-zinc-500 uppercase">
                 Recommended Innovation
               </p>
               <p className="mt-1 text-[16px] font-medium text-zinc-900">
@@ -333,7 +336,9 @@ export const InnovationConceptsSection = memo(
           <div className="flex flex-wrap gap-3 text-[14px]">
             {parallelCount > 0 && (
               <span>
-                <span className="font-medium text-zinc-700">{parallelCount}</span>{' '}
+                <span className="font-medium text-zinc-700">
+                  {parallelCount}
+                </span>{' '}
                 <span className="text-zinc-500">parallel investigations</span>
               </span>
             )}

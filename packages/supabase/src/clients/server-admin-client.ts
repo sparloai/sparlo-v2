@@ -24,14 +24,18 @@ export function getSupabaseServerAdminClient<GenericSchema = Database>() {
     console.error(
       '[Supabase Admin] Missing NEXT_PUBLIC_SUPABASE_URL environment variable',
     );
-    throw new Error('Supabase admin client configuration is incomplete: missing URL');
+    throw new Error(
+      'Supabase admin client configuration is incomplete: missing URL',
+    );
   }
 
   if (!secretKey) {
     console.error(
       '[Supabase Admin] Missing SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY environment variable',
     );
-    throw new Error('Supabase admin client configuration is incomplete: missing secret key');
+    throw new Error(
+      'Supabase admin client configuration is incomplete: missing secret key',
+    );
   }
 
   const client = createClient<GenericSchema>(url, secretKey, {
@@ -44,7 +48,9 @@ export function getSupabaseServerAdminClient<GenericSchema = Database>() {
 
   // Validate client was properly initialized
   if (!client || typeof client.from !== 'function') {
-    console.error('[Supabase Admin] Client initialization failed - invalid client object');
+    console.error(
+      '[Supabase Admin] Client initialization failed - invalid client object',
+    );
     throw new Error('Supabase admin client initialization failed');
   }
 

@@ -48,7 +48,8 @@ export const ChallengeFrameSection = memo(function ChallengeFrameSection({
             </p>
             {firstItem.challenge && (
               <p className="mt-2 text-[14px] text-zinc-600">
-                <span className="font-medium">Challenge:</span> {firstItem.challenge}
+                <span className="font-medium">Challenge:</span>{' '}
+                {firstItem.challenge}
               </p>
             )}
           </div>
@@ -57,7 +58,8 @@ export const ChallengeFrameSection = memo(function ChallengeFrameSection({
         {/* Count if more items */}
         {data.length > 1 && (
           <p className="text-[14px] text-zinc-500">
-            <span className="font-medium text-zinc-700">{data.length}</span> assumptions challenged
+            <span className="font-medium text-zinc-700">{data.length}</span>{' '}
+            assumptions challenged
           </p>
         )}
       </div>

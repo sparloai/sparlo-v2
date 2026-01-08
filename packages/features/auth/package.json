@@ -32,6 +32,7 @@
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-query": "catalog:",
     "@types/react": "catalog:",
+    "framer-motion": "^12.23.26",
     "lucide-react": "^0.556.0",
     "next": "catalog:",
     "react-hook-form": "^7.68.0",

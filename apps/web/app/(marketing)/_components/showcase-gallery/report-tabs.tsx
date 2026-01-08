@@ -30,7 +30,10 @@ export const ReportTabs = memo(function ReportTabs({
   onSelect,
 }: ReportTabsProps) {
   return (
-    <Tabs value={activeId} onValueChange={(v: string) => onSelect(v as ReportId)}>
+    <Tabs
+      value={activeId}
+      onValueChange={(v: string) => onSelect(v as ReportId)}
+    >
       <TabsList
         className="sticky top-16 z-40 border-b border-zinc-200 bg-white/95 backdrop-blur-sm"
         aria-label="Select a report"
@@ -61,7 +64,11 @@ export const ReportTabs = memo(function ReportTabs({
                     <motion.div
                       layoutId="activeReportIndicator"
                       className="absolute inset-0 -z-10 rounded-lg bg-zinc-100"
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 500,
+                        damping: 30,
+                      }}
                     />
                   )}
                 </TabsTrigger>

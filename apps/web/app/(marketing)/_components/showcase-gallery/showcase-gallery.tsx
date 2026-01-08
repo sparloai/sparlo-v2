@@ -200,7 +200,7 @@ const SectionCard = memo(function SectionCard({
 
       <AccordionContent className="border-t border-zinc-100 bg-zinc-50/50 px-6 pt-0 pb-6">
         {/* Strip section chrome - hide ALL h1 titles, remove section margins, compact article spacing */}
-        <div className="showcase-section-content [&_section]:!mt-0 [&_section]:!pt-0 [&_h1]:!hidden [&_article]:!mt-4 [&_.mt-12]:!mt-6 [&_.mt-24]:!mt-0">
+        <div className="showcase-section-content [&_.mt-12]:!mt-6 [&_.mt-24]:!mt-0 [&_article]:!mt-4 [&_h1]:!hidden [&_section]:!mt-0 [&_section]:!pt-0">
           <SectionPreviewContent sectionId={section.id} data={data} />
         </div>
       </AccordionContent>
@@ -222,7 +222,7 @@ const FullReportModal = memo(function FullReportModal({
 }) {
   return (
     <Dialog open={isOpen} onOpenChange={(open: boolean) => !open && onClose()}>
-      <DialogContent className="!fixed !top-4 !right-4 !bottom-4 !left-4 !translate-x-0 !translate-y-0 h-auto max-h-[calc(100vh-2rem)] !max-w-none w-auto overflow-y-auto rounded-xl bg-white p-0 shadow-2xl md:!inset-8 lg:!inset-12">
+      <DialogContent className="!fixed !top-4 !right-4 !bottom-4 !left-4 h-auto max-h-[calc(100vh-2rem)] w-auto !max-w-none !translate-x-0 !translate-y-0 overflow-y-auto rounded-xl bg-white p-0 shadow-2xl md:!inset-8 lg:!inset-12">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-zinc-200 bg-white px-6 py-4">
           <DialogTitle className="text-lg font-semibold text-zinc-900">
             {data.title}
@@ -411,33 +411,6 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
           </div>
         </div>
 
-        {/* Exit Ramp CTA */}
-        <div className="mt-16 rounded-r-lg border border-l-2 border-zinc-200 border-l-zinc-900 bg-zinc-50 p-8">
-          <div className="font-mono text-[11px] tracking-wide text-zinc-400">
-            RUN YOUR OWN ANALYSIS
-          </div>
-          <h4 className="mt-2 text-[20px] font-semibold tracking-[-0.02em] text-zinc-900">
-            Get reports like this for your technical challenges
-          </h4>
-          <p className="mt-3 max-w-lg text-[15px] leading-relaxed text-zinc-600">
-            Sparlo searches 47+ technical domains, analyzes patents and papers,
-            and delivers first-principles recommendations in ~25 minutes.
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <a
-              href="/auth/sign-up"
-              className="inline-flex min-h-[44px] items-center rounded-md bg-zinc-900 px-6 py-3 text-base font-medium text-white transition-colors hover:bg-zinc-800"
-            >
-              Start Free Analysis
-            </a>
-            <a
-              href="#methodology"
-              className="inline-flex min-h-[44px] items-center rounded-md border border-zinc-300 bg-white px-6 py-3 text-base font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
-            >
-              View Methodology
-            </a>
-          </div>
-        </div>
       </div>
 
       {/* Full Report Modal */}

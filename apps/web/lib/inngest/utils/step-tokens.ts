@@ -39,12 +39,16 @@ export async function persistStepTokens(
       stepName,
       error: readError.message,
     });
-    throw new Error(`Failed to read report for token tracking: ${readError.message}`);
+    throw new Error(
+      `Failed to read report for token tracking: ${readError.message}`,
+    );
   }
 
   // Merge new step tokens with existing
   // Type assertion needed until types are regenerated after migration
-  const currentTokens = ((report as { step_tokens?: Record<string, number> } | null)?.step_tokens) ?? {};
+  const currentTokens =
+    (report as { step_tokens?: Record<string, number> } | null)?.step_tokens ??
+    {};
   const updatedTokens = {
     ...currentTokens,
     [stepName]: usage.totalTokens,
@@ -100,8 +104,13 @@ export async function sumStepTokens(reportId: string): Promise<number> {
   }
 
   // Type assertion needed until types are regenerated after migration
-  const stepTokens = ((report as { step_tokens?: Record<string, number> } | null)?.step_tokens) ?? {};
-  const total = Object.values(stepTokens).reduce((sum, tokens) => sum + (tokens || 0), 0);
+  const stepTokens =
+    (report as { step_tokens?: Record<string, number> } | null)?.step_tokens ??
+    {};
+  const total = Object.values(stepTokens).reduce(
+    (sum, tokens) => sum + (tokens || 0),
+    0,
+  );
 
   console.log('[StepTokens] Summed tokens:', {
     reportId,

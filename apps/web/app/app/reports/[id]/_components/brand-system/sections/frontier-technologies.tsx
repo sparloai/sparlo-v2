@@ -67,7 +67,8 @@ export const FrontierTechnologiesSection = memo(
           {/* Count if more */}
           {data.length > 1 && (
             <p className="text-[14px] text-zinc-500">
-              <span className="font-medium text-zinc-700">{data.length}</span> technologies to monitor
+              <span className="font-medium text-zinc-700">{data.length}</span>{' '}
+              technologies to monitor
             </p>
           )}
         </div>

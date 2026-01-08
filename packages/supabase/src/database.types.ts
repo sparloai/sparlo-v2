@@ -797,6 +797,7 @@ export type Database = {
           phase_progress: number | null;
           report_data: Json | null;
           status: string;
+          step_tokens: Json | null;
           title: string;
           token_usage: Json | null;
           updated_at: string;
@@ -820,6 +821,7 @@ export type Database = {
           phase_progress?: number | null;
           report_data?: Json | null;
           status?: string;
+          step_tokens?: Json | null;
           title: string;
           token_usage?: Json | null;
           updated_at?: string;
@@ -843,6 +845,7 @@ export type Database = {
           phase_progress?: number | null;
           report_data?: Json | null;
           status?: string;
+          step_tokens?: Json | null;
           title?: string;
           token_usage?: Json | null;
           updated_at?: string;

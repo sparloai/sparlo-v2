@@ -126,7 +126,14 @@ export function ReportDisplay({
   if (isProcessing) {
     const displayProgress = progress ?? {
       id: report.id,
-      status: report.status as 'clarifying' | 'processing' | 'complete' | 'error' | 'failed' | 'cancelled' | 'confirm_rerun',
+      status: report.status as
+        | 'clarifying'
+        | 'processing'
+        | 'complete'
+        | 'error'
+        | 'failed'
+        | 'cancelled'
+        | 'confirm_rerun',
       currentStep: report.current_step,
       phaseProgress: report.phase_progress ?? 0,
       title: report.title,
@@ -140,7 +147,12 @@ export function ReportDisplay({
       errorMessage: report.last_message,
       createdAt: report.created_at,
     };
-    return <ProcessingScreen progress={displayProgress} onComplete={handleComplete} />;
+    return (
+      <ProcessingScreen
+        progress={displayProgress}
+        onComplete={handleComplete}
+      />
+    );
   }
 
   // Check if we have valid report content

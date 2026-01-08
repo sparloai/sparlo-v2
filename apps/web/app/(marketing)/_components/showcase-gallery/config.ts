@@ -103,7 +103,9 @@ export interface SectionConfig {
   /** Function to extract headline text from report data */
   getHeadline: (data: HybridReportData) => string;
   /** Function to extract key metrics for preview display */
-  getMetrics: (data: HybridReportData) => Array<{ value: string; label: string }>;
+  getMetrics: (
+    data: HybridReportData,
+  ) => Array<{ value: string; label: string }>;
   /** Function to check if section has data to display */
   hasData: (data: HybridReportData) => boolean;
 }
@@ -130,7 +132,9 @@ export const SECTION_CONFIG: SectionConfig[] = [
       if (typeof data.executive_summary !== 'string') {
         if (data.executive_summary?.viability) {
           metrics.push({
-            value: data.executive_summary.viability_label || data.executive_summary.viability,
+            value:
+              data.executive_summary.viability_label ||
+              data.executive_summary.viability,
             label: '',
           });
         }
@@ -147,7 +151,8 @@ export const SECTION_CONFIG: SectionConfig[] = [
       'Understanding the core challenges',
     getMetrics: (data) => {
       const metrics: Array<{ value: string; label: string }> = [];
-      const benchmarks = data.problem_analysis?.current_state_of_art?.benchmarks;
+      const benchmarks =
+        data.problem_analysis?.current_state_of_art?.benchmarks;
       if (benchmarks?.length) {
         metrics.push({ value: String(benchmarks.length), label: 'benchmarks' });
       }
@@ -159,8 +164,10 @@ export const SECTION_CONFIG: SectionConfig[] = [
     id: 'constraints',
     title: 'Constraints',
     getHeadline: (data) => {
-      const hardCount = data.constraints_and_metrics?.hard_constraints?.length || 0;
-      const softCount = data.constraints_and_metrics?.soft_constraints?.length || 0;
+      const hardCount =
+        data.constraints_and_metrics?.hard_constraints?.length || 0;
+      const softCount =
+        data.constraints_and_metrics?.soft_constraints?.length || 0;
       const total = hardCount + softCount;
       return total > 0
         ? `${total} constraints defined across hard and soft requirements`
@@ -170,13 +177,22 @@ export const SECTION_CONFIG: SectionConfig[] = [
       const metrics: Array<{ value: string; label: string }> = [];
       const cm = data.constraints_and_metrics;
       if (cm?.hard_constraints?.length) {
-        metrics.push({ value: String(cm.hard_constraints.length), label: 'hard' });
+        metrics.push({
+          value: String(cm.hard_constraints.length),
+          label: 'hard',
+        });
       }
       if (cm?.soft_constraints?.length) {
-        metrics.push({ value: String(cm.soft_constraints.length), label: 'soft' });
+        metrics.push({
+          value: String(cm.soft_constraints.length),
+          label: 'soft',
+        });
       }
       if (cm?.success_metrics?.length) {
-        metrics.push({ value: String(cm.success_metrics.length), label: 'metrics' });
+        metrics.push({
+          value: String(cm.success_metrics.length),
+          label: 'metrics',
+        });
       }
       return metrics;
     },
@@ -212,7 +228,10 @@ export const SECTION_CONFIG: SectionConfig[] = [
       const metrics: Array<{ value: string; label: string }> = [];
       const primary = data.execution_track?.primary;
       if (primary?.confidence_detail?.level) {
-        metrics.push({ value: primary.confidence_detail.level, label: 'confidence' });
+        metrics.push({
+          value: primary.confidence_detail.level,
+          label: 'confidence',
+        });
       } else if (primary?.confidence !== undefined) {
         metrics.push({ value: `${primary.confidence}%`, label: 'confidence' });
       }
@@ -231,13 +250,18 @@ export const SECTION_CONFIG: SectionConfig[] = [
     title: 'Innovation Concepts',
     getHeadline: (data) =>
       data.innovation_portfolio?.recommended_innovation?.title ||
-      data.innovation_portfolio?.recommended_innovation?.what_it_is?.slice(0, 150) + '...' ||
+      data.innovation_portfolio?.recommended_innovation?.what_it_is?.slice(
+        0,
+        150,
+      ) + '...' ||
       'Higher-risk explorations with breakthrough potential',
     getMetrics: (data) => {
       const metrics: Array<{ value: string; label: string }> = [];
       if (data.innovation_portfolio?.parallel_investigations?.length) {
         metrics.push({
-          value: String(data.innovation_portfolio.parallel_investigations.length),
+          value: String(
+            data.innovation_portfolio.parallel_investigations.length,
+          ),
           label: 'parallel investigations',
         });
       }
@@ -266,7 +290,7 @@ export const SECTION_CONFIG: SectionConfig[] = [
     hasData: (data) =>
       Boolean(
         data.innovation_portfolio?.frontier_watch &&
-          data.innovation_portfolio.frontier_watch.length > 0,
+        data.innovation_portfolio.frontier_watch.length > 0,
       ),
   },
   {
@@ -311,7 +335,10 @@ export const SECTION_CONFIG: SectionConfig[] = [
         });
       }
       if (sc?.validation_gaps?.length) {
-        metrics.push({ value: String(sc.validation_gaps.length), label: 'validation gaps' });
+        metrics.push({
+          value: String(sc.validation_gaps.length),
+          label: 'validation gaps',
+        });
       }
       return metrics;
     },
@@ -321,11 +348,18 @@ export const SECTION_CONFIG: SectionConfig[] = [
     id: 'recommendation',
     title: 'Final Recommendation',
     getHeadline: (data) =>
-      data.strategic_integration?.personal_recommendation?.key_insight?.slice(0, 150) + '...' ||
-      data.strategic_integration?.personal_recommendation?.intro?.slice(0, 150) + '...' ||
+      data.strategic_integration?.personal_recommendation?.key_insight?.slice(
+        0,
+        150,
+      ) + '...' ||
+      data.strategic_integration?.personal_recommendation?.intro?.slice(
+        0,
+        150,
+      ) + '...' ||
       'Personal recommendation from the analysis',
     getMetrics: () => [],
-    hasData: (data) => Boolean(data.strategic_integration?.personal_recommendation),
+    hasData: (data) =>
+      Boolean(data.strategic_integration?.personal_recommendation),
   },
 ];
 

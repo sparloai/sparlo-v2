@@ -15,7 +15,10 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-12">
           {/* Brand Column */}
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="inline-block transition-opacity hover:opacity-70">
+            <Link
+              href="/"
+              className="inline-block transition-opacity hover:opacity-70"
+            >
               <Image
                 src="/images/sparlo-logo-white.png"
                 alt="Sparlo"
@@ -25,7 +28,8 @@ export function Footer() {
               />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-zinc-500">
-              Engineering AI that solves deep tech problems with rigorous first principles thinking.
+              Engineering AI that solves deep tech problems with rigorous first
+              principles thinking.
             </p>
           </div>
 

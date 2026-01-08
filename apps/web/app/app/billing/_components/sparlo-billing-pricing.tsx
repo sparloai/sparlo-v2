@@ -153,7 +153,7 @@ export function SparloBillingPricing({
       <main className="min-h-screen bg-white">
         <div className="mx-auto max-w-5xl px-8 pt-24 pb-16">
           <div className="text-center">
-            <h1 className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900 mb-4">
+            <h1 className="font-heading mb-4 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
               Choose your plan
             </h1>
             <p className="text-[18px] text-zinc-500">
@@ -170,20 +170,20 @@ export function SparloBillingPricing({
       <div className="mx-auto max-w-6xl px-8 pt-16 pb-24">
         {/* Page Header */}
         <div className="mb-12 text-center">
-          <h1 className="text-[42px] font-normal tracking-[-0.02em] text-zinc-900 mb-4">
+          <h1 className="mb-4 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
             Choose your plan
           </h1>
-          <p className="text-[18px] text-zinc-500 max-w-xl mx-auto">
+          <p className="mx-auto max-w-xl text-[18px] text-zinc-500">
             Start analyzing problems today. Upgrade or downgrade anytime.
           </p>
         </div>
 
         {/* Billing Toggle */}
-        <div className="flex items-center justify-center gap-3 mb-12">
+        <div className="mb-12 flex items-center justify-center gap-3">
           <button
             onClick={() => setBillingPeriod('monthly')}
             className={cn(
-              'px-4 py-2 text-[15px] font-medium rounded-md transition-colors',
+              'rounded-md px-4 py-2 text-[15px] font-medium transition-colors',
               billingPeriod === 'monthly'
                 ? 'bg-zinc-900 text-white'
                 : 'text-zinc-500 hover:text-zinc-900',
@@ -194,7 +194,7 @@ export function SparloBillingPricing({
           <button
             onClick={() => setBillingPeriod('annual')}
             className={cn(
-              'px-4 py-2 text-[15px] font-medium rounded-md transition-colors flex items-center gap-2',
+              'flex items-center gap-2 rounded-md px-4 py-2 text-[15px] font-medium transition-colors',
               billingPeriod === 'annual'
                 ? 'bg-zinc-900 text-white'
                 : 'text-zinc-500 hover:text-zinc-900',
@@ -203,7 +203,7 @@ export function SparloBillingPricing({
             Yearly
             <span
               className={cn(
-                'text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded',
+                'rounded px-2 py-0.5 text-[11px] font-semibold tracking-wide uppercase',
                 billingPeriod === 'annual'
                   ? 'bg-white/20 text-white'
                   : 'bg-zinc-100 text-zinc-600',
@@ -217,7 +217,7 @@ export function SparloBillingPricing({
         {/* Error message */}
         {checkout.error && (
           <div
-            className="mb-8 max-w-xl mx-auto border-l-2 border-zinc-400 bg-zinc-50 py-4 pr-4 pl-6"
+            className="mx-auto mb-8 max-w-xl border-l-2 border-zinc-400 bg-zinc-50 py-4 pr-4 pl-6"
             role="alert"
           >
             <p className="text-[14px] tracking-[-0.02em] text-zinc-600">
@@ -227,7 +227,7 @@ export function SparloBillingPricing({
         )}
 
         {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {visibleProducts.map((product) => {
             // Get monthly and annual plans
             const monthlyPlan = product.plans.find(
@@ -251,7 +251,9 @@ export function SparloBillingPricing({
             const isHighlighted = product.highlighted === true;
 
             // Extract metrics from features
-            const { problemsPerMonth, seats } = extractMetrics(product.features);
+            const { problemsPerMonth, seats } = extractMetrics(
+              product.features,
+            );
 
             return (
               <div
@@ -259,16 +261,16 @@ export function SparloBillingPricing({
                 className={cn(
                   'relative flex flex-col rounded-xl border bg-white p-6 transition-all',
                   isHighlighted
-                    ? 'border-l-4 border-zinc-900 border-t border-r border-b border-t-zinc-200 border-r-zinc-200 border-b-zinc-200 shadow-lg ring-1 ring-zinc-900/5'
+                    ? 'border-t border-r border-b border-l-4 border-zinc-900 border-t-zinc-200 border-r-zinc-200 border-b-zinc-200 shadow-lg ring-1 ring-zinc-900/5'
                     : 'border-zinc-200 hover:border-zinc-300 hover:shadow-sm',
                 )}
               >
                 {/* Plan Header */}
                 <div className="mb-5">
-                  <h3 className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500 mb-2">
+                  <h3 className="mb-2 text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
                     {product.name}
                   </h3>
-                  <p className="text-[14px] text-zinc-500 leading-relaxed">
+                  <p className="text-[14px] leading-relaxed text-zinc-500">
                     {product.description}
                   </p>
                 </div>
@@ -282,14 +284,14 @@ export function SparloBillingPricing({
                     <span className="text-[14px] text-zinc-500">/mo</span>
                   </div>
                   {billingPeriod === 'annual' && (
-                    <p className="text-[12px] text-zinc-400 mt-1">
+                    <p className="mt-1 text-[12px] text-zinc-400">
                       Billed ${price.toLocaleString()}/year
                     </p>
                   )}
                 </div>
 
                 {/* Key Metrics */}
-                <div className="flex gap-4 mb-5 pb-5 border-b border-zinc-100">
+                <div className="mb-5 flex gap-4 border-b border-zinc-100 pb-5">
                   {problemsPerMonth && (
                     <div>
                       <span className="text-[22px] font-semibold text-zinc-900">
@@ -309,14 +311,16 @@ export function SparloBillingPricing({
                 </div>
 
                 {/* Features */}
-                <ul className="space-y-2.5 mb-6 flex-grow">
+                <ul className="mb-6 flex-grow space-y-2.5">
                   {product.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5">
                       <Check
-                        className="h-4 w-4 text-zinc-400 mt-0.5 flex-shrink-0"
+                        className="mt-0.5 h-4 w-4 flex-shrink-0 text-zinc-400"
                         aria-hidden="true"
                       />
-                      <span className="text-[14px] text-zinc-600">{feature}</span>
+                      <span className="text-[14px] text-zinc-600">
+                        {feature}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -326,7 +330,7 @@ export function SparloBillingPricing({
                   onClick={() => handleSelectPlan(activePlan.id, product.id)}
                   disabled={pending || isCurrent || isPending}
                   className={cn(
-                    'w-full py-3 px-4 text-[14px] font-medium rounded-lg transition-colors mt-auto',
+                    'mt-auto w-full rounded-lg px-4 py-3 text-[14px] font-medium transition-colors',
                     isCurrent
                       ? 'cursor-not-allowed bg-zinc-100 text-zinc-400'
                       : isHighlighted
@@ -352,7 +356,7 @@ export function SparloBillingPricing({
             Need more?{' '}
             <Link
               href="/contact"
-              className="text-zinc-900 font-medium hover:underline"
+              className="font-medium text-zinc-900 hover:underline"
             >
               Contact us for enterprise pricing
             </Link>

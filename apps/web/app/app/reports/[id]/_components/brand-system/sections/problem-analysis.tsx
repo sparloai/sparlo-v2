@@ -65,7 +65,7 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
         {/* Key factors preview */}
         {data.why_its_hard?.factors && data.why_its_hard.factors.length > 0 && (
           <div className="border-l-2 border-zinc-900 pl-4">
-            <p className="text-[13px] font-semibold uppercase tracking-wider text-zinc-500">
+            <p className="text-[13px] font-semibold tracking-wider text-zinc-500 uppercase">
               Key Difficulty
             </p>
             <p className="mt-1 text-[15px] font-medium text-zinc-900">
@@ -84,7 +84,9 @@ export const ProblemAnalysisSection = memo(function ProblemAnalysisSection({
           )}
           {benchmarkCount > 0 && (
             <span>
-              <span className="font-medium text-zinc-700">{benchmarkCount}</span>{' '}
+              <span className="font-medium text-zinc-700">
+                {benchmarkCount}
+              </span>{' '}
               <span className="text-zinc-500">industry benchmarks</span>
             </span>
           )}

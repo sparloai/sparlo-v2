@@ -369,12 +369,15 @@ export const generateDDReport = inngest.createFunction(
           // Get fresh client inside step.run to avoid stale references
           const rateLimitSupabase = getSupabaseServerAdminClient();
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data, error } = await (rateLimitSupabase as any).rpc('check_rate_limit', {
-            p_account_id: accountId,
-            p_resource_type: 'dd_report',
-            p_limit: RATE_LIMIT_REPORTS_PER_HOUR,
-            p_window_minutes: RATE_LIMIT_WINDOW_MINUTES,
-          });
+          const { data, error } = await (rateLimitSupabase as any).rpc(
+            'check_rate_limit',
+            {
+              p_account_id: accountId,
+              p_resource_type: 'dd_report',
+              p_limit: RATE_LIMIT_REPORTS_PER_HOUR,
+              p_window_minutes: RATE_LIMIT_WINDOW_MINUTES,
+            },
+          );
 
           if (error) {
             console.warn('[DD Function] Rate limit check failed:', error);
@@ -859,7 +862,8 @@ Based on this clarification, please proceed with full problem analysis. Set need
             inputTokens:
               an0mResult.usage.inputTokens + clarifiedResult.usage.inputTokens,
             outputTokens:
-              an0mResult.usage.outputTokens + clarifiedResult.usage.outputTokens,
+              an0mResult.usage.outputTokens +
+              clarifiedResult.usage.outputTokens,
             totalTokens:
               an0mResult.usage.totalTokens + clarifiedResult.usage.totalTokens,
           };
@@ -1512,15 +1516,18 @@ Make the report 3-5x more valuable than traditional DD.`;
           // FIX: Call rpc as method (not extracted) to preserve 'this' context
           const completionSupabase = getSupabaseServerAdminClient();
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const { data, error } = await (completionSupabase as any).rpc('complete_dd_report_atomic', {
-            p_report_id: reportId,
-            p_report_data: reportData,
-            p_title: generatedTitle,
-            p_headline: headline,
-            p_account_id: accountId,
-            p_total_tokens: totalUsage.totalTokens,
-            p_idempotency_key: idempotencyKey,
-          });
+          const { data, error } = await (completionSupabase as any).rpc(
+            'complete_dd_report_atomic',
+            {
+              p_report_id: reportId,
+              p_report_data: reportData,
+              p_title: generatedTitle,
+              p_headline: headline,
+              p_account_id: accountId,
+              p_total_tokens: totalUsage.totalTokens,
+              p_idempotency_key: idempotencyKey,
+            },
+          );
 
           if (error) {
             // Fallback to non-atomic update if function doesn't exist

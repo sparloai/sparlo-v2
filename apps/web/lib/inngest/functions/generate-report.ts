@@ -45,7 +45,10 @@ import {
   createInitialChainState,
 } from '../../llm/schemas/chain-state';
 import { inngest } from '../client';
-import { persistStepTokens, billCompletedStepsOnFailure } from '../utils/step-tokens';
+import {
+  billCompletedStepsOnFailure,
+  persistStepTokens,
+} from '../utils/step-tokens';
 
 /**
  * Generate Report - Inngest Durable Function (v10)
@@ -725,11 +728,17 @@ export const generateReport = inngest.createFunction(
             .single();
 
           // Type assertion needed until types are regenerated after migration
-          const stepTokens = ((report as { step_tokens?: Record<string, number> } | null)?.step_tokens) ?? {};
-          const persistedTotal = Object.values(stepTokens).reduce((sum, t) => sum + (t || 0), 0);
+          const stepTokens =
+            (report as { step_tokens?: Record<string, number> } | null)
+              ?.step_tokens ?? {};
+          const persistedTotal = Object.values(stepTokens).reduce(
+            (sum, t) => sum + (t || 0),
+            0,
+          );
 
           // Use persisted tokens if available, otherwise fall back to in-memory
-          const tokensToCharge = persistedTotal > 0 ? persistedTotal : totalUsage.totalTokens;
+          const tokensToCharge =
+            persistedTotal > 0 ? persistedTotal : totalUsage.totalTokens;
 
           try {
             const { error: usageError } = await freshSupabase.rpc(

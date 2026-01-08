@@ -346,14 +346,14 @@ export function ProcessingScreen({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.3 }}
           >
-            <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500">
+            <span className="text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
               Clarification Required
             </span>
           </motion.div>
 
           {/* Page Title - matches New Analysis style */}
           <motion.h1
-            className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900 mb-8"
+            className="font-heading mb-8 text-[42px] font-normal tracking-[-0.02em] text-zinc-900"
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.4 }}
@@ -366,7 +366,7 @@ export function ProcessingScreen({
             {/* Context - body text style, not all caps */}
             {pendingClarification.context && (
               <motion.p
-                className="text-[18px] leading-[1.5] tracking-[-0.02em] text-zinc-600 mb-10"
+                className="mb-10 text-[18px] leading-[1.5] tracking-[-0.02em] text-zinc-600"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2, duration: 0.3 }}
@@ -424,7 +424,7 @@ export function ProcessingScreen({
                       {/* Arrow indicator */}
                       <ArrowRight
                         className={cn(
-                          'h-5 w-5 mt-1.5 text-zinc-300 shrink-0',
+                          'mt-1.5 h-5 w-5 shrink-0 text-zinc-300',
                           'transition-all duration-200',
                           'group-hover:translate-x-1 group-hover:text-zinc-500',
                         )}
@@ -444,13 +444,13 @@ export function ProcessingScreen({
                 transition={{ delay: 0.4, duration: 0.3 }}
               >
                 {/* Label */}
-                <span className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500 mb-4 block">
+                <span className="mb-4 block text-[13px] font-semibold tracking-[0.06em] text-zinc-500 uppercase">
                   {pendingClarification.freetext_prompt ||
                     'Or describe your situation'}
                 </span>
 
                 {/* Textarea - card style */}
-                <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+                <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
                   <Textarea
                     value={clarificationAnswer}
                     onChange={(e) => setClarificationAnswer(e.target.value)}
@@ -472,7 +472,7 @@ export function ProcessingScreen({
                   />
 
                   {/* Submit button - always visible */}
-                  <div className="border-t border-zinc-100 bg-zinc-50/50 px-6 py-4 flex justify-between items-center">
+                  <div className="flex items-center justify-between border-t border-zinc-100 bg-zinc-50/50 px-6 py-4">
                     <span className="text-[13px] text-zinc-400">
                       {clarificationAnswer.trim() ? '⌘ + Enter to submit' : ''}
                     </span>

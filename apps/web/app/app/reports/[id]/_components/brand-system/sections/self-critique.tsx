@@ -63,7 +63,9 @@ export const SelfCritiqueSection = memo(function SelfCritiqueSection({
         {confidenceLevel && (
           <div className="inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1">
             <span className="text-sm font-medium text-zinc-700">
-              {confidenceLevel.charAt(0).toUpperCase() + confidenceLevel.slice(1).toLowerCase()} Confidence
+              {confidenceLevel.charAt(0).toUpperCase() +
+                confidenceLevel.slice(1).toLowerCase()}{' '}
+              Confidence
             </span>
           </div>
         )}

@@ -67,7 +67,9 @@ export function getSupabaseServerClient<GenericSchema = Database>() {
 
   // Validate client was properly initialized
   if (!client || typeof client.from !== 'function') {
-    console.error('[Supabase] Client initialization failed - invalid client object');
+    console.error(
+      '[Supabase] Client initialization failed - invalid client object',
+    );
     throw new Error('Supabase client initialization failed');
   }
 

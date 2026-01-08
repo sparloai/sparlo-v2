@@ -56,7 +56,8 @@ export const RisksWatchoutsSection = memo(function RisksWatchoutsSection({
             </p>
             {firstRisk.mitigation && (
               <p className="mt-1 text-[14px] text-zinc-600">
-                <span className="font-medium">Mitigation:</span> {firstRisk.mitigation.slice(0, 100)}
+                <span className="font-medium">Mitigation:</span>{' '}
+                {firstRisk.mitigation.slice(0, 100)}
                 {firstRisk.mitigation.length > 100 ? '...' : ''}
               </p>
             )}

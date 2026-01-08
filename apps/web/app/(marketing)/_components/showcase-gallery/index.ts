@@ -8,5 +8,14 @@ export { ReportTabs } from './report-tabs';
 export { SectionCard } from './section-card';
 export { useShowcaseState } from './use-showcase-state';
 export { REPORTS_CONFIG, SECTION_CONFIG, getAvailableSections } from './config';
-export type { ReportId, SectionId, CardState, ShowcaseState, SectionMetric } from './types';
-export type { ReportConfig, SectionConfig as SectionConfigType } from './config';
+export type {
+  ReportId,
+  SectionId,
+  CardState,
+  ShowcaseState,
+  SectionMetric,
+} from './types';
+export type {
+  ReportConfig,
+  SectionConfig as SectionConfigType,
+} from './config';

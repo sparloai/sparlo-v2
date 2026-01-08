@@ -2053,7 +2053,9 @@ export const DD4_M_OutputSchema = z.unknown().transform(
 
     // Check if new format (has prose_output and detailed_analysis)
     if (processed.prose_output && processed.detailed_analysis) {
-      const proseResult = DD4_M_ProseOutputSchema.safeParse(processed.prose_output);
+      const proseResult = DD4_M_ProseOutputSchema.safeParse(
+        processed.prose_output,
+      );
       const structuredResult = DD4_M_StructuredDataSchema.safeParse(
         processed.detailed_analysis,
       );
@@ -2819,6 +2821,158 @@ export const DiligenceActionSchema = z.object({
   timeline: z.string().optional(),
 });
 
+// ============================================
+// NEW: Problem Breakdown Schemas (Deep Problem Analysis)
+// Following hybrid report pattern for structured problem education
+// ============================================
+
+// Root cause hypothesis with confidence
+export const RootCauseHypothesisSchema = z
+  .object({
+    name: z.string().catch(''),
+    confidence_percent: flexibleNumber(50, { min: 0, max: 100 }),
+    explanation: z.string().catch(''),
+  })
+  .catch({ name: '', confidence_percent: 50, explanation: '' });
+
+// Governing equation for physics-based constraints
+export const GoverningEquationSchema = z
+  .object({
+    equation: z.string().optional(),
+    explanation: z.string().catch(''),
+    why_it_matters: z.string().optional(),
+  })
+  .catch({ explanation: '' });
+
+// Why it's hard - physics/engineering constraints
+export const WhyItsHardSchema = z
+  .object({
+    prose: z.string().catch(''),
+    factors: z.array(z.string()).optional().default([]),
+    governing_equation: GoverningEquationSchema.optional(),
+  })
+  .catch({ prose: '', factors: [] });
+
+// Current industry approach with limitations
+export const IndustryApproachSchema = z
+  .object({
+    approach: z.string().catch(''),
+    limitation: z.string().catch(''),
+    who_does_it: z.array(z.string()).optional().default([]),
+  })
+  .catch({ approach: '', limitation: '', who_does_it: [] });
+
+// Full problem breakdown container
+export const ProblemBreakdownSchema = z
+  .object({
+    whats_wrong: z.string().optional(),
+    why_its_hard: WhyItsHardSchema.optional(),
+    what_industry_does_today: z
+      .array(IndustryApproachSchema)
+      .optional()
+      .default([]),
+    root_cause_hypotheses: z
+      .array(RootCauseHypothesisSchema)
+      .optional()
+      .default([]),
+  })
+  .optional()
+  .catch(undefined);
+
+// ============================================
+// NEW: Fully Developed Concept Schemas
+// Deep concept analysis matching hybrid report depth
+// ============================================
+
+// The insight - where it came from and why it transfers
+export const ConceptInsightSchema = z
+  .object({
+    what: z.string().catch(''),
+    where_we_found_it: z
+      .object({
+        domain: z.string().catch(''),
+        how_they_use_it: z.string().optional(),
+        why_it_transfers: z.string().optional(),
+      })
+      .optional()
+      .catch(undefined),
+    why_industry_missed_it: z.string().optional(),
+  })
+  .catch({ what: '' });
+
+// Economics brief for concept
+export const ConceptEconomicsSchema = z
+  .object({
+    investment: z.string().optional(),
+    expected_outcome: z.string().optional(),
+    timeline: z.string().optional(),
+  })
+  .catch({});
+
+// First validation step
+export const ConceptValidationStepSchema = z
+  .object({
+    test: z.string().catch(''),
+    cost: z.string().optional(),
+    timeline: z.string().optional(),
+    go_criteria: z.string().optional(),
+    no_go_criteria: z.string().optional(),
+  })
+  .catch({ test: '' });
+
+// Innovation type enum
+export const InnovationType = flexibleEnum(
+  [
+    'CATALOG',
+    'EMERGING_PRACTICE',
+    'CROSS_DOMAIN',
+    'PARADIGM',
+    'TECHNOLOGY_REVIVAL',
+  ],
+  'CATALOG',
+);
+
+// Fully developed concept (matching hybrid depth)
+export const FullyDevelopedConceptSchema = z
+  .object({
+    id: z.string().optional(),
+    title: z.string().catch(''),
+    track: Track,
+    innovation_type: InnovationType.optional(),
+
+    // Full development (hybrid pattern)
+    what_it_is: z.string().catch(''),
+    the_insight: ConceptInsightSchema.optional(),
+    why_it_works: z.string().optional(),
+    economics: ConceptEconomicsSchema.optional(),
+    key_risk: z.string().optional(),
+    first_validation_step: ConceptValidationStepSchema.optional(),
+
+    // DD-specific
+    who_pursuing: z.array(z.string()).optional().default([]),
+    startup_approach: z.boolean().optional().default(false),
+    feasibility: flexibleNumber(5, { min: 1, max: 10 }).optional(),
+    impact: flexibleNumber(5, { min: 1, max: 10 }).optional(),
+  })
+  .catch({
+    title: '',
+    track: 'best_fit',
+    what_it_is: '',
+    who_pursuing: [],
+    startup_approach: false,
+  });
+
+// Cross-domain insight
+export const CrossDomainInsightSchema = z
+  .object({
+    source_domain: z.string().catch(''),
+    mechanism: z.string().catch(''),
+    why_it_transfers: z.string().optional(),
+    who_pursuing: z.array(z.string()).optional().default([]),
+    validation_approach: z.string().optional(),
+  })
+  .catch({ source_domain: '', mechanism: '', who_pursuing: [] });
+
 // New format prose report schema for DD5-M
 // ANTIFRAGILE: All fields have sensible defaults
 const DD5_M_ProseReportSchema = z.object({
@@ -2962,7 +3116,10 @@ const DD5_M_QuickReferenceSchema = z.object({
 
   // NEW: Tables for visual hierarchy (all optional with defaults)
   competitor_landscape: z.array(CompetitorRowSchema).optional().default([]),
-  claim_validation_table: z.array(ClaimValidationRowSchema).optional().default([]),
+  claim_validation_table: z
+    .array(ClaimValidationRowSchema)
+    .optional()
+    .default([]),
   solution_concepts: z.array(SolutionConceptRowSchema).optional().default([]),
   economics_bridge: EconomicsBridgeSchema.optional(),
   risks_table: z.array(RiskTableRowSchema).optional().default([]),
@@ -2975,6 +3132,21 @@ const DD5_M_QuickReferenceSchema = z.object({
 
   // NEW: Personal recommendation (first person)
   if_this_were_my_deal: z.string().optional(),
+
+  // NEW: Problem breakdown (structured from AN0-M) - deep problem education
+  problem_breakdown: ProblemBreakdownSchema,
+
+  // NEW: Fully developed concepts (not summaries) - deep solution education
+  developed_concepts: z
+    .array(FullyDevelopedConceptSchema)
+    .optional()
+    .default([]),
+
+  // NEW: Cross-domain insights (explicit cross-domain innovations)
+  cross_domain_insights: z
+    .array(CrossDomainInsightSchema)
+    .optional()
+    .default([]),
 });
 
 // New format appendix schema for DD5-M (flexible - many fields optional)

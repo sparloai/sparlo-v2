@@ -100,6 +100,10 @@ content_path = "./supabase/templates/change-email-address.html"
 subject = "Sign in to Makerkit"
 content_path = "./supabase/templates/magic-link.html"
 
+[auth.email.template.otp]
+subject = "Your Sparlo verification code"
+content_path = "./supabase/templates/otp.html"
+
 [analytics]
 enabled = true
 port = 54327

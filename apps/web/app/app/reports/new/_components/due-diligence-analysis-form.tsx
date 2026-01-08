@@ -150,7 +150,13 @@ export function DueDiligenceAnalysisForm() {
     clearError: clearAttachmentError,
   } = useFileAttachments({ allowedTypes: ALLOWED_TYPES });
 
-  const { step: _step, materials, reportId: _reportId, isSubmitting, error } = formState;
+  const {
+    step: _step,
+    materials,
+    reportId: _reportId,
+    isSubmitting,
+    error,
+  } = formState;
 
   // Debounce pattern matching using deferred value
   const deferredMaterials = useDeferredValue(materials);
