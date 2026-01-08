@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 
 /**
  * Check if we're on the app subdomain.
@@ -15,6 +15,20 @@ function checkIsAppSubdomain(): boolean {
     process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'sparlo.ai';
 
   return hostname === `${appSubdomain}.${productionDomain}`;
+}
+
+// Store subscription for useSyncExternalStore (no-op since hostname doesn't change)
+function subscribe(_callback: () => void) {
+  return () => {};
+}
+
+// Snapshot functions for useSyncExternalStore
+function getSnapshot() {
+  return checkIsAppSubdomain();
+}
+
+function getServerSnapshot() {
+  return false;
 }
 
 /**
@@ -51,13 +65,12 @@ export function getAppPath(path: string): string {
  * the app subdomain.
  */
 export function useAppPath() {
-  // Start with false to match server render (hydration-safe)
-  const [onAppSubdomain, setOnAppSubdomain] = useState(false);
-
-  // Check subdomain after hydration
-  useEffect(() => {
-    setOnAppSubdomain(checkIsAppSubdomain());
-  }, []);
+  // Use useSyncExternalStore for hydration-safe external state
+  const onAppSubdomain = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   return useMemo(
     () => ({
