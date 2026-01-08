@@ -5,13 +5,11 @@ import { AppLink } from '~/components/app-link';
 interface TokenGateScreenProps {
   variant: 'subscription_required' | 'limit_exceeded';
   periodEnd?: string | null;
-  percentage?: number;
 }
 
 export function TokenGateScreen({
   variant,
   periodEnd,
-  percentage = 100,
 }: TokenGateScreenProps) {
   const isLimitExceeded = variant === 'limit_exceeded';
 
