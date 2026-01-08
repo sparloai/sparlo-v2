@@ -471,43 +471,33 @@ export function ProcessingScreen({
                     }}
                   />
 
-                  {/* Submit button - inside card footer */}
-                  <AnimatePresence>
-                    {clarificationAnswer.trim() && (
-                      <motion.div
-                        className="border-t border-zinc-100 bg-zinc-50/50 px-6 py-4 flex justify-between items-center"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <span className="text-[13px] text-zinc-400">
-                          ⌘ + Enter to submit
-                        </span>
-                        <button
-                          onClick={handleSubmitClarification}
-                          disabled={isSubmitting}
-                          data-test="clarification-submit"
-                          className={cn(
-                            'flex items-center gap-2 rounded-lg px-6 py-3',
-                            'bg-zinc-900 text-[15px] font-medium text-white',
-                            'transition-all duration-150',
-                            'hover:bg-zinc-800',
-                            'disabled:cursor-not-allowed disabled:opacity-50',
-                          )}
-                        >
-                          {isSubmitting ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <>
-                              Submit
-                              <ArrowRight className="h-4 w-4" />
-                            </>
-                          )}
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* Submit button - always visible */}
+                  <div className="border-t border-zinc-100 bg-zinc-50/50 px-6 py-4 flex justify-between items-center">
+                    <span className="text-[13px] text-zinc-400">
+                      {clarificationAnswer.trim() ? '⌘ + Enter to submit' : ''}
+                    </span>
+                    <button
+                      onClick={handleSubmitClarification}
+                      disabled={isSubmitting || !clarificationAnswer.trim()}
+                      data-test="clarification-submit"
+                      className={cn(
+                        'flex items-center gap-2 rounded-lg px-6 py-3',
+                        'bg-zinc-900 text-[15px] font-medium text-white',
+                        'transition-all duration-150',
+                        'hover:bg-zinc-800',
+                        'disabled:cursor-not-allowed disabled:opacity-50',
+                      )}
+                    >
+                      {isSubmitting ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <>
+                          Submit
+                          <ArrowRight className="h-4 w-4" />
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             )}
