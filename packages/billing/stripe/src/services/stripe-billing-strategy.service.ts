@@ -161,7 +161,9 @@ export class StripeBillingStrategyService implements BillingStrategyProviderServ
         checkoutToken: session.client_secret,
         isSessionOpen,
         status: session.status ?? 'complete',
+        subscriptionId: typeof session.subscription === 'string' ? session.subscription : session.subscription?.id ?? null,
         customer: {
+          id: typeof session.customer === 'string' ? session.customer : session.customer?.id ?? null,
           email: session.customer_details?.email ?? null,
         },
       };

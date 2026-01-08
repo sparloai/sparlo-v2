@@ -24,11 +24,16 @@ async function ReturnCheckoutSessionPage({ searchParams }: SessionPageProps) {
     redirect('/app/billing');
   }
 
-  const { status, customerEmail } = await loadCheckoutSession(sessionId);
+  const { status, customerEmail, subscriptionSynced } = await loadCheckoutSession(sessionId);
 
   // If session is still open/incomplete, redirect back to billing
   if (status === 'open') {
     redirect('/app/billing');
+  }
+
+  // Log if subscription wasn't synced (webhook may have already handled it)
+  if (!subscriptionSynced) {
+    console.log('[Billing] Subscription already existed or webhook handled it');
   }
 
   return (
@@ -81,7 +86,7 @@ async function ReturnCheckoutSessionPage({ searchParams }: SessionPageProps) {
 export default withI18n(ReturnCheckoutSessionPage);
 
 async function loadCheckoutSession(sessionId: string) {
-  await requireUserInServerComponent();
+  const user = await requireUserInServerComponent();
 
   const client = getSupabaseServerClient();
   const gateway = await getBillingGatewayProvider(client);
@@ -94,8 +99,49 @@ async function loadCheckoutSession(sessionId: string) {
     notFound();
   }
 
+  // If session is complete and has a subscription, ensure it's synced to database
+  // This handles race condition where webhook hasn't fired yet
+  let subscriptionSynced = false;
+  if (session.status === 'complete' && session.subscriptionId) {
+    try {
+      // Check if subscription already exists
+      const { data: existingSub } = await client
+        .from('subscriptions')
+        .select('id')
+        .eq('id', session.subscriptionId)
+        .maybeSingle();
+
+      if (!existingSub) {
+        // Subscription doesn't exist yet - retrieve from Stripe and sync
+        const subscriptionData = await gateway.getSubscription(session.subscriptionId);
+
+        if (subscriptionData) {
+          // The gateway returns UpsertSubscriptionParams format, but we need to ensure
+          // the account_id is set correctly (it may be undefined from Stripe metadata)
+          const { error } = await client.rpc('upsert_subscription', {
+            ...subscriptionData,
+            target_account_id: user.id, // Override with current user's ID
+            // Use session customer ID if available, otherwise keep the one from subscription data
+            target_customer_id: session.customer.id ?? subscriptionData.target_customer_id,
+          });
+
+          if (error) {
+            console.error('[Billing] Failed to sync subscription on return:', error);
+          } else {
+            subscriptionSynced = true;
+            console.log('[Billing] Subscription synced on return page:', subscriptionData.target_subscription_id);
+          }
+        }
+      }
+    } catch (error) {
+      // Don't fail the page if sync fails - webhook will handle it
+      console.error('[Billing] Error syncing subscription on return:', error);
+    }
+  }
+
   return {
     status: session.status,
     customerEmail: session.customer.email,
+    subscriptionSynced,
   };
 }

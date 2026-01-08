@@ -24,8 +24,10 @@ export abstract class BillingStrategyProviderService {
     checkoutToken: string | null;
     status: 'complete' | 'expired' | 'open';
     isSessionOpen: boolean;
+    subscriptionId?: string | null;
 
     customer: {
+      id?: string | null;
       email: string | null;
     };
   }>;

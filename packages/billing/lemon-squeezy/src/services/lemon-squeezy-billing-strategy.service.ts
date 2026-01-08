@@ -196,7 +196,9 @@ export class LemonSqueezyBillingStrategyService implements BillingStrategyProvid
       checkoutToken: id,
       isSessionOpen: false,
       status: 'complete' as const,
+      subscriptionId: null,
       customer: {
+        id: null,
         email: attributes.checkout_data.email,
       },
     };
