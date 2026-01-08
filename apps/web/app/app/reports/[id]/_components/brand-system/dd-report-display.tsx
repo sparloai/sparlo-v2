@@ -1217,93 +1217,96 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           </Section>
         )}
 
-        {/* NEW: First Principles Insight (blockquote) */}
-        {quickRef?.first_principles_insight && (
-          <InsightBlockquote insight={quickRef.first_principles_insight} />
+        {/* PROSE SECTIONS - Moved up for narrative flow (hybrid pattern) */}
+
+        {/* Problem Primer with First Principles Insight embedded */}
+        {prose?.problem_primer?.content && (
+          <Section id="problem-primer">
+            <SectionTitle>Problem Primer</SectionTitle>
+            <ArticleBlock className="mt-8">
+              <BodyText parseCited>{prose.problem_primer.content}</BodyText>
+            </ArticleBlock>
+            {/* First Principles Insight - embedded in Problem Primer */}
+            {quickRef?.first_principles_insight && (
+              <InsightBlockquote insight={quickRef.first_principles_insight} />
+            )}
+          </Section>
         )}
 
-        {/* NEW: The Bet Statement (dark highlight) */}
+        {/* The Bet Statement - after problem framing */}
         {quickRef?.the_bet_statement && (
           <TheBetHighlight bet={quickRef.the_bet_statement} />
         )}
 
-        {/* NEW: Competitor Landscape Table */}
-        {quickRef?.competitor_landscape && quickRef.competitor_landscape.length > 0 && (
-          <Section id="competitor-landscape">
-            <SectionTitle size="lg">Competitor Landscape</SectionTitle>
-            <div className="mt-8">
-              <CompetitorLandscapeTable competitors={quickRef.competitor_landscape} />
-            </div>
+        {/* Technical Deep Dive with claim validation context */}
+        {prose?.technical_deep_dive?.content && (
+          <Section id="technical-deep-dive">
+            <SectionTitle>Technical Deep Dive</SectionTitle>
+            <ArticleBlock className="mt-8">
+              <BodyText parseCited>{prose.technical_deep_dive.content}</BodyText>
+            </ArticleBlock>
+            {/* Claim validation summary - inline after technical prose */}
+            {quickRef?.claim_validation_table && quickRef.claim_validation_table.length > 0 && (
+              <div className="mt-8">
+                <MonoLabel variant="strong" className="mb-4 block">Claim Validation Summary</MonoLabel>
+                <ClaimValidationList claims={quickRef.claim_validation_table} />
+              </div>
+            )}
           </Section>
         )}
 
-        {/* NEW: Claim Validation Table */}
-        {quickRef?.claim_validation_table && quickRef.claim_validation_table.length > 0 && (
-          <Section id="claim-validation">
-            <SectionTitle size="lg">Claim Validation</SectionTitle>
-            <div className="mt-8">
-              <ClaimValidationList claims={quickRef.claim_validation_table} />
-            </div>
+        {/* Solution Landscape with competitor context */}
+        {prose?.solution_landscape?.content && (
+          <Section id="solution-landscape">
+            <SectionTitle>Solution Landscape</SectionTitle>
+            <ArticleBlock className="mt-8">
+              <BodyText parseCited>{prose.solution_landscape.content}</BodyText>
+            </ArticleBlock>
+            {/* Competitor table - inline within solution landscape */}
+            {quickRef?.competitor_landscape && quickRef.competitor_landscape.length > 0 && (
+              <div className="mt-8">
+                <MonoLabel variant="strong" className="mb-4 block">State of the Art</MonoLabel>
+                <CompetitorLandscapeTable competitors={quickRef.competitor_landscape} />
+              </div>
+            )}
+            {/* Solution concepts - inline within solution landscape */}
+            {quickRef?.solution_concepts && quickRef.solution_concepts.length > 0 && (
+              <div className="mt-8">
+                <MonoLabel variant="strong" className="mb-4 block">Alternative Approaches</MonoLabel>
+                <SolutionConceptsList concepts={quickRef.solution_concepts} />
+              </div>
+            )}
           </Section>
         )}
 
-        {/* NEW: Solution Concepts */}
-        {quickRef?.solution_concepts && quickRef.solution_concepts.length > 0 && (
-          <Section id="solution-concepts">
-            <SectionTitle size="lg">Solution Landscape</SectionTitle>
-            <div className="mt-8">
-              <SolutionConceptsList concepts={quickRef.solution_concepts} />
-            </div>
+        {/* Commercialization Reality with economics context */}
+        {prose?.commercialization_reality?.content && (
+          <Section id="commercialization">
+            <SectionTitle>Commercialization Reality</SectionTitle>
+            <ArticleBlock className="mt-8">
+              <BodyText parseCited>{prose.commercialization_reality.content}</BodyText>
+            </ArticleBlock>
+            {/* Economics bridge - inline within commercialization */}
+            {quickRef?.economics_bridge && quickRef.economics_bridge.rows?.length > 0 && (
+              <div className="mt-8">
+                <MonoLabel variant="strong" className="mb-4 block">Unit Economics Bridge</MonoLabel>
+                <EconomicsBridgeTable bridge={quickRef.economics_bridge} />
+              </div>
+            )}
           </Section>
         )}
 
-        {/* NEW: Economics Bridge Table */}
-        {quickRef?.economics_bridge && quickRef.economics_bridge.rows?.length > 0 && (
-          <Section id="economics-bridge">
-            <SectionTitle size="lg">Unit Economics Bridge</SectionTitle>
-            <div className="mt-8">
-              <EconomicsBridgeTable bridge={quickRef.economics_bridge} />
-            </div>
+        {/* Investment Synthesis */}
+        {prose?.investment_synthesis?.content && (
+          <Section id="investment-synthesis">
+            <SectionTitle>Investment Synthesis</SectionTitle>
+            <ArticleBlock className="mt-8">
+              <BodyText parseCited>{prose.investment_synthesis.content}</BodyText>
+            </ArticleBlock>
           </Section>
         )}
 
-        {/* NEW: Risks Table (enhanced, use if available) */}
-        {quickRef?.risks_table && quickRef.risks_table.length > 0 && (
-          <Section id="risks-table">
-            <SectionTitle size="lg">Key Risks</SectionTitle>
-            <div className="mt-8">
-              <RisksTableDisplay risks={quickRef.risks_table} />
-            </div>
-          </Section>
-        )}
-
-        {/* Key Risks (legacy - only if new risks_table not present) */}
-        {quickRef?.key_risks && quickRef.key_risks.length > 0 && !quickRef?.risks_table?.length && (
-          <Section id="key-risks">
-            <SectionTitle size="lg">Key Risks</SectionTitle>
-            <div className="mt-8 space-y-4">
-              {quickRef.key_risks.map((risk, idx) => (
-                <div key={idx} className="border-l-2 border-zinc-200 pl-6">
-                  <div className="mb-2 flex items-center gap-3">
-                    <RiskSeverityIndicator
-                      severity={risk.severity || 'MEDIUM'}
-                    />
-                  </div>
-                  <BodyText variant="primary" className="font-medium">
-                    {risk.risk}
-                  </BodyText>
-                  {risk.mitigation && (
-                    <BodyText variant="muted" size="sm" className="mt-2">
-                      Mitigation: {risk.mitigation}
-                    </BodyText>
-                  )}
-                </div>
-              ))}
-            </div>
-          </Section>
-        )}
-
-        {/* Scenarios */}
+        {/* Scenarios - after investment synthesis */}
         {quickRef?.scenarios && (
           <Section id="scenarios">
             <SectionTitle size="lg">Investment Scenarios</SectionTitle>
@@ -1333,7 +1336,6 @@ export const DDReportDisplay = memo(function DDReportDisplay({
                 />
               )}
             </div>
-
             {quickRef.scenarios.expected_value && (
               <HighlightBox variant="strong" className="mt-8">
                 <MonoLabel className="text-zinc-400">Expected Value</MonoLabel>
@@ -1350,87 +1352,37 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           </Section>
         )}
 
-        {/* Prose Report Sections */}
-        {prose?.problem_primer?.content && (
-          <Section id="problem-primer">
-            <SectionTitle>Problem Primer</SectionTitle>
-            <ArticleBlock className="mt-8">
-              <BodyText parseCited>{prose.problem_primer.content}</BodyText>
-            </ArticleBlock>
+        {/* Key Risks - use enhanced table if available, otherwise legacy */}
+        {(quickRef?.risks_table?.length || quickRef?.key_risks?.length) && (
+          <Section id="key-risks">
+            <SectionTitle size="lg">Key Risks</SectionTitle>
+            <div className="mt-8">
+              {quickRef?.risks_table && quickRef.risks_table.length > 0 ? (
+                <RisksTableDisplay risks={quickRef.risks_table} />
+              ) : quickRef?.key_risks && quickRef.key_risks.length > 0 ? (
+                <div className="space-y-4">
+                  {quickRef.key_risks.map((risk, idx) => (
+                    <div key={idx} className="border-l-2 border-zinc-200 pl-6">
+                      <div className="mb-2 flex items-center gap-3">
+                        <RiskSeverityIndicator severity={risk.severity || 'MEDIUM'} />
+                      </div>
+                      <BodyText variant="primary" className="font-medium">{risk.risk}</BodyText>
+                      {risk.mitigation && (
+                        <BodyText variant="muted" size="sm" className="mt-2">
+                          Mitigation: {risk.mitigation}
+                        </BodyText>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </Section>
         )}
 
-        {prose?.technical_deep_dive?.content && (
-          <Section id="technical-deep-dive">
-            <SectionTitle>Technical Deep Dive</SectionTitle>
-            <ArticleBlock className="mt-8">
-              <BodyText parseCited>
-                {prose.technical_deep_dive.content}
-              </BodyText>
-            </ArticleBlock>
-          </Section>
-        )}
-
-        {prose?.solution_landscape?.content && (
-          <Section id="solution-landscape">
-            <SectionTitle>Solution Landscape</SectionTitle>
-            <ArticleBlock className="mt-8">
-              <BodyText parseCited>{prose.solution_landscape.content}</BodyText>
-            </ArticleBlock>
-          </Section>
-        )}
-
-        {prose?.commercialization_reality?.content && (
-          <Section id="commercialization">
-            <SectionTitle>Commercialization Reality</SectionTitle>
-            <ArticleBlock className="mt-8">
-              <BodyText parseCited>
-                {prose.commercialization_reality.content}
-              </BodyText>
-            </ArticleBlock>
-          </Section>
-        )}
-
-        {prose?.investment_synthesis?.content && (
-          <Section id="investment-synthesis">
-            <SectionTitle>Investment Synthesis</SectionTitle>
-            <ArticleBlock className="mt-8">
-              <BodyText parseCited>
-                {prose.investment_synthesis.content}
-              </BodyText>
-            </ArticleBlock>
-          </Section>
-        )}
-
-        {/* Founder Questions */}
-        {quickRef?.founder_questions &&
-          quickRef.founder_questions.length > 0 && (
-            <Section id="founder-questions">
-              <SectionTitle>Founder Questions</SectionTitle>
-              <div className="mt-8 space-y-6">
-                {quickRef.founder_questions.map((q, idx) => (
-                  <FounderQuestionCard key={idx} question={q} />
-                ))}
-              </div>
-            </Section>
-          )}
-
-        {/* Diligence Roadmap */}
-        {quickRef?.diligence_roadmap &&
-          quickRef.diligence_roadmap.length > 0 && (
-            <Section id="diligence-roadmap">
-              <SectionTitle>Diligence Roadmap</SectionTitle>
-              <div className="mt-8 space-y-4">
-                {quickRef.diligence_roadmap.map((item, idx) => (
-                  <DiligenceRoadmapCard key={idx} item={item} index={idx} />
-                ))}
-              </div>
-            </Section>
-          )}
-
-        {/* NEW: Validation Gaps (Self-Critique) */}
+        {/* Self-Critique with validation gaps */}
         {quickRef?.validation_gaps && quickRef.validation_gaps.length > 0 && (
-          <Section id="validation-gaps">
+          <Section id="self-critique">
             <SectionTitle size="lg">Self-Critique</SectionTitle>
             <div className="mt-8">
               <ValidationGapsList gaps={quickRef.validation_gaps} />
@@ -1438,19 +1390,39 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           </Section>
         )}
 
-        {/* NEW: Diligence Actions (enhanced roadmap) */}
-        {quickRef?.diligence_actions && quickRef.diligence_actions.length > 0 && (
-          <Section id="diligence-actions">
-            <SectionTitle size="lg">Diligence Actions</SectionTitle>
-            <div className="mt-8">
-              <DiligenceActionsList actions={quickRef.diligence_actions} />
+        {/* If This Were My Deal - personal voice final section */}
+        {quickRef?.if_this_were_my_deal && (
+          <IfThisWereMyDealSection content={quickRef.if_this_were_my_deal} />
+        )}
+
+        {/* Founder Questions */}
+        {quickRef?.founder_questions && quickRef.founder_questions.length > 0 && (
+          <Section id="founder-questions">
+            <SectionTitle>Founder Questions</SectionTitle>
+            <div className="mt-8 space-y-6">
+              {quickRef.founder_questions.map((q, idx) => (
+                <FounderQuestionCard key={idx} question={q} />
+              ))}
             </div>
           </Section>
         )}
 
-        {/* NEW: If This Were My Deal (personal voice) */}
-        {quickRef?.if_this_were_my_deal && (
-          <IfThisWereMyDealSection content={quickRef.if_this_were_my_deal} />
+        {/* Diligence Roadmap - use enhanced if available */}
+        {(quickRef?.diligence_actions?.length || quickRef?.diligence_roadmap?.length) && (
+          <Section id="diligence-roadmap">
+            <SectionTitle>Diligence Roadmap</SectionTitle>
+            <div className="mt-8">
+              {quickRef?.diligence_actions && quickRef.diligence_actions.length > 0 ? (
+                <DiligenceActionsList actions={quickRef.diligence_actions} />
+              ) : quickRef?.diligence_roadmap && quickRef.diligence_roadmap.length > 0 ? (
+                <div className="space-y-4">
+                  {quickRef.diligence_roadmap.map((item, idx) => (
+                    <DiligenceRoadmapCard key={idx} item={item} index={idx} />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </Section>
         )}
 
         {/* Appendix */}

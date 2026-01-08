@@ -2465,40 +2465,47 @@ Keep all current structured data but move it to quick_reference:
 - founder_questions (top 5 only, rest in appendix)
 - diligence_roadmap (key actions only, rest in appendix)
 
-**NEW - Visual Hierarchy Tables (MUST POPULATE):**
+**HYBRID NARRATIVE PATTERN - Prose-Forward with Strategic Visual Interruptions:**
 
-These create scannable visual interruptions in the prose. Populate ALL of these:
+Model this on the engineering report: educational prose FIRST, visual elements embedded within.
 
-1. **competitor_landscape** (3-6 rows): Table of competitors and prior art
-   - Entity name, their approach, performance if known, key limitation
+**Narrative Flow (CRITICAL):**
+1. Prose sections TEACH the reader - this is the primary content
+2. Visual elements appear WITHIN their related prose sections, not as separate dumps
+3. Tables only where comparison genuinely helps (NOT walls of tables)
+4. Callouts for key insights embedded in narrative
 
-2. **claim_validation_table** (3-5 rows): Key claims with inline verdicts
-   - The claim, verdict (VALIDATED/PLAUSIBLE/QUESTIONABLE/IMPLAUSIBLE), confidence %, reasoning
+**Visual Elements (Populate to support narrative, not replace it):**
 
-3. **solution_concepts** (4-8 rows): Map the solution landscape
-   - Mark which one is startup_approach: true
-   - Include track (simpler_path/best_fit/paradigm_shift/frontier_transfer)
-   - Include feasibility and impact scores (1-10)
+1. **first_principles_insight**: One reframing sentence.
+   → Appears as blockquote WITHIN Problem Primer prose.
 
-4. **economics_bridge**: Unit economics gap analysis (if >30% cost reduction claimed)
-   - current_state, target_state, line-item breakdown with validity assessment
+2. **the_bet_statement**: "If you invest, you are betting that [specific compound bet]"
+   → Appears as highlight box AFTER Problem Primer.
 
-5. **risks_table** (3-5 rows): Enhanced risk analysis
-   - Include category (TECHNICAL/COMMERCIAL/REGULATORY/MARKET/EXECUTION) + severity
+3. **competitor_landscape** (3-5 rows): State-of-art benchmarking.
+   → Appears WITHIN Solution Landscape prose. Only if comparison adds value.
 
-6. **validation_gaps** (2-4 rows): Self-critique - what we couldn't fully validate
-   - Status: ADDRESSED/NEEDS_VALIDATION/ACCEPTED_RISK
+4. **claim_validation_table** (3-5 key claims): Claims with verdicts.
+   → Appears as summary WITHIN Technical Deep Dive. Prose should reference.
 
-7. **diligence_actions** (3-5 rows): Specific next steps with cost/timeline estimates
+5. **solution_concepts** (4-6 approaches): Alternative approaches.
+   → Appears WITHIN Solution Landscape. Mark startup_approach: true.
 
-**NEW - Key Insight Highlights (MUST POPULATE):**
+6. **economics_bridge**: Unit economics gap.
+   → Appears WITHIN Commercialization Reality. Only if >30% cost reduction claimed.
 
-8. **first_principles_insight**: One reframing sentence that changes how you think about this deal
+7. **risks_table**: Enhanced risks with category + severity.
+   → Appears in Key Risks section. Prose in Investment Synthesis should reference.
 
-9. **the_bet_statement**: "If you invest, you are betting that [specific compound bet]"
+8. **validation_gaps** (2-4 items): Self-critique.
+   → Appears as Self-Critique section after main narrative.
 
-10. **if_this_were_my_deal**: 2-3 sentences in first person. Personal, opinionated, not hedged.
-    Example: "If this were my deal, I'd pass unless they can demonstrate X. The technical risk is manageable, but the commercial path requires Y which I don't see evidence of."
+9. **if_this_were_my_deal**: 2-3 sentences, first person, opinionated.
+   → Final personal voice section before Founder Questions.
+
+**Key Principle**: Write PROSE FIRST that teaches. Visual elements SUPPORT the narrative.
+Do NOT create walls of tables. Educational prose naturally leads into visual summaries.
 
 ### APPENDIX
 
