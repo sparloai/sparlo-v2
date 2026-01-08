@@ -440,7 +440,7 @@ export function NewAnalysisForm({
                 className={cn(
                   'px-8 py-4 text-[15px] font-medium transition-colors',
                   isSubmitting
-                    ? 'cursor-not-allowed bg-zinc-200 text-zinc-400'
+                    ? 'pointer-events-none bg-zinc-200 text-zinc-400'
                     : 'bg-zinc-900 text-white hover:bg-zinc-800',
                 )}
               >
@@ -631,7 +631,9 @@ export function NewAnalysisForm({
                         'px-6 py-3 text-[15px] font-medium transition-colors',
                         canSubmit && !isSubmitting
                           ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                          : 'cursor-not-allowed bg-zinc-100 text-zinc-400',
+                          : !canSubmit
+                            ? 'cursor-not-allowed bg-zinc-100 text-zinc-400'
+                            : 'pointer-events-none bg-zinc-100 text-zinc-400',
                       )}
                     >
                       {isSubmitting ? 'Starting...' : 'Run Analysis'}

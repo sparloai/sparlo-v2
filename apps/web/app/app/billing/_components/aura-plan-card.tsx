@@ -72,7 +72,8 @@ export function AuraPlanCard({
           isCurrent
             ? 'cursor-not-allowed bg-zinc-100 text-zinc-400'
             : 'bg-violet-600 text-white hover:bg-violet-700',
-          (disabled || isLoading) && 'cursor-not-allowed opacity-50',
+          disabled && 'cursor-not-allowed opacity-50',
+          isLoading && 'pointer-events-none opacity-60',
         )}
       >
         {isLoading

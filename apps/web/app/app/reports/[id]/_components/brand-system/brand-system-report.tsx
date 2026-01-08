@@ -616,7 +616,8 @@ function ActionButton({
       disabled={disabled || isLoading}
       className={cn(
         'flex items-center gap-2 rounded border border-zinc-200 px-3 py-2 text-[13px] tracking-[-0.01em] text-zinc-600 transition-colors hover:border-zinc-400 hover:text-zinc-900',
-        (disabled || isLoading) && 'cursor-not-allowed opacity-50',
+        disabled && 'cursor-not-allowed opacity-50',
+        isLoading && 'pointer-events-none opacity-60',
       )}
       aria-label={ariaLabel}
     >
