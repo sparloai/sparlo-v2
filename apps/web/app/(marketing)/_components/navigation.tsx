@@ -265,29 +265,32 @@ const MobileMenu = memo(function MobileMenu({
               </button>
             </>
           ) : (
-            <>
-              <Link
-                href={pathsConfig.auth.signIn}
-                onClick={onClose}
-                className="block min-h-[44px] py-2 text-lg leading-[1.2] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-white"
-              >
-                Sign In
-              </Link>
-              <div className="flex flex-col items-start">
+            <div className="flex flex-col items-center gap-6 pt-4">
+              {/* Primary CTA */}
+              <div className="flex w-full flex-col items-center gap-1">
                 <Link
                   href={pathsConfig.auth.signUp}
                   onClick={onClose}
-                  className="inline-flex min-h-[44px] items-center rounded bg-white px-6 py-3 text-zinc-900 transition-colors hover:bg-zinc-100"
+                  className="inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-md bg-white px-8 py-3 text-zinc-900 transition-colors hover:bg-zinc-100"
                 >
                   <span className="text-base leading-[1.2] font-medium tracking-[-0.02em]">
                     Run Analysis
                   </span>
                 </Link>
-                <span className="mt-1 text-[11px] tracking-wide text-zinc-500">
+                <span className="text-[11px] tracking-wide text-zinc-500">
                   First Report Free
                 </span>
               </div>
-            </>
+
+              {/* Secondary option */}
+              <Link
+                href={pathsConfig.auth.signIn}
+                onClick={onClose}
+                className="text-sm tracking-[-0.02em] text-zinc-500 transition-colors hover:text-white"
+              >
+                Already have an account? Sign in
+              </Link>
+            </div>
           )}
         </div>
       </nav>
