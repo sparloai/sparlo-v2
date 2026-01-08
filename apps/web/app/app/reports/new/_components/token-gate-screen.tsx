@@ -58,7 +58,7 @@ export function TokenGateScreen({
     );
   }
 
-  // Limit exceeded - show usage context
+  // Limit exceeded - show usage context with upgrade CTA
   return (
     <main className="bg-white">
       <div className="mx-auto max-w-3xl px-8 pt-16 pb-16">
@@ -72,31 +72,24 @@ export function TokenGateScreen({
 
         <div className="border-l-2 border-zinc-900 pl-10">
           <h1 className="font-heading mb-4 text-[36px] font-normal tracking-[-0.02em] text-zinc-900">
-            Usage Limit Reached
+            Out of Credits
           </h1>
 
-          <p className="mb-8 max-w-lg text-[17px] leading-[1.6] text-zinc-500">
-            You&apos;ve reached your monthly token allocation. Usage resets
-            automatically at the start of your next billing period.
+          <p className="mb-6 max-w-lg text-[17px] leading-[1.6] text-zinc-500">
+            You&apos;ve used all your credits for this month.
           </p>
 
-          {/* Usage indicator */}
-          <div className="mb-8 max-w-sm">
-            <div className="mb-2 flex items-center justify-between text-[13px]">
-              <span className="text-zinc-500">Monthly allocation</span>
-              <span className="font-medium text-zinc-900">{percentage}%</span>
-            </div>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-100">
-              <div
-                className="h-full rounded-full bg-zinc-900"
-                style={{ width: `${Math.min(percentage, 100)}%` }}
-              />
-            </div>
-            <div className="mt-3 flex items-center gap-1.5 text-[13px] text-zinc-400">
-              <Clock className="h-3.5 w-3.5" />
-              <span>Resets {resetDate}</span>
-            </div>
+          {/* Reset date */}
+          <div className="mb-8 flex items-center gap-2 text-[15px] text-zinc-600">
+            <Clock className="h-4 w-4 text-zinc-400" />
+            <span>
+              Usage resets <span className="font-medium">{resetDate}</span>
+            </span>
           </div>
+
+          <p className="mb-8 max-w-lg text-[17px] leading-[1.6] text-zinc-500">
+            Upgrade your plan to keep analyzing.
+          </p>
 
           <AppLink
             href="/app/billing"

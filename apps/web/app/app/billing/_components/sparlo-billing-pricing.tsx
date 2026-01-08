@@ -1,18 +1,21 @@
 'use client';
 
-import { useCallback, useState, useTransition } from 'react';
+import { useCallback, useRef, useState, useTransition } from 'react';
 
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import Link from 'next/link';
 
-import { Check } from 'lucide-react';
+import { Check, ExternalLink, Loader2 } from 'lucide-react';
 
 import type { BillingConfig } from '@kit/billing';
 import { getPrimaryLineItem } from '@kit/billing';
 import { useAppEvents } from '@kit/shared/events';
 import { cn } from '@kit/ui/utils';
 
-import { createPersonalAccountCheckoutSession } from '../_lib/server/server-actions';
+import {
+  createPersonalAccountBillingPortalSession,
+  createPersonalAccountCheckoutSession,
+} from '../_lib/server/server-actions';
 
 interface SparloBillingPricingProps {
   config: BillingConfig;
@@ -61,8 +64,18 @@ export function SparloBillingPricing({
     'monthly',
   );
   const [pending, startTransition] = useTransition();
+  const [portalPending, startPortalTransition] = useTransition();
   const [checkout, setCheckout] = useState<CheckoutState>(initialCheckoutState);
   const appEvents = useAppEvents();
+  const portalFormRef = useRef<HTMLFormElement>(null);
+
+  const isSubscriber = !!currentPlanId;
+
+  const handleManageBilling = useCallback(() => {
+    startPortalTransition(() => {
+      portalFormRef.current?.requestSubmit();
+    });
+  }, []);
 
   const handleSelectPlan = useCallback(
     (planId: string, productId: string) => {
@@ -116,15 +129,50 @@ export function SparloBillingPricing({
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-6xl px-8 pt-16 pb-24">
+        {/* Hidden form for billing portal */}
+        <form
+          ref={portalFormRef}
+          action={createPersonalAccountBillingPortalSession}
+          className="hidden"
+        />
+
         {/* Page Header */}
         <div className="mb-12 text-center">
           <h1 className="mb-4 text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
-            Choose your plan
+            {isSubscriber ? 'Upgrade your plan' : 'Choose your plan'}
           </h1>
           <p className="mx-auto max-w-xl text-[18px] text-zinc-500">
-            Start analyzing problems today. Upgrade or downgrade anytime.
+            {isSubscriber
+              ? 'Need more credits? Upgrade to a higher tier.'
+              : 'Start analyzing problems today. Upgrade or downgrade anytime.'}
           </p>
         </div>
+
+        {/* Manage Billing for Subscribers */}
+        {isSubscriber && (
+          <div className="mx-auto mb-12 max-w-md rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center">
+            <p className="mb-4 text-[15px] text-zinc-600">
+              Need to update your payment method or view invoices?
+            </p>
+            <button
+              onClick={handleManageBilling}
+              disabled={portalPending}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[14px] font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {portalPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                <>
+                  Manage billing
+                  <ExternalLink className="h-4 w-4" />
+                </>
+              )}
+            </button>
+          </div>
+        )}
 
         {/* Billing Toggle */}
         <div className="mb-12 flex items-center justify-center gap-3">
