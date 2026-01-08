@@ -263,15 +263,6 @@ export function SparloBillingPricing({
                     : 'border-zinc-200 hover:border-zinc-300 hover:shadow-sm',
                 )}
               >
-                {/* Recommended Badge */}
-                {isHighlighted && (
-                  <div className="absolute -top-3 left-6">
-                    <span className="bg-zinc-900 text-white text-[11px] font-semibold tracking-[0.06em] uppercase px-3 py-1 rounded">
-                      Recommended
-                    </span>
-                  </div>
-                )}
-
                 {/* Plan Header */}
                 <div className="mb-5">
                   <h3 className="text-[13px] font-semibold tracking-[0.06em] uppercase text-zinc-500 mb-2">
