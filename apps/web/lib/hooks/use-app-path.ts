@@ -1,11 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 /**
- * Check if we're on the app subdomain (app.sparlo.ai).
+ * Check if we're on the app subdomain.
+ * Only call this on the client side after hydration.
  */
-function isAppSubdomain(): boolean {
+function checkIsAppSubdomain(): boolean {
   if (typeof window === 'undefined') return false;
 
   const hostname = window.location.hostname;
@@ -20,9 +21,16 @@ function isAppSubdomain(): boolean {
  * Convert a path to the appropriate format for the current domain.
  * On app subdomain: strips /home prefix for clean URLs
  * On main domain: keeps /home prefix
+ *
+ * Note: This function is NOT hydration-safe. Use useAppPath hook instead.
  */
 export function getAppPath(path: string): string {
-  if (!isAppSubdomain()) {
+  // Always return original path during SSR to avoid hydration mismatch
+  if (typeof window === 'undefined') {
+    return path;
+  }
+
+  if (!checkIsAppSubdomain()) {
     return path;
   }
 
@@ -37,11 +45,18 @@ export function getAppPath(path: string): string {
 /**
  * Hook to get path converter for current domain.
  * Returns a function that converts paths appropriately.
+ *
+ * IMPORTANT: This hook is hydration-safe. During SSR and initial client render,
+ * it returns the original path. After hydration, it may transform paths for
+ * the app subdomain.
  */
 export function useAppPath() {
-  const onAppSubdomain = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    return isAppSubdomain();
+  // Start with false to match server render (hydration-safe)
+  const [onAppSubdomain, setOnAppSubdomain] = useState(false);
+
+  // Check subdomain after hydration
+  useEffect(() => {
+    setOnAppSubdomain(checkIsAppSubdomain());
   }, []);
 
   return useMemo(

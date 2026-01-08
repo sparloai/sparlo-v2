@@ -4,21 +4,20 @@ import type { ComponentProps } from 'react';
 
 import Link from 'next/link';
 
-import { getAppPath } from '~/lib/hooks/use-app-path';
+import { useAppPath } from '~/lib/hooks/use-app-path';
 
 type AppLinkProps = ComponentProps<typeof Link>;
 
 /**
- * A Link component that automatically converts /home/* paths to clean paths
- * when on the app subdomain (app.sparlo.ai).
+ * A Link component that automatically converts /home/* paths to clean paths.
  *
  * Usage: Replace `<Link href="/app/reports">` with `<AppLink href="/app/reports">`
- * On app.sparlo.ai, this renders as `/reports`
- * On sparlo.ai, this renders as `/app/reports`
  */
 export function AppLink({ href, ...props }: AppLinkProps) {
+  const { getPath } = useAppPath();
+
   const hrefString = typeof href === 'string' ? href : (href.pathname ?? '');
-  const convertedHref = getAppPath(hrefString);
+  const convertedHref = getPath(hrefString);
 
   // If href was an object, preserve the other properties
   const finalHref =
