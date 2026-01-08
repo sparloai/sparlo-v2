@@ -69,44 +69,46 @@ export const NavHeader = memo(function NavHeader({
       {/* Header - positioned after sidebar (desktop) or full-width (mobile) */}
       <header
         className={cn(
-          'fixed top-0 right-0 z-30',
+          'fixed top-0 right-0 z-30 h-14',
           'border-b border-zinc-200 dark:border-zinc-800',
           'bg-white/90 backdrop-blur-sm dark:bg-zinc-950/90',
           'transition-[left] duration-300 ease-out',
         )}
         style={{ left: sidebarWidth }}
       >
-        <nav className="flex h-14 items-center justify-between px-4 sm:px-6">
-          {/* Left: Hamburger menu (mobile) or Logo (desktop) */}
+        <nav className="flex h-full items-center justify-between px-4 sm:px-6">
+          {/* Left: Hamburger menu (mobile only) */}
           <div className="flex items-center gap-3">
             {isMobile && (
-              <button
-                onClick={() => setMobileMenuOpen(true)}
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-                aria-label="Open menu"
-              >
-                <MenuIcon className="h-6 w-6" />
-              </button>
+              <>
+                <button
+                  onClick={() => setMobileMenuOpen(true)}
+                  className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
+                  aria-label="Open menu"
+                >
+                  <MenuIcon className="h-6 w-6" />
+                </button>
+                <AppLink
+                  href="/app"
+                  className="transition-opacity hover:opacity-70"
+                >
+                  <Image
+                    src="/images/sparlo-logo.png"
+                    alt="Sparlo"
+                    width={80}
+                    height={22}
+                    className="h-[22px] w-auto dark:hidden"
+                  />
+                  <Image
+                    src="/images/sparlo-logo-white.png"
+                    alt="Sparlo"
+                    width={80}
+                    height={22}
+                    className="hidden h-[22px] w-auto dark:block"
+                  />
+                </AppLink>
+              </>
             )}
-            <AppLink
-              href="/app"
-              className="transition-opacity hover:opacity-70"
-            >
-              <Image
-                src="/images/sparlo-logo.png"
-                alt="Sparlo"
-                width={80}
-                height={22}
-                className="h-[22px] w-auto dark:hidden"
-              />
-              <Image
-                src="/images/sparlo-logo-white.png"
-                alt="Sparlo"
-                width={80}
-                height={22}
-                className="hidden h-[22px] w-auto dark:block"
-              />
-            </AppLink>
           </div>
 
           {/* Right: Usage indicator */}
