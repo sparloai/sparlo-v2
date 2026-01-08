@@ -2465,6 +2465,41 @@ Keep all current structured data but move it to quick_reference:
 - founder_questions (top 5 only, rest in appendix)
 - diligence_roadmap (key actions only, rest in appendix)
 
+**NEW - Visual Hierarchy Tables (MUST POPULATE):**
+
+These create scannable visual interruptions in the prose. Populate ALL of these:
+
+1. **competitor_landscape** (3-6 rows): Table of competitors and prior art
+   - Entity name, their approach, performance if known, key limitation
+
+2. **claim_validation_table** (3-5 rows): Key claims with inline verdicts
+   - The claim, verdict (VALIDATED/PLAUSIBLE/QUESTIONABLE/IMPLAUSIBLE), confidence %, reasoning
+
+3. **solution_concepts** (4-8 rows): Map the solution landscape
+   - Mark which one is startup_approach: true
+   - Include track (simpler_path/best_fit/paradigm_shift/frontier_transfer)
+   - Include feasibility and impact scores (1-10)
+
+4. **economics_bridge**: Unit economics gap analysis (if >30% cost reduction claimed)
+   - current_state, target_state, line-item breakdown with validity assessment
+
+5. **risks_table** (3-5 rows): Enhanced risk analysis
+   - Include category (TECHNICAL/COMMERCIAL/REGULATORY/MARKET/EXECUTION) + severity
+
+6. **validation_gaps** (2-4 rows): Self-critique - what we couldn't fully validate
+   - Status: ADDRESSED/NEEDS_VALIDATION/ACCEPTED_RISK
+
+7. **diligence_actions** (3-5 rows): Specific next steps with cost/timeline estimates
+
+**NEW - Key Insight Highlights (MUST POPULATE):**
+
+8. **first_principles_insight**: One reframing sentence that changes how you think about this deal
+
+9. **the_bet_statement**: "If you invest, you are betting that [specific compound bet]"
+
+10. **if_this_were_my_deal**: 2-3 sentences in first person. Personal, opinionated, not hedged.
+    Example: "If this were my deal, I'd pass unless they can demonstrate X. The technical risk is manageable, but the commercial path requires Y which I don't see evidence of."
+
 ### APPENDIX
 
 Detailed analysis for readers who want to go deeper:
