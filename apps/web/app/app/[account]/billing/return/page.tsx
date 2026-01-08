@@ -46,7 +46,7 @@ async function ReturnCheckoutSessionPage({
 
         {/* Heading */}
         <h1 className="mb-3 text-[32px] font-normal tracking-[-0.02em] text-zinc-900">
-          You're all set
+          You&apos;re all set
         </h1>
 
         {/* Description */}
