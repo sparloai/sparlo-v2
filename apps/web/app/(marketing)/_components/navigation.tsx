@@ -128,23 +128,23 @@ export const Navigation = memo(function Navigation({
                 >
                   Sign In
                 </Link>
-                <div className="flex flex-col items-center">
+                <div className="flex flex-col items-center gap-0.5">
                   <Link
                     href={pathsConfig.auth.signUp}
                     className={cn(
-                      'inline-flex min-h-[44px] items-center justify-center rounded px-6 py-2.5 transition-all duration-500',
+                      'inline-flex min-h-[40px] items-center justify-center rounded px-5 py-2 transition-all duration-500',
                       useLightUI
                         ? 'bg-white text-zinc-900 hover:bg-zinc-100 hover:shadow-md'
                         : 'bg-zinc-900 text-white hover:bg-zinc-800 hover:shadow-md',
                     )}
                   >
-                    <span className="text-base leading-[1.2] font-medium tracking-[-0.02em]">
+                    <span className="text-[15px] leading-[1.2] font-medium tracking-[-0.02em]">
                       Run Analysis
                     </span>
                   </Link>
                   <span
                     className={cn(
-                      'mt-1 text-[11px] tracking-wide',
+                      'text-[10px] tracking-wide',
                       useLightUI ? 'text-white/50' : 'text-zinc-400',
                     )}
                   >
