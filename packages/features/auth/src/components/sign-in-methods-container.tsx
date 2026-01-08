@@ -17,33 +17,6 @@ import { OauthProviders } from './oauth-providers';
 import { OtpSignInContainer } from './otp-sign-in-container';
 import { PasswordSignInContainer } from './password-sign-in-container';
 
-/**
- * Get the app subdomain URL for a given path.
- * Strips /home prefix since app subdomain uses clean URLs.
- */
-function getAppSubdomainUrl(path: string): string {
-  const appSubdomain = process.env.NEXT_PUBLIC_APP_SUBDOMAIN || 'app';
-  const productionDomain =
-    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'sparlo.ai';
-
-  // Strip /home prefix for clean app subdomain URLs
-  const appPath = path.startsWith('/home')
-    ? path.replace(/^\/home/, '') || '/'
-    : path;
-
-  return `https://${appSubdomain}.${productionDomain}${appPath}`;
-}
-
-/**
- * Check if a path is an app path (should redirect to app subdomain).
- */
-function isAppPath(path: string): boolean {
-  const mainDomainPaths = ['/auth', '/share', '/api', '/healthcheck'];
-  return !mainDomainPaths.some(
-    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
-  );
-}
-
 export function SignInMethodsContainer(props: {
   paths: {
     callback: string;
@@ -68,14 +41,6 @@ export function SignInMethodsContainer(props: {
 
   const onSignIn = useCallback(() => {
     const returnPath = props.paths.returnPath || '/home';
-    const isProduction = process.env.NODE_ENV === 'production';
-
-    // In production, redirect app paths to app subdomain
-    if (isProduction && isAppPath(returnPath)) {
-      window.location.href = getAppSubdomainUrl(returnPath);
-      return;
-    }
-
     router.replace(returnPath);
   }, [props.paths.returnPath, router]);
 

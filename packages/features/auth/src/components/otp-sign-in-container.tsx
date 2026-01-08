@@ -31,31 +31,6 @@ import { useLastAuthMethod } from '../hooks/use-last-auth-method';
 import { AuthErrorAlert } from './auth-error-alert';
 import { EmailInput } from './email-input';
 
-/**
- * Get the app subdomain URL for a given path.
- */
-function getAppSubdomainUrl(path: string): string {
-  const appSubdomain = process.env.NEXT_PUBLIC_APP_SUBDOMAIN || 'app';
-  const productionDomain =
-    process.env.NEXT_PUBLIC_PRODUCTION_DOMAIN || 'sparlo.ai';
-
-  const appPath = path.startsWith('/home')
-    ? path.replace(/^\/home/, '') || '/'
-    : path;
-
-  return `https://${appSubdomain}.${productionDomain}${appPath}`;
-}
-
-/**
- * Check if a path is an app path (should redirect to app subdomain).
- */
-function isAppPath(path: string): boolean {
-  const mainDomainPaths = ['/auth', '/share', '/api', '/healthcheck'];
-  return !mainDomainPaths.some(
-    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
-  );
-}
-
 const EmailSchema = z.object({ email: z.string().email() });
 const OtpSchema = z.object({ token: z.string().min(6).max(6) });
 
@@ -104,16 +79,8 @@ export function OtpSignInContainer(props: OtpSignInContainerProps) {
     // Record successful OTP sign-in
     recordAuthMethod('otp', { email });
 
-    // on sign ups we redirect to the app home
+    // Redirect to the next path or home
     const next = params.get('next') ?? '/home';
-    const isProduction = process.env.NODE_ENV === 'production';
-
-    // In production, redirect app paths to app subdomain
-    if (isProduction && isAppPath(next)) {
-      window.location.assign(getAppSubdomainUrl(next));
-      return;
-    }
-
     router.replace(next);
   };
 

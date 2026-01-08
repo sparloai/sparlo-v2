@@ -120,7 +120,7 @@ export default defineConfig({
       testMatch: /.*-debug\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
-        baseURL: 'https://app.sparlo.ai',
+        baseURL: 'https://sparlo.ai',
         navigationTimeout: 30 * 1000,
       },
       // No dependencies - runs with its own login flow
