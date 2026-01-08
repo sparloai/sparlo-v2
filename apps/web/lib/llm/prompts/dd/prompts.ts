@@ -2609,7 +2609,85 @@ CRITICAL: Respond with ONLY valid JSON. No markdown, no text before or after.
         "purpose": "What you learn",
         "priority": "CRITICAL | HIGH | MEDIUM"
       }
-    ]
+    ],
+
+    "competitor_landscape": [
+      {
+        "entity": "Competitor name or prior art",
+        "approach": "What they do",
+        "performance": "How they're doing (optional)",
+        "limitation": "Why they might lose (optional)"
+      }
+    ],
+
+    "claim_validation_table": [
+      {
+        "claim": "The specific claim being validated",
+        "verdict": "VALIDATED | PLAUSIBLE | QUESTIONABLE | IMPLAUSIBLE",
+        "confidence": "X% (optional)",
+        "reasoning": "2-3 sentence explanation of verdict"
+      }
+    ],
+
+    "solution_concepts": [
+      {
+        "title": "Approach name",
+        "track": "simpler_path | best_fit | paradigm_shift | frontier_transfer",
+        "description": "What it is and why it might work",
+        "who_pursuing": ["List of companies/labs pursuing this"],
+        "feasibility": 7,
+        "impact": 8,
+        "startup_approach": true
+      }
+    ],
+
+    "economics_bridge": {
+      "current_state": "$X/unit at pilot",
+      "target_state": "$Y/unit at scale",
+      "rows": [
+        {
+          "line_item": "Cost component",
+          "current": "$X",
+          "target": "$Y",
+          "gap": "-$Z",
+          "validity": "VALIDATED | REASONABLE | OPTIMISTIC | UNREALISTIC"
+        }
+      ],
+      "realistic_estimate": "$X-Y/unit",
+      "verdict": "Gap assessment summary"
+    },
+
+    "risks_table": [
+      {
+        "risk": "Risk description",
+        "category": "TECHNICAL | COMMERCIAL | REGULATORY | MARKET | EXECUTION",
+        "severity": "HIGH | MEDIUM | LOW",
+        "mitigation": "How to address (optional)"
+      }
+    ],
+
+    "validation_gaps": [
+      {
+        "concern": "What we couldn't fully validate",
+        "status": "ADDRESSED | NEEDS_VALIDATION | ACCEPTED_RISK",
+        "rationale": "Why this status (optional)"
+      }
+    ],
+
+    "diligence_actions": [
+      {
+        "action": "Specific action to take",
+        "priority": "CRITICAL | HIGH | MEDIUM | LOW",
+        "cost": "$X-Y (optional)",
+        "timeline": "X weeks (optional)"
+      }
+    ],
+
+    "first_principles_insight": "One sentence that reframes how to think about this problem",
+
+    "the_bet_statement": "If you invest, you are betting that [specific compound bet]",
+
+    "if_this_were_my_deal": "Personal recommendation paragraph in first person. Be opinionated, not hedged. Example: 'If this were my deal, I'd...'"
   },
 
   "appendix": {

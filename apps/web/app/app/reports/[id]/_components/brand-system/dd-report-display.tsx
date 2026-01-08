@@ -13,9 +13,20 @@
 import { memo, useMemo, useState } from 'react';
 
 import { ChevronDown, Download, Loader2, Share2 } from 'lucide-react';
+import type { z } from 'zod';
 
 import { cn } from '@kit/ui/utils';
 
+import {
+  ClaimValidationRowSchema,
+  CompetitorRowSchema,
+  DiligenceActionSchema,
+  EconomicsBridgeRowSchema,
+  EconomicsBridgeSchema,
+  RiskTableRowSchema,
+  SolutionConceptRowSchema,
+  ValidationGapRowSchema,
+} from '~/lib/llm/prompts/dd/schemas';
 import { useReportActions } from '../../_lib/hooks/use-report-actions';
 import {
   ArticleBlock,
@@ -130,6 +141,16 @@ interface DiligenceRoadmapItem {
   purpose?: string;
 }
 
+// NEW: Types derived from Zod schemas (per reviewer feedback)
+type CompetitorRow = z.infer<typeof CompetitorRowSchema>;
+type ClaimValidationRow = z.infer<typeof ClaimValidationRowSchema>;
+type SolutionConceptRow = z.infer<typeof SolutionConceptRowSchema>;
+type EconomicsBridgeRow = z.infer<typeof EconomicsBridgeRowSchema>;
+type EconomicsBridge = z.infer<typeof EconomicsBridgeSchema>;
+type RiskTableRow = z.infer<typeof RiskTableRowSchema>;
+type ValidationGapRow = z.infer<typeof ValidationGapRowSchema>;
+type DiligenceAction = z.infer<typeof DiligenceActionSchema>;
+
 interface QuickReference {
   one_page_summary?: OnePageSummary;
   scores?: Scores;
@@ -137,6 +158,19 @@ interface QuickReference {
   founder_questions?: FounderQuestion[];
   scenarios?: Scenarios;
   diligence_roadmap?: DiligenceRoadmapItem[];
+  // NEW: Tables for visual hierarchy
+  competitor_landscape?: CompetitorRow[];
+  claim_validation_table?: ClaimValidationRow[];
+  solution_concepts?: SolutionConceptRow[];
+  economics_bridge?: EconomicsBridge;
+  risks_table?: RiskTableRow[];
+  validation_gaps?: ValidationGapRow[];
+  diligence_actions?: DiligenceAction[];
+  // NEW: Key insight highlights
+  first_principles_insight?: string;
+  the_bet_statement?: string;
+  // NEW: Personal recommendation
+  if_this_were_my_deal?: string;
 }
 
 interface ProseSection {
@@ -524,6 +558,373 @@ const CollapsibleSection = memo(function CollapsibleSection({
 });
 
 // ============================================
+// NEW: Visual Hierarchy Components (Zinc-Scale)
+// ============================================
+
+// Zinc-scale badge styles (design system compliant)
+const VERDICT_BADGE_STYLES: Record<string, string> = {
+  VALIDATED: 'bg-zinc-900 text-white',
+  PLAUSIBLE: 'bg-zinc-600 text-white',
+  QUESTIONABLE: 'bg-zinc-400 text-zinc-900',
+  IMPLAUSIBLE: 'bg-zinc-200 text-zinc-700',
+};
+
+const STATUS_BADGE_STYLES: Record<string, string> = {
+  ADDRESSED: 'bg-zinc-900 text-white',
+  NEEDS_VALIDATION: 'bg-zinc-500 text-white',
+  ACCEPTED_RISK: 'bg-zinc-300 text-zinc-800',
+};
+
+const CATEGORY_BADGE_STYLES: Record<string, string> = {
+  TECHNICAL: 'bg-zinc-800 text-white',
+  COMMERCIAL: 'bg-zinc-700 text-white',
+  REGULATORY: 'bg-zinc-600 text-white',
+  MARKET: 'bg-zinc-500 text-white',
+  EXECUTION: 'bg-zinc-400 text-zinc-900',
+};
+
+const TRACK_BADGE_STYLES: Record<string, { label: string; style: string }> = {
+  simpler_path: { label: 'Simpler Path', style: 'bg-zinc-300 text-zinc-800' },
+  best_fit: { label: 'Best Fit', style: 'bg-zinc-700 text-white' },
+  paradigm_shift: { label: 'Paradigm Shift', style: 'bg-zinc-900 text-white' },
+  frontier_transfer: { label: 'Frontier', style: 'bg-zinc-500 text-white' },
+};
+
+const VALIDITY_STYLES: Record<string, string> = {
+  VALIDATED: 'text-zinc-900 font-semibold',
+  REASONABLE: 'text-zinc-700',
+  OPTIMISTIC: 'text-zinc-500',
+  UNREALISTIC: 'text-zinc-400',
+};
+
+// Generic Badge component (zinc-scale)
+const Badge = memo(function Badge({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center px-2 py-0.5 text-xs font-medium rounded',
+        className || 'bg-zinc-100 text-zinc-700',
+      )}
+    >
+      {children}
+    </span>
+  );
+});
+
+// Competitor Landscape Table
+const CompetitorLandscapeTable = memo(function CompetitorLandscapeTable({
+  competitors,
+}: {
+  competitors?: CompetitorRow[];
+}) {
+  if (!competitors?.length) return null;
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="border-b border-zinc-200">
+          <tr className="text-left text-zinc-500">
+            <th scope="col" className="py-2 pr-4 font-medium">Entity</th>
+            <th scope="col" className="py-2 pr-4 font-medium">Approach</th>
+            <th scope="col" className="py-2 pr-4 font-medium">Performance</th>
+            <th scope="col" className="py-2 font-medium">Limitation</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-zinc-100">
+          {competitors.map((row, i) => (
+            <tr key={`${row.entity}-${i}`}>
+              <td className="py-3 pr-4 font-medium text-zinc-900">{row.entity}</td>
+              <td className="py-3 pr-4 text-zinc-600 max-w-xs">{row.approach}</td>
+              <td className="py-3 pr-4 text-zinc-600">{row.performance || '—'}</td>
+              <td className="py-3 text-zinc-500">{row.limitation || '—'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+});
+
+// Claim Validation List (with inline verdict badges)
+const ClaimValidationList = memo(function ClaimValidationList({
+  claims,
+}: {
+  claims?: ClaimValidationRow[];
+}) {
+  if (!claims?.length) return null;
+  return (
+    <div className="space-y-4">
+      {claims.map((claim, i) => (
+        <div key={`claim-${i}`} className="border-l-2 border-zinc-200 pl-4 py-2">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <Badge className={VERDICT_BADGE_STYLES[claim.verdict] || 'bg-zinc-100 text-zinc-700'}>
+              {claim.verdict}
+            </Badge>
+            {claim.confidence && (
+              <span className="text-xs text-zinc-400 font-mono">{claim.confidence}</span>
+            )}
+          </div>
+          <p className="font-medium text-zinc-900">{claim.claim}</p>
+          <p className="text-sm text-zinc-600 mt-1">{claim.reasoning}</p>
+        </div>
+      ))}
+    </div>
+  );
+});
+
+// First Principles Insight (blockquote)
+const InsightBlockquote = memo(function InsightBlockquote({
+  insight,
+}: {
+  insight?: string;
+}) {
+  if (!insight) return null;
+  return (
+    <blockquote className="border-l-4 border-zinc-900 pl-4 py-2 my-6 bg-zinc-50 rounded-r-lg">
+      <p className="text-lg font-medium text-zinc-900 italic">{insight}</p>
+    </blockquote>
+  );
+});
+
+// The Bet Statement (dark highlighted box)
+const TheBetHighlight = memo(function TheBetHighlight({
+  bet,
+}: {
+  bet?: string;
+}) {
+  if (!bet) return null;
+  return (
+    <div className="bg-zinc-900 text-white p-6 rounded-lg my-6">
+      <p className="text-xs font-mono uppercase tracking-wider text-zinc-400 mb-2">
+        The Bet
+      </p>
+      <p className="text-lg leading-relaxed">{bet}</p>
+    </div>
+  );
+});
+
+// Solution Concepts List
+const SolutionConceptsList = memo(function SolutionConceptsList({
+  concepts,
+}: {
+  concepts?: SolutionConceptRow[];
+}) {
+  if (!concepts?.length) return null;
+  return (
+    <div className="space-y-4">
+      {concepts.map((concept, i) => {
+        const track = TRACK_BADGE_STYLES[concept.track] || {
+          label: concept.track,
+          style: 'bg-zinc-100 text-zinc-700',
+        };
+        return (
+          <div
+            key={`concept-${i}`}
+            className={cn(
+              'border-l-2 pl-4 py-2',
+              concept.startup_approach
+                ? 'border-zinc-900 bg-zinc-50 rounded-r-lg'
+                : 'border-zinc-200',
+            )}
+          >
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <Badge className={track.style}>{track.label}</Badge>
+              <span className="font-medium text-zinc-900">{concept.title}</span>
+              {concept.startup_approach && (
+                <Badge className="bg-zinc-900 text-white">Their Approach</Badge>
+              )}
+            </div>
+            <p className="text-sm text-zinc-600">{concept.description}</p>
+            {(concept.feasibility || concept.impact || concept.who_pursuing?.length) && (
+              <div className="flex gap-4 mt-2 text-xs text-zinc-500 flex-wrap">
+                {concept.feasibility && <span>Feasibility: {concept.feasibility}/10</span>}
+                {concept.impact && <span>Impact: {concept.impact}/10</span>}
+                {concept.who_pursuing?.length ? (
+                  <span>Also: {concept.who_pursuing.join(', ')}</span>
+                ) : null}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+});
+
+// Economics Bridge Table
+const EconomicsBridgeTable = memo(function EconomicsBridgeTable({
+  bridge,
+}: {
+  bridge?: EconomicsBridge;
+}) {
+  if (!bridge?.rows?.length) return null;
+  return (
+    <div className="border border-zinc-200 rounded-lg overflow-hidden">
+      {(bridge.current_state || bridge.target_state) && (
+        <div className="bg-zinc-50 px-4 py-3 border-b border-zinc-200">
+          <div className="flex justify-between text-sm">
+            {bridge.current_state && (
+              <span>
+                Current: <strong>{bridge.current_state}</strong>
+              </span>
+            )}
+            <span className="text-zinc-400">→</span>
+            {bridge.target_state && (
+              <span>
+                Target: <strong>{bridge.target_state}</strong>
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+      <table className="w-full text-sm">
+        <tbody className="divide-y divide-zinc-100">
+          {bridge.rows.map((row, i) => (
+            <tr key={`econ-${i}`}>
+              <td className="px-4 py-2 text-zinc-700">{row.line_item}</td>
+              <td className="px-4 py-2 text-right font-mono text-zinc-600">
+                {row.gap || '—'}
+              </td>
+              <td
+                className={cn(
+                  'px-4 py-2 text-right text-xs font-medium',
+                  VALIDITY_STYLES[row.validity] || 'text-zinc-500',
+                )}
+              >
+                {row.validity}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {(bridge.realistic_estimate || bridge.verdict) && (
+        <div className="bg-zinc-50 px-4 py-3 border-t border-zinc-200">
+          <div className="flex justify-between text-sm">
+            {bridge.realistic_estimate && (
+              <span>
+                Realistic: <strong>{bridge.realistic_estimate}</strong>
+              </span>
+            )}
+            {bridge.verdict && <span className="text-zinc-500">{bridge.verdict}</span>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+});
+
+// Risks Table (with category + severity badges)
+const RisksTableDisplay = memo(function RisksTableDisplay({
+  risks,
+}: {
+  risks?: RiskTableRow[];
+}) {
+  if (!risks?.length) return null;
+  return (
+    <div className="space-y-4">
+      {risks.map((risk, idx) => (
+        <div key={`risk-${idx}`} className="border-l-2 border-zinc-200 pl-4 py-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <Badge className={CATEGORY_BADGE_STYLES[risk.category] || 'bg-zinc-100 text-zinc-700'}>
+              {risk.category}
+            </Badge>
+            <RiskSeverityIndicator severity={risk.severity || 'MEDIUM'} />
+          </div>
+          <BodyText variant="primary" className="font-medium">
+            {risk.risk}
+          </BodyText>
+          {risk.mitigation && (
+            <BodyText variant="muted" size="sm" className="mt-2">
+              Mitigation: {risk.mitigation}
+            </BodyText>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+});
+
+// Validation Gaps (Self-Critique)
+const ValidationGapsList = memo(function ValidationGapsList({
+  gaps,
+}: {
+  gaps?: ValidationGapRow[];
+}) {
+  if (!gaps?.length) return null;
+  return (
+    <div className="space-y-3">
+      {gaps.map((gap, i) => (
+        <div
+          key={`gap-${i}`}
+          className="flex items-start gap-3 border-l-2 border-zinc-200 pl-4 py-2"
+        >
+          <Badge className={STATUS_BADGE_STYLES[gap.status] || 'bg-zinc-100 text-zinc-700'}>
+            {gap.status.replace(/_/g, ' ')}
+          </Badge>
+          <div>
+            <p className="text-zinc-900">{gap.concern}</p>
+            {gap.rationale && <p className="text-sm text-zinc-500 mt-1">{gap.rationale}</p>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
+
+// Diligence Actions (enhanced roadmap with cost/timeline)
+const DiligenceActionsList = memo(function DiligenceActionsList({
+  actions,
+}: {
+  actions?: DiligenceAction[];
+}) {
+  if (!actions?.length) return null;
+  return (
+    <div className="space-y-3">
+      {actions.map((action, i) => (
+        <div key={`action-${i}`} className="flex items-start gap-4 border-l-2 border-zinc-200 pl-4 py-2">
+          <RiskSeverityIndicator severity={action.priority || 'MEDIUM'} label={action.priority} />
+          <div className="flex-1">
+            <p className="text-zinc-900 font-medium">{action.action}</p>
+            {(action.cost || action.timeline) && (
+              <div className="flex gap-4 mt-1 text-xs text-zinc-500">
+                {action.cost && <span>Cost: {action.cost}</span>}
+                {action.timeline && <span>Timeline: {action.timeline}</span>}
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+});
+
+// If This Were My Deal (personal voice section)
+const IfThisWereMyDealSection = memo(function IfThisWereMyDealSection({
+  content,
+}: {
+  content?: string;
+}) {
+  if (!content) return null;
+  return (
+    <Section id="if-this-were-my-deal">
+      <SectionTitle>If This Were My Deal</SectionTitle>
+      <ArticleBlock className="mt-8">
+        <div className="border-l-4 border-zinc-900 pl-6">
+          <BodyText size="lg" className="italic text-zinc-700">
+            {content}
+          </BodyText>
+        </div>
+      </ArticleBlock>
+    </Section>
+  );
+});
+
+// ============================================
 // MAIN COMPONENT
 // ============================================
 
@@ -816,8 +1217,68 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           </Section>
         )}
 
-        {/* Key Risks */}
-        {quickRef?.key_risks && quickRef.key_risks.length > 0 && (
+        {/* NEW: First Principles Insight (blockquote) */}
+        {quickRef?.first_principles_insight && (
+          <InsightBlockquote insight={quickRef.first_principles_insight} />
+        )}
+
+        {/* NEW: The Bet Statement (dark highlight) */}
+        {quickRef?.the_bet_statement && (
+          <TheBetHighlight bet={quickRef.the_bet_statement} />
+        )}
+
+        {/* NEW: Competitor Landscape Table */}
+        {quickRef?.competitor_landscape && quickRef.competitor_landscape.length > 0 && (
+          <Section id="competitor-landscape">
+            <SectionTitle size="lg">Competitor Landscape</SectionTitle>
+            <div className="mt-8">
+              <CompetitorLandscapeTable competitors={quickRef.competitor_landscape} />
+            </div>
+          </Section>
+        )}
+
+        {/* NEW: Claim Validation Table */}
+        {quickRef?.claim_validation_table && quickRef.claim_validation_table.length > 0 && (
+          <Section id="claim-validation">
+            <SectionTitle size="lg">Claim Validation</SectionTitle>
+            <div className="mt-8">
+              <ClaimValidationList claims={quickRef.claim_validation_table} />
+            </div>
+          </Section>
+        )}
+
+        {/* NEW: Solution Concepts */}
+        {quickRef?.solution_concepts && quickRef.solution_concepts.length > 0 && (
+          <Section id="solution-concepts">
+            <SectionTitle size="lg">Solution Landscape</SectionTitle>
+            <div className="mt-8">
+              <SolutionConceptsList concepts={quickRef.solution_concepts} />
+            </div>
+          </Section>
+        )}
+
+        {/* NEW: Economics Bridge Table */}
+        {quickRef?.economics_bridge && quickRef.economics_bridge.rows?.length > 0 && (
+          <Section id="economics-bridge">
+            <SectionTitle size="lg">Unit Economics Bridge</SectionTitle>
+            <div className="mt-8">
+              <EconomicsBridgeTable bridge={quickRef.economics_bridge} />
+            </div>
+          </Section>
+        )}
+
+        {/* NEW: Risks Table (enhanced, use if available) */}
+        {quickRef?.risks_table && quickRef.risks_table.length > 0 && (
+          <Section id="risks-table">
+            <SectionTitle size="lg">Key Risks</SectionTitle>
+            <div className="mt-8">
+              <RisksTableDisplay risks={quickRef.risks_table} />
+            </div>
+          </Section>
+        )}
+
+        {/* Key Risks (legacy - only if new risks_table not present) */}
+        {quickRef?.key_risks && quickRef.key_risks.length > 0 && !quickRef?.risks_table?.length && (
           <Section id="key-risks">
             <SectionTitle size="lg">Key Risks</SectionTitle>
             <div className="mt-8 space-y-4">
@@ -966,6 +1427,31 @@ export const DDReportDisplay = memo(function DDReportDisplay({
               </div>
             </Section>
           )}
+
+        {/* NEW: Validation Gaps (Self-Critique) */}
+        {quickRef?.validation_gaps && quickRef.validation_gaps.length > 0 && (
+          <Section id="validation-gaps">
+            <SectionTitle size="lg">Self-Critique</SectionTitle>
+            <div className="mt-8">
+              <ValidationGapsList gaps={quickRef.validation_gaps} />
+            </div>
+          </Section>
+        )}
+
+        {/* NEW: Diligence Actions (enhanced roadmap) */}
+        {quickRef?.diligence_actions && quickRef.diligence_actions.length > 0 && (
+          <Section id="diligence-actions">
+            <SectionTitle size="lg">Diligence Actions</SectionTitle>
+            <div className="mt-8">
+              <DiligenceActionsList actions={quickRef.diligence_actions} />
+            </div>
+          </Section>
+        )}
+
+        {/* NEW: If This Were My Deal (personal voice) */}
+        {quickRef?.if_this_were_my_deal && (
+          <IfThisWereMyDealSection content={quickRef.if_this_were_my_deal} />
+        )}
 
         {/* Appendix */}
         {appendix && (

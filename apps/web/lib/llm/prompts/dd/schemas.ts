@@ -2729,6 +2729,96 @@ const DD5_M_OldFormatSchema = z.object({
   }),
 });
 
+// ============================================
+// NEW: Visual hierarchy table schemas for DD reports
+// All have .catch() for antifragility - LLM output can vary
+// ============================================
+
+// Competitor/Prior Art table rows
+export const CompetitorRowSchema = z.object({
+  entity: z.string().catch(''),
+  approach: z.string().catch(''),
+  performance: z.string().optional(),
+  limitation: z.string().optional(),
+});
+
+// Claim validation as table rows (inline verdicts)
+export const ClaimValidationRowSchema = z.object({
+  claim: z.string().catch(''),
+  verdict: flexibleEnum(
+    ['VALIDATED', 'PLAUSIBLE', 'QUESTIONABLE', 'IMPLAUSIBLE'],
+    'PLAUSIBLE',
+  ),
+  confidence: z.string().optional(),
+  reasoning: z.string().catch(''),
+});
+
+// Solution concepts list (not cards)
+export const SolutionConceptRowSchema = z.object({
+  title: z.string().catch(''),
+  track: flexibleEnum(
+    ['simpler_path', 'best_fit', 'paradigm_shift', 'frontier_transfer'],
+    'best_fit',
+  ),
+  description: z.string().catch(''),
+  who_pursuing: z.array(z.string()).optional().default([]),
+  feasibility: flexibleNumber(5, { min: 1, max: 10 }).optional(),
+  impact: flexibleNumber(5, { min: 1, max: 10 }).optional(),
+  startup_approach: z.boolean().optional().default(false),
+});
+
+// Unit economics bridge table rows
+export const EconomicsBridgeRowSchema = z.object({
+  line_item: z.string().catch(''),
+  current: z.string().optional(),
+  target: z.string().optional(),
+  gap: z.string().optional(),
+  validity: flexibleEnum(
+    ['VALIDATED', 'REASONABLE', 'OPTIMISTIC', 'UNREALISTIC'],
+    'REASONABLE',
+  ),
+});
+
+// Economics bridge container
+export const EconomicsBridgeSchema = z
+  .object({
+    current_state: z.string().optional(),
+    target_state: z.string().optional(),
+    rows: z.array(EconomicsBridgeRowSchema).optional().default([]),
+    realistic_estimate: z.string().optional(),
+    verdict: z.string().optional(),
+  })
+  .catch({ rows: [] });
+
+// Risk table rows (with category + severity)
+export const RiskTableRowSchema = z.object({
+  risk: z.string().catch(''),
+  category: flexibleEnum(
+    ['TECHNICAL', 'COMMERCIAL', 'REGULATORY', 'MARKET', 'EXECUTION'],
+    'TECHNICAL',
+  ),
+  severity: Severity,
+  mitigation: z.string().optional(),
+});
+
+// Validation gaps (self-critique)
+export const ValidationGapRowSchema = z.object({
+  concern: z.string().catch(''),
+  status: flexibleEnum(
+    ['ADDRESSED', 'NEEDS_VALIDATION', 'ACCEPTED_RISK'],
+    'NEEDS_VALIDATION',
+  ),
+  rationale: z.string().optional(),
+});
+
+// Diligence action with cost/timeline
+export const DiligenceActionSchema = z.object({
+  action: z.string().catch(''),
+  priority: flexibleEnum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'], 'MEDIUM'),
+  cost: z.string().optional(),
+  timeline: z.string().optional(),
+});
+
 // New format prose report schema for DD5-M
 // ANTIFRAGILE: All fields have sensible defaults
 const DD5_M_ProseReportSchema = z.object({
@@ -2869,6 +2959,22 @@ const DD5_M_QuickReferenceSchema = z.object({
       }),
     )
     .default([]),
+
+  // NEW: Tables for visual hierarchy (all optional with defaults)
+  competitor_landscape: z.array(CompetitorRowSchema).optional().default([]),
+  claim_validation_table: z.array(ClaimValidationRowSchema).optional().default([]),
+  solution_concepts: z.array(SolutionConceptRowSchema).optional().default([]),
+  economics_bridge: EconomicsBridgeSchema.optional(),
+  risks_table: z.array(RiskTableRowSchema).optional().default([]),
+  validation_gaps: z.array(ValidationGapRowSchema).optional().default([]),
+  diligence_actions: z.array(DiligenceActionSchema).optional().default([]),
+
+  // NEW: Key insight highlights (for blockquotes)
+  first_principles_insight: z.string().optional(),
+  the_bet_statement: z.string().optional(),
+
+  // NEW: Personal recommendation (first person)
+  if_this_were_my_deal: z.string().optional(),
 });
 
 // New format appendix schema for DD5-M (flexible - many fields optional)
