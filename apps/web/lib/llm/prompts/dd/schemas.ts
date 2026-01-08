@@ -222,6 +222,24 @@ function processNullValues(v: unknown): unknown {
   return v;
 }
 
+/**
+ * Validates and sanitizes URLs to only allow http/https protocols.
+ * Prevents XSS via javascript:, data:, or other malicious protocols.
+ * Returns undefined for invalid or dangerous URLs.
+ */
+function safeUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  try {
+    const parsed = new URL(url);
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return undefined;
+    }
+    return url;
+  } catch {
+    return undefined;
+  }
+}
+
 // ============================================
 // Shared Enums and Primitives (Antifragile)
 // ============================================
@@ -3225,7 +3243,11 @@ export const ReferenceSchema = z
   .object({
     id: z.union([z.string(), z.number()]).transform((v) => String(v)),
     citation: z.string().catch(''),
-    url: z.string().optional().catch(undefined),
+    url: z
+      .string()
+      .optional()
+      .transform(safeUrl)
+      .catch(undefined),
     source_type: z.string().optional().catch(undefined),
   })
   .catch({ id: '0', citation: '' });

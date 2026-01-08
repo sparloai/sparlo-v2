@@ -167,7 +167,7 @@ type CrossDomainInsight = z.infer<typeof CrossDomainInsightSchema>;
 // NEW: Commercialization and failure analysis types
 type CommercializationDetail = z.infer<typeof CommercializationDetailSchema>;
 type FailureAnalysis = z.infer<typeof FailureAnalysisSchema>;
-type HistoricalPrecedent = z.infer<typeof HistoricalPrecedentSchema>;
+type _HistoricalPrecedent = z.infer<typeof HistoricalPrecedentSchema>;
 type Reference = z.infer<typeof ReferenceSchema>;
 
 interface QuickReference {
@@ -623,6 +623,27 @@ const TRACK_BADGE_STYLES: Record<string, { label: string; style: string }> = {
   frontier_transfer: { label: 'Frontier', style: 'bg-zinc-500 text-white' },
 };
 
+// Default fallback styles - stable references to avoid object creation on each render
+const DEFAULT_TRACK_STYLE = { label: '', style: 'bg-zinc-100 text-zinc-700' };
+const DEFAULT_INNOVATION_STYLE = { label: '', style: 'border border-zinc-300 bg-white text-zinc-600' };
+
+// Stable lookup helpers - return same object reference for unknowns
+function getTrackStyle(track: string | undefined): { label: string; style: string } {
+  if (!track) return DEFAULT_TRACK_STYLE;
+  const style = TRACK_BADGE_STYLES[track];
+  if (style) return style;
+  // For unknown tracks, return default with correct label
+  return { ...DEFAULT_TRACK_STYLE, label: track };
+}
+
+function getInnovationTypeStyle(type: string | undefined): { label: string; style: string } | null {
+  if (!type) return null;
+  const style = INNOVATION_TYPE_STYLES[type];
+  if (style) return style;
+  // For unknown types, return default with formatted label
+  return { ...DEFAULT_INNOVATION_STYLE, label: type.replace(/_/g, ' ') };
+}
+
 const VALIDITY_STYLES: Record<string, string> = {
   VALIDATED: 'text-zinc-900 font-semibold',
   REASONABLE: 'text-zinc-700',
@@ -786,6 +807,34 @@ const TheBetHighlight = memo(function TheBetHighlight({
   );
 });
 
+// Memoized paragraph splitting component - prevents re-splitting on every render
+const SplitParagraphs = memo(function SplitParagraphs({
+  content,
+  keyPrefix,
+}: {
+  content: string;
+  keyPrefix: string;
+}) {
+  const paragraphs = useMemo(
+    () =>
+      content
+        .split(/\n\n+/)
+        .filter((p) => p.trim())
+        .map((p) => p.trim()),
+    [content]
+  );
+
+  return (
+    <>
+      {paragraphs.map((paragraph, idx) => (
+        <BodyText key={`${keyPrefix}-${idx}`} parseCited>
+          {paragraph}
+        </BodyText>
+      ))}
+    </>
+  );
+});
+
 // Solution Concepts List
 const SolutionConceptsList = memo(function SolutionConceptsList({
   concepts,
@@ -796,10 +845,7 @@ const SolutionConceptsList = memo(function SolutionConceptsList({
   return (
     <div className="space-y-4">
       {concepts.map((concept, i) => {
-        const track = TRACK_BADGE_STYLES[concept.track] || {
-          label: concept.track,
-          style: 'bg-zinc-100 text-zinc-700',
-        };
+        const track = getTrackStyle(concept.track);
         return (
           <div
             key={`concept-${i}`}
@@ -1197,18 +1243,10 @@ const DevelopedConceptCard = memo(function DevelopedConceptCard({
 }: {
   concept: FullyDevelopedConcept;
 }) {
-  const track = TRACK_BADGE_STYLES[concept.track] || {
-    label: concept.track,
-    style: 'bg-zinc-100 text-zinc-700',
-  };
+  const track = getTrackStyle(concept.track);
 
   // Use new INNOVATION_TYPE_STYLES for consistent badge rendering
-  const innovationType = concept.innovation_type
-    ? INNOVATION_TYPE_STYLES[concept.innovation_type] || {
-        label: concept.innovation_type.replace(/_/g, ' '),
-        style: 'border border-zinc-300 bg-white text-zinc-600',
-      }
-    : null;
+  const innovationType = getInnovationTypeStyle(concept.innovation_type);
 
   return (
     <div
@@ -2112,16 +2150,11 @@ export const DDReportDisplay = memo(function DDReportDisplay({
         {prose?.technical_deep_dive?.content && (
           <Section id="startup-claims">
             <SectionTitle>Startup Claims</SectionTitle>
-            {/* Split content into paragraphs for better readability */}
             <ArticleBlock className="mt-8 space-y-6">
-              {prose.technical_deep_dive.content
-                .split(/\n\n+/)
-                .filter((p: string) => p.trim())
-                .map((paragraph: string, idx: number) => (
-                  <BodyText key={`tech-p-${idx}`} parseCited>
-                    {paragraph.trim()}
-                  </BodyText>
-                ))}
+              <SplitParagraphs
+                content={prose.technical_deep_dive.content}
+                keyPrefix="tech-p"
+              />
             </ArticleBlock>
             {/* Claim validation summary - inline after technical prose */}
             {quickRef?.claim_validation_table &&
@@ -2213,16 +2246,11 @@ export const DDReportDisplay = memo(function DDReportDisplay({
         {prose?.investment_synthesis?.content && (
           <Section id="investment-synthesis">
             <SectionTitle>Investment Synthesis</SectionTitle>
-            {/* Split content into paragraphs for better readability */}
             <ArticleBlock className="mt-8 space-y-6">
-              {prose.investment_synthesis.content
-                .split(/\n\n+/)
-                .filter((p: string) => p.trim())
-                .map((paragraph: string, idx: number) => (
-                  <BodyText key={`synth-p-${idx}`} parseCited>
-                    {paragraph.trim()}
-                  </BodyText>
-                ))}
+              <SplitParagraphs
+                content={prose.investment_synthesis.content}
+                keyPrefix="synth-p"
+              />
             </ArticleBlock>
           </Section>
         )}
