@@ -32,7 +32,7 @@ import { AuthErrorAlert } from './auth-error-alert';
 import { EmailInput } from './email-input';
 
 const EmailSchema = z.object({ email: z.string().email() });
-const OtpSchema = z.object({ token: z.string().min(8).max(8) });
+const OtpSchema = z.object({ token: z.string().min(6).max(6) });
 
 type OtpSignInContainerProps = {
   shouldCreateUser: boolean;
@@ -112,7 +112,7 @@ export function OtpSignInContainer(props: OtpSignInContainerProps) {
             <FormItem>
               <FormControl>
                 <InputOTP
-                  maxLength={8}
+                  maxLength={6}
                   {...field}
                   disabled={verifyMutation.isPending}
                 >
@@ -120,14 +120,12 @@ export function OtpSignInContainer(props: OtpSignInContainerProps) {
                     <InputOTPSlot index={0} data-slot="0" />
                     <InputOTPSlot index={1} data-slot="1" />
                     <InputOTPSlot index={2} data-slot="2" />
-                    <InputOTPSlot index={3} data-slot="3" />
                   </InputOTPGroup>
                   <InputOTPSeparator />
                   <InputOTPGroup>
+                    <InputOTPSlot index={3} data-slot="3" />
                     <InputOTPSlot index={4} data-slot="4" />
                     <InputOTPSlot index={5} data-slot="5" />
-                    <InputOTPSlot index={6} data-slot="6" />
-                    <InputOTPSlot index={7} data-slot="7" />
                   </InputOTPGroup>
                 </InputOTP>
               </FormControl>
