@@ -323,8 +323,16 @@ export function SparloBillingPricing({
 
                 {/* CTA Button */}
                 <button
-                  onClick={() => handleSelectPlan(activePlan.id, product.id)}
-                  disabled={pending || isCurrent || isPending}
+                  onClick={() => {
+                    if (isSubscriber && !isCurrent) {
+                      // Existing subscribers upgrade via billing portal
+                      handleManageBilling();
+                    } else {
+                      // New users go to checkout
+                      handleSelectPlan(activePlan.id, product.id);
+                    }
+                  }}
+                  disabled={pending || portalPending || isCurrent || isPending}
                   className={cn(
                     'mt-auto w-full rounded-lg px-4 py-3 text-[14px] font-medium transition-colors',
                     isCurrent
@@ -332,14 +340,17 @@ export function SparloBillingPricing({
                       : isHighlighted
                         ? 'cursor-pointer bg-zinc-900 text-white hover:bg-zinc-800 active:bg-zinc-950'
                         : 'cursor-pointer border border-zinc-300 text-zinc-700 hover:border-zinc-900 hover:text-zinc-900 active:bg-zinc-50',
-                    (pending || isPending) && 'cursor-not-allowed opacity-50',
+                    (pending || portalPending || isPending) &&
+                      'cursor-not-allowed opacity-50',
                   )}
                 >
-                  {isPending
+                  {isPending || (portalPending && !isCurrent)
                     ? 'Loading...'
                     : isCurrent
                       ? 'Current Plan'
-                      : 'Get started'}
+                      : isSubscriber
+                        ? 'Upgrade'
+                        : 'Get started'}
                 </button>
               </div>
             );
