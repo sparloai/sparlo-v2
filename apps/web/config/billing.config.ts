@@ -10,9 +10,8 @@ export default createBillingSchema({
     {
       id: 'lite',
       name: 'Lite',
-      description: '~3 Problems/Mo',
+      description: 'For individuals getting started',
       currency: 'USD',
-      badge: 'Starter',
       plans: [
         {
           name: 'Lite Monthly',
@@ -43,12 +42,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: ['~3 problems/month'],
+      features: ['~3 problems/month', '1 seat', 'Email support', 'Basic analytics'],
     },
     {
       id: 'core',
       name: 'Core',
-      description: 'For individuals and small teams.',
+      description: 'For growing research needs',
       currency: 'USD',
       plans: [
         {
@@ -80,12 +79,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: ['Standard usage', '1 seat'],
+      features: ['~10 problems/month', '1 seat', 'Priority email support', 'Advanced analytics'],
     },
     {
       id: 'pro',
       name: 'Pro',
-      description: 'For growing teams.',
+      description: 'For teams and power users',
       currency: 'USD',
       highlighted: true,
       plans: [
@@ -118,12 +117,12 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: ['3× usage', '5 team seats'],
+      features: ['~25 problems/month', '5 team seats', 'Priority support', 'Team collaboration'],
     },
     {
       id: 'max',
       name: 'Max',
-      description: 'For large orgs.',
+      description: 'For organizations at scale',
       currency: 'USD',
       plans: [
         {
@@ -155,7 +154,7 @@ export default createBillingSchema({
           ],
         },
       ],
-      features: ['7× usage', '10 team seats'],
+      features: ['~50 problems/month', '10 team seats', 'Dedicated support', 'API access', 'SSO'],
     },
   ],
 });
