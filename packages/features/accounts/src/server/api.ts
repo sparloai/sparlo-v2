@@ -70,14 +70,16 @@ class AccountsApi {
 
   /**
    * @name getSubscription
-   * Get the subscription data for the given user.
+   * Get the active subscription data for the given account.
+   * Returns active subscriptions or recently-canceled ones that haven't ended yet.
    * @param accountId
    */
   async getSubscription(accountId: string) {
     const response = await this.client
       .from('subscriptions')
-      .select('*, items: subscription_items !inner (*)')
+      .select('*, items: subscription_items (*)')
       .eq('account_id', accountId)
+      .or('active.eq.true,and(status.eq.canceled,period_ends_at.gte.now())')
       .maybeSingle();
 
     if (response.error) {
