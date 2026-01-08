@@ -115,34 +115,34 @@ function SettingsDropdown({
     <div
       ref={dropdownRef}
       className={cn(
-        'absolute bottom-full mb-3 rounded-xl border border-zinc-200 bg-white p-1.5 shadow-lg dark:border-zinc-800 dark:bg-zinc-900',
-        collapsed ? 'left-full ml-3 w-56' : 'right-0 left-0 mx-2',
+        'absolute bottom-full mb-3 rounded-xl border border-zinc-200 bg-white py-2 shadow-lg dark:border-zinc-800 dark:bg-zinc-900',
+        collapsed ? 'left-full ml-3 w-52' : 'right-0 left-0 mx-2',
       )}
     >
       <Link
         href={getPath(pathsConfig.app.personalAccountSettings)}
         onClick={onClose}
-        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+        className="flex items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
       >
-        <SettingsIcon className="h-[18px] w-[18px] flex-shrink-0" />
+        <SettingsIcon className="h-5 w-5 flex-shrink-0 text-zinc-400" />
         Settings
       </Link>
       <Link
         href={getPath(pathsConfig.app.personalAccountBilling)}
         onClick={onClose}
-        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+        className="flex items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
       >
-        <BillingIcon className="h-[18px] w-[18px] flex-shrink-0" />
+        <BillingIcon className="h-5 w-5 flex-shrink-0 text-zinc-400" />
         Billing
       </Link>
       {isPaidPlan && (
         <Link
           href={getPath(pathsConfig.app.personalAccountTeams)}
           onClick={onClose}
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+          className="flex items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
         >
           <Users
-            className="h-[18px] w-[18px] flex-shrink-0"
+            className="h-5 w-5 flex-shrink-0 text-zinc-400"
             strokeWidth={1.5}
           />
           Teams
@@ -151,9 +151,9 @@ function SettingsDropdown({
       <Link
         href={getPath('/app/help')}
         onClick={onClose}
-        className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+        className="flex items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
       >
-        <HelpIcon className="h-[18px] w-[18px] flex-shrink-0" />
+        <HelpIcon className="h-5 w-5 flex-shrink-0 text-zinc-400" />
         Help
       </Link>
 
@@ -163,23 +163,20 @@ function SettingsDropdown({
       <form action={signOutAction}>
         <button
           type="submit"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
+          className="flex w-full items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
         >
-          <LogOutIcon className="h-[18px] w-[18px] flex-shrink-0" />
+          <LogOutIcon className="h-5 w-5 flex-shrink-0 text-zinc-400" />
           Log out
         </button>
       </form>
 
       {/* Email at bottom */}
       {userEmail && (
-        <>
-          <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
-          <div className="px-3 py-2">
-            <span className="block truncate text-[13px] text-zinc-400 dark:text-zinc-500">
-              {userEmail}
-            </span>
-          </div>
-        </>
+        <div className="border-t border-zinc-100 mt-1.5 px-4 py-3 dark:border-zinc-800">
+          <span className="block truncate text-[13px] text-zinc-400 dark:text-zinc-500">
+            {userEmail}
+          </span>
+        </div>
       )}
     </div>
   );

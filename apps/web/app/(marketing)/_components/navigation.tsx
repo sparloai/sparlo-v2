@@ -333,12 +333,12 @@ const UserAvatarDropdown = memo(function UserAvatarDropdown({
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="w-56 rounded-xl border border-zinc-200 bg-white p-2 shadow-lg"
+        className="w-52 rounded-xl border border-zinc-200 bg-white py-2 shadow-lg"
       >
         <DropdownMenuItem asChild>
           <Link
             href={pathsConfig.app.home}
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
+            className="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
           >
             <DashboardIcon className="h-5 w-5 text-zinc-400" />
             <span>Dashboard</span>
@@ -348,7 +348,7 @@ const UserAvatarDropdown = memo(function UserAvatarDropdown({
         <DropdownMenuItem asChild>
           <Link
             href={pathsConfig.app.personalAccountSettings}
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
+            className="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
           >
             <SettingsIcon className="h-5 w-5 text-zinc-400" />
             <span>Settings</span>
@@ -358,7 +358,7 @@ const UserAvatarDropdown = memo(function UserAvatarDropdown({
         <DropdownMenuItem asChild>
           <Link
             href={pathsConfig.app.personalAccountBilling}
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
+            className="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
           >
             <BillingIcon className="h-5 w-5 text-zinc-400" />
             <span>Billing</span>
@@ -368,30 +368,27 @@ const UserAvatarDropdown = memo(function UserAvatarDropdown({
         <DropdownMenuItem asChild>
           <Link
             href="/docs"
-            className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
+            className="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
           >
             <HelpIcon className="h-5 w-5 text-zinc-400" />
             <span>Help</span>
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator className="my-2 bg-zinc-100" />
+        <DropdownMenuSeparator className="my-1.5 bg-zinc-100" />
 
         <DropdownMenuItem
           onClick={() => signOut.mutateAsync()}
-          className="flex cursor-pointer items-center gap-3 rounded-lg px-3 py-3 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
+          className="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50"
         >
           <LogOutIcon className="h-5 w-5 text-zinc-400" />
           <span>Log out</span>
         </DropdownMenuItem>
 
         {user.email && (
-          <>
-            <DropdownMenuSeparator className="my-2 bg-zinc-100" />
-            <div className="px-3 py-2 text-[14px] text-zinc-400">
-              {user.email}
-            </div>
-          </>
+          <div className="border-t border-zinc-100 mt-1.5 px-4 py-3 text-[13px] text-zinc-400">
+            {user.email}
+          </div>
         )}
       </DropdownMenuContent>
     </DropdownMenu>
