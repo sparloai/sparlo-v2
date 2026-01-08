@@ -182,15 +182,41 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
 
   if (error) {
     console.error('[Usage] Failed to check usage:', error);
-    throw new Error('Failed to check usage limits');
+    // Return blocked state instead of throwing - shows upgrade screen
+    return {
+      allowed: false,
+      reason: 'limit_exceeded',
+      tokensUsed: 0,
+      tokensLimit: 0,
+      percentage: 100,
+      periodEnd: subscription?.period_ends_at ?? null,
+      isFirstReport: false,
+      hasActiveSubscription: !!subscription,
+      showUsageBar: false,
+      isWarning: false,
+      isAtLimit: true,
+    } as const;
   }
 
   // Validate JSONB response at runtime
   const validated = UsageCheckResponseSchema.safeParse(data);
 
   if (!validated.success) {
-    console.error('[Usage] Invalid response shape:', validated.error);
-    throw new Error('Invalid usage data from database');
+    console.error('[Usage] Invalid response shape:', validated.error, 'Raw data:', data);
+    // Return blocked state instead of throwing - shows upgrade screen
+    return {
+      allowed: false,
+      reason: 'limit_exceeded',
+      tokensUsed: 0,
+      tokensLimit: 0,
+      percentage: 100,
+      periodEnd: subscription?.period_ends_at ?? null,
+      isFirstReport: false,
+      hasActiveSubscription: !!subscription,
+      showUsageBar: false,
+      isWarning: false,
+      isAtLimit: true,
+    } as const;
   }
 
   const { data: usage } = validated;
@@ -199,7 +225,7 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
     tokensUsed: usage.tokens_used,
     tokensLimit: usage.tokens_limit,
     percentage: usage.percentage,
-    periodEnd: subscription?.period_ends_at ?? usage.period_end,
+    periodEnd: subscription?.period_ends_at ?? usage.period_end ?? null,
     hasActiveSubscription: true as const,
     showUsageBar:
       usage.percentage >= USAGE_CONSTANTS.USAGE_BAR_VISIBLE_THRESHOLD,

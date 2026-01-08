@@ -8,13 +8,13 @@ import { z } from 'zod';
 
 export const UsageCheckResponseSchema = z.object({
   allowed: z.boolean(),
-  tokens_used: z.number(),
-  tokens_limit: z.number(),
-  remaining: z.number(),
-  percentage: z.number(),
-  reports_count: z.number(),
-  chat_tokens_used: z.number(),
-  period_end: z.string(),
+  tokens_used: z.coerce.number().default(0),
+  tokens_limit: z.coerce.number().default(350000),
+  remaining: z.coerce.number().default(350000),
+  percentage: z.coerce.number().default(0),
+  reports_count: z.coerce.number().default(0),
+  chat_tokens_used: z.coerce.number().default(0),
+  period_end: z.string().nullable().optional(),
 });
 
 export const IncrementUsageResponseSchema = z.object({

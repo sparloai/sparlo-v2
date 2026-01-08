@@ -62,7 +62,7 @@ export async function loadUserUsage(
     tokensUsed: usage.tokens_used,
     tokensLimit: usage.tokens_limit,
     reportsCount: usage.reports_count,
-    periodEnd: usage.period_end,
+    periodEnd: usage.period_end ?? '',
     percentage,
     isSubscriber,
     // Only show usage bar for subscribers who are above the threshold

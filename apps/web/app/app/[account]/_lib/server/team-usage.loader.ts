@@ -109,7 +109,7 @@ async function teamUsageLoader(accountId: string): Promise<TeamUsageResult> {
         percentage: usage.percentage,
         tokensUsed: usage.tokens_used,
         tokensLimit: usage.tokens_limit,
-        periodEnd: usage.period_end,
+        periodEnd: usage.period_end ?? null,
         periodStart: periodStart.toISOString(),
         memberUsage,
       },
