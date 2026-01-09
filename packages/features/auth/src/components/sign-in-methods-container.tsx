@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -11,6 +11,7 @@ import { If } from '@kit/ui/if';
 import { Separator } from '@kit/ui/separator';
 import { Trans } from '@kit/ui/trans';
 
+import { AuthTransitionOverlay } from './auth-transition-overlay';
 import { LastAuthMethodHint } from './last-auth-method-hint';
 import { MagicLinkAuthContainer } from './magic-link-auth-container';
 import { OauthProviders } from './oauth-providers';
@@ -34,18 +35,27 @@ export function SignInMethodsContainer(props: {
   captchaSiteKey?: string;
 }) {
   const router = useRouter();
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const redirectUrl = isBrowser()
     ? new URL(props.paths.callback, window?.location.origin).toString()
     : '';
 
   const onSignIn = useCallback(() => {
+    // Show transition overlay
+    setIsTransitioning(true);
+
+    // Wait for fade animation to start, then redirect
     const returnPath = props.paths.returnPath || '/home';
-    router.replace(returnPath);
+    setTimeout(() => {
+      router.replace(returnPath);
+    }, 350); // Match DURATION.fadeOut
   }, [props.paths.returnPath, router]);
 
   return (
     <>
+      <AuthTransitionOverlay isActive={isTransitioning} message="Welcome back" />
+
       <LastAuthMethodHint />
 
       <If condition={props.providers.password}>

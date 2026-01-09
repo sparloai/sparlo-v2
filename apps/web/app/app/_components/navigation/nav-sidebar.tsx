@@ -15,7 +15,7 @@ import { useAppPath } from '~/lib/hooks/use-app-path';
 
 import { useAppWorkspace } from '../../_lib/app-workspace-context';
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
-import { signOutAction } from '../../_lib/server/signout-action';
+import { SignOutButton } from '../sign-out-button';
 import {
   COLLAPSED_WIDTH,
   EXPANDED_WIDTH,
@@ -159,16 +159,11 @@ function SettingsDropdown({
 
       <div className="my-1.5 h-px bg-zinc-100 dark:bg-zinc-800" />
 
-      {/* Server Action logout - has built-in CSRF protection */}
-      <form action={signOutAction}>
-        <button
-          type="submit"
-          className="flex w-full items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
-        >
-          <LogOutIcon className="h-5 w-5 flex-shrink-0 text-zinc-400" />
-          Log out
-        </button>
-      </form>
+      {/* Sign out with smooth transition animation */}
+      <SignOutButton className="flex w-full items-center gap-3 px-4 py-2.5 text-[15px] text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
+        <LogOutIcon className="h-5 w-5 flex-shrink-0 text-zinc-400" />
+        Log out
+      </SignOutButton>
 
       {/* Email at bottom */}
       {userEmail && (
