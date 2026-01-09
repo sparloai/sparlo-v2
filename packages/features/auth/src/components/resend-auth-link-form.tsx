@@ -46,7 +46,7 @@ export function ResendAuthLinkForm(props: {
         <AlertDescription>
           <Trans
             i18nKey={'auth:resendLinkSuccessDescription'}
-            defaults={'Success!'}
+            defaults={'Link sent successfully.'}
           />
         </AlertDescription>
       </Alert>

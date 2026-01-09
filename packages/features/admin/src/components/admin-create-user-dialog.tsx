@@ -58,7 +58,7 @@ export function AdminCreateUserDialog(props: React.PropsWithChildren) {
         const result = await createUserAction(data);
 
         if (result.success) {
-          toast.success('User creates successfully');
+          toast.success('User created successfully');
           form.reset();
 
           setOpen(false);

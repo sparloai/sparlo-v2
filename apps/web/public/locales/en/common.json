@@ -48,8 +48,8 @@
   "pageOfPages": "Page {{page}} of {{total}}",
   "showingRecordCount": "Showing {{pageSize}} of {{totalCount}} rows",
   "noData": "No data available",
-  "pageNotFoundHeading": "Ouch! :|",
-  "errorPageHeading": "Ouch! :|",
+  "pageNotFoundHeading": "Page not found",
+  "errorPageHeading": "Something went wrong",
   "notifications": "Notifications",
   "noNotifications": "No notifications",
   "justNow": "Just now",
@@ -112,7 +112,7 @@
     "errorSendingCode": "Error sending code. Please try again."
   },
   "cookieBanner": {
-    "title": "Hey, we use cookies 🍪",
+    "title": "We use cookies",
     "description": "This website uses cookies to ensure you get the best experience on our website.",
     "reject": "Reject",
     "accept": "Accept"

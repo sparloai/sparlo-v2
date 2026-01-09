@@ -70,7 +70,7 @@ export function AdminResetPasswordDialog(
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
 
-        toast.error('We hit an error. Please read the logs.');
+        toast.error('An error occurred. Please check the logs.');
       }
     });
   });

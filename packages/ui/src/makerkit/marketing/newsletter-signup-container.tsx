@@ -20,7 +20,7 @@ export function NewsletterSignupContainer({
   onSignup,
   heading = 'Subscribe to our newsletter',
   description = 'Get the latest updates and offers directly to your inbox.',
-  successMessage = 'Thank you for subscribing!',
+  successMessage = 'Thank you for subscribing.',
   errorMessage = 'An error occurred. Please try again.',
   className,
   ...props

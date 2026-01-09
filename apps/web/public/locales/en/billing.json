@@ -106,7 +106,7 @@
     "succeeded": {
       "badge": "Succeeded",
       "heading": "Your payment was successful",
-      "description": "Your payment was successful. Thank you for subscribing!"
+      "description": "Your payment was successful. Thank you for subscribing."
     },
     "pending": {
       "badge": "Pending",
