@@ -396,8 +396,8 @@ export class StripeBillingStrategyService implements BillingStrategyProviderServ
       const lineItems = subscription.items.data.map((item) => {
         return {
           ...item,
-          // we cannot retrieve this from the API, user should retrieve from the billing configuration if needed
-          type: '' as never,
+          // Stripe API doesn't provide the item type, default to 'flat' (most common)
+          type: 'flat' as const,
         };
       });
 
