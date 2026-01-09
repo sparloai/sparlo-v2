@@ -17,6 +17,7 @@ export type UsageStatus =
       reason: 'ok';
       tokensUsed: number;
       tokensLimit: number;
+      tokens_reserved: number; // Reserved tokens from in-progress reports
       percentage: number;
       periodEnd: string | null;
       showUsageBar: boolean;
@@ -28,6 +29,7 @@ export type UsageStatus =
       reason: 'limit_exceeded';
       tokensUsed: number;
       tokensLimit: number;
+      tokens_reserved: number; // Reserved tokens from in-progress reports
       percentage: number;
       periodEnd: string | null;
       showUsageBar: boolean;
@@ -58,6 +60,7 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
       reason: 'ok',
       tokensUsed: 0,
       tokensLimit: Number.MAX_SAFE_INTEGER,
+      tokens_reserved: 0,
       percentage: 0,
       periodEnd: null,
       showUsageBar: false,
@@ -82,6 +85,7 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
       reason: 'limit_exceeded',
       tokensUsed: 0,
       tokensLimit: 0,
+      tokens_reserved: 0,
       percentage: 100,
       periodEnd: null,
       showUsageBar: false,
@@ -105,6 +109,7 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
       reason: 'limit_exceeded',
       tokensUsed: 0,
       tokensLimit: 0,
+      tokens_reserved: 0,
       percentage: 100,
       periodEnd: null,
       showUsageBar: false,
@@ -121,6 +126,7 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
       reason: 'ok',
       tokensUsed: usage.tokens_used,
       tokensLimit: usage.tokens_limit,
+      tokens_reserved: usage.tokens_reserved,
       percentage: usage.percentage,
       periodEnd: usage.period_end ?? null,
       showUsageBar:
@@ -135,6 +141,7 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
     reason: 'limit_exceeded',
     tokensUsed: usage.tokens_used,
     tokensLimit: usage.tokens_limit,
+    tokens_reserved: usage.tokens_reserved,
     percentage: usage.percentage,
     periodEnd: usage.period_end ?? null,
     showUsageBar:

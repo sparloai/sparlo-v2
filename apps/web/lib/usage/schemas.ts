@@ -11,6 +11,7 @@ export const UsageCheckResponseSchema = z.object({
   tokens_used: z.coerce.number().default(0),
   tokens_limit: z.coerce.number().default(350000),
   remaining: z.coerce.number().default(350000),
+  tokens_reserved: z.coerce.number().default(0), // Reserved tokens from in-progress reports
   percentage: z.coerce.number().default(0),
   reports_count: z.coerce.number().default(0),
   chat_tokens_used: z.coerce.number().default(0),

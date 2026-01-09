@@ -438,14 +438,40 @@ export const startReportGeneration = enhanceAction(
     // Super admin bypass - skip all usage and rate limits
     const superAdmin = isSuperAdmin(user.id);
 
-    if (!superAdmin) {
-      // Check usage limits - pure token-based gating
-      const usage = await checkUsageAllowed(
-        user.id,
-        USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
-      );
+    // Track tokens to reserve for this report (0 for super admins)
+    let tokensToReserve = 0;
 
-      if (!usage.allowed) {
+    if (!superAdmin) {
+      // Atomic check-and-reserve to prevent concurrent analyses from bypassing limits
+      // This locks the usage period row while checking available tokens
+      const { data: reserveResult, error: reserveError } = await (
+        client.rpc as CallableFunction
+      )('try_reserve_tokens_for_report', {
+        p_account_id: user.id,
+        p_estimated_tokens: USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
+      });
+
+      if (reserveError) {
+        console.error('[Token Reservation] RPC error:', reserveError);
+        throw new Error('Failed to check token availability');
+      }
+
+      if (reserveResult === null) {
+        // Insufficient tokens - check why for user-friendly error message
+        const usage = await checkUsageAllowed(
+          user.id,
+          USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
+        );
+
+        if (usage.tokens_reserved > 0) {
+          throw new Error(
+            createUsageErrorMessage(
+              USAGE_ERROR_CODES.LIMIT_EXCEEDED,
+              `You have analyses in progress. Please wait for them to complete or try again shortly.`,
+            ),
+          );
+        }
+
         throw new Error(
           createUsageErrorMessage(
             USAGE_ERROR_CODES.LIMIT_EXCEEDED,
@@ -454,11 +480,19 @@ export const startReportGeneration = enhanceAction(
         );
       }
 
+      tokensToReserve = reserveResult as number;
+
+      // Log warning if user is near limit
+      const usage = await checkUsageAllowed(
+        user.id,
+        USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
+      );
       if (usage.isWarning) {
         console.log(
           `[Usage Warning] User ${user.id} at ${usage.percentage.toFixed(0)}% usage`,
         );
       }
+
       // P1 Security: Rate limiting - check recent reports
       const windowStart = new Date(
         Date.now() - RATE_LIMIT_WINDOW_MS,
@@ -494,6 +528,7 @@ export const startReportGeneration = enhanceAction(
     const conversationId = crypto.randomUUID();
 
     // Create the report record with mode set immediately for clarification event routing
+    // tokens_reserved tracks the estimated tokens for this report to prevent concurrent bypass
     const { data: report, error: dbError } = await client
       .from('sparlo_reports')
       .insert({
@@ -503,6 +538,7 @@ export const startReportGeneration = enhanceAction(
         status: 'processing',
         current_step: 'an0',
         report_data: { mode: 'hybrid' }, // Set mode early for clarification event routing
+        tokens_reserved: tokensToReserve, // Reserve tokens to prevent concurrent analyses bypassing limits
         messages: [
           {
             id: crypto.randomUUID(),
