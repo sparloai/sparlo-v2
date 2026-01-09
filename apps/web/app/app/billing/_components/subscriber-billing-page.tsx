@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 
-import { ArrowUpRight, Check, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowUpRight, Check, ExternalLink, Loader2, X } from 'lucide-react';
 
 import { AppLink } from '~/components/app-link';
 import type { UsageCheckResponse } from '~/lib/usage/schemas';
@@ -29,6 +29,15 @@ export function SubscriberBillingPage({
 }: SubscriberBillingPageProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
+  const [showBanner, setShowBanner] = useState(showUpdateSuccess);
+
+  // Auto-dismiss success banner after 5 seconds
+  useEffect(() => {
+    if (showUpdateSuccess) {
+      const timer = setTimeout(() => setShowBanner(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showUpdateSuccess]);
 
   const handleManageBilling = () => {
     startTransition(() => {
@@ -62,14 +71,23 @@ export function SubscriberBillingPage({
         </AppLink>
 
         {/* Success banner */}
-        {showUpdateSuccess && (
-          <div className="mb-6 flex items-center gap-3 rounded-lg bg-emerald-50 px-4 py-3">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
-              <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+        {showBanner && (
+          <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300 flex items-center justify-between gap-3 rounded-lg bg-emerald-50 px-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
+                <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+              </div>
+              <p className="text-sm font-medium text-emerald-800">
+                Your subscription has been updated successfully.
+              </p>
             </div>
-            <p className="text-sm font-medium text-emerald-800">
-              Your subscription has been updated successfully.
-            </p>
+            <button
+              onClick={() => setShowBanner(false)}
+              className="text-emerald-600 hover:text-emerald-800 transition-colors"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         )}
 
