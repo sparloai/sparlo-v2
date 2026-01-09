@@ -367,7 +367,7 @@ export default function DiscoveryNewReportPage() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={attachments.length >= MAX_ATTACHMENTS}
-                  className="group/btn flex items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-3 py-1.5 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="group/btn flex items-center gap-1.5 rounded-md border border-[--border-subtle] bg-transparent px-3 py-1.5 text-xs text-[--text-secondary] transition-all hover:border-[--border-default] hover:bg-[--surface-overlay] hover:text-[--text-primary] disabled:opacity-50"
                 >
                   Attach
                   {attachments.length > 0 && (
@@ -546,7 +546,7 @@ export default function DiscoveryNewReportPage() {
                       'group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-8 py-4 transition-all duration-300 md:w-auto',
                       canSubmit && !isSubmitting
                         ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/20 hover:bg-teal-500 dark:bg-teal-600 dark:hover:bg-teal-500'
-                        : 'cursor-not-allowed bg-[--surface-overlay] text-[--text-muted] dark:bg-neutral-800 dark:text-neutral-500',
+                        : 'bg-[--surface-overlay] text-[--text-muted] dark:bg-neutral-800 dark:text-neutral-500',
                     )}
                   >
                     <span

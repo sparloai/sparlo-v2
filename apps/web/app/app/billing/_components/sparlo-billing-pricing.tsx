@@ -157,7 +157,7 @@ export function SparloBillingPricing({
             <button
               onClick={handleManageBilling}
               disabled={portalPending}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[14px] font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-[14px] font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
             >
               {portalPending ? (
                 <>
@@ -336,12 +336,12 @@ export function SparloBillingPricing({
                   className={cn(
                     'mt-auto w-full rounded-lg px-4 py-3 text-[14px] font-medium transition-colors',
                     isCurrent
-                      ? 'cursor-not-allowed bg-zinc-100 text-zinc-400'
+                      ? 'bg-zinc-100 text-zinc-400'
                       : isHighlighted
                         ? 'cursor-pointer bg-zinc-900 text-white hover:bg-zinc-800 active:bg-zinc-950'
                         : 'cursor-pointer border border-zinc-300 text-zinc-700 hover:border-zinc-900 hover:text-zinc-900 active:bg-zinc-50',
                     (pending || portalPending || isPending) &&
-                      'cursor-not-allowed opacity-50',
+                      'opacity-50',
                   )}
                 >
                   {isPending || (portalPending && !isCurrent)

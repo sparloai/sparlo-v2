@@ -8,7 +8,7 @@ import { Label as LabelPrimitive } from 'radix-ui';
 import { cn } from '../lib/utils';
 
 const labelVariants = cva(
-  'text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+  'text-sm leading-none font-medium peer-disabled:opacity-70',
 );
 
 const Label: React.FC<

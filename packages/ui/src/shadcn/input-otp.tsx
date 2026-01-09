@@ -17,7 +17,7 @@ const InputOTP: React.FC<React.ComponentPropsWithoutRef<typeof OTPInput>> = ({
       'flex items-center gap-2 has-disabled:opacity-50',
       containerClassName,
     )}
-    className={cn('disabled:cursor-not-allowed', className)}
+    className={className}
     {...props}
   />
 );

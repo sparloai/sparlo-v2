@@ -398,7 +398,7 @@ export function ProcessingScreen({
                       'transition-all duration-200',
                       'hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm',
                       'focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 focus:outline-none',
-                      'disabled:cursor-not-allowed disabled:opacity-40',
+                      'disabled:opacity-40',
                     )}
                   >
                     <div className="flex items-start gap-5">
@@ -485,7 +485,7 @@ export function ProcessingScreen({
                         'bg-zinc-900 text-[15px] font-medium text-white',
                         'transition-all duration-150',
                         'hover:bg-zinc-800',
-                        'disabled:cursor-not-allowed disabled:opacity-50',
+                        'disabled:opacity-50',
                       )}
                     >
                       {isSubmitting ? (

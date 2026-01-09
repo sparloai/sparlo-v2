@@ -318,7 +318,7 @@ export function TechnicalAnalysisForm({
               className={cn(
                 'px-8 py-4 text-[15px] font-medium transition-colors',
                 isSubmitting
-                  ? 'cursor-not-allowed bg-zinc-200 text-zinc-400'
+                  ? 'bg-zinc-200 text-zinc-400'
                   : 'bg-zinc-900 text-white hover:bg-zinc-800',
               )}
             >
@@ -414,7 +414,7 @@ export function TechnicalAnalysisForm({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={attachments.length >= 5}
-                  className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:opacity-50"
                 >
                   Attach file
                   {attachments.length > 0 && ` (${attachments.length})`}
@@ -437,7 +437,7 @@ export function TechnicalAnalysisForm({
                   'px-6 py-3 text-[15px] font-medium transition-colors',
                   canSubmit && !isSubmitting
                     ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                    : 'cursor-not-allowed bg-zinc-100 text-zinc-400',
+                    : 'bg-zinc-100 text-zinc-400',
                 )}
               >
                 {isSubmitting ? 'Starting...' : 'Run Analysis'}

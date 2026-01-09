@@ -615,7 +615,7 @@ export function NewAnalysisForm({
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={attachments.length >= MAX_ATTACHMENTS}
-                      className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:opacity-50"
                     >
                       Attach file
                       {attachments.length > 0 && ` (${attachments.length})`}
@@ -652,7 +652,7 @@ export function NewAnalysisForm({
                         canSubmit && !isSubmitting
                           ? 'bg-zinc-900 text-white hover:bg-zinc-800'
                           : !canSubmit
-                            ? 'cursor-not-allowed bg-zinc-100 text-zinc-400'
+                            ? 'bg-zinc-100 text-zinc-400'
                             : 'pointer-events-none bg-zinc-100 text-zinc-400',
                       )}
                     >

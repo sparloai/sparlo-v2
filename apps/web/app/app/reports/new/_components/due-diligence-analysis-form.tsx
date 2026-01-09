@@ -306,7 +306,7 @@ export function DueDiligenceAnalysisForm() {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={attachments.length >= 5}
-                  className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="text-[13px] tracking-[-0.02em] text-zinc-400 transition-colors hover:text-zinc-600 disabled:opacity-50"
                 >
                   Attach file
                   {attachments.length > 0 && ` (${attachments.length})`}
@@ -328,7 +328,7 @@ export function DueDiligenceAnalysisForm() {
                     'px-6 py-3 text-[15px] font-medium transition-colors',
                     canSubmit && !isSubmitting
                       ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                      : 'cursor-not-allowed bg-zinc-100 text-zinc-400',
+                      : 'bg-zinc-100 text-zinc-400',
                   )}
                 >
                   {isSubmitting ? 'Starting...' : 'Run Due Diligence'}

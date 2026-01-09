@@ -37,7 +37,7 @@ export const ChatSuggestions = memo(function ChatSuggestions({
             key={index}
             onClick={() => onSelect(suggestion)}
             disabled={disabled}
-            className="group flex w-full items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-left transition-all hover:border-zinc-300 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="group flex w-full items-start gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-left transition-all hover:border-zinc-300 hover:bg-zinc-50 disabled:opacity-50"
           >
             <span className="flex-1 text-[14px] leading-[1.4] tracking-[-0.01em] text-zinc-700 group-hover:text-zinc-900">
               {suggestion}
