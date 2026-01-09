@@ -11,8 +11,8 @@ import { loadUserWorkspace } from '../_lib/server/load-user-workspace';
 async function TeamsLayout(props: React.PropsWithChildren) {
   const workspace = await loadUserWorkspace();
 
-  // Redirect to billing if not on a paid plan
-  if (!workspace.isPaidPlan) {
+  // Redirect to billing if user doesn't have teams access
+  if (!workspace.hasTeamsAccess) {
     redirect('/app/billing');
   }
 

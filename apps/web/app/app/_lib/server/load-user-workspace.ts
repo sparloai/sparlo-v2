@@ -4,6 +4,7 @@ import { createAccountsApi } from '@kit/accounts/api';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import featureFlagsConfig from '~/config/feature-flags.config';
+import { checkTeamsAccess, getReportLimit } from '~/lib/billing/plan-limits';
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 
 import {
@@ -14,21 +15,6 @@ import {
 const shouldLoadAccounts = featureFlagsConfig.enableTeamAccounts;
 
 export type UserWorkspace = Awaited<ReturnType<typeof loadUserWorkspace>>;
-
-// Report limits per plan variant ID
-const PLAN_REPORT_LIMITS: Record<string, number> = {
-  // Free/no subscription
-  free: 3,
-  // Starter plans
-  price_1NNwYHI1i3VnbZTqI2UzaHIe: 10,
-  'starter-yearly': 10,
-  // Pro plans
-  price_1PGOAVI1i3VnbZTqc69xaypm: 50,
-  price_pro_yearly: 50,
-  // Enterprise plans
-  'price_enterprise-monthly': 999,
-  price_enterprise_yearly: 999,
-};
 
 const DEFAULT_REPORT_LIMIT = 3;
 
@@ -62,22 +48,23 @@ async function workspaceLoader() {
     countCompletedReports(user.id),
   ]);
 
-  // Get subscription data for report limits
+  // Get subscription data for report limits and teams access
   let reportLimit = DEFAULT_REPORT_LIMIT;
+  let hasTeamsAccess = false;
+
   try {
     const subscription = await api.getSubscription(user.id);
     if (subscription?.active && subscription.items?.length > 0) {
       const variantId = subscription.items[0]?.variant_id;
-      if (variantId && PLAN_REPORT_LIMITS[variantId]) {
-        reportLimit = PLAN_REPORT_LIMITS[variantId];
+      if (variantId) {
+        // Get report limit and teams access from billing config (single source of truth)
+        reportLimit = getReportLimit(variantId);
+        hasTeamsAccess = checkTeamsAccess(variantId);
       }
     }
-  } catch {
-    // No subscription found, use default limit
+  } catch (error) {
+    console.error('[load-user-workspace] Failed to fetch subscription:', error);
   }
-
-  // Pro (50 reports) or Enterprise/Max (999 reports) are "paid" plans with Teams access
-  const isPaidPlan = reportLimit >= 50;
 
   return {
     accounts,
@@ -86,6 +73,6 @@ async function workspaceLoader() {
     reportLimit,
     reports,
     reportsUsed,
-    isPaidPlan,
+    hasTeamsAccess,
   };
 }

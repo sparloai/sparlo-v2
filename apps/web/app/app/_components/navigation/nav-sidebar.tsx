@@ -73,14 +73,14 @@ function SettingsDropdown({
   collapsed,
   userEmail,
   getPath,
-  isPaidPlan,
+  hasTeamsAccess,
 }: {
   isOpen: boolean;
   onClose: () => void;
   collapsed: boolean;
   userEmail?: string | null;
   getPath: (path: string) => string;
-  isPaidPlan: boolean;
+  hasTeamsAccess: boolean;
 }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -134,7 +134,7 @@ function SettingsDropdown({
         <BillingIcon className="h-5 w-5 flex-shrink-0 text-zinc-400" />
         Billing
       </Link>
-      {isPaidPlan && (
+      {hasTeamsAccess && (
         <Link
           href={getPath(pathsConfig.app.personalAccountTeams)}
           onClick={onClose}
@@ -360,7 +360,7 @@ export const NavSidebar = memo(function NavSidebar({
 }: NavSidebarProps) {
   const router = useRouter();
   const { getPath } = useAppPath();
-  const { isPaidPlan } = useAppWorkspace();
+  const { hasTeamsAccess } = useAppWorkspace();
   const {
     collapsed,
     setCollapsed,
@@ -415,9 +415,7 @@ export const NavSidebar = memo(function NavSidebar({
         <div
           className={cn(
             'flex h-14 items-center border-b border-zinc-200 dark:border-zinc-800',
-            collapsed && !isMobile
-              ? 'justify-center px-2'
-              : 'justify-end px-4',
+            collapsed && !isMobile ? 'justify-center px-2' : 'justify-end px-4',
           )}
         >
           {isMobile ? (
@@ -523,7 +521,7 @@ export const NavSidebar = memo(function NavSidebar({
             collapsed={collapsed && !isMobile}
             userEmail={user.email}
             getPath={getPath}
-            isPaidPlan={isPaidPlan}
+            hasTeamsAccess={hasTeamsAccess}
           />
 
           <div
