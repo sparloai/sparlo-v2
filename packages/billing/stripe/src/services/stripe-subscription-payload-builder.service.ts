@@ -56,7 +56,7 @@ class StripeSubscriptionPayloadBuilderService {
         price_amount: item.price?.unit_amount,
         interval: item.price?.recurring?.interval as string,
         interval_count: item.price?.recurring?.interval_count as number,
-        type: item.type,
+        type: item.type || 'flat',
       };
     });
 

@@ -22,15 +22,6 @@ async function PersonalAccountBillingPage() {
   const [subscription, _order, customerId, usage] =
     await loadPersonalAccountBillingPageData(user.id);
 
-  // Debug: Log subscription data to identify why it might not be showing
-  console.log('[Billing Page] User:', user.id);
-  console.log('[Billing Page] Subscription:', subscription ? {
-    id: subscription.id,
-    status: subscription.status,
-    active: (subscription as { active?: boolean }).active,
-    account_id: (subscription as { account_id?: string }).account_id,
-  } : null);
-
   const hasActiveSubscription =
     subscription && subscription.status !== 'canceled';
 
