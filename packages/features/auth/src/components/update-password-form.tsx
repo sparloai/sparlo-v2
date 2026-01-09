@@ -1,6 +1,11 @@
 'use client';
 
+import { useState, useTransition } from 'react';
+
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { useRouter } from 'next/navigation';
+
+import type { AuthError } from '@supabase/supabase-js';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
@@ -9,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { z } from 'zod';
 
-import { useUpdateUser } from '@kit/supabase/hooks/use-update-user-mutation';
 import { Alert, AlertDescription, AlertTitle } from '@kit/ui/alert';
 import { Button } from '@kit/ui/button';
 import {
@@ -25,12 +29,14 @@ import { Trans } from '@kit/ui/trans';
 
 import { PasswordResetSchema } from '../schemas/password-reset.schema';
 import { PasswordInput } from './password-input';
+import { updatePasswordAction } from './update-password.action';
 
 export function UpdatePasswordForm(params: {
   redirectTo: string;
   heading?: React.ReactNode;
 }) {
-  const updateUser = useUpdateUser();
+  const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<{ code: string } | null>(null);
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -42,10 +48,8 @@ export function UpdatePasswordForm(params: {
     },
   });
 
-  if (updateUser.error) {
-    const error = updateUser.error as unknown as { code: string };
-
-    return <ErrorState error={error} onRetry={() => updateUser.reset()} />;
+  if (error) {
+    return <ErrorState error={error} onRetry={() => setError(null)} />;
   }
 
   return (
@@ -62,14 +66,22 @@ export function UpdatePasswordForm(params: {
         <form
           className={'flex w-full flex-1 flex-col'}
           onSubmit={form.handleSubmit(async ({ password }) => {
-            await updateUser.mutateAsync({
-              password,
-              redirectTo: params.redirectTo,
+            startTransition(async () => {
+              try {
+                await updatePasswordAction({ password });
+
+                router.replace(params.redirectTo);
+
+                toast.success(t('account:updatePasswordSuccessMessage'));
+              } catch (err) {
+                if (isRedirectError(err)) {
+                  throw err;
+                }
+
+                const authError = err as AuthError;
+                setError({ code: authError.code || 'resetPasswordError' });
+              }
             });
-
-            router.replace(params.redirectTo);
-
-            toast.success(t('account:updatePasswordSuccessMessage'));
           })}
         >
           <div className={'flex-col space-y-2.5'}>
@@ -103,11 +115,7 @@ export function UpdatePasswordForm(params: {
               )}
             />
 
-            <Button
-              disabled={updateUser.isPending}
-              type="submit"
-              className={'w-full'}
-            >
+            <Button disabled={isPending} type="submit" className={'w-full'}>
               <Trans i18nKey={'auth:passwordResetLabel'} />
             </Button>
           </div>
