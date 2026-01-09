@@ -62,11 +62,14 @@ const Button: React.FC<ButtonProps> = ({
   // The loading spinner is incompatible with asChild since Slot.Root
   // uses React.Children.only which throws on multiple children
   if (asChild) {
+    // Ensure we don't accidentally pass children in props
+    const { children: _propsChildren, ...restProps } = props as { children?: React.ReactNode };
+
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         disabled={isDisabled}
-        {...props}
+        {...restProps}
       >
         {children}
       </Comp>
