@@ -151,7 +151,14 @@ class UserBillingService {
     const returnUrl = getBillingPortalReturnUrl();
 
     if (!customerId) {
-      throw new Error('Customer not found');
+      // Customer might not be synced yet (race condition after checkout)
+      logger.error(
+        { name: this.namespace, accountId },
+        'Customer not found in database - subscription may not have synced yet',
+      );
+      throw new Error(
+        'Your subscription is still being processed. Please refresh the page and try again in a few seconds.',
+      );
     }
 
     const ctx = {
