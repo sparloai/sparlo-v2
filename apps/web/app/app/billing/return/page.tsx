@@ -92,11 +92,27 @@ async function loadCheckoutSession(sessionId: string) {
   const user = await requireUserInServerComponent();
 
   const client = getSupabaseServerClient();
-  const gateway = await getBillingGatewayProvider(client);
 
-  const session = await gateway.retrieveCheckoutSession({
-    sessionId,
-  });
+  let gateway;
+  try {
+    gateway = await getBillingGatewayProvider(client);
+  } catch (error) {
+    console.error('[Billing] Failed to get billing gateway provider:', error);
+    throw new Error('Failed to initialize billing gateway');
+  }
+
+  let session;
+  try {
+    session = await gateway.retrieveCheckoutSession({
+      sessionId,
+    });
+  } catch (error) {
+    console.error('[Billing] Failed to retrieve checkout session:', {
+      sessionId,
+      error,
+    });
+    throw new Error('Failed to retrieve checkout session from Stripe');
+  }
 
   if (!session) {
     notFound();
@@ -118,36 +134,44 @@ async function loadCheckoutSession(sessionId: string) {
   // This handles race condition where webhook hasn't fired yet
   let subscriptionSynced = false;
   if (session.status === 'complete' && session.subscriptionId) {
+    // ALWAYS fetch fresh subscription data from Stripe
+    let subscriptionData;
     try {
-      // Check if subscription already exists
-      const { data: existingSub } = await client
-        .from('subscriptions')
-        .select('id')
-        .eq('id', session.subscriptionId)
-        .maybeSingle();
+      subscriptionData = await gateway.getSubscription(session.subscriptionId);
+    } catch (error) {
+      console.error('[Billing] Failed to fetch subscription from Stripe:', {
+        subscriptionId: session.subscriptionId,
+        error,
+      });
+      // Don't crash the page - webhook will handle sync
+    }
 
-      if (!existingSub) {
-        // Subscription doesn't exist yet - retrieve from Stripe and sync
-        const subscriptionData = await gateway.getSubscription(session.subscriptionId);
+    if (subscriptionData) {
+      // SECURITY: Validate subscription ownership from Stripe metadata
+      if (subscriptionData.target_account_id &&
+          subscriptionData.target_account_id !== user.id) {
+        console.error('[Billing Security] Subscription account mismatch', {
+          sessionId,
+          currentUserId: user.id,
+          subscriptionAccountId: subscriptionData.target_account_id,
+        });
+        redirect('/app/billing?error=subscription_mismatch');
+      }
 
-        if (subscriptionData) {
-          // SECURITY: Validate subscription ownership from Stripe metadata
-          // If Stripe has an account_id in metadata, it MUST match current user
-          if (subscriptionData.target_account_id &&
-              subscriptionData.target_account_id !== user.id) {
-            console.error('[Billing Security] Subscription account mismatch', {
-              sessionId,
-              currentUserId: user.id,
-              subscriptionAccountId: subscriptionData.target_account_id,
-            });
-            redirect('/app/billing?error=subscription_mismatch');
-          }
+      // Check if subscription already exists in our database
+      try {
+        const { data: existingSub } = await client
+          .from('subscriptions')
+          .select('id')
+          .eq('id', session.subscriptionId)
+          .maybeSingle();
 
+        if (!existingSub) {
+          // Subscription doesn't exist yet - sync it
           const { error } = await client.rpc('upsert_subscription', {
             ...subscriptionData,
-            // Use current user's ID - we've validated ownership above
             target_account_id: user.id,
-            target_customer_id: session.customer.id ?? subscriptionData.target_customer_id,
+            target_customer_id: session.customer?.id ?? subscriptionData.target_customer_id,
           });
 
           if (error) {
@@ -155,43 +179,71 @@ async function loadCheckoutSession(sessionId: string) {
           } else {
             subscriptionSynced = true;
             console.log('[Billing] Subscription synced on return page:', subscriptionData.target_subscription_id);
-
-            // Also sync usage period with correct token limit
-            // This handles the race condition where webhook hasn't fired yet
-            const priceId = subscriptionData.line_items?.[0]?.variant_id;
-            if (priceId && subscriptionData.period_starts_at && subscriptionData.period_ends_at) {
-              try {
-                const tokenLimit = getPlanTokenLimit(priceId);
-                const adminClient = getSupabaseServerAdminClient();
-                const { error: usageError } = await adminClient.rpc('reset_usage_period', {
-                  p_account_id: user.id,
-                  p_tokens_limit: tokenLimit,
-                  p_period_start: subscriptionData.period_starts_at,
-                  p_period_end: subscriptionData.period_ends_at,
-                });
-
-                if (usageError) {
-                  console.error('[Billing] Failed to sync usage period on return:', usageError);
-                } else {
-                  console.log('[Billing] Usage period synced on return page:', { tokenLimit, priceId });
-                }
-              } catch (usageErr) {
-                console.error('[Billing] Error syncing usage period:', usageErr);
-                // Don't fail - webhook will handle it as fallback
-              }
-            }
           }
+        } else {
+          console.log('[Billing] Subscription already exists in DB, skipping subscription sync');
         }
+      } catch (error) {
+        console.error('[Billing] Error checking/syncing subscription:', error);
       }
-    } catch (error) {
-      // Don't fail the page if sync fails - webhook will handle it
-      console.error('[Billing] Error syncing subscription on return:', error);
+
+      // CRITICAL: ALWAYS sync usage period regardless of subscription sync status
+      // This ensures usage period is created even if:
+      // 1. Subscription was already synced by webhook
+      // 2. Webhook created subscription but not usage period
+      // 3. Any previous sync attempts failed
+      const priceId = subscriptionData.line_items?.[0]?.variant_id;
+      console.log('[Billing] Preparing to sync usage period:', {
+        accountId: user.id,
+        priceId,
+        hasPeriodStart: !!subscriptionData.period_starts_at,
+        hasPeriodEnd: !!subscriptionData.period_ends_at,
+      });
+
+      if (priceId && subscriptionData.period_starts_at && subscriptionData.period_ends_at) {
+        try {
+          const tokenLimit = getPlanTokenLimit(priceId);
+          const adminClient = getSupabaseServerAdminClient();
+
+          console.log('[Billing] Calling reset_usage_period:', {
+            accountId: user.id,
+            tokenLimit,
+            priceId,
+            periodStart: subscriptionData.period_starts_at,
+            periodEnd: subscriptionData.period_ends_at,
+          });
+
+          const { error: usageError } = await adminClient.rpc('reset_usage_period', {
+            p_account_id: user.id,
+            p_tokens_limit: tokenLimit,
+            p_period_start: subscriptionData.period_starts_at,
+            p_period_end: subscriptionData.period_ends_at,
+          });
+
+          if (usageError) {
+            console.error('[Billing] FAILED to sync usage period on return:', usageError);
+          } else {
+            console.log('[Billing] SUCCESS: Usage period synced on return page:', { tokenLimit, priceId });
+          }
+        } catch (usageErr) {
+          console.error('[Billing] EXCEPTION syncing usage period:', usageErr);
+        }
+      } else {
+        console.error('[Billing] MISSING DATA for usage period sync - this is a bug:', {
+          priceId,
+          periodStart: subscriptionData.period_starts_at,
+          periodEnd: subscriptionData.period_ends_at,
+          fullSubscriptionData: JSON.stringify(subscriptionData),
+        });
+      }
+    } else {
+      console.error('[Billing] Failed to fetch subscription from Stripe:', session.subscriptionId);
     }
   }
 
   return {
     status: session.status,
-    customerEmail: session.customer.email,
+    customerEmail: session.customer?.email ?? null,
     subscriptionSynced,
   };
 }

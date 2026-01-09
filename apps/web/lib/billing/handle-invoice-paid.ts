@@ -55,18 +55,27 @@ export async function handleInvoicePaid(
     tokenLimit = 1_000_000; // Default fallback (Lite tier)
   }
 
-  // Check if usage period already exists for this billing cycle (idempotency)
+  // Check if usage period already exists with CORRECT token limit (proper idempotency)
+  // If period exists but has wrong limit, we should update it
   const { data: existingPeriod } = await supabase
     .from('usage_periods')
-    .select('id')
+    .select('id, tokens_limit')
     .eq('account_id', accountId)
     .eq('period_start', periodStart)
     .eq('period_end', periodEnd)
     .maybeSingle();
 
-  if (existingPeriod) {
-    console.log('[Billing] Usage period already exists for this billing cycle');
+  if (existingPeriod && existingPeriod.tokens_limit === tokenLimit) {
+    console.log('[Billing] Usage period already exists with correct token limit, skipping');
     return;
+  }
+
+  if (existingPeriod) {
+    console.log('[Billing] Usage period exists but has wrong limit:', {
+      existing: existingPeriod.tokens_limit,
+      expected: tokenLimit,
+      willUpdate: true,
+    });
   }
 
   // Create new usage period (or reset existing)
