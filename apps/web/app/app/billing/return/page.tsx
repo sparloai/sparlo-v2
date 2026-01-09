@@ -168,7 +168,9 @@ async function loadCheckoutSession(sessionId: string) {
 
         if (!existingSub) {
           // Subscription doesn't exist yet - sync it
-          const { error } = await client.rpc('upsert_subscription', {
+          // IMPORTANT: Use admin client because upsert_subscription is only granted to service_role
+          const adminClient = getSupabaseServerAdminClient();
+          const { error } = await adminClient.rpc('upsert_subscription', {
             ...subscriptionData,
             target_account_id: user.id,
             target_customer_id: session.customer?.id ?? subscriptionData.target_customer_id,
