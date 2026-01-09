@@ -35,7 +35,7 @@ type EmailActionType =
 function getEmailContent(
   actionType: EmailActionType,
   data: AuthEmailPayload,
-): { subject: string; html: string } {
+): { subject: string; html: string; text: string } {
   const { user, email_data } = data;
   const userName = user.user_metadata?.full_name || 'there';
 
@@ -63,6 +63,15 @@ function getEmailContent(
     case 'signup':
       return {
         subject: 'Confirm your Sparlo account',
+        text: `Welcome to Sparlo
+
+Hi ${userName}, thanks for signing up! Please confirm your email address to get started.
+
+Confirm your email: ${confirmUrl}
+
+Or use this code: ${email_data.token}
+
+- Sparlo`,
         html: `
           <!DOCTYPE html>
           <html><head><style>${baseStyles}</style></head>
@@ -85,6 +94,15 @@ function getEmailContent(
     case 'recovery':
       return {
         subject: 'Reset your Sparlo password',
+        text: `Reset Your Password
+
+We received a request to reset your password.
+
+Reset your password: ${SITE_URL}/auth/confirm?token_hash=${email_data.token_hash}&type=recovery&next=${SITE_URL}/update-password
+
+If you didn't request this, you can safely ignore this email.
+
+- Sparlo`,
         html: `
           <!DOCTYPE html>
           <html><head><style>${baseStyles}</style></head>
@@ -107,6 +125,15 @@ function getEmailContent(
     case 'magiclink':
       return {
         subject: 'Sign in to Sparlo',
+        text: `Sign in to Sparlo
+
+Click the link below to sign in to your account:
+
+${confirmUrl}
+
+This link expires in 1 hour.
+
+- Sparlo`,
         html: `
           <!DOCTYPE html>
           <html><head><style>${baseStyles}</style></head>
@@ -129,6 +156,13 @@ function getEmailContent(
     case 'invite':
       return {
         subject: "You've been invited to Sparlo",
+        text: `You're Invited to Sparlo
+
+You've been invited to join a team on Sparlo.
+
+Accept invitation: ${confirmUrl}
+
+- Sparlo`,
         html: `
           <!DOCTYPE html>
           <html><head><style>${baseStyles}</style></head>
@@ -150,6 +184,15 @@ function getEmailContent(
     case 'email_change':
       return {
         subject: 'Confirm your email change',
+        text: `Confirm Email Change
+
+We received a request to change your email address.
+
+Confirm change: ${confirmUrl}
+
+If you didn't request this, please secure your account immediately.
+
+- Sparlo`,
         html: `
           <!DOCTYPE html>
           <html><head><style>${baseStyles}</style></head>
@@ -172,6 +215,13 @@ function getEmailContent(
     default:
       return {
         subject: 'Your Sparlo verification code',
+        text: `Verification Code
+
+Use this code to verify your action: ${email_data.token}
+
+This code expires in 1 hour.
+
+- Sparlo`,
         html: `
           <!DOCTYPE html>
           <html><head><style>${baseStyles}</style></head>
@@ -216,7 +266,7 @@ Deno.serve(async (req) => {
   }
 
   const actionType = data.email_data.email_action_type as EmailActionType;
-  const { subject, html } = getEmailContent(actionType, data);
+  const { subject, html, text } = getEmailContent(actionType, data);
 
   // Send via Resend API
   try {
@@ -231,6 +281,7 @@ Deno.serve(async (req) => {
         to: [data.user.email],
         subject,
         html,
+        text,
       }),
     });
 
