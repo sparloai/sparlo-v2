@@ -126,6 +126,7 @@ class ProseMarkdownErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       // Fallback: render as plain text with paragraph splitting
+      // Uses brand system typography: Suisse Intl, -0.02em, 1.3 line height
       const paragraphs = this.props.fallbackContent
         .split(/\n\n+/)
         .filter((p) => p.trim());
@@ -135,7 +136,7 @@ class ProseMarkdownErrorBoundary extends Component<
           {paragraphs.map((paragraph, idx) => (
             <p
               key={idx}
-              className="mb-4 text-[18px] leading-[1.7] text-zinc-700 last:mb-0"
+              className="mb-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] last:mb-0"
               style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
             >
               {paragraph}

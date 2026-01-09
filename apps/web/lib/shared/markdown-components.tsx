@@ -132,68 +132,100 @@ export const PROSE_SANITIZE_SCHEMA: RehypeSanitizeOptions = {
 
 /**
  * Prose-specific markdown components for DD report sections
- * Styled to match brand system typography (18px base)
+ * Styled to match brand system typography:
+ * - Font: Suisse Intl (var(--font-heading))
+ * - Letter spacing: -0.02em
+ * - Line height: 1.3
+ * - Primary text: #1e1e1e
+ * - Headers: normal case (not all caps)
  */
 export const PROSE_MARKDOWN_COMPONENTS = {
   p: ({ children }: { children?: React.ReactNode }) => (
     <p
-      className="mb-4 text-[18px] leading-[1.7] text-zinc-700 last:mb-0"
+      className="mb-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] last:mb-0"
       style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
     >
       {children}
     </p>
   ),
   h1: ({ children }: { children?: React.ReactNode }) => (
-    <h2 className="mb-4 mt-8 text-[28px] font-semibold tracking-tight text-zinc-900">
+    <h2
+      className="mb-4 mt-8 text-[24px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-900 normal-case"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </h2>
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
-    <h3 className="mb-4 mt-8 text-[24px] font-semibold tracking-tight text-zinc-900">
+    <h3
+      className="mb-3 mt-6 text-[22px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-900 normal-case"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </h3>
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
-    <h4 className="mb-3 mt-6 text-[20px] font-semibold tracking-tight text-zinc-800">
+    <h4
+      className="mb-3 mt-5 text-[20px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-800 normal-case"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </h4>
   ),
   h4: ({ children }: { children?: React.ReactNode }) => (
-    <h5 className="mb-2 mt-4 text-[18px] font-semibold text-zinc-800">
+    <h5
+      className="mb-2 mt-4 text-[18px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-800 normal-case"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </h5>
   ),
   h5: ({ children }: { children?: React.ReactNode }) => (
-    <h6 className="mb-2 mt-4 text-[16px] font-semibold text-zinc-800">
+    <h6
+      className="mb-2 mt-4 text-[16px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-800 normal-case"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </h6>
   ),
   h6: ({ children }: { children?: React.ReactNode }) => (
-    <p className="mb-2 mt-4 text-[14px] font-semibold text-zinc-700">
+    <p
+      className="mb-2 mt-4 text-[16px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-700 normal-case"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </p>
   ),
   strong: ({ children }: { children?: React.ReactNode }) => (
-    <strong className="font-semibold text-zinc-900">{children}</strong>
+    <strong className="font-semibold text-[#1e1e1e]">{children}</strong>
   ),
   em: ({ children }: { children?: React.ReactNode }) => (
     <em className="italic">{children}</em>
   ),
   ul: ({ children }: { children?: React.ReactNode }) => (
-    <ul className="mb-4 ml-6 list-disc space-y-2 text-[18px] text-zinc-700">
+    <ul
+      className="mb-4 ml-6 list-disc space-y-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </ul>
   ),
   ol: ({ children }: { children?: React.ReactNode }) => (
-    <ol className="mb-4 ml-6 list-decimal space-y-2 text-[18px] text-zinc-700">
+    <ol
+      className="mb-4 ml-6 list-decimal space-y-2 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e]"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </ol>
   ),
   li: ({ children }: { children?: React.ReactNode }) => (
-    <li className="leading-[1.7]">{children}</li>
+    <li className="leading-[1.3] tracking-[-0.02em]">{children}</li>
   ),
   blockquote: ({ children }: { children?: React.ReactNode }) => (
-    <blockquote className="my-4 border-l-4 border-zinc-300 pl-4 italic text-zinc-600">
+    <blockquote
+      className="my-4 border-l-2 border-zinc-300 pl-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-zinc-600 italic"
+      style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+    >
       {children}
     </blockquote>
   ),
@@ -222,7 +254,7 @@ export const PROSE_MARKDOWN_COMPONENTS = {
     return (
       <a
         href={href}
-        className="text-blue-600 underline decoration-blue-400 underline-offset-2 hover:decoration-blue-600"
+        className="text-[#1e1e1e] underline decoration-zinc-400 underline-offset-2 hover:decoration-zinc-600"
         target="_blank"
         rel="noopener noreferrer"
       >
