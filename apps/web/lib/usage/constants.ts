@@ -2,9 +2,9 @@
  * Centralized usage tracking constants.
  *
  * Token estimates based on production data from Claude Opus 4.5:
- * - Per report: ~150,000 tokens (input + output across all phases)
+ * - Per report: ~300,000 tokens (input + output across all phases)
  * - Per chat message: ~2,000 tokens
- * - Combined report + chat: ~180,000 tokens per "report session"
+ * - Combined report + chat: ~350,000 tokens per "report session"
  */
 
 export const USAGE_CONSTANTS = {
@@ -12,7 +12,7 @@ export const USAGE_CONSTANTS = {
   DEFAULT_TOKEN_LIMIT: 3_000_000,
 
   /** Estimated tokens consumed per full report generation */
-  ESTIMATED_TOKENS_PER_REPORT: 180_000,
+  ESTIMATED_TOKENS_PER_REPORT: 350_000,
 
   /** Estimated tokens per chat message exchange */
   ESTIMATED_TOKENS_PER_CHAT_MESSAGE: 2_000,
@@ -60,15 +60,15 @@ export const PLAN_TOKEN_LIMITS: Record<string, number> = {
 
 /**
  * Report limits per subscription plan.
- * Based on ~180,000 tokens per report.
+ * Based on ~350,000 tokens per report.
  */
 export const PLAN_REPORT_LIMITS: Record<string, number> = {
-  'lite-monthly': 5,
-  'lite-annual': 5,
-  'core-monthly': 16,
-  'core-annual': 16,
-  'pro-monthly': 55,
-  'pro-annual': 55,
-  'max-monthly': 111,
-  'max-annual': 111,
+  'lite-monthly': 2, // 1M / 350k = ~2.8 reports
+  'lite-annual': 2,
+  'core-monthly': 8, // 3M / 350k = ~8.5 reports
+  'core-annual': 8,
+  'pro-monthly': 28, // 10M / 350k = ~28.5 reports
+  'pro-annual': 28,
+  'max-monthly': 57, // 20M / 350k = ~57 reports
+  'max-annual': 57,
 } as const;

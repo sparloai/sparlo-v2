@@ -43,9 +43,7 @@ async function UsageGatedContent({
 
   // Gate: Show upgrade screen if not allowed
   if (!usage.allowed) {
-    return (
-      <TokenGateScreen variant={usage.reason} periodEnd={usage.periodEnd} />
-    );
+    return <TokenGateScreen />;
   }
 
   // Show the tabbed analysis mode selector
