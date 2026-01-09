@@ -1,6 +1,6 @@
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
 import { redirect } from 'next/navigation';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { createAuthCallbackService } from '@kit/supabase/auth';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
@@ -51,7 +51,9 @@ export async function GET(request: NextRequest) {
         redirectPath,
       });
 
-      return NextResponse.redirect(url);
+      // Use redirect() instead of NextResponse.redirect() to ensure
+      // session cookies set by verifyOtp are included in the response
+      return redirect(url.pathname + url.search);
     } else {
       // No valid auth parameter - redirect to error
       return redirect(
