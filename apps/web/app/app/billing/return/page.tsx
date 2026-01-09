@@ -12,8 +12,6 @@ import { getPlanTokenLimit } from '~/lib/billing/plan-limits';
 import { withI18n } from '~/lib/i18n/with-i18n';
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 
-import { createPersonalAccountBillingPortalSession } from '../_lib/server/server-actions';
-
 interface SessionPageProps {
   searchParams: Promise<{
     session_id: string;
@@ -65,22 +63,12 @@ async function ReturnCheckoutSessionPage({ searchParams }: SessionPageProps) {
 
         {/* CTA */}
         <Link
-          href="/app"
+          href="/app/reports/new"
           className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-6 py-3 text-[15px] font-medium text-white transition-colors hover:bg-zinc-800"
         >
           Run Analysis
           <ArrowRight className="h-4 w-4" />
         </Link>
-
-        {/* Secondary link - goes to Stripe billing portal */}
-        <form action={createPersonalAccountBillingPortalSession} className="mt-6">
-          <button
-            type="submit"
-            className="text-[14px] text-zinc-400 underline transition-colors hover:text-zinc-600"
-          >
-            Manage subscription
-          </button>
-        </form>
       </div>
     </main>
   );
