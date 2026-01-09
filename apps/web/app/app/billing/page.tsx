@@ -35,8 +35,14 @@ function getPlanInfo(priceId: string | undefined) {
   return { name: 'Unknown', interval: 'month' as const };
 }
 
-async function PersonalAccountBillingPage() {
+interface PageProps {
+  searchParams: Promise<{ updated?: string }>;
+}
+
+async function PersonalAccountBillingPage({ searchParams }: PageProps) {
   const user = await requireUserInServerComponent();
+  const { updated } = await searchParams;
+  const showUpdateSuccess = updated === 'true';
 
   const [subscription, _order, customerId, usage] =
     await loadPersonalAccountBillingPageData(user.id);
@@ -59,16 +65,14 @@ async function PersonalAccountBillingPage() {
         planName={planInfo.name}
         planInterval={planInfo.interval}
         canUpgrade={canUpgrade}
+        showUpdateSuccess={showUpdateSuccess}
       />
     );
   }
 
   // Non-subscribers see the pricing/plans page
   return (
-    <SparloBillingPricing
-      config={billingConfig}
-      customerId={customerId}
-    />
+    <SparloBillingPricing config={billingConfig} customerId={customerId} />
   );
 }
 

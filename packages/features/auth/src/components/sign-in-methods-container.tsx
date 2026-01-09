@@ -54,7 +54,10 @@ export function SignInMethodsContainer(props: {
 
   return (
     <>
-      <AuthTransitionOverlay isActive={isTransitioning} message="Welcome back" />
+      <AuthTransitionOverlay
+        isActive={isTransitioning}
+        message="Welcome back"
+      />
 
       <LastAuthMethodHint />
 

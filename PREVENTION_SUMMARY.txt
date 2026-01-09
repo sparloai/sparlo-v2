@@ -1,0 +1,441 @@
+================================================================================
+PostgreSQL Function Security: Prevention Strategies
+================================================================================
+
+DOCUMENT SUITE CREATED
+================================================================================
+
+The following documents have been created to prevent the PostgreSQL issues that
+were recently fixed in this codebase:
+
+1. PREVENTION_STRATEGIES.md (COMPREHENSIVE GUIDE)
+   - Complete analysis of both issues
+   - Prevention strategies and best practices
+   - Code review checklist
+   - Test cases for both issues
+   - Real-world examples
+   - When to use SECURITY DEFINER vs INVOKER
+   - How to detect silent RLS failures
+
+2. QUICK_REFERENCE_GUIDE.md (FAST LOOKUP)
+   - Decision trees for security context
+   - Common pattern library
+   - Debugging commands
+   - Common mistakes and fixes
+   - The 10 Golden Rules
+
+3. CODE_REVIEW_CHECKLIST.md (PRACTICAL TOOL)
+   - Section-by-section review guide
+   - Red flags for automatic rejection
+   - Specific code review comments
+   - Approval criteria
+
+4. TEST_CASES_PREVENTION.sql (pgTAP TEST SUITE)
+   - BIGINT overflow detection tests
+   - SECURITY DEFINER authorization tests
+   - SECURITY INVOKER RLS enforcement tests
+   - RLS bypass detection tests
+   - Type precision tests
+   - SQL injection prevention tests
+
+================================================================================
+ISSUES PREVENTED
+================================================================================
+
+ISSUE 1: BIGINT to INTEGER Overflow
+────────────────────────────────────────────────────────────────────────────────
+
+THE PROBLEM:
+- PostgreSQL functions returning INTEGER for BIGINT columns
+- No error raised - silent cast happens
+- Results in wrong values for large numbers (>2.147 billion)
+- Happens with usage tracking: tokens_used, tokens_limit, etc.
+
+PREVENTION STRATEGIES:
+1. Code Review Checklist
+   - Verify return types match source column types EXACTLY
+   - No INTEGER for BIGINT columns
+   - Check all COALESCE statements for type consistency
+   - Test with large values (>2.1B)
+
+2. Best Practices
+   - Use BIGINT for all token/usage counters
+   - Explicit type casting with ::bigint
+   - COALESCE(bigint_col, 0::bigint) not COALESCE(bigint_col, 0)
+   - Verify function signature: \df+ function_name
+
+3. Test Coverage
+   - Test with tokens_used = 9000000000 (9 billion)
+   - Verify SUM(bigint) returns correct type
+   - Check function returns match application schema expectations
+
+4. Detection
+   - Schema validation tests during code review
+   - Runtime type checking in application
+   - Monitoring for unexpectedly small values
+
+
+ISSUE 2: RLS Blocking SECURITY INVOKER Functions
+────────────────────────────────────────────────────────────────────────────────
+
+THE PROBLEM:
+- SECURITY INVOKER functions inherit caller's RLS context
+- Can't access data from team members (RLS blocks it)
+- Function fails silently (empty results, no error)
+- Happens when accessing cross-user data in team accounts
+
+PREVENTION STRATEGIES:
+1. Code Review Checklist
+   - Understand why function needs elevated privileges
+   - Add authorization checks to SECURITY DEFINER functions
+   - Verify RLS exists for SECURITY INVOKER functions
+   - SET search_path = '' in SECURITY DEFINER functions
+
+2. Decision Framework
+   - Need to access data beyond caller's account? → SECURITY DEFINER
+   - Can RLS policies protect the access? → SECURITY INVOKER + verify RLS
+   - Querying cross-user team data? → SECURITY DEFINER + auth check
+
+3. Best Practices
+   - Authorization check is FIRST statement in function
+   - Use explicit: IF NOT EXISTS (SELECT 1 FROM accounts_memberships ...) THEN RAISE
+   - Always include SET search_path = '' in SECURITY DEFINER
+   - Document why DEFINER is needed in COMMENT ON
+
+4. Test Coverage
+   - Test that unauthorized users get access denied error
+   - Test that team members can access team data
+   - Test that RLS policies apply correctly
+   - Test that SECURITY DEFINER doesn't bypass needed controls
+
+5. Detection
+   - Audit logging for sensitive function calls
+   - Application-level verification before RPC calls
+   - Monitoring for unexpected empty results
+   - RLS policy validation in tests
+
+
+================================================================================
+KEY PRINCIPLES
+================================================================================
+
+TYPE SAFETY
+───────────
+1. Match return types exactly - No silent casts
+2. Use BIGINT for aggregates and tokens
+3. Explicit casting with ::bigint
+4. Test with edge values (large numbers, NULL)
+5. Verify function signature matches schema
+
+SECURITY CONTEXT
+─────────────────
+1. Choose DEFINER vs INVOKER deliberately, not by accident
+2. Authorization comes FIRST, before any data access
+3. SET search_path = '' in SECURITY DEFINER functions
+4. Grant to specific roles (authenticated, service_role)
+5. Document security decisions in comments
+
+RLS ENFORCEMENT
+────────────────
+1. INVOKER: Verify RLS exists on ALL accessed tables
+2. DEFINER: Add explicit authorization checks
+3. DEFINER: Don't rely on RLS policies
+4. Test with different user roles
+5. Application-level checks for defense-in-depth
+
+TESTING
+────────
+1. Test authorization separately from business logic
+2. Test RLS with multiple user roles
+3. Test with large values (>2.147 billion)
+4. Test error cases (unauthorized access)
+5. Test cross-user access (team members, non-members)
+
+
+================================================================================
+QUICK DECISION TREE
+================================================================================
+
+Creating a new PostgreSQL function?
+
+1. Determine security context:
+   └─ Does it need to access data outside caller's view?
+      ├─ YES → Use SECURITY DEFINER + authorization check
+      └─ NO → Use SECURITY INVOKER + verify RLS
+
+2. Check return types:
+   └─ Are any columns large numbers (tokens, counters)?
+      ├─ YES → Use BIGINT, test with 9+ billion
+      └─ NO → Verify types match source schema
+
+3. Add authorization:
+   └─ If SECURITY DEFINER:
+      ├─ Add auth check as FIRST statement
+      ├─ Add SET search_path = ''
+      ├─ Add COMMENT ON explaining why
+      └─ Grant to specific role
+
+4. Add RLS verification:
+   └─ If SECURITY INVOKER:
+      ├─ Verify RLS on all accessed tables
+      ├─ Verify policies cover all operations
+      ├─ Test with different roles
+      └─ Add application-level checks
+
+5. Test authorization:
+   └─ Create test users
+   ├─ Verify authorized access works
+   ├─ Verify unauthorized access fails
+   ├─ Verify membership changes work
+   └─ Document test process in PR
+
+
+================================================================================
+RED FLAGS: AUTOMATIC REJECTION DURING CODE REVIEW
+================================================================================
+
+CRITICAL SECURITY ISSUES:
+✗ SECURITY DEFINER without authorization check
+✗ SECURITY DEFINER accessing data without auth.uid() validation
+✗ No SET search_path = '' in SECURITY DEFINER
+✗ Grant EXECUTE to public or anon (unless intentionally public)
+✗ Dynamic SQL with user input (string concatenation)
+✗ SECURITY INVOKER without verified RLS policies
+
+CRITICAL TYPE ISSUES:
+✗ INTEGER return type for BIGINT columns
+✗ No explicit type cast in COALESCE
+✗ Implicit type conversions on numeric columns
+
+CRITICAL DESIGN ISSUES:
+✗ No authorization check for sensitive data
+✗ Function returns more data than caller should see
+✗ Breaks existing RLS policies
+✗ Silent failure instead of explicit error
+
+MISSING DOCUMENTATION:
+✗ No COMMENT ON function
+✗ No explanation of security choices
+✗ No test cases for authorization
+
+
+================================================================================
+IMPLEMENTATION CHECKLIST FOR NEW FUNCTIONS
+================================================================================
+
+PHASE 1: DESIGN
+────────────────
+[ ] Determine security context (DEFINER or INVOKER?)
+[ ] Plan authorization checks (if DEFINER)
+[ ] Define precise return types
+[ ] Document security decisions
+
+PHASE 2: IMPLEMENTATION
+────────────────────────
+[ ] Write authorization check first (if DEFINER)
+[ ] Add SET search_path = '' (if DEFINER)
+[ ] Verify return types match schema
+[ ] Add COMMENT ON with security explanation
+[ ] Grant appropriately
+
+PHASE 3: TESTING
+─────────────────
+[ ] Unit tests: authorization and data access
+[ ] Integration tests: multiple user roles
+[ ] Edge cases: NULL, empty results, permission changes
+[ ] Type tests: large values, precision
+[ ] Security tests: unauthorized access, privilege escalation
+
+PHASE 4: CODE REVIEW
+──────────────────────
+[ ] Use CODE_REVIEW_CHECKLIST.md
+[ ] Run TEST_CASES_PREVENTION.sql
+[ ] Verify type safety with \df+ function_name
+[ ] Verify RLS policies (if INVOKER)
+[ ] Check grants are specific
+
+
+================================================================================
+USAGE INSTRUCTIONS
+================================================================================
+
+FOR CODE REVIEW:
+1. Use CODE_REVIEW_CHECKLIST.md for systematic review
+2. Run TEST_CASES_PREVENTION.sql before approval
+3. Reference QUICK_REFERENCE_GUIDE.md for common patterns
+4. Check PREVENTION_STRATEGIES.md for detailed explanations
+
+FOR FUNCTION DEVELOPMENT:
+1. Review decision tree in QUICK_REFERENCE_GUIDE.md
+2. Use authorization template in QUICK_REFERENCE_GUIDE.md
+3. Follow implementation checklist above
+4. Use pattern library in QUICK_REFERENCE_GUIDE.md
+
+FOR DEBUGGING:
+1. Check debugging commands in QUICK_REFERENCE_GUIDE.md
+2. Use SELECT debugging steps in TYPE SAFETY section
+3. Reference RED FLAGS in CODE_REVIEW_CHECKLIST.md
+4. Look up common mistakes in QUICK_REFERENCE_GUIDE.md
+
+FOR TESTING:
+1. Run TEST_CASES_PREVENTION.sql in pgTAP framework
+2. Follow test cases in PREVENTION_STRATEGIES.md
+3. Use test templates in CODE_REVIEW_CHECKLIST.md
+
+
+================================================================================
+DOCUMENT LOCATIONS
+================================================================================
+
+All documents created in: /Users/alijangbar/Desktop/sparlo-v2/
+
+1. PREVENTION_STRATEGIES.md - Comprehensive guide (9000+ lines)
+2. QUICK_REFERENCE_GUIDE.md - Fast lookup
+3. CODE_REVIEW_CHECKLIST.md - Practical tool
+4. TEST_CASES_PREVENTION.sql - pgTAP tests
+5. PREVENTION_SUMMARY.txt - This file
+
+
+================================================================================
+RELATED FILES IN CODEBASE
+================================================================================
+
+SECURITY FIXES (References):
+- /Users/alijangbar/Desktop/sparlo-v2/SECURITY_FIX_get_team_member_usage.sql
+  → Shows correct SECURITY DEFINER + authorization pattern
+
+- /Users/alijangbar/Desktop/sparlo-v2/SECURITY_FIX_team-usage.loader.ts
+  → Shows application-level defense-in-depth
+
+MIGRATIONS WITH FIXES:
+- apps/web/supabase/migrations/20260108135731_fix_admin_search_return_types.sql
+  → BIGINT type fix example
+
+- apps/web/supabase/migrations/20260107082025_create_admin_usage_rpcs.sql
+  → SECURITY DEFINER + authorization pattern
+
+- apps/web/supabase/migrations/20260107200826_fix-sparlo-reports-rls-team-access.sql
+  → RLS policy fix example
+
+SCHEMA DEFINITIONS:
+- apps/web/supabase/schemas/17-usage-periods.sql
+  → Shows BIGINT usage for tokens_used, tokens_limit
+
+
+================================================================================
+REAL-WORLD EXAMPLE: FIXED get_team_member_usage()
+================================================================================
+
+BEFORE (BROKEN):
+────────────────
+CREATE FUNCTION get_team_member_usage(...)
+RETURNS TABLE (...)
+LANGUAGE sql
+SECURITY INVOKER
+AS $$
+  SELECT ... FROM sparlo_reports r
+  WHERE r.account_id = p_account_id
+    AND r.created_by = u.id
+$$;
+
+PROBLEMS:
+- SECURITY INVOKER with RLS prevents access to other users' reports
+- Silent failure: Returns empty results instead of error
+- Breaks team member usage tracking
+
+AFTER (FIXED):
+──────────────
+CREATE FUNCTION get_team_member_usage(
+  p_account_id uuid,
+  p_period_start timestamptz,
+  p_period_end timestamptz
+)
+RETURNS TABLE (
+  user_id uuid,
+  user_name text,
+  user_email text,
+  reports_count bigint,        -- ✓ BIGINT for safety
+  is_current_member boolean
+)
+LANGUAGE plpgsql
+SECURITY DEFINER              -- ✓ Elevated privileges for cross-user data
+SET search_path = ''          -- ✓ Prevent SQL injection
+AS $$
+BEGIN
+  -- ✓ Authorization check FIRST
+  if not exists (
+    select 1
+    from public.accounts_memberships am
+    where am.account_id = p_account_id
+      and am.user_id = auth.uid()
+  ) then
+    raise exception 'Access denied: You are not a member of this account'
+      using errcode = 'insufficient_privilege';
+  end if;
+
+  -- ✓ Now safe to query cross-user data
+  return query
+  select ... from ... where account_id = p_account_id;
+end;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_team_member_usage(...) TO authenticated;
+
+-- ✓ Clear security documentation
+COMMENT ON FUNCTION public.get_team_member_usage IS
+  'Returns team member usage statistics. Requires caller to be a member.';
+
+KEY IMPROVEMENTS:
+✓ Type safety: BIGINT for reports_count
+✓ Authorization: Explicit membership check
+✓ Security context: SECURITY DEFINER with auth
+✓ SQL injection protection: SET search_path = ''
+✓ Error handling: Clear exception message
+✓ Documentation: Security comment explains requirements
+
+
+================================================================================
+GETTING STARTED
+================================================================================
+
+1. READ FIRST:
+   - QUICK_REFERENCE_GUIDE.md (10 min read)
+   - Understand the decision tree
+
+2. FOR CODE REVIEW:
+   - Use CODE_REVIEW_CHECKLIST.md
+   - Reference PREVENTION_STRATEGIES.md for details
+
+3. FOR NEW FUNCTIONS:
+   - Follow IMPLEMENTATION CHECKLIST above
+   - Use pattern library in QUICK_REFERENCE_GUIDE.md
+   - Run TEST_CASES_PREVENTION.sql
+
+4. FOR DEBUGGING:
+   - Check "Common Mistakes & Fixes" in QUICK_REFERENCE_GUIDE.md
+   - Use debugging commands provided
+   - Reference red flags in CODE_REVIEW_CHECKLIST.md
+
+
+================================================================================
+QUESTIONS?
+================================================================================
+
+For detailed explanations: See PREVENTION_STRATEGIES.md
+For quick lookup: See QUICK_REFERENCE_GUIDE.md
+For code review: See CODE_REVIEW_CHECKLIST.md
+For testing: See TEST_CASES_PREVENTION.sql
+
+Each document is self-contained and can be read independently, but together
+they provide comprehensive coverage of:
+1. Why these issues happened
+2. How to prevent them
+3. How to review code for them
+4. How to test for them
+5. Real-world examples and patterns
+
+================================================================================
+Last Updated: January 8, 2026
+Version: 1.0
+Status: Production Ready
+================================================================================

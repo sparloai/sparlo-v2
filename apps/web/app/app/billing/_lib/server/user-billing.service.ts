@@ -211,7 +211,7 @@ function getCheckoutSessionReturnUrl() {
 
 function getBillingPortalReturnUrl() {
   return new URL(
-    pathsConfig.app.personalAccountBilling,
+    pathsConfig.app.personalAccountBillingPortalReturn,
     appConfig.url,
   ).toString();
 }

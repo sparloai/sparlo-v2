@@ -1,7 +1,7 @@
+import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-import { Check, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRight, Check } from 'lucide-react';
 
 import { getBillingGatewayProvider } from '@kit/billing-gateway';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';

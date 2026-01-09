@@ -7,10 +7,7 @@ interface TokenGateScreenProps {
   periodEnd?: string | null;
 }
 
-export function TokenGateScreen({
-  variant,
-  periodEnd,
-}: TokenGateScreenProps) {
+export function TokenGateScreen({ variant, periodEnd }: TokenGateScreenProps) {
   const isLimitExceeded = variant === 'limit_exceeded';
 
   const resetDate = periodEnd

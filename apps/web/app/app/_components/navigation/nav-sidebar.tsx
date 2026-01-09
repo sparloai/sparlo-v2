@@ -15,12 +15,12 @@ import { useAppPath } from '~/lib/hooks/use-app-path';
 
 import { useAppWorkspace } from '../../_lib/app-workspace-context';
 import type { RecentReport } from '../../_lib/server/recent-reports.loader';
-import { SignOutButton } from '../sign-out-button';
 import {
   COLLAPSED_WIDTH,
   EXPANDED_WIDTH,
   useSidebarState,
 } from '../../_lib/sidebar-context';
+import { SignOutButton } from '../sign-out-button';
 
 /**
  * App Sidebar - Claude-style
@@ -167,7 +167,7 @@ function SettingsDropdown({
 
       {/* Email at bottom */}
       {userEmail && (
-        <div className="border-t border-zinc-100 mt-1.5 px-4 py-3 dark:border-zinc-800">
+        <div className="mt-1.5 border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
           <span className="block truncate text-[13px] text-zinc-400 dark:text-zinc-500">
             {userEmail}
           </span>

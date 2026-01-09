@@ -410,7 +410,6 @@ export const ShowcaseGallery = memo(function ShowcaseGallery() {
             </Button>
           </div>
         </div>
-
       </div>
 
       {/* Full Report Modal */}

@@ -465,7 +465,7 @@ export const DD0_M_OutputSchema = z.object({
   novelty_claims: z
     .array(
       z.object({
-        claim: z.string(),
+        claim: z.string().catch(''),
         basis: z.string().catch(''),
         evidence_provided: z.string().default('None provided'),
         prior_art_search_query: z.string().catch(''),
@@ -477,7 +477,7 @@ export const DD0_M_OutputSchema = z.object({
     .array(
       z.object({
         id: z.string().catch(''),
-        claim_text: z.string(),
+        claim_text: z.string().catch(''),
         claim_type: ClaimType,
         evidence_level: EvidenceLevel,
         verifiability: Verifiability,
@@ -492,7 +492,7 @@ export const DD0_M_OutputSchema = z.object({
     .array(
       z.object({
         id: z.string().catch(''),
-        mechanism: z.string(),
+        mechanism: z.string().catch(''),
         how_described: z.string().catch(''),
         depth_of_explanation: flexibleEnum(
           ['DETAILED', 'MODERATE', 'SUPERFICIAL', 'HAND_WAVY'],
@@ -519,7 +519,7 @@ export const DD0_M_OutputSchema = z.object({
           ],
           'VAGUE_MECHANISM',
         ),
-        description: z.string(),
+        description: z.string().catch(''),
         severity: flexibleEnum(['CRITICAL', 'HIGH', 'MEDIUM'], 'MEDIUM'),
         related_claim_id: z.string().catch(''),
         question_for_founders: z.string().catch(''),
@@ -530,7 +530,7 @@ export const DD0_M_OutputSchema = z.object({
   information_gaps: z
     .array(
       z.object({
-        gap: z.string(),
+        gap: z.string().catch(''),
         why_needed: z.string().catch(''),
         impact_if_missing: z.string().catch(''),
       }),
@@ -555,7 +555,7 @@ export const DD0_M_OutputSchema = z.object({
     .array(
       z.object({
         id: z.string().catch(''),
-        assumption: z.string(),
+        assumption: z.string().catch(''),
         category: CommercialAssumptionCategory,
         stated_or_implied: flexibleEnum(['STATED', 'IMPLIED'], 'IMPLIED'),
         source_in_materials: z.string().catch(''),
@@ -570,7 +570,7 @@ export const DD0_M_OutputSchema = z.object({
   policy_dependencies: z
     .array(
       z.object({
-        policy: z.string(),
+        policy: z.string().catch(''),
         dependency_level: Severity,
         current_status: z.string().default('Unknown'),
         risk_factors: z.string().catch(''),
@@ -595,19 +595,27 @@ export type DD0_M_Output = z.infer<typeof DD0_M_OutputSchema>;
 // Inner schema for DD3 structured data (used in both old and new formats)
 // ANTIFRAGILE: All fields have sensible defaults
 const DD3_M_StructuredDataSchema = z.object({
-  validation_summary: z.object({
-    overall_technical_assessment: z.string().default('Assessment pending'),
-    critical_claims_status: z.string().default('Under review'),
-    mechanism_validity: MechanismVerdict,
-    key_concern: z.string().catch(''),
-    key_strength: z.string().catch(''),
-  }),
+  validation_summary: z
+    .object({
+      overall_technical_assessment: z.string().default('Assessment pending'),
+      critical_claims_status: z.string().default('Under review'),
+      mechanism_validity: MechanismVerdict,
+      key_concern: z.string().catch(''),
+      key_strength: z.string().catch(''),
+    })
+    .default({
+      overall_technical_assessment: 'Assessment pending',
+      critical_claims_status: 'Under review',
+      mechanism_validity: 'QUESTIONABLE',
+      key_concern: '',
+      key_strength: '',
+    }),
 
   physics_validation: z
     .array(
       z.object({
         claim_id: z.string().catch(''),
-        claim_text: z.string(),
+        claim_text: z.string().catch(''),
         governing_physics: z.object({
           principle: z.string().catch(''),
           equation: z.string().optional(),
@@ -626,175 +634,289 @@ const DD3_M_StructuredDataSchema = z.object({
     )
     .default([]),
 
-  mechanism_validation: z.object({
-    claimed_mechanism: z.string().catch(''),
-    actual_physics: z.string().catch(''),
-    accuracy_assessment: flexibleEnum(
-      ['ACCURATE', 'OVERSIMPLIFIED', 'PARTIALLY_WRONG', 'FUNDAMENTALLY_WRONG'],
-      'OVERSIMPLIFIED',
-    ),
+  mechanism_validation: z
+    .object({
+      claimed_mechanism: z.string().catch(''),
+      actual_physics: z.string().catch(''),
+      accuracy_assessment: flexibleEnum(
+        [
+          'ACCURATE',
+          'OVERSIMPLIFIED',
+          'PARTIALLY_WRONG',
+          'FUNDAMENTALLY_WRONG',
+        ],
+        'OVERSIMPLIFIED',
+      ),
 
-    mechanism_deep_dive: z.object({
-      working_principle: z.string().catch(''),
-      rate_limiting_step: z.string().catch(''),
-      key_parameters: z
+      mechanism_deep_dive: z
+        .object({
+          working_principle: z.string().catch(''),
+          rate_limiting_step: z.string().catch(''),
+          key_parameters: z
+            .array(
+              z.object({
+                parameter: z.string().catch(''),
+                startup_claim: z.string().catch(''),
+                validated_range: z.string().catch(''),
+                gap: z.string().catch(''),
+              }),
+            )
+            .default([]),
+          failure_modes: z
+            .array(
+              z.object({
+                mode: z.string().catch(''),
+                trigger: z.string().catch(''),
+                startup_addresses: z.boolean().default(false),
+                mitigation_quality: flexibleEnum(
+                  ['STRONG', 'ADEQUATE', 'WEAK', 'MISSING'],
+                  'WEAK',
+                ),
+              }),
+            )
+            .default([]),
+        })
+        .default({
+          working_principle: '',
+          rate_limiting_step: '',
+          key_parameters: [],
+          failure_modes: [],
+        }),
+
+      mechanism_precedent: z
+        .object({
+          demonstrated_elsewhere: z.boolean().default(false),
+          where: z.string().default('Unknown'),
+          at_what_scale: z.string().default('Unknown'),
+          key_differences: z.string().catch(''),
+        })
+        .default({
+          demonstrated_elsewhere: false,
+          where: 'Unknown',
+          at_what_scale: 'Unknown',
+          key_differences: '',
+        }),
+
+      verdict: MechanismVerdict,
+      confidence: Confidence,
+      reasoning: z.string().catch(''),
+    })
+    .default({
+      claimed_mechanism: '',
+      actual_physics: '',
+      accuracy_assessment: 'OVERSIMPLIFIED',
+      mechanism_deep_dive: {
+        working_principle: '',
+        rate_limiting_step: '',
+        key_parameters: [],
+        failure_modes: [],
+      },
+      mechanism_precedent: {
+        demonstrated_elsewhere: false,
+        where: 'Unknown',
+        at_what_scale: 'Unknown',
+        key_differences: '',
+      },
+      verdict: 'QUESTIONABLE',
+      confidence: 'LOW',
+      reasoning: '',
+    }),
+
+  triz_analysis: z
+    .object({
+      problem_contradictions: z
         .array(
           z.object({
-            parameter: z.string(),
-            startup_claim: z.string().catch(''),
-            validated_range: z.string().catch(''),
-            gap: z.string().catch(''),
+            contradiction: z.string().catch(''),
+            type: flexibleEnum(['TECHNICAL', 'PHYSICAL'], 'TECHNICAL'),
+            improving_parameter: z.string().catch(''),
+            worsening_parameter: z.string().catch(''),
+            startup_awareness: flexibleEnum(
+              ['IDENTIFIED', 'PARTIALLY_AWARE', 'UNAWARE'],
+              'PARTIALLY_AWARE',
+            ),
+            startup_resolution: z.string().catch(''),
+            resolution_validity: flexibleEnum(
+              ['RESOLVED', 'PARTIALLY_RESOLVED', 'UNRESOLVED', 'IGNORED'],
+              'PARTIALLY_RESOLVED',
+            ),
+            standard_resolution: z.string().catch(''),
+            inventive_principles_applicable: z.array(z.string()).default([]),
           }),
         )
         .default([]),
-      failure_modes: z
+
+      missed_contradictions: z
         .array(
           z.object({
-            mode: z.string(),
-            trigger: z.string().catch(''),
-            startup_addresses: z.boolean().default(false),
-            mitigation_quality: flexibleEnum(
-              ['STRONG', 'ADEQUATE', 'WEAK', 'MISSING'],
-              'WEAK',
+            contradiction: z.string().catch(''),
+            why_it_matters: z.string().catch(''),
+            likely_manifestation: z.string().catch(''),
+          }),
+        )
+        .default([]),
+
+      triz_assessment: z
+        .object({
+          contradiction_awareness: Confidence,
+          resolution_quality: flexibleEnum(
+            ['ELEGANT', 'ADEQUATE', 'PARTIAL', 'POOR'],
+            'ADEQUATE',
+          ),
+          inventive_level: flexibleNumber(3, { min: 1, max: 5 }),
+          inventive_level_rationale: z.string().catch(''),
+        })
+        .default({
+          contradiction_awareness: 'LOW',
+          resolution_quality: 'ADEQUATE',
+          inventive_level: 3,
+          inventive_level_rationale: '',
+        }),
+    })
+    .default({
+      problem_contradictions: [],
+      missed_contradictions: [],
+      triz_assessment: {
+        contradiction_awareness: 'LOW',
+        resolution_quality: 'ADEQUATE',
+        inventive_level: 3,
+        inventive_level_rationale: '',
+      },
+    }),
+
+  feasibility_validation: z
+    .object({
+      scale_assessment: z
+        .object({
+          current_demonstrated_scale: z.string().default('Unknown'),
+          claimed_target_scale: z.string().default('Unknown'),
+          scaling_challenges: z
+            .array(
+              z.object({
+                challenge: z.string().catch(''),
+                nonlinearity: z.string().catch(''),
+                startup_addresses: z.boolean().default(false),
+                assessment: flexibleEnum(
+                  ['MANAGEABLE', 'SIGNIFICANT', 'SEVERE'],
+                  'SIGNIFICANT',
+                ),
+              }),
+            )
+            .default([]),
+          scale_verdict: flexibleEnum(
+            ['FEASIBLE', 'CHALLENGING', 'UNLIKELY'],
+            'CHALLENGING',
+          ),
+        })
+        .default({
+          current_demonstrated_scale: 'Unknown',
+          claimed_target_scale: 'Unknown',
+          scaling_challenges: [],
+          scale_verdict: 'CHALLENGING',
+        }),
+
+      cost_assessment: z
+        .object({
+          claimed_cost: z.string().default('Not specified'),
+          cost_basis_provided: z.string().default('None'),
+          cost_basis_quality: flexibleEnum(
+            ['DETAILED', 'REASONABLE', 'SUPERFICIAL', 'MISSING'],
+            'SUPERFICIAL',
+          ),
+          hidden_costs_identified: z
+            .array(
+              z.object({
+                cost: z.string().catch(''),
+                estimated_impact: z.string().catch(''),
+                basis: z.string().catch(''),
+              }),
+            )
+            .default([]),
+          realistic_cost_range: z.string().default('Unknown'),
+          cost_verdict: flexibleEnum(
+            ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
+            'OPTIMISTIC',
+          ),
+        })
+        .default({
+          claimed_cost: 'Not specified',
+          cost_basis_provided: 'None',
+          cost_basis_quality: 'SUPERFICIAL',
+          hidden_costs_identified: [],
+          realistic_cost_range: 'Unknown',
+          cost_verdict: 'OPTIMISTIC',
+        }),
+
+      timeline_assessment: z
+        .object({
+          claimed_timeline: z.string().default('Not specified'),
+          trl_current: z.string().default('Unknown'),
+          trl_claimed: z.string().default('Unknown'),
+          timeline_verdict: flexibleEnum(
+            ['REALISTIC', 'AGGRESSIVE', 'UNREALISTIC'],
+            'AGGRESSIVE',
+          ),
+          realistic_timeline: z.string().default('TBD'),
+        })
+        .default({
+          claimed_timeline: 'Not specified',
+          trl_current: 'Unknown',
+          trl_claimed: 'Unknown',
+          timeline_verdict: 'AGGRESSIVE',
+          realistic_timeline: 'TBD',
+        }),
+    })
+    .default({
+      scale_assessment: {
+        current_demonstrated_scale: 'Unknown',
+        claimed_target_scale: 'Unknown',
+        scaling_challenges: [],
+        scale_verdict: 'CHALLENGING',
+      },
+      cost_assessment: {
+        claimed_cost: 'Not specified',
+        cost_basis_provided: 'None',
+        cost_basis_quality: 'SUPERFICIAL',
+        hidden_costs_identified: [],
+        realistic_cost_range: 'Unknown',
+        cost_verdict: 'OPTIMISTIC',
+      },
+      timeline_assessment: {
+        claimed_timeline: 'Not specified',
+        trl_current: 'Unknown',
+        trl_claimed: 'Unknown',
+        timeline_verdict: 'AGGRESSIVE',
+        realistic_timeline: 'TBD',
+      },
+    }),
+
+  internal_consistency: z
+    .object({
+      consistent: z.boolean().default(true),
+      inconsistencies: z
+        .array(
+          z.object({
+            claim_1: z.string().catch(''),
+            claim_2: z.string().catch(''),
+            conflict: z.string().catch(''),
+            severity: flexibleEnum(
+              ['CRITICAL', 'MODERATE', 'MINOR'],
+              'MODERATE',
             ),
           }),
         )
         .default([]),
+    })
+    .default({
+      consistent: true,
+      inconsistencies: [],
     }),
-
-    mechanism_precedent: z.object({
-      demonstrated_elsewhere: z.boolean().default(false),
-      where: z.string().default('Unknown'),
-      at_what_scale: z.string().default('Unknown'),
-      key_differences: z.string().catch(''),
-    }),
-
-    verdict: MechanismVerdict,
-    confidence: Confidence,
-    reasoning: z.string().catch(''),
-  }),
-
-  triz_analysis: z.object({
-    problem_contradictions: z
-      .array(
-        z.object({
-          contradiction: z.string(),
-          type: flexibleEnum(['TECHNICAL', 'PHYSICAL'], 'TECHNICAL'),
-          improving_parameter: z.string().catch(''),
-          worsening_parameter: z.string().catch(''),
-          startup_awareness: flexibleEnum(
-            ['IDENTIFIED', 'PARTIALLY_AWARE', 'UNAWARE'],
-            'PARTIALLY_AWARE',
-          ),
-          startup_resolution: z.string().catch(''),
-          resolution_validity: flexibleEnum(
-            ['RESOLVED', 'PARTIALLY_RESOLVED', 'UNRESOLVED', 'IGNORED'],
-            'PARTIALLY_RESOLVED',
-          ),
-          standard_resolution: z.string().catch(''),
-          inventive_principles_applicable: z.array(z.string()).default([]),
-        }),
-      )
-      .default([]),
-
-    missed_contradictions: z
-      .array(
-        z.object({
-          contradiction: z.string(),
-          why_it_matters: z.string().catch(''),
-          likely_manifestation: z.string().catch(''),
-        }),
-      )
-      .default([]),
-
-    triz_assessment: z.object({
-      contradiction_awareness: Confidence,
-      resolution_quality: flexibleEnum(
-        ['ELEGANT', 'ADEQUATE', 'PARTIAL', 'POOR'],
-        'ADEQUATE',
-      ),
-      inventive_level: flexibleNumber(3, { min: 1, max: 5 }),
-      inventive_level_rationale: z.string().catch(''),
-    }),
-  }),
-
-  feasibility_validation: z.object({
-    scale_assessment: z.object({
-      current_demonstrated_scale: z.string().default('Unknown'),
-      claimed_target_scale: z.string().default('Unknown'),
-      scaling_challenges: z
-        .array(
-          z.object({
-            challenge: z.string(),
-            nonlinearity: z.string().catch(''),
-            startup_addresses: z.boolean().default(false),
-            assessment: flexibleEnum(
-              ['MANAGEABLE', 'SIGNIFICANT', 'SEVERE'],
-              'SIGNIFICANT',
-            ),
-          }),
-        )
-        .default([]),
-      scale_verdict: flexibleEnum(
-        ['FEASIBLE', 'CHALLENGING', 'UNLIKELY'],
-        'CHALLENGING',
-      ),
-    }),
-
-    cost_assessment: z.object({
-      claimed_cost: z.string().default('Not specified'),
-      cost_basis_provided: z.string().default('None'),
-      cost_basis_quality: flexibleEnum(
-        ['DETAILED', 'REASONABLE', 'SUPERFICIAL', 'MISSING'],
-        'SUPERFICIAL',
-      ),
-      hidden_costs_identified: z
-        .array(
-          z.object({
-            cost: z.string(),
-            estimated_impact: z.string().catch(''),
-            basis: z.string().catch(''),
-          }),
-        )
-        .default([]),
-      realistic_cost_range: z.string().default('Unknown'),
-      cost_verdict: flexibleEnum(
-        ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
-        'OPTIMISTIC',
-      ),
-    }),
-
-    timeline_assessment: z.object({
-      claimed_timeline: z.string().default('Not specified'),
-      trl_current: z.string().default('Unknown'),
-      trl_claimed: z.string().default('Unknown'),
-      timeline_verdict: flexibleEnum(
-        ['REALISTIC', 'AGGRESSIVE', 'UNREALISTIC'],
-        'AGGRESSIVE',
-      ),
-      realistic_timeline: z.string().default('TBD'),
-    }),
-  }),
-
-  internal_consistency: z.object({
-    consistent: z.boolean().default(true),
-    inconsistencies: z
-      .array(
-        z.object({
-          claim_1: z.string(),
-          claim_2: z.string(),
-          conflict: z.string().catch(''),
-          severity: flexibleEnum(['CRITICAL', 'MODERATE', 'MINOR'], 'MODERATE'),
-        }),
-      )
-      .default([]),
-  }),
 
   validation_verdicts: z
     .array(
       z.object({
         claim_id: z.string().catch(''),
-        claim_summary: z.string(),
+        claim_summary: z.string().catch(''),
         verdict: Verdict,
         confidence: Confidence,
         one_line_reasoning: z.string().catch(''),
@@ -805,7 +927,7 @@ const DD3_M_StructuredDataSchema = z.object({
   critical_questions_for_founders: z
     .array(
       z.object({
-        question: z.string(),
+        question: z.string().catch(''),
         why_critical: z.string().catch(''),
         good_answer_looks_like: z.string().catch(''),
         bad_answer_looks_like: z.string().catch(''),
@@ -813,23 +935,42 @@ const DD3_M_StructuredDataSchema = z.object({
     )
     .default([]),
 
-  technical_credibility_score: z.object({
-    score: flexibleNumber(5, { min: 1, max: 10 }),
-    out_of: flexibleNumber(10),
-    breakdown: z.object({
-      physics_validity: flexibleNumber(5),
-      mechanism_soundness: flexibleNumber(5),
-      feasibility_realism: flexibleNumber(5),
-      internal_consistency: flexibleNumber(5),
+  technical_credibility_score: z
+    .object({
+      score: flexibleNumber(5, { min: 1, max: 10 }),
+      out_of: flexibleNumber(10),
+      breakdown: z
+        .object({
+          physics_validity: flexibleNumber(5),
+          mechanism_soundness: flexibleNumber(5),
+          feasibility_realism: flexibleNumber(5),
+          internal_consistency: flexibleNumber(5),
+        })
+        .default({
+          physics_validity: 5,
+          mechanism_soundness: 5,
+          feasibility_realism: 5,
+          internal_consistency: 5,
+        }),
+      rationale: z.string().catch(''),
+    })
+    .default({
+      score: 5,
+      out_of: 10,
+      breakdown: {
+        physics_validity: 5,
+        mechanism_soundness: 5,
+        feasibility_realism: 5,
+        internal_consistency: 5,
+      },
+      rationale: '',
     }),
-    rationale: z.string().catch(''),
-  }),
 });
 
 // Prose output schema for DD3-M (new format)
 const DD3_M_ProseOutputSchema = z.object({
-  technical_deep_dive: z.string(),
-  mechanism_explanation: z.string(),
+  technical_deep_dive: z.string().catch(''),
+  mechanism_explanation: z.string().catch(''),
 });
 
 /**
@@ -943,7 +1084,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
       magic_assumptions: z
         .array(
           z.object({
-            assumption: z.string(),
+            assumption: z.string().catch(''),
             probability: z.string().default('Unknown'),
             impact_if_wrong: z.string().catch(''),
           }),
@@ -1033,7 +1174,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
     path_to_scale: z
       .array(
         z.object({
-          stage: z.string(),
+          stage: z.string().catch(''),
           key_challenge: z.string().catch(''),
           timeline_months: flexibleNumber(0),
           capital_required: z.string().default('Unknown'),
@@ -1064,7 +1205,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
     critical_path: z
       .array(
         z.object({
-          milestone: z.string(),
+          milestone: z.string().catch(''),
           their_timeline: z.string().default('Unknown'),
           realistic_timeline: z.string().default('Unknown'),
           dependencies: z.array(z.string()).default([]),
@@ -1097,7 +1238,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
       enabling_conditions_status: z
         .array(
           z.object({
-            condition: z.string(),
+            condition: z.string().catch(''),
             status: flexibleEnum(['MET', 'EMERGING', 'NOT_MET'], 'EMERGING'),
             timeline_to_met: z.string().default('Unknown'),
           }),
@@ -1142,7 +1283,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
     infrastructure: z
       .array(
         z.object({
-          requirement: z.string(),
+          requirement: z.string().catch(''),
           exists_today: z.boolean().default(false),
           who_builds: z.string().default('Unknown'),
           who_pays: z.string().default('Unknown'),
@@ -1162,7 +1303,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
     complementary_tech: z
       .array(
         z.object({
-          technology: z.string(),
+          technology: z.string().catch(''),
           current_readiness: z.string().default('Unknown'),
           needed_readiness: z.string().default('Unknown'),
           timeline_to_ready: z.string().default('Unknown'),
@@ -1179,7 +1320,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
     critical_policies: z
       .array(
         z.object({
-          policy: z.string(),
+          policy: z.string().catch(''),
           what_it_provides: z.string().catch(''),
           current_value: z.string().default('Unknown'),
           dependency_level: Severity,
@@ -1224,7 +1365,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
   commercial_red_flags: z
     .array(
       z.object({
-        flag: z.string(),
+        flag: z.string().catch(''),
         severity: Severity,
         evidence: z.string().catch(''),
         what_would_resolve: z.string().catch(''),
@@ -1236,7 +1377,7 @@ const DD3_5_M_StructuredDataSchema = z.object({
   commercial_questions_for_founders: z
     .array(
       z.object({
-        question: z.string(),
+        question: z.string().catch(''),
         category: CommercialAssumptionCategory,
         why_critical: z.string().catch(''),
         good_answer: z.string().catch(''),
@@ -1249,47 +1390,51 @@ const DD3_5_M_StructuredDataSchema = z.object({
   // Uses flexibleOptionalObject to gracefully handle empty/malformed LLM output
   unit_economics_bridge: flexibleOptionalObject({
     triggers: z.object({
-      cost_reduction_claimed: z.string(),
-      threshold_exceeded: z.boolean(),
+      cost_reduction_claimed: z.string().catch(''),
+      threshold_exceeded: z.boolean().default(false),
     }),
-    current_cost_breakdown: z.array(
-      z.object({
-        component: z.string(),
-        current_cost: z.string(),
-        percentage_of_total: z.string(),
-      }),
-    ),
-    reduction_pathway: z.array(
-      z.object({
-        cost_component: z.string(),
-        reduction_mechanism: z.string(),
-        reduction_percentage: z.string(),
-        confidence: Confidence,
-        precedent: z.string(),
-        assumption_risk: z.string(),
-      }),
-    ),
+    current_cost_breakdown: z
+      .array(
+        z.object({
+          component: z.string().catch(''),
+          current_cost: z.string().catch(''),
+          percentage_of_total: z.string().catch(''),
+        }),
+      )
+      .default([]),
+    reduction_pathway: z
+      .array(
+        z.object({
+          cost_component: z.string().catch(''),
+          reduction_mechanism: z.string().catch(''),
+          reduction_percentage: z.string().catch(''),
+          confidence: Confidence,
+          precedent: z.string().catch(''),
+          assumption_risk: z.string().catch(''),
+        }),
+      )
+      .default([]),
     learning_curve_analysis: z.object({
-      claimed_learning_rate: z.string(),
-      industry_benchmark: z.string(),
+      claimed_learning_rate: z.string().catch(''),
+      industry_benchmark: z.string().catch(''),
       assessment: flexibleEnum(
         ['REALISTIC', 'OPTIMISTIC', 'UNREALISTIC'],
         'OPTIMISTIC',
       ),
-      reasoning: z.string(),
+      reasoning: z.string().catch(''),
     }),
     scale_effects_analysis: z.object({
-      what_scales_linearly: z.array(z.string()),
-      what_scales_sub_linearly: z.array(z.string()),
-      what_doesnt_scale: z.array(z.string()),
-      net_effect: z.string(),
+      what_scales_linearly: z.array(z.string()).default([]),
+      what_scales_sub_linearly: z.array(z.string()).default([]),
+      what_doesnt_scale: z.array(z.string()).default([]),
+      net_effect: z.string().catch(''),
     }),
     bridge_verdict: z.object({
-      achievable_cost: z.string(),
-      gap_vs_claimed: z.string(),
+      achievable_cost: z.string().catch(''),
+      gap_vs_claimed: z.string().catch(''),
       confidence: Confidence,
-      key_assumption: z.string(),
-      if_assumption_wrong: z.string(),
+      key_assumption: z.string().catch(''),
+      if_assumption_wrong: z.string().catch(''),
     }),
   }),
 
@@ -1297,99 +1442,105 @@ const DD3_5_M_StructuredDataSchema = z.object({
   // Uses flexibleOptionalObject to gracefully handle empty/malformed LLM output
   policy_deep_dive: flexibleOptionalObject({
     triggers: z.object({
-      policy_identified: z.string(),
-      dependency_level: z.string(),
+      policy_identified: z.string().catch(''),
+      dependency_level: z.string().catch(''),
     }),
     policy_details: z.object({
-      full_name: z.string(),
-      mechanism: z.string(),
-      value_to_company: z.string(),
-      percentage_of_margin: z.string(),
-      expiration_date: z.string(),
+      full_name: z.string().catch(''),
+      mechanism: z.string().catch(''),
+      value_to_company: z.string().catch(''),
+      percentage_of_margin: z.string().catch(''),
+      expiration_date: z.string().catch(''),
     }),
     qualification_analysis: z.object({
-      requirements: z.array(z.string()),
+      requirements: z.array(z.string()).default([]),
       company_status: flexibleEnum(
         ['QUALIFIES', 'LIKELY_QUALIFIES', 'UNCERTAIN', 'UNLIKELY'],
         'UNCERTAIN',
       ),
-      uncertain_requirements: z.array(z.string()),
-      what_could_disqualify: z.array(z.string()),
+      uncertain_requirements: z.array(z.string()).default([]),
+      what_could_disqualify: z.array(z.string()).default([]),
     }),
     political_risk_assessment: z.object({
-      current_political_support: z.string(),
-      sunset_risk: z.string(),
-      modification_risk: z.string(),
-      timeline_of_risk: z.string(),
+      current_political_support: z.string().catch(''),
+      sunset_risk: z.string().catch(''),
+      modification_risk: z.string().catch(''),
+      timeline_of_risk: z.string().catch(''),
     }),
     scenario_economics: z.object({
       with_policy: z.object({
-        unit_cost: z.string(),
-        margin: z.string(),
+        unit_cost: z.string().catch(''),
+        margin: z.string().catch(''),
         viability: flexibleEnum(['VIABLE', 'MARGINAL', 'UNVIABLE'], 'VIABLE'),
       }),
       without_policy: z.object({
-        unit_cost: z.string(),
-        margin: z.string(),
+        unit_cost: z.string().catch(''),
+        margin: z.string().catch(''),
         viability: flexibleEnum(['VIABLE', 'MARGINAL', 'UNVIABLE'], 'UNVIABLE'),
       }),
-      breakeven_policy_value: z.string(),
+      breakeven_policy_value: z.string().catch(''),
     }),
-    mitigation_options: z.array(
-      z.object({
-        strategy: z.string(),
-        feasibility: Confidence,
-        timeline: z.string(),
-      }),
-    ),
+    mitigation_options: z
+      .array(
+        z.object({
+          strategy: z.string().catch(''),
+          feasibility: Confidence,
+          timeline: z.string().catch(''),
+        }),
+      )
+      .default([]),
     policy_verdict: z.object({
       exposure_level: PolicyExposureVerdict,
-      recommendation: z.string(),
-      diligence_action: z.string(),
+      recommendation: z.string().catch(''),
+      diligence_action: z.string().catch(''),
     }),
   }),
 
   // Optional: Byproduct and revenue stream analysis
   // Uses flexibleOptionalObject to gracefully handle empty/malformed LLM output
   byproduct_analysis: flexibleOptionalObject({
-    byproducts_identified: z.array(
-      z.object({
-        byproduct: z.string(),
-        quantity_per_unit: z.string(),
-        quality: z.string(),
-        market_value: z.string(),
-        addressable_market: z.string(),
-        monetization_status: flexibleEnum(
-          ['CONTRACTED', 'IN_DISCUSSION', 'IDENTIFIED', 'SPECULATIVE'],
-          'IDENTIFIED',
-        ),
-      }),
-    ),
+    byproducts_identified: z
+      .array(
+        z.object({
+          byproduct: z.string().catch(''),
+          quantity_per_unit: z.string().catch(''),
+          quality: z.string().catch(''),
+          market_value: z.string().catch(''),
+          addressable_market: z.string().catch(''),
+          monetization_status: flexibleEnum(
+            ['CONTRACTED', 'IN_DISCUSSION', 'IDENTIFIED', 'SPECULATIVE'],
+            'IDENTIFIED',
+          ),
+        }),
+      )
+      .default([]),
     revenue_contribution: z.object({
-      percentage_of_revenue: z.string(),
-      margin_impact: z.string(),
-      required_for_viability: z.boolean(),
+      percentage_of_revenue: z.string().catch(''),
+      margin_impact: z.string().catch(''),
+      required_for_viability: z.boolean().default(false),
     }),
-    market_risks: z.array(
-      z.object({
-        risk: z.string(),
-        impact: z.string(),
-        mitigation: z.string(),
-      }),
-    ),
+    market_risks: z
+      .array(
+        z.object({
+          risk: z.string().catch(''),
+          impact: z.string().catch(''),
+          mitigation: z.string().catch(''),
+        }),
+      )
+      .default([]),
     verdict: z.object({
       byproduct_quality: flexibleEnum(
         ['STRONG_ASSET', 'HELPFUL', 'UNCERTAIN', 'LIABILITY'],
         'HELPFUL',
       ),
-      reasoning: z.string(),
+      reasoning: z.string().catch(''),
     }),
   }),
 });
 
 // Prose output schema for DD3.5-M (new format)
 const DD3_5_M_ProseOutputSchema = z.object({
-  commercialization_narrative: z.string(),
+  commercialization_narrative: z.string().catch(''),
 });
 
 /**
@@ -1632,7 +1783,7 @@ const DD4_M_StructuredDataSchema = z.object({
   key_insights: z
     .array(
       z.object({
-        insight: z.string(),
+        insight: z.string().catch(''),
         type: FindingType,
         investment_implication: z.string().catch(''),
       }),
@@ -1642,7 +1793,7 @@ const DD4_M_StructuredDataSchema = z.object({
   strategic_questions: z
     .array(
       z.object({
-        question: z.string(),
+        question: z.string().catch(''),
         why_it_matters: z.string().catch(''),
         what_good_looks_like: z.string().catch(''),
       }),
@@ -1675,7 +1826,7 @@ const DD4_M_StructuredDataSchema = z.object({
       implicit_dismissals: z
         .array(
           z.object({
-            dismissed_alternative: z.string(),
+            dismissed_alternative: z.string().catch(''),
             their_implicit_reasoning: z.string().catch(''),
             our_assessment: z.string().catch(''),
           }),
@@ -1734,7 +1885,7 @@ const DD4_M_StructuredDataSchema = z.object({
       closest_comparables: z
         .array(
           z.object({
-            company: z.string(),
+            company: z.string().catch(''),
             similarity: z.string().catch(''),
             funding_raised: z.string().default('Unknown'),
             timeline: z.string().default('Unknown'),
@@ -1994,7 +2145,7 @@ const DD4_M_StructuredDataSchema = z.object({
         .union([
           z.array(
             z.object({
-              pattern: z.string(),
+              pattern: z.string().catch(''),
               n_companies: flexibleNumber(0),
               success_rate_if_present: z.string().default('N/A'),
               success_rate_if_absent: z.string().default('N/A'),
@@ -2044,8 +2195,8 @@ const DD4_M_StructuredDataSchema = z.object({
 
 // Prose output schema for DD4-M (new format)
 const DD4_M_ProseOutputSchema = z.object({
-  solution_landscape_narrative: z.string(),
-  strategic_synthesis: z.string(),
+  solution_landscape_narrative: z.string().catch(''),
+  strategic_synthesis: z.string().catch(''),
 });
 
 /**
@@ -3243,11 +3394,7 @@ export const ReferenceSchema = z
   .object({
     id: z.union([z.string(), z.number()]).transform((v) => String(v)),
     citation: z.string().catch(''),
-    url: z
-      .string()
-      .optional()
-      .transform(safeUrl)
-      .catch(undefined),
+    url: z.string().optional().transform(safeUrl).catch(undefined),
     source_type: z.string().optional().catch(undefined),
   })
   .catch({ id: '0', citation: '' });
@@ -3260,11 +3407,11 @@ const DD5_M_AppendixSchema = z
     detailed_claim_validation: z
       .array(
         z.object({
-          claim: z.string(),
-          verdict: z.string(),
-          confidence: z.string(),
-          plain_english: z.string(),
-          full_reasoning: z.string(),
+          claim: z.string().catch(''),
+          verdict: z.string().catch(''),
+          confidence: z.string().catch(''),
+          plain_english: z.string().catch(''),
+          full_reasoning: z.string().catch(''),
         }),
       )
       .optional(),

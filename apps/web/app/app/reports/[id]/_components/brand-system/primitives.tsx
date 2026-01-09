@@ -11,14 +11,22 @@
  * - Labels: 13px, uppercase, tracking wide
  * - Headings: font-semibold, tracking-tight
  */
-import { type ReactNode, memo, useMemo, Component, type ErrorInfo } from 'react';
+import {
+  Component,
+  type ErrorInfo,
+  type ReactNode,
+  memo,
+  useMemo,
+} from 'react';
+
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 
 import { cn } from '@kit/ui/utils';
+
 import {
-  PROSE_SANITIZE_SCHEMA,
   PROSE_MARKDOWN_COMPONENTS,
+  PROSE_SANITIZE_SCHEMA,
 } from '~/lib/shared/markdown-components';
 
 // ============================================
@@ -114,7 +122,9 @@ class ProseMarkdownErrorBoundary extends Component<
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): ProseMarkdownErrorBoundaryState {
+  static getDerivedStateFromError(
+    error: Error,
+  ): ProseMarkdownErrorBoundaryState {
     return { hasError: true, error };
   }
 
@@ -137,7 +147,9 @@ class ProseMarkdownErrorBoundary extends Component<
             <p
               key={idx}
               className="mb-4 text-[18px] leading-[1.3] tracking-[-0.02em] text-[#1e1e1e] last:mb-0"
-              style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+              style={{
+                fontFamily: 'var(--font-heading), system-ui, sans-serif',
+              }}
             >
               {paragraph}
             </p>

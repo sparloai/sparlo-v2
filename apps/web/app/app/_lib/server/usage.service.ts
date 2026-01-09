@@ -202,7 +202,12 @@ export const checkUsageAllowed = cache(async function checkUsageAllowedImpl(
   const validated = UsageCheckResponseSchema.safeParse(data);
 
   if (!validated.success) {
-    console.error('[Usage] Invalid response shape:', validated.error, 'Raw data:', data);
+    console.error(
+      '[Usage] Invalid response shape:',
+      validated.error,
+      'Raw data:',
+      data,
+    );
     // Return blocked state instead of throwing - shows upgrade screen
     return {
       allowed: false,

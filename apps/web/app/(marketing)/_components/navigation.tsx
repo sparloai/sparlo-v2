@@ -386,7 +386,7 @@ const UserAvatarDropdown = memo(function UserAvatarDropdown({
         </DropdownMenuItem>
 
         {user.email && (
-          <div className="border-t border-zinc-100 mt-1.5 px-4 py-3 text-[13px] text-zinc-400">
+          <div className="mt-1.5 border-t border-zinc-100 px-4 py-3 text-[13px] text-zinc-400">
             {user.email}
           </div>
         )}

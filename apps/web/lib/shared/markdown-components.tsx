@@ -116,11 +116,7 @@ export const STRICT_SANITIZE_SCHEMA: RehypeSanitizeOptions = {
  * Extends STRICT_SANITIZE_SCHEMA to allow <sup> for citations
  */
 export const PROSE_SANITIZE_SCHEMA: RehypeSanitizeOptions = {
-  tagNames: [
-    ...(STRICT_SANITIZE_SCHEMA.tagNames ?? []),
-    'sup',
-    'sub',
-  ],
+  tagNames: [...(STRICT_SANITIZE_SCHEMA.tagNames ?? []), 'sup', 'sub'],
   attributes: {
     ...STRICT_SANITIZE_SCHEMA.attributes,
   },
@@ -150,7 +146,7 @@ export const PROSE_MARKDOWN_COMPONENTS = {
   ),
   h1: ({ children }: { children?: React.ReactNode }) => (
     <h2
-      className="mb-4 mt-8 text-[24px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-900 normal-case"
+      className="mt-8 mb-4 text-[24px] leading-[1.3] font-semibold tracking-[-0.02em] text-zinc-900 normal-case"
       style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
     >
       {children}
@@ -158,7 +154,7 @@ export const PROSE_MARKDOWN_COMPONENTS = {
   ),
   h2: ({ children }: { children?: React.ReactNode }) => (
     <h3
-      className="mb-3 mt-6 text-[22px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-900 normal-case"
+      className="mt-6 mb-3 text-[22px] leading-[1.3] font-semibold tracking-[-0.02em] text-zinc-900 normal-case"
       style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
     >
       {children}
@@ -166,7 +162,7 @@ export const PROSE_MARKDOWN_COMPONENTS = {
   ),
   h3: ({ children }: { children?: React.ReactNode }) => (
     <h4
-      className="mb-3 mt-5 text-[20px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-800 normal-case"
+      className="mt-5 mb-3 text-[20px] leading-[1.3] font-semibold tracking-[-0.02em] text-zinc-800 normal-case"
       style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
     >
       {children}
@@ -174,7 +170,7 @@ export const PROSE_MARKDOWN_COMPONENTS = {
   ),
   h4: ({ children }: { children?: React.ReactNode }) => (
     <h5
-      className="mb-2 mt-4 text-[18px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-800 normal-case"
+      className="mt-4 mb-2 text-[18px] leading-[1.3] font-semibold tracking-[-0.02em] text-zinc-800 normal-case"
       style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
     >
       {children}
@@ -182,7 +178,7 @@ export const PROSE_MARKDOWN_COMPONENTS = {
   ),
   h5: ({ children }: { children?: React.ReactNode }) => (
     <h6
-      className="mb-2 mt-4 text-[16px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-800 normal-case"
+      className="mt-4 mb-2 text-[16px] leading-[1.3] font-semibold tracking-[-0.02em] text-zinc-800 normal-case"
       style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
     >
       {children}
@@ -190,7 +186,7 @@ export const PROSE_MARKDOWN_COMPONENTS = {
   ),
   h6: ({ children }: { children?: React.ReactNode }) => (
     <p
-      className="mb-2 mt-4 text-[16px] font-semibold leading-[1.3] tracking-[-0.02em] text-zinc-700 normal-case"
+      className="mt-4 mb-2 text-[16px] leading-[1.3] font-semibold tracking-[-0.02em] text-zinc-700 normal-case"
       style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
     >
       {children}

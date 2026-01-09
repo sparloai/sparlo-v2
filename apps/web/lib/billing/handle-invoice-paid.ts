@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { UpsertSubscriptionParams } from '@kit/billing/types';
-
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 
 import { getPlanTokenLimit } from './plan-limits';
@@ -49,9 +48,7 @@ export async function handleInvoicePaid(
     tokenLimit = getPlanTokenLimit(priceId);
   } catch {
     // Log and use default if price ID not found (shouldn't happen in prod)
-    console.warn(
-      `[Billing] Unknown price ID: ${priceId}, using default limit`,
-    );
+    console.warn(`[Billing] Unknown price ID: ${priceId}, using default limit`);
     tokenLimit = 1_000_000; // Default fallback (Lite tier)
   }
 
@@ -66,7 +63,9 @@ export async function handleInvoicePaid(
     .maybeSingle();
 
   if (existingPeriod && existingPeriod.tokens_limit === tokenLimit) {
-    console.log('[Billing] Usage period already exists with correct token limit, skipping');
+    console.log(
+      '[Billing] Usage period already exists with correct token limit, skipping',
+    );
     return;
   }
 

@@ -2,8 +2,9 @@
 
 import { useCallback, useState } from 'react';
 
-import { AnimatePresence, motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
+
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { signOutAction } from '../_lib/server/signout-action';
 

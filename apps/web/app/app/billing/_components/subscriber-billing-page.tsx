@@ -2,7 +2,7 @@
 
 import { useRef, useTransition } from 'react';
 
-import { ArrowUpRight, ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowUpRight, Check, ExternalLink, Loader2 } from 'lucide-react';
 
 import { AppLink } from '~/components/app-link';
 import type { UsageCheckResponse } from '~/lib/usage/schemas';
@@ -16,6 +16,7 @@ interface SubscriberBillingPageProps {
   planName: string;
   planInterval: 'month' | 'year';
   canUpgrade: boolean;
+  showUpdateSuccess?: boolean;
 }
 
 export function SubscriberBillingPage({
@@ -24,6 +25,7 @@ export function SubscriberBillingPage({
   planName,
   planInterval,
   canUpgrade,
+  showUpdateSuccess,
 }: SubscriberBillingPageProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -59,6 +61,18 @@ export function SubscriberBillingPage({
           Dashboard
         </AppLink>
 
+        {/* Success banner */}
+        {showUpdateSuccess && (
+          <div className="mb-6 flex items-center gap-3 rounded-lg bg-emerald-50 px-4 py-3">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
+              <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
+            </div>
+            <p className="text-sm font-medium text-emerald-800">
+              Your subscription has been updated successfully.
+            </p>
+          </div>
+        )}
+
         {/* Page title */}
         <h1 className="font-heading text-[42px] font-normal tracking-[-0.02em] text-zinc-900">
           Billing
@@ -69,7 +83,9 @@ export function SubscriberBillingPage({
           <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-zinc-500">Current plan</p>
+                <p className="text-sm font-medium text-zinc-500">
+                  Current plan
+                </p>
                 <h2 className="mt-1 text-2xl font-semibold text-zinc-900">
                   {planName}
                 </h2>
@@ -78,7 +94,9 @@ export function SubscriberBillingPage({
                 </p>
               </div>
               <div className="rounded-full bg-emerald-50 px-3 py-1">
-                <span className="text-sm font-medium text-emerald-700">Active</span>
+                <span className="text-sm font-medium text-emerald-700">
+                  Active
+                </span>
               </div>
             </div>
             {canUpgrade && (

@@ -2,17 +2,19 @@
 
 import { useCallback, useState } from 'react';
 
+import { createPortal } from 'react-dom';
+
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { PersonalAccountDropdown } from '@kit/accounts/personal-account-dropdown';
 import { useSignOut } from '@kit/supabase/hooks/use-sign-out';
 import { JWTUserData } from '@kit/supabase/types';
 import { Button } from '@kit/ui/button';
 import { If } from '@kit/ui/if';
-import { AnimatePresence, motion } from 'framer-motion';
-import { createPortal } from 'react-dom';
 
 import featuresFlagConfig from '~/config/feature-flags.config';
 import pathsConfig from '~/config/paths.config';

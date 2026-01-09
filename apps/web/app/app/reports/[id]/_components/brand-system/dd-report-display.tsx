@@ -626,10 +626,16 @@ const TRACK_BADGE_STYLES: Record<string, { label: string; style: string }> = {
 
 // Default fallback styles - stable references to avoid object creation on each render
 const DEFAULT_TRACK_STYLE = { label: '', style: 'bg-zinc-100 text-zinc-700' };
-const DEFAULT_INNOVATION_STYLE = { label: '', style: 'border border-zinc-300 bg-white text-zinc-600' };
+const DEFAULT_INNOVATION_STYLE = {
+  label: '',
+  style: 'border border-zinc-300 bg-white text-zinc-600',
+};
 
 // Stable lookup helpers - return same object reference for unknowns
-function getTrackStyle(track: string | undefined): { label: string; style: string } {
+function getTrackStyle(track: string | undefined): {
+  label: string;
+  style: string;
+} {
   if (!track) return DEFAULT_TRACK_STYLE;
   const style = TRACK_BADGE_STYLES[track];
   if (style) return style;
@@ -637,7 +643,9 @@ function getTrackStyle(track: string | undefined): { label: string; style: strin
   return { ...DEFAULT_TRACK_STYLE, label: track };
 }
 
-function getInnovationTypeStyle(type: string | undefined): { label: string; style: string } | null {
+function getInnovationTypeStyle(
+  type: string | undefined,
+): { label: string; style: string } | null {
   if (!type) return null;
   const style = INNOVATION_TYPE_STYLES[type];
   if (style) return style;
@@ -653,17 +661,27 @@ const VALIDITY_STYLES: Record<string, string> = {
 };
 
 // NEW: Innovation type styles for simplified 3-tier system
-const INNOVATION_TYPE_STYLES: Record<string, { label: string; style: string }> = {
-  FRONTIER: { label: 'Frontier', style: 'bg-zinc-900 text-white' },
-  EMERGING: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
-  ESTABLISHED: { label: 'Established', style: 'border border-zinc-400 bg-white text-zinc-700' },
-  // Backwards compat for old values (mapped via flexibleEnum, but defensive rendering)
-  CATALOG: { label: 'Established', style: 'border border-zinc-400 bg-white text-zinc-700' },
-  EMERGING_PRACTICE: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
-  CROSS_DOMAIN: { label: 'Established', style: 'border border-zinc-400 bg-white text-zinc-700' },
-  PARADIGM: { label: 'Frontier', style: 'bg-zinc-900 text-white' },
-  TECHNOLOGY_REVIVAL: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
-};
+const INNOVATION_TYPE_STYLES: Record<string, { label: string; style: string }> =
+  {
+    FRONTIER: { label: 'Frontier', style: 'bg-zinc-900 text-white' },
+    EMERGING: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
+    ESTABLISHED: {
+      label: 'Established',
+      style: 'border border-zinc-400 bg-white text-zinc-700',
+    },
+    // Backwards compat for old values (mapped via flexibleEnum, but defensive rendering)
+    CATALOG: {
+      label: 'Established',
+      style: 'border border-zinc-400 bg-white text-zinc-700',
+    },
+    EMERGING_PRACTICE: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
+    CROSS_DOMAIN: {
+      label: 'Established',
+      style: 'border border-zinc-400 bg-white text-zinc-700',
+    },
+    PARADIGM: { label: 'Frontier', style: 'bg-zinc-900 text-white' },
+    TECHNOLOGY_REVIVAL: { label: 'Emerging', style: 'bg-zinc-600 text-white' },
+  };
 
 // NEW: Failure type styles for historical precedents
 const FAILURE_TYPE_STYLES: Record<string, { label: string; style: string }> = {
@@ -1027,25 +1045,23 @@ const DiligenceActionsList = memo(function DiligenceActionsList({
 });
 
 // Synthesis & Recommendation (renamed from "If This Were My Deal")
-const SynthesisRecommendationSection = memo(function SynthesisRecommendationSection({
-  content,
-}: {
-  content?: string;
-}) {
-  if (!content) return null;
-  return (
-    <Section id="synthesis-recommendation">
-      <SectionTitle>Synthesis &amp; Recommendation</SectionTitle>
-      <ArticleBlock className="mt-8">
-        <div className="border-l-4 border-zinc-900 pl-6">
-          <BodyText size="lg" className="text-zinc-700 italic">
-            {content}
-          </BodyText>
-        </div>
-      </ArticleBlock>
-    </Section>
-  );
-});
+const SynthesisRecommendationSection = memo(
+  function SynthesisRecommendationSection({ content }: { content?: string }) {
+    if (!content) return null;
+    return (
+      <Section id="synthesis-recommendation">
+        <SectionTitle>Synthesis &amp; Recommendation</SectionTitle>
+        <ArticleBlock className="mt-8">
+          <div className="border-l-4 border-zinc-900 pl-6">
+            <BodyText size="lg" className="text-zinc-700 italic">
+              {content}
+            </BodyText>
+          </div>
+        </ArticleBlock>
+      </Section>
+    );
+  },
+);
 
 // ============================================
 // NEW: Problem Breakdown Components (Deep Problem Education)
@@ -1196,7 +1212,7 @@ const ProblemBreakdownSection = memo(function ProblemBreakdownSection({
             <MonoLabel variant="strong" className="mb-3 block">
               First Principles Insight
             </MonoLabel>
-            <BodyText size="lg" className="text-zinc-800 font-medium">
+            <BodyText size="lg" className="font-medium text-zinc-800">
               {firstPrinciplesInsight}
             </BodyText>
           </div>
@@ -1242,7 +1258,7 @@ const DevelopedConceptCard = memo(function DevelopedConceptCard({
             )}
             {/* Source domain for cross-domain transfers */}
             {concept.source_domain && (
-              <Badge className="border border-zinc-200 bg-zinc-50 text-zinc-500 text-xs">
+              <Badge className="border border-zinc-200 bg-zinc-50 text-xs text-zinc-500">
                 from {concept.source_domain}
               </Badge>
             )}
@@ -1448,204 +1464,219 @@ const DevelopedConceptsSection = memo(function DevelopedConceptsSection({
 
 // Cross-Domain Insights Subsection (integrated into Solution Landscape)
 // Shows the research provenance - where solution ideas came from
-const CrossDomainInsightsSubsection = memo(function CrossDomainInsightsSubsection({
-  insights,
-}: {
-  insights?: CrossDomainInsight[];
-}) {
-  if (!insights?.length) return null;
+const CrossDomainInsightsSubsection = memo(
+  function CrossDomainInsightsSubsection({
+    insights,
+  }: {
+    insights?: CrossDomainInsight[];
+  }) {
+    if (!insights?.length) return null;
 
-  return (
-    <ArticleBlock className="mt-10">
-      <MonoLabel variant="strong" className="mb-4 block">
-        Cross-Domain Research
-      </MonoLabel>
-      <BodyText variant="muted" size="sm" className="mb-6">
-        Ideas from adjacent industries that inform these solutions.
-      </BodyText>
+    return (
+      <ArticleBlock className="mt-10">
+        <MonoLabel variant="strong" className="mb-4 block">
+          Cross-Domain Research
+        </MonoLabel>
+        <BodyText variant="muted" size="sm" className="mb-6">
+          Ideas from adjacent industries that inform these solutions.
+        </BodyText>
 
-      <div className="space-y-5">
-        {insights.map((insight, i) => (
-          <div
-            key={`xdomain-${i}`}
-            className="border-l-2 border-zinc-700 py-3 pl-5"
-          >
-            <div className="mb-2 flex items-center gap-2">
-              <Badge className="bg-zinc-900 text-white">
-                {insight.source_domain}
-              </Badge>
-              <span className="text-zinc-400">→</span>
-              <span className="text-sm text-zinc-600">This problem</span>
-            </div>
-            <BodyText className="mb-1 font-medium">
-              {insight.mechanism}
-            </BodyText>
-            {insight.why_it_transfers && (
-              <BodyText variant="muted" size="sm">
-                {insight.why_it_transfers}
+        <div className="space-y-5">
+          {insights.map((insight, i) => (
+            <div
+              key={`xdomain-${i}`}
+              className="border-l-2 border-zinc-700 py-3 pl-5"
+            >
+              <div className="mb-2 flex items-center gap-2">
+                <Badge className="bg-zinc-900 text-white">
+                  {insight.source_domain}
+                </Badge>
+                <span className="text-zinc-400">→</span>
+                <span className="text-sm text-zinc-600">This problem</span>
+              </div>
+              <BodyText className="mb-1 font-medium">
+                {insight.mechanism}
               </BodyText>
-            )}
-            <div className="mt-2 flex flex-wrap gap-4 text-xs text-zinc-400">
-              {insight.who_pursuing && insight.who_pursuing.length > 0 && (
-                <span>Pursuing: {insight.who_pursuing.join(', ')}</span>
+              {insight.why_it_transfers && (
+                <BodyText variant="muted" size="sm">
+                  {insight.why_it_transfers}
+                </BodyText>
               )}
-              {insight.validation_approach && (
-                <span>Validation: {insight.validation_approach}</span>
-              )}
+              <div className="mt-2 flex flex-wrap gap-4 text-xs text-zinc-400">
+                {insight.who_pursuing && insight.who_pursuing.length > 0 && (
+                  <span>Pursuing: {insight.who_pursuing.join(', ')}</span>
+                )}
+                {insight.validation_approach && (
+                  <span>Validation: {insight.validation_approach}</span>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </ArticleBlock>
-  );
-});
+          ))}
+        </div>
+      </ArticleBlock>
+    );
+  },
+);
 
 // ============================================
 // NEW: Commercialization Detail Component
 // ============================================
 
-const CommercializationDetailSection = memo(function CommercializationDetailSection({
-  detail,
-}: {
-  detail?: CommercializationDetail;
-}) {
-  if (!detail) return null;
+const CommercializationDetailSection = memo(
+  function CommercializationDetailSection({
+    detail,
+  }: {
+    detail?: CommercializationDetail;
+  }) {
+    if (!detail) return null;
 
-  // Check if there's any meaningful content
-  const hasContent =
-    detail.unit_economics_current ||
-    detail.unit_economics_target ||
-    detail.path_to_economics ||
-    (detail.key_assumptions && detail.key_assumptions.length > 0) ||
-    detail.go_to_market_path ||
-    (detail.customer_segments && detail.customer_segments.length > 0) ||
-    detail.sales_complexity ||
-    (detail.commercialization_obstacles && detail.commercialization_obstacles.length > 0) ||
-    detail.revenue_timeline;
+    // Check if there's any meaningful content
+    const hasContent =
+      detail.unit_economics_current ||
+      detail.unit_economics_target ||
+      detail.path_to_economics ||
+      (detail.key_assumptions && detail.key_assumptions.length > 0) ||
+      detail.go_to_market_path ||
+      (detail.customer_segments && detail.customer_segments.length > 0) ||
+      detail.sales_complexity ||
+      (detail.commercialization_obstacles &&
+        detail.commercialization_obstacles.length > 0) ||
+      detail.revenue_timeline;
 
-  if (!hasContent) return null;
+    if (!hasContent) return null;
 
-  return (
-    <Section id="commercialization-detail">
-      <SectionTitle>Commercialization Reality</SectionTitle>
+    return (
+      <Section id="commercialization-detail">
+        <SectionTitle>Commercialization Reality</SectionTitle>
 
-      {/* Unit Economics */}
-      {(detail.unit_economics_current || detail.unit_economics_target) && (
-        <ArticleBlock className="mt-8">
-          <MonoLabel variant="strong" className="mb-4 block">
-            Unit Economics
-          </MonoLabel>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {detail.unit_economics_current && (
-              <div className="rounded border border-zinc-200 bg-zinc-50 p-4">
-                <BodyText variant="muted" size="sm" className="mb-1">
-                  Current State
-                </BodyText>
-                <BodyText>{detail.unit_economics_current}</BodyText>
-              </div>
-            )}
-            {detail.unit_economics_target && (
-              <div className="rounded border border-zinc-300 bg-white p-4">
-                <BodyText variant="muted" size="sm" className="mb-1">
-                  Target State
-                </BodyText>
-                <BodyText>{detail.unit_economics_target}</BodyText>
-              </div>
-            )}
-          </div>
-          {detail.path_to_economics && (
-            <div className="mt-4 border-l-2 border-zinc-400 pl-4">
-              <BodyText variant="muted" size="sm" className="mb-1">
-                Path to Target
-              </BodyText>
-              <BodyText>{detail.path_to_economics}</BodyText>
-            </div>
-          )}
-          {detail.key_assumptions && detail.key_assumptions.length > 0 && (
-            <div className="mt-4">
-              <BodyText variant="muted" size="sm" className="mb-2">
-                Key Assumptions
-              </BodyText>
-              <ul className="space-y-1">
-                {detail.key_assumptions.map((assumption, i) => (
-                  <li key={`assumption-${i}`} className="flex items-start gap-2">
-                    <span className="mt-1 text-zinc-400">•</span>
-                    <BodyText size="sm">{assumption}</BodyText>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </ArticleBlock>
-      )}
-
-      {/* Go-to-Market Path */}
-      {(detail.go_to_market_path || (detail.customer_segments && detail.customer_segments.length > 0) || detail.sales_complexity) && (
-        <ArticleBlock className="mt-8">
-          <MonoLabel variant="strong" className="mb-4 block">
-            Go-to-Market Path
-          </MonoLabel>
-          {detail.go_to_market_path && (
-            <BodyText className="mb-4">{detail.go_to_market_path}</BodyText>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {detail.customer_segments && detail.customer_segments.length > 0 && (
-              <div>
-                <BodyText variant="muted" size="sm" className="mb-2">
-                  Customer Segments
-                </BodyText>
-                <div className="flex flex-wrap gap-2">
-                  {detail.customer_segments.map((segment, i) => (
-                    <Badge key={`segment-${i}`} className="bg-zinc-100 text-zinc-700">
-                      {segment}
-                    </Badge>
-                  ))}
+        {/* Unit Economics */}
+        {(detail.unit_economics_current || detail.unit_economics_target) && (
+          <ArticleBlock className="mt-8">
+            <MonoLabel variant="strong" className="mb-4 block">
+              Unit Economics
+            </MonoLabel>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {detail.unit_economics_current && (
+                <div className="rounded border border-zinc-200 bg-zinc-50 p-4">
+                  <BodyText variant="muted" size="sm" className="mb-1">
+                    Current State
+                  </BodyText>
+                  <BodyText>{detail.unit_economics_current}</BodyText>
                 </div>
-              </div>
-            )}
-            {detail.sales_complexity && (
-              <div>
-                <BodyText variant="muted" size="sm" className="mb-2">
-                  Sales Complexity
+              )}
+              {detail.unit_economics_target && (
+                <div className="rounded border border-zinc-300 bg-white p-4">
+                  <BodyText variant="muted" size="sm" className="mb-1">
+                    Target State
+                  </BodyText>
+                  <BodyText>{detail.unit_economics_target}</BodyText>
+                </div>
+              )}
+            </div>
+            {detail.path_to_economics && (
+              <div className="mt-4 border-l-2 border-zinc-400 pl-4">
+                <BodyText variant="muted" size="sm" className="mb-1">
+                  Path to Target
                 </BodyText>
-                <BodyText>{detail.sales_complexity}</BodyText>
+                <BodyText>{detail.path_to_economics}</BodyText>
               </div>
             )}
-          </div>
-        </ArticleBlock>
-      )}
-
-      {/* Commercialization Obstacles */}
-      {detail.commercialization_obstacles && detail.commercialization_obstacles.length > 0 && (
-        <ArticleBlock className="mt-8">
-          <MonoLabel variant="strong" className="mb-4 block">
-            Commercialization Obstacles
-          </MonoLabel>
-          <div className="space-y-3">
-            {detail.commercialization_obstacles.map((obstacle, i) => (
-              <div
-                key={`obstacle-${i}`}
-                className="border-l-2 border-zinc-300 py-1 pl-4"
-              >
-                <BodyText>{obstacle}</BodyText>
+            {detail.key_assumptions && detail.key_assumptions.length > 0 && (
+              <div className="mt-4">
+                <BodyText variant="muted" size="sm" className="mb-2">
+                  Key Assumptions
+                </BodyText>
+                <ul className="space-y-1">
+                  {detail.key_assumptions.map((assumption, i) => (
+                    <li
+                      key={`assumption-${i}`}
+                      className="flex items-start gap-2"
+                    >
+                      <span className="mt-1 text-zinc-400">•</span>
+                      <BodyText size="sm">{assumption}</BodyText>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            ))}
-          </div>
-        </ArticleBlock>
-      )}
+            )}
+          </ArticleBlock>
+        )}
 
-      {/* Revenue Timeline */}
-      {detail.revenue_timeline && (
-        <ArticleBlock className="mt-8">
-          <MonoLabel variant="strong" className="mb-2 block">
-            Path to Revenue
-          </MonoLabel>
-          <BodyText>{detail.revenue_timeline}</BodyText>
-        </ArticleBlock>
-      )}
-    </Section>
-  );
-});
+        {/* Go-to-Market Path */}
+        {(detail.go_to_market_path ||
+          (detail.customer_segments && detail.customer_segments.length > 0) ||
+          detail.sales_complexity) && (
+          <ArticleBlock className="mt-8">
+            <MonoLabel variant="strong" className="mb-4 block">
+              Go-to-Market Path
+            </MonoLabel>
+            {detail.go_to_market_path && (
+              <BodyText className="mb-4">{detail.go_to_market_path}</BodyText>
+            )}
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {detail.customer_segments &&
+                detail.customer_segments.length > 0 && (
+                  <div>
+                    <BodyText variant="muted" size="sm" className="mb-2">
+                      Customer Segments
+                    </BodyText>
+                    <div className="flex flex-wrap gap-2">
+                      {detail.customer_segments.map((segment, i) => (
+                        <Badge
+                          key={`segment-${i}`}
+                          className="bg-zinc-100 text-zinc-700"
+                        >
+                          {segment}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              {detail.sales_complexity && (
+                <div>
+                  <BodyText variant="muted" size="sm" className="mb-2">
+                    Sales Complexity
+                  </BodyText>
+                  <BodyText>{detail.sales_complexity}</BodyText>
+                </div>
+              )}
+            </div>
+          </ArticleBlock>
+        )}
+
+        {/* Commercialization Obstacles */}
+        {detail.commercialization_obstacles &&
+          detail.commercialization_obstacles.length > 0 && (
+            <ArticleBlock className="mt-8">
+              <MonoLabel variant="strong" className="mb-4 block">
+                Commercialization Obstacles
+              </MonoLabel>
+              <div className="space-y-3">
+                {detail.commercialization_obstacles.map((obstacle, i) => (
+                  <div
+                    key={`obstacle-${i}`}
+                    className="border-l-2 border-zinc-300 py-1 pl-4"
+                  >
+                    <BodyText>{obstacle}</BodyText>
+                  </div>
+                ))}
+              </div>
+            </ArticleBlock>
+          )}
+
+        {/* Revenue Timeline */}
+        {detail.revenue_timeline && (
+          <ArticleBlock className="mt-8">
+            <MonoLabel variant="strong" className="mb-2 block">
+              Path to Revenue
+            </MonoLabel>
+            <BodyText>{detail.revenue_timeline}</BodyText>
+          </ArticleBlock>
+        )}
+      </Section>
+    );
+  },
+);
 
 // ============================================
 // NEW: Failure Analysis Component
@@ -1661,7 +1692,8 @@ const FailureAnalysisSection = memo(function FailureAnalysisSection({
   // Check if there's any meaningful content
   const hasContent =
     analysis.pre_mortem ||
-    (analysis.historical_precedents && analysis.historical_precedents.length > 0) ||
+    (analysis.historical_precedents &&
+      analysis.historical_precedents.length > 0) ||
     analysis.how_startup_differs;
 
   if (!hasContent) return null;
@@ -1685,51 +1717,54 @@ const FailureAnalysisSection = memo(function FailureAnalysisSection({
       )}
 
       {/* Historical Precedents */}
-      {analysis.historical_precedents && analysis.historical_precedents.length > 0 && (
-        <ArticleBlock className="mt-8">
-          <MonoLabel variant="strong" className="mb-4 block">
-            Historical Precedents
-          </MonoLabel>
-          <div className="space-y-4">
-            {analysis.historical_precedents.map((precedent, i) => {
-              const failureType = precedent.failure_type
-                ? FAILURE_TYPE_STYLES[precedent.failure_type] || {
-                    label: precedent.failure_type,
-                    style: 'bg-zinc-500 text-white',
-                  }
-                : null;
+      {analysis.historical_precedents &&
+        analysis.historical_precedents.length > 0 && (
+          <ArticleBlock className="mt-8">
+            <MonoLabel variant="strong" className="mb-4 block">
+              Historical Precedents
+            </MonoLabel>
+            <div className="space-y-4">
+              {analysis.historical_precedents.map((precedent, i) => {
+                const failureType = precedent.failure_type
+                  ? FAILURE_TYPE_STYLES[precedent.failure_type] || {
+                      label: precedent.failure_type,
+                      style: 'bg-zinc-500 text-white',
+                    }
+                  : null;
 
-              return (
-                <div
-                  key={`precedent-${i}`}
-                  className="rounded-lg border border-zinc-200 bg-white p-4"
-                >
-                  <div className="mb-2 flex items-center gap-2">
-                    <span className="font-semibold text-zinc-900">
-                      {precedent.company || 'Unknown Company'}
-                    </span>
-                    {failureType && (
-                      <Badge className={failureType.style}>
-                        {failureType.label}
-                      </Badge>
+                return (
+                  <div
+                    key={`precedent-${i}`}
+                    className="rounded-lg border border-zinc-200 bg-white p-4"
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="font-semibold text-zinc-900">
+                        {precedent.company || 'Unknown Company'}
+                      </span>
+                      {failureType && (
+                        <Badge className={failureType.style}>
+                          {failureType.label}
+                        </Badge>
+                      )}
+                    </div>
+                    {precedent.what_happened && (
+                      <BodyText className="mb-2">
+                        {precedent.what_happened}
+                      </BodyText>
+                    )}
+                    {precedent.lessons && (
+                      <div className="border-l-2 border-zinc-300 pl-3">
+                        <BodyText variant="muted" size="sm">
+                          <strong>Lesson:</strong> {precedent.lessons}
+                        </BodyText>
+                      </div>
                     )}
                   </div>
-                  {precedent.what_happened && (
-                    <BodyText className="mb-2">{precedent.what_happened}</BodyText>
-                  )}
-                  {precedent.lessons && (
-                    <div className="border-l-2 border-zinc-300 pl-3">
-                      <BodyText variant="muted" size="sm">
-                        <strong>Lesson:</strong> {precedent.lessons}
-                      </BodyText>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </ArticleBlock>
-      )}
+                );
+              })}
+            </div>
+          </ArticleBlock>
+        )}
 
       {/* How This Startup Differs */}
       {analysis.how_startup_differs && (
@@ -1783,7 +1818,7 @@ const AppendixReferencesSection = memo(function AppendixReferencesSection({
                   </a>
                 )}
                 {ref.source_type && (
-                  <Badge className="ml-2 bg-zinc-100 text-zinc-600 text-xs">
+                  <Badge className="ml-2 bg-zinc-100 text-xs text-zinc-600">
                     {ref.source_type}
                   </Badge>
                 )}
@@ -2185,7 +2220,9 @@ export const DDReportDisplay = memo(function DDReportDisplay({
 
         {/* Commercialization Reality - prefer structured commercialization_detail, fallback to prose */}
         {quickRef?.commercialization_detail ? (
-          <CommercializationDetailSection detail={quickRef.commercialization_detail} />
+          <CommercializationDetailSection
+            detail={quickRef.commercialization_detail}
+          />
         ) : prose?.commercialization_reality?.content ? (
           <Section id="commercialization">
             <SectionTitle>Commercialization Reality</SectionTitle>
@@ -2217,7 +2254,9 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           <Section id="investment-synthesis">
             <SectionTitle>Investment Synthesis</SectionTitle>
             <ArticleBlock className="mt-8">
-              <ProseMarkdown>{prose.investment_synthesis.content}</ProseMarkdown>
+              <ProseMarkdown>
+                {prose.investment_synthesis.content}
+              </ProseMarkdown>
             </ArticleBlock>
           </Section>
         )}
@@ -2311,9 +2350,12 @@ export const DDReportDisplay = memo(function DDReportDisplay({
         )}
 
         {/* Synthesis & Recommendation (renamed from "If This Were My Deal") */}
-        {(quickRef?.synthesis_recommendation || quickRef?.if_this_were_my_deal) && (
+        {(quickRef?.synthesis_recommendation ||
+          quickRef?.if_this_were_my_deal) && (
           <SynthesisRecommendationSection
-            content={quickRef.synthesis_recommendation || quickRef.if_this_were_my_deal}
+            content={
+              quickRef.synthesis_recommendation || quickRef.if_this_were_my_deal
+            }
           />
         )}
 

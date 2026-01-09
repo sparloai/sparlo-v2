@@ -1,14 +1,13 @@
+import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 
-import { Check, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRight, Check } from 'lucide-react';
 
 import { getBillingGatewayProvider } from '@kit/billing-gateway';
 import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
 
 import { getPlanTokenLimit } from '~/lib/billing/plan-limits';
-
 import { withI18n } from '~/lib/i18n/with-i18n';
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 
@@ -25,7 +24,8 @@ async function ReturnCheckoutSessionPage({ searchParams }: SessionPageProps) {
     redirect('/app/billing');
   }
 
-  const { status, customerEmail, subscriptionSynced } = await loadCheckoutSession(sessionId);
+  const { status, customerEmail, subscriptionSynced } =
+    await loadCheckoutSession(sessionId);
 
   // If session is still open/incomplete, redirect back to billing
   if (status === 'open') {
@@ -109,11 +109,14 @@ async function loadCheckoutSession(sessionId: string) {
   // SECURITY: Validate session ownership to prevent subscription hijacking
   // clientReferenceId contains the account ID that initiated checkout
   if (session.clientReferenceId && session.clientReferenceId !== user.id) {
-    console.error('[Billing Security] Session ownership mismatch - potential hijacking attempt', {
-      sessionId,
-      currentUserId: user.id,
-      sessionOwnerId: session.clientReferenceId,
-    });
+    console.error(
+      '[Billing Security] Session ownership mismatch - potential hijacking attempt',
+      {
+        sessionId,
+        currentUserId: user.id,
+        sessionOwnerId: session.clientReferenceId,
+      },
+    );
     // Redirect to billing with error - don't expose details to potential attacker
     redirect('/app/billing?error=session_invalid');
   }
@@ -136,8 +139,10 @@ async function loadCheckoutSession(sessionId: string) {
 
     if (subscriptionData) {
       // SECURITY: Validate subscription ownership from Stripe metadata
-      if (subscriptionData.target_account_id &&
-          subscriptionData.target_account_id !== user.id) {
+      if (
+        subscriptionData.target_account_id &&
+        subscriptionData.target_account_id !== user.id
+      ) {
         console.error('[Billing Security] Subscription account mismatch', {
           sessionId,
           currentUserId: user.id,
@@ -161,17 +166,26 @@ async function loadCheckoutSession(sessionId: string) {
           const { error } = await adminClient.rpc('upsert_subscription', {
             ...subscriptionData,
             target_account_id: user.id,
-            target_customer_id: session.customer?.id ?? subscriptionData.target_customer_id,
+            target_customer_id:
+              session.customer?.id ?? subscriptionData.target_customer_id,
           });
 
           if (error) {
-            console.error('[Billing] Failed to sync subscription on return:', error);
+            console.error(
+              '[Billing] Failed to sync subscription on return:',
+              error,
+            );
           } else {
             subscriptionSynced = true;
-            console.log('[Billing] Subscription synced on return page:', subscriptionData.target_subscription_id);
+            console.log(
+              '[Billing] Subscription synced on return page:',
+              subscriptionData.target_subscription_id,
+            );
           }
         } else {
-          console.log('[Billing] Subscription already exists in DB, skipping subscription sync');
+          console.log(
+            '[Billing] Subscription already exists in DB, skipping subscription sync',
+          );
         }
       } catch (error) {
         console.error('[Billing] Error checking/syncing subscription:', error);
@@ -190,7 +204,11 @@ async function loadCheckoutSession(sessionId: string) {
         hasPeriodEnd: !!subscriptionData.period_ends_at,
       });
 
-      if (priceId && subscriptionData.period_starts_at && subscriptionData.period_ends_at) {
+      if (
+        priceId &&
+        subscriptionData.period_starts_at &&
+        subscriptionData.period_ends_at
+      ) {
         try {
           const tokenLimit = getPlanTokenLimit(priceId);
           const adminClient = getSupabaseServerAdminClient();
@@ -203,31 +221,46 @@ async function loadCheckoutSession(sessionId: string) {
             periodEnd: subscriptionData.period_ends_at,
           });
 
-          const { error: usageError } = await adminClient.rpc('reset_usage_period', {
-            p_account_id: user.id,
-            p_tokens_limit: tokenLimit,
-            p_period_start: subscriptionData.period_starts_at,
-            p_period_end: subscriptionData.period_ends_at,
-          });
+          const { error: usageError } = await adminClient.rpc(
+            'reset_usage_period',
+            {
+              p_account_id: user.id,
+              p_tokens_limit: tokenLimit,
+              p_period_start: subscriptionData.period_starts_at,
+              p_period_end: subscriptionData.period_ends_at,
+            },
+          );
 
           if (usageError) {
-            console.error('[Billing] FAILED to sync usage period on return:', usageError);
+            console.error(
+              '[Billing] FAILED to sync usage period on return:',
+              usageError,
+            );
           } else {
-            console.log('[Billing] SUCCESS: Usage period synced on return page:', { tokenLimit, priceId });
+            console.log(
+              '[Billing] SUCCESS: Usage period synced on return page:',
+              { tokenLimit, priceId },
+            );
           }
         } catch (usageErr) {
           console.error('[Billing] EXCEPTION syncing usage period:', usageErr);
         }
       } else {
-        console.error('[Billing] MISSING DATA for usage period sync - this is a bug:', {
-          priceId,
-          periodStart: subscriptionData.period_starts_at,
-          periodEnd: subscriptionData.period_ends_at,
-          fullSubscriptionData: JSON.stringify(subscriptionData),
-        });
+        console.error(
+          '[Billing] MISSING DATA for usage period sync - this is a bug:',
+          {
+            priceId,
+            periodStart: subscriptionData.period_starts_at,
+            periodEnd: subscriptionData.period_ends_at,
+            fullSubscriptionData: JSON.stringify(subscriptionData),
+          },
+        );
       }
     } else {
-      console.error('[Billing] Failed to fetch subscription from Stripe:', session.subscriptionId);
+      console.error(
+        '[Billing] Failed to fetch subscription from Stripe:',
+        session.subscriptionId,
+      );
     }
   }
 
