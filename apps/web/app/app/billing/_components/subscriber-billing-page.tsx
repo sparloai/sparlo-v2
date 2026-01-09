@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 
-import { ArrowUpRight, Check, ExternalLink, Loader2, X } from 'lucide-react';
+import { ArrowUpRight, ExternalLink, Loader2, X } from 'lucide-react';
 
 import { AppLink } from '~/components/app-link';
 import type { UsageCheckResponse } from '~/lib/usage/schemas';
@@ -70,20 +70,18 @@ export function SubscriberBillingPage({
           Dashboard
         </AppLink>
 
-        {/* Success banner */}
+        {/* Success indicator */}
         {showBanner && (
-          <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-300 flex items-center justify-between gap-3 rounded-lg bg-emerald-50 px-4 py-3">
+          <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
-                <Check className="h-4 w-4 text-white" strokeWidth={2.5} />
-              </div>
-              <p className="text-sm font-medium text-emerald-800">
-                Your subscription has been updated successfully.
+              <div className="h-1.5 w-1.5 rounded-full bg-zinc-900" />
+              <p className="text-[15px] text-zinc-600">
+                Subscription updated
               </p>
             </div>
             <button
               onClick={() => setShowBanner(false)}
-              className="text-emerald-600 hover:text-emerald-800 transition-colors"
+              className="text-zinc-400 hover:text-zinc-600 transition-colors"
               aria-label="Dismiss"
             >
               <X className="h-4 w-4" />
@@ -111,8 +109,9 @@ export function SubscriberBillingPage({
                   Billed {planInterval === 'year' ? 'annually' : 'monthly'}
                 </p>
               </div>
-              <div className="rounded-full bg-emerald-50 px-3 py-1">
-                <span className="text-sm font-medium text-emerald-700">
+              <div className="flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-zinc-900" />
+                <span className="text-[13px] font-medium tracking-[0.06em] uppercase text-zinc-500">
                   Active
                 </span>
               </div>

@@ -1,18 +1,15 @@
-import { Loader2 } from 'lucide-react';
-
 export default function PortalReturnLoading() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white">
-      <div className="text-center">
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100">
-          <Loader2 className="h-8 w-8 animate-spin text-zinc-600" />
+    <main className="min-h-screen bg-white">
+      <div className="mx-auto max-w-2xl px-8 pt-24 pb-16">
+        <div className="border-l-2 border-zinc-900 pl-10">
+          <div className="flex items-center gap-3">
+            <div className="h-1.5 w-1.5 rounded-full bg-zinc-500 animate-pulse" />
+            <p className="text-[15px] text-zinc-500">
+              Syncing changes...
+            </p>
+          </div>
         </div>
-        <h1 className="text-xl font-medium text-zinc-900">
-          Updating your subscription
-        </h1>
-        <p className="mt-2 text-sm text-zinc-500">
-          This will only take a moment...
-        </p>
       </div>
     </main>
   );
