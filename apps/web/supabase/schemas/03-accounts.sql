@@ -87,6 +87,22 @@ before insert or update on public.accounts
 for each row execute function public.trigger_set_user_tracking();
 
 -- RLS on the accounts table
+-- SELECT(accounts):
+-- Users can read their own personal account or team accounts they're members of
+create policy accounts_select on public.accounts
+for select
+  to authenticated using (
+    -- Personal account: user is the primary owner
+    (is_personal_account = true and primary_owner_user_id = auth.uid())
+    or
+    -- Team account: user is a member of the account
+    (is_personal_account = false and exists (
+      select 1 from public.accounts_memberships
+      where account_id = accounts.id
+      and user_id = auth.uid()
+    ))
+  );
+
 -- UPDATE(accounts):
 -- Team owners can update their accounts
 create policy accounts_self_update on public.accounts

@@ -62,13 +62,19 @@ async function syncSubscriptionFromStripe(userId: string) {
   }
 
   // Fetch fresh subscription data from Stripe
-  console.log('[Portal Return] Fetching subscription from Stripe:', existingSub.id);
+  console.log(
+    '[Portal Return] Fetching subscription from Stripe:',
+    existingSub.id,
+  );
 
   let subscriptionData;
   try {
     subscriptionData = await gateway.getSubscription(existingSub.id);
   } catch (error) {
-    console.error('[Portal Return] Failed to fetch subscription from Stripe:', error);
+    console.error(
+      '[Portal Return] Failed to fetch subscription from Stripe:',
+      error,
+    );
     return;
   }
 
@@ -90,14 +96,21 @@ async function syncSubscriptionFromStripe(userId: string) {
   });
 
   if (upsertError) {
-    console.error('[Portal Return] Failed to upsert subscription:', upsertError);
+    console.error(
+      '[Portal Return] Failed to upsert subscription:',
+      upsertError,
+    );
     return;
   }
 
   // Update usage period with new plan limits
   const priceId = subscriptionData.line_items?.[0]?.variant_id;
 
-  if (priceId && subscriptionData.period_starts_at && subscriptionData.period_ends_at) {
+  if (
+    priceId &&
+    subscriptionData.period_starts_at &&
+    subscriptionData.period_ends_at
+  ) {
     try {
       const tokenLimit = getPlanTokenLimit(priceId);
 
@@ -106,15 +119,21 @@ async function syncSubscriptionFromStripe(userId: string) {
         tokenLimit,
       });
 
-      const { error: usageError } = await adminClient.rpc('reset_usage_period', {
-        p_account_id: userId,
-        p_tokens_limit: tokenLimit,
-        p_period_start: subscriptionData.period_starts_at,
-        p_period_end: subscriptionData.period_ends_at,
-      });
+      const { error: usageError } = await adminClient.rpc(
+        'reset_usage_period',
+        {
+          p_account_id: userId,
+          p_tokens_limit: tokenLimit,
+          p_period_start: subscriptionData.period_starts_at,
+          p_period_end: subscriptionData.period_ends_at,
+        },
+      );
 
       if (usageError) {
-        console.error('[Portal Return] Failed to update usage period:', usageError);
+        console.error(
+          '[Portal Return] Failed to update usage period:',
+          usageError,
+        );
       } else {
         console.log('[Portal Return] Usage period updated successfully');
       }

@@ -569,6 +569,7 @@ COMMIT;
 ## Related Issues
 
 - [Supabase 406 Error - Stale Schema Cache](./supabase-406-stale-schema-cache-20260107.md) - Different cause: stale PostgREST schema cache (no PGRST error code)
+- [Accounts Table Missing SELECT RLS Policy](./accounts-table-missing-select-rls-policy-20260109.md) - Specific case: accounts table had UPDATE/INSERT/DELETE policies but no SELECT policy
 
 ---
 

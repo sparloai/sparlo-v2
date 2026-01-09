@@ -10,6 +10,58 @@ import { getSupabaseClientKeys } from '../get-supabase-client-keys';
 const COOKIE_DOMAIN = '.sparlo.ai';
 
 /**
+ * Storage key used by Supabase to store auth tokens.
+ * Format: sb-{project-ref}-auth-token
+ */
+function getSupabaseStorageKey(url: string): string {
+  const projectRef = new URL(url).hostname.split('.')[0];
+  return `sb-${projectRef}-auth-token`;
+}
+
+/**
+ * Clear corrupted auth tokens from localStorage.
+ * Called when we detect an invalid refresh token to prevent infinite retry loops.
+ */
+function clearCorruptedTokens(url: string): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    const storageKey = getSupabaseStorageKey(url);
+    localStorage.removeItem(storageKey);
+    console.warn(
+      '[Supabase] Cleared corrupted auth tokens to prevent refresh loop',
+    );
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+/**
+ * Check if stored tokens appear corrupted (missing refresh_token).
+ * This can cause infinite retry loops in the Supabase client.
+ */
+function hasCorruptedTokens(url: string): boolean {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    const storageKey = getSupabaseStorageKey(url);
+    const stored = localStorage.getItem(storageKey);
+
+    if (!stored) return false;
+
+    const parsed = JSON.parse(stored);
+    // If we have a session but no refresh_token, it's corrupted
+    if (parsed && !parsed.refresh_token && parsed.access_token) {
+      return true;
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * @name getSupabaseBrowserClient
  * @description Get a Supabase client for use in the Browser.
  * Cookies are configured for cross-subdomain auth in production.
@@ -17,6 +69,13 @@ const COOKIE_DOMAIN = '.sparlo.ai';
 export function getSupabaseBrowserClient<GenericSchema = Database>() {
   const keys = getSupabaseClientKeys();
   const isProduction = process.env.NODE_ENV === 'production';
+
+  // Proactively clear corrupted tokens to prevent infinite refresh loops
+  // This is a defensive measure against a known Supabase bug where invalid
+  // refresh tokens cause _callRefreshToken → _removeSession → _notifyAllSubscribers loops
+  if (hasCorruptedTokens(keys.url)) {
+    clearCorruptedTokens(keys.url);
+  }
 
   return createBrowserClient<GenericSchema>(keys.url, keys.publicKey, {
     cookieOptions: {

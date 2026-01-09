@@ -19,10 +19,13 @@ export async function handleSubscriptionUpdated(
 
   // Early validation - not an error, just incomplete data
   if (!accountId || !priceId) {
-    console.warn('[Billing] handleSubscriptionUpdated: Missing required fields', {
-      hasAccountId: !!accountId,
-      hasPriceId: !!priceId,
-    });
+    console.warn(
+      '[Billing] handleSubscriptionUpdated: Missing required fields',
+      {
+        hasAccountId: !!accountId,
+        hasPriceId: !!priceId,
+      },
+    );
     return;
   }
 
@@ -43,15 +46,25 @@ export async function handleSubscriptionUpdated(
     .select('id');
 
   if (error) {
-    console.error('[Billing] Failed to update token limit:', { error, accountId, priceId });
+    console.error('[Billing] Failed to update token limit:', {
+      error,
+      accountId,
+      priceId,
+    });
     throw new Error(`Failed to update token limit: ${error.message}`);
   }
 
   if (!data || data.length === 0) {
     // No active period - not an error, invoice.paid will create it
-    console.log('[Billing] No active usage period to update (transitioning)', { accountId });
+    console.log('[Billing] No active usage period to update (transitioning)', {
+      accountId,
+    });
     return;
   }
 
-  console.log('[Billing] Token limit updated:', { accountId, priceId, tokenLimit });
+  console.log('[Billing] Token limit updated:', {
+    accountId,
+    priceId,
+    tokenLimit,
+  });
 }
