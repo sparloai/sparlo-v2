@@ -70,7 +70,7 @@ const staggerItem = {
   },
 };
 
-const typewriter = {
+const _typewriter = {
   hidden: { width: 0 },
   visible: {
     width: 'auto',
