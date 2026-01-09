@@ -41,6 +41,7 @@ import {
   BodyText,
   HighlightBox,
   MonoLabel,
+  ProseMarkdown,
   RiskSeverityIndicator,
   ScoreDisplay,
   Section,
@@ -804,34 +805,6 @@ const TheBetHighlight = memo(function TheBetHighlight({
       </p>
       <p className="text-lg leading-relaxed">{bet}</p>
     </div>
-  );
-});
-
-// Memoized paragraph splitting component - prevents re-splitting on every render
-const SplitParagraphs = memo(function SplitParagraphs({
-  content,
-  keyPrefix,
-}: {
-  content: string;
-  keyPrefix: string;
-}) {
-  const paragraphs = useMemo(
-    () =>
-      content
-        .split(/\n\n+/)
-        .filter((p) => p.trim())
-        .map((p) => p.trim()),
-    [content]
-  );
-
-  return (
-    <>
-      {paragraphs.map((paragraph, idx) => (
-        <BodyText key={`${keyPrefix}-${idx}`} parseCited>
-          {paragraph}
-        </BodyText>
-      ))}
-    </>
   );
 });
 
@@ -2132,7 +2105,7 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           <Section id="problem-primer">
             <SectionTitle>Problem Primer</SectionTitle>
             <ArticleBlock className="mt-8">
-              <BodyText parseCited>{prose.problem_primer.content}</BodyText>
+              <ProseMarkdown>{prose.problem_primer.content}</ProseMarkdown>
             </ArticleBlock>
             {/* First Principles Insight - embedded in Problem Primer (fallback) */}
             {quickRef?.first_principles_insight && (
@@ -2150,11 +2123,8 @@ export const DDReportDisplay = memo(function DDReportDisplay({
         {prose?.technical_deep_dive?.content && (
           <Section id="startup-claims">
             <SectionTitle>Startup Claims</SectionTitle>
-            <ArticleBlock className="mt-8 space-y-6">
-              <SplitParagraphs
-                content={prose.technical_deep_dive.content}
-                keyPrefix="tech-p"
-              />
+            <ArticleBlock className="mt-8">
+              <ProseMarkdown>{prose.technical_deep_dive.content}</ProseMarkdown>
             </ArticleBlock>
             {/* Claim validation summary - inline after technical prose */}
             {quickRef?.claim_validation_table &&
@@ -2182,7 +2152,7 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           <Section id="solution-landscape">
             <SectionTitle>Solution Landscape</SectionTitle>
             <ArticleBlock className="mt-8">
-              <BodyText parseCited>{prose.solution_landscape.content}</BodyText>
+              <ProseMarkdown>{prose.solution_landscape.content}</ProseMarkdown>
             </ArticleBlock>
             {/* Competitor table - inline within solution landscape */}
             {quickRef?.competitor_landscape &&
@@ -2220,9 +2190,9 @@ export const DDReportDisplay = memo(function DDReportDisplay({
           <Section id="commercialization">
             <SectionTitle>Commercialization Reality</SectionTitle>
             <ArticleBlock className="mt-8">
-              <BodyText parseCited>
+              <ProseMarkdown>
                 {prose.commercialization_reality.content}
-              </BodyText>
+              </ProseMarkdown>
             </ArticleBlock>
             {/* Economics bridge - inline within commercialization */}
             {quickRef?.economics_bridge &&
@@ -2246,11 +2216,8 @@ export const DDReportDisplay = memo(function DDReportDisplay({
         {prose?.investment_synthesis?.content && (
           <Section id="investment-synthesis">
             <SectionTitle>Investment Synthesis</SectionTitle>
-            <ArticleBlock className="mt-8 space-y-6">
-              <SplitParagraphs
-                content={prose.investment_synthesis.content}
-                keyPrefix="synth-p"
-              />
+            <ArticleBlock className="mt-8">
+              <ProseMarkdown>{prose.investment_synthesis.content}</ProseMarkdown>
             </ArticleBlock>
           </Section>
         )}

@@ -11,9 +11,15 @@
  * - Labels: 13px, uppercase, tracking wide
  * - Headings: font-semibold, tracking-tight
  */
-import { type ReactNode, memo, useMemo } from 'react';
+import { type ReactNode, memo, useMemo, Component, type ErrorInfo } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 
 import { cn } from '@kit/ui/utils';
+import {
+  PROSE_SANITIZE_SCHEMA,
+  PROSE_MARKDOWN_COMPONENTS,
+} from '~/lib/shared/markdown-components';
 
 // ============================================
 // CITATION PARSING UTILITY
@@ -79,6 +85,107 @@ export const CitedText = memo(function CitedText({
   const parsedContent = useMemo(() => parseCitations(children), [children]);
 
   return <Component className={className}>{parsedContent}</Component>;
+});
+
+// ============================================
+// PROSE MARKDOWN COMPONENT (Antifragile)
+// ============================================
+
+/**
+ * Error boundary for ProseMarkdown - catches any rendering errors
+ * and falls back to displaying plain text.
+ */
+interface ProseMarkdownErrorBoundaryState {
+  hasError: boolean;
+  error?: Error;
+}
+
+interface ProseMarkdownErrorBoundaryProps {
+  children: ReactNode;
+  fallbackContent: string;
+}
+
+class ProseMarkdownErrorBoundary extends Component<
+  ProseMarkdownErrorBoundaryProps,
+  ProseMarkdownErrorBoundaryState
+> {
+  constructor(props: ProseMarkdownErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error): ProseMarkdownErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log error but don't crash - antifragile behavior
+    console.error('ProseMarkdown rendering error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Fallback: render as plain text with paragraph splitting
+      const paragraphs = this.props.fallbackContent
+        .split(/\n\n+/)
+        .filter((p) => p.trim());
+
+      return (
+        <div className="prose-fallback">
+          {paragraphs.map((paragraph, idx) => (
+            <p
+              key={idx}
+              className="mb-4 text-[18px] leading-[1.7] text-zinc-700 last:mb-0"
+              style={{ fontFamily: 'var(--font-heading), system-ui, sans-serif' }}
+            >
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+/**
+ * ProseMarkdown - Renders markdown content with brand system typography.
+ *
+ * Antifragile design:
+ * - Empty/null content returns null (no crash)
+ * - Error boundary catches ReactMarkdown failures and shows plain text fallback
+ * - Sanitizes all HTML to prevent XSS
+ * - Allows <sup> for citations
+ */
+interface ProseMarkdownProps {
+  children: string | null | undefined;
+  className?: string;
+}
+
+export const ProseMarkdown = memo(function ProseMarkdown({
+  children,
+  className,
+}: ProseMarkdownProps) {
+  // Antifragile: handle empty/null content gracefully
+  if (!children || typeof children !== 'string' || !children.trim()) {
+    return null;
+  }
+
+  const content = children.trim();
+
+  return (
+    <ProseMarkdownErrorBoundary fallbackContent={content}>
+      <div className={cn('prose-content', className)}>
+        <ReactMarkdown
+          rehypePlugins={[[rehypeSanitize, PROSE_SANITIZE_SCHEMA]]}
+          components={PROSE_MARKDOWN_COMPONENTS}
+        >
+          {content}
+        </ReactMarkdown>
+      </div>
+    </ProseMarkdownErrorBoundary>
+  );
 });
 
 // ============================================
