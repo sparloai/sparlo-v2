@@ -23,210 +23,135 @@ async function PrivacyPolicyPage() {
       <div className="container mx-auto max-w-3xl px-4 py-12">
         <div className="prose prose-zinc dark:prose-invert max-w-none">
           <p className="text-muted-foreground text-sm">
-            Last updated: January 3, 2025
+            Last updated: January 9, 2025
           </p>
 
-          <Section title="Our Commitment to Your Privacy">
-            <p>
-              At Sparlo, we understand that R&D teams work with sensitive
-              technical information and proprietary research. Protecting your
-              intellectual property and maintaining the confidentiality of your
-              data is fundamental to our service. This Privacy Policy explains
-              how we collect, use, protect, and handle your information.
-            </p>
-          </Section>
-
-          <Section title="1. Intellectual Property Protection">
+          <Section title="We Cannot See Your Data">
             <Highlight>
-              <strong>Your IP remains yours.</strong> We do not claim any
-              ownership rights to the research data, technical specifications,
-              or other content you submit to Sparlo. Your intellectual property
-              is protected.
+              <strong>
+                Sparlo cannot read your queries, your research data, or your
+                generated reports.
+              </strong>{' '}
+              Your content is processed by a third-party AI provider and
+              returned directly to you. No human at Sparlo has access to it.
             </Highlight>
 
-            <h4>Key IP Protections</h4>
+            <p>
+              We built Sparlo for R&D teams working on sensitive problems. If we
+              could see your data, we would not be able to serve you.
+            </p>
+          </Section>
+
+          <Section title="How Your Data Flows">
+            <p>Here is exactly what happens when you use Sparlo:</p>
             <ul>
               <li>
-                <strong>No IP Claims:</strong> We make no claims to ownership of
-                your submitted content or the solutions generated from it
+                <strong>Encrypted everywhere:</strong> Your data is encrypted in
+                transit (TLS 1.3) and at rest (AES-256).
               </li>
               <li>
-                <strong>No Training on Your Data:</strong> Your proprietary data
-                is not used to train our AI models or improve services for other
-                customers
+                <strong>We cannot access your content:</strong> Your queries and
+                generated reports are stored in your account. Our team has no
+                way to view them.
               </li>
               <li>
-                <strong>Isolated Processing:</strong> Your queries and data are
-                processed in isolation and are not shared across customer
-                accounts
+                <strong>Processed via third-party AI:</strong> Your queries are
+                sent to a third-party AI API provider for processing. The
+                results come back to your account.
               </li>
               <li>
-                <strong>Data Deletion:</strong> You can request deletion of your
-                data at any time, and we will permanently remove it from our
-                systems
+                <strong>Not used for AI training:</strong> We use an enterprise
+                API tier where the provider does not train on customer data.
+                This is their policy, not just ours.
+              </li>
+              <li>
+                <strong>Not sold or shared:</strong> Your data is never sold to
+                advertisers, data brokers, or any other third parties.
               </li>
             </ul>
           </Section>
 
-          <Section title="2. Information We Collect">
-            <h4>Account Information</h4>
+          <Section title="Your IP Stays Yours">
             <p>
-              When you create an account, we collect your email address and
-              authentication credentials. If you use social login providers, we
-              receive basic profile information from those services.
+              We make no claims on anything you submit or anything we generate
+              for you.
             </p>
-
-            <h4>Usage Data</h4>
-            <p>
-              We collect information about how you interact with our Service,
-              including pages visited, features used, and timestamps. This helps
-              us improve the user experience.
-            </p>
-
-            <h4>Technical Queries and Content</h4>
-            <p>
-              When you use our analysis features, we process the technical
-              questions, research topics, and specifications you submit. This
-              data is necessary to provide the Service and generate relevant
-              solutions.
-            </p>
-
-            <h4>Payment Information</h4>
-            <p>
-              Payment processing is handled by Stripe. We do not store your
-              credit card numbers or banking information on our servers. Stripe
-              maintains PCI DSS compliance.
-            </p>
-          </Section>
-
-          <Section title="3. Security Infrastructure">
-            <Highlight>
-              We implement enterprise-grade security measures to protect your
-              data at every level.
-            </Highlight>
-
-            <h4>Data Encryption</h4>
             <ul>
               <li>
-                <strong>In Transit:</strong> All data transmitted between your
-                browser and our servers is encrypted using TLS 1.3
+                <strong>No ownership claims:</strong> Your content and generated
+                solutions belong entirely to you.
               </li>
               <li>
-                <strong>At Rest:</strong> Data stored in our databases is
-                encrypted using AES-256 encryption
-              </li>
-            </ul>
-
-            <h4>Infrastructure Security</h4>
-            <ul>
-              <li>
-                <strong>Cloud Infrastructure:</strong> We use industry-leading
-                cloud providers with SOC 2 Type II certification
+                <strong>Isolated processing:</strong> Your queries are processed
+                in isolation. Nothing crosses between accounts.
               </li>
               <li>
-                <strong>Network Security:</strong> Our infrastructure is
-                protected by firewalls, intrusion detection systems, and regular
-                security monitoring
-              </li>
-              <li>
-                <strong>Access Controls:</strong> Strict authentication and
-                authorization controls limit access to systems and data
-              </li>
-            </ul>
-
-            <h4>Application Security</h4>
-            <ul>
-              <li>Regular security audits and penetration testing</li>
-              <li>Secure coding practices and code review processes</li>
-              <li>Dependency monitoring and vulnerability scanning</li>
-            </ul>
-          </Section>
-
-          <Section title="4. Team Access Restrictions">
-            <Highlight>
-              <strong>We operate on a principle of minimal access.</strong> Our
-              team does not have routine access to your proprietary content.
-            </Highlight>
-
-            <h4>What Our Team Cannot Access</h4>
-            <ul>
-              <li>
-                The specific content of your technical queries and research data
-              </li>
-              <li>Generated reports and solutions specific to your account</li>
-              <li>Your payment card details (handled exclusively by Stripe)</li>
-            </ul>
-
-            <h4>What Our Team Can Access (When Necessary)</h4>
-            <ul>
-              <li>
-                Account information (email, subscription status) for customer
-                support
-              </li>
-              <li>
-                Aggregated, anonymized usage statistics for service improvement
-              </li>
-              <li>
-                Technical logs for debugging critical issues (with strict access
-                controls and audit logging)
-              </li>
-            </ul>
-
-            <p>
-              Access to any customer data requires explicit justification,
-              manager approval, and is logged for audit purposes.
-            </p>
-          </Section>
-
-          <Section title="5. How We Use Your Information">
-            <p>We use collected information to:</p>
-            <ul>
-              <li>Provide, maintain, and improve the Service</li>
-              <li>Process your technical queries and generate solutions</li>
-              <li>Send important account notifications and updates</li>
-              <li>Respond to customer support requests</li>
-              <li>
-                Analyze aggregated usage patterns to improve user experience
-              </li>
-              <li>Prevent fraud and ensure security</li>
-            </ul>
-
-            <h4>What We Do Not Do</h4>
-            <ul>
-              <li>Sell your personal information to third parties</li>
-              <li>Use your proprietary data for advertising purposes</li>
-              <li>Share your data with other customers</li>
-              <li>
-                Train AI models on your specific queries without explicit
-                consent
+                <strong>Full deletion:</strong> Request deletion anytime. We
+                permanently remove everything.
               </li>
             </ul>
           </Section>
 
-          <Section title="6. Third-Party Services">
+          <Section title="What We Can Access">
+            <p>Our team can see:</p>
+            <ul>
+              <li>Your email address and subscription status.</li>
+              <li>Anonymized usage statistics (page views, feature usage).</li>
+              <li>
+                Technical logs for debugging (timestamped events, not content).
+              </li>
+            </ul>
+
+            <p>Our team cannot see:</p>
+            <ul>
+              <li>Your queries or prompts.</li>
+              <li>Your generated reports.</li>
+              <li>Your research data or uploaded content.</li>
+              <li>Your payment details (Stripe handles this directly).</li>
+            </ul>
+
             <p>
-              We use carefully selected third-party services that adhere to
-              strict security and privacy standards:
+              Any access to account data requires justification, approval, and
+              audit logging.
             </p>
+          </Section>
+
+          <Section title="Security">
             <ul>
               <li>
-                <strong>Authentication:</strong> Supabase Auth (SOC 2 compliant)
+                <strong>Infrastructure:</strong> Hosted on SOC 2 Type II
+                certified cloud providers.
               </li>
               <li>
-                <strong>Payment Processing:</strong> Stripe (PCI DSS Level 1
-                compliant)
+                <strong>Access controls:</strong> Strict authentication and
+                authorization at every level.
               </li>
               <li>
-                <strong>AI Processing:</strong> Anthropic Claude (enterprise
-                security standards)
+                <strong>Regular audits:</strong> Security testing and
+                vulnerability scanning.
+              </li>
+            </ul>
+          </Section>
+
+          <Section title="Third-Party Services">
+            <p>We rely on third-party services to operate Sparlo:</p>
+            <ul>
+              <li>
+                <strong>AI processing:</strong> Your queries are processed by a
+                third-party AI API provider. We use their enterprise tier, which
+                contractually prohibits training on customer data.
               </li>
               <li>
-                <strong>Product Analytics:</strong> PostHog (privacy-focused,
-                GDPR compliant). We use PostHog to understand how users interact
-                with our Service, measure conversion funnels, and improve user
-                experience. PostHog only collects data after you consent to
-                analytics cookies. We do not use PostHog for advertising or
-                share your data with advertisers.{' '}
+                <strong>Authentication:</strong> Account login handled by
+                Supabase Auth.
+              </li>
+              <li>
+                <strong>Payments:</strong> Payment processing handled by Stripe.
+                We never see your card details.
+              </li>
+              <li>
+                <strong>Analytics:</strong> PostHog for usage analytics (opt-in
+                only, privacy-focused).{' '}
                 <a
                   href="https://posthog.com/privacy"
                   className="text-primary"
@@ -235,103 +160,112 @@ async function PrivacyPolicyPage() {
                 >
                   PostHog Privacy Policy
                 </a>
-              </li>
-            </ul>
-            <p>
-              These providers are contractually bound to protect your data and
-              use it only for the purposes specified.
-            </p>
-          </Section>
-
-          <Section title="7. Data Retention">
-            <p>
-              We retain your data only as long as necessary to provide the
-              Service:
-            </p>
-            <ul>
-              <li>
-                <strong>Active Accounts:</strong> Data is retained while your
-                account is active
-              </li>
-              <li>
-                <strong>Account Deletion:</strong> Upon account deletion, your
-                data is permanently removed within 30 days
-              </li>
-              <li>
-                <strong>Legal Requirements:</strong> Some data may be retained
-                longer if required by law
+                .
               </li>
             </ul>
           </Section>
 
-          <Section title="8. Your Rights">
-            <p>You have the right to:</p>
+          <Section title="What We Collect">
+            <h4>Account information</h4>
+            <p>
+              Email, authentication credentials, and basic profile info from
+              social logins.
+            </p>
+
+            <h4>Usage data</h4>
+            <p>
+              Pages visited, features used, and timestamps. This helps us
+              improve the product.
+            </p>
+
+            <h4>Content you submit</h4>
+            <p>
+              Your queries and research topics are processed to generate
+              solutions. This data stays in your account.
+            </p>
+
+            <h4>Payment</h4>
+            <p>
+              Handled entirely by Stripe. We never see or store card numbers.
+            </p>
+          </Section>
+
+          <Section title="What We Do Not Do">
+            <ul>
+              <li>Sell your data to anyone.</li>
+              <li>Share your data with advertisers or data brokers.</li>
+              <li>Share data between customers.</li>
+              <li>
+                Use your queries for AI training (our provider&apos;s enterprise
+                terms prohibit this).
+              </li>
+              <li>Access your reports or research content.</li>
+            </ul>
+          </Section>
+
+          <Section title="Data Retention">
             <ul>
               <li>
-                <strong>Access:</strong> Request a copy of the data we hold
-                about you
+                <strong>Active accounts:</strong> Data retained while active.
               </li>
               <li>
-                <strong>Correction:</strong> Update or correct inaccurate
-                information
+                <strong>Deletion:</strong> Permanently removed within 30 days of
+                account deletion.
               </li>
               <li>
-                <strong>Deletion:</strong> Request deletion of your data and
-                account
-              </li>
-              <li>
-                <strong>Export:</strong> Export your data in a portable format
-              </li>
-              <li>
-                <strong>Opt-out:</strong> Unsubscribe from marketing
-                communications
+                <strong>Legal holds:</strong> May retain longer if required by
+                law.
               </li>
             </ul>
+          </Section>
+
+          <Section title="Your Rights">
+            <p>You can:</p>
+            <ul>
+              <li>Access a copy of your data.</li>
+              <li>Correct inaccurate information.</li>
+              <li>Delete your data and account.</li>
+              <li>Export your data.</li>
+              <li>Opt out of marketing.</li>
+            </ul>
             <p>
-              To exercise these rights, contact us at{' '}
+              Contact{' '}
               <a href="mailto:privacy@sparlo.ai" className="text-primary">
                 privacy@sparlo.ai
-              </a>
-              .
+              </a>{' '}
+              to exercise these rights.
             </p>
           </Section>
 
-          <Section title="9. International Data Transfers">
+          <Section title="International Transfers">
             <p>
-              Your data may be processed in the United States where our servers
-              are located. We ensure appropriate safeguards are in place for
-              international data transfers in compliance with applicable data
-              protection laws.
+              Data is processed in the United States. We maintain appropriate
+              safeguards for international transfers.
             </p>
           </Section>
 
-          <Section title="10. Changes to This Policy">
+          <Section title="Policy Changes">
             <p>
-              We may update this Privacy Policy from time to time. We will
-              notify you of material changes by posting the updated policy on
-              our website and, where appropriate, by email. Your continued use
-              of the Service after changes constitutes acceptance of the updated
-              policy.
+              We may update this policy. Material changes will be posted here
+              and emailed to you. Continued use after changes means acceptance.
             </p>
           </Section>
 
-          <Section title="11. Contact Us">
-            <p>
-              If you have questions about this Privacy Policy or our data
-              practices, please contact us:
-            </p>
+          <Section title="Contact">
             <ul>
               <li>
-                Email:{' '}
+                Privacy:{' '}
                 <a href="mailto:privacy@sparlo.ai" className="text-primary">
                   privacy@sparlo.ai
                 </a>
+                .
               </li>
               <li>
-                General inquiries:{' '}
+                General:{' '}
                 <a href="mailto:hello@sparlo.ai" className="text-primary">
                   hello@sparlo.ai
                 </a>
+                .
               </li>
             </ul>
           </Section>

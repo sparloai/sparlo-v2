@@ -73,6 +73,14 @@ const SIGNED_OUT_DEBOUNCE_MS = 1500;
 const MAX_REDIRECTS_IN_WINDOW = 3;
 const REDIRECT_WINDOW_MS = 10_000; // 10 seconds
 
+/**
+ * Thresholds to detect rapid SIGNED_OUT events, which indicates
+ * an infinite token refresh loop (Supabase bug with invalid refresh tokens).
+ * When detected, we clear localStorage to break the cycle.
+ */
+const MAX_SIGNOUTS_IN_WINDOW = 5;
+const SIGNOUT_WINDOW_MS = 5_000; // 5 seconds
+
 // ============================================================================
 // DEBUG LOGGING
 // ============================================================================
@@ -85,6 +93,43 @@ function debugLog(context: string, data: Record<string, unknown>) {
       timestamp: new Date().toISOString(),
       ...data,
     });
+  }
+}
+
+// ============================================================================
+// AUTH TOKEN CLEANUP
+// ============================================================================
+
+/**
+ * Clear Supabase auth tokens from localStorage.
+ * Called when we detect an infinite refresh loop to break the cycle.
+ */
+function clearSupabaseAuthTokens(): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    // Find and remove all Supabase auth tokens (sb-*-auth-token pattern)
+    const keysToRemove: string[] = [];
+
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+
+      if (key?.startsWith('sb-') && key.endsWith('-auth-token')) {
+        keysToRemove.push(key);
+      }
+    }
+
+    for (const key of keysToRemove) {
+      localStorage.removeItem(key);
+    }
+
+    if (keysToRemove.length > 0) {
+      console.warn(
+        '[AuthListener] Cleared corrupted auth tokens to break infinite refresh loop',
+      );
+    }
+  } catch {
+    // Ignore storage errors
   }
 }
 
@@ -342,6 +387,11 @@ export function useAuthChangeListener({
   const redirectCountRef = useRef<number>(0);
   const lastRedirectTimeRef = useRef<number>(0);
 
+  // Track rapid SIGNED_OUT events to detect infinite token refresh loops
+  const signoutCountRef = useRef<number>(0);
+  const lastSignoutTimeRef = useRef<number>(0);
+  const hasTrippedRefreshLoopBreakerRef = useRef(false);
+
   const setupAuthListener = useEffectEvent(() => {
     if (typeof window === 'undefined') {
       return;
@@ -368,6 +418,39 @@ export function useAuthChangeListener({
       // Fire callback
       if (onEvent) {
         onEvent(event, user);
+      }
+
+      // ================================================================
+      // DETECT INFINITE TOKEN REFRESH LOOP
+      // ================================================================
+      // When a refresh token is invalid, Supabase gets stuck in a loop:
+      // _callRefreshToken → _removeSession → _notifyAllSubscribers → retry
+      // We detect this by watching for rapid SIGNED_OUT events.
+      if (event === 'SIGNED_OUT') {
+        const now = Date.now();
+        const timeSinceLastSignout = now - lastSignoutTimeRef.current;
+
+        if (timeSinceLastSignout < SIGNOUT_WINDOW_MS) {
+          signoutCountRef.current++;
+
+          if (
+            signoutCountRef.current >= MAX_SIGNOUTS_IN_WINDOW &&
+            !hasTrippedRefreshLoopBreakerRef.current
+          ) {
+            // We've detected an infinite loop - clear tokens to break it
+            hasTrippedRefreshLoopBreakerRef.current = true;
+            console.error(
+              '[AuthListener] Detected infinite token refresh loop. Clearing corrupted tokens.',
+            );
+            clearSupabaseAuthTokens();
+            // Don't return - let the normal flow proceed to redirect to auth
+          }
+        } else {
+          // New time window - reset counter
+          signoutCountRef.current = 1;
+        }
+
+        lastSignoutTimeRef.current = now;
       }
 
       // Track stable sessions (not INITIAL_SESSION which can be transient)

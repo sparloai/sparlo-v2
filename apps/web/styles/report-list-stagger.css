@@ -1,0 +1,75 @@
+/**
+ * Report List Stagger Animation
+ *
+ * CSS-only stagger animation for the first 4 items.
+ * Performance-capped to prevent frame budget issues on large lists.
+ *
+ * Based on research:
+ * - Stagger beyond 4 items provides diminishing returns
+ * - Total animation duration capped at 160ms
+ * - GPU-accelerated using transform and opacity only
+ */
+
+/* Stagger animation for report cards */
+.report-card-stagger {
+  opacity: 0;
+  animation: fadeSlideIn 200ms ease-out forwards;
+}
+
+/* Stagger delays - first 4 items only */
+.report-card-stagger:nth-child(1) {
+  animation-delay: 0ms;
+}
+.report-card-stagger:nth-child(2) {
+  animation-delay: 40ms;
+}
+.report-card-stagger:nth-child(3) {
+  animation-delay: 80ms;
+}
+.report-card-stagger:nth-child(4) {
+  animation-delay: 120ms;
+}
+/* All items after 4th get same delay (capped) */
+.report-card-stagger:nth-child(n + 5) {
+  animation-delay: 160ms;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .report-card-stagger {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Alternative: Use CSS custom properties for dynamic stagger */
+.report-card-dynamic {
+  opacity: 0;
+  animation: fadeSlideIn 200ms ease-out forwards;
+  /* Set --stagger-index in component: style={{ '--stagger-index': index }} */
+  animation-delay: calc(var(--stagger-index, 0) * 40ms);
+}
+
+/* Cap dynamic stagger at 160ms */
+.report-card-dynamic:nth-child(n + 5) {
+  animation-delay: 160ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-card-dynamic {
+    animation: none;
+    opacity: 1;
+  }
+}

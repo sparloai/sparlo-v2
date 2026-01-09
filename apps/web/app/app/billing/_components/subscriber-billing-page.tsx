@@ -75,13 +75,11 @@ export function SubscriberBillingPage({
           <div className="mb-8 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-1.5 w-1.5 rounded-full bg-zinc-900" />
-              <p className="text-[15px] text-zinc-600">
-                Subscription updated
-              </p>
+              <p className="text-[15px] text-zinc-600">Subscription updated</p>
             </div>
             <button
               onClick={() => setShowBanner(false)}
-              className="text-zinc-400 hover:text-zinc-600 transition-colors"
+              className="text-zinc-400 transition-colors hover:text-zinc-600"
               aria-label="Dismiss"
             >
               <X className="h-4 w-4" />
@@ -111,7 +109,7 @@ export function SubscriberBillingPage({
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-1.5 w-1.5 rounded-full bg-zinc-900" />
-                <span className="text-[13px] font-medium tracking-[0.06em] uppercase text-zinc-500">
+                <span className="text-[13px] font-medium tracking-[0.06em] text-zinc-500 uppercase">
                   Active
                 </span>
               </div>
