@@ -2,12 +2,13 @@ import * as React from 'react';
 
 import { cva } from 'class-variance-authority';
 import type { VariantProps } from 'class-variance-authority';
+import { Loader2 } from 'lucide-react';
 import { Slot } from 'radix-ui';
 
 import { cn } from '../lib/utils';
 
 const buttonVariants = cva(
-  'focus-visible:ring-ring inline-flex cursor-pointer items-center justify-center rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-1 focus-visible:outline-hidden active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50',
+  'focus-visible:ring-ring inline-flex cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-1 focus-visible:outline-hidden active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -41,6 +42,7 @@ export interface ButtonProps
     React.ComponentPropsWithRef<'button'>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  loading?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -48,15 +50,23 @@ const Button: React.FC<ButtonProps> = ({
   variant,
   size,
   asChild = false,
+  loading = false,
+  disabled,
+  children,
   ...props
 }) => {
   const Comp = asChild ? Slot.Root : 'button';
+  const isDisabled = disabled || loading;
 
   return (
     <Comp
       className={cn(buttonVariants({ variant, size, className }))}
+      disabled={isDisabled}
       {...props}
-    />
+    >
+      {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+      {children}
+    </Comp>
   );
 };
 
