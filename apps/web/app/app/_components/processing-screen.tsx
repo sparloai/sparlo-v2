@@ -435,8 +435,8 @@ export function ProcessingScreen({
               </motion.div>
             )}
 
-            {/* Freetext section */}
-            {pendingClarification.allows_freetext && (
+            {/* Freetext section - show if allows_freetext is true OR if there are no options (fallback) */}
+            {(pendingClarification.allows_freetext || !hasOptions) && (
               <motion.div
                 className="mt-12"
                 initial={{ opacity: 0 }}
