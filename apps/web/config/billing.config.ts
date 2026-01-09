@@ -57,9 +57,9 @@ export default createBillingSchema({
           interval: 'month',
           lineItems: [
             {
-              id: 'price_1SlTJFEe4gCtTPhv72apc9yq',
+              id: 'price_1Sng4XEe4gCtTPhv4OMZBGjq',
               name: 'Core',
-              cost: 19900,
+              cost: 24900,
               type: 'flat' as const,
             },
           ],
@@ -71,9 +71,9 @@ export default createBillingSchema({
           interval: 'year',
           lineItems: [
             {
-              id: 'price_1SlTQcEe4gCtTPhvAyhzMLGE',
+              id: 'price_1Sng4xEe4gCtTPhvtS4Nd1Rk',
               name: 'Core',
-              cost: 199000,
+              cost: 249000,
               type: 'flat' as const,
             },
           ],
