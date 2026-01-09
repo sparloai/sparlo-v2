@@ -8,6 +8,7 @@ import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client'
 
 import billingConfig from '~/config/billing.config';
 import { handleInvoicePaid } from '~/lib/billing/handle-invoice-paid';
+import { handleSubscriptionUpdated } from '~/lib/billing/handle-subscription-updated';
 
 /**
  * Track subscription activation for analytics (fire-and-forget)
@@ -65,6 +66,10 @@ export const POST = enhanceRouteHandler(
         // Create/reset usage period when invoice is paid
         onInvoicePaid: async (payload) => {
           await handleInvoicePaid(payload);
+        },
+        // Update token limit immediately when subscription tier changes
+        onSubscriptionUpdated: async (payload) => {
+          await handleSubscriptionUpdated(payload);
         },
       });
 
