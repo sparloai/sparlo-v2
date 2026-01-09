@@ -1,6 +1,7 @@
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 
 import { AppLink } from '~/components/app-link';
+import { HelpWidgetTrigger } from '~/components/help-widget';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
 // Import shared components from team account help
@@ -61,6 +62,7 @@ function HelpPage() {
           <HelpDocsLink />
         </section>
       </div>
+      <HelpWidgetTrigger />
     </main>
   );
 }

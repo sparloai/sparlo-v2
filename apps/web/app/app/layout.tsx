@@ -2,7 +2,6 @@ import { use } from 'react';
 
 import { UserWorkspaceContextProvider } from '@kit/accounts/components';
 
-import { HelpWidgetTrigger } from '~/components/help-widget';
 import { withI18n } from '~/lib/i18n/with-i18n';
 
 import { MainContent } from './_components/navigation/main-content';
@@ -32,7 +31,6 @@ function UserHomeLayout({ children }: React.PropsWithChildren) {
             />
             <MainContent>{children}</MainContent>
           </div>
-          <HelpWidgetTrigger />
         </SidebarProvider>
       </AppWorkspaceProvider>
     </UserWorkspaceContextProvider>
