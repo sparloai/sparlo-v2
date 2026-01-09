@@ -13,11 +13,15 @@ import { PlanUsageLimits } from './plan-usage-limits';
 interface SubscriberBillingPageProps {
   usage: UsageCheckResponse | null;
   periodEnd: string;
+  planName: string;
+  planInterval: 'month' | 'year';
 }
 
 export function SubscriberBillingPage({
   usage,
   periodEnd,
+  planName,
+  planInterval,
 }: SubscriberBillingPageProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -59,6 +63,24 @@ export function SubscriberBillingPage({
         </h1>
 
         <div className="mt-10 space-y-6">
+          {/* Current Plan Card */}
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-zinc-500">Current plan</p>
+                <h2 className="mt-1 text-2xl font-semibold text-zinc-900">
+                  {planName}
+                </h2>
+                <p className="mt-0.5 text-sm text-zinc-500">
+                  Billed {planInterval === 'year' ? 'annually' : 'monthly'}
+                </p>
+              </div>
+              <div className="rounded-full bg-emerald-50 px-3 py-1">
+                <span className="text-sm font-medium text-emerald-700">Active</span>
+              </div>
+            </div>
+          </div>
+
           {/* Plan Usage Limits */}
           {usage && (
             <PlanUsageLimits

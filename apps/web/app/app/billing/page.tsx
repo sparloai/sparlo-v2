@@ -16,6 +16,25 @@ export const generateMetadata = async () => {
   };
 };
 
+// Get plan info from price ID
+function getPlanInfo(priceId: string | undefined) {
+  if (!priceId) return { name: 'Unknown', interval: 'month' as const };
+
+  for (const product of billingConfig.products) {
+    for (const plan of product.plans) {
+      const lineItem = plan.lineItems.find((item) => item.id === priceId);
+      if (lineItem) {
+        return {
+          name: product.name,
+          interval: plan.interval as 'month' | 'year',
+        };
+      }
+    }
+  }
+
+  return { name: 'Unknown', interval: 'month' as const };
+}
+
 async function PersonalAccountBillingPage() {
   const user = await requireUserInServerComponent();
 
@@ -27,10 +46,16 @@ async function PersonalAccountBillingPage() {
 
   // Active subscribers see their subscription management page
   if (hasActiveSubscription) {
+    // Get price ID from subscription items
+    const priceId = subscription.items?.[0]?.variant_id;
+    const planInfo = getPlanInfo(priceId);
+
     return (
       <SubscriberBillingPage
         usage={usage}
         periodEnd={subscription.period_ends_at}
+        planName={planInfo.name}
+        planInterval={planInfo.interval}
       />
     );
   }
