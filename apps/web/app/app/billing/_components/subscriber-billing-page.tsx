@@ -2,7 +2,7 @@
 
 import { useRef, useTransition } from 'react';
 
-import { ExternalLink, Loader2 } from 'lucide-react';
+import { ArrowUpRight, ExternalLink, Loader2 } from 'lucide-react';
 
 import { AppLink } from '~/components/app-link';
 import type { UsageCheckResponse } from '~/lib/usage/schemas';
@@ -15,6 +15,7 @@ interface SubscriberBillingPageProps {
   periodEnd: string;
   planName: string;
   planInterval: 'month' | 'year';
+  canUpgrade: boolean;
 }
 
 export function SubscriberBillingPage({
@@ -22,6 +23,7 @@ export function SubscriberBillingPage({
   periodEnd,
   planName,
   planInterval,
+  canUpgrade,
 }: SubscriberBillingPageProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isPending, startTransition] = useTransition();
@@ -79,6 +81,25 @@ export function SubscriberBillingPage({
                 <span className="text-sm font-medium text-emerald-700">Active</span>
               </div>
             </div>
+            {canUpgrade && (
+              <button
+                onClick={handleManageBilling}
+                disabled={isPending}
+                className="mt-4 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    Upgrade Plan
+                    <ArrowUpRight className="h-4 w-4" />
+                  </>
+                )}
+              </button>
+            )}
           </div>
 
           {/* Plan Usage Limits */}

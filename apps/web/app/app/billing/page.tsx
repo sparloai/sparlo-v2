@@ -49,6 +49,8 @@ async function PersonalAccountBillingPage() {
     // Get price ID from subscription items
     const priceId = subscription.items?.[0]?.variant_id;
     const planInfo = getPlanInfo(priceId);
+    // Can upgrade if not on Max plan
+    const canUpgrade = planInfo.name !== 'Max';
 
     return (
       <SubscriberBillingPage
@@ -56,6 +58,7 @@ async function PersonalAccountBillingPage() {
         periodEnd={subscription.period_ends_at}
         planName={planInfo.name}
         planInterval={planInfo.interval}
+        canUpgrade={canUpgrade}
       />
     );
   }
