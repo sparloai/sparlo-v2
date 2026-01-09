@@ -439,29 +439,19 @@ export const startReportGeneration = enhanceAction(
     const superAdmin = isSuperAdmin(user.id);
 
     if (!superAdmin) {
-      // Check usage limits FIRST (before any other checks)
+      // Check usage limits - pure token-based gating
       const usage = await checkUsageAllowed(
         user.id,
         USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
       );
 
       if (!usage.allowed) {
-        if (usage.reason === 'subscription_required') {
-          throw new Error(
-            createUsageErrorMessage(
-              USAGE_ERROR_CODES.SUBSCRIPTION_REQUIRED,
-              'Your free report has been used. Please subscribe to generate more reports.',
-            ),
-          );
-        }
-        if (usage.reason === 'limit_exceeded') {
-          throw new Error(
-            createUsageErrorMessage(
-              USAGE_ERROR_CODES.LIMIT_EXCEEDED,
-              'You have reached your monthly usage limit.',
-            ),
-          );
-        }
+        throw new Error(
+          createUsageErrorMessage(
+            USAGE_ERROR_CODES.LIMIT_EXCEEDED,
+            `You're out of credits. Upgrade your plan to continue.`,
+          ),
+        );
       }
 
       if (usage.isWarning) {

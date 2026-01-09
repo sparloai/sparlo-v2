@@ -10,7 +10,7 @@ import { getSupabaseServerClient } from '@kit/supabase/server-client';
 import { inngest } from '~/lib/inngest/client';
 import { USAGE_CONSTANTS } from '~/lib/usage/constants';
 
-import { checkUsageAllowed, markFirstReportUsed } from './usage.service';
+import { checkUsageAllowed } from './usage.service';
 
 // Attachment schema for vision support (images and PDFs)
 const AttachmentSchema = z.object({
@@ -155,27 +155,18 @@ export const startHybridReportGeneration = enhanceAction(
 
     // Super admin bypass - skip all usage and rate limits
     const superAdmin = isSuperAdmin(user.id);
-    let isFirstReport = false;
 
     if (!superAdmin) {
-      // Check usage limits FIRST (freemium: first report free, then subscription required)
+      // Check usage limits - pure token-based gating
       const usage = await checkUsageAllowed(
         user.id,
         USAGE_CONSTANTS.ESTIMATED_TOKENS_PER_REPORT,
       );
 
       if (!usage.allowed) {
-        if (usage.reason === 'subscription_required') {
-          throw new Error(
-            'Your free report has been used. Please subscribe to generate more reports.',
-          );
-        }
-        if (usage.reason === 'limit_exceeded') {
-          throw new Error(
-            `Usage limit reached (${usage.percentage.toFixed(0)}% used). ` +
-              `Upgrade your plan or wait until ${usage.periodEnd ? new Date(usage.periodEnd).toLocaleDateString() : 'next billing cycle'}.`,
-          );
-        }
+        throw new Error(
+          `You're out of credits. Upgrade your plan to continue.`,
+        );
       }
 
       if (usage.isWarning) {
@@ -183,9 +174,6 @@ export const startHybridReportGeneration = enhanceAction(
           `[Usage Warning] User ${user.id} at ${usage.percentage.toFixed(0)}% usage`,
         );
       }
-
-      // Track if this is the first report (for marking after success)
-      isFirstReport = usage.isFirstReport;
 
       // Rate limiting - check recent reports
       const windowStart = new Date(
@@ -275,17 +263,6 @@ export const startHybridReportGeneration = enhanceAction(
         reportId: report.id,
         eventIds: sendResult.ids,
       });
-
-      // Mark first report as used (after successful creation)
-      if (isFirstReport) {
-        try {
-          await markFirstReportUsed(user.id);
-          console.log('Marked first report as used for user:', user.id);
-        } catch (markError) {
-          // Log but don't fail - report is already created
-          console.error('Failed to mark first report used:', markError);
-        }
-      }
     } catch (inngestError) {
       console.error('Failed to trigger Inngest:', inngestError);
       await client
