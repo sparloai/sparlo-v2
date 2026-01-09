@@ -118,7 +118,7 @@ export function PasswordSignUpForm({
           data-test="auth-submit-button"
           type="submit"
           disabled={loading || captchaLoading}
-          className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-zinc-900 text-[15px] font-medium text-white transition-all hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-zinc-900 text-[15px] font-medium text-white transition-all hover:bg-zinc-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50"
         >
           <If condition={captchaLoading}>
             <span className="animate-in fade-in slide-in-from-bottom-24">

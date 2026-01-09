@@ -2,7 +2,7 @@
 
 import { useCallback, useState, useTransition } from 'react';
 
-import { Check, Copy, Link2, Loader2 } from 'lucide-react';
+import { Check, Copy, Link2 } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
 import {
@@ -84,20 +84,11 @@ export function ShareModal({ reportId, open, onOpenChange }: ShareModalProps) {
           {!shareUrl ? (
             <Button
               onClick={handleGenerateLink}
-              disabled={isPending}
+              loading={isPending}
               className="w-full"
             >
-              {isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating link...
-                </>
-              ) : (
-                <>
-                  <Link2 className="mr-2 h-4 w-4" />
-                  Generate Share Link
-                </>
-              )}
+              <Link2 className="h-4 w-4" />
+              {isPending ? 'Generating link...' : 'Generate Share Link'}
             </Button>
           ) : (
             <div className="space-y-3">

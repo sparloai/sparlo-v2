@@ -124,7 +124,7 @@ export function ContactForm() {
           }}
         />
 
-        <Button disabled={pending} type={'submit'}>
+        <Button loading={pending} type={'submit'}>
           <Trans i18nKey={'marketing:sendMessage'} />
         </Button>
       </form>

@@ -8,7 +8,6 @@ import {
   Archive,
   ChevronRight,
   FileText,
-  Loader2,
   Plus,
   Search,
   X,
@@ -158,14 +157,10 @@ function CancelButton({
         e.stopPropagation();
         handleCancel();
       }}
-      disabled={isPending}
+      loading={isPending}
       className="h-8 gap-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700"
     >
-      {isPending ? (
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-      ) : (
-        <X className="h-3.5 w-3.5" />
-      )}
+      {!isPending && <X className="h-3.5 w-3.5" />}
       Cancel
     </Button>
   );

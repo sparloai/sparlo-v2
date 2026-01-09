@@ -168,8 +168,8 @@ export function HelpTicketForm() {
           )}
         />
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? 'Submitting...' : 'Submit Ticket'}
+        <Button type="submit" className="w-full" loading={isSubmitting}>
+          Submit Ticket
         </Button>
       </form>
     </Form>
