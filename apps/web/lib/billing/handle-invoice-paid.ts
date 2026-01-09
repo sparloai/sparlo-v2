@@ -16,6 +16,13 @@ import { getPlanTokenLimit } from './plan-limits';
 export async function handleInvoicePaid(
   payload: UpsertSubscriptionParams,
 ): Promise<void> {
+  console.log('[Billing] handleInvoicePaid called with:', {
+    accountId: payload.target_account_id,
+    priceId: payload.line_items?.[0]?.variant_id,
+    periodStart: payload.period_starts_at,
+    periodEnd: payload.period_ends_at,
+  });
+
   const supabase = getSupabaseServerAdminClient();
 
   // Extract relevant data from payload

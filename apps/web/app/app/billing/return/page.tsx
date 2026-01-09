@@ -4,7 +4,10 @@ import { Check, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 import { getBillingGatewayProvider } from '@kit/billing-gateway';
+import { getSupabaseServerAdminClient } from '@kit/supabase/server-admin-client';
 import { getSupabaseServerClient } from '@kit/supabase/server-client';
+
+import { getPlanTokenLimit } from '~/lib/billing/plan-limits';
 
 import { withI18n } from '~/lib/i18n/with-i18n';
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
@@ -152,6 +155,31 @@ async function loadCheckoutSession(sessionId: string) {
           } else {
             subscriptionSynced = true;
             console.log('[Billing] Subscription synced on return page:', subscriptionData.target_subscription_id);
+
+            // Also sync usage period with correct token limit
+            // This handles the race condition where webhook hasn't fired yet
+            const priceId = subscriptionData.line_items?.[0]?.variant_id;
+            if (priceId && subscriptionData.period_starts_at && subscriptionData.period_ends_at) {
+              try {
+                const tokenLimit = getPlanTokenLimit(priceId);
+                const adminClient = getSupabaseServerAdminClient();
+                const { error: usageError } = await adminClient.rpc('reset_usage_period', {
+                  p_account_id: user.id,
+                  p_tokens_limit: tokenLimit,
+                  p_period_start: subscriptionData.period_starts_at,
+                  p_period_end: subscriptionData.period_ends_at,
+                });
+
+                if (usageError) {
+                  console.error('[Billing] Failed to sync usage period on return:', usageError);
+                } else {
+                  console.log('[Billing] Usage period synced on return page:', { tokenLimit, priceId });
+                }
+              } catch (usageErr) {
+                console.error('[Billing] Error syncing usage period:', usageErr);
+                // Don't fail - webhook will handle it as fallback
+              }
+            }
           }
         }
       }
