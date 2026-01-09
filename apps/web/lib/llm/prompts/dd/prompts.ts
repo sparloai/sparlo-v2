@@ -2613,6 +2613,13 @@ cross_domain_insights: [
 **Key Principle**: Write PROSE FIRST that teaches. Structured data enables rendering of educational content.
 The problem_breakdown and developed_concepts fields are PRIMARY - they power the educational value.
 
+**Prose Formatting Rules (CRITICAL for visual rendering):**
+- Use Title Case for all markdown headers (e.g., "## The Commercial Thesis" NOT "## THE COMMERCIAL THESIS")
+- NEVER use ALL CAPS for headers or subheadings
+- Use **bold** for emphasis on key terms, not for entire phrases or sentences
+- Use sentence case for body text
+- Headers should be descriptive and scannable, not shouty
+
 ### APPENDIX
 
 Detailed analysis for readers who want to go deeper:
