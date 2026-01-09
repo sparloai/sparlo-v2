@@ -77,9 +77,9 @@ export const NavHeader = memo(function NavHeader({
         style={{ left: sidebarWidth }}
       >
         <nav className="flex h-full items-center justify-between px-4 sm:px-6">
-          {/* Left: Hamburger menu (mobile only) */}
+          {/* Left: Hamburger menu (mobile) or Logo (desktop) */}
           <div className="flex items-center gap-3">
-            {isMobile && (
+            {isMobile ? (
               <>
                 <button
                   onClick={() => setMobileMenuOpen(true)}
@@ -108,6 +108,26 @@ export const NavHeader = memo(function NavHeader({
                   />
                 </AppLink>
               </>
+            ) : (
+              <AppLink
+                href="/app"
+                className="transition-opacity hover:opacity-70"
+              >
+                <Image
+                  src="/images/sparlo-logo.png"
+                  alt="Sparlo"
+                  width={80}
+                  height={22}
+                  className="h-[22px] w-auto dark:hidden"
+                />
+                <Image
+                  src="/images/sparlo-logo-white.png"
+                  alt="Sparlo"
+                  width={80}
+                  height={22}
+                  className="hidden h-[22px] w-auto dark:block"
+                />
+              </AppLink>
             )}
           </div>
 

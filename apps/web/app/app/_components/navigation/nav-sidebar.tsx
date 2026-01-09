@@ -2,7 +2,6 @@
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -417,32 +416,10 @@ export const NavSidebar = memo(function NavSidebar({
           className={cn(
             'flex h-14 items-center border-b border-zinc-200 dark:border-zinc-800',
             collapsed && !isMobile
-              ? 'justify-center px-0'
-              : 'justify-between px-4',
+              ? 'justify-center px-2'
+              : 'justify-end px-4',
           )}
         >
-          {(!collapsed || isMobile) && (
-            <Link
-              href={getPath('/app')}
-              onClick={handleLinkClick}
-              className="transition-opacity hover:opacity-70"
-            >
-              <Image
-                src="/images/sparlo-logo.png"
-                alt="Sparlo"
-                width={80}
-                height={22}
-                className="h-[22px] w-auto dark:hidden"
-              />
-              <Image
-                src="/images/sparlo-logo-white.png"
-                alt="Sparlo"
-                width={80}
-                height={22}
-                className="hidden h-[22px] w-auto dark:block"
-              />
-            </Link>
-          )}
           {isMobile ? (
             <button
               onClick={() => setMobileMenuOpen(false)}
