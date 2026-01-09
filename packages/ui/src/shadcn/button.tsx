@@ -58,6 +58,21 @@ const Button: React.FC<ButtonProps> = ({
   const Comp = asChild ? Slot.Root : 'button';
   const isDisabled = disabled || loading;
 
+  // When using asChild with Slot.Root, we must pass exactly one child
+  // The loading spinner is incompatible with asChild since Slot.Root
+  // uses React.Children.only which throws on multiple children
+  if (asChild) {
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        disabled={isDisabled}
+        {...props}
+      >
+        {children}
+      </Comp>
+    );
+  }
+
   return (
     <Comp
       className={cn(buttonVariants({ variant, size, className }))}
