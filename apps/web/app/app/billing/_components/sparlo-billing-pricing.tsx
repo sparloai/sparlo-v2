@@ -340,8 +340,7 @@ export function SparloBillingPricing({
                       : isHighlighted
                         ? 'cursor-pointer bg-zinc-900 text-white hover:bg-zinc-800 active:bg-zinc-950'
                         : 'cursor-pointer border border-zinc-300 text-zinc-700 hover:border-zinc-900 hover:text-zinc-900 active:bg-zinc-50',
-                    (pending || portalPending || isPending) &&
-                      'opacity-50',
+                    (pending || portalPending || isPending) && 'opacity-50',
                   )}
                 >
                   {isPending || (portalPending && !isCurrent)

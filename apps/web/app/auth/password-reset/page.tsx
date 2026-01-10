@@ -1,7 +1,6 @@
 import Link from 'next/link';
 
 import { PasswordResetRequestContainer } from '@kit/auth/password-reset';
-import { Button } from '@kit/ui/button';
 import { Heading } from '@kit/ui/heading';
 import { Trans } from '@kit/ui/trans';
 
@@ -37,11 +36,12 @@ function PasswordResetPage() {
         <PasswordResetRequestContainer redirectPath={redirectPath} />
 
         <div className={'flex justify-center text-xs'}>
-          <Button asChild variant={'link'} size={'sm'}>
-            <Link href={signIn}>
-              <Trans i18nKey={'auth:passwordRecoveredQuestion'} />
-            </Link>
-          </Button>
+          <Link
+            href={signIn}
+            className="text-sm text-primary underline-offset-4 hover:underline"
+          >
+            <Trans i18nKey={'auth:passwordRecoveredQuestion'} />
+          </Link>
         </div>
       </div>
     </>

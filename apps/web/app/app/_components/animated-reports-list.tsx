@@ -18,7 +18,7 @@ import { cn } from '@kit/ui/utils';
 
 import { AppLink } from '~/components/app-link';
 
-import { DURATION, EASING, STAGGER } from '../_lib/animation-constants';
+import { DURATION, EASE, STAGGER } from '../_lib/animation';
 import type { ConversationStatus } from '../_lib/types';
 
 interface Report {
@@ -31,27 +31,40 @@ interface Report {
   archived: boolean;
 }
 
-// Animation variants - defined outside component for performance
-const containerVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: STAGGER.normal,
+// Animation variants - stagger capped at maxItems for performance
+function createContainerVariants(itemCount: number): Variants {
+  const staggeredCount = Math.min(itemCount, STAGGER.maxItems);
+  return {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        // Dynamic stagger: faster with more items, capped at maxDuration
+        staggerChildren: Math.min(
+          STAGGER.normal,
+          STAGGER.maxDuration / staggeredCount
+        ),
+      },
     },
-  },
-};
+  };
+}
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
+  hidden: { opacity: 0, y: 8 },
   show: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: DURATION.normal,
-      ease: EASING.easeOut,
+      duration: DURATION.fast / 1000,
+      ease: EASE.out,
     },
   },
+};
+
+// Items beyond stagger cap render without animation
+const instantVariants: Variants = {
+  hidden: { opacity: 1, y: 0 },
+  show: { opacity: 1, y: 0 },
 };
 
 const cardVariants: Variants = {
@@ -59,14 +72,14 @@ const cardVariants: Variants = {
   hover: {
     y: -2,
     transition: {
-      duration: DURATION.fast + 0.05,
-      ease: EASING.easeOut,
+      duration: DURATION.fast / 1000,
+      ease: EASE.out,
     },
   },
   tap: {
     scale: 0.98,
     transition: {
-      duration: DURATION.fast - 0.05,
+      duration: DURATION.instant / 1000,
     },
   },
 };
@@ -161,9 +174,11 @@ function formatTimeAgo(date: Date): string {
 function ReportCard({
   report,
   shouldAnimate,
+  index,
 }: {
   report: Report;
   shouldAnimate: boolean;
+  index: number;
 }) {
   const timeAgo = formatTimeAgo(new Date(report.created_at));
 
@@ -182,8 +197,11 @@ function ReportCard({
   );
 
   if (shouldAnimate) {
+    // Items beyond stagger cap use instant variants (no animation delay)
+    const variants = index < STAGGER.maxItems ? itemVariants : instantVariants;
+
     return (
-      <motion.div variants={itemVariants}>
+      <motion.div variants={variants}>
         <AppLink
           href={`/app/reports/${report.id}`}
           className="group block"
@@ -253,6 +271,9 @@ export function AnimatedReportsList({ reports }: AnimatedReportsListProps) {
   }
 
   if (shouldAnimate) {
+    // Use dynamic container variants with stagger capped at maxItems
+    const containerVariants = createContainerVariants(reports.length);
+
     return (
       <motion.div
         variants={containerVariants}
@@ -260,11 +281,12 @@ export function AnimatedReportsList({ reports }: AnimatedReportsListProps) {
         animate="show"
         className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
-        {reports.map((report) => (
+        {reports.map((report, index) => (
           <ReportCard
             key={report.id}
             report={report}
             shouldAnimate={shouldAnimate}
+            index={index}
           />
         ))}
       </motion.div>
@@ -273,11 +295,12 @@ export function AnimatedReportsList({ reports }: AnimatedReportsListProps) {
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {reports.map((report) => (
+      {reports.map((report, index) => (
         <ReportCard
           key={report.id}
           report={report}
           shouldAnimate={shouldAnimate}
+          index={index}
         />
       ))}
     </div>

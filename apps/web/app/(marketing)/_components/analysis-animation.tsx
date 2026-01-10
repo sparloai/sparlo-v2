@@ -15,7 +15,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { usePrefersReducedMotion } from '@kit/ui/hooks';
 
-import { DURATION, EASING } from '~/app/_lib/animation-constants';
+import { EASING, TIMING } from '~/app/_lib/animation';
 
 // ============================================================================
 // TYPES
@@ -319,7 +319,7 @@ function AnalysisTracksSection({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{
                   delay: i * 0.1,
-                  duration: DURATION.normal,
+                  duration: TIMING.normal,
                   ease: EASING.easeOut,
                 }}
                 className={typography.citation}
@@ -341,7 +341,7 @@ function AnalysisTracksSection({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{
                   delay: i * 0.08,
-                  duration: DURATION.normal,
+                  duration: TIMING.normal,
                   ease: EASING.easeOut,
                 }}
                 className={`${typography.concept} ${domain.isConnection ? 'text-blue-400' : ''}`}
@@ -378,7 +378,7 @@ function SynthesisSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{
               delay: i * 0.1,
-              duration: DURATION.normal,
+              duration: TIMING.normal,
               ease: EASING.easeOut,
             }}
             className={
@@ -403,7 +403,7 @@ function ReportSection() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: DURATION.slow, ease: EASING.easeOut }}
+          transition={{ duration: TIMING.slow, ease: EASING.easeOut }}
           className="rounded-lg border border-zinc-700/20 bg-zinc-900/50 p-6"
         >
           <div className="flex items-baseline gap-8">
@@ -453,7 +453,7 @@ function PhaseContent({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: DURATION.normal, ease: EASING.easeOut }}
+            transition={{ duration: TIMING.normal, ease: EASING.easeOut }}
           >
             <ProblemSection />
           </motion.div>
@@ -466,7 +466,7 @@ function PhaseContent({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: DURATION.normal, ease: EASING.easeOut }}
+            transition={{ duration: TIMING.normal, ease: EASING.easeOut }}
           >
             <ReframeSection />
           </motion.div>
@@ -479,7 +479,7 @@ function PhaseContent({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: DURATION.normal, ease: EASING.easeOut }}
+            transition={{ duration: TIMING.normal, ease: EASING.easeOut }}
           >
             <AnalysisTracksSection scrollYProgress={scrollYProgress} />
           </motion.div>
@@ -492,7 +492,7 @@ function PhaseContent({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: DURATION.normal, ease: EASING.easeOut }}
+            transition={{ duration: TIMING.normal, ease: EASING.easeOut }}
           >
             <SynthesisSection />
           </motion.div>
@@ -505,7 +505,7 @@ function PhaseContent({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: DURATION.slow, ease: EASING.easeOut }}
+            transition={{ duration: TIMING.slow, ease: EASING.easeOut }}
           >
             <ReportSection />
           </motion.div>

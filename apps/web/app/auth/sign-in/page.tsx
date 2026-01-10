@@ -2,7 +2,6 @@ import Link from 'next/link';
 
 import { SignInMethodsContainer } from '@kit/auth/sign-in';
 import { getSafeRedirectPath } from '@kit/shared/utils';
-import { Button } from '@kit/ui/button';
 import { Heading } from '@kit/ui/heading';
 import { Trans } from '@kit/ui/trans';
 
@@ -53,11 +52,13 @@ async function SignInPage({ searchParams }: SignInPageProps) {
       />
 
       <div className={'flex justify-center'}>
-        <Button asChild variant={'link'} size={'sm'}>
-          <Link href={pathsConfig.auth.signUp} prefetch={true}>
-            <Trans i18nKey={'auth:doNotHaveAccountYet'} />
-          </Link>
-        </Button>
+        <Link
+          href={pathsConfig.auth.signUp}
+          prefetch={true}
+          className="text-sm text-primary underline-offset-4 hover:underline"
+        >
+          <Trans i18nKey={'auth:doNotHaveAccountYet'} />
+        </Link>
       </div>
     </>
   );

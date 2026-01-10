@@ -4,7 +4,7 @@ import { type Transition } from 'framer-motion';
 
 import { SPRING } from '~/app/_lib/animation';
 
-import { usePrefersReducedMotion } from './use-prefers-reduced-motion';
+import { usePrefersReducedMotion } from '@kit/ui/hooks';
 
 /**
  * Returns a spring configuration that adapts to:

@@ -14,27 +14,31 @@ import { type Transition, type Variants } from 'framer-motion';
 
 // Duration (in milliseconds)
 export const DURATION = {
-  instant: 100, // toggles, checkboxes
-  fast: 150, // hover states
-  normal: 200, // standard UI
+  instant: 50, // press feedback, toggles
+  fast: 150, // hover states, micro-interactions
+  normal: 200, // standard transitions
   moderate: 250, // modals, dropdowns
   relaxed: 300, // panels, cards
-  page: 400, // route changes
+  page: 300, // route changes (was 400) - optimized for premium feel
+  slow: 400, // complex orchestrations
 } as const satisfies Record<string, number>;
 
 // Easing curves (cubic-bezier format for Framer Motion)
+// Deep tech aesthetic - no bounce/spring for UI
 export const EASE = {
-  out: [0.25, 1, 0.5, 1] as const, // ease-out-quart (entering)
-  in: [0.4, 0, 1, 1] as const, // ease-in (exiting)
-  inOut: [0.83, 0, 0.17, 1] as const, // ease-in-out-quint (morphing)
+  out: [0.22, 1, 0.36, 1] as const, // elements entering
+  in: [0.4, 0, 1, 1] as const, // elements exiting
+  inOut: [0.65, 0, 0.35, 1] as const, // state changes
+  standard: [0.4, 0, 0.2, 1] as const, // general purpose
   outExpo: [0.16, 1, 0.3, 1] as const, // ease-out-expo (premium feel)
 } satisfies Record<string, readonly [number, number, number, number]>;
 
 // CSS easing values (for use in CSS transitions)
 export const CSS_EASE = {
-  out: 'cubic-bezier(0.25, 1, 0.5, 1)',
+  out: 'cubic-bezier(0.22, 1, 0.36, 1)',
   in: 'cubic-bezier(0.4, 0, 1, 1)',
-  inOut: 'cubic-bezier(0.83, 0, 0.17, 1)',
+  inOut: 'cubic-bezier(0.65, 0, 0.35, 1)',
+  standard: 'cubic-bezier(0.4, 0, 0.2, 1)',
   outExpo: 'cubic-bezier(0.16, 1, 0.3, 1)',
 } as const;
 
@@ -72,9 +76,9 @@ export const STAGGER = {
   fast: 0.03,
   normal: 0.04,
   relaxed: 0.06,
-  // Performance caps
-  maxItems: 20,
-  maxDuration: 0.5, // 500ms total cap
+  // Performance caps - reduced for better UX
+  maxItems: 10, // cap stagger at 10 items (was 20)
+  maxDuration: 0.4, // 400ms total cap (was 500ms)
 } as const;
 
 /**
@@ -145,11 +149,20 @@ export const staggerItemVariants: Variants = {
 };
 
 // Legacy exports for backwards compatibility
-export const EASING = EASE;
+// Note: EASING includes aliases for old naming conventions (easeOut, easeIn, custom)
+export const EASING = {
+  ...EASE,
+  easeOut: EASE.out,
+  easeIn: EASE.in,
+  easeInOut: EASE.inOut,
+  custom: EASE.out, // Legacy "custom" maps to standard out easing
+};
+
 export const TIMING = {
   fast: DURATION.fast / 1000,
   normal: DURATION.normal / 1000,
-  slow: DURATION.relaxed / 1000,
+  slow: DURATION.slow / 1000,
+  relaxed: DURATION.relaxed / 1000,
   pageTransition: DURATION.page / 1000,
   pageExit: DURATION.moderate / 1000,
   pulse: 2,

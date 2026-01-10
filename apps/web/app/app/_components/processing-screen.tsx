@@ -13,7 +13,7 @@ import { usePrefersReducedMotion } from '@kit/ui/hooks';
 import { Textarea } from '@kit/ui/textarea';
 import { cn } from '@kit/ui/utils';
 
-import { DURATION, EASING } from '../_lib/animation-constants';
+import { EASING, TIMING } from '../_lib/animation';
 import { answerClarification } from '../_lib/server/sparlo-reports-server-actions';
 import { type ReportProgress } from '../_lib/use-report-progress';
 import { formatElapsed, useElapsedTime } from '../_lib/utils/elapsed-time';
@@ -31,12 +31,12 @@ const textVariants: Variants = {
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: DURATION.normal, ease: EASING.easeOut },
+    transition: { duration: TIMING.normal, ease: EASING.easeOut },
   },
   exit: {
     opacity: 0,
     y: -8,
-    transition: { duration: DURATION.fast, ease: EASING.easeIn },
+    transition: { duration: TIMING.fast, ease: EASING.easeIn },
   },
 };
 

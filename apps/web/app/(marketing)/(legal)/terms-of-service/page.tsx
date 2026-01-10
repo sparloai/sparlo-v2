@@ -153,7 +153,8 @@ async function TermsOfServicePage() {
                 any particular purpose.
               </li>
               <li>
-                The Service will be uninterrupted, timely, secure, or error-free.
+                The Service will be uninterrupted, timely, secure, or
+                error-free.
               </li>
             </ul>
             <p>

@@ -4,14 +4,7 @@ import { useMemo, useState, useTransition } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import {
-  Archive,
-  ChevronRight,
-  FileText,
-  Plus,
-  Search,
-  X,
-} from 'lucide-react';
+import { Archive, ChevronRight, FileText, Plus, Search, X } from 'lucide-react';
 
 import { Button } from '@kit/ui/button';
 import { cn } from '@kit/ui/utils';

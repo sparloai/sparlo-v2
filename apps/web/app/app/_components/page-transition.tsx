@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 
 import { usePrefersReducedMotion } from '@kit/ui/hooks';
 
-import { DURATION, EASING } from '../_lib/animation-constants';
+import { EASE, TIMING } from '../_lib/animation';
 
 const pageVariants: Variants = {
   initial: { opacity: 0, y: 12 },
@@ -15,16 +15,16 @@ const pageVariants: Variants = {
     opacity: 1,
     y: 0,
     transition: {
-      duration: DURATION.pageTransition,
-      ease: EASING.custom,
+      duration: TIMING.pageTransition,
+      ease: EASE.out,
     },
   },
   exit: {
     opacity: 0,
-    y: -8,
+    y: 8, // Fixed: exits DOWN (same direction as enter) - not UP
     transition: {
-      duration: DURATION.pageExit,
-      ease: EASING.custom,
+      duration: TIMING.pageExit,
+      ease: EASE.in,
     },
   },
 };

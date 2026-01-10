@@ -4,7 +4,6 @@ import type { AuthError } from '@supabase/supabase-js';
 
 import { ResendAuthLinkForm } from '@kit/auth/resend-email-link';
 import { Alert, AlertDescription, AlertTitle } from '@kit/ui/alert';
-import { Button } from '@kit/ui/button';
 import { Trans } from '@kit/ui/trans';
 
 import pathsConfig from '~/config/paths.config';
@@ -60,11 +59,12 @@ function AuthCallbackForm(props: {
 
 function SignInButton(props: { signInPath: string }) {
   return (
-    <Button className={'w-full'} asChild>
-      <Link href={props.signInPath}>
-        <Trans i18nKey={'auth:signIn'} />
-      </Link>
-    </Button>
+    <Link
+      href={props.signInPath}
+      className="bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex h-9 w-full cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium shadow-xs transition-colors focus-visible:ring-1 focus-visible:outline-hidden active:scale-[0.98]"
+    >
+      <Trans i18nKey={'auth:signIn'} />
+    </Link>
   );
 }
 
