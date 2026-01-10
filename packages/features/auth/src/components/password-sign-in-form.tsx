@@ -93,17 +93,12 @@ export function PasswordSignInForm({
                 <FormMessage />
 
                 <div>
-                  <Button
-                    asChild
-                    type={'button'}
-                    size={'sm'}
-                    variant={'link'}
-                    className={'text-xs'}
+                  <Link
+                    href={'/auth/password-reset'}
+                    className="text-xs text-primary underline-offset-4 hover:underline"
                   >
-                    <Link href={'/auth/password-reset'}>
-                      <Trans i18nKey={'auth:passwordForgottenQuestion'} />
-                    </Link>
-                  </Button>
+                    <Trans i18nKey={'auth:passwordForgottenQuestion'} />
+                  </Link>
                 </div>
               </FormItem>
             )}
